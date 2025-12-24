@@ -6340,10 +6340,15 @@ async def sync_canva_to_project(data: dict):
 @api_router.post("/scrape-product")
 async def scrape_product_advanced(data: dict):
     """
-    Product scraping endpoint - HYBRID MODEL
-    1. ALWAYS scrape the website first for images, dimensions, links, name, SKU
-    2. Then lookup database ONLY for price (user's wholesale price sheets)
-    3. Combine both: scraped data + database price
+    Product scraping endpoint - WEB SCRAPING ONLY MODE
+    
+    ⚠️ DATABASE DISABLED: Per user request, scraper now ONLY scrapes websites
+    The database lookup was overwriting correct prices with old/incorrect database values.
+    Database can be re-enabled after web scraping is verified working independently.
+    
+    Behavior:
+    - URL input: Scrape the actual website for ALL data including price
+    - SKU input: Try to construct a search URL and scrape, or return error if can't find
     """
     url = data.get('url', '')
     
@@ -6351,7 +6356,7 @@ async def scrape_product_advanced(data: dict):
         raise HTTPException(status_code=400, detail="URL is required")
     
     try:
-        print(f"🔍 SCRAPING product from: {url}")
+        print(f"🔍 SCRAPING product from: {url} (DATABASE DISABLED - web only)")
         import re
         from urllib.parse import urlparse
         
@@ -6378,52 +6383,19 @@ async def scrape_product_advanced(data: dict):
         vendor_hint = data.get('vendor', '').lower()
         
         if is_sku_only:
-            # INPUT IS A SKU - First check database, then scrape if not found
-            print(f"📦 Input is a SKU: {url} - Looking up in database first...")
+            # INPUT IS A SKU - DATABASE DISABLED - Build URL and scrape instead
+            print(f"📦 Input is a SKU: {url} - Building search URL (database disabled)...")
             sku_upper = url.strip().upper()
             
-            # Try exact match first
-            db_product = await db.master_products.find_one(
-                {"sku": sku_upper},
-                {"_id": 0}
-            )
+            # ⚠️ DATABASE LOOKUP DISABLED - User requested web-only scraping
+            # The database was returning incorrect/outdated prices
+            # This block can be re-enabled when database is verified accurate
+            """
+            db_product = await db.master_products.find_one(...)
+            """
             
-            # Try case-insensitive
-            if not db_product:
-                db_product = await db.master_products.find_one(
-                    {"sku": {"$regex": f"^{re.escape(sku_upper)}$", "$options": "i"}},
-                    {"_id": 0}
-                )
-            
-            # Try partial match
-            if not db_product:
-                db_product = await db.master_products.find_one(
-                    {"sku": {"$regex": re.escape(sku_upper), "$options": "i"}},
-                    {"_id": 0}
-                )
-            
-            if db_product:
-                print(f"✅ Found in database: {db_product.get('name')} - ${db_product.get('price')}")
-                scraped_data.update({
-                    "name": db_product.get('name'),
-                    "title": db_product.get('name'),
-                    "sku": db_product.get('sku'),
-                    "price": db_product.get('price'),
-                    "cost": db_product.get('price'),
-                    "vendor": db_product.get('vendor_name') or db_product.get('vendor'),
-                    "dimensions": db_product.get('dimensions'),
-                    "size": db_product.get('dimensions'),
-                })
-                
-                return {
-                    "success": True,
-                    "source": "database",
-                    "data": scraped_data,
-                    "product": scraped_data
-                }
-            else:
-                # NOT IN DATABASE - Try to construct URL and scrape the website
-                print(f"⚠️ SKU {sku_upper} not found in database - attempting web scrape...")
+            # NOT IN DATABASE MODE - Try to construct URL and scrape the website
+            print(f"🌐 SKU {sku_upper} - Attempting web scrape (database disabled)...")
                 
                 # Map vendor hints to their websites
                 vendor_urls = {
