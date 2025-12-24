@@ -296,7 +296,7 @@ class BackendTester:
             paint_data = {
                 "room_length": 15,
                 "room_width": 12,
-                "room_height": 9,
+                "wall_height": 9,
                 "coats": 2
             }
             
