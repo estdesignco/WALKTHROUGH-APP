@@ -1815,9 +1815,11 @@ async def get_project(project_id: str, sheet_type: str = None):
         raise HTTPException(status_code=404, detail="Project not found")
     
     # Fetch rooms filtered by sheet_type to make them independent (if sheet_type specified)
-    if sheet_type:
+    # EXCEPTION: FFE view shows ALL rooms regardless of sheet_type (it's the master list)
+    if sheet_type and sheet_type != 'ffe':
         rooms = await db.rooms.find({"project_id": project_id, "sheet_type": sheet_type}).sort("order_index", 1).to_list(1000)
     else:
+        # FFE or no filter: get all rooms
         rooms = await db.rooms.find({"project_id": project_id}).sort("order_index", 1).to_list(1000)
     project_data["rooms"] = []
     
