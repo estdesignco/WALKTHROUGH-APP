@@ -6390,42 +6390,39 @@ async def scrape_product_advanced(data: dict):
             # ⚠️ DATABASE LOOKUP DISABLED - User requested web-only scraping
             # The database was returning incorrect/outdated prices
             # This block can be re-enabled when database is verified accurate
-            """
-            db_product = await db.master_products.find_one(...)
-            """
             
             # NOT IN DATABASE MODE - Try to construct URL and scrape the website
             print(f"🌐 SKU {sku_upper} - Attempting web scrape (database disabled)...")
-                
-                # Map vendor hints to their websites
-                vendor_urls = {
-                    'fourhands': f'https://www.fourhands.com/search?q={sku_upper}',
-                    'four hands': f'https://www.fourhands.com/search?q={sku_upper}',
-                    'uttermost': f'https://www.quoizel.com/search?text={sku_upper}',
-                    'bassett': f'https://www.quoizel.com/search?text={sku_upper}',
-                    'gabby': f'https://www.gabbyhome.com/search?q={sku_upper}',
-                    'worlds away': f'https://quoizel.com/search?text={sku_upper}',
-                    'worldsaway': f'https://quoizel.com/search?text={sku_upper}',
-                    'villa': f'https://quoizel.com/search?text={sku_upper}',
-                    'hvl': f'https://quoizel.com/search?text={sku_upper}',
-                    'surya': f'https://www.quoizel.com/search?text={sku_upper}',
-                    'loloi': f'https://www.quoizel.com/search?text={sku_upper}',
-                }
-                
-                # Try to find a vendor URL
-                scrape_url = None
-                for v_key, v_url in vendor_urls.items():
-                    if v_key in vendor_hint:
-                        scrape_url = v_url
-                        break
-                
-                # Default search URL if no vendor hint
-                if not scrape_url:
-                    scrape_url = f'https://www.google.com/search?q={sku_upper}+furniture+price'
-                
-                # Update URL to scrape
-                url = scrape_url
-                print(f"🌐 Attempting to scrape: {url}")
+            
+            # Map vendor hints to their websites
+            vendor_urls = {
+                'fourhands': f'https://www.fourhands.com/search?q={sku_upper}',
+                'four hands': f'https://www.fourhands.com/search?q={sku_upper}',
+                'uttermost': f'https://www.quoizel.com/search?text={sku_upper}',
+                'bassett': f'https://www.quoizel.com/search?text={sku_upper}',
+                'gabby': f'https://www.gabbyhome.com/search?q={sku_upper}',
+                'worlds away': f'https://quoizel.com/search?text={sku_upper}',
+                'worldsaway': f'https://quoizel.com/search?text={sku_upper}',
+                'villa': f'https://quoizel.com/search?text={sku_upper}',
+                'hvl': f'https://quoizel.com/search?text={sku_upper}',
+                'surya': f'https://www.quoizel.com/search?text={sku_upper}',
+                'loloi': f'https://www.quoizel.com/search?text={sku_upper}',
+            }
+            
+            # Try to find a vendor URL
+            scrape_url = None
+            for v_key, v_url in vendor_urls.items():
+                if v_key in vendor_hint:
+                    scrape_url = v_url
+                    break
+            
+            # Default search URL if no vendor hint
+            if not scrape_url:
+                scrape_url = f'https://www.google.com/search?q={sku_upper}+furniture+price'
+            
+            # Update URL to scrape
+            url = scrape_url
+            print(f"🌐 Attempting to scrape: {url}")
         
         # ===== STEP 1: SCRAPE THE WEBSITE =====
         # Get images, dimensions, name, SKU from the actual website
