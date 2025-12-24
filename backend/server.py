@@ -6198,8 +6198,9 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # VENDOR-SPECIFIC: Rowe Furniture
             elif 'rowefurniture.com' in domain:
                 import re
-                # Look for fabric/finish selection
-                fabric_match = re.search(r'(?:Fabric|Finish|Color)[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\|)', all_text, re.IGNORECASE)
+                # Rowe uses a configurator - fabric selection is interactive
+                # Try to find any default/selected fabric
+                fabric_match = re.search(r'(?:Fabric|Finish|Color|Cover)[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\|)', all_text, re.IGNORECASE)
                 if fabric_match:
                     result['finish_color'] = fabric_match.group(1).strip()
                     print(f"✅ ROWE FINISH: {result['finish_color']}")
@@ -6211,6 +6212,44 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 if finish_match:
                     result['finish_color'] = finish_match.group(1).strip()
                     print(f"✅ UTTERMOST FINISH: {result['finish_color']}")
+            
+            # VENDOR-SPECIFIC: Jaipur Living
+            elif 'jaipurliving.com' in domain:
+                import re
+                # Jaipur shows Color: Ivory / Blue format
+                color_match = re.search(r'Color[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|Size|Quantity)', all_text, re.IGNORECASE)
+                if color_match:
+                    color = color_match.group(1).strip()
+                    # Clean up
+                    color = re.sub(r'\s+', ' ', color)
+                    if len(color) > 2 and len(color) < 50:
+                        result['finish_color'] = color
+                        print(f"✅ JAIPUR COLOR: {result['finish_color']}")
+                
+                # Also try Material
+                if not result.get('finish_color'):
+                    material_match = re.search(r'Material[:\s]+([A-Za-z\s\/\-,]+?)(?:\n|$|Construction)', all_text, re.IGNORECASE)
+                    if material_match:
+                        result['finish_color'] = material_match.group(1).strip()[:50]
+                        print(f"✅ JAIPUR MATERIAL: {result['finish_color']}")
+            
+            # VENDOR-SPECIFIC: Loloi Rugs
+            elif 'loloirugs.com' in domain or 'lfrbrands.com' in domain:
+                import re
+                # Loloi shows Color: Ivory prominently
+                color_match = re.search(r'Color[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|,)', all_text, re.IGNORECASE)
+                if color_match:
+                    color = color_match.group(1).strip()
+                    if len(color) > 2 and len(color) < 50:
+                        result['finish_color'] = color
+                        print(f"✅ LOLOI COLOR: {result['finish_color']}")
+                
+                # Also try Collection name as it often indicates style
+                if not result.get('finish_color'):
+                    collection_match = re.search(r'Collection[:\s]+([A-Za-z\s]+?)(?:\n|$)', all_text, re.IGNORECASE)
+                    if collection_match:
+                        result['finish_color'] = collection_match.group(1).strip()
+                        print(f"✅ LOLOI COLLECTION: {result['finish_color']}")
             
             # GENERIC: Try to extract from product description text
             if not result.get('finish_color'):
