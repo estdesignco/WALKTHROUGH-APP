@@ -48,14 +48,14 @@ VENDOR_CONFIGS = {
     
     "rowefurniture.com": {
         "name": "Rowe Furniture",
-        "login_url": "https://rowefurniture.com/account/login",
+        "login_url": "https://www.rowefurniture.com/login",
         "login_type": "direct",
         "extra_wait_before_login": 5000,
-        "username_selectors": ['#CustomerEmail', 'input[type="email"]', 'input[name="customer[email]"]'],
-        "password_selectors": ['#CustomerPassword', 'input[type="password"]', 'input[name="customer[password]"]'],
-        "submit_selectors": ['button[type="submit"]', 'input[type="submit"]'],
-        "wait_after_login": 5000,
-        "wait_for_content": 3000,
+        "username_selectors": ['input[type="email"]', 'input[name="email"]', '#Email', '#email'],
+        "password_selectors": ['input[type="password"]', 'input[name="password"]', '#Password', '#password'],
+        "submit_selectors": ['button[type="submit"]', 'input[type="submit"]', 'button:has-text("Sign In")', 'button:has-text("Log In")'],
+        "wait_after_login": 8000,
+        "wait_for_content": 5000,
     },
     
     "reginaandrew.com": {
