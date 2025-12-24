@@ -5416,6 +5416,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 'price': None,  # Will be float (not string)
                 'image_url': None,
                 'finish_color': None,
+                'finish_image': None,  # Image of the finish/swatch for Materials Library
                 'size': None,
                 'description': None,
                 'sku': None,
