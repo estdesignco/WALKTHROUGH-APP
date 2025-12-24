@@ -13174,7 +13174,9 @@ async def create_project_material(material: dict):
                 }
                 await db.master_materials.insert_one(master_material)
         
-        return {**material_doc, "_id": material_doc["id"]}
+        # Remove MongoDB _id from response
+        material_doc.pop('_id', None)
+        return material_doc
     except Exception as e:
         logging.error(f"Error creating material: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
