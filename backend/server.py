@@ -2570,6 +2570,44 @@ async def update_item(item_id: str, item_update: ItemUpdate):
     update_data = {k: v for k, v in item_update.dict().items() if v is not None}
     update_data["updated_at"] = datetime.utcnow()
     
+    # AUTO-SYNC: Mirror FFE data to Shipping Tracker
+    # If item has tracking info or shipping-related status, create shipping object
+    tracking_number = getattr(item_update, 'tracking_number', None) or current_item_doc.get('tracking_number')
+    carrier = getattr(item_update, 'carrier', None) or current_item_doc.get('carrier')
+    ship_date = getattr(item_update, 'ship_date', None) or current_item_doc.get('ship_date')
+    delivery_date = getattr(item_update, 'delivery_date', None) or current_item_doc.get('delivery_date')
+    order_status = getattr(item_update, 'order_status', None) or current_item_doc.get('order_status')
+    
+    # Map FFE status to shipping status
+    shipping_status_mapping = {
+        'ORDERED': 'ordered',
+        'SHIPPED': 'shipped',
+        'IN TRANSIT': 'in_transit',
+        'OUT FOR DELIVERY': 'out_for_delivery',
+        'DELIVERED': 'delivered',
+        'DELIVERED TO RECEIVER': 'delivered',
+        'DELIVERED TO JOB SITE': 'delivered',
+        'INSTALLED': 'delivered',
+        'EXCEPTION': 'exception',
+        'ON HOLD': 'exception'
+    }
+    
+    # Create/update shipping object if we have any shipping-related data
+    if tracking_number or carrier or new_status in shipping_status_mapping:
+        current_shipping = current_item_doc.get('shipping', {})
+        shipping_status = shipping_status_mapping.get(new_status, order_status or current_shipping.get('status', 'ordered'))
+        
+        update_data['shipping'] = {
+            'carrier': carrier or current_shipping.get('carrier', ''),
+            'tracking_number': tracking_number or current_shipping.get('tracking_number', ''),
+            'status': shipping_status,
+            'estimated_delivery': delivery_date or current_shipping.get('estimated_delivery'),
+            'ship_date': ship_date or current_shipping.get('ship_date'),
+            'last_update': datetime.now(timezone.utc).isoformat(),
+            'events': current_shipping.get('events', [])
+        }
+        logging.info(f"📦 Auto-synced FFE to Shipping Tracker: {item_id} - {shipping_status}")
+    
     result = await db.items.update_one(
         {"id": item_id}, 
         {"$set": update_data}
