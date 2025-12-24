@@ -63,9 +63,31 @@ export default function ShippingTracker({ projectId }) {
       'FedEx': '🟠',
       'UPS': '🟤',
       'USPS': '🔵',
-      'DHL': '🟡'
+      'DHL': '🟡',
+      'Zenith': '🟢',
+      'Brooks': '🔷',
+      'Sunbelt': '🔴'
     };
     return logos[carrier] || '📦';
+  };
+
+  // Carrier tracking URLs - for clickable tracking links
+  const getTrackingUrl = (carrier, trackingNumber) => {
+    const trackingUrls = {
+      'FedEx': `https://www.fedex.com/apps/fedextrack/?tracknumbers=${trackingNumber}`,
+      'UPS': `https://www.ups.com/track?tracknum=${trackingNumber}`,
+      'USPS': `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`,
+      'DHL': `https://www.dhl.com/us-en/home/tracking.html?tracking-id=${trackingNumber}`,
+      'Zenith': `https://secure.zenithcompanies.com/tracking/${trackingNumber}`,
+      'Brooks': `https://www.brooksdelivery.com/track/${trackingNumber}`,
+      'Sunbelt': `https://sunbeltdelivery.com/track/${trackingNumber}`,
+      'R+L Carriers': `https://www.rlcarriers.com/tracking/${trackingNumber}`,
+      'XPO Logistics': `https://www.xpo.com/tracking/${trackingNumber}`,
+      'Old Dominion': `https://www.odfl.com/Freight-Tracking/${trackingNumber}`,
+      'Estes Express': `https://www.estes-express.com/resources/shipment-tracking?search=${trackingNumber}`,
+      'Saia LTL': `https://www.saia.com/track/${trackingNumber}`,
+    };
+    return trackingUrls[carrier] || null;
   };
 
   const filteredItems = filter === 'all' 
