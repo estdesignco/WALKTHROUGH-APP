@@ -5562,6 +5562,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             
             # STRATEGY 0: JSON-LD Structured Data (MOST RELIABLE SOURCE)
             print("📌 Checking JSON-LD for price...")
+            json_ld_price = None
             try:
                 json_ld_scripts = await page.locator('script[type="application/ld+json"]').all_text_contents()
                 import json
@@ -5573,9 +5574,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             if 'offers' in data and isinstance(data['offers'], dict):
                                 price_val = data['offers'].get('price')
                                 if price_val:
-                                    result['price'] = float(price_val)
-                                    result['cost'] = float(price_val)
-                                    print(f"✅ JSON-LD PRICE FOUND: ${result['price']}")
+                                    json_ld_price = float(price_val)
+                                    print(f"📌 JSON-LD has price: ${json_ld_price} (will check visible prices first)")
                             
                             # Also extract image if not already found
                             if not result['image_url'] and 'image' in data:
@@ -5584,9 +5584,6 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 if img_url and not img_url.endswith('.svg'):
                                     result['image_url'] = img_url
                                     print(f"✅ JSON-LD IMAGE FOUND: {img_url[:60]}...")
-                            
-                            if result['price']:
-                                break
                     except:
                         continue
             except Exception as e:
