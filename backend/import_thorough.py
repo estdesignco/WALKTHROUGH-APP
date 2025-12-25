@@ -353,10 +353,11 @@ async def main():
     
     os.chdir('/app/backend')
     
-    # Delete existing Gabby, Summer Classics, Loloi, Rowe products
-    for vendor_code in ['gabby', 'summer_classics', 'loloi', 'rowe']:
-        deleted = await db.master_products.delete_many({'vendor_code': vendor_code})
-        print(f"Deleted {deleted.deleted_count} old {vendor_code} products")
+    # DISABLED: Delete existing products - USE UPSERT INSTEAD
+    # for vendor_code in ['gabby', 'summer_classics', 'loloi', 'rowe']:
+    #     deleted = await db.master_products.delete_many({'vendor_code': vendor_code})
+    #     print(f"Deleted {deleted.deleted_count} old {vendor_code} products")
+    print("⚠️  Using UPSERT mode - existing products will be updated, not deleted")
     
     # Process Gabby Case Goods
     if os.path.exists('gabby_casegoods_map.pdf'):
