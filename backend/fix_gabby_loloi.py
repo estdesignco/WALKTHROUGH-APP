@@ -114,8 +114,9 @@ async def import_loloi():
     client = AsyncIOMotorClient(MONGO_URL)
     db = client['interior_design_db']
     
-    # Delete old loloi
-    await db.master_products.delete_many({'vendor_code': 'loloi'})
+    # DISABLED: Delete old loloi - USE UPSERT INSTEAD
+    # await db.master_products.delete_many({'vendor_code': 'loloi'})
+    print('⚠️  Using UPSERT mode - existing products will be updated, not deleted')
     
     products = []
     
