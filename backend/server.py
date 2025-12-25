@@ -6216,29 +6216,48 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # VENDOR-SPECIFIC: Jaipur Living
             elif 'jaipurliving.com' in domain:
                 import re
-                # Jaipur uses product codes for colors (MJL01, MJL02)
-                # Try to extract color from product name or visible text
-                color_match = re.search(r'Color[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|Size|Quantity|Select)', all_text, re.IGNORECASE)
-                if color_match:
-                    color = color_match.group(1).strip()
-                    color = re.sub(r'\s+', ' ', color)
-                    if len(color) > 2 and len(color) < 50 and not color.startswith('MJL'):
-                        result['finish_color'] = color
-                        print(f"✅ JAIPUR COLOR: {result['finish_color']}")
+                # Jaipur Living: Look for "Design" field which contains the colorway name
+                # Example: "Design: Parallel" on a rug page
+                design_match = re.search(r'Design\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|Size|More|SKU)', all_text, re.IGNORECASE)
+                if design_match:
+                    design = design_match.group(1).strip()
+                    design = re.sub(r'\s+', ' ', design)
+                    if len(design) > 2 and len(design) < 50:
+                        result['finish_color'] = design
+                        print(f"✅ JAIPUR DESIGN: {result['finish_color']}")
                 
-                # Try Material (usually Wool, Cotton, etc.)
+                # Try Color field (if explicit)
                 if not result.get('finish_color'):
-                    material_match = re.search(r'Material[:\s]+([A-Za-z\s\/\-,]+?)(?:\n|$|Construction)', all_text, re.IGNORECASE)
-                    if material_match:
-                        material = material_match.group(1).strip()[:50]
-                        if len(material) > 2:
-                            result['finish_color'] = material
-                            print(f"✅ JAIPUR MATERIAL: {result['finish_color']}")
+                    color_match = re.search(r'Color[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|Size|Quantity|Select)', all_text, re.IGNORECASE)
+                    if color_match:
+                        color = color_match.group(1).strip()
+                        color = re.sub(r'\s+', ' ', color)
+                        if len(color) > 2 and len(color) < 50 and not color.startswith('MJL'):
+                            result['finish_color'] = color
+                            print(f"✅ JAIPUR COLOR: {result['finish_color']}")
+                
+                # Try Content/Material with % (e.g., "65% Viscose 35% Wool")
+                if not result.get('finish_color'):
+                    content_match = re.search(r'Content\s*[:\s]+([0-9%\s\-A-Za-z,]+?)(?:\n|$|Backing|Origin)', all_text, re.IGNORECASE)
+                    if content_match:
+                        content = content_match.group(1).strip()[:60]
+                        if len(content) > 5:
+                            result['finish_color'] = content
+                            print(f"✅ JAIPUR CONTENT: {result['finish_color']}")
+                
+                # Try Pantone Colors if available
+                if not result.get('finish_color'):
+                    pantone_match = re.search(r'Pantone\s*Colors?\s*[:\s]*([A-Za-z0-9\s,\-]+?)(?:\n|$|Style)', all_text, re.IGNORECASE)
+                    if pantone_match:
+                        pantone = pantone_match.group(1).strip()[:50]
+                        if len(pantone) > 3:
+                            result['finish_color'] = pantone
+                            print(f"✅ JAIPUR PANTONE: {result['finish_color']}")
                 
                 # Extract from product name (often contains color hints)
                 if not result.get('finish_color') and result.get('name'):
                     # Common rug colors
-                    common_colors = ['ivory', 'blue', 'red', 'green', 'beige', 'tan', 'gold', 'silver', 'brown', 'black', 'white', 'gray', 'grey', 'navy', 'rust', 'teal', 'coral', 'sand', 'charcoal', 'slate', 'terracotta', 'sage', 'olive', 'cream']
+                    common_colors = ['ivory', 'blue', 'red', 'green', 'beige', 'tan', 'gold', 'silver', 'brown', 'black', 'white', 'gray', 'grey', 'navy', 'rust', 'teal', 'coral', 'sand', 'charcoal', 'slate', 'terracotta', 'sage', 'olive', 'cream', 'natural', 'spice', 'pink', 'orange', 'purple', 'blush']
                     name_lower = result['name'].lower()
                     for color in common_colors:
                         if color in name_lower:
