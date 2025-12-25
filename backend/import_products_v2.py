@@ -60,10 +60,16 @@ async def get_db():
     return client[DB_NAME]
 
 async def clear_products():
-    """Clear existing master products"""
-    db = await get_db()
-    await db.master_products.delete_many({})
-    print("✅ Cleared existing master_products collection")
+    """Clear existing master products - DISABLED FOR SAFETY
+    
+    WARNING: This function was disabled to prevent accidental data wipes.
+    If you REALLY need to clear products, use MongoDB shell directly.
+    """
+    print("⚠️  clear_products() is DISABLED for safety")
+    print("⚠️  Use MongoDB shell if you need to clear data manually")
+    # db = await get_db()
+    # await db.master_products.delete_many({})
+    # print("✅ Cleared existing master_products collection")
 
 async def import_fourhands(filepath):
     """Import Four Hands Excel (has specific structure)"""
