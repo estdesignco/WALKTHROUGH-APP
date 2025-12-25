@@ -913,6 +913,129 @@ const CalculatorDashboard = ({ projectId }) => {
           </div>
         )}
 
+        {/* CONVERT CALCULATOR */}
+        {activeCalculator === 'convert' && (
+          <div style={styles.form}>
+            <h3 style={styles.formTitle}>🔄 Unit Converter</h3>
+            <p style={styles.formSubtitle}>Convert between common design measurements</p>
+            
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Conversion Type</label>
+              <select
+                style={styles.input}
+                id="convert-type"
+                onChange={(e) => {
+                  document.getElementById('convert-value').value = '';
+                  setResults(null);
+                }}
+              >
+                <option value="in-to-ft">Inches → Feet</option>
+                <option value="ft-to-in">Feet → Inches</option>
+                <option value="ft-to-m">Feet → Meters</option>
+                <option value="m-to-ft">Meters → Feet</option>
+                <option value="sqft-to-sqm">Square Feet → Square Meters</option>
+                <option value="sqm-to-sqft">Square Meters → Square Feet</option>
+                <option value="yd-to-m">Yards → Meters</option>
+                <option value="m-to-yd">Meters → Yards</option>
+                <option value="cm-to-in">Centimeters → Inches</option>
+                <option value="in-to-cm">Inches → Centimeters</option>
+              </select>
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Value to Convert</label>
+              <input
+                type="number"
+                placeholder="Enter value"
+                style={styles.input}
+                id="convert-value"
+                step="0.01"
+              />
+            </div>
+
+            <button 
+              onClick={() => {
+                const type = document.getElementById('convert-type').value;
+                const value = parseFloat(document.getElementById('convert-value').value);
+                
+                if (isNaN(value)) {
+                  alert('Please enter a valid number');
+                  return;
+                }
+                
+                let result, fromUnit, toUnit;
+                
+                switch(type) {
+                  case 'in-to-ft':
+                    result = value / 12;
+                    fromUnit = 'inches';
+                    toUnit = 'feet';
+                    break;
+                  case 'ft-to-in':
+                    result = value * 12;
+                    fromUnit = 'feet';
+                    toUnit = 'inches';
+                    break;
+                  case 'ft-to-m':
+                    result = value * 0.3048;
+                    fromUnit = 'feet';
+                    toUnit = 'meters';
+                    break;
+                  case 'm-to-ft':
+                    result = value / 0.3048;
+                    fromUnit = 'meters';
+                    toUnit = 'feet';
+                    break;
+                  case 'sqft-to-sqm':
+                    result = value * 0.0929;
+                    fromUnit = 'sq ft';
+                    toUnit = 'sq meters';
+                    break;
+                  case 'sqm-to-sqft':
+                    result = value / 0.0929;
+                    fromUnit = 'sq meters';
+                    toUnit = 'sq ft';
+                    break;
+                  case 'yd-to-m':
+                    result = value * 0.9144;
+                    fromUnit = 'yards';
+                    toUnit = 'meters';
+                    break;
+                  case 'm-to-yd':
+                    result = value / 0.9144;
+                    fromUnit = 'meters';
+                    toUnit = 'yards';
+                    break;
+                  case 'cm-to-in':
+                    result = value / 2.54;
+                    fromUnit = 'cm';
+                    toUnit = 'inches';
+                    break;
+                  case 'in-to-cm':
+                    result = value * 2.54;
+                    fromUnit = 'inches';
+                    toUnit = 'cm';
+                    break;
+                  default:
+                    result = value;
+                    fromUnit = '';
+                    toUnit = '';
+                }
+                
+                setResults({
+                  'Original Value': `${value} ${fromUnit}`,
+                  'Converted Value': `${result.toFixed(4)} ${toUnit}`,
+                  'Conversion': `${fromUnit} → ${toUnit}`
+                });
+              }}
+              disabled={loading}
+              style={styles.calculateButton}
+            >
+              Convert
+            </button>
+          </div>
+        )}
+
       {/* RESULTS DISPLAY */}
       {results && (
         <div style={styles.results}>
