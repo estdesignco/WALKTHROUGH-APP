@@ -6443,6 +6443,55 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     except:
                         continue
             
+            # THIRD: UNIVERSAL SELECTED OPTION DETECTION
+            # This catches any currently selected color/finish/fabric option that the user has clicked
+            if not result.get('finish_color'):
+                print("🔍 Looking for selected options (user may have clicked a color/finish)...")
+                selected_option_selectors = [
+                    # Selected/active state indicators
+                    '.selected .swatch-name', '.active .swatch-name', '[aria-selected="true"]',
+                    '.selected-variant-name', '.selected-option', '.active-option',
+                    '.variant-selected', '.option-selected .name', '.color-selected',
+                    # Fabric/finish specific
+                    '.fabric-name.active', '.finish-name.active', '.material-name.active',
+                    '.selected-fabric-name', '.current-fabric', '.chosen-fabric',
+                    # Generic variant displays
+                    '.variant-value.selected', '.option-value.selected',
+                    '[class*="selected"][class*="color"]', '[class*="selected"][class*="finish"]',
+                    '[class*="active"][class*="swatch"]', '[class*="current"][class*="option"]',
+                    # Data attributes that might hold selected values  
+                    '[data-selected-color]', '[data-selected-finish]', '[data-selected-variant]',
+                ]
+                
+                for selector in selected_option_selectors:
+                    try:
+                        # Handle data attribute selectors differently
+                        if selector.startswith('[data-'):
+                            elements = await page.query_selector_all(selector)
+                            for element in elements:
+                                # Try getting the attribute value
+                                attr_name = selector.split('[')[1].split(']')[0]
+                                attr_value = await element.get_attribute(attr_name)
+                                if attr_value and len(attr_value.strip()) > 2 and len(attr_value.strip()) < 50:
+                                    result['finish_color'] = attr_value.strip()
+                                    print(f"✅ SELECTED OPTION (data attr): {result['finish_color']}")
+                                    break
+                        else:
+                            elements = await page.query_selector_all(selector)
+                            for element in elements:
+                                text = await element.text_content()
+                                if text:
+                                    cleaned = text.strip()
+                                    skip_terms = ['select', 'choose', 'add', 'cart', 'price', 'quantity', 'size', 'email', 'subscribe']
+                                    if 2 <= len(cleaned) <= 50 and not any(skip in cleaned.lower() for skip in skip_terms):
+                                        result['finish_color'] = cleaned
+                                        print(f"✅ SELECTED OPTION: {result['finish_color']}")
+                                        break
+                        if result.get('finish_color'):
+                            break
+                    except:
+                        continue
+            
             # ===== 6b. FINISH/SWATCH IMAGE EXTRACTION =====
             print("🎨 EXTRACTING FINISH/SWATCH IMAGE...")
             
