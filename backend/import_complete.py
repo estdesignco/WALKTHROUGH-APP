@@ -197,9 +197,10 @@ async def main():
     db = await get_db()
     all_products = []
     
-    # Clear old imported products
-    deleted = await db.master_products.delete_many({'source_file': {'$exists': True}})
-    print(f"Cleared {deleted.deleted_count} previously imported products\n")
+    # DISABLED: Clear old imported products - USE UPSERT INSTEAD
+    # deleted = await db.master_products.delete_many({'source_file': {'$exists': True}})
+    # print(f"Cleared {deleted.deleted_count} previously imported products\n")
+    print("⚠️  Using UPSERT mode - existing products will be updated, not deleted")
     
     os.chdir('/app/backend')
     
