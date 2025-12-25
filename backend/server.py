@@ -6198,12 +6198,51 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # VENDOR-SPECIFIC: Rowe Furniture
             elif 'rowefurniture.com' in domain:
                 import re
-                # Rowe uses a configurator - fabric selection is interactive
-                # Try to find any default/selected fabric
-                fabric_match = re.search(r'(?:Fabric|Finish|Color|Cover)[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\|)', all_text, re.IGNORECASE)
-                if fabric_match:
-                    result['finish_color'] = fabric_match.group(1).strip()
-                    print(f"✅ ROWE FINISH: {result['finish_color']}")
+                # Rowe uses a configurator - the SELECTED fabric/finish should be visible on page
+                # Look for selected fabric name in various formats
+                
+                # Try to find selected fabric from UI elements
+                try:
+                    fabric_selectors = [
+                        '.selected-fabric', '.fabric-name.selected', '.current-fabric',
+                        '.selected-finish', '[data-selected="true"]', '.active-swatch .name',
+                        '.fabric-selection .active', '.selected-option-name'
+                    ]
+                    for sel in fabric_selectors:
+                        selected = await page.query_selector(sel)
+                        if selected:
+                            text = await selected.text_content()
+                            if text and len(text.strip()) > 2 and len(text.strip()) < 60:
+                                result['finish_color'] = text.strip()
+                                print(f"✅ ROWE SELECTED FABRIC: {result['finish_color']}")
+                                break
+                except:
+                    pass
+                
+                # Try regex patterns for fabric/finish mentions
+                if not result.get('finish_color'):
+                    fabric_patterns = [
+                        r'(?:Selected\s+)?Fabric\s*[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\||,|Price)',
+                        r'(?:Selected\s+)?Finish\s*[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\||,|Price)',
+                        r'(?:Selected\s+)?Cover\s*[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\||,|Price)',
+                        r'(?:Selected\s+)?Color\s*[:\s]+([A-Za-z0-9\s\-]+?)(?:\n|$|\||,|Price)',
+                        r'(?:Grade|Style)\s*[:\s]+([A-Za-z0-9]+)\s*-\s*([A-Za-z\s]+?)(?:\n|$)'
+                    ]
+                    for pattern in fabric_patterns:
+                        fabric_match = re.search(pattern, all_text, re.IGNORECASE)
+                        if fabric_match:
+                            # Handle the grade-style pattern specially
+                            if fabric_match.lastindex >= 2:
+                                result['finish_color'] = f"{fabric_match.group(1)} - {fabric_match.group(2)}".strip()
+                            else:
+                                result['finish_color'] = fabric_match.group(1).strip()
+                            # Skip if it's a generic nav term
+                            skip_terms = ['products', 'quick ship', 'materials', 'info', 'menu', 'search']
+                            if not any(skip in result['finish_color'].lower() for skip in skip_terms):
+                                print(f"✅ ROWE FABRIC: {result['finish_color']}")
+                                break
+                            else:
+                                result['finish_color'] = None
             
             # VENDOR-SPECIFIC: Uttermost
             elif 'uttermost.com' in domain:
