@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://vendor-import.preview.emergentagent.com
+**System URL**: https://scraper-fix-1.preview.emergentagent.com
 
 ---
 

@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://vendor-import.preview.emergentagent.com/mobile-app
+Test it now: https://scraper-fix-1.preview.emergentagent.com/mobile-app

@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://vendor-import.preview.emergentagent.com';
+const BACKEND_URL = 'https://scraper-fix-1.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

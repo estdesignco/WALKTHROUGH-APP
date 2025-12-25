@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://vendor-import.preview.emergentagent.com
+https://scraper-fix-1.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://vendor-import.preview.emergentagent.com/mobile-app
+https://scraper-fix-1.preview.emergentagent.com/mobile-app
 
 ---
 

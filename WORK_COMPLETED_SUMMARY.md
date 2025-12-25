@@ -171,7 +171,7 @@ Created comprehensive integration plan document:
 ## 🚀 How to Test
 
 ### Test Offline Mode:
-1. Open mobile app: `https://vendor-import.preview.emergentagent.com/mobile-app`
+1. Open mobile app: `https://scraper-fix-1.preview.emergentagent.com/mobile-app`
 2. Select a project
 3. Open Walkthrough or FF&E
 4. **Turn off WiFi/mobile data**
@@ -221,10 +221,10 @@ Created comprehensive integration plan document:
 ## 📱 Mobile App URL
 
 **Main App:**
-`https://vendor-import.preview.emergentagent.com`
+`https://scraper-fix-1.preview.emergentagent.com`
 
 **Mobile Simulator:**
-`https://vendor-import.preview.emergentagent.com/mobile-app`
+`https://scraper-fix-1.preview.emergentagent.com/mobile-app`
 
 ---
 

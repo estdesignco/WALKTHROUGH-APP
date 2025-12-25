@@ -21,7 +21,7 @@ from datetime import datetime
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://vendor-import.preview.emergentagent.com/api"
+BACKEND_URL = "https://scraper-fix-1.preview.emergentagent.com/api"
 
 class ComprehensiveBackendTester:
     def __init__(self):
