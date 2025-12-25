@@ -6266,22 +6266,49 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             break
             
             # VENDOR-SPECIFIC: Loloi Rugs
-            elif 'loloirugs.com' in domain or 'lfrbrands.com' in domain:
+            elif 'loloirugs.com' in domain or 'lfrbrands.com' in domain or 'loloi.com' in domain:
                 import re
-                # Loloi shows Color: Ivory prominently
-                color_match = re.search(r'Color[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|,)', all_text, re.IGNORECASE)
+                # Loloi shows Color: Ivory prominently OR as "Colors: Natural / Spice"
+                color_match = re.search(r'Colors?\s*[:\s]+([A-Za-z\s\/\-]+?)(?:\n|$|,|Size|Quantity)', all_text, re.IGNORECASE)
                 if color_match:
                     color = color_match.group(1).strip()
                     if len(color) > 2 and len(color) < 50:
                         result['finish_color'] = color
                         print(f"✅ LOLOI COLOR: {result['finish_color']}")
                 
+                # Try to get selected color from UI (look for .selected, .active, aria-selected)
+                if not result.get('finish_color'):
+                    try:
+                        selected_selectors = [
+                            '.color-swatch.selected', '.color-option.active', '[aria-selected="true"]',
+                            '.swatch-selected', '.selected-color-name', '.color-name.active'
+                        ]
+                        for sel in selected_selectors:
+                            selected = await page.query_selector(sel)
+                            if selected:
+                                text = await selected.text_content()
+                                if text and len(text.strip()) > 2:
+                                    result['finish_color'] = text.strip()
+                                    print(f"✅ LOLOI SELECTED COLOR: {result['finish_color']}")
+                                    break
+                    except:
+                        pass
+                
                 # Also try Collection name as it often indicates style
                 if not result.get('finish_color'):
-                    collection_match = re.search(r'Collection[:\s]+([A-Za-z\s]+?)(?:\n|$)', all_text, re.IGNORECASE)
+                    collection_match = re.search(r'Collection\s*[:\s]+([A-Za-z\s]+?)(?:\n|$|,)', all_text, re.IGNORECASE)
                     if collection_match:
                         result['finish_color'] = collection_match.group(1).strip()
                         print(f"✅ LOLOI COLLECTION: {result['finish_color']}")
+                
+                # Try Material/Fiber
+                if not result.get('finish_color'):
+                    material_match = re.search(r'(?:Material|Fiber|Content)\s*[:\s]+([A-Za-z0-9%\s,]+?)(?:\n|$|Construction)', all_text, re.IGNORECASE)
+                    if material_match:
+                        material = material_match.group(1).strip()[:50]
+                        if len(material) > 3:
+                            result['finish_color'] = material
+                            print(f"✅ LOLOI MATERIAL: {result['finish_color']}")
             
             # GENERIC: Try to extract from product description text
             if not result.get('finish_color'):
