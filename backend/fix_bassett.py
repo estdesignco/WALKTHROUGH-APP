@@ -30,9 +30,10 @@ async def fix_bassett():
     client = AsyncIOMotorClient(os.environ.get('MONGO_URL'))
     db = client['interior_design_db']
     
-    # Delete old Bassett products
-    await db.master_products.delete_many({'vendor_code': 'bassett_mirror'})
-    print('Deleted old Bassett products')
+    # DISABLED: Delete old Bassett products - USE UPSERT INSTEAD
+    # await db.master_products.delete_many({'vendor_code': 'bassett_mirror'})
+    # print('Deleted old Bassett products')
+    print('⚠️  Using UPSERT mode - existing products will be updated, not deleted')
     
     products = []
     
