@@ -97,6 +97,18 @@ VENDOR_CONFIGS = {
         "wait_for_content": 5000,
     },
     
+    "jaipurliving.com": {
+        "name": "Jaipur Living",
+        "login_url": "https://www.jaipurliving.com/customer/account/login/",
+        "login_type": "direct",
+        "extra_wait_before_login": 8000,
+        "username_selectors": ['#email', 'input[type="email"]', 'input[name="login[username]"]'],
+        "password_selectors": ['#pass', 'input[type="password"]', 'input[name="login[password]"]'],
+        "submit_selectors": ['#send2', 'button[type="submit"]', 'button:has-text("Sign In")'],
+        "wait_after_login": 10000,
+        "wait_for_content": 8000,
+    },
+    
     "visualcomfort.com": {
         "name": "Visual Comfort",
         "login_url": "https://www.visualcomfort.com/customer/account/login/",
