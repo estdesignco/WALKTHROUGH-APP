@@ -6247,10 +6247,40 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # VENDOR-SPECIFIC: Uttermost
             elif 'uttermost.com' in domain:
                 import re
-                finish_match = re.search(r'(?:Finish|Color|Material)[:\s]+([A-Za-z\s]+?)(?:\n|$|,)', all_text, re.IGNORECASE)
-                if finish_match:
-                    result['finish_color'] = finish_match.group(1).strip()
-                    print(f"✅ UTTERMOST FINISH: {result['finish_color']}")
+                # Uttermost has several format patterns
+                # Look for explicit Finish: field first
+                finish_patterns = [
+                    r'Finish\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Materials)',
+                    r'Color\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Materials)',
+                    r'(?:Primary\s+)?Material\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.)',
+                ]
+                for pattern in finish_patterns:
+                    finish_match = re.search(pattern, all_text, re.IGNORECASE)
+                    if finish_match:
+                        finish = finish_match.group(1).strip()
+                        # Skip generic terms
+                        skip_terms = ['click', 'select', 'view', 'add', 'cart', 'email', 'subscribe']
+                        if len(finish) > 2 and len(finish) < 50 and not any(skip in finish.lower() for skip in skip_terms):
+                            result['finish_color'] = finish
+                            print(f"✅ UTTERMOST FINISH: {result['finish_color']}")
+                            break
+                
+                # Try to extract from product description (often describes finish)
+                if not result.get('finish_color'):
+                    desc_patterns = [
+                        r'(?:in a|with a|features? a?|finished in)\s+([a-zA-Z\s]+(?:finish|brass|bronze|gold|silver|chrome|nickel|iron|wood|oak|walnut|marble|stone|glass))',
+                        r'(antique\s+\w+)\s+finish',
+                        r'(\w+\s+(?:brass|bronze|gold|silver|chrome|nickel))',
+                        r'((?:aged|burnished|polished|brushed|matte|satin|distressed)\s+\w+)'
+                    ]
+                    for pattern in desc_patterns:
+                        desc_match = re.search(pattern, all_text, re.IGNORECASE)
+                        if desc_match:
+                            finish = desc_match.group(1).strip().title()
+                            if len(finish) > 3 and len(finish) < 50:
+                                result['finish_color'] = finish
+                                print(f"✅ UTTERMOST FINISH FROM DESC: {result['finish_color']}")
+                                break
             
             # VENDOR-SPECIFIC: Jaipur Living
             elif 'jaipurliving.com' in domain:
