@@ -224,18 +224,21 @@ class FinalBackendVerifier:
         # POST /api/calculators/wallpaper
         try:
             wallpaper_payload = {
-                "room_length": 12,
-                "room_width": 10,
-                "room_height": 9,
-                "doors": 2,
-                "windows": 3
+                "wallpaper_type": "double_roll",
+                "wall_width": 12.0,
+                "wall_height": 9.0,
+                "door_widths": [3.0, 3.0],
+                "door_heights": [7.0, 7.0],
+                "window_widths": [4.0, 4.0, 3.0],
+                "window_heights": [5.0, 5.0, 4.0],
+                "pattern_repeat": 6.0,
+                "cost_per_unit": 150.0
             }
             response = self.session.post(f"{BACKEND_URL}/api/calculators/wallpaper", 
                                        json=wallpaper_payload, timeout=30)
             if response.status_code == 200:
                 data = response.json()
-                result = data.get('result', {})
-                rolls_needed = result.get('rolls_needed', 0)
+                rolls_needed = data.get('rolls_needed', 0)
                 self.log_result("POST /api/calculators/wallpaper", True, f"Calculated {rolls_needed} rolls needed")
             else:
                 self.log_result("POST /api/calculators/wallpaper", False, f"Status: {response.status_code}", response.text)
@@ -245,17 +248,18 @@ class FinalBackendVerifier:
         # POST /api/calculators/drapery
         try:
             drapery_payload = {
-                "window_width": 60,
-                "window_height": 84,
-                "fullness": 2.5,
-                "header_style": "rod_pocket"
+                "window_width": 60.0,
+                "finished_length": 84.0,
+                "pleat_type": "rod_pocket",
+                "fullness_ratio": 2.5,
+                "fabric_width": 54.0,
+                "include_lining": False
             }
             response = self.session.post(f"{BACKEND_URL}/api/calculators/drapery", 
                                        json=drapery_payload, timeout=30)
             if response.status_code == 200:
                 data = response.json()
-                result = data.get('result', {})
-                fabric_needed = result.get('fabric_yards', 0)
+                fabric_needed = data.get('fabric_yardage', 0)
                 self.log_result("POST /api/calculators/drapery", True, f"Calculated {fabric_needed} yards fabric needed")
             else:
                 self.log_result("POST /api/calculators/drapery", False, f"Status: {response.status_code}", response.text)
@@ -265,9 +269,9 @@ class FinalBackendVerifier:
         # POST /api/calculators/paint
         try:
             paint_payload = {
-                "room_length": 12,
-                "room_width": 10,
-                "room_height": 9,
+                "wall_height": 9.0,
+                "room_length": 12.0,
+                "room_width": 10.0,
                 "doors": 2,
                 "windows": 3,
                 "coats": 2
@@ -276,8 +280,7 @@ class FinalBackendVerifier:
                                        json=paint_payload, timeout=30)
             if response.status_code == 200:
                 data = response.json()
-                result = data.get('result', {})
-                gallons_needed = result.get('gallons_needed', 0)
+                gallons_needed = data.get('gallons_needed', 0)
                 self.log_result("POST /api/calculators/paint", True, f"Calculated {gallons_needed} gallons needed")
             else:
                 self.log_result("POST /api/calculators/paint", False, f"Status: {response.status_code}", response.text)
@@ -295,8 +298,7 @@ class FinalBackendVerifier:
                                        json=lighting_payload, timeout=30)
             if response.status_code == 200:
                 data = response.json()
-                result = data.get('result', {})
-                lumens_needed = result.get('total_lumens', 0)
+                lumens_needed = data.get('total_lumens', 0)
                 self.log_result("POST /api/calculators/lighting", True, f"Calculated {lumens_needed} lumens needed")
             else:
                 self.log_result("POST /api/calculators/lighting", False, f"Status: {response.status_code}", response.text)
