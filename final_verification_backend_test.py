@@ -173,11 +173,13 @@ class FinalBackendVerifier:
             response = self.session.get(f"{BACKEND_URL}/api/backup/full", timeout=60)
             if response.status_code == 200:
                 data = response.json()
-                # Verify it returns counts for contacts, materials, credentials, projects
-                contacts_count = data.get('contacts_count', 0)
-                materials_count = data.get('materials_count', 0)
-                credentials_count = data.get('credentials_count', 0)
-                projects_count = data.get('projects_count', 0)
+                # Check if backup contains data
+                backup_data = data.get('data', {})
+                
+                contacts_count = len(backup_data.get('master_contacts', []))
+                materials_count = len(backup_data.get('master_materials', []))
+                credentials_count = len(backup_data.get('vendor_credentials', []))
+                projects_count = len(backup_data.get('projects', []))
                 
                 success = all([contacts_count > 0, materials_count > 0, credentials_count > 0, projects_count > 0])
                 details = f"Contacts: {contacts_count}, Materials: {materials_count}, Credentials: {credentials_count}, Projects: {projects_count}"
