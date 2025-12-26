@@ -6159,10 +6159,14 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             if any(indicator in size_text.lower() for indicator in ['w', 'h', 'd', 'width', 'height', 'depth', 'inch', 'cm', 'x', '"', "'"]):
                                 # Clean and validate
                                 cleaned = size_text.strip()
-                                if 5 <= len(cleaned) <= 100:  # Reasonable length
-                                    result['size'] = cleaned
-                                    print(f"✅ SIZE FOUND: {result['size']}")
-                                    break
+                                # Filter out garbage text (nav items, breadcrumbs, etc.)
+                                skip_indicators = ['pendant', 'light', 'lamp', 'voltage', 'suspension', 'ceiling', 'menu', 'nav', 'category', 'shop', 'collection']
+                                if 5 <= len(cleaned) <= 100 and not any(skip in cleaned.lower() for skip in skip_indicators):
+                                    # Must contain at least one number to be a valid size
+                                    if re.search(r'\d', cleaned):
+                                        result['size'] = cleaned
+                                        print(f"✅ SIZE FOUND: {result['size']}")
+                                        break
                     
                     if result['size']:
                         break
