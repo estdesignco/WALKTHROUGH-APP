@@ -294,6 +294,47 @@ const MainDashboard = () => {
             <span>📋</span>
             <span>Full Questionnaire</span>
           </button>
+          <button 
+            onClick={async () => {
+              try {
+                const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+                const response = await fetch(`${BACKEND_URL}/api/backup/full`);
+                if (response.ok) {
+                  const blob = await response.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+                  document.body.appendChild(a);
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                  a.remove();
+                  alert('✅ Backup downloaded! Upload this file to Google Drive for safekeeping.');
+                } else {
+                  throw new Error('Backup failed');
+                }
+              } catch (error) {
+                alert('❌ Backup failed: ' + error.message);
+              }
+            }}
+            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
+            style={{
+              background: `linear-gradient(135deg, #2d5016 0%, #3d6b1f 50%, #2d5016 100%)`,
+              boxShadow: '0 4px 15px rgba(45, 80, 22, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+              filter: 'drop-shadow(0 0 5px rgba(61, 107, 31, 0.3))'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(45, 80, 22, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 15px rgba(45, 80, 22, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+            }}
+          >
+            <span>💾</span>
+            <span>Backup Data</span>
+          </button>
         </div>
 
         {/* Studio Projects Title - Moved Below */}
