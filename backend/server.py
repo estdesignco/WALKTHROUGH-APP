@@ -6307,6 +6307,31 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 # Visual Comfort uses specific finish naming in product pages
                 # Common patterns: "Finish: Hand-Rubbed Antique Brass", "Finish: Burnished Brass"
                 
+                # FIRST: Extract SIZE/DIMENSIONS for Visual Comfort
+                # Visual Comfort shows dimensions like "Width: 28" Height: 91.5" or similar
+                size_patterns = [
+                    r'Width[:\s]*(\d+\.?\d*)["\s]*(?:Height|H)[:\s]*(\d+\.?\d*)',
+                    r'(\d+\.?\d*)["\s]*[Ww]\s*[xX×]\s*(\d+\.?\d*)["\s]*[Hh]',
+                    r'Dimensions?[:\s]*(\d+[^,\n]{3,40})',
+                    r'(\d+)\s*(?:inch|in|")\s*(?:wide|width|W)',
+                ]
+                for pattern in size_patterns:
+                    size_match = re.search(pattern, all_text, re.IGNORECASE)
+                    if size_match:
+                        if size_match.lastindex >= 2:
+                            result['size'] = f'{size_match.group(1)}"W x {size_match.group(2)}"H'
+                        else:
+                            result['size'] = size_match.group(1).strip()
+                        print(f"✅ VISUAL COMFORT SIZE: {result['size']}")
+                        break
+                
+                # Extract from product name (e.g., "Bau 28 Pendant" -> 28")
+                if not result.get('size') and result.get('name'):
+                    name_size_match = re.search(r'(\d+)["\s]*(?:Pendant|Light|Chandelier|Sconce|Flush)', result['name'], re.IGNORECASE)
+                    if name_size_match:
+                        result['size'] = f'{name_size_match.group(1)}"'
+                        print(f"✅ VISUAL COMFORT SIZE FROM NAME: {result['size']}")
+                
                 # Try to get finish from selected swatch or active option
                 try:
                     finish_selectors = [
