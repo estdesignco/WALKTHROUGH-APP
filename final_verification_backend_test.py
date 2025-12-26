@@ -115,7 +115,13 @@ class FinalBackendVerifier:
             response = self.session.get(f"{BACKEND_URL}/api/vendor-credentials", timeout=30)
             if response.status_code == 200:
                 data = response.json()
-                cred_count = len(data) if isinstance(data, list) else 0
+                # Handle both direct array and wrapped response
+                if isinstance(data, dict) and 'credentials' in data:
+                    cred_count = len(data['credentials'])
+                elif isinstance(data, list):
+                    cred_count = len(data)
+                else:
+                    cred_count = 0
                 expected = 22
                 success = cred_count >= expected
                 self.log_result("GET /api/vendor-credentials", success, f"Retrieved {cred_count} credentials (expected 22)")
@@ -143,7 +149,13 @@ class FinalBackendVerifier:
             response = self.session.get(f"{BACKEND_URL}/api/carrier-options", timeout=30)
             if response.status_code == 200:
                 data = response.json()
-                carrier_count = len(data) if isinstance(data, list) else 0
+                # Handle both direct array and wrapped response
+                if isinstance(data, dict) and 'data' in data:
+                    carrier_count = len(data['data'])
+                elif isinstance(data, list):
+                    carrier_count = len(data)
+                else:
+                    carrier_count = 0
                 expected = 19
                 success = carrier_count >= expected
                 self.log_result("GET /api/carrier-options", success, f"Retrieved {carrier_count} carriers (expected 19)")
