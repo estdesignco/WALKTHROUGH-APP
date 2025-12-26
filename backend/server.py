@@ -14008,6 +14008,145 @@ async def login_to_all_vendor_portals():
         raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {str(e) or 'Unknown error'}")
 
 
+# ============================================================================
+# BACKUP / EXPORT ENDPOINTS
+# ============================================================================
+
+@api_router.get("/backup/full")
+async def create_full_backup():
+    """Create a full backup of all data (contacts, materials, credentials, projects)"""
+    try:
+        import json
+        from datetime import datetime
+        
+        backup_data = {
+            "backup_date": datetime.utcnow().isoformat(),
+            "backup_version": "1.0",
+            "data": {}
+        }
+        
+        # Export master_contacts
+        contacts = await db.master_contacts.find({}, {"_id": 0}).to_list(10000)
+        backup_data["data"]["master_contacts"] = contacts
+        backup_data["data"]["master_contacts_count"] = len(contacts)
+        
+        # Export master_materials
+        materials = await db.master_materials.find({}, {"_id": 0}).to_list(10000)
+        backup_data["data"]["master_materials"] = materials
+        backup_data["data"]["master_materials_count"] = len(materials)
+        
+        # Export vendor_credentials (mask passwords)
+        credentials = await db.vendor_credentials.find({}, {"_id": 0}).to_list(1000)
+        for cred in credentials:
+            if "password" in cred:
+                cred["password"] = "***MASKED***"
+        backup_data["data"]["vendor_credentials"] = credentials
+        backup_data["data"]["vendor_credentials_count"] = len(credentials)
+        
+        # Export projects with all nested data
+        projects = await db.projects.find({}, {"_id": 0}).to_list(1000)
+        backup_data["data"]["projects"] = projects
+        backup_data["data"]["projects_count"] = len(projects)
+        
+        # Export master_products (limited to 50000 for performance)
+        products = await db.master_products.find({}, {"_id": 0}).to_list(50000)
+        backup_data["data"]["master_products"] = products
+        backup_data["data"]["master_products_count"] = len(products)
+        
+        # Generate filename with timestamp
+        filename = f"backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+        
+        # Return as downloadable JSON
+        from fastapi.responses import Response
+        json_content = json.dumps(backup_data, indent=2, default=str)
+        
+        return Response(
+            content=json_content,
+            media_type="application/json",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Backup failed: {str(e)}")
+
+
+@api_router.get("/backup/contacts")
+async def backup_contacts():
+    """Export just contacts as JSON"""
+    try:
+        import json
+        contacts = await db.master_contacts.find({}, {"_id": 0}).to_list(10000)
+        
+        return Response(
+            content=json.dumps(contacts, indent=2, default=str),
+            media_type="application/json",
+            headers={
+                "Content-Disposition": "attachment; filename=contacts_backup.json"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Contacts backup failed: {str(e)}")
+
+
+@api_router.get("/backup/materials")
+async def backup_materials():
+    """Export just materials as JSON"""
+    try:
+        import json
+        materials = await db.master_materials.find({}, {"_id": 0}).to_list(10000)
+        
+        return Response(
+            content=json.dumps(materials, indent=2, default=str),
+            media_type="application/json",
+            headers={
+                "Content-Disposition": "attachment; filename=materials_backup.json"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Materials backup failed: {str(e)}")
+
+
+@api_router.get("/backup/projects")
+async def backup_projects():
+    """Export all projects with their data as JSON"""
+    try:
+        import json
+        projects = await db.projects.find({}, {"_id": 0}).to_list(1000)
+        
+        return Response(
+            content=json.dumps(projects, indent=2, default=str),
+            media_type="application/json",
+            headers={
+                "Content-Disposition": "attachment; filename=projects_backup.json"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Projects backup failed: {str(e)}")
+
+
+@api_router.post("/restore/contacts")
+async def restore_contacts(data: dict):
+    """Restore contacts from backup (uses upsert to avoid duplicates)"""
+    try:
+        contacts = data.get("contacts", [])
+        restored = 0
+        
+        for contact in contacts:
+            if contact.get("id"):
+                await db.master_contacts.update_one(
+                    {"id": contact["id"]},
+                    {"$set": contact},
+                    upsert=True
+                )
+                restored += 1
+        
+        return {"success": True, "restored_count": restored}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Restore failed: {str(e)}")
+
+
 app.include_router(api_router)
 
 
