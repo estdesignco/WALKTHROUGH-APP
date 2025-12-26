@@ -6301,6 +6301,93 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 print(f"✅ UTTERMOST FINISH FROM DESC: {result['finish_color']}")
                                 break
             
+            # VENDOR-SPECIFIC: Visual Comfort
+            elif 'visualcomfort.com' in domain:
+                import re
+                # Visual Comfort uses specific finish naming in product pages
+                # Common patterns: "Finish: Hand-Rubbed Antique Brass", "Finish: Burnished Brass"
+                
+                # Try to get finish from selected swatch or active option
+                try:
+                    finish_selectors = [
+                        '.selected-finish', '.finish-name.active', '.swatch-selected .name',
+                        '[data-selected-finish]', '.option-selected[data-type="finish"]',
+                        '.pdp-swatch-selected', '.finish-option.selected'
+                    ]
+                    for sel in finish_selectors:
+                        selected = await page.query_selector(sel)
+                        if selected:
+                            text = await selected.text_content()
+                            if text and len(text.strip()) > 2 and len(text.strip()) < 60:
+                                result['finish_color'] = text.strip()
+                                print(f"✅ VISUAL COMFORT SELECTED FINISH: {result['finish_color']}")
+                                break
+                except:
+                    pass
+                
+                # Try regex patterns for finish field
+                if not result.get('finish_color'):
+                    finish_patterns = [
+                        r'Finish\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Socket|Wattage|Height)',
+                        r'Selected\s+Finish\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.)',
+                        r'Color\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Socket)',
+                    ]
+                    for pattern in finish_patterns:
+                        finish_match = re.search(pattern, all_text, re.IGNORECASE)
+                        if finish_match:
+                            finish = finish_match.group(1).strip()
+                            skip_terms = ['select', 'choose', 'click', 'view', 'options']
+                            if len(finish) > 2 and len(finish) < 60 and not any(skip in finish.lower() for skip in skip_terms):
+                                result['finish_color'] = finish
+                                print(f"✅ VISUAL COMFORT FINISH: {result['finish_color']}")
+                                break
+                
+                # Try to extract finish from SKU or product name
+                # Visual Comfort SKUs often contain finish codes like HAB (Hand-Rubbed Antique Brass), PN (Polished Nickel), etc.
+                if not result.get('finish_color'):
+                    sku = result.get('sku', '') or ''
+                    name = result.get('name', '') or ''
+                    
+                    # Common Visual Comfort finish codes
+                    finish_codes = {
+                        'HAB': 'Hand-Rubbed Antique Brass',
+                        'PN': 'Polished Nickel',
+                        'BZ': 'Bronze',
+                        'AI': 'Aged Iron',
+                        'GI': 'Gilded Iron',
+                        'NB': 'Natural Brass',
+                        'BLK': 'Black',
+                        'WHT': 'White',
+                        'SB': 'Soft Brass',
+                        'BB': 'Burnished Brass',
+                        'CG': 'Clear Glass',
+                        'ALB': 'Antique-Burnished Brass',
+                        'EU': 'European White',
+                        'G': 'Gild',
+                    }
+                    
+                    # Check SKU for finish codes
+                    for code, finish_name in finish_codes.items():
+                        if code in sku.upper():
+                            result['finish_color'] = finish_name
+                            print(f"✅ VISUAL COMFORT FINISH FROM SKU: {result['finish_color']}")
+                            break
+                
+                # Try common finish names in page text
+                if not result.get('finish_color'):
+                    common_finishes = [
+                        'hand-rubbed antique brass', 'polished nickel', 'burnished brass', 'antique brass',
+                        'aged iron', 'gilded iron', 'natural brass', 'soft brass', 'bronze', 
+                        'matte black', 'polished chrome', 'satin nickel', 'oil rubbed bronze',
+                        'antique nickel', 'antique gold', 'gild', 'iron', 'brass', 'nickel', 'chrome'
+                    ]
+                    text_lower = all_text.lower()
+                    for finish in common_finishes:
+                        if finish in text_lower:
+                            result['finish_color'] = finish.title()
+                            print(f"✅ VISUAL COMFORT FINISH FROM TEXT: {result['finish_color']}")
+                            break
+            
             # VENDOR-SPECIFIC: Jaipur Living
             elif 'jaipurliving.com' in domain:
                 import re
