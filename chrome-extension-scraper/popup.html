@@ -3,41 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 220px;
-      padding: 15px;
-      font-family: -apple-system, sans-serif;
-      background: #1a1a2e;
+      width: 450px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f1a;
       color: #fff;
-      margin: 0;
     }
-    .main-btn {
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      padding: 15px;
+      border-bottom: 1px solid #333;
+    }
+    .header h1 {
+      font-size: 16px;
+      color: #4ade80;
+      margin-bottom: 10px;
+    }
+    .scrape-btn {
       width: 100%;
-      padding: 16px;
-      background: #4ade80;
+      padding: 12px;
+      background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
       color: #000;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: 8px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
     }
-    .main-btn:hover { background: #22c55e; }
-    .main-btn:disabled { background: #444; color: #888; }
-    .status {
-      margin-top: 10px;
+    .scrape-btn:hover { opacity: 0.9; }
+    .scrape-btn:disabled { background: #444; color: #888; cursor: wait; }
+    
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .result-table th {
+      background: #1a1a2e;
+      padding: 10px 8px;
+      text-align: left;
+      color: #888;
+      font-weight: 500;
+      border-bottom: 1px solid #333;
+    }
+    .result-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #222;
+      color: #fff;
+      vertical-align: top;
+    }
+    .result-table tr:hover { background: #1a1a2e; }
+    
+    .field-label { color: #888; font-size: 10px; display: block; margin-bottom: 2px; }
+    .field-value { color: #fff; word-break: break-word; }
+    .field-value.price { color: #4ade80; font-weight: 700; font-size: 16px; }
+    .field-value.missing { color: #f87171; }
+    
+    .product-image {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #222;
+    }
+    
+    .actions {
+      padding: 15px;
+      background: #1a1a2e;
+      border-top: 1px solid #333;
+    }
+    .send-btn {
+      width: 100%;
+      padding: 14px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .send-btn:hover { background: #4f46e5; }
+    .send-btn:disabled { background: #444; color: #888; }
+    
+    .copy-btn {
+      width: 100%;
       padding: 10px;
-      border-radius: 6px;
+      background: transparent;
+      color: #888;
+      border: 1px solid #444;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #222; color: #fff; }
+    
+    .status {
+      padding: 10px 15px;
       font-size: 12px;
       text-align: center;
     }
-    .success { background: #166534; color: #4ade80; }
-    .error { background: #7f1d1d; color: #fca5a5; }
+    .status.success { background: #166534; color: #4ade80; }
+    .status.error { background: #7f1d1d; color: #fca5a5; }
+    .status.info { background: #1e3a5f; color: #93c5fd; }
+    
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: #666;
+    }
+    .empty-state p { margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <button id="btn" class="main-btn">⚡ ADD TO APP</button>
-  <div id="status" class="status" style="display:none"></div>
+  <div class="header">
+    <h1>🛒 Design Ready Scraper</h1>
+    <button id="scrapeBtn" class="scrape-btn">⚡ SCRAPE THIS PAGE</button>
+  </div>
+  
+  <div id="status" class="status" style="display: none;"></div>
+  
+  <div id="emptyState" class="empty-state">
+    <p>Navigate to a product page and click "Scrape" to extract data.</p>
+  </div>
+  
+  <div id="resultContainer" style="display: none;">
+    <table class="result-table">
+      <tbody>
+        <tr>
+          <td style="width: 80px;">
+            <span class="field-label">Image</span>
+            <img id="resultImage" class="product-image" src="" alt="">
+          </td>
+          <td>
+            <span class="field-label">Product Name</span>
+            <div id="resultName" class="field-value">-</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="field-label">Price (USD)</span>
+            <div id="resultPrice" class="field-value price">-</div>
+          </td>
+          <td>
+            <span class="field-label">MSRP</span>
+            <div id="resultMsrp" class="field-value">-</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="field-label">SKU</span>
+            <div id="resultSku" class="field-value">-</div>
+          </td>
+          <td>
+            <span class="field-label">Vendor</span>
+            <div id="resultVendor" class="field-value">-</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="field-label">Size</span>
+            <div id="resultSize" class="field-value">-</div>
+          </td>
+          <td>
+            <span class="field-label">Finish/Color</span>
+            <div id="resultFinish" class="field-value">-</div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <span class="field-label">Product URL</span>
+            <div id="resultUrl" class="field-value" style="font-size: 10px; color: #666;">-</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <div class="actions">
+      <button id="sendBtn" class="send-btn">🚀 SEND TO DESIGN READY APP</button>
+      <button id="copyBtn" class="copy-btn">📋 Copy to Clipboard</button>
+    </div>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
