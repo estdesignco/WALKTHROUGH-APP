@@ -77,14 +77,35 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
       });
       
       let websiteData = null;
+      let result = null;
       if (scrapeResponse.ok) {
         const scrapeResult = await scrapeResponse.json();
+        result = scrapeResult;
         console.log('🔍 Scrape API Response:', JSON.stringify(scrapeResult, null, 2));
         if (scrapeResult.success && scrapeResult.data) {
           websiteData = scrapeResult.data;
           console.log('🔍 websiteData extracted:', JSON.stringify(websiteData, null, 2));
           console.log('🔍 finish_color from websiteData:', websiteData.finish_color);
           console.log('🔍 color from websiteData:', websiteData.color);
+        }
+      }
+      
+      // Check extension cache for price (if server scraper couldn't get it)
+      if (!websiteData?.price && !websiteData?.cost) {
+        try {
+          const cacheResponse = await fetch(`${backendUrl}/api/extension-scrape-cache?url=${encodeURIComponent(url)}`);
+          if (cacheResponse.ok) {
+            const cacheResult = await cacheResponse.json();
+            if (cacheResult.success && cacheResult.data && cacheResult.data.price) {
+              console.log('💰 Found price in extension cache:', cacheResult.data.price);
+              if (websiteData) {
+                websiteData.price = cacheResult.data.price;
+                websiteData.cost = cacheResult.data.price;
+              }
+            }
+          }
+        } catch (e) {
+          console.log('Extension cache check failed:', e);
         }
       }
       
