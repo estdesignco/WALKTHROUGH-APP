@@ -1,5 +1,7 @@
-// Content script that runs on wholesale vendor pages
-// This scrapes product data from the USER'S logged-in browser session
+// Content script - scrapes product data from the USER'S logged-in browser
+// ONE CLICK = Scrape + Send to App (no extra steps)
+
+const BACKEND_URL = 'https://designready-1.preview.emergentagent.com';
 
 console.log('🛒 Product Scraper loaded on:', window.location.href);
 
@@ -12,148 +14,232 @@ function scrapeProductData() {
   
   const data = {
     url: url,
-    vendor: domain,
+    vendor: getVendorName(domain),
     name: null,
     sku: null,
     price: null,
     size: null,
     finish_color: null,
-    image_url: null
+    image_url: null,
+    msrp: null
   };
   
-  // Get all text from the page
   const bodyText = document.body.innerText || '';
-  const bodyHTML = document.body.innerHTML || '';
   
-  // === EXTRACT NAME ===
-  // Try H1 first
-  const h1 = document.querySelector('h1');
-  if (h1) {
-    data.name = h1.innerText.trim();
+  // === VENDOR-SPECIFIC EXTRACTION ===
+  if (domain.includes('uttermost')) {
+    data.name = extractText('h1') || extractMeta('og:title');
+    data.sku = extractPattern(bodyText, /SKU[:\s]*(\d+)/i) || extractFromUrl(/[-\/](\d{5})/);
+    data.price = extractUttermost Price(bodyText);
+    data.msrp = extractPattern(bodyText, /Suggested retail price[:\s]*\$?([\d,]+)/i);
+    data.size = extractPattern(bodyText, /Dimensions[:\s]*([^\n]+)/i) || 
+                extractPattern(bodyText, /(\d+\.?\d*)\s*W\s*X\s*(\d+\.?\d*)\s*H\s*X\s*(\d+\.?\d*)\s*D/i);
+    data.finish_color = extractPattern(bodyText, /Finish[:\s]*([^\n,]+)/i);
+    data.image_url = extractMeta('og:image') || extractFirstImage();
+  } 
+  else if (domain.includes('visualcomfort')) {
+    data.name = extractText('h1.product-name, h1');
+    data.sku = extractPattern(bodyText, /SKU[:\s]*([A-Z0-9-]+)/i);
+    data.price = extractFirstPrice(bodyText);
+    data.size = extractPattern(bodyText, /Dimensions[:\s]*([^\n]+)/i);
+    data.finish_color = extractPattern(bodyText, /Finish[:\s]*([^\n,]+)/i);
+    data.image_url = extractMeta('og:image');
   }
-  // Fallback to title
-  if (!data.name || data.name.length < 3) {
-    const title = document.querySelector('title');
-    if (title) {
-      data.name = title.innerText.split('|')[0].split('-')[0].trim();
-    }
+  else if (domain.includes('fourhands')) {
+    data.name = extractText('h1');
+    data.sku = extractPattern(bodyText, /Item[:\s#]*([A-Z0-9-]+)/i) || extractFromUrl(/product\/([^\/]+)/);
+    data.price = extractFirstPrice(bodyText);
+    data.size = extractPattern(bodyText, /(\d+\.?\d*)"?\s*[Ww]\s*[Xx×]\s*(\d+\.?\d*)"?\s*[Dd]\s*[Xx×]\s*(\d+\.?\d*)"?\s*[Hh]/);
+    data.finish_color = extractPattern(bodyText, /Finish[:\s]*([^\n,]+)/i);
+    data.image_url = extractMeta('og:image');
   }
-  
-  // === EXTRACT PRICE ===
-  // Look for dollar amounts - the wholesale/trade price is usually the LOWER one
-  const priceMatches = bodyText.match(/\$[\d,]+\.?\d*/g) || [];
-  console.log('💰 Found price patterns:', priceMatches);
-  
-  if (priceMatches.length > 0) {
-    // Convert to numbers and sort
-    const prices = priceMatches.map(p => {
-      const num = parseFloat(p.replace(/[$,]/g, ''));
-      return isNaN(num) ? 0 : num;
-    }).filter(p => p > 10 && p < 100000); // Filter reasonable prices
-    
-    // Sort ascending - lowest is usually trade/wholesale price
-    prices.sort((a, b) => a - b);
-    
-    if (prices.length > 0) {
-      data.price = prices[0]; // Take the lowest price
-      console.log('✅ Selected price:', data.price);
-    }
-  }
-  
-  // === EXTRACT SKU ===
-  // Look for SKU patterns
-  const skuPatterns = [
-    /SKU[:\s]*([A-Z0-9-]+)/i,
-    /Item[:\s#]*([A-Z0-9-]+)/i,
-    /Model[:\s#]*([A-Z0-9-]+)/i,
-    /Product[:\s#]*([A-Z0-9-]+)/i
-  ];
-  
-  for (const pattern of skuPatterns) {
-    const match = bodyText.match(pattern);
-    if (match) {
-      data.sku = match[1].toUpperCase();
-      break;
-    }
+  else {
+    // Generic extraction for other vendors
+    data.name = extractText('h1') || extractMeta('og:title');
+    data.sku = extractPattern(bodyText, /SKU[:\s]*([A-Z0-9-]+)/i) || 
+               extractPattern(bodyText, /Item[:\s#]*([A-Z0-9-]+)/i) ||
+               extractFromUrl(/[-\/]([A-Z]?\d{4,6}[-A-Z0-9]*)/i);
+    data.price = extractFirstPrice(bodyText);
+    data.size = extractPattern(bodyText, /Dimensions?[:\s]*([^\n]+)/i) ||
+                extractPattern(bodyText, /Size[:\s]*([^\n]+)/i);
+    data.finish_color = extractPattern(bodyText, /Finish[:\s]*([^\n,]+)/i) ||
+                        extractPattern(bodyText, /Color[:\s]*([^\n,]+)/i);
+    data.image_url = extractMeta('og:image') || extractFirstImage();
   }
   
-  // Fallback: extract from URL
-  if (!data.sku) {
-    const urlSkuMatch = url.match(/[-\/]([A-Z]?\d{4,6}[-A-Z0-9]*)/i);
-    if (urlSkuMatch) {
-      data.sku = urlSkuMatch[1].toUpperCase();
-    }
-  }
-  
-  // === EXTRACT SIZE/DIMENSIONS ===
-  const sizePatterns = [
-    /(\d+\.?\d*)\s*["']?\s*[HhWwDdLl]\s*[Xx×]\s*(\d+\.?\d*)\s*["']?\s*[HhWwDdLl]\s*[Xx×]?\s*(\d+\.?\d*)?/,
-    /Dimensions?[:\s]*([^<\n]+)/i,
-    /Size[:\s]*([^<\n]+)/i,
-    /(\d+\.?\d*)\s*[Hh]\s*[Xx×]\s*(\d+\.?\d*)\s*[Ww]\s*[Xx×]?\s*(\d+\.?\d*)?\s*[Dd]?/
-  ];
-  
-  for (const pattern of sizePatterns) {
-    const match = bodyText.match(pattern);
-    if (match) {
-      if (match[3]) {
-        data.size = `${match[1]} x ${match[2]} x ${match[3]}`;
-      } else if (match[2]) {
-        data.size = `${match[1]} x ${match[2]}`;
-      } else if (match[1]) {
-        data.size = match[1].trim();
-      }
-      break;
-    }
-  }
-  
-  // === EXTRACT FINISH/COLOR ===
-  const finishPatterns = [
-    /Finish[:\s]*([^<\n,]+)/i,
-    /Color[:\s]*([^<\n,]+)/i,
-    /Material[:\s]*([^<\n,]+)/i
-  ];
-  
-  for (const pattern of finishPatterns) {
-    const match = bodyText.match(pattern);
-    if (match && match[1].length < 100) {
-      data.finish_color = match[1].trim();
-      break;
-    }
-  }
-  
-  // === EXTRACT IMAGE ===
-  // Try Open Graph image first
-  const ogImage = document.querySelector('meta[property="og:image"]');
-  if (ogImage) {
-    data.image_url = ogImage.content;
-  }
-  
-  // Fallback to main product image
-  if (!data.image_url) {
-    const productImages = document.querySelectorAll('img[src*="product"], img[class*="product"], img[class*="gallery"]');
-    if (productImages.length > 0) {
-      data.image_url = productImages[0].src;
-    }
+  // Clean up size if it's a match array
+  if (data.size && typeof data.size === 'object') {
+    data.size = `${data.size[1]}W x ${data.size[2]}H x ${data.size[3] || ''}D`.trim();
   }
   
   console.log('📦 Scraped data:', data);
   return data;
 }
 
-// Listen for messages from the popup
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('📨 Received message:', request);
+// Helper functions
+function extractText(selector) {
+  const el = document.querySelector(selector);
+  return el ? el.innerText.trim() : null;
+}
+
+function extractMeta(property) {
+  const el = document.querySelector(`meta[property="${property}"], meta[name="${property}"]`);
+  return el ? el.content : null;
+}
+
+function extractPattern(text, pattern) {
+  const match = text.match(pattern);
+  return match ? (match[1] || match[0]).trim() : null;
+}
+
+function extractFromUrl(pattern) {
+  const match = window.location.href.match(pattern);
+  return match ? match[1] : null;
+}
+
+function extractFirstImage() {
+  const imgs = document.querySelectorAll('img[src*="product"], img.product-image, .gallery img');
+  return imgs.length > 0 ? imgs[0].src : null;
+}
+
+function extractUttermostPrice(text) {
+  // Uttermost shows wholesale price first, then "Suggested retail price"
+  // Look for dollar amount that's NOT after "Suggested retail"
+  const lines = text.split('\n');
+  for (const line of lines) {
+    if (line.toLowerCase().includes('suggested retail')) continue;
+    const priceMatch = line.match(/\$\s*([\d,]+(?:\.\d{2})?)/);
+    if (priceMatch) {
+      return parseFloat(priceMatch[1].replace(/,/g, ''));
+    }
+  }
+  return null;
+}
+
+function extractFirstPrice(text) {
+  const prices = text.match(/\$\s*([\d,]+(?:\.\d{2})?)/g) || [];
+  if (prices.length === 0) return null;
   
-  if (request.action === 'scrapeProduct') {
-    const data = scrapeProductData();
-    sendResponse({ success: true, data: data });
+  // Convert to numbers and get the lowest (usually wholesale)
+  const numPrices = prices.map(p => parseFloat(p.replace(/[$,]/g, '')))
+                          .filter(p => p > 10 && p < 100000)
+                          .sort((a, b) => a - b);
+  
+  return numPrices.length > 0 ? numPrices[0] : null;
+}
+
+function getVendorName(domain) {
+  const vendorMap = {
+    'uttermost.com': 'Uttermost',
+    'visualcomfort.com': 'Visual Comfort',
+    'fourhands.com': 'Four Hands',
+    'bernhardt.com': 'Bernhardt',
+    'reginaandrew.com': 'Regina Andrew',
+    'loloirugs.com': 'Loloi',
+    'jaipurliving.com': 'Jaipur Living',
+    'globalviews.com': 'Global Views',
+    'surya.com': 'Surya',
+    'gabby.com': 'Gabby'
+  };
+  
+  for (const [key, value] of Object.entries(vendorMap)) {
+    if (domain.includes(key.replace('.com', ''))) return value;
+  }
+  return domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
+}
+
+// Send data to app automatically
+async function sendToApp(data) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/extension-scrape`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    if (response.ok) {
+      console.log('✅ Data sent to app successfully');
+      return { success: true };
+    } else {
+      console.error('❌ Failed to send data:', response.status);
+      return { success: false, error: `Server error: ${response.status}` };
+    }
+  } catch (e) {
+    console.error('❌ Error sending data:', e);
+    return { success: false, error: e.message };
+  }
+}
+
+// ONE CLICK: Scrape + Send + Open App
+async function scrapeAndSend() {
+  const data = scrapeProductData();
+  const result = await sendToApp(data);
+  
+  if (result.success) {
+    // Open the app in a new tab with the data pre-filled
+    const appUrl = `${BACKEND_URL}?scraped=true&url=${encodeURIComponent(data.url)}`;
+    
+    // Show success notification
+    showNotification('✅ Product scraped! Price: $' + (data.price || 'N/A'), 'success');
+  } else {
+    showNotification('❌ Failed to send: ' + result.error, 'error');
   }
   
-  return true;
+  return { ...result, data };
+}
+
+// Show a notification on the page
+function showNotification(message, type = 'info') {
+  const existing = document.getElementById('scraper-notification');
+  if (existing) existing.remove();
+  
+  const div = document.createElement('div');
+  div.id = 'scraper-notification';
+  div.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+    color: white;
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999999;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+  `;
+  div.textContent = message;
+  document.body.appendChild(div);
+  
+  // Add animation style
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  setTimeout(() => div.remove(), 4000);
+}
+
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'scrapeAndSend') {
+    scrapeAndSend().then(result => sendResponse(result));
+    return true; // Keep channel open for async response
+  }
+  if (request.action === 'scrapeOnly') {
+    const data = scrapeProductData();
+    sendResponse({ success: true, data });
+  }
 });
 
-// Also expose scrapeProductData to the window for debugging
+// Expose for debugging
 window.scrapeProductData = scrapeProductData;
+window.scrapeAndSend = scrapeAndSend;
 
-console.log('✅ Product Scraper ready! You can call window.scrapeProductData() to test.');
+console.log('✅ Product Scraper ready! Click extension icon to scrape.');
