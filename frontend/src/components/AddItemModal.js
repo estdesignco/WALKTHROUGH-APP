@@ -137,12 +137,15 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         const source = websiteData ? 'website' : 'database';
         // Show warning if price was not found (common for wholesale vendor login walls)
         const priceFound = mergedData.cost && mergedData.cost > 0;
+        const priceNote = result?.price_note;
         if (priceFound) {
           setUrlLookupMessage(`✅ Loaded "${mergedData.name}" - $${mergedData.cost}`);
+        } else if (priceNote) {
+          setUrlLookupMessage(`✅ Loaded "${mergedData.name}" - ⚠️ ${priceNote}`);
         } else {
-          setUrlLookupMessage(`✅ Loaded "${mergedData.name}" - ⚠️ Price not found (enter from your logged-in browser)`);
+          setUrlLookupMessage(`✅ Loaded "${mergedData.name}" - ⚠️ Enter price from your logged-in browser`);
         }
-        setTimeout(() => setUrlLookupMessage(''), 5000);
+        setTimeout(() => setUrlLookupMessage(''), 8000);
       } else {
         setUrlLookupMessage('⚠️ Could not extract product data');
         setTimeout(() => setUrlLookupMessage(''), 3000);
