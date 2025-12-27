@@ -5640,11 +5640,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # Vendor-specific price selectors (most reliable)
             vendor_price_selectors = {
                 'uttermost.com': [
-                    # Uttermost specific - wholesale/trade price usually first
+                    # Uttermost Revelation site specific - price is displayed as plain text "$199.00"
+                    'text=$199', 'text=$', 
                     '[class*="price"]:not([class*="retail"]):not([class*="suggested"])',
                     '.price', '.cost', '.product-price',
-                    'span:has-text("$")', 'div:has-text("$")',
-                    '[class*="ProductPrice"]', '[class*="price"]',
                 ],
                 'hvlgroup.com': [
                     '.product-price', '.price', '.cost',
