@@ -7539,6 +7539,69 @@ async def scrape_product_advanced(data: dict):
         raise HTTPException(status_code=400, detail=f"Failed to scrape URL: {str(e)}")
 
 # REMOVED HOUZZ FUNCTION: async def auto_clip_to_houzz_pro(product_url: str, product_info: dict) -> dict:
+
+# ===== BROWSER EXTENSION ENDPOINT =====
+# Receives scraped data from the user's logged-in browser session
+@api_router.post("/extension-scrape")
+async def receive_extension_scrape(data: dict):
+    """
+    Receives product data scraped by the browser extension.
+    This allows getting prices from the user's logged-in session.
+    """
+    print(f"📥 RECEIVED DATA FROM BROWSER EXTENSION")
+    print(f"   URL: {data.get('url')}")
+    print(f"   Name: {data.get('name')}")
+    print(f"   Price: {data.get('price')}")
+    print(f"   SKU: {data.get('sku')}")
+    
+    # Store the scraped data in a temporary cache
+    # This allows the frontend to retrieve it when adding items
+    cache_key = data.get('url', '').split('?')[0]  # Remove query params
+    
+    # Store in MongoDB for persistence
+    try:
+        await db.extension_scrape_cache.update_one(
+            {"url": cache_key},
+            {"$set": {
+                "url": data.get('url'),
+                "name": data.get('name'),
+                "price": data.get('price'),
+                "sku": data.get('sku'),
+                "size": data.get('size'),
+                "finish_color": data.get('finish_color'),
+                "image_url": data.get('image_url'),
+                "vendor": data.get('vendor'),
+                "scraped_at": datetime.utcnow().isoformat()
+            }},
+            upsert=True
+        )
+        print(f"   ✅ Cached extension data for: {cache_key}")
+    except Exception as e:
+        print(f"   ⚠️ Failed to cache: {e}")
+    
+    return {
+        "success": True,
+        "message": "Data received from extension",
+        "data": data
+    }
+
+# Endpoint to get cached extension data
+@api_router.get("/extension-scrape-cache")
+async def get_extension_cache(url: str = None):
+    """Get cached data from extension scrapes"""
+    if not url:
+        # Return all cached items
+        items = await db.extension_scrape_cache.find({}, {"_id": 0}).to_list(100)
+        return {"items": items}
+    
+    # Get specific URL
+    cache_key = url.split('?')[0]
+    item = await db.extension_scrape_cache.find_one({"url": {"$regex": cache_key}}, {"_id": 0})
+    
+    if item:
+        return {"success": True, "data": item}
+    return {"success": False, "message": "No cached data for this URL"}
+
 async def extract_links_from_canva_board(board_url: str, page_number: Optional[int] = None) -> list:
     """
     Extract product links from a Canva board using advanced bot detection bypass
