@@ -6371,6 +6371,38 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             elif 'uttermost.com' in domain:
                 import re
                 
+                # UTTERMOST: Extract PRICE first (since user is logged in and can see it)
+                # Price format on Uttermost Revelation: "$199.00"
+                if not result.get('price'):
+                    try:
+                        # Get all text from page
+                        body_text = await page.inner_text('body')
+                        
+                        # Look for price patterns - Uttermost shows "$199.00" format
+                        # Skip suggested retail prices (usually higher, like $597.00)
+                        price_matches = re.findall(r'\$(\d{1,3}(?:,\d{3})*\.?\d{0,2})', body_text)
+                        if price_matches:
+                            # Convert to floats and filter
+                            prices = []
+                            for p in price_matches:
+                                try:
+                                    val = float(p.replace(',', ''))
+                                    # Skip very small numbers (likely not prices)
+                                    if val > 10:
+                                        prices.append(val)
+                                except:
+                                    continue
+                            
+                            if prices:
+                                # For wholesale, the LOWER price is usually the trade price
+                                # Higher price is suggested retail
+                                prices = sorted(set(prices))
+                                # Take the lowest non-trivial price as wholesale
+                                result['price'] = prices[0]
+                                print(f"✅ UTTERMOST PRICE: ${result['price']}")
+                    except Exception as e:
+                        print(f"⚠️ Uttermost price extraction error: {e}")
+                
                 # UTTERMOST: Extract product NAME properly (not vendor name)
                 # Uttermost product pages have format like "Quill 9 Light Chandelier"
                 if not result.get('name') or result.get('name') == 'Uttermost':
