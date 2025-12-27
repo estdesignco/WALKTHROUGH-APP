@@ -411,65 +411,51 @@ function scrapePageData() {
     }
   }
   
-  // ======= FINISH/SWATCH IMAGE (CRITICAL) =======
-  // Look for swatch/finish images specifically
+  // ======= MAIN PRODUCT IMAGE (AGGRESSIVE) =======
+  // Strategy: Find ALL images, filter by size and position, pick the best one
   
-  // Uttermost-specific: Get the color swatch images
-  if (domain.includes('uttermost') && !data.finish_image) {
-    // Look for color section images
-    const colorSection = document.querySelector('[class*="color"], [class*="swatch"]');
-    if (colorSection) {
-      const swatchImg = colorSection.querySelector('img');
-      if (swatchImg && swatchImg.src && swatchImg.src.startsWith('http')) {
-        data.finish_image = swatchImg.src;
-      }
-    }
-    // Alternative: find images near "Color" text
-    if (!data.finish_image) {
-      const allImgs = document.querySelectorAll('img');
-      for (const img of allImgs) {
-        if (img.src && (img.src.includes('swatch') || img.src.includes('color') || 
-            img.alt?.toLowerCase().includes('color') || img.alt?.toLowerCase().includes('finish'))) {
-          if (img.src.startsWith('http') && !img.src.startsWith('data:')) {
-            data.finish_image = img.src;
-            break;
-          }
-        }
-      }
-    }
+  // First try: og:image meta tag (most reliable)
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  if (ogImage && ogImage.content) {
+    data.image_url = ogImage.content;
   }
   
-  const swatchSelectors = [
-    '[class*="swatch"] img',
-    '[class*="finish"] img',
-    '[class*="color-option"] img',
-    '[class*="variant-image"] img',
-    '[class*="option-swatch"]',
-    'img[class*="swatch"]',
-    'img[class*="finish"]',
-    '.color-swatch img',
-    '.finish-swatch img',
-    '[data-swatch] img',
-    // Four Hands specific
-    'img[src*="swatch"]',
-    'img[src*="Swatch"]',
-    'img[src*="finish"]',
-    'img[src*="Finish"]',
-    // Selected/active swatch
-    '[class*="selected"] img[class*="swatch"]',
-    '[class*="active"] img[class*="swatch"]',
-    '.selected .swatch-image',
-    '.active .swatch-image'
-  ];
-  
-  if (!data.finish_image) {
-    for (const sel of swatchSelectors) {
+  // Second try: Specific selectors for product images
+  if (!data.image_url) {
+    const imgSelectors = [
+      // Common e-commerce patterns
+      '[class*="product-image"] img',
+      '[class*="ProductImage"] img', 
+      '[class*="product-detail"] img',
+      '[class*="main-image"] img',
+      '[class*="MainImage"] img',
+      '[class*="hero-image"] img',
+      '[class*="gallery"] img:first-child',
+      '[class*="Gallery"] img:first-child',
+      '[class*="zoom"] img',
+      '[class*="Zoom"] img',
+      '.pdp-image img',
+      '[itemprop="image"]',
+      // Uttermost specific
+      '[class*="slick"] img',
+      '[class*="carousel"] img:first-child',
+      '[class*="slider"] img:first-child',
+      // Data attributes
+      'img[data-zoom-image]',
+      'img[data-large]',
+      'img[data-src]'
+    ];
+    
+    for (const sel of imgSelectors) {
       try {
         const el = document.querySelector(sel);
         if (el) {
-          const src = el.src || el.getAttribute('data-src') || el.style.backgroundImage?.match(/url\(["']?([^"')]+)["']?\)/)?.[1];
-          if (src && src.startsWith('http') && !src.includes('placeholder') && !src.startsWith('data:')) {
-            data.finish_image = src;
+          // Check multiple possible sources
+          const src = el.src || el.getAttribute('data-src') || el.getAttribute('data-zoom-image') || 
+                      el.getAttribute('data-large') || el.getAttribute('data-lazy') || el.getAttribute('content');
+          if (src && src.startsWith('http') && !src.includes('placeholder') && 
+              !src.includes('spacer') && !src.includes('loading') && !src.startsWith('data:')) {
+            data.image_url = src;
             break;
           }
         }
@@ -477,13 +463,104 @@ function scrapePageData() {
     }
   }
   
-  // If no dedicated swatch, try to find an image that looks like a finish swatch (small square images)
-  if (!data.finish_image) {
+  // Third try: Find the LARGEST image on the page (likely the product image)
+  if (!data.image_url) {
     const allImages = document.querySelectorAll('img');
+    let bestImage = null;
+    let bestSize = 0;
+    
     for (const img of allImages) {
-      const src = img.src;
-      if (src && (src.toLowerCase().includes('swatch') || src.toLowerCase().includes('finish') || src.toLowerCase().includes('_color'))) {
-        if (!src.startsWith('data:') && src.startsWith('http')) {
+      // Get actual displayed size or natural size
+      const width = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
+      const height = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
+      const size = width * height;
+      
+      // Get source
+      const src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src');
+      
+      // Skip invalid images
+      if (!src || src.startsWith('data:') || src.includes('placeholder') || 
+          src.includes('spacer') || src.includes('pixel') || src.includes('logo') ||
+          src.includes('icon') || src.includes('sprite') || src.includes('loading')) {
+        continue;
+      }
+      
+      // Must be reasonably large (at least 100x100)
+      if (size > bestSize && width >= 100 && height >= 100) {
+        bestSize = size;
+        bestImage = src;
+      }
+    }
+    
+    if (bestImage) {
+      data.image_url = bestImage;
+    }
+  }
+  
+  // ======= FINISH/SWATCH IMAGE (AGGRESSIVE) =======
+  
+  // First: Look for images with swatch/color in src or class
+  const allImgs = document.querySelectorAll('img');
+  for (const img of allImgs) {
+    const src = img.src || img.getAttribute('data-src') || '';
+    const className = (img.className || '').toLowerCase();
+    const alt = (img.alt || '').toLowerCase();
+    const parentClass = (img.parentElement?.className || '').toLowerCase();
+    
+    // Check if this looks like a swatch
+    const isSwatch = src.toLowerCase().includes('swatch') || 
+                     src.toLowerCase().includes('color') ||
+                     src.toLowerCase().includes('finish') ||
+                     className.includes('swatch') ||
+                     className.includes('color') ||
+                     alt.includes('swatch') ||
+                     alt.includes('color') ||
+                     alt.includes('finish') ||
+                     parentClass.includes('swatch') ||
+                     parentClass.includes('color');
+    
+    if (isSwatch && src && src.startsWith('http') && !src.startsWith('data:')) {
+      data.finish_image = src;
+      break;
+    }
+  }
+  
+  // Second: Look for small square images near "Color" or "Finish" labels
+  if (!data.finish_image) {
+    const labels = document.querySelectorAll('span, div, label, p');
+    for (const label of labels) {
+      const text = (label.innerText || '').toLowerCase().trim();
+      if (text === 'color' || text === 'finish' || text === 'colors' || text === 'finishes') {
+        // Found a color/finish label, look for nearby images
+        const parent = label.closest('div, section, li');
+        if (parent) {
+          const nearbyImgs = parent.querySelectorAll('img');
+          for (const img of nearbyImgs) {
+            const src = img.src || img.getAttribute('data-src');
+            if (src && src.startsWith('http') && !src.startsWith('data:')) {
+              data.finish_image = src;
+              break;
+            }
+          }
+        }
+        if (data.finish_image) break;
+      }
+    }
+  }
+  
+  // Third: If we have a finish_color from title but no image, try to use a thumbnail
+  if (!data.finish_image && data.finish_color) {
+    // Look for any small image (thumbnails are usually small)
+    for (const img of allImgs) {
+      const src = img.src || img.getAttribute('data-src');
+      const width = img.width || img.naturalWidth || 0;
+      const height = img.height || img.naturalHeight || 0;
+      
+      // Small square-ish images are often swatches (20-100px)
+      if (src && src.startsWith('http') && !src.startsWith('data:') &&
+          width >= 20 && width <= 100 && height >= 20 && height <= 100) {
+        // Skip icons and logos
+        if (!src.includes('icon') && !src.includes('logo') && !src.includes('sprite')) {
           data.finish_image = src;
           break;
         }
@@ -491,25 +568,9 @@ function scrapePageData() {
     }
   }
   
-  // ======= MAIN PRODUCT IMAGE =======
-  const imgSelectors = [
-    '[class*="product-image"] img', '[class*="gallery"] img:first-child',
-    '[class*="main-image"] img', '.pdp-image img', '[itemprop="image"]',
-    'meta[property="og:image"]'
-  ];
-  for (const sel of imgSelectors) {
-    const el = document.querySelector(sel);
-    if (el) {
-      const src = el.src || el.getAttribute('content') || el.getAttribute('href');
-      if (src && src.startsWith('http') && !src.includes('placeholder') && !src.startsWith('data:')) {
-        data.image_url = src;
-        break;
-      }
-    }
-  }
-  if (!data.image_url) {
-    const ogImage = document.querySelector('meta[property="og:image"]');
-    if (ogImage) data.image_url = ogImage.content;
+  // If STILL no finish image, use the main product image as fallback
+  if (!data.finish_image && data.image_url) {
+    data.finish_image = data.image_url;
   }
   
   return data;
