@@ -1032,3 +1032,68 @@ After extensive debugging of the Uttermost scraper:
 - **Jaipur Living**: ✅ WORKING (7/7 fields)
 - **Uttermost**: ❌ CREDENTIAL ISSUE - needs user verification
 
+
+---
+
+## CHROME EXTENSION REBUILD COMPLETE - December 27, 2024
+**Agent**: Fork Agent
+**Focus**: Complete rebuild of Chrome Extension for scraping bot-protected vendor sites
+**Status**: ✅ COMPLETED
+
+### Summary
+Rebuilt the Chrome Extension (`/app/chrome-extension-scraper/`) with:
+- Enhanced popup UI with table display of scraped data (like Thunderbit)
+- Improved scraping logic for 22+ vendors
+- "ADD TO DESIGN READY APP" button workflow
+- Vendor-specific extraction patterns
+
+### Extension Features (v2.0)
+1. **Popup UI**: Shows scraped data in a clean table before sending
+2. **One-Click Flow**: Scrape → Review → Send to App
+3. **Fields Extracted**: name, price, MSRP, SKU, size, finish/color, image, URL
+4. **Vendor Detection**: Automatically identifies 22+ supported vendors
+5. **Price Alert**: Shows warning if price not found (likely needs login)
+
+### API Endpoints Verified ✅
+| Endpoint | Method | Status |
+|----------|--------|--------|
+| `/api/extension-scrape` | POST | ✅ Working |
+| `/api/extension-scrape-cache` | GET | ✅ Working |
+| `/api/extension-scrape-latest` | GET | ✅ Working |
+
+### Frontend Integration Verified ✅
+- URL parameters correctly parsed from extension
+- localStorage correctly stores extension data
+- Add Item modal auto-populates with extension data
+- Shows success message: "Auto-filled from extension: [Product] - $[Price]"
+
+### Files Created/Updated
+- `/app/chrome-extension-scraper/popup.html` - Enhanced UI
+- `/app/chrome-extension-scraper/popup.js` - Enhanced scraping logic
+- `/app/chrome-extension-scraper/content.js` - Simplified content script
+- `/app/chrome-extension-scraper/manifest.json` - v2.0.0
+- `/app/chrome-extension-scraper/README.md` - Installation instructions
+- `/app/chrome-extension-scraper.zip` - Downloadable package
+
+### Installation Instructions for User
+1. Download `/app/chrome-extension-scraper.zip`
+2. Unzip to a permanent folder
+3. Go to `chrome://extensions/`
+4. Enable "Developer mode"
+5. Click "Load unpacked"
+6. Select the unzipped folder
+
+### Usage Workflow
+1. Login to vendor website (e.g., Uttermost)
+2. Navigate to product page
+3. Click extension icon
+4. Click "SCRAPE THIS PAGE"
+5. Review data in popup table
+6. Click "ADD TO DESIGN READY APP"
+7. App opens with pre-filled Add Item modal
+
+### Why Extension Instead of Server Scraper?
+- Server-side scraper is blocked by reCAPTCHA Enterprise on many vendors
+- Extension runs in user's browser with active login session
+- Extension can see prices that require authentication
+
