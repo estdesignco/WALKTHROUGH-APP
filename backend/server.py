@@ -6270,7 +6270,61 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # VENDOR-SPECIFIC: Uttermost
             elif 'uttermost.com' in domain:
                 import re
-                # Uttermost has several format patterns
+                
+                # UTTERMOST: Extract product NAME properly (not vendor name)
+                # Uttermost product pages have format like "Quill 9 Light Chandelier"
+                if not result.get('name') or result.get('name') == 'Uttermost':
+                    name_patterns = [
+                        r'<h1[^>]*>([^<]+)</h1>',
+                        r'"name"\s*:\s*"([^"]+)"',
+                        r'product-name[^>]*>([^<]+)<',
+                    ]
+                    for pattern in name_patterns:
+                        name_match = re.search(pattern, all_text, re.IGNORECASE)
+                        if name_match:
+                            name = name_match.group(1).strip()
+                            if name and name != 'Uttermost' and len(name) > 3:
+                                result['name'] = name
+                                print(f"✅ UTTERMOST NAME: {result['name']}")
+                                break
+                    
+                    # Try to get name from page title
+                    if not result.get('name') or result.get('name') == 'Uttermost':
+                        try:
+                            title = await page.title()
+                            if title and 'Uttermost' in title:
+                                # Title format: "Product Name | Uttermost"
+                                name = title.split('|')[0].strip()
+                                if name and name != 'Uttermost':
+                                    result['name'] = name
+                                    print(f"✅ UTTERMOST NAME FROM TITLE: {result['name']}")
+                        except:
+                            pass
+                
+                # UTTERMOST: Extract SIZE/DIMENSIONS
+                if not result.get('size'):
+                    size_patterns = [
+                        r'Dimensions?[:\s]*([^,\n]{5,50})',
+                        r'Size[:\s]*([^,\n]{5,50})',
+                        r'(\d+\.?\d*)\s*["\']?\s*[Ww]\s*[xX×]\s*(\d+\.?\d*)\s*["\']?\s*[Dd]?\s*[xX×]?\s*(\d+\.?\d*)?\s*["\']?\s*[Hh]?',
+                    ]
+                    for pattern in size_patterns:
+                        size_match = re.search(pattern, all_text, re.IGNORECASE)
+                        if size_match:
+                            if size_match.lastindex and size_match.lastindex >= 2:
+                                w = size_match.group(1)
+                                h = size_match.group(2)
+                                d = size_match.group(3) if size_match.lastindex >= 3 else None
+                                if d:
+                                    result['size'] = f'{w}"W x {d}"D x {h}"H'
+                                else:
+                                    result['size'] = f'{w}"W x {h}"H'
+                            else:
+                                result['size'] = size_match.group(1).strip()
+                            print(f"✅ UTTERMOST SIZE: {result['size']}")
+                            break
+                
+                # Uttermost has several format patterns for finish
                 # Look for explicit Finish: field first
                 finish_patterns = [
                     r'Finish\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Materials)',
@@ -6282,7 +6336,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     if finish_match:
                         finish = finish_match.group(1).strip()
                         # Skip generic terms
-                        skip_terms = ['click', 'select', 'view', 'add', 'cart', 'email', 'subscribe']
+                        skip_terms = ['click', 'select', 'view', 'add', 'cart', 'email', 'subscribe', 'uttermost']
                         if len(finish) > 2 and len(finish) < 50 and not any(skip in finish.lower() for skip in skip_terms):
                             result['finish_color'] = finish
                             print(f"✅ UTTERMOST FINISH: {result['finish_color']}")
