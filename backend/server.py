@@ -5261,8 +5261,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
                 is_actually_logged_in = any(ind.lower() in page_content.lower() for ind in login_indicators)
                 shows_login_form = any(ind.lower() in page_content.lower() for ind in logout_indicators) and 'logout' not in page_content.lower()
+                shows_error = 'error has occurred' in page_content.lower() or 'invalid' in page_content.lower()
                 
-                if is_actually_logged_in:
+                if shows_error:
+                    print(f"❌ LOGIN FAILED - Error message shown on page!")
+                    login_successful = False
+                elif is_actually_logged_in and not shows_login_form:
                     print(f"✅ LOGIN VERIFIED - Found logged-in indicators")
                     login_successful = True
                 elif shows_login_form:
