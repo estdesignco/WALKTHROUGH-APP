@@ -1,5 +1,5 @@
 // Design Ready Product Scraper - Popup Script
-// Version 2.0 - Enhanced with vendor-specific extraction
+// Version 2.1 - Enhanced with finish_image extraction and direct row targeting
 
 const APP_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
 const BACKEND_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
@@ -61,7 +61,7 @@ function displayResults(data) {
     loginWarning.style.display = 'flex';
   }
   
-  // Image
+  // Main product image
   const imgEl = document.getElementById('productImage');
   if (data.image_url && !data.image_url.startsWith('data:image/gif')) {
     imgEl.src = data.image_url;
@@ -69,6 +69,16 @@ function displayResults(data) {
   } else {
     imgEl.src = '';
     imgEl.style.display = 'none';
+  }
+  
+  // Finish swatch image
+  const finishImgEl = document.getElementById('finishImage');
+  const finishImgContainer = document.getElementById('finishImageContainer');
+  if (data.finish_image && !data.finish_image.startsWith('data:image/gif')) {
+    finishImgEl.src = data.finish_image;
+    finishImgContainer.style.display = 'block';
+  } else {
+    finishImgContainer.style.display = 'none';
   }
   
   // Data grid
@@ -106,8 +116,8 @@ function scrapePageData() {
     msrp: null,
     size: null,
     finish_color: null,
-    image_url: null,
-    finish_image: null
+    finish_image: null,  // CRITICAL: Swatch image URL
+    image_url: null
   };
   
   // ======= VENDOR DETECTION =======
@@ -143,13 +153,11 @@ function scrapePageData() {
     }
   }
   if (!data.vendor) {
-    // Try to extract from domain
     const domainPart = domain.split('.')[0];
     data.vendor = domainPart.charAt(0).toUpperCase() + domainPart.slice(1);
   }
   
   // ======= PRODUCT NAME =======
-  // Try multiple strategies
   const h1 = document.querySelector('h1');
   if (h1 && h1.innerText.trim().length > 2 && h1.innerText.trim().length < 200) {
     data.name = h1.innerText.trim();
@@ -182,7 +190,6 @@ function scrapePageData() {
       }
     }
   }
-  // Fallback: regex on body text
   if (!data.sku) {
     const skuPatterns = [
       /SKU[:#\s]*([A-Z0-9][-A-Z0-9]{2,20})/i,
@@ -198,14 +205,12 @@ function scrapePageData() {
       }
     }
   }
-  // Extract from URL if still not found
   if (!data.sku) {
     const urlMatch = url.match(/\/([A-Z0-9][-A-Z0-9]{4,15})(?:[\/?#]|$)/i);
     if (urlMatch) data.sku = urlMatch[1].toUpperCase();
   }
   
   // ======= PRICE EXTRACTION =======
-  // Strategy: Find all prices, pick the lowest valid one (usually wholesale)
   const priceSelectors = [
     '[class*="price"]:not([class*="compare"]):not([class*="msrp"]):not([class*="retail"])',
     '[class*="cost"]', '[class*="wholesale"]', '[class*="trade-price"]',
@@ -214,7 +219,6 @@ function scrapePageData() {
   
   let allPrices = [];
   
-  // From specific elements
   for (const sel of priceSelectors) {
     const els = document.querySelectorAll(sel);
     els.forEach(el => {
@@ -231,12 +235,8 @@ function scrapePageData() {
     });
   }
   
-  // From body text (excluding CSS/JS)
   const textContent = Array.from(document.querySelectorAll('p, span, div, td, li'))
-    .filter(el => {
-      const tag = el.tagName.toLowerCase();
-      return !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    })
+    .filter(el => !el.closest('script') && !el.closest('style') && !el.closest('noscript'))
     .map(el => el.innerText)
     .join(' ');
   
@@ -246,12 +246,11 @@ function scrapePageData() {
     if (val > 10 && val < 500000) allPrices.push(val);
   });
   
-  // Sort and pick
   allPrices = [...new Set(allPrices)].sort((a, b) => a - b);
   if (allPrices.length > 0) {
-    data.price = allPrices[0]; // Lowest = wholesale/trade
+    data.price = allPrices[0];
     if (allPrices.length > 1) {
-      data.msrp = allPrices[allPrices.length - 1]; // Highest = MSRP
+      data.msrp = allPrices[allPrices.length - 1];
     }
   }
   
@@ -296,7 +295,7 @@ function scrapePageData() {
   // ======= FINISH / COLOR =======
   const finishSelectors = [
     '[class*="finish"]', '[class*="color"]', '[class*="variant"]',
-    '[class*="selected-option"]', '[data-finish]'
+    '[class*="selected-option"]', '[data-finish]', '[class*="option-value"]'
   ];
   for (const sel of finishSelectors) {
     const el = document.querySelector(sel);
@@ -323,8 +322,59 @@ function scrapePageData() {
     }
   }
   
-  // ======= IMAGES =======
-  // Main product image
+  // ======= FINISH/SWATCH IMAGE (CRITICAL) =======
+  // Look for swatch/finish images specifically
+  const swatchSelectors = [
+    '[class*="swatch"] img',
+    '[class*="finish"] img',
+    '[class*="color-option"] img',
+    '[class*="variant-image"] img',
+    '[class*="option-swatch"]',
+    'img[class*="swatch"]',
+    'img[class*="finish"]',
+    '.color-swatch img',
+    '.finish-swatch img',
+    '[data-swatch] img',
+    // Four Hands specific
+    'img[src*="swatch"]',
+    'img[src*="Swatch"]',
+    'img[src*="finish"]',
+    'img[src*="Finish"]',
+    // Selected/active swatch
+    '[class*="selected"] img[class*="swatch"]',
+    '[class*="active"] img[class*="swatch"]',
+    '.selected .swatch-image',
+    '.active .swatch-image'
+  ];
+  
+  for (const sel of swatchSelectors) {
+    try {
+      const el = document.querySelector(sel);
+      if (el) {
+        const src = el.src || el.getAttribute('data-src') || el.style.backgroundImage?.match(/url\(["']?([^"')]+)["']?\)/)?.[1];
+        if (src && src.startsWith('http') && !src.includes('placeholder') && !src.startsWith('data:')) {
+          data.finish_image = src;
+          break;
+        }
+      }
+    } catch (e) {}
+  }
+  
+  // If no dedicated swatch, try to find an image that looks like a finish swatch (small square images)
+  if (!data.finish_image) {
+    const allImages = document.querySelectorAll('img');
+    for (const img of allImages) {
+      const src = img.src;
+      if (src && (src.toLowerCase().includes('swatch') || src.toLowerCase().includes('finish') || src.toLowerCase().includes('_color'))) {
+        if (!src.startsWith('data:') && src.startsWith('http')) {
+          data.finish_image = src;
+          break;
+        }
+      }
+    }
+  }
+  
+  // ======= MAIN PRODUCT IMAGE =======
   const imgSelectors = [
     '[class*="product-image"] img', '[class*="gallery"] img:first-child',
     '[class*="main-image"] img', '.pdp-image img', '[itemprop="image"]',
@@ -345,19 +395,6 @@ function scrapePageData() {
     if (ogImage) data.image_url = ogImage.content;
   }
   
-  // Finish/Swatch image
-  const swatchSelectors = [
-    '[class*="swatch"] img', '[class*="finish-image"] img',
-    '[class*="color-swatch"]', '[class*="thumbnail"] img'
-  ];
-  for (const sel of swatchSelectors) {
-    const el = document.querySelector(sel);
-    if (el && el.src && el.src.startsWith('http')) {
-      data.finish_image = el.src;
-      break;
-    }
-  }
-  
   return data;
 }
 
@@ -369,14 +406,12 @@ async function doScrape() {
   showStatus('Extracting product data...', 'info');
   
   try {
-    // Get current tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
     if (!tab || !tab.url || tab.url.startsWith('chrome://')) {
       throw new Error('Please navigate to a product page first');
     }
     
-    // Execute scraping script
     const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: scrapePageData
@@ -388,10 +423,8 @@ async function doScrape() {
       throw new Error('Could not find product data on this page. Make sure you\'re on a product detail page.');
     }
     
-    // Display results
     displayResults(data);
     
-    // Show success status
     if (data.price) {
       showStatus(`Found: ${data.name} - $${data.price}`, 'success');
     } else {
@@ -413,10 +446,10 @@ async function sendToApp() {
   
   const originalText = sendBtn.innerHTML;
   sendBtn.disabled = true;
-  sendBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
+  sendBtn.innerHTML = '<div class="spinner"></div><span>Opening App...</span>';
   
   try {
-    // Cache data on server (optional, for backup)
+    // Cache data on server
     try {
       await fetch(`${BACKEND_URL}/api/extension-scrape`, {
         method: 'POST',
@@ -427,7 +460,7 @@ async function sendToApp() {
       console.warn('Could not cache on server:', e);
     }
     
-    // Build URL with all parameters
+    // Build URL with all parameters including finish_image
     const params = new URLSearchParams();
     params.set('action', 'add-item');
     params.set('source', 'extension');
@@ -436,6 +469,7 @@ async function sendToApp() {
     if (scrapedData.sku) params.set('sku', scrapedData.sku);
     if (scrapedData.size) params.set('size', scrapedData.size);
     if (scrapedData.finish_color) params.set('finish', scrapedData.finish_color);
+    if (scrapedData.finish_image) params.set('finish_image', scrapedData.finish_image); // CRITICAL: Include finish image
     if (scrapedData.vendor) params.set('vendor', scrapedData.vendor);
     if (scrapedData.url) params.set('link', scrapedData.url);
     if (scrapedData.image_url) params.set('image', scrapedData.image_url);
@@ -468,6 +502,8 @@ async function copyToClipboard() {
     `Vendor: ${scrapedData.vendor || 'N/A'}`,
     `Size: ${scrapedData.size || 'N/A'}`,
     `Finish/Color: ${scrapedData.finish_color || 'N/A'}`,
+    `Finish Image: ${scrapedData.finish_image || 'N/A'}`,
+    `Product Image: ${scrapedData.image_url || 'N/A'}`,
     `URL: ${scrapedData.url || 'N/A'}`
   ].join('\n');
   

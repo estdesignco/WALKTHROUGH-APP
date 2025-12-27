@@ -109,7 +109,7 @@
     .empty-state h3 { color: #888; margin-bottom: 8px; }
     .empty-state p { font-size: 13px; line-height: 1.6; }
     
-    /* Results Table */
+    /* Results Container */
     .results-container {
       display: none;
     }
@@ -154,6 +154,41 @@
     .product-price.missing {
       color: #f87171;
       font-size: 14px;
+    }
+    
+    /* Finish Image Section */
+    .finish-section {
+      padding: 12px 16px;
+      background: #12121e;
+      border-bottom: 1px solid #222;
+      display: none;
+    }
+    .finish-section.visible {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .finish-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 2px solid #4ade80;
+    }
+    .finish-info {
+      flex: 1;
+    }
+    .finish-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #4ade80;
+      margin-bottom: 2px;
+    }
+    .finish-name {
+      font-size: 14px;
+      color: #fff;
+      font-weight: 500;
     }
     
     /* Data Grid */
@@ -244,13 +279,13 @@
     }
     .secondary-btn:hover { background: #222; color: #fff; border-color: #444; }
     
-    /* Logged In Warning */
+    /* Login Warning */
     .login-warning {
       background: linear-gradient(90deg, #854d0e 0%, #713f12 100%);
       padding: 12px 16px;
       font-size: 12px;
       color: #fef08a;
-      display: flex;
+      display: none;
       align-items: center;
       gap: 8px;
     }
@@ -293,8 +328,17 @@
       </div>
     </div>
     
-    <div id="loginWarning" class="login-warning" style="display: none;">
+    <div id="loginWarning" class="login-warning">
       ⚠️ No price found - make sure you're logged into this vendor's website!
+    </div>
+    
+    <!-- Finish/Color Image Section -->
+    <div id="finishImageContainer" class="finish-section">
+      <img id="finishImage" class="finish-image" src="" alt="Finish">
+      <div class="finish-info">
+        <div class="finish-label">✨ Finish Swatch</div>
+        <div id="finishName" class="finish-name">-</div>
+      </div>
     </div>
     
     <div class="data-grid">
