@@ -1,38 +1,42 @@
-// ONE CLICK - Scrape and send to app automatically
+// Simple: Scrape page and save to server (keyed by URL)
+// User then pastes URL into app, app finds the cached data with price
 
 document.getElementById('mainBtn').addEventListener('click', async () => {
   const btn = document.getElementById('mainBtn');
   const statusEl = document.getElementById('status');
-  const previewEl = document.getElementById('dataPreview');
+  const priceDisplay = document.getElementById('priceDisplay');
+  const priceValue = document.getElementById('priceValue');
   
   btn.disabled = true;
-  btn.innerHTML = '<span>⏳</span> Scraping...';
+  btn.textContent = '⏳ Scraping...';
   
   statusEl.style.display = 'block';
   statusEl.className = 'status loading';
-  statusEl.textContent = '🔍 Extracting product data...';
+  statusEl.textContent = '🔍 Extracting data...';
   
   try {
-    // Get active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
     if (!tab || !tab.id) {
       throw new Error('No active tab');
     }
     
-    // Inject and run content script
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ['content.js']
-    });
+    // Inject content script
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      });
+    } catch (e) {
+      // May already be injected
+    }
     
-    // Small delay for script to initialize
     await new Promise(r => setTimeout(r, 500));
     
-    // Send message to scrape AND send to app
+    // Scrape the page
     chrome.tabs.sendMessage(tab.id, { action: 'scrapeAndSend' }, (response) => {
       btn.disabled = false;
-      btn.innerHTML = '<span>⚡</span> SCRAPE & SEND TO APP';
+      btn.textContent = '⚡ SCRAPE THIS PAGE';
       
       if (chrome.runtime.lastError) {
         statusEl.className = 'status error';
@@ -40,42 +44,33 @@ document.getElementById('mainBtn').addEventListener('click', async () => {
         return;
       }
       
-      if (!response) {
+      if (!response || !response.data) {
         statusEl.className = 'status error';
-        statusEl.textContent = '❌ No response from page';
+        statusEl.textContent = '❌ Could not scrape page';
         return;
       }
       
       const data = response.data;
       
-      // Show preview
-      previewEl.style.display = 'block';
-      
-      document.getElementById('previewPrice').textContent = data.price ? `$${data.price}` : 'Not found';
-      document.getElementById('previewPrice').className = 'data-value price-highlight' + (data.price ? '' : ' missing');
-      
-      document.getElementById('previewName').textContent = data.name || 'Not found';
-      document.getElementById('previewName').className = 'data-value' + (data.name ? '' : ' missing');
-      
-      document.getElementById('previewSku').textContent = data.sku || 'Not found';
-      document.getElementById('previewSku').className = 'data-value' + (data.sku ? '' : ' missing');
-      
-      if (response.success) {
+      if (response.success && data.price) {
         statusEl.className = 'status success';
-        if (data.price) {
-          statusEl.textContent = `✅ Sent to app! Price: $${data.price}`;
-        } else {
-          statusEl.textContent = '⚠️ Sent but no price found. Are you logged in?';
-        }
+        statusEl.textContent = '✅ Saved! Now paste the URL into the app.';
+        
+        priceDisplay.style.display = 'block';
+        priceValue.textContent = '$' + data.price;
+      } else if (response.success) {
+        statusEl.className = 'status success';
+        statusEl.textContent = '⚠️ Saved but no price found. Are you logged in?';
+        priceDisplay.style.display = 'none';
       } else {
         statusEl.className = 'status error';
-        statusEl.textContent = '❌ ' + (response.error || 'Failed to send');
+        statusEl.textContent = '❌ ' + (response.error || 'Failed');
       }
     });
     
   } catch (e) {
     btn.disabled = false;
-    btn.innerHTML = '<span>⚡</span> SCRAPE & SEND TO APP';
+    btn.textContent = '⚡ SCRAPE THIS PAGE';
     statusEl.className = 'status error';
     statusEl.textContent = '❌ ' + e.message;
   }
