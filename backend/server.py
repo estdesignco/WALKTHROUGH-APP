@@ -6538,6 +6538,29 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         if len(material) > 3:
                             result['finish_color'] = material
                             print(f"✅ LOLOI MATERIAL: {result['finish_color']}")
+                
+                # LOLOI: Extract finish_image (rug texture/swatch)
+                if not result.get('finish_image'):
+                    try:
+                        swatch_selectors = [
+                            '.swatch-image img', '.color-swatch img', 
+                            '[class*="swatch"] img', '.product-gallery img'
+                        ]
+                        for sel in swatch_selectors:
+                            img = await page.query_selector(sel)
+                            if img:
+                                src = await img.get_attribute('src') or await img.get_attribute('data-src')
+                                if src and len(src) > 10:
+                                    result['finish_image'] = src if src.startswith('http') else urljoin(url, src)
+                                    print(f"✅ LOLOI FINISH IMAGE: {result['finish_image'][:60]}...")
+                                    break
+                    except:
+                        pass
+                    
+                    # Fallback: Use main image for rugs
+                    if not result.get('finish_image') and result.get('image_url'):
+                        result['finish_image'] = result['image_url']
+                        print(f"✅ LOLOI FINISH IMAGE (from main): {result['finish_image'][:60]}...")
             
             # GENERIC: Try to extract from product description text
             if not result.get('finish_color'):
