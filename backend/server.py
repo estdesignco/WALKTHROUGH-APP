@@ -5172,8 +5172,15 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         ]
         
         # Vendors where automated login is BLOCKED by bot detection (Cloudflare, etc.)
-        # These still work for product info but price requires manual entry or database
-        bot_detection_vendors = ['globalviews.com', 'surya.com']
+        # These vendors detect Playwright and serve fake 404/error pages
+        # The scraper will report this clearly and allow manual data entry
+        bot_detection_vendors = [
+            'globalviews.com', 'surya.com', 'uttermost.com', 'visualcomfort.com',
+            'bernhardt.com', 'reginaandrew.com', 'vandh.com', 'hinkley.com',
+            'hubbardtonforge.com', 'elegantlighting.com', 'bassettmirror.com',
+            'crestviewcollection.com', 'eichholtz.com', 'myohamerica.com',
+            'zeevlighting.com'
+        ]
         
         needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
         is_bot_protected = any(v in domain for v in bot_detection_vendors)
