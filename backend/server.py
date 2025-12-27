@@ -5185,6 +5185,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
         is_bot_protected = any(v in domain for v in bot_detection_vendors)
         
+        # WARN about bot-protected vendors upfront
+        if is_bot_protected:
+            print(f"⚠️ BOT DETECTION VENDOR: {domain} - This vendor blocks automated scrapers.")
+            print(f"   The scraper will attempt to extract what it can, but prices may need manual entry.")
+        
         # LOGIN FIRST for wholesale vendors that hide prices (BUT SKIP for bot-protected sites)
         if needs_login_for_prices and not is_bot_protected and credentials and credentials.get("username") and credentials.get("password"):
             print(f"🔐 WHOLESALE VENDOR DETECTED - Logging in FIRST to get prices for {domain}...")
