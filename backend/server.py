@@ -5650,14 +5650,24 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             # Get page text to find any dollar amounts
             all_text = await page.inner_text('body')
             
-            # DEBUG: For Uttermost, take screenshot and save page content for debugging
+            # DEBUG: For Uttermost, save a screenshot to see what the page looks like
             if 'uttermost.com' in domain:
                 print(f"🔍 DEBUG Uttermost: Page text length: {len(all_text)}")
                 print(f"🔍 DEBUG Uttermost: First 500 chars: {all_text[:500]}...")
                 if '$' in all_text:
                     print("🔍 DEBUG: $ symbol FOUND in page text")
+                    # Find and print all dollar amounts
+                    price_matches = re.findall(r'\$[\d,]+\.?\d*', all_text)
+                    print(f"🔍 DEBUG: Found prices: {price_matches[:10]}")
                 else:
                     print("⚠️ DEBUG: NO $ symbol in page text - prices not visible!")
+                    print("⚠️ This means the scraper is NOT seeing the logged-in view")
+                    # Save screenshot for debugging
+                    try:
+                        await page.screenshot(path='/tmp/uttermost_debug.png')
+                        print("📸 Screenshot saved to /tmp/uttermost_debug.png")
+                    except:
+                        pass
             
             # Find ALL dollar amounts on page
             import re
