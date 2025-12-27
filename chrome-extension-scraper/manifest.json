@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "1.0.0",
-  "description": "Scrape product data from wholesale vendors and send to Design Ready app",
+  "version": "2.0.0",
+  "description": "Scrape product data from wholesale vendors and send to Design Ready app. Works with your logged-in browser session to extract prices.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -14,6 +14,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
+    "default_title": "Scrape Product",
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png",
@@ -24,5 +25,12 @@
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
 }

@@ -5,185 +5,336 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 450px;
+      width: 480px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: #0f0f1a;
       color: #fff;
     }
+    
+    /* Header */
     .header {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      padding: 15px;
+      padding: 16px;
       border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
     }
     .header h1 {
       font-size: 16px;
+      color: #fff;
+      font-weight: 600;
+    }
+    .header .subtitle {
+      font-size: 11px;
+      color: #888;
+    }
+    .vendor-badge {
+      background: #333;
       color: #4ade80;
-      margin-bottom: 10px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    
+    /* Scrape Button */
+    .scrape-section {
+      padding: 16px;
+      background: #12121e;
     }
     .scrape-btn {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
       color: #000;
       border: none;
-      border-radius: 8px;
-      font-size: 14px;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
     }
-    .scrape-btn:hover { opacity: 0.9; }
-    .scrape-btn:disabled { background: #444; color: #888; cursor: wait; }
+    .scrape-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3); }
+    .scrape-btn:disabled { background: #333; color: #666; transform: none; box-shadow: none; cursor: wait; }
+    .scrape-btn .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
     
-    .result-table {
-      width: 100%;
-      border-collapse: collapse;
+    /* Status Bar */
+    .status-bar {
+      padding: 10px 16px;
       font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .result-table th {
-      background: #1a1a2e;
-      padding: 10px 8px;
-      text-align: left;
-      color: #888;
-      font-weight: 500;
-      border-bottom: 1px solid #333;
-    }
-    .result-table td {
-      padding: 10px 8px;
-      border-bottom: 1px solid #222;
-      color: #fff;
-      vertical-align: top;
-    }
-    .result-table tr:hover { background: #1a1a2e; }
+    .status-bar.success { background: linear-gradient(90deg, #166534 0%, #14532d 100%); color: #4ade80; }
+    .status-bar.error { background: linear-gradient(90deg, #7f1d1d 0%, #450a0a 100%); color: #fca5a5; }
+    .status-bar.info { background: linear-gradient(90deg, #1e3a5f 0%, #172554 100%); color: #93c5fd; }
+    .status-bar.warning { background: linear-gradient(90deg, #854d0e 0%, #713f12 100%); color: #fef08a; }
     
-    .field-label { color: #888; font-size: 10px; display: block; margin-bottom: 2px; }
-    .field-value { color: #fff; word-break: break-word; }
-    .field-value.price { color: #4ade80; font-weight: 700; font-size: 16px; }
-    .field-value.missing { color: #f87171; }
-    
-    .product-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 4px;
-      background: #222;
-    }
-    
-    .actions {
-      padding: 15px;
-      background: #1a1a2e;
-      border-top: 1px solid #333;
-    }
-    .send-btn {
-      width: 100%;
-      padding: 14px;
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-    .send-btn:hover { background: #4f46e5; }
-    .send-btn:disabled { background: #444; color: #888; }
-    
-    .copy-btn {
-      width: 100%;
-      padding: 10px;
-      background: transparent;
-      color: #888;
-      border: 1px solid #444;
-      border-radius: 8px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .copy-btn:hover { background: #222; color: #fff; }
-    
-    .status {
-      padding: 10px 15px;
-      font-size: 12px;
-      text-align: center;
-    }
-    .status.success { background: #166534; color: #4ade80; }
-    .status.error { background: #7f1d1d; color: #fca5a5; }
-    .status.info { background: #1e3a5f; color: #93c5fd; }
-    
+    /* Empty State */
     .empty-state {
-      padding: 40px 20px;
+      padding: 50px 20px;
       text-align: center;
       color: #666;
     }
-    .empty-state p { margin-bottom: 10px; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state h3 { color: #888; margin-bottom: 8px; }
+    .empty-state p { font-size: 13px; line-height: 1.6; }
+    
+    /* Results Table */
+    .results-container {
+      display: none;
+    }
+    .product-header {
+      padding: 16px;
+      background: #16162a;
+      display: flex;
+      gap: 16px;
+      border-bottom: 1px solid #222;
+    }
+    .product-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #222;
+      border: 1px solid #333;
+    }
+    .product-main-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .product-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .product-sku {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .product-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: #4ade80;
+    }
+    .product-price.missing {
+      color: #f87171;
+      font-size: 14px;
+    }
+    
+    /* Data Grid */
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: #222;
+      border-top: 1px solid #222;
+    }
+    .data-item {
+      background: #12121e;
+      padding: 12px 16px;
+    }
+    .data-item.full-width {
+      grid-column: 1 / -1;
+    }
+    .data-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .data-value {
+      font-size: 13px;
+      color: #fff;
+      word-break: break-word;
+    }
+    .data-value.missing {
+      color: #666;
+      font-style: italic;
+    }
+    .data-value.link {
+      color: #93c5fd;
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Actions */
+    .actions {
+      padding: 16px;
+      background: #16162a;
+      border-top: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .send-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .send-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+    .send-btn:disabled { background: #333; color: #666; transform: none; box-shadow: none; }
+    
+    .secondary-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .secondary-btn {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      color: #888;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .secondary-btn:hover { background: #222; color: #fff; border-color: #444; }
+    
+    /* Logged In Warning */
+    .login-warning {
+      background: linear-gradient(90deg, #854d0e 0%, #713f12 100%);
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #fef08a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🛒 Design Ready Scraper</h1>
-    <button id="scrapeBtn" class="scrape-btn">⚡ SCRAPE THIS PAGE</button>
+    <div class="header-left">
+      <div class="logo">🛒</div>
+      <div>
+        <h1>Design Ready Scraper</h1>
+        <div class="subtitle">Extract product data instantly</div>
+      </div>
+    </div>
+    <div id="vendorBadge" class="vendor-badge" style="display: none;">-</div>
   </div>
   
-  <div id="status" class="status" style="display: none;"></div>
+  <div class="scrape-section">
+    <button id="scrapeBtn" class="scrape-btn">
+      <span>⚡</span>
+      <span>SCRAPE THIS PAGE</span>
+    </button>
+  </div>
+  
+  <div id="statusBar" class="status-bar" style="display: none;"></div>
   
   <div id="emptyState" class="empty-state">
-    <p>Navigate to a product page and click "Scrape" to extract data.</p>
+    <div class="icon">📦</div>
+    <h3>Ready to Scrape</h3>
+    <p>Navigate to any product page on a vendor website,<br>then click "Scrape This Page" to extract the data.</p>
   </div>
   
-  <div id="resultContainer" style="display: none;">
-    <table class="result-table">
-      <tbody>
-        <tr>
-          <td style="width: 80px;">
-            <span class="field-label">Image</span>
-            <img id="resultImage" class="product-image" src="" alt="">
-          </td>
-          <td>
-            <span class="field-label">Product Name</span>
-            <div id="resultName" class="field-value">-</div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="field-label">Price (USD)</span>
-            <div id="resultPrice" class="field-value price">-</div>
-          </td>
-          <td>
-            <span class="field-label">MSRP</span>
-            <div id="resultMsrp" class="field-value">-</div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="field-label">SKU</span>
-            <div id="resultSku" class="field-value">-</div>
-          </td>
-          <td>
-            <span class="field-label">Vendor</span>
-            <div id="resultVendor" class="field-value">-</div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span class="field-label">Size</span>
-            <div id="resultSize" class="field-value">-</div>
-          </td>
-          <td>
-            <span class="field-label">Finish/Color</span>
-            <div id="resultFinish" class="field-value">-</div>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <span class="field-label">Product URL</span>
-            <div id="resultUrl" class="field-value" style="font-size: 10px; color: #666;">-</div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div id="resultsContainer" class="results-container">
+    <div class="product-header">
+      <img id="productImage" class="product-image" src="" alt="Product">
+      <div class="product-main-info">
+        <div id="productName" class="product-name">-</div>
+        <div id="productSku" class="product-sku">SKU: -</div>
+        <div id="productPrice" class="product-price">-</div>
+      </div>
+    </div>
+    
+    <div id="loginWarning" class="login-warning" style="display: none;">
+      ⚠️ No price found - make sure you're logged into this vendor's website!
+    </div>
+    
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="data-label">Vendor</div>
+        <div id="dataVendor" class="data-value">-</div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">Size / Dimensions</div>
+        <div id="dataSize" class="data-value">-</div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">Finish / Color</div>
+        <div id="dataFinish" class="data-value">-</div>
+      </div>
+      <div class="data-item">
+        <div class="data-label">MSRP</div>
+        <div id="dataMsrp" class="data-value">-</div>
+      </div>
+      <div class="data-item full-width">
+        <div class="data-label">Product URL</div>
+        <div id="dataUrl" class="data-value link">-</div>
+      </div>
+    </div>
     
     <div class="actions">
-      <button id="sendBtn" class="send-btn">🚀 SEND TO DESIGN READY APP</button>
-      <button id="copyBtn" class="copy-btn">📋 Copy to Clipboard</button>
+      <button id="sendBtn" class="send-btn">
+        <span>🚀</span>
+        <span>ADD TO DESIGN READY APP</span>
+      </button>
+      <div class="secondary-actions">
+        <button id="copyBtn" class="secondary-btn">
+          <span>📋</span>
+          <span>Copy All</span>
+        </button>
+        <button id="rescrapeBtn" class="secondary-btn">
+          <span>🔄</span>
+          <span>Re-scrape</span>
+        </button>
+      </div>
     </div>
   </div>
 
