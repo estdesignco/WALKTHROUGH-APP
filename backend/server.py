@@ -6500,33 +6500,34 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             print(f"✅ UTTERMOST FINISH FROM NAME: {result['finish_color']}")
                 
                 # UTTERMOST: Extract SIZE/DIMENSIONS
-                if not result.get('size'):
-                    # Look for dimensions in format: H 5.5 W 5.5 D 5.5
-                    dim_match = re.search(r'[Hh]\s*[:=]?\s*(\d+\.?\d*)\s*["\']?\s*[WwXx]\s*[:=]?\s*(\d+\.?\d*)\s*["\']?\s*(?:[DdXx]\s*[:=]?\s*(\d+\.?\d*))?', all_text)
-                    if dim_match:
-                        h = dim_match.group(1)
-                        w = dim_match.group(2)
-                        d = dim_match.group(3) if dim_match.lastindex >= 3 and dim_match.group(3) else None
-                        if d:
-                            result['size'] = f'{w}"W x {d}"D x {h}"H'
-                        else:
-                            result['size'] = f'{w}"W x {h}"H'
-                        print(f"✅ UTTERMOST SIZE: {result['size']}")
+                if not result.get('size') or result.get('size') == '0H X 0 D':
+                    # Uttermost format: "7H, SHADE 0H X 0 Dia. (in)"
+                    # We want the MAIN dimension (7H), not the shade
+                    
+                    # First, try to find the main height before "SHADE"
+                    main_dim_match = re.search(r'(\d+\.?\d*)\s*H\s*,\s*SHADE', all_text, re.IGNORECASE)
+                    if main_dim_match:
+                        height = main_dim_match.group(1)
+                        result['size'] = f'{height}"H'
+                        print(f"✅ UTTERMOST SIZE (main): {result['size']}")
                     else:
-                        # Try other patterns
-                        size_patterns = [
-                            r'Dimensions?[:\s]*([^,\n]{5,50})',
-                            r'(\d+\.?\d*)\s*["\']?\s*[Ww]\s*[xX×]\s*(\d+\.?\d*)\s*["\']?\s*[Hh]',
-                        ]
-                        for pattern in size_patterns:
-                            size_match = re.search(pattern, all_text, re.IGNORECASE)
-                            if size_match:
-                                if size_match.lastindex and size_match.lastindex >= 2:
-                                    result['size'] = f'{size_match.group(1)}"W x {size_match.group(2)}"H'
-                                else:
-                                    result['size'] = size_match.group(1).strip()
-                                print(f"✅ UTTERMOST SIZE: {result['size']}")
-                                break
+                        # Try standard dimension formats
+                        # Look for pattern: 7H or 7"H or Height: 7
+                        height_match = re.search(r'(?:^|[^\d])(\d+\.?\d*)\s*["\']?\s*H(?:[,\s]|$)', all_text, re.IGNORECASE)
+                        if height_match:
+                            h = height_match.group(1)
+                            if float(h) > 0:  # Skip 0H
+                                result['size'] = f'{h}"H'
+                                print(f"✅ UTTERMOST SIZE (height): {result['size']}")
+                        
+                        # If still no size, try Width x Height pattern
+                        if not result.get('size') or 'X 0' in result.get('size', ''):
+                            wh_match = re.search(r'(\d+\.?\d*)\s*["\']?\s*[Ww]\s*[xX×]\s*(\d+\.?\d*)\s*["\']?\s*[Hh]', all_text)
+                            if wh_match:
+                                w, h = wh_match.group(1), wh_match.group(2)
+                                if float(h) > 0 and float(w) > 0:
+                                    result['size'] = f'{w}"W x {h}"H'
+                                    print(f"✅ UTTERMOST SIZE (WxH): {result['size']}")
                 
                 # If no finish from name, try other patterns (but skip "Touch Dimmer" type garbage)
                 if not result.get('finish_color'):
