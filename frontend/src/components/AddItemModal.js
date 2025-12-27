@@ -39,6 +39,39 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
   const searchTimeoutRef = useRef(null);
   const urlLookupTimeoutRef = useRef(null);
 
+  // Check for extension-scraped data on mount
+  useEffect(() => {
+    const extensionData = localStorage.getItem('extensionScrapedData');
+    if (extensionData) {
+      try {
+        const data = JSON.parse(extensionData);
+        console.log('📦 Found extension data in localStorage:', data);
+        
+        // Auto-populate form
+        setFormData(prev => ({
+          ...prev,
+          name: data.name || prev.name,
+          vendor: data.vendor || prev.vendor,
+          sku: data.sku || prev.sku,
+          cost: data.price || prev.cost,
+          size: data.size || prev.size,
+          finish_color: data.finish_color || prev.finish_color,
+          image_url: data.image_url || prev.image_url,
+          link: data.link || prev.link
+        }));
+        setSearchQuery(data.name || '');
+        setUrlLookupMessage(`✅ Auto-filled from extension: ${data.name} - $${data.price || 'N/A'}`);
+        
+        // Clear localStorage so it doesn't auto-fill again
+        localStorage.removeItem('extensionScrapedData');
+        
+        setTimeout(() => setUrlLookupMessage(''), 5000);
+      } catch (e) {
+        console.error('Failed to parse extension data:', e);
+      }
+    }
+  }, []);
+
   // Fetch vendor list on mount
   useEffect(() => {
     const fetchVendors = async () => {
