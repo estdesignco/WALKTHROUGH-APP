@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://scraper-fix-1.preview.emergentagent.com"
+BACKEND_URL = "https://designready-1.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test URLs for vendor finish/color extraction
