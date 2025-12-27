@@ -95,17 +95,52 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
   }, []);
 
   // Auto-lookup product from URL when pasting a link
-  // PRIORITY: Website data > Database data (website is always more current)
+  // PRIORITY: Extension cache (has price) > Website scrape > Database
   const lookupProductFromUrl = useCallback(async (url) => {
     if (!url || !url.startsWith('http')) return;
     
     setIsLookingUpUrl(true);
-    setUrlLookupMessage('🔍 Fetching product from website...');
+    setUrlLookupMessage('🔍 Checking for scraped data...');
     
     try {
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
       
-      // ALWAYS scrape the website first for current data
+      // FIRST: Check if user scraped this URL with the browser extension (has price!)
+      let extensionData = null;
+      try {
+        const cacheResponse = await fetch(`${backendUrl}/api/extension-scrape-cache?url=${encodeURIComponent(url)}`);
+        if (cacheResponse.ok) {
+          const cacheResult = await cacheResponse.json();
+          if (cacheResult.success && cacheResult.data) {
+            extensionData = cacheResult.data;
+            console.log('💰 Found extension-scraped data with price:', extensionData.price);
+          }
+        }
+      } catch (e) {
+        console.log('Extension cache check failed:', e);
+      }
+      
+      // If extension has the data WITH price, use it directly
+      if (extensionData && extensionData.price) {
+        setUrlLookupMessage(`✅ Loaded from extension: ${extensionData.name} - $${extensionData.price}`);
+        setFormData(prev => ({
+          ...prev,
+          name: extensionData.name || prev.name,
+          vendor: extensionData.vendor || prev.vendor,
+          sku: extensionData.sku || prev.sku,
+          cost: extensionData.price || prev.cost,
+          size: extensionData.size || prev.size,
+          finish_color: extensionData.finish_color || prev.finish_color,
+          image_url: extensionData.image_url || prev.image_url,
+          link: url
+        }));
+        setSearchQuery(extensionData.name || '');
+        setIsLookingUpUrl(false);
+        setTimeout(() => setUrlLookupMessage(''), 5000);
+        return;
+      }
+      
+      // SECOND: Scrape the website (may not get price for login-required sites)
       setUrlLookupMessage('📦 Fetching from website...');
       
       const scrapeResponse = await fetch(`${backendUrl}/api/scrape-product`, {
@@ -125,6 +160,13 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
           console.log('🔍 websiteData extracted:', JSON.stringify(websiteData, null, 2));
           console.log('🔍 finish_color from websiteData:', websiteData.finish_color);
           console.log('🔍 color from websiteData:', websiteData.color);
+          
+          // If server scraper didn't get price, use extension data price
+          if ((!websiteData.price && !websiteData.cost) && extensionData && extensionData.price) {
+            websiteData.price = extensionData.price;
+            websiteData.cost = extensionData.price;
+            console.log('💰 Using price from extension cache:', extensionData.price);
+          }
         }
       }
       
