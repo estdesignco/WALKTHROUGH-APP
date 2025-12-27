@@ -112,10 +112,13 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
           cost: websiteData?.cost || websiteData?.price || databaseData?.cost || databaseData?.price || '',
           size: websiteData?.size || websiteData?.dimensions || databaseData?.size || databaseData?.dimensions || '',
           image_url: websiteData?.image_url || websiteData?.image || databaseData?.image_url || '',
-          finish_color: websiteData?.color || websiteData?.finish || websiteData?.finish_color || databaseData?.finish_color || databaseData?.color || '',
+          finish_color: websiteData?.finish_color || websiteData?.color || websiteData?.finish || databaseData?.finish_color || databaseData?.color || '',
           finish_image: websiteData?.finish_image || databaseData?.finish_image || '',  // Swatch image
           link: url
         };
+        
+        console.log('🔍 MERGED DATA:', JSON.stringify(mergedData, null, 2));
+        console.log('🔍 finish_color in mergedData:', mergedData.finish_color);
         
         setFormData(prev => ({
           ...prev,
