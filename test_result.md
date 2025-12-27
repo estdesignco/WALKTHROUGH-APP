@@ -847,3 +847,63 @@ Testing ALL vendor scrapers for COMPLETE field extraction of 7 fields:
 - ❌ Regina Andrew: Invalid URL (3/7 fields)
 - ❌ Bernhardt: Invalid URL (3/7 fields)
 - ❌ Rowe Furniture: Invalid URL (4/7 fields)
+---
+
+## VENDOR SCRAPER BOT DETECTION STATUS - December 27, 2024
+
+### CRITICAL FINDING: Many Wholesale Vendors Have Bot Detection
+
+Many wholesale vendor websites (Uttermost, Visual Comfort, Bernhardt, etc.) have aggressive bot detection that:
+1. Detects Playwright/automated browsers
+2. Serves fake "Page Not Found" errors to bots
+3. Prevents automated login and price extraction
+
+### WORKING VENDORS (Confirmed 7/7 Fields):
+| Vendor | Status | Notes |
+|--------|--------|-------|
+| Four Hands | ✅ WORKING | All 7 fields extracted including wholesale price |
+| Jaipur Living | ✅ WORKING | All 7 fields extracted |
+
+### BOT-BLOCKED VENDORS (Need Manual Data Entry):
+| Vendor | Status | Notes |
+|--------|--------|-------|
+| Uttermost | ❌ BLOCKED | Bot detection shows fake 404 |
+| Visual Comfort | ❌ BLOCKED | Bot detection shows fake 404 |
+| Bernhardt | ❌ BLOCKED | Bot detection blocks access |
+| Regina Andrew | ❌ BLOCKED | Bot detection blocks access |
+| Global Views | ❌ BLOCKED | Cloudflare protection |
+| Surya | ❌ BLOCKED | Cloudflare protection |
+
+### UNTESTED VENDORS (Need Testing):
+- Loloi Rugs
+- HVL Group
+- Rowe Furniture
+- Flow Decor
+- Eichholtz
+- Crestview Collection
+- Bassett Mirror
+- MYO America
+- Safavieh
+- Zeev Lighting
+- Hubbardton Forge
+- Hinkley
+- Elegant Lighting
+- Gabby Home
+- V and H
+
+### API Now Returns Bot Detection Warning
+The `/api/scrape-product` endpoint now includes a `bot_detection_warning` field when a vendor is known to block automated scraping. This allows the frontend to inform users that they need to manually enter product data.
+
+---
+
+## Testing Protocol (Do not edit this section)
+1. Test backend APIs with curl before frontend testing
+2. Use testing subagent for comprehensive E2E testing
+3. Document all test results below
+
+## Incorporate User Feedback
+- User is EXTREMELY frustrated with scraping not working
+- User has verified credentials are correct
+- User wants ALL 22 vendors to work perfectly
+- Many vendors have bot detection that cannot be bypassed
+
