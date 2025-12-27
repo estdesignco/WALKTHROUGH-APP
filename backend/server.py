@@ -5344,7 +5344,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         is_blocked = any(x in page_text.lower() for x in ['page not found', '404', 'not found', 'access denied'])
         is_login_required = any(x in page_text.lower() for x in ['sign in', 'log in', 'login required', 'please login'])
         
-        if (is_blocked or is_login_required) and not login_successful and credentials and credentials.get("username") and credentials.get("password"):
+        # Skip login for reCAPTCHA-protected sites
+        if (is_blocked or is_login_required) and not login_successful and credentials and credentials.get("username") and credentials.get("password") and not has_recaptcha:
             print(f"🔐 PAGE REQUIRES LOGIN - Attempting authentication for {domain}...")
             
             # Get login URL from vendor config
