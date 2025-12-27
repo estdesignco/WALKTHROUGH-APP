@@ -6468,6 +6468,31 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             result['finish_color'] = color.title()
                             print(f"✅ JAIPUR COLOR FROM NAME: {result['finish_color']}")
                             break
+                
+                # JAIPUR LIVING: Extract finish_image (rug swatch/texture image)
+                if not result.get('finish_image'):
+                    try:
+                        # Try to find swatch images or texture images
+                        swatch_selectors = [
+                            '.swatch-image img', '.color-swatch img', '.texture-image img',
+                            '[class*="swatch"] img', '[data-swatch] img', 
+                            '.product-image-gallery img', '.gallery-image img'
+                        ]
+                        for sel in swatch_selectors:
+                            img = await page.query_selector(sel)
+                            if img:
+                                src = await img.get_attribute('src') or await img.get_attribute('data-src')
+                                if src and len(src) > 10:
+                                    result['finish_image'] = src if src.startswith('http') else urljoin(url, src)
+                                    print(f"✅ JAIPUR FINISH IMAGE: {result['finish_image'][:60]}...")
+                                    break
+                    except:
+                        pass
+                    
+                    # Fallback: Use the main product image as finish image for rugs
+                    if not result.get('finish_image') and result.get('image_url'):
+                        result['finish_image'] = result['image_url']
+                        print(f"✅ JAIPUR FINISH IMAGE (from main): {result['finish_image'][:60]}...")
             
             # VENDOR-SPECIFIC: Loloi Rugs
             elif 'loloirugs.com' in domain or 'lfrbrands.com' in domain or 'loloi.com' in domain:
