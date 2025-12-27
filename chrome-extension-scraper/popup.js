@@ -413,6 +413,32 @@ function scrapePageData() {
   
   // ======= FINISH/SWATCH IMAGE (CRITICAL) =======
   // Look for swatch/finish images specifically
+  
+  // Uttermost-specific: Get the color swatch images
+  if (domain.includes('uttermost') && !data.finish_image) {
+    // Look for color section images
+    const colorSection = document.querySelector('[class*="color"], [class*="swatch"]');
+    if (colorSection) {
+      const swatchImg = colorSection.querySelector('img');
+      if (swatchImg && swatchImg.src && swatchImg.src.startsWith('http')) {
+        data.finish_image = swatchImg.src;
+      }
+    }
+    // Alternative: find images near "Color" text
+    if (!data.finish_image) {
+      const allImgs = document.querySelectorAll('img');
+      for (const img of allImgs) {
+        if (img.src && (img.src.includes('swatch') || img.src.includes('color') || 
+            img.alt?.toLowerCase().includes('color') || img.alt?.toLowerCase().includes('finish'))) {
+          if (img.src.startsWith('http') && !img.src.startsWith('data:')) {
+            data.finish_image = img.src;
+            break;
+          }
+        }
+      }
+    }
+  }
+  
   const swatchSelectors = [
     '[class*="swatch"] img',
     '[class*="finish"] img',
@@ -436,17 +462,19 @@ function scrapePageData() {
     '.active .swatch-image'
   ];
   
-  for (const sel of swatchSelectors) {
-    try {
-      const el = document.querySelector(sel);
-      if (el) {
-        const src = el.src || el.getAttribute('data-src') || el.style.backgroundImage?.match(/url\(["']?([^"')]+)["']?\)/)?.[1];
-        if (src && src.startsWith('http') && !src.includes('placeholder') && !src.startsWith('data:')) {
-          data.finish_image = src;
-          break;
+  if (!data.finish_image) {
+    for (const sel of swatchSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el) {
+          const src = el.src || el.getAttribute('data-src') || el.style.backgroundImage?.match(/url\(["']?([^"')]+)["']?\)/)?.[1];
+          if (src && src.startsWith('http') && !src.includes('placeholder') && !src.startsWith('data:')) {
+            data.finish_image = src;
+            break;
+          }
         }
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
   }
   
   // If no dedicated swatch, try to find an image that looks like a finish swatch (small square images)
