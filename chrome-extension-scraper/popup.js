@@ -293,20 +293,104 @@ function scrapePageData() {
   }
   
   // ======= FINISH / COLOR =======
-  const finishSelectors = [
-    '[class*="finish"]', '[class*="color"]', '[class*="variant"]',
-    '[class*="selected-option"]', '[data-finish]', '[class*="option-value"]'
-  ];
-  for (const sel of finishSelectors) {
-    const el = document.querySelector(sel);
-    if (el && el.innerText) {
-      const txt = el.innerText.trim();
-      if (txt.length > 2 && txt.length < 60 && !txt.match(/^\$/)) {
-        data.finish_color = txt;
+  // VENDOR-SPECIFIC extraction for better accuracy
+  
+  // Try to extract from product title first (often contains finish like "Bronze", "Brass", etc.)
+  const commonFinishes = ['Bronze', 'Brass', 'Gold', 'Silver', 'Chrome', 'Nickel', 'Black', 'White', 
+    'Natural', 'Oak', 'Walnut', 'Mahogany', 'Gray', 'Grey', 'Antique', 'Polished', 'Brushed', 
+    'Satin', 'Matte', 'Aged', 'Weathered', 'Rustic', 'Iron', 'Copper', 'Pewter'];
+  
+  if (data.name) {
+    for (const finish of commonFinishes) {
+      if (data.name.toLowerCase().includes(finish.toLowerCase())) {
+        data.finish_color = finish;
         break;
       }
     }
   }
+  
+  // Uttermost-specific: Look for color swatches section
+  if (domain.includes('uttermost')) {
+    // Look for the Color label and its associated swatches
+    const colorLabels = document.querySelectorAll('span, div, label');
+    for (const label of colorLabels) {
+      if (label.innerText && label.innerText.trim().toLowerCase() === 'color') {
+        // Find the next sibling or parent container with swatch images
+        const parent = label.closest('div');
+        if (parent) {
+          const swatchImgs = parent.querySelectorAll('img');
+          if (swatchImgs.length > 0) {
+            // Get the first swatch as the selected one
+            const selectedSwatch = parent.querySelector('img.selected, img:first-child');
+            if (selectedSwatch && selectedSwatch.alt) {
+              data.finish_color = selectedSwatch.alt;
+            }
+            if (selectedSwatch && selectedSwatch.src) {
+              data.finish_image = selectedSwatch.src;
+            }
+          }
+        }
+        break;
+      }
+    }
+    
+    // If still no finish, try to extract from the product title after the dash
+    if (!data.finish_color && data.name && data.name.includes(' - ')) {
+      const parts = data.name.split(' - ');
+      if (parts.length > 1) {
+        // The part after the dash often contains the finish
+        const finishPart = parts[1].split(',')[0].trim();
+        if (finishPart.length > 1 && finishPart.length < 30) {
+          data.finish_color = finishPart;
+        }
+      }
+    }
+  }
+  
+  // Four Hands specific
+  if (domain.includes('fourhands')) {
+    const finishEl = document.querySelector('[class*="finish"], [data-finish]');
+    if (finishEl) {
+      data.finish_color = finishEl.innerText.trim();
+    }
+  }
+  
+  // Visual Comfort specific
+  if (domain.includes('visualcomfort')) {
+    const finishEl = document.querySelector('[class*="selected-finish"], [class*="finish-name"]');
+    if (finishEl) {
+      data.finish_color = finishEl.innerText.trim();
+    }
+  }
+  
+  // Generic fallback selectors (avoid shipping info!)
+  if (!data.finish_color) {
+    const finishSelectors = [
+      '[class*="finish-name"]', '[class*="color-name"]', '[class*="variant-name"]',
+      '[class*="selected-option"]:not([class*="ship"])', 
+      '[data-finish]', '[data-color]',
+      '[class*="option-value"]:not([class*="ship"])'
+    ];
+    for (const sel of finishSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el && el.innerText) {
+          const txt = el.innerText.trim();
+          // Skip if it looks like shipping info
+          if (txt.length > 2 && txt.length < 60 && 
+              !txt.match(/^\$/) && 
+              !txt.toLowerCase().includes('ship') &&
+              !txt.toLowerCase().includes('freight') &&
+              !txt.toLowerCase().includes('delivery')) {
+            data.finish_color = txt;
+            break;
+          }
+        }
+      } catch (e) {}
+    }
+  }
+  
+  // Pattern-based fallback (avoid shipping terms)
   if (!data.finish_color) {
     const finishPatterns = [
       /Finish[:\s]+([^\n,]{3,40})/i,
@@ -316,8 +400,13 @@ function scrapePageData() {
     for (const pattern of finishPatterns) {
       const match = bodyText.match(pattern);
       if (match) {
-        data.finish_color = match[1].trim();
-        break;
+        const value = match[1].trim();
+        if (!value.toLowerCase().includes('ship') && 
+            !value.toLowerCase().includes('freight') &&
+            !value.toLowerCase().includes('motor')) {
+          data.finish_color = value;
+          break;
+        }
       }
     }
   }
