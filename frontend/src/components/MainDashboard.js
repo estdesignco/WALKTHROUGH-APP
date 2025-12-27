@@ -1,13 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAPI } from '../App';
 
 const MainDashboard = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
+  const [extensionData, setExtensionData] = useState(null);
+
+  // Check for extension data in URL params
+  useEffect(() => {
+    const action = searchParams.get('action');
+    if (action === 'add-item') {
+      const data = {
+        name: searchParams.get('name'),
+        price: searchParams.get('price'),
+        sku: searchParams.get('sku'),
+        size: searchParams.get('size'),
+        finish_color: searchParams.get('finish'),
+        vendor: searchParams.get('vendor'),
+        link: searchParams.get('link'),
+        image_url: searchParams.get('image')
+      };
+      console.log('📦 Extension data received:', data);
+      setExtensionData(data);
+      
+      // Store in localStorage so FFE dashboard can access it
+      localStorage.setItem('extensionScrapedData', JSON.stringify(data));
+      
+      // Show notification
+      alert(`✅ Product scraped!\n\nName: ${data.name}\nPrice: $${data.price || 'N/A'}\n\nGo to any project's FF&E tab and click "Add Item" - the data will auto-populate!`);
+      
+      // Clear URL params
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchProjects = async () => {
