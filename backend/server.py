@@ -6722,6 +6722,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 except:
                     pass
             
+            # UNIVERSAL FALLBACK: If still no finish_image, use the main product image
+            # For items like rugs, furniture, the main image IS the finish/material representation
+            if not result.get('finish_image') and result.get('image_url'):
+                result['finish_image'] = result['image_url']
+                print(f"✅ FINISH IMAGE (fallback to main): {result['finish_image'][:60]}...")
+            
             # ===== FINAL VALIDATION AND CLEANUP =====
             print("🔧 VALIDATING AND CLEANING RESULTS...")
             
