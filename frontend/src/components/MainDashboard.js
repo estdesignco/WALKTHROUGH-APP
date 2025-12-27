@@ -21,9 +21,11 @@ const MainDashboard = () => {
         sku: searchParams.get('sku'),
         size: searchParams.get('size'),
         finish_color: searchParams.get('finish'),
+        finish_image: searchParams.get('finish_image'), // CRITICAL: Swatch image
         vendor: searchParams.get('vendor'),
         link: searchParams.get('link'),
-        image_url: searchParams.get('image')
+        image_url: searchParams.get('image'),
+        msrp: searchParams.get('msrp')
       };
       console.log('📦 Extension data received:', data);
       setExtensionData(data);
@@ -31,8 +33,9 @@ const MainDashboard = () => {
       // Store in localStorage so FFE dashboard can access it
       localStorage.setItem('extensionScrapedData', JSON.stringify(data));
       
-      // Show notification
-      alert(`✅ Product scraped!\n\nName: ${data.name}\nPrice: $${data.price || 'N/A'}\n\nGo to any project's FF&E tab and click "Add Item" - the data will auto-populate!`);
+      // Show notification with finish info if available
+      const finishInfo = data.finish_color ? `\nFinish: ${data.finish_color}` : '';
+      alert(`✅ Product scraped!\n\nName: ${data.name}\nPrice: $${data.price || 'N/A'}${finishInfo}\n\nGo to any project's FF&E tab and click "Add Item" - the data will auto-populate!`);
       
       // Clear URL params
       window.history.replaceState({}, '', window.location.pathname);
