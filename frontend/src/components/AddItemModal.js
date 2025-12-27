@@ -39,44 +39,6 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
   const searchTimeoutRef = useRef(null);
   const urlLookupTimeoutRef = useRef(null);
 
-  // Poll for extension-scraped data
-  useEffect(() => {
-    const checkExtensionData = async () => {
-      try {
-        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
-        const response = await fetch(`${backendUrl}/api/extension-scrape-latest`);
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data && result.data.name) {
-            // Auto-populate form with extension data
-            const data = result.data;
-            setFormData(prev => ({
-              ...prev,
-              name: data.name || prev.name,
-              vendor: data.vendor || prev.vendor,
-              sku: data.sku || prev.sku,
-              cost: data.price || prev.cost,
-              size: data.size || prev.size,
-              finish_color: data.finish_color || prev.finish_color,
-              image_url: data.image_url || prev.image_url,
-              link: data.url || prev.link
-            }));
-            setSearchQuery(data.name || '');
-            setUrlLookupMessage(`✅ Loaded from extension: ${data.name} - $${data.price || 'N/A'}`);
-            setTimeout(() => setUrlLookupMessage(''), 5000);
-          }
-        }
-      } catch (e) {
-        // Silently fail - extension data is optional
-      }
-    };
-    
-    // Check immediately and then every 2 seconds
-    checkExtensionData();
-    const interval = setInterval(checkExtensionData, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Fetch vendor list on mount
   useEffect(() => {
     const fetchVendors = async () => {
