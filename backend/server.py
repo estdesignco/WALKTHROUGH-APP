@@ -6200,48 +6200,46 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             if 'reginaandrew.com' in domain:
                 import re
                 # Regina Andrew shows finish in product details
-                # Common formats: "Finish: Antique Gold Leaf", "Material: Natural Woven Seagrass"
+                # Format: "Finish: Natural" or "Material: Natural Material"
                 
-                # Try to extract finish
+                # Try to extract finish (format: "Finish: Natural")
                 finish_patterns = [
-                    r'Finish\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Material)',
-                    r'Color\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.)',
+                    r'Finish\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|$|Weight|Height)',
+                    r'Color\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|$|Weight)',
                 ]
                 for pattern in finish_patterns:
                     finish_match = re.search(pattern, all_text, re.IGNORECASE)
                     if finish_match:
                         finish = finish_match.group(1).strip()
-                        if len(finish) > 2 and len(finish) < 50:
+                        if len(finish) > 1 and len(finish) < 50:
                             result['finish_color'] = finish
                             print(f"✅ REGINA ANDREW FINISH: {result['finish_color']}")
                             break
                 
                 # Try Material as finish (for woven/natural materials)
                 if not result.get('finish_color'):
-                    material_match = re.search(r'Material\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.)', all_text, re.IGNORECASE)
+                    material_match = re.search(r'Material\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|$|Finish)', all_text, re.IGNORECASE)
                     if material_match:
                         material = material_match.group(1).strip()
                         if len(material) > 2 and len(material) < 50:
                             result['finish_color'] = material
                             print(f"✅ REGINA ANDREW MATERIAL: {result['finish_color']}")
                 
-                # Extract SIZE for Regina Andrew
+                # Extract SIZE for Regina Andrew (format: Height: 34\nWidth: 36\nDepth: 36)
                 if not result.get('size'):
-                    size_patterns = [
-                        r'Dimensions?\s*[:\s]*([^,\n]{5,60})',
-                        r'(\d+\.?\d*)\s*["\']?\s*[Ww]\s*[xX×]\s*(\d+\.?\d*)\s*["\']?\s*[Hh]',
-                        r'Height\s*[:\s]*(\d+\.?\d*)',
-                        r'Width\s*[:\s]*(\d+\.?\d*)',
-                    ]
-                    for pattern in size_patterns:
-                        size_match = re.search(pattern, all_text, re.IGNORECASE)
-                        if size_match:
-                            if size_match.lastindex and size_match.lastindex >= 2:
-                                result['size'] = f'{size_match.group(1)}"W x {size_match.group(2)}"H'
-                            else:
-                                result['size'] = size_match.group(1).strip()
-                            print(f"✅ REGINA ANDREW SIZE: {result['size']}")
-                            break
+                    height_match = re.search(r'Height\s*[:\s]+\s*(\d+\.?\d*)', all_text, re.IGNORECASE)
+                    width_match = re.search(r'Width\s*[:\s]+\s*(\d+\.?\d*)', all_text, re.IGNORECASE)
+                    depth_match = re.search(r'Depth\s*[:\s]+\s*(\d+\.?\d*)', all_text, re.IGNORECASE)
+                    
+                    if height_match and width_match:
+                        h = height_match.group(1)
+                        w = width_match.group(1)
+                        if depth_match:
+                            d = depth_match.group(1)
+                            result['size'] = f'{w}"W x {d}"D x {h}"H'
+                        else:
+                            result['size'] = f'{w}"W x {h}"H'
+                        print(f"✅ REGINA ANDREW SIZE: {result['size']}")
             
             # VENDOR-SPECIFIC: Four Hands has specific format
             elif 'fourhands.com' in domain:
