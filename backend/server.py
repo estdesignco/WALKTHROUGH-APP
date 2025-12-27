@@ -6201,34 +6201,64 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             if 'reginaandrew.com' in domain:
                 print("🎯 REGINA ANDREW VENDOR DETECTED - Using specific extraction")
                 import re
-                # Regina Andrew shows finish in product details
-                # Format: "Finish: Natural" or "Material: Natural Material"
                 
-                # Debug: Print part of all_text to see actual format
-                if 'Finish' in all_text or 'finish' in all_text:
-                    finish_idx = all_text.lower().find('finish')
-                    print(f"🔍 Text around 'Finish': ...{all_text[max(0, finish_idx-20):finish_idx+50]}...")
-                else:
-                    print("⚠️ 'Finish' not found in all_text")
-                
-                # Try to extract finish (format: "Finish: Natural")
-                finish_patterns = [
-                    r'Finish\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|$|Weight|Height)',
-                    r'Color\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|$|Weight)',
-                    r'Finish[:\s]+([A-Za-z]+)',  # Simple pattern
-                ]
-                for pattern in finish_patterns:
-                    print(f"🔍 Trying pattern: {pattern}")
-                    finish_match = re.search(pattern, all_text, re.IGNORECASE)
+                # For Regina Andrew, try to get text from the Details section specifically
+                try:
+                    # Wait for the details section to load
+                    await page.wait_for_timeout(3000)
+                    
+                    # Try to find the details section and extract text
+                    details_selectors = ['.product-details', '#details', '[class*="details"]', 'table', '.specifications']
+                    details_text = ""
+                    for sel in details_selectors:
+                        try:
+                            details_el = await page.query_selector(sel)
+                            if details_el:
+                                details_text = await details_el.inner_text()
+                                if details_text and len(details_text) > 50:
+                                    print(f"🔍 Found details section with {len(details_text)} chars")
+                                    break
+                        except:
+                            continue
+                    
+                    # Also get the full page inner text
+                    full_text = await page.inner_text('body')
+                    combined_text = details_text + "\n" + full_text
+                    
+                    # Search for Finish in combined text
+                    finish_match = re.search(r'Finish\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|Weight|$)', combined_text, re.IGNORECASE)
                     if finish_match:
                         finish = finish_match.group(1).strip()
-                        print(f"🔍 Found finish match: '{finish}'")
                         if len(finish) > 1 and len(finish) < 50:
                             result['finish_color'] = finish
                             print(f"✅ REGINA ANDREW FINISH: {result['finish_color']}")
-                            break
-                    else:
-                        print(f"  ❌ No match")
+                    
+                    # Material as fallback
+                    if not result.get('finish_color'):
+                        material_match = re.search(r'Material\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|Finish|$)', combined_text, re.IGNORECASE)
+                        if material_match:
+                            material = material_match.group(1).strip()
+                            if len(material) > 2 and len(material) < 50:
+                                result['finish_color'] = material
+                                print(f"✅ REGINA ANDREW MATERIAL: {result['finish_color']}")
+                    
+                    # Size extraction
+                    height_match = re.search(r'Height\s*[:\s]+\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
+                    width_match = re.search(r'Width\s*[:\s]+\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
+                    depth_match = re.search(r'Depth\s*[:\s]+\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
+                    
+                    if height_match and width_match:
+                        h = height_match.group(1)
+                        w = width_match.group(1)
+                        if depth_match:
+                            d = depth_match.group(1)
+                            result['size'] = f'{w}"W x {d}"D x {h}"H'
+                        else:
+                            result['size'] = f'{w}"W x {h}"H'
+                        print(f"✅ REGINA ANDREW SIZE: {result['size']}")
+                        
+                except Exception as ra_err:
+                    print(f"⚠️ Regina Andrew specific extraction error: {ra_err}")
                 
                 # Try Material as finish (for woven/natural materials)
                 if not result.get('finish_color'):
