@@ -79,8 +79,12 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
       let websiteData = null;
       if (scrapeResponse.ok) {
         const scrapeResult = await scrapeResponse.json();
+        console.log('🔍 Scrape API Response:', JSON.stringify(scrapeResult, null, 2));
         if (scrapeResult.success && scrapeResult.data) {
           websiteData = scrapeResult.data;
+          console.log('🔍 websiteData extracted:', JSON.stringify(websiteData, null, 2));
+          console.log('🔍 finish_color from websiteData:', websiteData.finish_color);
+          console.log('🔍 color from websiteData:', websiteData.color);
         }
       }
       
