@@ -6217,6 +6217,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 details_text = await details_el.inner_text()
                                 if details_text and len(details_text) > 50:
                                     print(f"🔍 Found details section with {len(details_text)} chars")
+                                    # Print first 500 chars for debugging
+                                    print(f"🔍 Details preview: {details_text[:500]}...")
                                     break
                         except:
                             continue
@@ -6225,37 +6227,47 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     full_text = await page.inner_text('body')
                     combined_text = details_text + "\n" + full_text
                     
-                    # Search for Finish in combined text
-                    finish_match = re.search(r'Finish\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|Weight|$)', combined_text, re.IGNORECASE)
-                    if finish_match:
-                        finish = finish_match.group(1).strip()
-                        if len(finish) > 1 and len(finish) < 50:
-                            result['finish_color'] = finish
-                            print(f"✅ REGINA ANDREW FINISH: {result['finish_color']}")
+                    # Search for Finish in combined text - very simple pattern
+                    if 'Finish' in combined_text:
+                        print("✅ 'Finish' FOUND in combined text!")
+                        finish_match = re.search(r'Finish\s*(\S+)', combined_text, re.IGNORECASE)
+                        if finish_match:
+                            finish = finish_match.group(1).strip()
+                            print(f"🔍 Raw finish match: '{finish}'")
+                            if len(finish) > 1 and len(finish) < 50:
+                                result['finish_color'] = finish
+                                print(f"✅ REGINA ANDREW FINISH: {result['finish_color']}")
+                    else:
+                        print("⚠️ 'Finish' NOT found in combined text")
                     
                     # Material as fallback
                     if not result.get('finish_color'):
-                        material_match = re.search(r'Material\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|Finish|$)', combined_text, re.IGNORECASE)
+                        material_match = re.search(r'Material\s*(\S+)', combined_text, re.IGNORECASE)
                         if material_match:
                             material = material_match.group(1).strip()
                             if len(material) > 2 and len(material) < 50:
                                 result['finish_color'] = material
                                 print(f"✅ REGINA ANDREW MATERIAL: {result['finish_color']}")
                     
-                    # Size extraction
-                    height_match = re.search(r'Height\s*[:\s]+\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
-                    width_match = re.search(r'Width\s*[:\s]+\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
-                    depth_match = re.search(r'Depth\s*[:\s]+\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
-                    
-                    if height_match and width_match:
-                        h = height_match.group(1)
-                        w = width_match.group(1)
-                        if depth_match:
-                            d = depth_match.group(1)
-                            result['size'] = f'{w}"W x {d}"D x {h}"H'
-                        else:
-                            result['size'] = f'{w}"W x {h}"H'
-                        print(f"✅ REGINA ANDREW SIZE: {result['size']}")
+                    # Size extraction - look for Height/Width patterns
+                    if 'Height' in combined_text:
+                        print("✅ 'Height' FOUND in combined text!")
+                        height_match = re.search(r'Height\s*[:=]?\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
+                        width_match = re.search(r'Width\s*[:=]?\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
+                        depth_match = re.search(r'Depth\s*[:=]?\s*(\d+\.?\d*)', combined_text, re.IGNORECASE)
+                        
+                        if height_match and width_match:
+                            h = height_match.group(1)
+                            w = width_match.group(1)
+                            print(f"🔍 Found H={h}, W={w}")
+                            if depth_match:
+                                d = depth_match.group(1)
+                                result['size'] = f'{w}"W x {d}"D x {h}"H'
+                            else:
+                                result['size'] = f'{w}"W x {h}"H'
+                            print(f"✅ REGINA ANDREW SIZE: {result['size']}")
+                    else:
+                        print("⚠️ 'Height' NOT found in combined text")
                         
                 except Exception as ra_err:
                     print(f"⚠️ Regina Andrew specific extraction error: {ra_err}")
