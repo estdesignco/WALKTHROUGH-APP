@@ -993,3 +993,42 @@ The `/api/scrape-product` endpoint now includes a `bot_detection_warning` field 
 - User wants ALL 22 vendors to work perfectly
 - Many vendors have bot detection that cannot be bypassed
 
+
+---
+
+## CRITICAL FINDING: Uttermost Login Credentials Issue - Dec 27, 2024
+
+### What We Discovered
+After extensive debugging of the Uttermost scraper:
+
+1. **The scraper IS working correctly** - it navigates to the login page, fills credentials, clicks login
+2. **Uttermost is showing an ERROR: "An error has occurred. Please check the input and try again."**
+3. **The stored credentials ARE being decrypted correctly:**
+   - Email: `Orders@estdesignco.com` (also tried lowercase: `orders@estdesignco.com`)
+   - Password: `Zeke1919$$$$` (12 characters)
+
+4. **When login DOES succeed** (we had one successful test), the session is NOT being preserved when navigating to the product page - it still shows "Sign In or Register"
+
+### Root Causes Identified
+1. **Credential Issue**: The Uttermost login is rejecting the stored credentials with a generic error message
+2. **Possible causes**:
+   - Password changed on Uttermost website
+   - Account locked/suspended
+   - Bot detection silently failing even with correct credentials
+
+### What User Needs to Do
+1. **Manually verify credentials work** - Log into https://uttermost.com/sign-in manually to confirm the credentials are still valid
+2. **If credentials changed** - Update them in the system via the Vendor Credentials page
+3. **If credentials work manually but scraper fails** - Uttermost may have implemented stricter bot detection
+
+### Evidence
+- Screenshots saved at:
+  - `/tmp/uttermost_login_debug.png` - Shows login form with credentials filled
+  - `/tmp/uttermost_login_result.png` - Shows error message after login attempt
+  - `/tmp/uttermost_logged_in_product.png` - Shows product page (without prices)
+
+### Scraper Status for Other Vendors
+- **Four Hands**: ✅ WORKING (7/7 fields)
+- **Jaipur Living**: ✅ WORKING (7/7 fields)
+- **Uttermost**: ❌ CREDENTIAL ISSUE - needs user verification
+
