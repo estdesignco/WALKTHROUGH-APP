@@ -6402,46 +6402,62 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                         except:
                             pass
                 
+                # UTTERMOST: Extract FINISH/COLOR from product name FIRST
+                # Uttermost products often have finish in name: "Product Name - Latte Onyx"
+                if result.get('name') and ' - ' in result['name']:
+                    parts = result['name'].rsplit(' - ', 1)
+                    if len(parts) == 2:
+                        potential_finish = parts[1].strip()
+                        # Check if it looks like a finish (not a size or number)
+                        if len(potential_finish) > 2 and len(potential_finish) < 40 and not re.match(r'^\d', potential_finish):
+                            result['finish_color'] = potential_finish
+                            print(f"✅ UTTERMOST FINISH FROM NAME: {result['finish_color']}")
+                
                 # UTTERMOST: Extract SIZE/DIMENSIONS
                 if not result.get('size'):
-                    size_patterns = [
-                        r'Dimensions?[:\s]*([^,\n]{5,50})',
-                        r'Size[:\s]*([^,\n]{5,50})',
-                        r'(\d+\.?\d*)\s*["\']?\s*[Ww]\s*[xX×]\s*(\d+\.?\d*)\s*["\']?\s*[Dd]?\s*[xX×]?\s*(\d+\.?\d*)?\s*["\']?\s*[Hh]?',
-                    ]
-                    for pattern in size_patterns:
-                        size_match = re.search(pattern, all_text, re.IGNORECASE)
-                        if size_match:
-                            if size_match.lastindex and size_match.lastindex >= 2:
-                                w = size_match.group(1)
-                                h = size_match.group(2)
-                                d = size_match.group(3) if size_match.lastindex >= 3 else None
-                                if d:
-                                    result['size'] = f'{w}"W x {d}"D x {h}"H'
+                    # Look for dimensions in format: H 5.5 W 5.5 D 5.5
+                    dim_match = re.search(r'[Hh]\s*[:=]?\s*(\d+\.?\d*)\s*["\']?\s*[WwXx]\s*[:=]?\s*(\d+\.?\d*)\s*["\']?\s*(?:[DdXx]\s*[:=]?\s*(\d+\.?\d*))?', all_text)
+                    if dim_match:
+                        h = dim_match.group(1)
+                        w = dim_match.group(2)
+                        d = dim_match.group(3) if dim_match.lastindex >= 3 and dim_match.group(3) else None
+                        if d:
+                            result['size'] = f'{w}"W x {d}"D x {h}"H'
+                        else:
+                            result['size'] = f'{w}"W x {h}"H'
+                        print(f"✅ UTTERMOST SIZE: {result['size']}")
+                    else:
+                        # Try other patterns
+                        size_patterns = [
+                            r'Dimensions?[:\s]*([^,\n]{5,50})',
+                            r'(\d+\.?\d*)\s*["\']?\s*[Ww]\s*[xX×]\s*(\d+\.?\d*)\s*["\']?\s*[Hh]',
+                        ]
+                        for pattern in size_patterns:
+                            size_match = re.search(pattern, all_text, re.IGNORECASE)
+                            if size_match:
+                                if size_match.lastindex and size_match.lastindex >= 2:
+                                    result['size'] = f'{size_match.group(1)}"W x {size_match.group(2)}"H'
                                 else:
-                                    result['size'] = f'{w}"W x {h}"H'
-                            else:
-                                result['size'] = size_match.group(1).strip()
-                            print(f"✅ UTTERMOST SIZE: {result['size']}")
-                            break
+                                    result['size'] = size_match.group(1).strip()
+                                print(f"✅ UTTERMOST SIZE: {result['size']}")
+                                break
                 
-                # Uttermost has several format patterns for finish
-                # Look for explicit Finish: field first
-                finish_patterns = [
-                    r'Finish\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Materials)',
-                    r'Color\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Materials)',
-                    r'(?:Primary\s+)?Material\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.)',
-                ]
-                for pattern in finish_patterns:
-                    finish_match = re.search(pattern, all_text, re.IGNORECASE)
-                    if finish_match:
-                        finish = finish_match.group(1).strip()
-                        # Skip generic terms
-                        skip_terms = ['click', 'select', 'view', 'add', 'cart', 'email', 'subscribe', 'uttermost']
-                        if len(finish) > 2 and len(finish) < 50 and not any(skip in finish.lower() for skip in skip_terms):
-                            result['finish_color'] = finish
-                            print(f"✅ UTTERMOST FINISH: {result['finish_color']}")
-                            break
+                # If no finish from name, try other patterns (but skip "Touch Dimmer" type garbage)
+                if not result.get('finish_color'):
+                    finish_patterns = [
+                        r'Finish\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Materials)',
+                        r'Color\s*[:\s]+([A-Za-z\s\-]+?)(?:\n|$|,|\.|Materials)',
+                    ]
+                    for pattern in finish_patterns:
+                        finish_match = re.search(pattern, all_text, re.IGNORECASE)
+                        if finish_match:
+                            finish = finish_match.group(1).strip()
+                            # Skip generic terms and technical terms
+                            skip_terms = ['click', 'select', 'view', 'add', 'cart', 'email', 'subscribe', 'uttermost', 'touch', 'dimmer', 'switch', 'light', 'lamp', 'led']
+                            if len(finish) > 2 and len(finish) < 50 and not any(skip in finish.lower() for skip in skip_terms):
+                                result['finish_color'] = finish
+                                print(f"✅ UTTERMOST FINISH: {result['finish_color']}")
+                                break
                 
                 # Try to extract from product description (often describes finish)
                 if not result.get('finish_color'):
