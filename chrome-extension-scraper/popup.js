@@ -61,25 +61,48 @@ function displayResults(data) {
     loginWarning.style.display = 'flex';
   }
   
-  // Main product image
+  // Main product image - SHOW PLACEHOLDER IF MISSING
   const imgEl = document.getElementById('productImage');
-  if (data.image_url && !data.image_url.startsWith('data:image/gif')) {
+  if (data.image_url && data.image_url.startsWith('http')) {
     imgEl.src = data.image_url;
     imgEl.style.display = 'block';
+    imgEl.onerror = () => {
+      imgEl.src = '';
+      imgEl.style.display = 'none';
+      console.log('Failed to load product image:', data.image_url);
+    };
   } else {
     imgEl.src = '';
     imgEl.style.display = 'none';
+    console.log('No product image found');
   }
   
-  // Finish swatch image
+  // Finish swatch image - SHOW IF AVAILABLE
   const finishImgEl = document.getElementById('finishImage');
   const finishImgContainer = document.getElementById('finishImageContainer');
-  if (data.finish_image && !data.finish_image.startsWith('data:image/gif')) {
+  const finishNameEl = document.getElementById('finishName');
+  
+  if (data.finish_image && data.finish_image.startsWith('http')) {
     finishImgEl.src = data.finish_image;
-    finishImgContainer.style.display = 'block';
+    finishImgContainer.style.display = 'flex';
+    finishImgContainer.classList.add('visible');
+    finishNameEl.textContent = data.finish_color || 'Swatch';
+    finishImgEl.onerror = () => {
+      finishImgContainer.style.display = 'none';
+      finishImgContainer.classList.remove('visible');
+      console.log('Failed to load finish image:', data.finish_image);
+    };
   } else {
     finishImgContainer.style.display = 'none';
+    finishImgContainer.classList.remove('visible');
+    console.log('No finish image found');
   }
+  
+  // Log what was found for debugging
+  console.log('=== SCRAPE RESULTS ===');
+  console.log('Product Image:', data.image_url || 'NOT FOUND');
+  console.log('Finish Image:', data.finish_image || 'NOT FOUND');
+  console.log('Finish Color:', data.finish_color || 'NOT FOUND');
   
   // Data grid
   setDataValue('dataVendor', data.vendor);
