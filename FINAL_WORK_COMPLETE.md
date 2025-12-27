@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://designready-1.preview.emergentagent.com
+https://vendor-bridge-8.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://designready-1.preview.emergentagent.com/mobile-app
+https://vendor-bridge-8.preview.emergentagent.com/mobile-app
 
 ---
 

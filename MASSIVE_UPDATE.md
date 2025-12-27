@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://designready-1.preview.emergentagent.com/mobile-app
+Test it now: https://vendor-bridge-8.preview.emergentagent.com/mobile-app

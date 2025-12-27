@@ -2,7 +2,7 @@
 """
 COMPREHENSIVE BACKEND API AUDIT
 Interior Design Application - All Endpoints Test
-Backend URL: https://designready-1.preview.emergentagent.com
+Backend URL: https://vendor-bridge-8.preview.emergentagent.com
 """
 
 import requests
@@ -12,7 +12,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BASE_URL = "https://designready-1.preview.emergentagent.com/api"
+BASE_URL = "https://vendor-bridge-8.preview.emergentagent.com/api"
 TIMEOUT = 60  # 60 seconds timeout for scraper endpoints
 
 class APIAuditor:

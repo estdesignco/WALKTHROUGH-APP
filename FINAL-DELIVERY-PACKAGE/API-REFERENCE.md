@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://designready-1.preview.emergentagent.com/api
+https://vendor-bridge-8.preview.emergentagent.com/api
 ```
 
 ---

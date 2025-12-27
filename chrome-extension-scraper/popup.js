@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://designready-1.preview.emergentagent.com';
+const BACKEND_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
 
 let scrapedData = null;
 

@@ -1,8 +1,8 @@
 // ONE CLICK: Scrape + Open App with data pre-filled
 // No copy/paste, no extra steps
 
-const BACKEND_URL = 'https://designready-1.preview.emergentagent.com';
-const APP_URL = 'https://designready-1.preview.emergentagent.com';
+const BACKEND_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
+const APP_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
 
 console.log('🛒 Product Scraper loaded');
 
