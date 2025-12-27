@@ -1,26 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Product Price Scraper",
+  "name": "Design Ready Product Scraper",
   "version": "1.0.0",
-  "description": "Scrapes product data including prices from your logged-in wholesale vendor sessions",
+  "description": "Scrape product data from wholesale vendors and send to Design Ready app",
   "permissions": [
     "activeTab",
-    "storage",
     "scripting",
-    "clipboardWrite"
+    "storage"
   ],
   "host_permissions": [
-    "https://*.uttermost.com/*",
-    "https://*.visualcomfort.com/*",
-    "https://*.bernhardt.com/*",
-    "https://*.reginaandrew.com/*",
-    "https://*.hvlgroup.com/*",
-    "https://*.loloirugs.com/*",
-    "https://*.globalviews.com/*",
-    "https://*.surya.com/*",
-    "https://*.fourhands.com/*",
-    "https://*.jaipurliving.com/*",
-    "https://designready-1.preview.emergentagent.com/*"
+    "https://*/*",
+    "http://*/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -30,24 +20,6 @@
       "128": "icon128.png"
     }
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://*.uttermost.com/*",
-        "https://*.visualcomfort.com/*",
-        "https://*.bernhardt.com/*",
-        "https://*.reginaandrew.com/*",
-        "https://*.hvlgroup.com/*",
-        "https://*.loloirugs.com/*",
-        "https://*.globalviews.com/*",
-        "https://*.surya.com/*",
-        "https://*.fourhands.com/*",
-        "https://*.jaipurliving.com/*"
-      ],
-      "js": ["content.js"],
-      "run_at": "document_idle"
-    }
-  ],
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
