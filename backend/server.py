@@ -7516,9 +7516,18 @@ async def scrape_product_advanced(data: dict):
         # ===== STEP 3: RETURN WEB-SCRAPED DATA ONLY =====
         print(f"✅ Final product data (WEB SCRAPE ONLY): {scraped_data.get('name')} - ${scraped_data.get('cost') or scraped_data.get('price') or 'N/A'}")
         
+        # Check if price is missing due to reCAPTCHA
+        recaptcha_vendors = ['uttermost.com', 'visualcomfort.com']
+        has_recaptcha = any(v in domain for v in recaptcha_vendors)
+        price_note = None
+        if has_recaptcha and not scraped_data.get('price'):
+            price_note = f"Price requires manual entry - {domain} has bot protection that blocks automated price scraping"
+            print(f"⚠️ {price_note}")
+        
         return {
             "success": True,
             "source": "scraped",
+            "price_note": price_note,
             "data": scraped_data
         }
         
