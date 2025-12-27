@@ -5256,8 +5256,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
                 # VERIFY LOGIN ACTUALLY WORKED by checking page content
                 page_content = await page.inner_text('body')
-                login_indicators = ['logout', 'sign out', 'my account', 'welcome', 'logged in', 'orders@']
-                logout_indicators = ['sign in', 'login', 'create account', 'forgot password']
+                login_indicators = ['logout', 'sign out', 'my account', 'welcome', 'logged in as']
+                logout_indicators = ['sign in', 'login', 'create account', 'forgot password', 'sign in or register']
                 
                 is_actually_logged_in = any(ind.lower() in page_content.lower() for ind in login_indicators)
                 shows_login_form = any(ind.lower() in page_content.lower() for ind in logout_indicators) and 'logout' not in page_content.lower()
