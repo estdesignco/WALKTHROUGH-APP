@@ -1,138 +1,82 @@
-const BACKEND_URL = 'https://designready-1.preview.emergentagent.com';
-let scrapedData = null;
+// ONE CLICK - Scrape and send to app automatically
 
-document.getElementById('scrapeBtn').addEventListener('click', async () => {
+document.getElementById('mainBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('mainBtn');
   const statusEl = document.getElementById('status');
-  const dataBox = document.getElementById('dataBox');
+  const previewEl = document.getElementById('dataPreview');
+  
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Scraping...';
   
   statusEl.style.display = 'block';
-  statusEl.className = 'status info';
-  statusEl.textContent = '🔍 Scraping page...';
+  statusEl.className = 'status loading';
+  statusEl.textContent = '🔍 Extracting product data...';
   
   try {
     // Get active tab
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
     if (!tab || !tab.id) {
-      throw new Error('No active tab found');
+      throw new Error('No active tab');
     }
     
-    // Check if we're on a supported vendor page
-    const supportedVendors = [
-      'uttermost.com', 'visualcomfort.com', 'bernhardt.com', 
-      'reginaandrew.com', 'hvlgroup.com', 'loloirugs.com',
-      'globalviews.com', 'surya.com', 'fourhands.com', 'jaipurliving.com'
-    ];
+    // Inject and run content script
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['content.js']
+    });
     
-    const isSupported = supportedVendors.some(v => tab.url.includes(v));
+    // Small delay for script to initialize
+    await new Promise(r => setTimeout(r, 500));
     
-    if (!isSupported) {
-      statusEl.className = 'status error';
-      statusEl.textContent = '❌ Not on a supported vendor page. Navigate to a product page first.';
-      return;
-    }
-    
-    // Inject content script if needed
-    try {
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ['content.js']
-      });
-    } catch (e) {
-      console.log('Content script may already be loaded:', e);
-    }
-    
-    // Wait a moment for script to load
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Send message to content script
-    chrome.tabs.sendMessage(tab.id, { action: 'scrapeProduct' }, (response) => {
+    // Send message to scrape AND send to app
+    chrome.tabs.sendMessage(tab.id, { action: 'scrapeAndSend' }, (response) => {
+      btn.disabled = false;
+      btn.innerHTML = '<span>⚡</span> SCRAPE & SEND TO APP';
+      
       if (chrome.runtime.lastError) {
         statusEl.className = 'status error';
-        statusEl.textContent = '❌ Error: ' + chrome.runtime.lastError.message;
+        statusEl.textContent = '❌ ' + chrome.runtime.lastError.message;
         return;
       }
       
-      if (!response || !response.success) {
+      if (!response) {
         statusEl.className = 'status error';
-        statusEl.textContent = '❌ Failed to scrape page';
+        statusEl.textContent = '❌ No response from page';
         return;
       }
       
-      scrapedData = response.data;
+      const data = response.data;
       
-      // Update UI
-      dataBox.style.display = 'block';
+      // Show preview
+      previewEl.style.display = 'block';
       
-      document.getElementById('dataName').textContent = scrapedData.name || '-';
-      document.getElementById('dataName').className = 'data-value' + (scrapedData.name ? '' : ' missing');
+      document.getElementById('previewPrice').textContent = data.price ? `$${data.price}` : 'Not found';
+      document.getElementById('previewPrice').className = 'data-value price-highlight' + (data.price ? '' : ' missing');
       
-      document.getElementById('dataPrice').textContent = scrapedData.price ? `$${scrapedData.price}` : '-';
-      document.getElementById('dataPrice').className = 'data-value' + (scrapedData.price ? '' : ' missing');
+      document.getElementById('previewName').textContent = data.name || 'Not found';
+      document.getElementById('previewName').className = 'data-value' + (data.name ? '' : ' missing');
       
-      document.getElementById('dataSku').textContent = scrapedData.sku || '-';
-      document.getElementById('dataSku').className = 'data-value' + (scrapedData.sku ? '' : ' missing');
+      document.getElementById('previewSku').textContent = data.sku || 'Not found';
+      document.getElementById('previewSku').className = 'data-value' + (data.sku ? '' : ' missing');
       
-      document.getElementById('dataSize').textContent = scrapedData.size || '-';
-      document.getElementById('dataSize').className = 'data-value' + (scrapedData.size ? '' : ' missing');
-      
-      document.getElementById('dataFinish').textContent = scrapedData.finish_color || '-';
-      document.getElementById('dataFinish').className = 'data-value' + (scrapedData.finish_color ? '' : ' missing');
-      
-      statusEl.className = 'status success';
-      if (scrapedData.price) {
-        statusEl.textContent = `✅ Found price: $${scrapedData.price}`;
+      if (response.success) {
+        statusEl.className = 'status success';
+        if (data.price) {
+          statusEl.textContent = `✅ Sent to app! Price: $${data.price}`;
+        } else {
+          statusEl.textContent = '⚠️ Sent but no price found. Are you logged in?';
+        }
       } else {
-        statusEl.textContent = '⚠️ Scraped but no price found. Are you logged in?';
+        statusEl.className = 'status error';
+        statusEl.textContent = '❌ ' + (response.error || 'Failed to send');
       }
     });
     
   } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>⚡</span> SCRAPE & SEND TO APP';
     statusEl.className = 'status error';
-    statusEl.textContent = '❌ Error: ' + e.message;
-    console.error('Scrape error:', e);
-  }
-});
-
-// Copy price to clipboard
-document.getElementById('copyBtn').addEventListener('click', async () => {
-  if (scrapedData && scrapedData.price) {
-    await navigator.clipboard.writeText(scrapedData.price.toString());
-    document.getElementById('status').textContent = '📋 Price copied to clipboard!';
-  }
-});
-
-// Send to app
-document.getElementById('sendBtn').addEventListener('click', async () => {
-  const statusEl = document.getElementById('status');
-  
-  if (!scrapedData) {
-    statusEl.className = 'status error';
-    statusEl.textContent = '❌ No data to send. Scrape first!';
-    return;
-  }
-  
-  statusEl.className = 'status info';
-  statusEl.textContent = '🚀 Sending to app...';
-  
-  try {
-    // Send the scraped data to the backend
-    const response = await fetch(`${BACKEND_URL}/api/extension-scrape`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(scrapedData)
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status}`);
-    }
-    
-    statusEl.className = 'status success';
-    statusEl.textContent = '✅ Data sent to app! Check your browser.';
-    
-  } catch (e) {
-    statusEl.className = 'status error';
-    statusEl.textContent = '❌ Failed to send: ' + e.message;
-    console.error('Send error:', e);
+    statusEl.textContent = '❌ ' + e.message;
   }
 });
