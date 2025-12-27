@@ -1,0 +1,133 @@
+[
+  {
+    "vendor": "Four Hands",
+    "url": "https://www.fourhands.com/product/232775-001",
+    "status": "PASS",
+    "fields_extracted": "7/7",
+    "field_details": {
+      "name": {
+        "status": "found",
+        "value": "Abaso Coffee Table"
+      },
+      "sku": {
+        "status": "found",
+        "value": "232775-001"
+      },
+      "price": {
+        "status": "found",
+        "value": 1182.55
+      },
+      "size": {
+        "status": "found",
+        "value": "55.00\"w x 55.00\"d x 15.00\"h"
+      },
+      "finish_color": {
+        "status": "found",
+        "value": "Rustic Wormwood Oak"
+      },
+      "image_url": {
+        "status": "found",
+        "value": "https://dd3ka9h4chfr8.cloudfront.net/image/725136000567/image_bkkc84uqt523506m3dsdbpup5o/-Ro%3a5%2cw%3a200%2ch%3a200-FJPG/232775-001_PRM_1.jpg"
+      },
+      "finish_image": {
+        "status": "found",
+        "value": "https://dd3ka9h4chfr8.cloudfront.net/image/725136000567/image_ths25h27nl3ltafop2bf85dv72/-Ro%3a5%2cw%3a200%2ch%3a200-FJPG/007342-001_Rustic_Wormwood_Oak.png"
+      }
+    },
+    "response_time": 82.67384147644043,
+    "bot_detection": null,
+    "product_name": "Abaso Coffee Table",
+    "price": 1182.55,
+    "finish_color": "Rustic Wormwood Oak"
+  },
+  {
+    "vendor": "Jaipur Living",
+    "url": "https://www.jaipurliving.com/syntax-syn03.html",
+    "status": "PASS",
+    "fields_extracted": "7/7",
+    "field_details": {
+      "name": {
+        "status": "found",
+        "value": "Syntax SYN03"
+      },
+      "sku": {
+        "status": "found",
+        "value": "VIEW"
+      },
+      "price": {
+        "status": "found",
+        "value": 244.0
+      },
+      "size": {
+        "status": "found",
+        "value": "Select Size18\" Swatch2'X3'5'X8'8'X11'9'X13'CUSTOM SIZE"
+      },
+      "finish_color": {
+        "status": "found",
+        "value": "Parallel"
+      },
+      "image_url": {
+        "status": "found",
+        "value": "https://www.jaipurliving.com/media/catalog/product/S/Y/SYN03.jpg?quality=70&bg-color=255,255,255&fit=bounds&height=265&width=265&canvas=265:265"
+      },
+      "finish_image": {
+        "status": "found",
+        "value": "https://www.jaipurliving.com/media/catalog/product/S/Y/SYN03.jpg?quality=70&bg-color=255,255,255&fit=bounds&height=265&width=265&canvas=265:265"
+      }
+    },
+    "response_time": 63.374886989593506,
+    "bot_detection": null,
+    "product_name": "Syntax SYN03",
+    "price": 244.0,
+    "finish_color": "Parallel"
+  },
+  {
+    "vendor": "Loloi Rugs",
+    "url": "https://www.loloirugs.com/products/layla-lay-13-ocean-multi",
+    "status": "TIMEOUT",
+    "error": "Request timeout",
+    "fields_extracted": "0/7",
+    "response_time": 300
+  },
+  {
+    "vendor": "Rowe Furniture",
+    "url": "https://www.rowefurniture.com/products/p390-002-sectional",
+    "status": "FAIL",
+    "fields_extracted": "3/7",
+    "field_details": {
+      "name": {
+        "status": "invalid",
+        "value": "Page not found"
+      },
+      "sku": {
+        "status": "found",
+        "value": "P390-002-SECTIONAL"
+      },
+      "price": {
+        "status": "missing",
+        "value": null
+      },
+      "size": {
+        "status": "missing",
+        "value": null
+      },
+      "finish_color": {
+        "status": "missing",
+        "value": null
+      },
+      "image_url": {
+        "status": "found",
+        "value": "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+      },
+      "finish_image": {
+        "status": "found",
+        "value": "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+      }
+    },
+    "response_time": 65.90449976921082,
+    "bot_detection": null,
+    "product_name": "Page not found",
+    "price": null,
+    "finish_color": null
+  }
+]
