@@ -5407,11 +5407,29 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 # Wait for login to complete
                 await page.wait_for_timeout(10000)
                 
+                # VERIFY THE LOGIN ACTUALLY WORKED
+                login_page_content = await page.inner_text('body')
+                if 'sign in' in login_page_content.lower() and 'logout' not in login_page_content.lower():
+                    print(f"⚠️ LOGIN FAILED - Still on login page! Credentials may be wrong.")
+                    login_successful = False
+                elif 'welcome' in login_page_content.lower() or 'my account' in login_page_content.lower() or 'logout' in login_page_content.lower():
+                    print(f"✅ LOGIN VERIFIED - Found logged-in indicators")
+                    login_successful = True
+                else:
+                    print(f"⚠️ LOGIN STATUS UNKNOWN - Page content doesn't show clear indicators")
+                    login_successful = True  # Assume it worked and continue
+                
                 # Navigate back to product page
                 await page.goto(url, wait_until='domcontentloaded', timeout=45000)
                 await page.wait_for_timeout(5000)
                 
-                login_successful = True
+                # Final check - do we see prices now?
+                product_page_content = await page.inner_text('body')
+                if '$' in product_page_content:
+                    print(f"✅ PRICES VISIBLE after login!")
+                else:
+                    print(f"⚠️ NO PRICES VISIBLE after login - login may have failed")
+                
                 print(f"✅ LOGIN COMPLETE - Returned to product page")
                 
             except Exception as login_err:
