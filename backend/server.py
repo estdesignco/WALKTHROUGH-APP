@@ -14563,6 +14563,37 @@ async def login_to_all_vendor_portals():
 # BACKUP / EXPORT ENDPOINTS
 # ============================================================================
 
+# ============================================================================
+# CHROME EXTENSION DOWNLOAD
+# ============================================================================
+
+@api_router.get("/download/chrome-extension")
+async def download_chrome_extension():
+    """Download the Chrome Extension zip file"""
+    import os
+    
+    # Try multiple locations
+    possible_paths = [
+        "/app/chrome-extension-scraper.zip",
+        "/app/backend/static/chrome-extension-scraper.zip",
+        os.path.join(os.path.dirname(__file__), "..", "chrome-extension-scraper.zip")
+    ]
+    
+    for zip_path in possible_paths:
+        if os.path.exists(zip_path):
+            return FileResponse(
+                path=zip_path,
+                filename="design-ready-scraper-extension.zip",
+                media_type="application/zip",
+                headers={
+                    "Content-Disposition": "attachment; filename=design-ready-scraper-extension.zip"
+                }
+            )
+    
+    raise HTTPException(status_code=404, detail="Extension file not found")
+
+
+
 @api_router.get("/backup/full")
 async def create_full_backup():
     """Create a full backup of all data (contacts, materials, credentials, projects)"""
