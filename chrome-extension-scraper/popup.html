@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <style>
     body {
-      width: 280px;
+      width: 260px;
       padding: 15px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -15,9 +15,6 @@
       margin: 0 0 12px 0;
       color: #4ade80;
       font-size: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
     .main-btn {
       width: 100%;
@@ -29,25 +26,13 @@
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
     .main-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
-    }
-    .main-btn:active {
-      transform: translateY(0);
+      opacity: 0.9;
     }
     .main-btn:disabled {
       background: #444;
       color: #888;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
     }
     .status {
       margin-top: 12px;
@@ -56,80 +41,44 @@
       font-size: 12px;
       text-align: center;
     }
-    .status.success {
-      background: rgba(16, 185, 129, 0.2);
-      color: #4ade80;
-      border: 1px solid rgba(74, 222, 128, 0.3);
-    }
-    .status.error {
-      background: rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-    .status.loading {
-      background: rgba(59, 130, 246, 0.2);
-      color: #93c5fd;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-    .data-preview {
+    .status.success { background: rgba(16, 185, 129, 0.2); color: #4ade80; }
+    .status.error { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .status.loading { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+    .instructions {
       margin-top: 12px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
-      padding: 10px;
       font-size: 11px;
-    }
-    .data-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .data-row:last-child {
-      border-bottom: none;
-    }
-    .data-label {
       color: #888;
+      line-height: 1.5;
     }
-    .data-value {
-      color: #4ade80;
-      font-weight: 500;
-      max-width: 150px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .price-display {
+      margin-top: 10px;
+      padding: 12px;
+      background: rgba(74, 222, 128, 0.1);
+      border-radius: 8px;
+      text-align: center;
     }
-    .data-value.missing {
-      color: #fca5a5;
-    }
-    .price-highlight {
-      font-size: 18px;
-      color: #4ade80;
-      font-weight: 700;
-    }
+    .price-label { font-size: 11px; color: #888; }
+    .price-value { font-size: 24px; color: #4ade80; font-weight: 700; }
   </style>
 </head>
 <body>
   <h2>🛒 Price Scraper</h2>
   
-  <button id="mainBtn" class="main-btn">
-    <span>⚡</span> SCRAPE & SEND TO APP
-  </button>
+  <button id="mainBtn" class="main-btn">⚡ SCRAPE THIS PAGE</button>
   
   <div id="status" class="status" style="display: none;"></div>
   
-  <div id="dataPreview" class="data-preview" style="display: none;">
-    <div class="data-row">
-      <span class="data-label">Price:</span>
-      <span id="previewPrice" class="data-value price-highlight">-</span>
-    </div>
-    <div class="data-row">
-      <span class="data-label">Name:</span>
-      <span id="previewName" class="data-value">-</span>
-    </div>
-    <div class="data-row">
-      <span class="data-label">SKU:</span>
-      <span id="previewSku" class="data-value">-</span>
-    </div>
+  <div id="priceDisplay" class="price-display" style="display: none;">
+    <div class="price-label">Wholesale Price</div>
+    <div id="priceValue" class="price-value">$0</div>
+  </div>
+  
+  <div class="instructions">
+    <strong>How to use:</strong><br>
+    1. Click SCRAPE on product page<br>
+    2. Copy the URL from browser<br>
+    3. Paste URL into Add Item modal<br>
+    → Price will auto-populate!
   </div>
 
   <script src="popup.js"></script>
