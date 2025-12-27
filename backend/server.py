@@ -5179,7 +5179,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             'bernhardt.com', 'reginaandrew.com', 'vandh.com', 'hinkley.com',
             'hubbardtonforge.com', 'elegantlighting.com', 'bassettmirror.com',
             'crestviewcollection.com', 'eichholtz.com', 'myohamerica.com',
-            'zeevlighting.com'
+            'zeevlighting.com', 'loloirugs.com', 'rowefurniture.com'
         ]
         
         needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
@@ -7537,7 +7537,7 @@ async def scrape_product_advanced(data: dict):
             'bernhardt.com', 'reginaandrew.com', 'vandh.com', 'hinkley.com',
             'hubbardtonforge.com', 'elegantlighting.com', 'bassettmirror.com',
             'crestviewcollection.com', 'eichholtz.com', 'myohamerica.com',
-            'zeevlighting.com'
+            'zeevlighting.com', 'loloirugs.com', 'rowefurniture.com'
         ]
         is_bot_protected = any(v in domain for v in bot_detection_vendors)
         
