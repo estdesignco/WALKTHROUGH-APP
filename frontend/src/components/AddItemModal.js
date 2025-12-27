@@ -47,7 +47,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
         const data = JSON.parse(extensionData);
         console.log('📦 Found extension data in localStorage:', data);
         
-        // Auto-populate form
+        // Auto-populate form including finish_image
         setFormData(prev => ({
           ...prev,
           name: data.name || prev.name,
@@ -56,11 +56,15 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
           cost: data.price || prev.cost,
           size: data.size || prev.size,
           finish_color: data.finish_color || prev.finish_color,
+          finish_image: data.finish_image || prev.finish_image,  // CRITICAL: Swatch image
           image_url: data.image_url || prev.image_url,
           link: data.link || prev.link
         }));
         setSearchQuery(data.name || '');
-        setUrlLookupMessage(`✅ Auto-filled from extension: ${data.name} - $${data.price || 'N/A'}`);
+        
+        // Show message with finish info if available
+        const finishInfo = data.finish_color ? ` | Finish: ${data.finish_color}` : '';
+        setUrlLookupMessage(`✅ Auto-filled from extension: ${data.name} - $${data.price || 'N/A'}${finishInfo}`);
         
         // Clear localStorage so it doesn't auto-fill again
         localStorage.removeItem('extensionScrapedData');
