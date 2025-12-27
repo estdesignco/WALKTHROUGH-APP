@@ -4,120 +4,132 @@
   <meta charset="UTF-8">
   <style>
     body {
-      width: 350px;
+      width: 280px;
       padding: 15px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #1a1a2e;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       color: #fff;
+      margin: 0;
     }
     h2 {
-      margin: 0 0 15px 0;
+      margin: 0 0 12px 0;
       color: #4ade80;
-      font-size: 16px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .btn {
+    .main-btn {
       width: 100%;
-      padding: 12px;
-      background: #4ade80;
+      padding: 14px;
+      background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
       color: #000;
       border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
-      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .btn:hover {
-      background: #22c55e;
+    .main-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
     }
-    .btn:disabled {
+    .main-btn:active {
+      transform: translateY(0);
+    }
+    .main-btn:disabled {
       background: #444;
       color: #888;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
-    .data-box {
-      background: #252545;
+    .status {
+      margin-top: 12px;
+      padding: 10px;
       border-radius: 8px;
-      padding: 12px;
-      margin-top: 10px;
       font-size: 12px;
+      text-align: center;
+    }
+    .status.success {
+      background: rgba(16, 185, 129, 0.2);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+    .status.error {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .status.loading {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .data-preview {
+      margin-top: 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 11px;
     }
     .data-row {
       display: flex;
       justify-content: space-between;
-      margin: 5px 0;
-      border-bottom: 1px solid #333;
-      padding-bottom: 5px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .data-row:last-child {
+      border-bottom: none;
     }
     .data-label {
       color: #888;
     }
     .data-value {
       color: #4ade80;
-      max-width: 200px;
+      font-weight: 500;
+      max-width: 150px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     .data-value.missing {
-      color: #f87171;
-    }
-    .status {
-      padding: 10px;
-      border-radius: 6px;
-      margin-top: 10px;
-      font-size: 12px;
-    }
-    .status.success {
-      background: #166534;
-      color: #4ade80;
-    }
-    .status.error {
-      background: #7f1d1d;
       color: #fca5a5;
     }
-    .status.info {
-      background: #1e3a5f;
-      color: #93c5fd;
-    }
-    .copy-btn {
-      background: #6366f1;
-      padding: 8px 12px;
-      font-size: 12px;
-      margin-top: 10px;
+    .price-highlight {
+      font-size: 18px;
+      color: #4ade80;
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
-  <h2>🛒 Product Price Scraper</h2>
+  <h2>🛒 Price Scraper</h2>
   
-  <button id="scrapeBtn" class="btn">📋 Scrape This Page</button>
+  <button id="mainBtn" class="main-btn">
+    <span>⚡</span> SCRAPE & SEND TO APP
+  </button>
   
-  <div id="status" class="status info" style="display: none;"></div>
+  <div id="status" class="status" style="display: none;"></div>
   
-  <div id="dataBox" class="data-box" style="display: none;">
-    <div class="data-row">
-      <span class="data-label">Name:</span>
-      <span id="dataName" class="data-value">-</span>
-    </div>
+  <div id="dataPreview" class="data-preview" style="display: none;">
     <div class="data-row">
       <span class="data-label">Price:</span>
-      <span id="dataPrice" class="data-value">-</span>
+      <span id="previewPrice" class="data-value price-highlight">-</span>
+    </div>
+    <div class="data-row">
+      <span class="data-label">Name:</span>
+      <span id="previewName" class="data-value">-</span>
     </div>
     <div class="data-row">
       <span class="data-label">SKU:</span>
-      <span id="dataSku" class="data-value">-</span>
+      <span id="previewSku" class="data-value">-</span>
     </div>
-    <div class="data-row">
-      <span class="data-label">Size:</span>
-      <span id="dataSize" class="data-value">-</span>
-    </div>
-    <div class="data-row">
-      <span class="data-label">Finish:</span>
-      <span id="dataFinish" class="data-value">-</span>
-    </div>
-    <button id="copyBtn" class="btn copy-btn">📋 Copy Price to Clipboard</button>
-    <button id="sendBtn" class="btn" style="background: #6366f1;">🚀 Send to App</button>
   </div>
 
   <script src="popup.js"></script>
