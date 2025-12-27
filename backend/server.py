@@ -5259,7 +5259,25 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 
                 # Wait for login to complete
                 await page.wait_for_timeout(10000)
-                login_successful = True
+                
+                # VERIFY LOGIN ACTUALLY WORKED by checking page content
+                page_content = await page.inner_text('body')
+                login_indicators = ['logout', 'sign out', 'my account', 'welcome', 'logged in', 'orders@']
+                logout_indicators = ['sign in', 'login', 'create account', 'forgot password']
+                
+                is_actually_logged_in = any(ind.lower() in page_content.lower() for ind in login_indicators)
+                shows_login_form = any(ind.lower() in page_content.lower() for ind in logout_indicators) and 'logout' not in page_content.lower()
+                
+                if is_actually_logged_in:
+                    print(f"✅ LOGIN VERIFIED - Found logged-in indicators")
+                    login_successful = True
+                elif shows_login_form:
+                    print(f"⚠️ LOGIN FAILED - Still showing login form. Check credentials!")
+                    login_successful = False
+                else:
+                    print(f"⚠️ LOGIN STATUS UNCLEAR - Proceeding anyway")
+                    login_successful = True
+                
                 print(f"✅ PRE-LOGIN COMPLETE for {domain}")
                 
             except Exception as login_err:
