@@ -7602,6 +7602,39 @@ async def get_extension_cache(url: str = None):
         return {"success": True, "data": item}
     return {"success": False, "message": "No cached data for this URL"}
 
+# Get the LATEST extension scrape (for auto-population)
+@api_router.get("/extension-scrape-latest")
+async def get_latest_extension_scrape():
+    """Get the most recent extension scrape data (for auto-populating the add item form)"""
+    try:
+        # Find the most recent scrape
+        item = await db.extension_scrape_cache.find_one(
+            {},
+            {"_id": 0},
+            sort=[("scraped_at", -1)]
+        )
+        
+        if item:
+            # Check if it's recent (within last 30 seconds)
+            from datetime import datetime, timedelta
+            scraped_at = item.get('scraped_at', '')
+            if scraped_at:
+                try:
+                    scrape_time = datetime.fromisoformat(scraped_at.replace('Z', '+00:00'))
+                    if datetime.utcnow() - scrape_time.replace(tzinfo=None) < timedelta(seconds=30):
+                        # Mark as consumed so we don't return it again
+                        await db.extension_scrape_cache.update_one(
+                            {"url": item.get('url')},
+                            {"$set": {"consumed": True}}
+                        )
+                        return {"success": True, "data": item}
+                except:
+                    pass
+        
+        return {"success": False, "message": "No recent extension data"}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
 async def extract_links_from_canva_board(board_url: str, page_number: Optional[int] = None) -> list:
     """
     Extract product links from a Canva board using advanced bot detection bypass
