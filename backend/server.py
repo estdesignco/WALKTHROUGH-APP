@@ -6204,12 +6204,21 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 # Regina Andrew shows finish in product details
                 # Format: "Finish: Natural" or "Material: Natural Material"
                 
+                # Debug: Print part of all_text to see actual format
+                if 'Finish' in all_text or 'finish' in all_text:
+                    finish_idx = all_text.lower().find('finish')
+                    print(f"🔍 Text around 'Finish': ...{all_text[max(0, finish_idx-20):finish_idx+50]}...")
+                else:
+                    print("⚠️ 'Finish' not found in all_text")
+                
                 # Try to extract finish (format: "Finish: Natural")
                 finish_patterns = [
                     r'Finish\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|$|Weight|Height)',
                     r'Color\s*[:\s]+\s*([A-Za-z\s\-]+?)(?:\n|$|Weight)',
+                    r'Finish[:\s]+([A-Za-z]+)',  # Simple pattern
                 ]
                 for pattern in finish_patterns:
+                    print(f"🔍 Trying pattern: {pattern}")
                     finish_match = re.search(pattern, all_text, re.IGNORECASE)
                     if finish_match:
                         finish = finish_match.group(1).strip()
@@ -6218,6 +6227,8 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                             result['finish_color'] = finish
                             print(f"✅ REGINA ANDREW FINISH: {result['finish_color']}")
                             break
+                    else:
+                        print(f"  ❌ No match")
                 
                 # Try Material as finish (for woven/natural materials)
                 if not result.get('finish_color'):
