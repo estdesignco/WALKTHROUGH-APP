@@ -6195,9 +6195,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             
             # ===== 6. FINISH/COLOR EXTRACTION =====
             print("🎨 EXTRACTING FINISH/COLOR...")
+            print(f"🔍 Domain for finish extraction: {domain}")
             
             # VENDOR-SPECIFIC: Regina Andrew
             if 'reginaandrew.com' in domain:
+                print("🎯 REGINA ANDREW VENDOR DETECTED - Using specific extraction")
                 import re
                 # Regina Andrew shows finish in product details
                 # Format: "Finish: Natural" or "Material: Natural Material"
@@ -6211,6 +6213,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     finish_match = re.search(pattern, all_text, re.IGNORECASE)
                     if finish_match:
                         finish = finish_match.group(1).strip()
+                        print(f"🔍 Found finish match: '{finish}'")
                         if len(finish) > 1 and len(finish) < 50:
                             result['finish_color'] = finish
                             print(f"✅ REGINA ANDREW FINISH: {result['finish_color']}")
