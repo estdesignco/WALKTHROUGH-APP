@@ -30,7 +30,7 @@ function scrapeProductData() {
   if (domain.includes('uttermost')) {
     data.name = extractText('h1') || extractMeta('og:title');
     data.sku = extractPattern(bodyText, /SKU[:\s]*(\d+)/i) || extractFromUrl(/[-\/](\d{5})/);
-    data.price = extractUttermost Price(bodyText);
+    data.price = extractUttermostPrice(bodyText);
     data.msrp = extractPattern(bodyText, /Suggested retail price[:\s]*\$?([\d,]+)/i);
     data.size = extractPattern(bodyText, /Dimensions[:\s]*([^\n]+)/i) || 
                 extractPattern(bodyText, /(\d+\.?\d*)\s*W\s*X\s*(\d+\.?\d*)\s*H\s*X\s*(\d+\.?\d*)\s*D/i);
