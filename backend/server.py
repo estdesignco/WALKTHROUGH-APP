@@ -7531,9 +7531,30 @@ async def scrape_product_advanced(data: dict):
         # ===== STEP 3: RETURN WEB-SCRAPED DATA ONLY =====
         print(f"✅ Final product data (WEB SCRAPE ONLY): {scraped_data.get('name')} - ${scraped_data.get('cost') or scraped_data.get('price') or 'N/A'}")
         
+        # Check for bot detection issues
+        bot_detection_vendors = [
+            'globalviews.com', 'surya.com', 'uttermost.com', 'visualcomfort.com',
+            'bernhardt.com', 'reginaandrew.com', 'vandh.com', 'hinkley.com',
+            'hubbardtonforge.com', 'elegantlighting.com', 'bassettmirror.com',
+            'crestviewcollection.com', 'eichholtz.com', 'myohamerica.com',
+            'zeevlighting.com'
+        ]
+        is_bot_protected = any(v in domain for v in bot_detection_vendors)
+        
+        # Detect if we got garbage data (name is vendor name or "page not found")
+        name_lower = (scraped_data.get('name') or '').lower()
+        got_garbage = any(x in name_lower for x in ['page not found', 'page cannot be found', '404', 'access denied'])
+        got_vendor_as_name = name_lower in [v.replace('.com', '').lower() for v in bot_detection_vendors]
+        
+        bot_warning = None
+        if is_bot_protected and (got_garbage or got_vendor_as_name or not scraped_data.get('price')):
+            bot_warning = f"This vendor ({domain}) has bot detection that blocks automated scraping. You may need to manually enter: price, name, size, and finish_color."
+            print(f"⚠️ BOT DETECTION WARNING: {bot_warning}")
+        
         return {
             "success": True,
             "source": "scraped",
+            "bot_detection_warning": bot_warning,
             "data": scraped_data
         }
         
