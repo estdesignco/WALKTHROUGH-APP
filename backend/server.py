@@ -5160,10 +5160,9 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         print(f"🌐 NAVIGATING TO PRODUCT PAGE: {url}")
         
         # WHOLESALE VENDORS THAT ALWAYS REQUIRE LOGIN FOR PRICES
-        # NOTE: Uttermost removed - their bot detection blocks automated login
-        # The scraper will get all other data but price must be entered manually
+        # These vendors show product pages publicly but hide prices until logged in
         wholesale_vendors_requiring_login = [
-            'fourhands.com', 'hvlgroup.com', 'visualcomfort.com',
+            'uttermost.com', 'fourhands.com', 'hvlgroup.com', 'visualcomfort.com',
             'bernhardt.com', 'globalviews.com', 'reginaandrew.com', 'loloirugs.com',
             'flowdecor.com', 'eichholtz.com', 'surya.com', 'hinkley.com',
             'hubbardtonforge.com', 'elegantlighting.com', 'gabby.com', 'vandh.com',
@@ -5171,27 +5170,10 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             'zeevlighting.com', 'rowefurniture.com'
         ]
         
-        # Vendors where automated login is BLOCKED by bot detection (Cloudflare, etc.)
-        # These vendors detect Playwright and serve fake 404/error pages
-        # The scraper will report this clearly and allow manual data entry
-        bot_detection_vendors = [
-            'globalviews.com', 'surya.com', 'uttermost.com', 'visualcomfort.com',
-            'bernhardt.com', 'reginaandrew.com', 'vandh.com', 'hinkley.com',
-            'hubbardtonforge.com', 'elegantlighting.com', 'bassettmirror.com',
-            'crestviewcollection.com', 'eichholtz.com', 'myohamerica.com',
-            'zeevlighting.com', 'loloirugs.com', 'rowefurniture.com'
-        ]
-        
         needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
-        is_bot_protected = any(v in domain for v in bot_detection_vendors)
         
-        # WARN about bot-protected vendors upfront
-        if is_bot_protected:
-            print(f"⚠️ BOT DETECTION VENDOR: {domain} - This vendor blocks automated scrapers.")
-            print(f"   The scraper will attempt to extract what it can, but prices may need manual entry.")
-        
-        # LOGIN FIRST for wholesale vendors that hide prices (BUT SKIP for bot-protected sites)
-        if needs_login_for_prices and not is_bot_protected and credentials and credentials.get("username") and credentials.get("password"):
+        # LOGIN FIRST for wholesale vendors that hide prices
+        if needs_login_for_prices and credentials and credentials.get("username") and credentials.get("password"):
             print(f"🔐 WHOLESALE VENDOR DETECTED - Logging in FIRST to get prices for {domain}...")
             
             login_url = vendor_config.get('login_url') or f'https://{domain}/login'
