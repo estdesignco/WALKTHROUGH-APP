@@ -5172,8 +5172,12 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
         
         needs_login_for_prices = any(v in domain for v in wholesale_vendors_requiring_login)
         
-        # LOGIN FIRST for wholesale vendors that hide prices
-        if needs_login_for_prices and credentials and credentials.get("username") and credentials.get("password"):
+        # Vendors with reCAPTCHA that blocks automated login
+        recaptcha_vendors = ['uttermost.com', 'visualcomfort.com']
+        has_recaptcha = any(v in domain for v in recaptcha_vendors)
+        
+        # LOGIN FIRST for wholesale vendors that hide prices (skip for reCAPTCHA sites)
+        if needs_login_for_prices and credentials and credentials.get("username") and credentials.get("password") and not has_recaptcha:
             print(f"🔐 WHOLESALE VENDOR DETECTED - Logging in FIRST to get prices for {domain}...")
             
             login_url = vendor_config.get('login_url') or f'https://{domain}/login'
