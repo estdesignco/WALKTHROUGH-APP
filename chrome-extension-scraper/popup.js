@@ -727,11 +727,31 @@ async function sendToApp() {
     if (scrapedData.image_url) params.set('image', scrapedData.image_url);
     if (scrapedData.msrp) params.set('msrp', scrapedData.msrp);
     
+    // Get the last project URL from storage (if user was on a specific project)
+    let lastProjectUrl = null;
+    try {
+      const stored = await chrome.storage.local.get('lastProjectUrl');
+      lastProjectUrl = stored.lastProjectUrl;
+    } catch (e) {
+      console.log('No stored project URL');
+    }
+    
+    // If we have a last project URL, return to that project's checklist
+    let appUrl;
+    if (lastProjectUrl && lastProjectUrl.includes('/project/')) {
+      // Extract the project path and add our params
+      const projectPath = lastProjectUrl.split('?')[0]; // Remove any existing params
+      appUrl = `${projectPath}?${params.toString()}`;
+      console.log('Returning to last project:', appUrl);
+    } else {
+      // Default to home with params
+      appUrl = `${APP_URL}?${params.toString()}`;
+    }
+    
     // Open app in new tab with data
-    const appUrl = `${APP_URL}?${params.toString()}`;
     window.open(appUrl, '_blank');
     
-    showStatus('App opened with product data!', 'success');
+    showStatus('Data sent! Go to your checklist and click PASTE on any row.', 'success');
     
   } catch (error) {
     console.error('Send error:', error);
