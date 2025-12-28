@@ -1,11 +1,33 @@
 // Design Ready Product Scraper - Content Script
 // This script runs in the context of web pages
-// Version 2.0
+// Version 2.3 - Tracks last project URL
 
 console.log('🛒 Design Ready Scraper loaded on:', window.location.hostname);
 
+// If we're on the Design Ready app, save the current project URL
+if (window.location.hostname.includes('emergentagent.com') || 
+    window.location.hostname.includes('localhost')) {
+  
+  // Check if we're on a project page
+  if (window.location.pathname.includes('/project/')) {
+    // Save this URL so extension can return here
+    chrome.storage.local.set({ 
+      lastProjectUrl: window.location.href,
+      lastProjectTime: Date.now()
+    });
+    console.log('📍 Saved project URL:', window.location.href);
+  }
+}
+
 // Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'getLastProject') {
+    chrome.storage.local.get(['lastProjectUrl', 'lastProjectTime'], (data) => {
+      sendResponse(data);
+    });
+    return true; // Keep channel open for async response
+  }
+  
   if (request.action === 'scrape') {
     try {
       const data = scrapeCurrentPage();
@@ -14,12 +36,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ success: false, error: error.message });
     }
   }
-  return true; // Keep message channel open for async response
+  return true;
 });
 
 function scrapeCurrentPage() {
-  // This is a fallback - the main scraping is done via executeScript in popup.js
-  // This allows the extension to work even if scripting fails
   return {
     url: window.location.href,
     title: document.title,
