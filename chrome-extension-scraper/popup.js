@@ -566,7 +566,7 @@ function scrapePageData() {
     return false;
   }
   
-  // STRATEGY 1: Find the "Color" section and get swatch images directly
+  // STRATEGY 1: Find the "Color" section and get the SELECTED swatch image
   // Look for container that has "Color" text AND multiple small images (the swatches)
   const allTextNodes = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -582,28 +582,68 @@ function scrapePageData() {
     let container = colorLabel.parentElement;
     for (let i = 0; i < 8 && container && !data.finish_image; i++) {
       const imgs = container.querySelectorAll('img');
-      // Look for a group of small-ish images (swatches usually come in groups of 2+)
       const validSwatches = [];
+      let selectedSwatch = null;
       
       for (const img of imgs) {
         const src = getImageSrc(img);
         if (!src || !src.startsWith('http') || src.startsWith('data:')) continue;
         if (isNavigationOrIcon(img, src)) continue;
         
-        // Check if it looks like a swatch (small-medium square-ish image)
         const width = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 100;
         const height = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 100;
         
-        // Swatches are usually 40-200px and roughly square
         if (width >= 30 && width <= 250 && height >= 30 && height <= 250) {
+          // Check if THIS swatch is the selected/active one
+          const imgParent = img.closest('a, button, div, li, span');
+          const isSelected = 
+            img.classList.contains('selected') || img.classList.contains('active') ||
+            img.classList.contains('current') || img.classList.contains('chosen') ||
+            imgParent?.classList.contains('selected') || imgParent?.classList.contains('active') ||
+            imgParent?.classList.contains('current') || imgParent?.classList.contains('chosen') ||
+            imgParent?.getAttribute('aria-selected') === 'true' ||
+            imgParent?.getAttribute('aria-checked') === 'true' ||
+            imgParent?.hasAttribute('data-selected') ||
+            // Check for border/outline indicating selection (common pattern)
+            imgParent?.style.border?.includes('2px') ||
+            imgParent?.style.outline?.includes('2px') ||
+            img.style.border?.includes('2px') ||
+            // Check for classes with "select" in the name
+            Array.from(imgParent?.classList || []).some(c => c.includes('select')) ||
+            Array.from(img.classList || []).some(c => c.includes('select'));
+          
+          if (isSelected) {
+            selectedSwatch = { img, src, width, height };
+            console.log('✅ Found SELECTED swatch:', src);
+          }
           validSwatches.push({ img, src, width, height });
         }
       }
       
-      // If we found 2+ potential swatches, grab the first one (usually selected)
-      if (validSwatches.length >= 2) {
-        data.finish_image = validSwatches[0].src;
-        console.log('✅ Found swatch from Color group:', data.finish_image);
+      // Prefer the selected swatch, otherwise grab first one if we found 2+
+      if (selectedSwatch) {
+        data.finish_image = selectedSwatch.src;
+        break;
+      } else if (validSwatches.length >= 2) {
+        // If no selected found but we have swatches, check by matching the finish_color name
+        if (data.finish_color) {
+          const colorName = data.finish_color.toLowerCase();
+          for (const swatch of validSwatches) {
+            const alt = (swatch.img.alt || '').toLowerCase();
+            const title = (swatch.img.title || '').toLowerCase();
+            const src = swatch.src.toLowerCase();
+            if (alt.includes(colorName) || title.includes(colorName) || src.includes(colorName)) {
+              data.finish_image = swatch.src;
+              console.log('✅ Found swatch matching color name:', colorName, swatch.src);
+              break;
+            }
+          }
+        }
+        // Still no match? Take first one
+        if (!data.finish_image) {
+          data.finish_image = validSwatches[0].src;
+          console.log('✅ Using first swatch from group:', data.finish_image);
+        }
         break;
       }
       
