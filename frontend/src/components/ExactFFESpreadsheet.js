@@ -405,6 +405,67 @@ const ExactFFESpreadsheet = ({
     }
   };
 
+  // ✅ PASTE SCRAPED DATA INTO A SPECIFIC ITEM ROW
+  const handlePasteScrapedData = async (itemId) => {
+    if (!scraperClipboard) {
+      alert('No scraped data available. Use the Chrome extension to scrape a product first!');
+      return;
+    }
+    
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      
+      // Prepare update data from scraped clipboard
+      const updateData = {
+        vendor: scraperClipboard.vendor || undefined,
+        sku: scraperClipboard.sku || undefined,
+        cost: scraperClipboard.price ? parseFloat(scraperClipboard.price) : undefined,
+        size: scraperClipboard.size || undefined,
+        finish_color: scraperClipboard.finish_color || undefined,
+        finish_image: scraperClipboard.finish_image || undefined,
+        image_url: scraperClipboard.image_url || undefined,
+        link: scraperClipboard.link || scraperClipboard.url || undefined
+      };
+      
+      // Remove undefined values
+      Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+      
+      console.log('📋 Pasting scraped data into item:', itemId, updateData);
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+      
+      if (response.ok) {
+        // Clear the clipboard after successful paste
+        localStorage.removeItem('extensionScrapedData');
+        setScraperClipboard(null);
+        setShowScraperNotification(false);
+        setSelectedItemForPaste(null);
+        
+        alert(`✅ Pasted: ${scraperClipboard.name || 'Product data'}\n\nVendor: ${updateData.vendor || 'N/A'}\nPrice: $${updateData.cost || 'N/A'}\nFinish: ${updateData.finish_color || 'N/A'}`);
+        
+        if (onReload) {
+          onReload();
+        }
+      } else {
+        alert('❌ Failed to paste data. Please try again.');
+      }
+    } catch (error) {
+      console.error('❌ Paste error:', error);
+      alert(`❌ Error: ${error.message}`);
+    }
+  };
+  
+  // Clear the scraper clipboard
+  const clearScraperClipboard = () => {
+    localStorage.removeItem('extensionScrapedData');
+    setScraperClipboard(null);
+    setShowScraperNotification(false);
+  };
+
   // Handle adding new items - FIX THE SUBCATEGORY SELECTION
   const handleAddItem = async (itemData) => {
     try {
