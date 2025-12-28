@@ -1796,15 +1796,27 @@ const ExactFFESpreadsheet = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* ACTIONS - DELETE INSTALLED */}
+                                                          {/* ACTIONS - PASTE & DELETE */}
                                                           <td className="border border-[#B49B7E] px-2 py-2 text-center">
-                                                            <button 
-                                                              onClick={() => handleDeleteItem(item.id)}
-                                                              className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
-                                                              title="Delete Item"
-                                                            >
-                                                              🗑️
-                                                            </button>
+                                                            <div className="flex items-center justify-center gap-1">
+                                                              {/* PASTE BUTTON - Only shows when scraper data is available */}
+                                                              {scraperClipboard && (
+                                                                <button 
+                                                                  onClick={() => handlePasteScrapedData(item.id)}
+                                                                  className="bg-green-600 hover:bg-green-500 text-white text-xs px-2 py-1 rounded animate-pulse"
+                                                                  title={`Paste: ${scraperClipboard.name}`}
+                                                                >
+                                                                  📋
+                                                                </button>
+                                                              )}
+                                                              <button 
+                                                                onClick={() => handleDeleteItem(item.id)}
+                                                                className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
+                                                                title="Delete Item"
+                                                              >
+                                                                🗑️
+                                                              </button>
+                                                            </div>
                                                           </td>
                                                         </tr>
                                                         ))
