@@ -263,6 +263,14 @@ async function doScrape() {
 
 async function sendToApp() {
   if (!scrapedData) return;
+  
+  // Check if project is selected
+  if (!selectedProjectId) {
+    showStatus('Please select a project first!', 'warning');
+    projectSelector.focus();
+    return;
+  }
+  
   sendBtn.disabled = true;
   try {
     const params = new URLSearchParams();
@@ -279,14 +287,11 @@ async function sendToApp() {
     if(scrapedData.image_url) params.set('image',scrapedData.image_url);
     if(scrapedData.msrp) params.set('msrp',scrapedData.msrp);
     
-    let appUrl = APP_URL;
-    try { 
-      const s = await chrome.storage.local.get('lastProjectUrl'); 
-      if(s.lastProjectUrl?.includes('/project/')) appUrl = s.lastProjectUrl.split('?')[0]; 
-    } catch(e){}
+    // Go directly to the selected project's checklist
+    const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
     
-    window.open(`${appUrl}?${params.toString()}`, '_blank');
-    showStatus('Sent!', 'success');
+    window.open(projectUrl, '_blank');
+    showStatus('Sent to project!', 'success');
   } catch(e) { showStatus('Failed', 'error'); }
   finally { sendBtn.disabled = false; sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>'; }
 }
