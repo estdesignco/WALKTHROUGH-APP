@@ -89,40 +89,44 @@ function scrapePageData() {
   const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
   if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
 
-  // PRICE & MSRP - Look in the bottom bar near ADD TO CART
+  // PRICE & MSRP - Search the entire page text
   // Uttermost format: "$488.00" and "Suggested retail price $1,464.00"
   const pageText = document.body.innerText;
   
-  // Find price near "Add to Cart" or in product area
-  const priceArea = document.querySelector('[class*="addToCart"], [class*="product-price"], [class*="price-box"]');
-  let priceText = priceArea ? priceArea.closest('section, div')?.innerText : '';
+  // First get MSRP - it's clearly labeled
+  const msrpMatch = pageText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
+  if (msrpMatch) {
+    data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
+    console.log('Found MSRP:', data.msrp);
+  }
   
-  // If no price area found, search the whole page but be smart about it
-  if (!priceText) {
-    // Look for the pattern: $XXX.XX followed later by "Suggested retail price $X,XXX.XX"
-    const allPrices = pageText.match(/\$[\d,]+\.?\d*/g) || [];
-    const msrpMatch = pageText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
+  // For dealer price, look for pattern: standalone price before "Suggested retail"
+  // Or find price near "ADD TO CART"
+  const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)\s*[\s\S]*?ADD TO CART/i);
+  if (addToCartMatch) {
+    data.price = parseFloat(addToCartMatch[1].replace(/,/g, ''));
+    console.log('Found price near ADD TO CART:', data.price);
+  }
+  
+  // Fallback: find all prices and pick the one that looks like dealer price
+  if (!data.price) {
+    const allPrices = pageText.match(/\$([\d,]+\.?\d*)/g) || [];
+    console.log('All prices found:', allPrices);
     
-    if (msrpMatch) {
-      data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
-    }
-    
-    // The dealer price is typically much lower than MSRP
     for (const p of allPrices) {
       const val = parseFloat(p.replace(/[$,]/g, ''));
-      if (val > 50 && val < 10000) {
-        if (!data.msrp || val < data.msrp * 0.8) {
+      // Dealer price should be > $50 and if we have MSRP, should be less than MSRP
+      if (val > 50 && val < 50000) {
+        if (data.msrp && val < data.msrp) {
+          data.price = val;
+          console.log('Found dealer price:', data.price);
+          break;
+        } else if (!data.msrp) {
           data.price = val;
           break;
         }
       }
     }
-  } else {
-    const priceMatch = priceText.match(/\$([\d,]+\.?\d*)/);
-    if (priceMatch) data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
-    
-    const msrpMatch = priceText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
-    if (msrpMatch) data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
   }
 
   // PRODUCT IMAGE - main product photo from carousel
