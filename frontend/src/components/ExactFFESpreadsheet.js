@@ -45,6 +45,30 @@ const ExactFFESpreadsheet = ({
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
   
+  // ✅ SCRAPER CLIPBOARD STATE - For pasting scraped data into specific rows
+  const [scraperClipboard, setScraperClipboard] = useState(null);
+  const [selectedItemForPaste, setSelectedItemForPaste] = useState(null); // Which item row is selected
+  const [showScraperNotification, setShowScraperNotification] = useState(false);
+  
+  // Check for scraped data in localStorage on mount and periodically
+  useEffect(() => {
+    const checkForScrapedData = () => {
+      const data = localStorage.getItem('extensionScrapedData');
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          setScraperClipboard(parsed);
+          setShowScraperNotification(true);
+        } catch (e) {}
+      }
+    };
+    
+    checkForScrapedData();
+    // Check every 2 seconds for new scraped data
+    const interval = setInterval(checkForScrapedData, 2000);
+    return () => clearInterval(interval);
+  }, []);
+  
   // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
