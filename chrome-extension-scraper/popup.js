@@ -1,5 +1,5 @@
-// Design Ready Product Scraper v4.0
-// CRITICAL FIX: Swatch images on Uttermost are CSS background-images on buttons, NOT img tags!
+// Design Ready Product Scraper v5.0
+// Clean rebuild - SPECIFIC targeting for Uttermost
 
 const APP_URL = 'https://decor-grab.preview.emergentagent.com';
 const BACKEND_URL = 'https://decor-grab.preview.emergentagent.com';
@@ -46,286 +46,157 @@ function displayResults(data) {
 }
 
 function scrapePageData() {
-  const url = window.location.href;
+  const data = {
+    url: window.location.href,
+    vendor: null,
+    name: null,
+    sku: null,
+    price: null,
+    msrp: null,
+    size: null,
+    finish_color: null,
+    finish_image: null,
+    image_url: null
+  };
+
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
-  const bodyText = document.body.innerText || '';
   
-  const data = { url, vendor: null, name: null, sku: null, price: null, msrp: null, size: null, finish_color: null, finish_image: null, image_url: null };
-  
-  // Vendor detection
-  const vendors = {'uttermost':'Uttermost','visualcomfort':'Visual Comfort','fourhands':'Four Hands','bernhardt':'Bernhardt'};
-  for (const [k,v] of Object.entries(vendors)) { if (domain.includes(k)) { data.vendor = v; break; } }
-  if (!data.vendor) data.vendor = domain.split('.')[0];
-  
-  // Product Name from H1
+  // VENDOR
+  if (domain.includes('uttermost')) data.vendor = 'Uttermost';
+  else if (domain.includes('visualcomfort')) data.vendor = 'Visual Comfort';
+  else if (domain.includes('fourhands')) data.vendor = 'Four Hands';
+  else if (domain.includes('bernhardt')) data.vendor = 'Bernhardt';
+  else data.vendor = domain.split('.')[0];
+
+  // PRODUCT NAME - from H1
   const h1 = document.querySelector('h1');
   if (h1) data.name = h1.innerText.trim();
-  
-  // SKU
-  const skuMatch = bodyText.match(/(?:SKU|Item)[:#\s]*([A-Z0-9][-A-Z0-9]{2,20})/i);
-  if (skuMatch) data.sku = skuMatch[1].toUpperCase();
-  
-  // === PRICE - UTTERMOST SPECIFIC ===
-  // On Uttermost, the price is in a sticky footer bar OR near "Add to Cart"
-  // Format: "$488.00" with "Suggested retail price $1,464.00"
-  
-  console.log('=== STARTING PRICE DETECTION ===');
-  
-  // UTTERMOST: Look for the sticky bottom bar with price and "ADD TO CART"
-  // The structure is: $488.00 ... Suggested retail price $1,464.00 ... ADD TO CART
-  const addToCartBtn = document.querySelector('button[aria-label*="Add to Cart"], button:has(span:contains("ADD TO CART")), [class*="addToCart"] button');
-  if (addToCartBtn) {
-    // Find the container that has both price and add to cart
-    let priceContainer = addToCartBtn.closest('section, div, form');
-    if (priceContainer) {
-      const text = priceContainer.innerText || '';
-      console.log('Found Add to Cart container text:', text.substring(0, 200));
-      
-      // Look for dealer price (first price) and MSRP (after "Suggested retail price" or "MSRP")
-      const dealerPriceMatch = text.match(/^\s*\$\s*([\d,]+\.?\d*)/m);
-      const msrpMatch = text.match(/(?:Suggested retail price|MSRP|Retail)[:\s]*\$\s*([\d,]+\.?\d*)/i);
-      
-      if (dealerPriceMatch) {
-        data.price = parseFloat(dealerPriceMatch[1].replace(/,/g, ''));
-        console.log('Dealer price from Add to Cart area:', data.price);
-      }
-      if (msrpMatch) {
-        data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
-        console.log('MSRP from Add to Cart area:', data.msrp);
-      }
-    }
+
+  // SKU - look for "SKU:" text
+  const skuEl = document.querySelector('[class*="productSku"], [class*="sku"]');
+  if (skuEl) {
+    const skuMatch = skuEl.innerText.match(/SKU[:\s]*(\w+)/i);
+    if (skuMatch) data.sku = skuMatch[1];
   }
-  
-  // Fallback: Look for price in the product form specifically (NOT in related products)
-  if (!data.price) {
-    const productForm = document.querySelector('form[class*="productFullDetail"], [class*="product-detail-form"], .product-info');
-    if (productForm) {
-      const formText = productForm.innerText || '';
-      const priceMatch = formText.match(/\$\s*([\d,]+\.?\d*)/);
-      if (priceMatch) {
-        data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
-        console.log('Price from product form:', data.price);
-      }
-    }
+  if (!data.sku) {
+    const bodyText = document.body.innerText;
+    const skuMatch = bodyText.match(/SKU[:\s]*(\d+)/i);
+    if (skuMatch) data.sku = skuMatch[1];
   }
-  
-  // Last resort: Find the FIRST price on the page that's near the product name/SKU
-  if (!data.price) {
-    const h1 = document.querySelector('h1');
-    if (h1) {
-      let searchArea = h1.closest('section, article, main') || h1.parentElement;
-      for (let i = 0; i < 5 && searchArea; i++) {
-        const text = searchArea.innerText || '';
-        const priceMatch = text.match(/\$\s*([\d,]+\.?\d*)/);
-        if (priceMatch) {
-          const price = parseFloat(priceMatch[1].replace(/,/g, ''));
-          if (price > 10 && price < 50000) {
-            data.price = price;
-            console.log('Price near H1:', data.price);
-            break;
-          }
-        }
-        searchArea = searchArea.parentElement;
-      }
-    }
-  }
-  
-  console.log('Final price:', data.price, 'MSRP:', data.msrp);
-  
-  // Size
+
+  // DIMENSIONS - "30 W X 27 H X 32 D"
+  const bodyText = document.body.innerText;
   const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
   if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
+
+  // PRICE & MSRP - Look in the bottom bar near ADD TO CART
+  // Uttermost format: "$488.00" and "Suggested retail price $1,464.00"
+  const pageText = document.body.innerText;
   
-  // Helper to extract background-image URL from style
-  function extractBackgroundImageUrl(element) {
-    const style = element.getAttribute('style') || '';
-    const computed = window.getComputedStyle(element);
-    const bgImage = computed.backgroundImage || style;
+  // Find price near "Add to Cart" or in product area
+  const priceArea = document.querySelector('[class*="addToCart"], [class*="product-price"], [class*="price-box"]');
+  let priceText = priceArea ? priceArea.closest('section, div')?.innerText : '';
+  
+  // If no price area found, search the whole page but be smart about it
+  if (!priceText) {
+    // Look for the pattern: $XXX.XX followed later by "Suggested retail price $X,XXX.XX"
+    const allPrices = pageText.match(/\$[\d,]+\.?\d*/g) || [];
+    const msrpMatch = pageText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
     
-    // Match url("...") or url('...') or url(...)
-    const urlMatch = bgImage.match(/url\(["']?([^"')]+)["']?\)/);
-    if (urlMatch && urlMatch[1]) {
-      let imgUrl = urlMatch[1];
-      // Convert relative URL to absolute
-      if (imgUrl.startsWith('/')) {
-        imgUrl = window.location.origin + imgUrl;
-      }
-      return imgUrl;
-    }
-    return null;
-  }
-  
-  // Helper to get image src
-  function getSrc(img) {
-    return img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '';
-  }
-  
-  // Check if element/src should be excluded
-  function isExcludedImage(src, element) {
-    const srcLower = src.toLowerCase();
-    const socialIcons = ['linkedin', 'facebook', 'instagram', 'pinterest', 'twitter', 'youtube', 'tiktok'];
-    const uiElements = ['arrow', 'chevron', 'caret', 'nav', 'prev', 'next', 'icon', 'logo', 'sprite', 
-                        'pixel', 'track', 'spacer', 'loader', 'spinner', 'close', 'search', 'cart', 
-                        'bag', 'wishlist', 'heart', 'share', 'social', 'follow'];
-    
-    if (socialIcons.some(s => srcLower.includes(s))) return true;
-    if (uiElements.some(u => srcLower.includes(u))) return true;
-    if (element?.closest('footer, [class*="footer"], [class*="social"]')) return true;
-    
-    return false;
-  }
-  
-  // === UTTERMOST SPECIFIC: Color swatch buttons with background-image ===
-  console.log('=== STARTING UTTERMOST SWATCH DETECTION ===');
-  
-  // Find the Color option section - look for span with "Color" text
-  const colorLabels = document.querySelectorAll('span.option-title-KCu, [class*="option-title"]');
-  let colorOptionContainer = null;
-  
-  for (const label of colorLabels) {
-    if (label.textContent.trim().toLowerCase() === 'color') {
-      // Found the Color label - the container is its parent
-      colorOptionContainer = label.closest('[class*="option-root"]') || label.parentElement;
-      console.log('Found Color option container via label');
-      break;
-    }
-  }
-  
-  // Fallback: look for tileList with buttons having background-image
-  if (!colorOptionContainer) {
-    const tileLists = document.querySelectorAll('[class*="tileList"], [class*="tile-list"]');
-    for (const list of tileLists) {
-      const buttons = list.querySelectorAll('button[style*="background-image"]');
-      if (buttons.length > 0) {
-        colorOptionContainer = list.closest('[class*="option-root"]') || list;
-        console.log('Found Color option via tileList with background-image buttons');
-        break;
-      }
-    }
-  }
-  
-  if (colorOptionContainer) {
-    console.log('Color option container found');
-    
-    // Look for buttons with background-image (these are the swatches!)
-    const swatchButtons = colorOptionContainer.querySelectorAll('button[style*="background-image"]');
-    console.log('Found', swatchButtons.length, 'swatch buttons with background-image');
-    
-    for (const btn of swatchButtons) {
-      const isSelected = btn.classList.contains('tile-root_selected-Au1') || 
-                         btn.classList.contains('selected') ||
-                         btn.getAttribute('aria-selected') === 'true' ||
-                         btn.classList.toString().includes('selected');
-      
-      const colorName = btn.getAttribute('title') || btn.getAttribute('aria-label')?.replace(/^Fashion size /, '').replace(/ button selected$/, '') || '';
-      const bgUrl = extractBackgroundImageUrl(btn);
-      
-      console.log('Swatch button:', colorName, 'selected:', isSelected, 'bgUrl:', bgUrl);
-      
-      if (isSelected && bgUrl) {
-        data.finish_image = bgUrl;
-        data.finish_color = colorName;
-        console.log('*** FOUND SELECTED SWATCH ***', colorName, bgUrl);
-        break;
-      }
+    if (msrpMatch) {
+      data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
     }
     
-    // If no selected found, take first one
-    if (!data.finish_image && swatchButtons.length > 0) {
-      const firstBtn = swatchButtons[0];
-      const bgUrl = extractBackgroundImageUrl(firstBtn);
-      const colorName = firstBtn.getAttribute('title') || '';
-      if (bgUrl) {
-        data.finish_image = bgUrl;
-        data.finish_color = colorName;
-        console.log('Using first swatch as fallback:', colorName, bgUrl);
-      }
-    }
-  }
-  
-  // Fallback: Extract color from product name if contains comma (e.g., "Abound Swivel Chair, Ginger")
-  if (!data.finish_color && data.name) {
-    const parts = data.name.split(',');
-    if (parts.length > 1) {
-      data.finish_color = parts[parts.length - 1].trim();
-      console.log('Extracted finish_color from name:', data.finish_color);
-    }
-  }
-  
-  // === MAIN PRODUCT IMAGE ===
-  const ogImg = document.querySelector('meta[property="og:image"]');
-  if (ogImg?.content) data.image_url = ogImg.content;
-  
-  if (!data.image_url) {
-    // Look for main product image in swiper or image carousel
-    const mainImageSelectors = [
-      '.swiper-slide-active img',
-      '[class*="imageCarousel"] img',
-      '[class*="product-image"] img',
-      '[class*="productSlider"] .swiper-slide-active img'
-    ];
-    
-    for (const selector of mainImageSelectors) {
-      const img = document.querySelector(selector);
-      if (img) {
-        const src = getSrc(img);
-        if (src && src.startsWith('http') && !isExcludedImage(src, img)) {
-          data.image_url = src;
-          console.log('Main image from selector:', selector, src);
+    // The dealer price is typically much lower than MSRP
+    for (const p of allPrices) {
+      const val = parseFloat(p.replace(/[$,]/g, ''));
+      if (val > 50 && val < 10000) {
+        if (!data.msrp || val < data.msrp * 0.8) {
+          data.price = val;
           break;
+        }
+      }
+    }
+  } else {
+    const priceMatch = priceText.match(/\$([\d,]+\.?\d*)/);
+    if (priceMatch) data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
+    
+    const msrpMatch = priceText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
+    if (msrpMatch) data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
+  }
+
+  // PRODUCT IMAGE - main product photo from carousel
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  if (ogImage?.content) {
+    data.image_url = ogImage.content;
+  } else {
+    const mainImg = document.querySelector('.swiper-slide-active img, [class*="product-image"] img');
+    if (mainImg) data.image_url = mainImg.src;
+  }
+
+  // COLOR NAME & SWATCH - This is the key part!
+  // On Uttermost, colors are buttons with background-image style
+  // The selected one has class containing "selected"
+  
+  // First, find the Color section
+  const colorLabel = Array.from(document.querySelectorAll('span, label, div')).find(
+    el => el.innerText?.trim().toLowerCase() === 'color'
+  );
+  
+  if (colorLabel) {
+    // Look in the parent container for swatch buttons
+    const container = colorLabel.closest('div[class*="option"], section') || colorLabel.parentElement;
+    
+    if (container) {
+      // Find buttons with background-image (these are the swatches)
+      const swatchButtons = container.querySelectorAll('button[style*="background-image"]');
+      
+      for (const btn of swatchButtons) {
+        // Check if this is the selected swatch
+        const classList = btn.className || '';
+        const isSelected = classList.includes('selected') || 
+                          btn.getAttribute('aria-selected') === 'true' ||
+                          btn.getAttribute('aria-label')?.includes('selected');
+        
+        if (isSelected) {
+          // Get the color name from title attribute
+          data.finish_color = btn.getAttribute('title') || '';
+          
+          // Get the swatch image from background-image
+          const style = btn.getAttribute('style') || '';
+          const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
+          if (bgMatch) {
+            let imgUrl = bgMatch[1];
+            if (imgUrl.startsWith('/')) {
+              imgUrl = window.location.origin + imgUrl;
+            }
+            data.finish_image = imgUrl;
+          }
+          break;
+        }
+      }
+      
+      // If no selected found, take the first one
+      if (!data.finish_color && swatchButtons.length > 0) {
+        const firstBtn = swatchButtons[0];
+        data.finish_color = firstBtn.getAttribute('title') || '';
+        const style = firstBtn.getAttribute('style') || '';
+        const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
+        if (bgMatch) {
+          let imgUrl = bgMatch[1];
+          if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
+          data.finish_image = imgUrl;
         }
       }
     }
   }
   
-  // Ultimate fallback for main image
-  if (!data.image_url) {
-    let best = null, bestSize = 0;
-    document.querySelectorAll('img').forEach(img => {
-      const src = getSrc(img);
-      if (!src || !src.startsWith('http')) return;
-      if (isExcludedImage(src, img)) return;
-      const w = img.naturalWidth || img.width || 0;
-      const h = img.naturalHeight || img.height || 0;
-      if (w > 200 && h > 200 && w*h > bestSize) { bestSize = w*h; best = src; }
-    });
-    if (best) data.image_url = best;
+  // Fallback: Get color name from product name (e.g., "Abound Swivel Chair, Ginger")
+  if (!data.finish_color && data.name && data.name.includes(',')) {
+    data.finish_color = data.name.split(',').pop().trim();
   }
-  
-  // === GENERIC FALLBACK FOR SWATCH (for non-Uttermost sites) ===
-  if (!data.finish_image) {
-    // Try finding swatch images (actual img tags)
-    const swatchContainers = document.querySelectorAll('[class*="swatch"], [class*="color-option"], [class*="variant"]');
-    for (const container of swatchContainers) {
-      if (container.closest('footer')) continue;
-      
-      // Check for background-image on any element
-      const elementsWithBg = container.querySelectorAll('[style*="background-image"]');
-      for (const el of elementsWithBg) {
-        const bgUrl = extractBackgroundImageUrl(el);
-        if (bgUrl && !isExcludedImage(bgUrl, el)) {
-          data.finish_image = bgUrl;
-          console.log('Swatch from background-image:', bgUrl);
-          break;
-        }
-      }
-      if (data.finish_image) break;
-      
-      // Check for img tags
-      const imgs = container.querySelectorAll('img');
-      for (const img of imgs) {
-        const src = getSrc(img);
-        if (src && src.startsWith('http') && !isExcludedImage(src, img) && src !== data.image_url) {
-          data.finish_image = src;
-          console.log('Swatch from img tag:', src);
-          break;
-        }
-      }
-      if (data.finish_image) break;
-    }
-  }
-  
-  console.log('=== FINAL SCRAPE RESULT ===', data);
+
+  console.log('Scraped data:', data);
   return data;
 }
 
@@ -349,9 +220,9 @@ async function sendToApp() {
   if (!scrapedData) return;
   sendBtn.disabled = true;
   try {
-    try { await fetch(`${BACKEND_URL}/api/extension-scrape`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(scrapedData)}); } catch(e){}
     const params = new URLSearchParams();
-    params.set('action','add-item'); params.set('source','extension');
+    params.set('action','add-item');
+    params.set('source','extension');
     if(scrapedData.name) params.set('name',scrapedData.name);
     if(scrapedData.price) params.set('price',scrapedData.price);
     if(scrapedData.sku) params.set('sku',scrapedData.sku);
@@ -361,8 +232,14 @@ async function sendToApp() {
     if(scrapedData.vendor) params.set('vendor',scrapedData.vendor);
     if(scrapedData.url) params.set('link',scrapedData.url);
     if(scrapedData.image_url) params.set('image',scrapedData.image_url);
+    if(scrapedData.msrp) params.set('msrp',scrapedData.msrp);
+    
     let appUrl = APP_URL;
-    try { const s = await chrome.storage.local.get('lastProjectUrl'); if(s.lastProjectUrl?.includes('/project/')) appUrl = s.lastProjectUrl.split('?')[0]; } catch(e){}
+    try { 
+      const s = await chrome.storage.local.get('lastProjectUrl'); 
+      if(s.lastProjectUrl?.includes('/project/')) appUrl = s.lastProjectUrl.split('?')[0]; 
+    } catch(e){}
+    
     window.open(`${appUrl}?${params.toString()}`, '_blank');
     showStatus('Sent!', 'success');
   } catch(e) { showStatus('Failed', 'error'); }
@@ -371,7 +248,11 @@ async function sendToApp() {
 
 async function copyToClipboard() {
   if (!scrapedData) return;
-  try { await navigator.clipboard.writeText(`${scrapedData.name}\n$${scrapedData.price}\n${scrapedData.vendor}\n${scrapedData.finish_color}`); copyBtn.innerHTML='<span>✅</span><span>Copied!</span>'; setTimeout(()=>{copyBtn.innerHTML='<span>📋</span><span>Copy</span>';},2000); } catch(e){}
+  try { 
+    await navigator.clipboard.writeText(`${scrapedData.name}\n$${scrapedData.price}\n${scrapedData.vendor}\n${scrapedData.finish_color}`); 
+    copyBtn.innerHTML='<span>✅</span><span>Copied!</span>'; 
+    setTimeout(()=>{copyBtn.innerHTML='<span>📋</span><span>Copy</span>';},2000); 
+  } catch(e){}
 }
 
 scrapeBtn.addEventListener('click', doScrape);
@@ -379,4 +260,16 @@ sendBtn.addEventListener('click', sendToApp);
 copyBtn.addEventListener('click', copyToClipboard);
 rescrapeBtn.addEventListener('click', doScrape);
 
-(async()=>{ try { const [t] = await chrome.tabs.query({active:true,currentWindow:true}); if(t?.url){const d=new URL(t.url).hostname; if(d.includes('uttermost')){vendorBadge.textContent='Uttermost';vendorBadge.style.display='block';}}} catch(e){} })();
+// Auto-detect vendor on popup open
+(async()=>{ 
+  try { 
+    const [t] = await chrome.tabs.query({active:true,currentWindow:true}); 
+    if(t?.url){
+      const d=new URL(t.url).hostname; 
+      if(d.includes('uttermost')){
+        vendorBadge.textContent='Uttermost';
+        vendorBadge.style.display='block';
+      }
+    }
+  } catch(e){} 
+})();
