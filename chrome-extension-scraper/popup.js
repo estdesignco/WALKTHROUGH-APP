@@ -520,131 +520,163 @@ function scrapePageData() {
     }
   }
   
-  // ======= FINISH/SWATCH IMAGE (AGGRESSIVE - UTTERMOST SPECIFIC) =======
+  // ======= FINISH/SWATCH IMAGE - COMPLETE REWRITE =======
+  // Get ALL possible image sources from the page
   
-  // UTTERMOST SPECIFIC: Look for color swatches in the "Color" section at bottom of page
-  // These are typically inside a container near the "Order Swatches" link
-  if (domain.includes('uttermost')) {
-    // Strategy 1: Find images near "Color" text
-    const allElements = document.querySelectorAll('*');
-    for (const el of allElements) {
-      const text = el.innerText?.trim().toLowerCase();
-      if (text === 'color' || text === 'colors') {
-        // Look in parent containers for swatch images
-        let parent = el.parentElement;
-        for (let i = 0; i < 5 && parent; i++) {
-          const imgs = parent.querySelectorAll('img');
-          for (const img of imgs) {
-            const src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src');
-            // Skip tiny tracking pixels and icons
-            if (src && src.startsWith('http') && !src.startsWith('data:') && 
-                !src.includes('pixel') && !src.includes('tracking') &&
-                img.width > 30 && img.height > 30) {
-              data.finish_image = src;
-              console.log('Found Uttermost color swatch:', src);
-              break;
-            }
-          }
-          if (data.finish_image) break;
-          parent = parent.parentElement;
-        }
-        if (data.finish_image) break;
-      }
-    }
-    
-    // Strategy 2: Look for product thumbnails on left side (often show different colors)
-    if (!data.finish_image) {
-      const thumbnails = document.querySelectorAll('img[class*="thumb"], img[class*="gallery"], img[class*="variant"]');
-      for (const img of thumbnails) {
-        const src = img.src || img.getAttribute('data-src');
-        if (src && src.startsWith('http') && src !== data.image_url) {
-          data.finish_image = src;
-          console.log('Found Uttermost thumbnail:', src);
-          break;
-        }
-      }
-    }
+  function getImageSrc(img) {
+    // Check ALL possible image source attributes
+    return img.src || 
+           img.getAttribute('data-src') || 
+           img.getAttribute('data-lazy-src') ||
+           img.getAttribute('data-original') ||
+           img.getAttribute('data-image') ||
+           img.getAttribute('data-zoom-image') ||
+           img.getAttribute('data-full-size') ||
+           img.srcset?.split(',')[0]?.trim().split(' ')[0] ||
+           img.getAttribute('data-srcset')?.split(',')[0]?.trim().split(' ')[0] ||
+           '';
   }
   
-  // GENERIC: Look for images with swatch/color in src, class, or alt
-  if (!data.finish_image) {
-    const allImgs = document.querySelectorAll('img');
-    for (const img of allImgs) {
-      const src = img.src || img.getAttribute('data-src') || '';
-      const className = (img.className || '').toLowerCase();
-      const alt = (img.alt || '').toLowerCase();
-      const parentClass = (img.parentElement?.className || '').toLowerCase();
-      const grandparentClass = (img.parentElement?.parentElement?.className || '').toLowerCase();
-      
-      // Check if this looks like a swatch
-      const isSwatch = src.toLowerCase().includes('swatch') || 
-                       src.toLowerCase().includes('color') ||
-                       src.toLowerCase().includes('finish') ||
-                       src.toLowerCase().includes('leather') ||
-                       src.toLowerCase().includes('fabric') ||
-                       className.includes('swatch') ||
-                       className.includes('color') ||
-                       className.includes('option') ||
-                       alt.includes('swatch') ||
-                       alt.includes('color') ||
-                       alt.includes('finish') ||
-                       parentClass.includes('swatch') ||
-                       parentClass.includes('color') ||
-                       parentClass.includes('option') ||
-                       grandparentClass.includes('color');
-      
-      if (isSwatch && src && src.startsWith('http') && !src.startsWith('data:') &&
-          img.width > 20 && img.height > 20) {
-        data.finish_image = src;
-        console.log('Found swatch image:', src);
-        break;
-      }
-    }
-  }
+  // Strategy 1: Find color/swatch section by looking for "Color" label
+  const colorLabels = Array.from(document.querySelectorAll('*')).filter(el => {
+    const text = (el.innerText || '').trim().toLowerCase();
+    return (text === 'color' || text === 'colors' || text === 'finish' || text === 'finishes') 
+           && el.children.length === 0; // Only text nodes
+  });
   
-  // Look for images inside elements with "color" or "swatch" in any parent's class
-  if (!data.finish_image) {
-    const colorContainers = document.querySelectorAll('[class*="color"], [class*="swatch"], [class*="option"], [class*="finish"]');
-    for (const container of colorContainers) {
-      const imgs = container.querySelectorAll('img');
+  for (const label of colorLabels) {
+    // Search UP to 10 parent levels for images
+    let parent = label.parentElement;
+    for (let level = 0; level < 10 && parent && !data.finish_image; level++) {
+      const imgs = parent.querySelectorAll('img');
       for (const img of imgs) {
-        const src = img.src || img.getAttribute('data-src');
-        if (src && src.startsWith('http') && !src.startsWith('data:') && 
-            img.width > 20 && img.height > 20) {
+        const src = getImageSrc(img);
+        if (src && src.startsWith('http') && !src.startsWith('data:') &&
+            !src.includes('pixel') && !src.includes('tracking') && !src.includes('spacer') &&
+            !src.includes('logo') && !src.includes('icon')) {
           data.finish_image = src;
-          console.log('Found swatch in color container:', src);
+          console.log('✅ Found finish image near Color label:', src);
           break;
         }
       }
-      if (data.finish_image) break;
+      parent = parent.parentElement;
+    }
+    if (data.finish_image) break;
+  }
+  
+  // Strategy 2: Look for clickable swatch elements (often have onclick or are inside <a> or <button>)
+  if (!data.finish_image) {
+    const clickables = document.querySelectorAll('a img, button img, [onclick] img, [role="button"] img');
+    for (const img of clickables) {
+      const src = getImageSrc(img);
+      const parentText = (img.closest('a, button, [onclick]')?.innerText || '').toLowerCase();
+      if (src && src.startsWith('http') && !src.startsWith('data:') &&
+          !src.includes('cart') && !src.includes('wishlist') && !src.includes('share')) {
+        // Prefer images where parent has color/swatch related text or class
+        const parentClass = (img.parentElement?.className || '').toLowerCase();
+        const grandparentClass = (img.parentElement?.parentElement?.className || '').toLowerCase();
+        if (parentClass.includes('color') || parentClass.includes('swatch') || 
+            parentClass.includes('option') || grandparentClass.includes('color') ||
+            grandparentClass.includes('swatch')) {
+          data.finish_image = src;
+          console.log('✅ Found clickable swatch:', src);
+          break;
+        }
+      }
     }
   }
   
-  // Last resort: Use small square product thumbnails (often show finish details)
+  // Strategy 3: Look for images with swatch/color keywords anywhere
   if (!data.finish_image) {
     const allImgs = document.querySelectorAll('img');
     for (const img of allImgs) {
-      const src = img.src || img.getAttribute('data-src');
-      const width = img.width || img.naturalWidth || 0;
-      const height = img.height || img.naturalHeight || 0;
+      const src = getImageSrc(img);
+      if (!src || !src.startsWith('http') || src.startsWith('data:')) continue;
       
-      // Small-medium images that aren't icons
-      if (src && src.startsWith('http') && !src.startsWith('data:') &&
-          width >= 40 && width <= 200 && height >= 40 && height <= 200 &&
-          !src.includes('icon') && !src.includes('logo') && !src.includes('sprite') &&
-          !src.includes('pixel') && !src.includes('tracking') &&
-          src !== data.image_url) {
+      const srcLower = src.toLowerCase();
+      const alt = (img.alt || '').toLowerCase();
+      const className = (img.className || '').toLowerCase();
+      const id = (img.id || '').toLowerCase();
+      
+      // Check for swatch indicators in src, alt, class, or id
+      const isSwatchLike = srcLower.includes('swatch') || srcLower.includes('color') || 
+                          srcLower.includes('finish') || srcLower.includes('leather') ||
+                          srcLower.includes('fabric') || srcLower.includes('material') ||
+                          srcLower.includes('closeup') || srcLower.includes('detail') ||
+                          alt.includes('swatch') || alt.includes('color') || alt.includes('finish') ||
+                          className.includes('swatch') || className.includes('color') ||
+                          id.includes('swatch') || id.includes('color');
+      
+      if (isSwatchLike) {
         data.finish_image = src;
-        console.log('Found small product image:', src);
+        console.log('✅ Found swatch-like image:', src);
         break;
       }
     }
   }
   
-  // Absolute fallback: Use main product image
+  // Strategy 4: Look for small-medium images (swatches are typically 50-150px)
+  if (!data.finish_image) {
+    const allImgs = document.querySelectorAll('img');
+    for (const img of allImgs) {
+      const src = getImageSrc(img);
+      if (!src || !src.startsWith('http') || src.startsWith('data:') || src === data.image_url) continue;
+      
+      // Get size from attributes if natural size is 0 (lazy loaded)
+      const width = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
+      const height = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
+      
+      // Look for small-medium images that aren't icons
+      if ((width >= 40 && width <= 200) || (height >= 40 && height <= 200)) {
+        const srcLower = src.toLowerCase();
+        if (!srcLower.includes('icon') && !srcLower.includes('logo') && 
+            !srcLower.includes('sprite') && !srcLower.includes('pixel') &&
+            !srcLower.includes('tracking') && !srcLower.includes('spacer')) {
+          data.finish_image = src;
+          console.log('✅ Found small/medium image as swatch:', src);
+          break;
+        }
+      }
+    }
+  }
+  
+  // Strategy 5: Get secondary product images (thumbnails/gallery)
+  if (!data.finish_image) {
+    const galleryImgs = document.querySelectorAll(
+      '[class*="gallery"] img, [class*="thumb"] img, [class*="carousel"] img, ' +
+      '[class*="slider"] img, [class*="product-image"] img'
+    );
+    for (const img of galleryImgs) {
+      const src = getImageSrc(img);
+      if (src && src.startsWith('http') && !src.startsWith('data:') && src !== data.image_url) {
+        data.finish_image = src;
+        console.log('✅ Found gallery/thumbnail image:', src);
+        break;
+      }
+    }
+  }
+  
+  // Strategy 6: Background images in color/swatch containers
+  if (!data.finish_image) {
+    const elements = document.querySelectorAll('[class*="color"], [class*="swatch"], [class*="option"]');
+    for (const el of elements) {
+      const style = getComputedStyle(el);
+      const bg = style.backgroundImage;
+      if (bg && bg !== 'none' && bg.includes('url')) {
+        const match = bg.match(/url\(["']?([^"')]+)["']?\)/);
+        if (match && match[1] && match[1].startsWith('http')) {
+          data.finish_image = match[1];
+          console.log('✅ Found background-image swatch:', match[1]);
+          break;
+        }
+      }
+    }
+  }
+  
+  // FINAL FALLBACK: Use main product image
   if (!data.finish_image && data.image_url) {
     data.finish_image = data.image_url;
-    console.log('Using main product image as finish image');
+    console.log('⚠️ Using main product image as finish image fallback');
   }
   
   return data;
