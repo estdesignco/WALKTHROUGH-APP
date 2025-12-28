@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://vendor-bridge-8.preview.emergentagent.com/email-template.html
+https://decor-grab.preview.emergentagent.com/email-template.html
 
 ---
 

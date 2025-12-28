@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://vendor-bridge-8.preview.emergentagent.com
-API_URL=https://vendor-bridge-8.preview.emergentagent.com/api
+BACKEND_URL=https://decor-grab.preview.emergentagent.com
+API_URL=https://decor-grab.preview.emergentagent.com/api
 ```
 
 ### App Configuration

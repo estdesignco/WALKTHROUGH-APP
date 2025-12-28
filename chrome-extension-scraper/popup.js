@@ -1,8 +1,8 @@
 // Design Ready Product Scraper v3.1
 // FIXED: Excludes social icons and footer images
 
-const APP_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
-const BACKEND_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
+const APP_URL = 'https://decor-grab.preview.emergentagent.com';
+const BACKEND_URL = 'https://decor-grab.preview.emergentagent.com';
 let scrapedData = null;
 
 const scrapeBtn = document.getElementById('scrapeBtn');

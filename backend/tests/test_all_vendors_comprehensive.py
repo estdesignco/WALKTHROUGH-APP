@@ -110,7 +110,7 @@ async def test_vendor(session, api_url, vendor_name, product_url, timeout=120):
 
 async def run_all_tests():
     """Run tests for all vendors"""
-    api_url = os.environ.get('API_URL', 'https://vendor-bridge-8.preview.emergentagent.com')
+    api_url = os.environ.get('API_URL', 'https://decor-grab.preview.emergentagent.com')
     
     print("=" * 60)
     print("COMPREHENSIVE VENDOR SCRAPER TEST")

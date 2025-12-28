@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://vendor-bridge-8.preview.emergentagent.com/*"
+    "https://decor-grab.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

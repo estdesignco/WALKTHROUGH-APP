@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://vendor-bridge-8.preview.emergentagent.com";
+const BACKEND_URL = "https://decor-grab.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**
