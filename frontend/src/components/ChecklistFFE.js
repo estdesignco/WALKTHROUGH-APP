@@ -25,6 +25,9 @@ const ChecklistFFE = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+  
+  // Expanded image state for viewing finish swatches
+  const [expandedImage, setExpandedImage] = useState(null);
 
   // Calculator Popup State
   const [showCalculator, setShowCalculator] = useState(false);
@@ -33,6 +36,28 @@ const ChecklistFFE = ({
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
+  
+  // ✅ SCRAPER CLIPBOARD STATE - For pasting scraped data into specific rows
+  const [scraperClipboard, setScraperClipboard] = useState(null);
+  const [showScraperNotification, setShowScraperNotification] = useState(false);
+  
+  // Check for scraped data in localStorage on mount and periodically
+  useEffect(() => {
+    const checkForScrapedData = () => {
+      const data = localStorage.getItem('extensionScrapedData');
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          setScraperClipboard(parsed);
+          setShowScraperNotification(true);
+        } catch (e) {}
+      }
+    };
+    
+    checkForScrapedData();
+    const interval = setInterval(checkForScrapedData, 2000);
+    return () => clearInterval(interval);
+  }, []);
   
   // ✅ Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
