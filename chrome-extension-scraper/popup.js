@@ -576,28 +576,93 @@ function scrapePageData() {
     return false;
   }
   
-  // STRATEGY 1: Find the "Color" section and get the SELECTED swatch image
-  // Look for container that has "Color" text AND multiple small images (the swatches)
-  const allTextNodes = [];
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  while (walker.nextNode()) {
-    const text = walker.currentNode.textContent.trim().toLowerCase();
-    if (text === 'color' || text === 'colors' || text === 'colour' || text === 'colours') {
-      allTextNodes.push(walker.currentNode.parentElement);
+  // ========== UTTERMOST SPECIFIC - TRY THIS FIRST ==========
+  if (domain.includes('uttermost')) {
+    console.log('🔍 Uttermost detected - using specific swatch detection');
+    
+    // On Uttermost, swatches are in a section with "Color" heading
+    // Look for all images that are NOT the main product image
+    const allImgs = Array.from(document.querySelectorAll('img'));
+    const potentialSwatches = [];
+    
+    for (const img of allImgs) {
+      const src = getImageSrc(img);
+      if (!src || !src.startsWith('http') || src.startsWith('data:')) continue;
+      
+      // Skip main product image
+      if (isMainProductImage(img, src, data.image_url)) continue;
+      
+      // Skip navigation/icons
+      if (isNavigationOrIcon(img, src)) continue;
+      
+      // Get dimensions
+      const width = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
+      const height = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
+      
+      // Swatches on Uttermost are typically 80-150px
+      if (width >= 50 && width <= 200 && height >= 50 && height <= 200) {
+        // Check if it's in a container with color-related class or near "Color" text
+        const parent = img.closest('div, li, a, button');
+        const parentText = parent?.innerText?.toLowerCase() || '';
+        const parentClass = parent?.className?.toLowerCase() || '';
+        const grandparent = parent?.parentElement;
+        const grandparentText = grandparent?.innerText?.toLowerCase() || '';
+        
+        // Score this potential swatch
+        let score = 0;
+        if (parentClass.includes('swatch') || parentClass.includes('color') || parentClass.includes('option')) score += 10;
+        if (parentText.includes('color') || grandparentText.includes('color')) score += 5;
+        if (src.toLowerCase().includes('swatch') || src.toLowerCase().includes('leather') || src.toLowerCase().includes('fabric')) score += 10;
+        
+        // Check if selected
+        const isSelected = 
+          img.classList.contains('selected') || img.classList.contains('active') ||
+          parent?.classList.contains('selected') || parent?.classList.contains('active') ||
+          parent?.getAttribute('aria-selected') === 'true';
+        if (isSelected) score += 20;
+        
+        // Check if alt/title matches the finish color
+        const alt = (img.alt || '').toLowerCase();
+        const title = (img.title || '').toLowerCase();
+        if (data.finish_color && (alt.includes(data.finish_color.toLowerCase()) || title.includes(data.finish_color.toLowerCase()))) {
+          score += 15;
+        }
+        
+        potentialSwatches.push({ img, src, score, width, height });
+      }
+    }
+    
+    // Sort by score and take the best one
+    if (potentialSwatches.length > 0) {
+      potentialSwatches.sort((a, b) => b.score - a.score);
+      data.finish_image = potentialSwatches[0].src;
+      console.log('✅ Uttermost swatch found:', data.finish_image, 'Score:', potentialSwatches[0].score);
     }
   }
   
-  for (const colorLabel of allTextNodes) {
-    // Find the closest container that has multiple images (swatch group)
-    let container = colorLabel.parentElement;
-    for (let i = 0; i < 8 && container && !data.finish_image; i++) {
-      const imgs = container.querySelectorAll('img');
-      const validSwatches = [];
-      let selectedSwatch = null;
-      
-      for (const img of imgs) {
-        const src = getImageSrc(img);
-        if (!src || !src.startsWith('http') || src.startsWith('data:')) continue;
+  // ========== GENERIC STRATEGIES IF UTTERMOST DIDN'T WORK ==========
+  
+  // STRATEGY 1: Find the "Color" section and get the SELECTED swatch image
+  if (!data.finish_image) {
+    const allTextNodes = [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const text = walker.currentNode.textContent.trim().toLowerCase();
+      if (text === 'color' || text === 'colors' || text === 'colour' || text === 'colours') {
+        allTextNodes.push(walker.currentNode.parentElement);
+      }
+    }
+    
+    for (const colorLabel of allTextNodes) {
+      let container = colorLabel.parentElement;
+      for (let i = 0; i < 8 && container && !data.finish_image; i++) {
+        const imgs = container.querySelectorAll('img');
+        const validSwatches = [];
+        let selectedSwatch = null;
+        
+        for (const img of imgs) {
+          const src = getImageSrc(img);
+          if (!src || !src.startsWith('http') || src.startsWith('data:')) continue;
         if (isNavigationOrIcon(img, src)) continue;
         
         const width = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 100;
