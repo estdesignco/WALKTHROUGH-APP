@@ -1,12 +1,11 @@
-// Design Ready Product Scraper - Popup Script
-// Version 2.8 - Uttermost-specific swatch detection
+// Design Ready Product Scraper - Popup Script v3.0
+// FIXED: Aggressive image extraction
 
 const APP_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
 const BACKEND_URL = 'https://vendor-bridge-8.preview.emergentagent.com';
 
 let scrapedData = null;
 
-// DOM Elements
 const scrapeBtn = document.getElementById('scrapeBtn');
 const sendBtn = document.getElementById('sendBtn');
 const copyBtn = document.getElementById('copyBtn');
@@ -48,23 +47,27 @@ function displayResults(data) {
     loginWarning.style.display = 'flex';
   }
   
+  // Product image
   const imgEl = document.getElementById('productImage');
-  if (data.image_url && data.image_url.startsWith('http')) {
+  if (data.image_url) {
     imgEl.src = data.image_url;
     imgEl.style.display = 'block';
+    imgEl.onerror = () => { imgEl.style.display = 'none'; };
   } else {
     imgEl.style.display = 'none';
   }
   
+  // Finish swatch image
   const finishImgEl = document.getElementById('finishImage');
   const finishImgContainer = document.getElementById('finishImageContainer');
   const finishNameEl = document.getElementById('finishName');
   
-  if (data.finish_image && data.finish_image.startsWith('http')) {
+  if (data.finish_image) {
     finishImgEl.src = data.finish_image;
     finishImgContainer.style.display = 'flex';
     finishImgContainer.classList.add('visible');
     finishNameEl.textContent = data.finish_color || 'Swatch';
+    finishImgEl.onerror = () => { finishImgContainer.style.display = 'none'; };
   } else {
     finishImgContainer.style.display = 'none';
   }
@@ -74,9 +77,13 @@ function displayResults(data) {
   document.getElementById('dataFinish').textContent = data.finish_color || 'Not found';
   document.getElementById('dataMsrp').textContent = data.msrp ? `$${parseFloat(data.msrp).toLocaleString()}` : 'Not found';
   document.getElementById('dataUrl').textContent = data.url || 'Not found';
+  
+  console.log('=== SCRAPE RESULTS ===');
+  console.log('Main Image:', data.image_url || 'NONE');
+  console.log('Finish Image:', data.finish_image || 'NONE');
 }
 
-// The scraping function
+// The scraping function - runs in page context
 function scrapePageData() {
   const url = window.location.href;
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
@@ -95,192 +102,181 @@ function scrapePageData() {
     image_url: null
   };
   
-  // Vendor detection
+  // === VENDOR ===
   const vendorMap = {
-    'uttermost.com': 'Uttermost',
-    'visualcomfort.com': 'Visual Comfort',
-    'fourhands.com': 'Four Hands',
-    'bernhardt.com': 'Bernhardt',
-    'reginaandrew.com': 'Regina Andrew',
-    'jaipurliving.com': 'Jaipur Living',
-    'loloirugs.com': 'Loloi',
-    'globalviews.com': 'Global Views',
-    'surya.com': 'Surya',
-    'gabby.com': 'Gabby'
+    'uttermost': 'Uttermost', 'visualcomfort': 'Visual Comfort', 'fourhands': 'Four Hands',
+    'bernhardt': 'Bernhardt', 'reginaandrew': 'Regina Andrew', 'jaipurliving': 'Jaipur Living',
+    'loloirugs': 'Loloi', 'globalviews': 'Global Views', 'surya': 'Surya', 'gabby': 'Gabby'
   };
-  
-  for (const [domainKey, vendorName] of Object.entries(vendorMap)) {
-    if (domain.includes(domainKey.replace('.com', ''))) {
-      data.vendor = vendorName;
-      break;
-    }
+  for (const [key, val] of Object.entries(vendorMap)) {
+    if (domain.includes(key)) { data.vendor = val; break; }
   }
-  if (!data.vendor) {
-    data.vendor = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
-  }
+  if (!data.vendor) data.vendor = domain.split('.')[0];
   
-  // Product name
+  // === NAME ===
   const h1 = document.querySelector('h1');
-  if (h1 && h1.innerText.trim().length > 2 && h1.innerText.trim().length < 200) {
-    data.name = h1.innerText.trim();
-  }
+  if (h1) data.name = h1.innerText.trim();
   if (!data.name) {
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) data.name = ogTitle.content.split('|')[0].trim();
+    const og = document.querySelector('meta[property="og:title"]');
+    if (og) data.name = og.content.split('|')[0].trim();
   }
   
-  // SKU
-  const skuPatterns = [/SKU[:#\s]*([A-Z0-9][-A-Z0-9]{2,20})/i, /Item\s*#?[:#\s]*([A-Z0-9][-A-Z0-9]{2,20})/i];
-  for (const pattern of skuPatterns) {
-    const match = bodyText.match(pattern);
-    if (match) { data.sku = match[1].toUpperCase(); break; }
-  }
+  // === SKU ===
+  const skuMatch = bodyText.match(/(?:SKU|Item)[:#\s]*([A-Z0-9][-A-Z0-9]{2,20})/i);
+  if (skuMatch) data.sku = skuMatch[1].toUpperCase();
   if (!data.sku) {
-    const urlMatch = url.match(/\/([A-Z0-9][-A-Z0-9]{4,15})(?:[\/?#]|$)/i);
-    if (urlMatch) data.sku = urlMatch[1].toUpperCase();
+    const urlSku = url.match(/\/([A-Z0-9][-A-Z0-9]{4,15})(?:[\/?#]|$)/i);
+    if (urlSku) data.sku = urlSku[1].toUpperCase();
   }
   
-  // Price
-  let allPrices = [];
-  document.querySelectorAll('[class*="price"]').forEach(el => {
-    const txt = el.innerText || el.getAttribute('content') || '';
-    const matches = txt.match(/\$?\s*([\d,]+\.?\d{0,2})/g);
-    if (matches) {
-      matches.forEach(m => {
-        const val = parseFloat(m.replace(/[$,\s]/g, ''));
-        if (val > 10 && val < 500000) allPrices.push(val);
-      });
-    }
+  // === PRICE ===
+  const priceEls = document.querySelectorAll('[class*="price"]');
+  let prices = [];
+  priceEls.forEach(el => {
+    const matches = (el.innerText || '').match(/\$\s*([\d,]+\.?\d*)/g);
+    if (matches) matches.forEach(m => {
+      const v = parseFloat(m.replace(/[$,]/g, ''));
+      if (v > 10 && v < 500000) prices.push(v);
+    });
   });
-  allPrices = [...new Set(allPrices)].sort((a, b) => a - b);
-  if (allPrices.length > 0) {
-    data.price = allPrices[0];
-    if (allPrices.length > 1) data.msrp = allPrices[allPrices.length - 1];
-  }
+  prices = [...new Set(prices)].sort((a,b) => a-b);
+  if (prices.length > 0) { data.price = prices[0]; if (prices.length > 1) data.msrp = prices[prices.length-1]; }
   
-  // Size
-  const sizePatterns = [/(\d+\.?\d*)\s*["']?\s*[Ww]\s*[Xx×]\s*(\d+\.?\d*)\s*["']?\s*[Hh]/];
-  for (const pattern of sizePatterns) {
-    const match = bodyText.match(pattern);
-    if (match) { data.size = `${match[1]}" W x ${match[2]}" H`; break; }
-  }
-  if (!data.size) {
-    const dimMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
-    if (dimMatch) data.size = `${dimMatch[1]} W X ${dimMatch[2]} H X ${dimMatch[3]} D`;
-  }
+  // === SIZE ===
+  const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
+  if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
   
-  // Finish/Color from title
-  const commonFinishes = ['Bronze', 'Brass', 'Gold', 'Silver', 'Chrome', 'Nickel', 'Black', 'White', 
-    'Natural', 'Oak', 'Walnut', 'Toffee', 'Smoke', 'Gray', 'Grey', 'Antique', 'Leather'];
+  // === FINISH COLOR (from title) ===
+  const finishes = ['Bronze','Brass','Gold','Silver','Chrome','Nickel','Black','White','Toffee','Smoke','Gray','Natural','Oak','Walnut','Leather'];
   if (data.name) {
-    for (const finish of commonFinishes) {
-      if (data.name.toLowerCase().includes(finish.toLowerCase())) {
-        data.finish_color = finish;
-        break;
-      }
+    for (const f of finishes) {
+      if (data.name.toLowerCase().includes(f.toLowerCase())) { data.finish_color = f; break; }
     }
   }
   if (!data.finish_color && data.name && data.name.includes(' - ')) {
     const parts = data.name.split(' - ');
-    if (parts.length > 1) {
-      const finishPart = parts[parts.length - 1].split(',')[0].trim();
-      if (finishPart.length > 1 && finishPart.length < 30) {
-        data.finish_color = finishPart;
-      }
-    }
+    if (parts.length > 1) data.finish_color = parts[parts.length-1].split(',')[0].trim();
   }
   
-  // Main product image
-  const ogImage = document.querySelector('meta[property="og:image"]');
-  if (ogImage && ogImage.content) {
-    data.image_url = ogImage.content;
+  // === HELPER: Get any possible src from an image ===
+  function getSrc(img) {
+    return img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || 
+           img.getAttribute('data-original') || img.getAttribute('data-zoom-image') ||
+           (img.srcset ? img.srcset.split(',')[0].split(' ')[0] : '') || '';
   }
+  
+  // === MAIN PRODUCT IMAGE - AGGRESSIVE ===
+  // Try og:image first
+  const ogImg = document.querySelector('meta[property="og:image"]');
+  if (ogImg && ogImg.content) {
+    data.image_url = ogImg.content;
+    console.log('Got og:image:', data.image_url);
+  }
+  
+  // Try common selectors
   if (!data.image_url) {
-    const mainImg = document.querySelector('[class*="product-image"] img, [class*="main-image"] img, [class*="gallery"] img');
-    if (mainImg && mainImg.src && mainImg.src.startsWith('http')) {
-      data.image_url = mainImg.src;
-    }
-  }
-  
-  // ===== FINISH/SWATCH IMAGE =====
-  
-  function getImgSrc(img) {
-    return img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '';
-  }
-  
-  function isNavOrIcon(src) {
-    const lower = src.toLowerCase();
-    const excludes = ['arrow', 'chevron', 'nav', 'prev', 'next', 'icon', 'logo', 'sprite', 'pixel', 'tracking', 'spacer', 'loader', 'close', 'search', 'cart', 'social'];
-    return excludes.some(e => lower.includes(e));
-  }
-  
-  // Find all images that could be swatches (small, not main image, not icons)
-  const allImgs = document.querySelectorAll('img');
-  const swatchCandidates = [];
-  
-  for (const img of allImgs) {
-    const src = getImgSrc(img);
-    if (!src || !src.startsWith('http') || src.startsWith('data:')) continue;
-    if (isNavOrIcon(src)) continue;
-    if (src === data.image_url) continue; // Skip main product image
-    
-    const width = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
-    const height = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
-    
-    // Skip very large images (main product) and very small (icons)
-    if (width > 300 || height > 300) continue;
-    if (width < 30 && width > 0) continue;
-    if (height < 30 && height > 0) continue;
-    
-    // Check context
-    const parent = img.closest('div, a, button, li');
-    const parentClass = (parent?.className || '').toLowerCase();
-    const parentText = (parent?.innerText || '').toLowerCase();
-    const grandparent = parent?.parentElement;
-    const gpClass = (grandparent?.className || '').toLowerCase();
-    const gpText = (grandparent?.innerText || '').toLowerCase();
-    
-    let score = 0;
-    
-    // Score based on context
-    if (parentClass.includes('swatch') || parentClass.includes('color') || parentClass.includes('option')) score += 20;
-    if (gpClass.includes('swatch') || gpClass.includes('color') || gpClass.includes('option')) score += 15;
-    if (parentText === 'color' || gpText.includes('color')) score += 10;
-    if (src.toLowerCase().includes('swatch') || src.toLowerCase().includes('leather') || src.toLowerCase().includes('fabric')) score += 15;
-    
-    // Check if selected
-    const isSelected = img.classList.contains('selected') || img.classList.contains('active') ||
-                       parent?.classList.contains('selected') || parent?.classList.contains('active');
-    if (isSelected) score += 30;
-    
-    // Match color name
-    if (data.finish_color) {
-      const colorLower = data.finish_color.toLowerCase();
-      const alt = (img.alt || '').toLowerCase();
-      const title = (img.title || '').toLowerCase();
-      if (alt.includes(colorLower) || title.includes(colorLower) || src.toLowerCase().includes(colorLower)) {
-        score += 25;
+    const selectors = [
+      'img[class*="product"]', 'img[class*="gallery"]', 'img[class*="main"]',
+      'img[class*="hero"]', 'img[class*="primary"]', '.product-image img',
+      '.gallery img', '.main-image img', '#product-image', '.pdp-image img'
+    ];
+    for (const sel of selectors) {
+      const img = document.querySelector(sel);
+      if (img) {
+        const src = getSrc(img);
+        if (src && src.startsWith('http')) { data.image_url = src; console.log('Got image from selector:', sel); break; }
       }
     }
-    
-    if (score > 0) {
-      swatchCandidates.push({ src, score, img });
+  }
+  
+  // Find LARGEST image on page (likely product image)
+  if (!data.image_url) {
+    let bestImg = null, bestSize = 0;
+    document.querySelectorAll('img').forEach(img => {
+      const src = getSrc(img);
+      if (!src || !src.startsWith('http') || src.startsWith('data:')) return;
+      const w = img.naturalWidth || img.width || 0;
+      const h = img.naturalHeight || img.height || 0;
+      if (w * h > bestSize && w > 200 && h > 200) {
+        bestSize = w * h;
+        bestImg = src;
+      }
+    });
+    if (bestImg) { data.image_url = bestImg; console.log('Got largest image:', bestImg); }
+  }
+  
+  // Last resort - first big image
+  if (!data.image_url) {
+    const imgs = document.querySelectorAll('img');
+    for (const img of imgs) {
+      const src = getSrc(img);
+      if (src && src.startsWith('http') && !src.includes('logo') && !src.includes('icon')) {
+        data.image_url = src;
+        console.log('Got first valid image:', src);
+        break;
+      }
     }
   }
   
-  // Sort by score and take best
+  // === FINISH/SWATCH IMAGE ===
+  const isExcluded = (src) => {
+    const lower = src.toLowerCase();
+    return ['arrow','chevron','nav','prev','next','icon','logo','sprite','pixel','track','spacer','load','close','search','cart','social','facebook','twitter','instagram'].some(x => lower.includes(x));
+  };
+  
+  // Collect ALL small-medium images that aren't the main image
+  const swatchCandidates = [];
+  document.querySelectorAll('img').forEach(img => {
+    const src = getSrc(img);
+    if (!src || !src.startsWith('http') || src.startsWith('data:')) return;
+    if (src === data.image_url) return; // Skip main image
+    if (isExcluded(src)) return;
+    
+    const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
+    const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
+    
+    // Skip very large (main product) or tiny (icons)
+    if (w > 400 || h > 400) return;
+    if (w > 0 && w < 25) return;
+    if (h > 0 && h < 25) return;
+    
+    // Score it
+    let score = 1;
+    const srcLower = src.toLowerCase();
+    const alt = (img.alt || '').toLowerCase();
+    const cls = (img.className || '').toLowerCase();
+    const parentCls = (img.parentElement?.className || '').toLowerCase();
+    const gpCls = (img.parentElement?.parentElement?.className || '').toLowerCase();
+    
+    if (srcLower.includes('swatch') || srcLower.includes('leather') || srcLower.includes('fabric') || srcLower.includes('color')) score += 30;
+    if (cls.includes('swatch') || cls.includes('color') || cls.includes('option')) score += 20;
+    if (parentCls.includes('swatch') || parentCls.includes('color')) score += 15;
+    if (gpCls.includes('swatch') || gpCls.includes('color')) score += 10;
+    if (img.classList.contains('selected') || img.classList.contains('active')) score += 25;
+    if (img.parentElement?.classList.contains('selected') || img.parentElement?.classList.contains('active')) score += 25;
+    
+    if (data.finish_color) {
+      const fc = data.finish_color.toLowerCase();
+      if (alt.includes(fc) || img.title?.toLowerCase().includes(fc) || srcLower.includes(fc)) score += 30;
+    }
+    
+    swatchCandidates.push({ src, score });
+  });
+  
+  // Sort and pick best
   if (swatchCandidates.length > 0) {
-    swatchCandidates.sort((a, b) => b.score - a.score);
+    swatchCandidates.sort((a,b) => b.score - a.score);
     data.finish_image = swatchCandidates[0].src;
-    console.log('✅ Swatch found:', data.finish_image, 'Score:', swatchCandidates[0].score);
+    console.log('Best swatch:', data.finish_image, 'score:', swatchCandidates[0].score);
   }
   
-  // Fallback: use main image
+  // Fallback
   if (!data.finish_image && data.image_url) {
     data.finish_image = data.image_url;
-    console.log('⚠️ Using main image as swatch fallback');
+    console.log('Using main image as swatch fallback');
   }
   
+  console.log('=== FINAL DATA ===', data);
   return data;
 }
 
@@ -293,7 +289,7 @@ async function doScrape() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab || !tab.url || tab.url.startsWith('chrome://')) {
-      throw new Error('Please navigate to a product page first');
+      throw new Error('Navigate to a product page first');
     }
     
     const results = await chrome.scripting.executeScript({
@@ -302,110 +298,68 @@ async function doScrape() {
     });
     
     const data = results[0].result;
-    if (!data || (!data.name && !data.price)) {
-      throw new Error('Could not find product data on this page.');
-    }
+    if (!data) throw new Error('Scrape returned no data');
     
     displayResults(data);
-    showStatus(data.price ? `Found: ${data.name} - $${data.price}` : `Found: ${data.name}`, data.price ? 'success' : 'warning');
+    showStatus(data.name ? `Found: ${data.name}` : 'Scraped page', 'success');
   } catch (error) {
     console.error('Scrape error:', error);
-    showStatus(error.message || 'Failed to scrape page', 'error');
+    showStatus(error.message || 'Failed', 'error');
   } finally {
     scrapeBtn.disabled = false;
     scrapeBtn.innerHTML = '<span>⚡</span><span>SCRAPE THIS PAGE</span>';
   }
 }
 
-// Send data to app
+// Send to app
 async function sendToApp() {
   if (!scrapedData) return;
-  
   sendBtn.disabled = true;
   sendBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
   
   try {
-    // Cache on server
-    try {
-      await fetch(`${BACKEND_URL}/api/extension-scrape`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(scrapedData)
-      });
-    } catch (e) {}
+    try { await fetch(`${BACKEND_URL}/api/extension-scrape`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(scrapedData) }); } catch(e){}
     
-    // Build URL params
     const params = new URLSearchParams();
     params.set('action', 'add-item');
     params.set('source', 'extension');
-    if (scrapedData.name) params.set('name', scrapedData.name);
-    if (scrapedData.price) params.set('price', scrapedData.price);
-    if (scrapedData.sku) params.set('sku', scrapedData.sku);
-    if (scrapedData.size) params.set('size', scrapedData.size);
-    if (scrapedData.finish_color) params.set('finish', scrapedData.finish_color);
-    if (scrapedData.finish_image) params.set('finish_image', scrapedData.finish_image);
-    if (scrapedData.vendor) params.set('vendor', scrapedData.vendor);
-    if (scrapedData.url) params.set('link', scrapedData.url);
-    if (scrapedData.image_url) params.set('image', scrapedData.image_url);
-    if (scrapedData.msrp) params.set('msrp', scrapedData.msrp);
+    Object.entries({
+      name: scrapedData.name, price: scrapedData.price, sku: scrapedData.sku,
+      size: scrapedData.size, finish: scrapedData.finish_color, finish_image: scrapedData.finish_image,
+      vendor: scrapedData.vendor, link: scrapedData.url, image: scrapedData.image_url, msrp: scrapedData.msrp
+    }).forEach(([k,v]) => { if(v) params.set(k,v); });
     
-    // Get last project URL
-    let lastProjectUrl = null;
+    let appUrl = APP_URL;
     try {
       const stored = await chrome.storage.local.get('lastProjectUrl');
-      lastProjectUrl = stored.lastProjectUrl;
-    } catch (e) {}
+      if (stored.lastProjectUrl?.includes('/project/')) appUrl = stored.lastProjectUrl.split('?')[0];
+    } catch(e){}
     
-    let appUrl = lastProjectUrl && lastProjectUrl.includes('/project/') 
-      ? `${lastProjectUrl.split('?')[0]}?${params.toString()}`
-      : `${APP_URL}?${params.toString()}`;
-    
-    window.open(appUrl, '_blank');
-    showStatus('Data sent! Go to checklist and click PASTE.', 'success');
-  } catch (error) {
-    showStatus('Failed to send', 'error');
-  } finally {
-    sendBtn.disabled = false;
-    sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>';
-  }
+    window.open(`${appUrl}?${params.toString()}`, '_blank');
+    showStatus('Sent! Click PASTE on any row.', 'success');
+  } catch(e) { showStatus('Failed', 'error'); }
+  finally { sendBtn.disabled = false; sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>'; }
 }
 
-// Copy to clipboard
+// Copy
 async function copyToClipboard() {
   if (!scrapedData) return;
-  const text = [
-    `Product: ${scrapedData.name || 'N/A'}`,
-    `Price: ${scrapedData.price ? '$' + scrapedData.price : 'N/A'}`,
-    `SKU: ${scrapedData.sku || 'N/A'}`,
-    `Vendor: ${scrapedData.vendor || 'N/A'}`,
-    `Size: ${scrapedData.size || 'N/A'}`,
-    `Finish: ${scrapedData.finish_color || 'N/A'}`,
-    `URL: ${scrapedData.url || 'N/A'}`
-  ].join('\n');
-  
-  try {
-    await navigator.clipboard.writeText(text);
-    copyBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
-    setTimeout(() => { copyBtn.innerHTML = '<span>📋</span><span>Copy All</span>'; }, 2000);
-  } catch (e) {}
+  const text = `Product: ${scrapedData.name}\nPrice: $${scrapedData.price||'N/A'}\nSKU: ${scrapedData.sku||'N/A'}\nVendor: ${scrapedData.vendor||'N/A'}\nFinish: ${scrapedData.finish_color||'N/A'}`;
+  try { await navigator.clipboard.writeText(text); copyBtn.innerHTML = '<span>✅</span><span>Copied!</span>'; setTimeout(()=>{copyBtn.innerHTML='<span>📋</span><span>Copy</span>';},2000); } catch(e){}
 }
 
-// Event Listeners
 scrapeBtn.addEventListener('click', doScrape);
 sendBtn.addEventListener('click', sendToApp);
 copyBtn.addEventListener('click', copyToClipboard);
 rescrapeBtn.addEventListener('click', doScrape);
 
-// Auto-detect vendor
 (async function() {
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const [tab] = await chrome.tabs.query({active:true,currentWindow:true});
     if (tab?.url) {
-      const domain = new URL(tab.url).hostname.replace('www.', '');
-      const vendors = { 'uttermost': 'Uttermost', 'visualcomfort': 'Visual Comfort', 'fourhands': 'Four Hands' };
-      for (const [key, val] of Object.entries(vendors)) {
-        if (domain.includes(key)) { vendorBadge.textContent = val; vendorBadge.style.display = 'block'; break; }
-      }
+      const d = new URL(tab.url).hostname.replace('www.','');
+      const v = {'uttermost':'Uttermost','visualcomfort':'Visual Comfort','fourhands':'Four Hands'};
+      for (const [k,n] of Object.entries(v)) { if(d.includes(k)){vendorBadge.textContent=n;vendorBadge.style.display='block';break;} }
     }
-  } catch (e) {}
+  } catch(e){}
 })();
