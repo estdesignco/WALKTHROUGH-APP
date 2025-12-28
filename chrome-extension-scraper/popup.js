@@ -65,13 +65,35 @@ function scrapePageData() {
   const skuMatch = bodyText.match(/(?:SKU|Item)[:#\s]*([A-Z0-9][-A-Z0-9]{2,20})/i);
   if (skuMatch) data.sku = skuMatch[1].toUpperCase();
   
-  // Price
+  // Price - comprehensive search
   let prices = [];
-  document.querySelectorAll('[class*="price"]').forEach(el => {
+  
+  // Method 1: Elements with "price" in class
+  document.querySelectorAll('[class*="price"], [class*="Price"]').forEach(el => {
     const m = (el.innerText||'').match(/\$\s*([\d,]+\.?\d*)/g);
     if (m) m.forEach(x => { const v = parseFloat(x.replace(/[$,]/g,'')); if (v > 10 && v < 500000) prices.push(v); });
   });
+  
+  // Method 2: Look for price near common labels
+  document.querySelectorAll('*').forEach(el => {
+    const text = el.innerText?.trim() || '';
+    // Look for "Price:" or "Your Price:" patterns
+    if (text.match(/^(Your\s+)?Price:?\s*\$/i)) {
+      const m = text.match(/\$\s*([\d,]+\.?\d*)/);
+      if (m) { const v = parseFloat(m[1].replace(/,/g,'')); if (v > 10 && v < 500000) prices.push(v); }
+    }
+  });
+  
+  // Method 3: Find any dollar amounts on the page in product area
+  const productArea = document.querySelector('[class*="productFullDetail"], [class*="product-detail"], main, article') || document.body;
+  const priceMatches = productArea.innerText.match(/\$\s*[\d,]+\.?\d*/g) || [];
+  priceMatches.forEach(p => {
+    const v = parseFloat(p.replace(/[$,\s]/g, ''));
+    if (v > 50 && v < 50000) prices.push(v); // Reasonable furniture price range
+  });
+  
   prices = [...new Set(prices)].sort((a,b)=>a-b);
+  console.log('Found prices:', prices);
   if (prices.length) { data.price = prices[0]; if (prices.length > 1) data.msrp = prices[prices.length-1]; }
   
   // Size
