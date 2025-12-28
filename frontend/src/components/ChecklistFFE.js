@@ -971,15 +971,27 @@ const ChecklistFFE = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* FINISH/Color - EDITABLE INLINE */}
+                                                          {/* FINISH/Color with SWATCH IMAGE - EDITABLE INLINE */}
                                                           <td className="border border-gray-400 px-2 py-2 text-sm text-white">
-                                                            <div 
-                                                              contentEditable={true}
-                                                              suppressContentEditableWarning={true}
-                                                              className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
-                                                            >
-                                                              {item.finish_color || ''}
+                                                            <div className="flex items-center gap-2">
+                                                              {/* Finish Swatch Image */}
+                                                              {item.finish_image && (
+                                                                <img 
+                                                                  src={item.finish_image} 
+                                                                  alt={item.finish_color || 'Finish'} 
+                                                                  className="w-8 h-8 object-cover rounded border border-gray-500 cursor-pointer hover:scale-150 hover:z-50 transition-transform flex-shrink-0" 
+                                                                  onClick={() => setExpandedImage && setExpandedImage(item.finish_image)}
+                                                                  title={`Click to view ${item.finish_color || 'finish'} swatch`}
+                                                                />
+                                                              )}
+                                                              <div 
+                                                                contentEditable={true}
+                                                                suppressContentEditableWarning={true}
+                                                                className="flex-1 bg-transparent text-white text-sm outline-none min-w-0"
+                                                                onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                                              >
+                                                                {item.finish_color || ''}
+                                                              </div>
                                                             </div>
                                                           </td>
                                                           
