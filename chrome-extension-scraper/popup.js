@@ -1,9 +1,11 @@
-// Design Ready Product Scraper v5.0
+// Design Ready Product Scraper v5.2
 // Clean rebuild - SPECIFIC targeting for Uttermost
+// Added: Project selector dropdown with persistence
 
 const APP_URL = 'https://decor-grab.preview.emergentagent.com';
 const BACKEND_URL = 'https://decor-grab.preview.emergentagent.com';
 let scrapedData = null;
+let selectedProjectId = null;
 
 const scrapeBtn = document.getElementById('scrapeBtn');
 const sendBtn = document.getElementById('sendBtn');
@@ -14,6 +16,45 @@ const emptyState = document.getElementById('emptyState');
 const resultsContainer = document.getElementById('resultsContainer');
 const vendorBadge = document.getElementById('vendorBadge');
 const loginWarning = document.getElementById('loginWarning');
+const projectSelector = document.getElementById('projectSelector');
+
+// Load projects from API
+async function loadProjects() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/projects`);
+    if (!response.ok) throw new Error('Failed to load projects');
+    const projects = await response.json();
+    
+    // Clear and populate dropdown
+    projectSelector.innerHTML = '<option value="">-- Select a Project --</option>';
+    projects.forEach(project => {
+      const option = document.createElement('option');
+      option.value = project.id;
+      option.textContent = project.name;
+      projectSelector.appendChild(option);
+    });
+    
+    // Restore previously selected project
+    const stored = await chrome.storage.local.get('selectedProjectId');
+    if (stored.selectedProjectId) {
+      projectSelector.value = stored.selectedProjectId;
+      selectedProjectId = stored.selectedProjectId;
+    }
+  } catch (e) {
+    console.error('Failed to load projects:', e);
+    projectSelector.innerHTML = '<option value="">-- Could not load projects --</option>';
+  }
+}
+
+// Save selected project when changed
+projectSelector?.addEventListener('change', async () => {
+  selectedProjectId = projectSelector.value;
+  await chrome.storage.local.set({ selectedProjectId: selectedProjectId });
+  console.log('Saved project selection:', selectedProjectId);
+});
+
+// Load projects on popup open
+loadProjects();
 
 function showStatus(message, type = 'info') {
   statusBar.style.display = 'flex';
