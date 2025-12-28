@@ -1044,6 +1044,37 @@ const ExactFFESpreadsheet = ({
         </div>
       </div>
 
+      {/* ✅ SCRAPER CLIPBOARD NOTIFICATION - Shows when data is ready to paste */}
+      {scraperClipboard && showScraperNotification && (
+        <div className="mx-4 mb-4 p-4 rounded-lg border-2 border-green-500 animate-pulse" 
+             style={{ 
+               background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(22, 101, 52, 0.3) 100%)',
+               boxShadow: '0 0 20px rgba(34, 197, 94, 0.3)'
+             }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="text-3xl">📋</div>
+              <div>
+                <div className="text-green-400 font-bold text-lg">SCRAPED DATA READY TO PASTE!</div>
+                <div className="text-white text-sm">
+                  <span className="font-semibold">{scraperClipboard.name}</span>
+                  {scraperClipboard.vendor && <span className="text-gray-300"> • {scraperClipboard.vendor}</span>}
+                  {scraperClipboard.price && <span className="text-green-400"> • ${scraperClipboard.price}</span>}
+                  {scraperClipboard.finish_color && <span className="text-amber-400"> • {scraperClipboard.finish_color}</span>}
+                </div>
+                <div className="text-gray-400 text-xs mt-1">👆 Click the <span className="text-green-400 font-bold">📋 PASTE</span> button on any item row to apply this data</div>
+              </div>
+            </div>
+            <button 
+              onClick={clearScraperClipboard}
+              className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm"
+            >
+              ✕ Clear
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ORIGINAL TABLE STRUCTURE - DO NOT CHANGE */}
       <div className="w-full overflow-x-auto" style={{ backgroundColor: '#0F172A', touchAction: 'pan-x' }}>
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
