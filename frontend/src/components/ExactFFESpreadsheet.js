@@ -50,6 +50,36 @@ const ExactFFESpreadsheet = ({
   const [selectedItemForPaste, setSelectedItemForPaste] = useState(null); // Which item row is selected
   const [showScraperNotification, setShowScraperNotification] = useState(false);
   
+  // Check for URL parameters from extension (action=add-item&source=extension)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'add-item' && params.get('source') === 'extension') {
+      const scrapedData = {
+        name: params.get('name') || '',
+        price: params.get('price') || '',
+        sku: params.get('sku') || '',
+        size: params.get('size') || '',
+        finish_color: params.get('finish') || '',
+        finish_image: params.get('finish_image') || '',
+        vendor: params.get('vendor') || '',
+        url: params.get('link') || '',
+        link: params.get('link') || '',
+        image_url: params.get('image') || '',
+        msrp: params.get('msrp') || ''
+      };
+      
+      // Only store if we have actual data
+      if (scrapedData.name || scrapedData.sku || scrapedData.price) {
+        localStorage.setItem('extensionScrapedData', JSON.stringify(scrapedData));
+        console.log('Stored scraper data from URL:', scrapedData);
+        
+        // Clean URL without reloading
+        const cleanUrl = window.location.pathname + '?tab=Checklist';
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    }
+  }, []);
+  
   // Check for scraped data in localStorage on mount and periodically
   useEffect(() => {
     const checkForScrapedData = () => {
