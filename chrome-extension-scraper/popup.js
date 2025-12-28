@@ -520,7 +520,7 @@ function scrapePageData() {
     }
   }
   
-  // ======= FINISH/SWATCH IMAGE - FIXED TO NOT GRAB ARROWS =======
+  // ======= FINISH/SWATCH IMAGE - UTTERMOST SPECIFIC FIX =======
   
   function getImageSrc(img) {
     return img.src || 
@@ -530,6 +530,16 @@ function scrapePageData() {
            img.getAttribute('data-image') ||
            img.srcset?.split(',')[0]?.trim().split(' ')[0] ||
            '';
+  }
+  
+  // Check if image is the main product image (we don't want this as swatch)
+  function isMainProductImage(img, src, mainImageUrl) {
+    if (src === mainImageUrl) return true;
+    // Main images are usually large
+    const width = img.naturalWidth || img.width || 0;
+    const height = img.naturalHeight || img.height || 0;
+    if (width > 400 || height > 400) return true;
+    return false;
   }
   
   // Check if image is a navigation/icon element (NOT a swatch)
