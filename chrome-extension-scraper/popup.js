@@ -65,36 +65,72 @@ function scrapePageData() {
   const skuMatch = bodyText.match(/(?:SKU|Item)[:#\s]*([A-Z0-9][-A-Z0-9]{2,20})/i);
   if (skuMatch) data.sku = skuMatch[1].toUpperCase();
   
-  // Price - comprehensive search
-  let prices = [];
+  // === PRICE - UTTERMOST SPECIFIC ===
+  // On Uttermost, the price is in a sticky footer bar OR near "Add to Cart"
+  // Format: "$488.00" with "Suggested retail price $1,464.00"
   
-  // Method 1: Elements with "price" in class
-  document.querySelectorAll('[class*="price"], [class*="Price"]').forEach(el => {
-    const m = (el.innerText||'').match(/\$\s*([\d,]+\.?\d*)/g);
-    if (m) m.forEach(x => { const v = parseFloat(x.replace(/[$,]/g,'')); if (v > 10 && v < 500000) prices.push(v); });
-  });
+  console.log('=== STARTING PRICE DETECTION ===');
   
-  // Method 2: Look for price near common labels
-  document.querySelectorAll('*').forEach(el => {
-    const text = el.innerText?.trim() || '';
-    // Look for "Price:" or "Your Price:" patterns
-    if (text.match(/^(Your\s+)?Price:?\s*\$/i)) {
-      const m = text.match(/\$\s*([\d,]+\.?\d*)/);
-      if (m) { const v = parseFloat(m[1].replace(/,/g,'')); if (v > 10 && v < 500000) prices.push(v); }
+  // UTTERMOST: Look for the sticky bottom bar with price and "ADD TO CART"
+  // The structure is: $488.00 ... Suggested retail price $1,464.00 ... ADD TO CART
+  const addToCartBtn = document.querySelector('button[aria-label*="Add to Cart"], button:has(span:contains("ADD TO CART")), [class*="addToCart"] button');
+  if (addToCartBtn) {
+    // Find the container that has both price and add to cart
+    let priceContainer = addToCartBtn.closest('section, div, form');
+    if (priceContainer) {
+      const text = priceContainer.innerText || '';
+      console.log('Found Add to Cart container text:', text.substring(0, 200));
+      
+      // Look for dealer price (first price) and MSRP (after "Suggested retail price" or "MSRP")
+      const dealerPriceMatch = text.match(/^\s*\$\s*([\d,]+\.?\d*)/m);
+      const msrpMatch = text.match(/(?:Suggested retail price|MSRP|Retail)[:\s]*\$\s*([\d,]+\.?\d*)/i);
+      
+      if (dealerPriceMatch) {
+        data.price = parseFloat(dealerPriceMatch[1].replace(/,/g, ''));
+        console.log('Dealer price from Add to Cart area:', data.price);
+      }
+      if (msrpMatch) {
+        data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
+        console.log('MSRP from Add to Cart area:', data.msrp);
+      }
     }
-  });
+  }
   
-  // Method 3: Find any dollar amounts on the page in product area
-  const productArea = document.querySelector('[class*="productFullDetail"], [class*="product-detail"], main, article') || document.body;
-  const priceMatches = productArea.innerText.match(/\$\s*[\d,]+\.?\d*/g) || [];
-  priceMatches.forEach(p => {
-    const v = parseFloat(p.replace(/[$,\s]/g, ''));
-    if (v > 50 && v < 50000) prices.push(v); // Reasonable furniture price range
-  });
+  // Fallback: Look for price in the product form specifically (NOT in related products)
+  if (!data.price) {
+    const productForm = document.querySelector('form[class*="productFullDetail"], [class*="product-detail-form"], .product-info');
+    if (productForm) {
+      const formText = productForm.innerText || '';
+      const priceMatch = formText.match(/\$\s*([\d,]+\.?\d*)/);
+      if (priceMatch) {
+        data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
+        console.log('Price from product form:', data.price);
+      }
+    }
+  }
   
-  prices = [...new Set(prices)].sort((a,b)=>a-b);
-  console.log('Found prices:', prices);
-  if (prices.length) { data.price = prices[0]; if (prices.length > 1) data.msrp = prices[prices.length-1]; }
+  // Last resort: Find the FIRST price on the page that's near the product name/SKU
+  if (!data.price) {
+    const h1 = document.querySelector('h1');
+    if (h1) {
+      let searchArea = h1.closest('section, article, main') || h1.parentElement;
+      for (let i = 0; i < 5 && searchArea; i++) {
+        const text = searchArea.innerText || '';
+        const priceMatch = text.match(/\$\s*([\d,]+\.?\d*)/);
+        if (priceMatch) {
+          const price = parseFloat(priceMatch[1].replace(/,/g, ''));
+          if (price > 10 && price < 50000) {
+            data.price = price;
+            console.log('Price near H1:', data.price);
+            break;
+          }
+        }
+        searchArea = searchArea.parentElement;
+      }
+    }
+  }
+  
+  console.log('Final price:', data.price, 'MSRP:', data.msrp);
   
   // Size
   const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
