@@ -14796,34 +14796,51 @@ async def ai_scrape_product_v2(request: AIScraperRequestV2):
         chat = LlmChat(
             api_key=api_key,
             session_id=f"scrape-v2-{uuid.uuid4()}",
-            system_message="""You are a product data extraction expert for furniture/decor e-commerce websites.
+            system_message="""You are an expert at extracting product data from furniture/decor e-commerce websites.
 
-TASK 1: Extract product information from the page text.
-TASK 2: Select the CORRECT swatch/color image from the list of candidate images.
+TASK 1: EXTRACT PRODUCT INFO from the page text.
+TASK 2: SELECT THE CORRECT SWATCH/COLOR IMAGE from the candidate list.
 
-IMPORTANT FOR SWATCH SELECTION:
-- The swatch image should be a small color/material sample, NOT the main product photo
-- Look for images marked as "SELECTED" or "swatch-like"
-- Images with title/alt containing color names are likely swatches
-- Small square images near "color", "finish", "fabric" text are likely swatches
-- Return the INDEX number of the correct swatch image
+=== CRITICAL: HOW TO IDENTIFY A SWATCH IMAGE ===
+A SWATCH is a SMALL COLOR/MATERIAL SAMPLE thumbnail. It is NOT:
+- The main product photo (large hero image showing the full product)
+- A lifestyle/room scene image
+- A detail/zoom image of the product
+- A packaging or shipping image
 
-Return ONLY valid JSON:
+A SWATCH image IS:
+- A SMALL SQUARE (typically 30-80px) showing just a color/finish/fabric sample
+- Located near words like: "color", "finish", "fabric", "material", "option", "select color"
+- Has alt/title text containing color names (e.g., "Brass", "Natural Oak", "Blue Velvet")
+- Has data-color or similar attributes indicating it's a color selector
+- Part of a row/grid of similar small images representing different color options
+- Marked as "(SELECTED)" if it's the currently active color choice
+
+PRIORITY ORDER for swatch selection:
+1. Image marked "(SELECTED)" that is also "(swatch-like)" or "(small square)"
+2. Image with data-color attribute matching the product's finish/color
+3. "(swatch-like)" image with alt/title matching the product's color
+4. Any "(small square)" image near color/finish text
+5. null if no valid swatch is found (do NOT pick the main product image)
+
+=== OUTPUT FORMAT ===
+Return ONLY valid JSON (no markdown, no explanation):
 {
-  "name": "product name without color suffix",
-  "sku": "alphanumeric SKU code",
+  "name": "product name (exclude color suffix like '- Brass')",
+  "sku": "alphanumeric SKU/model number",
   "price": 123.45,
   "msrp": 456.78,
-  "size": "dimensions in W x H x D format",
-  "finish_color": "color or finish name",
+  "size": "W x H x D format with units",
+  "finish_color": "the color or finish name",
   "swatch_image_index": 0
 }
 
-Rules:
-- SKU must be alphanumeric with possible dashes (not words like "Information")
-- price is dealer/your price (lower), msrp is retail/list (higher)
-- finish_color is the color/fabric/finish name, NOT dimensions
-- swatch_image_index is the [index] of the correct swatch image from the list, or null if none found"""
+=== DATA EXTRACTION RULES ===
+- SKU: Alphanumeric code (may have dashes). NOT words like "Details" or "Information"
+- price: The lower price (dealer/net/your price)
+- msrp: The higher price (retail/list/MSRP)
+- finish_color: Color or finish name only, NOT dimensions or materials
+- swatch_image_index: The [index] number of the correct swatch, or null if none found"""
         ).with_model("openai", "gpt-4o-mini")
         
         # Build prompt
