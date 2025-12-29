@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Configuration - Use external URL from frontend .env
-BACKEND_URL = "https://decor-grab.preview.emergentagent.com/api"
+BACKEND_URL = "https://shopfetch-1.preview.emergentagent.com/api"
 
 class ComprehensiveBackendTester:
     def __init__(self):

@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://decor-grab.preview.emergentagent.com';
+const BACKEND_URL = 'https://shopfetch-1.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

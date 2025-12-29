@@ -313,7 +313,7 @@ async def scrape_fourhands_authenticated(num_products=5, max_attempts=50):
         print("="*80)
         print(f"✅ Success: {success}/{num_products}")
         print(f"❌ Failed: {failed}/{num_products}")
-        print(f"\n🔗 View: https://decor-grab.preview.emergentagent.com/furniture-search")
+        print(f"\n🔗 View: https://shopfetch-1.preview.emergentagent.com/furniture-search")
         print("="*80 + "\n")
     
     client.close()

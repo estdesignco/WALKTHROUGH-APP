@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://decor-grab.preview.emergentagent.com"
+BACKEND_URL = "https://shopfetch-1.preview.emergentagent.com"
 
 def test_single_url(vendor, url, expected_finish):
     """Test a single URL with detailed logging"""

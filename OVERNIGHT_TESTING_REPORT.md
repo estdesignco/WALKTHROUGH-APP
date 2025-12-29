@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://decor-grab.preview.emergentagent.com
+**System URL**: https://shopfetch-1.preview.emergentagent.com
 
 ---
 

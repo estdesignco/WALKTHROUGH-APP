@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://decor-grab.preview.emergentagent.com/email-template.html
+https://shopfetch-1.preview.emergentagent.com/email-template.html
 
 ---
 

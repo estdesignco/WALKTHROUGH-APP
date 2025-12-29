@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://decor-grab.preview.emergentagent.com/api
+https://shopfetch-1.preview.emergentagent.com/api
 ```
 
 ---
