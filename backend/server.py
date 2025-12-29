@@ -14745,6 +14745,7 @@ async def ai_scrape_product_v2(request: AIScraperRequestV2):
     AI-powered product scraping V2 - Uses AI for BOTH text extraction AND swatch image selection.
     """
     from emergentintegrations.llm.chat import LlmChat, UserMessage
+    import json as json_module
     
     try:
         api_key = os.environ.get('EMERGENT_LLM_KEY')
