@@ -14892,7 +14892,8 @@ Return JSON with product data and swatch_image_index (the [number] of the correc
             size=data.get('size'),
             finish_color=data.get('finish_color'),
             vendor=vendor,
-            swatch_image_url=swatch_url
+            swatch_image_url=swatch_url,
+            image_url=request.main_image  # Return the main product image
         )
         
     except Exception as e:
