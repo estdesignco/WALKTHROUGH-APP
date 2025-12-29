@@ -14595,6 +14595,120 @@ async def download_chrome_extension():
     
     raise HTTPException(status_code=404, detail="Extension file not found")
 
+# ============================================================================
+# AI-POWERED PRODUCT SCRAPER (Like Thunderbit)
+# ============================================================================
+
+class AIScraperRequest(BaseModel):
+    page_text: str  # The visible text content of the page
+    page_url: str   # The URL being scraped
+
+class AIScraperResponse(BaseModel):
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    price: Optional[float] = None
+    msrp: Optional[float] = None
+    size: Optional[str] = None
+    finish_color: Optional[str] = None
+    vendor: Optional[str] = None
+
+@api_router.post("/ai-scrape", response_model=AIScraperResponse)
+async def ai_scrape_product(request: AIScraperRequest):
+    """
+    AI-powered product scraping using GPT to intelligently extract product data.
+    This works like Thunderbit - using AI to understand page content.
+    """
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    
+    try:
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="AI key not configured")
+        
+        # Extract vendor from URL
+        from urllib.parse import urlparse
+        domain = urlparse(request.page_url).hostname or ''
+        domain = domain.replace('www.', '')
+        vendor = domain.split('.')[0].title()
+        
+        # Clean up vendor names
+        vendor_map = {
+            'Loloirugs': 'Loloi',
+            'Fourhands': 'Four Hands',
+            'Hvlgroup': 'Hudson Valley',
+            'Visualcomfort': 'Visual Comfort'
+        }
+        vendor = vendor_map.get(vendor, vendor)
+        
+        # Truncate page text to avoid token limits (keep first 8000 chars)
+        page_text = request.page_text[:8000] if len(request.page_text) > 8000 else request.page_text
+        
+        # Create the AI chat
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"scrape-{uuid.uuid4()}",
+            system_message="""You are a product data extraction expert for interior design and furniture websites.
+Extract the following information from the product page text provided.
+Return ONLY a valid JSON object with these exact fields (use null for missing values):
+{
+  "name": "product name",
+  "sku": "SKU or item number (alphanumeric code like 23878, ABC-123, F3102-BRZ)",
+  "price": 123.45,
+  "msrp": 456.78,
+  "size": "dimensions like 30 W X 27 H X 32 D",
+  "finish_color": "color or finish name like Ginger, Bronze, Charcoal, Natural/Espresso"
+}
+
+IMPORTANT RULES:
+- SKU should be a product code (letters and numbers), NOT words like "Information" or "Global"
+- Price should be the dealer/your price (lower price), MSRP is the retail/list price (higher price)
+- Finish/Color is the material finish, fabric, or color - NOT dimensions or sizes
+- Size should be dimensions in inches (W x H x D format)
+- Return ONLY the JSON, no explanation or markdown"""
+        ).with_model("openai", "gpt-4o-mini")
+        
+        # Send the page text to AI
+        user_message = UserMessage(
+            text=f"Extract product information from this furniture/decor product page:\n\n{page_text}"
+        )
+        
+        response = await chat.send_message(user_message)
+        
+        # Parse the JSON response
+        import json
+        # Clean up response - remove markdown code blocks if present
+        response_text = response.strip()
+        if response_text.startswith('```'):
+            response_text = response_text.split('\n', 1)[1]  # Remove first line
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            response_text = response_text.strip()
+        
+        try:
+            data = json.loads(response_text)
+        except json.JSONDecodeError:
+            # Try to extract JSON from the response
+            json_match = re.search(r'\{[^{}]*\}', response_text, re.DOTALL)
+            if json_match:
+                data = json.loads(json_match.group())
+            else:
+                logger.error(f"Failed to parse AI response: {response_text}")
+                data = {}
+        
+        return AIScraperResponse(
+            name=data.get('name'),
+            sku=data.get('sku'),
+            price=float(data['price']) if data.get('price') else None,
+            msrp=float(data['msrp']) if data.get('msrp') else None,
+            size=data.get('size'),
+            finish_color=data.get('finish_color'),
+            vendor=vendor
+        )
+        
+    except Exception as e:
+        logger.error(f"AI scrape error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @api_router.get("/backup/full")
