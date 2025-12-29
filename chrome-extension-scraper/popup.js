@@ -434,7 +434,7 @@ async function doScrape() {
       size: aiData.size,
       finish_color: aiData.finish_color,
       vendor: aiData.vendor,
-      image_url: pageData.mainProductImage,
+      image_url: aiData.image_url || pageData.mainProductImage,  // Use API response or fallback to local detection
       finish_image: aiData.swatch_image_url
     };
     
