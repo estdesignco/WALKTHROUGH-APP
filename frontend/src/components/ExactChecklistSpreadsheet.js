@@ -1310,6 +1310,31 @@ const ExactChecklistSpreadsheet = ({
   return (
     <div className="w-full" style={{ backgroundColor: '#0F172A' }}>
       
+      {/* SCRAPER CLIPBOARD NOTIFICATION - Shows when data is ready to paste */}
+      {scraperClipboard && showScraperNotification && (
+        <div className="mb-4 p-4 bg-gradient-to-r from-green-900 to-green-800 border border-green-500 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="text-green-400 font-bold text-lg">📋 SCRAPED DATA READY TO PASTE!</div>
+              <div className="text-white text-sm mt-1">
+                <span className="font-semibold">{scraperClipboard.name}</span>
+                {scraperClipboard.vendor && <span className="text-gray-300"> • {scraperClipboard.vendor}</span>}
+                {scraperClipboard.price && <span className="text-green-400"> • ${scraperClipboard.price}</span>}
+                {scraperClipboard.finish_color && <span className="text-amber-400"> • {scraperClipboard.finish_color}</span>}
+              </div>
+              <div className="text-gray-400 text-xs mt-1">👆 Click the <span className="text-green-400 font-bold">📋 PASTE</span> button on any item row to apply this data</div>
+            </div>
+            <button
+              onClick={clearScrapedData}
+              className="ml-4 bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-sm"
+              title="Clear scraped data"
+            >
+              ✕ Clear
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* ENHANCED FILTER SECTION - MATCHING FFE FUNCTIONALITY */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
         <div className="flex flex-col lg:flex-row gap-4 items-center">
