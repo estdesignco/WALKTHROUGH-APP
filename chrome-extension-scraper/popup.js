@@ -198,7 +198,8 @@ function scrapePageData() {
   });
   
   // Also check for prices near "Add to Cart" button
-  const addToCartBtn = document.querySelector('button[class*="add-to-cart"], button[class*="addtocart"], [data-action="add-to-cart"], button:has-text("Add to Cart")');
+  const addToCartBtn = document.querySelector('button[class*="add-to-cart"], button[class*="addtocart"], [data-action="add-to-cart"]') || 
+                       Array.from(document.querySelectorAll('button')).find(b => /add to cart/i.test(b.innerText));
   if (addToCartBtn) {
     const container = addToCartBtn.closest('div, section, form');
     if (container) {
