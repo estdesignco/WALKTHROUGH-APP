@@ -64,6 +64,116 @@ const ExactChecklistSpreadsheet = ({
   const [filteredProject, setFilteredProject] = useState(project);
   const [showCanvaModal, setShowCanvaModal] = useState(false);
   
+  // SCRAPER CLIPBOARD STATE
+  const [scraperClipboard, setScraperClipboard] = useState(null);
+  const [showScraperNotification, setShowScraperNotification] = useState(false);
+  
+  // Check for URL parameters from extension (action=add-item&source=extension)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'add-item' && params.get('source') === 'extension') {
+      const scrapedData = {
+        name: params.get('name') || '',
+        price: params.get('price') || '',
+        sku: params.get('sku') || '',
+        size: params.get('size') || '',
+        finish_color: params.get('finish') || '',
+        finish_image: params.get('finish_image') || '',
+        vendor: params.get('vendor') || '',
+        url: params.get('link') || '',
+        link: params.get('link') || '',
+        image_url: params.get('image') || '',
+        msrp: params.get('msrp') || ''
+      };
+      
+      // Only store if we have actual data
+      if (scrapedData.name || scrapedData.sku || scrapedData.price) {
+        localStorage.setItem('extensionScrapedData', JSON.stringify(scrapedData));
+        console.log('✅ Stored scraper data from URL:', scrapedData);
+        
+        // Set clipboard immediately
+        setScraperClipboard(scrapedData);
+        setShowScraperNotification(true);
+        
+        // Clean URL without reloading
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    }
+  }, []);
+  
+  // Check for scraped data in localStorage on mount
+  useEffect(() => {
+    const data = localStorage.getItem('extensionScrapedData');
+    if (data) {
+      try {
+        const parsed = JSON.parse(data);
+        setScraperClipboard(parsed);
+        setShowScraperNotification(true);
+        console.log('📋 Loaded scraper data from localStorage:', parsed);
+      } catch (e) {
+        console.error('Failed to parse scraper data:', e);
+      }
+    }
+  }, []);
+  
+  // Handle paste scraped data into a specific item row
+  const handlePasteScrapedData = async (itemId) => {
+    if (!scraperClipboard) {
+      alert('No scraped data to paste. Use the extension to scrape a product first.');
+      return;
+    }
+    
+    try {
+      const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+      
+      const updateData = {
+        name: scraperClipboard.name || undefined,
+        vendor: scraperClipboard.vendor || undefined,
+        sku: scraperClipboard.sku || undefined,
+        cost: scraperClipboard.price ? parseFloat(scraperClipboard.price) : undefined,
+        size: scraperClipboard.size || undefined,
+        finish_color: scraperClipboard.finish_color || undefined,
+        finish_image: scraperClipboard.finish_image || undefined,
+        image_url: scraperClipboard.image_url || undefined,
+        link: scraperClipboard.link || scraperClipboard.url || undefined
+      };
+      
+      // Remove undefined values
+      Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+      
+      if (response.ok) {
+        // Clear the clipboard after successful paste
+        localStorage.removeItem('extensionScrapedData');
+        setScraperClipboard(null);
+        setShowScraperNotification(false);
+        
+        alert(`✅ Pasted: ${scraperClipboard.name || 'Product data'}\n\nVendor: ${updateData.vendor || 'N/A'}\nPrice: $${updateData.cost || 'N/A'}\nFinish: ${updateData.finish_color || 'N/A'}`);
+        
+        // Reload to show updated data
+        if (onReload) onReload();
+      } else {
+        throw new Error('Failed to update item');
+      }
+    } catch (error) {
+      console.error('Error pasting scraped data:', error);
+      alert('❌ Failed to paste data. Please try again.');
+    }
+  };
+  
+  // Clear scraped data
+  const clearScrapedData = () => {
+    localStorage.removeItem('extensionScrapedData');
+    setScraperClipboard(null);
+    setShowScraperNotification(false);
+  };
+  
   // Room photos state - for displaying walkthrough photos above each room
   const [roomPhotos, setRoomPhotos] = useState({});
   const [expandedPhotoRooms, setExpandedPhotoRooms] = useState({});
