@@ -5650,7 +5650,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 import json
                 for script_content in json_ld_scripts:
                     try:
-                        data = json.loads(script_content)
+                        data = json_module.loads(script_content)
                         if isinstance(data, dict):
                             # Check for direct price
                             if 'offers' in data and isinstance(data['offers'], dict):
@@ -5914,7 +5914,7 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                     import json
                     for script_content in json_ld:
                         try:
-                            data = json.loads(script_content)
+                            data = json_module.loads(script_content)
                             if isinstance(data, dict) and 'image' in data:
                                 img_url = data['image'] if isinstance(data['image'], str) else data['image'][0]
                                 if img_url and not img_url.endswith('.svg'):
@@ -14685,12 +14685,12 @@ IMPORTANT RULES:
             response_text = response_text.strip()
         
         try:
-            data = json.loads(response_text)
+            data = json_module.loads(response_text)
         except json.JSONDecodeError:
             # Try to extract JSON from the response
             json_match = re.search(r'\{[^{}]*\}', response_text, re.DOTALL)
             if json_match:
-                data = json.loads(json_match.group())
+                data = json_module.loads(json_match.group())
             else:
                 logger.error(f"Failed to parse AI response: {response_text}")
                 data = {}
@@ -14848,11 +14848,11 @@ Return JSON with product data and swatch_image_index (the [number] of the correc
             response_text = response_text.strip()
         
         try:
-            data = json.loads(response_text)
+            data = json_module.loads(response_text)
         except json.JSONDecodeError:
             json_match = re.search(r'\{[^{}]*\}', response_text, re.DOTALL)
             if json_match:
-                data = json.loads(json_match.group())
+                data = json_module.loads(json_match.group())
             else:
                 data = {}
         
@@ -14946,7 +14946,7 @@ async def create_full_backup():
         
         # Return as downloadable JSON
         from fastapi.responses import Response
-        json_content = json.dumps(backup_data, indent=2, default=str)
+        json_content = json_module.dumps(backup_data, indent=2, default=str)
         
         return Response(
             content=json_content,
@@ -14968,7 +14968,7 @@ async def backup_contacts():
         contacts = await db.master_contacts.find({}, {"_id": 0}).to_list(10000)
         
         return Response(
-            content=json.dumps(contacts, indent=2, default=str),
+            content=json_module.dumps(contacts, indent=2, default=str),
             media_type="application/json",
             headers={
                 "Content-Disposition": "attachment; filename=contacts_backup.json"
@@ -14986,7 +14986,7 @@ async def backup_materials():
         materials = await db.master_materials.find({}, {"_id": 0}).to_list(10000)
         
         return Response(
-            content=json.dumps(materials, indent=2, default=str),
+            content=json_module.dumps(materials, indent=2, default=str),
             media_type="application/json",
             headers={
                 "Content-Disposition": "attachment; filename=materials_backup.json"
@@ -15004,7 +15004,7 @@ async def backup_projects():
         projects = await db.projects.find({}, {"_id": 0}).to_list(1000)
         
         return Response(
-            content=json.dumps(projects, indent=2, default=str),
+            content=json_module.dumps(projects, indent=2, default=str),
             media_type="application/json",
             headers={
                 "Content-Disposition": "attachment; filename=projects_backup.json"
