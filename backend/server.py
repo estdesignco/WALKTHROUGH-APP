@@ -14738,6 +14738,7 @@ class AIScraperResponseV2(BaseModel):
     finish_color: Optional[str] = None
     vendor: Optional[str] = None
     swatch_image_url: Optional[str] = None
+    image_url: Optional[str] = None  # Main product image
 
 @api_router.post("/ai-scrape-v2", response_model=AIScraperResponseV2)
 async def ai_scrape_product_v2(request: AIScraperRequestV2):
