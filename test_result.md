@@ -1254,3 +1254,37 @@ Rebuilt the Chrome Extension (`/app/chrome-extension-scraper/`) with:
 - Extension runs in user's browser with active login session
 - Extension can see prices that require authentication
 
+
+---
+
+## Test Session: December 29, 2025
+
+### Issues Fixed This Session
+
+1. **FIXED: Backend AI Scraper Crash (P0)**
+   - Root cause: `NameError: name 'json' is not defined` in `/api/ai-scrape-v2`
+   - Fix: Changed `import json as json_module` to `import json` at line 14749 of server.py
+   - Status: ✅ VERIFIED WORKING via curl tests
+
+2. **IMPROVED: AI Scraper Prompt (P0)**
+   - Enhanced system prompt to better distinguish main product images from swatch images
+   - Added explicit priority order for swatch selection
+   - Added detailed criteria for identifying swatch vs product images
+   - Status: ✅ TESTED - correctly selects swatch images in test scenarios
+
+3. **FIXED: API Limit Bug (P1)**
+   - Changed default limit from 100 to 10000 in `/api/master/contacts` endpoint
+   - File: `/app/backend/master_database_api.py` line 60
+   - Status: ✅ Fixed
+
+### Endpoints to Test
+| Endpoint | Method | Expected |
+|----------|--------|----------|
+| `/api/ai-scrape-v2` | POST | Returns product data with correct swatch selection |
+| `/api/master/contacts` | GET | Returns all contacts (no 100 limit) |
+
+### Incorporate User Feedback
+- User was frustrated with repeated testing failures
+- User wants agent to test thoroughly before handing back
+- Focus on real-world vendor scenarios for scraper testing
+
