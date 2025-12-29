@@ -975,6 +975,7 @@ class ItemUpdate(BaseModel):
     size: Optional[str] = None
     remarks: Optional[str] = None
     vendor: Optional[str] = None
+    sku: Optional[str] = None  # Added for scraper paste
     status: Optional[ItemStatus] = None
     cost: Optional[float] = None
     link: Optional[str] = None
@@ -982,6 +983,7 @@ class ItemUpdate(BaseModel):
     order_date: Optional[datetime] = None
     install_date: Optional[datetime] = None
     image_url: Optional[str] = None
+    finish_image: Optional[str] = None  # Added for scraper paste - swatch image
     carrier: Optional[str] = None
     stock_status: Optional[str] = None
     stock_quantity: Optional[int] = None
