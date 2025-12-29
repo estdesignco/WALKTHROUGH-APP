@@ -2212,20 +2212,32 @@ const ExactChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
-                                  {/* FINISH/COLOR - EDITABLE */}
+                                  {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
-                                      onBlur={(e) => {
-                                        const newValue = e.target.textContent;
-                                        if (newValue !== item.finish_color) {
-                                          handleUpdateItemField(item.id, 'finish_color', newValue);
-                                        }
-                                      }}
-                                    >
-                                      {item.finish_color || ''}
+                                    <div className="flex items-center gap-2">
+                                      {/* Swatch Image */}
+                                      {item.finish_image && (
+                                        <img 
+                                          src={item.finish_image} 
+                                          alt={item.finish_color || 'Swatch'} 
+                                          className="w-8 h-8 rounded border border-[#B49B7E] object-cover flex-shrink-0"
+                                          onError={(e) => { e.target.style.display = 'none'; }}
+                                        />
+                                      )}
+                                      {/* Color Name - Editable */}
+                                      <div 
+                                        contentEditable={true}
+                                        suppressContentEditableWarning={true}
+                                        className="flex-1 bg-transparent text-[#D4C5A9] text-sm outline-none"
+                                        onBlur={(e) => {
+                                          const newValue = e.target.textContent;
+                                          if (newValue !== item.finish_color) {
+                                            handleUpdateItemField(item.id, 'finish_color', newValue);
+                                          }
+                                        }}
+                                      >
+                                        {item.finish_color || ''}
+                                      </div>
                                     </div>
                                   </td>
                                   
