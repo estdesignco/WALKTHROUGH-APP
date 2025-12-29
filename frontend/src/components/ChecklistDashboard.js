@@ -28,6 +28,36 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   const [syncStatus, setSyncStatus] = useState(null);
   const [syncing, setSyncing] = useState(false);
   
+  // ✅ Check for URL parameters from extension and store in localStorage
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('action') === 'add-item' && params.get('source') === 'extension') {
+      const scrapedData = {
+        name: params.get('name') || '',
+        price: params.get('price') || '',
+        sku: params.get('sku') || '',
+        size: params.get('size') || '',
+        finish_color: params.get('finish') || '',
+        finish_image: params.get('finish_image') || '',
+        vendor: params.get('vendor') || '',
+        url: params.get('link') || '',
+        link: params.get('link') || '',
+        image_url: params.get('image') || '',
+        msrp: params.get('msrp') || ''
+      };
+      
+      // Store if we have actual data
+      if (scrapedData.name || scrapedData.sku || scrapedData.price) {
+        localStorage.setItem('extensionScrapedData', JSON.stringify(scrapedData));
+        console.log('✅ ChecklistDashboard: Stored scraper data from URL:', scrapedData);
+        
+        // Clean URL without reloading
+        const cleanUrl = window.location.pathname;
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    }
+  }, []);
+  
   useEffect(() => {
     if (projectId) {
       console.log('🚀 Loading project:', projectId);
