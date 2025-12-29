@@ -14709,6 +14709,194 @@ IMPORTANT RULES:
         logger.error(f"AI scrape error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================================================
+# AI-POWERED PRODUCT SCRAPER V2 - With Swatch Image Selection
+# ============================================================================
+
+class ImageInfo(BaseModel):
+    url: str
+    type: str = "img"
+    width: int = 0
+    height: int = 0
+    isSwatchLike: bool = False
+    isSelected: bool = False
+    isSmallSquare: bool = False
+    context: dict = {}
+
+class AIScraperRequestV2(BaseModel):
+    page_text: str
+    page_url: str
+    all_images: List[ImageInfo] = []
+    main_image: Optional[str] = None
+
+class AIScraperResponseV2(BaseModel):
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    price: Optional[float] = None
+    msrp: Optional[float] = None
+    size: Optional[str] = None
+    finish_color: Optional[str] = None
+    vendor: Optional[str] = None
+    swatch_image_url: Optional[str] = None
+
+@api_router.post("/ai-scrape-v2", response_model=AIScraperResponseV2)
+async def ai_scrape_product_v2(request: AIScraperRequestV2):
+    """
+    AI-powered product scraping V2 - Uses AI for BOTH text extraction AND swatch image selection.
+    """
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    
+    try:
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            raise HTTPException(status_code=500, detail="AI key not configured")
+        
+        # Extract vendor from URL
+        from urllib.parse import urlparse
+        domain = urlparse(request.page_url).hostname or ''
+        domain = domain.replace('www.', '')
+        vendor = domain.split('.')[0].title()
+        
+        vendor_map = {
+            'Loloirugs': 'Loloi', 'Fourhands': 'Four Hands', 'Hvlgroup': 'Hudson Valley',
+            'Visualcomfort': 'Visual Comfort', 'Globalviews': 'Global Views',
+            'Reginaandrew': 'Regina Andrew', 'Crestviewcollection': 'Crestview'
+        }
+        vendor = vendor_map.get(vendor, vendor)
+        
+        # Truncate page text
+        page_text = request.page_text[:8000] if len(request.page_text) > 8000 else request.page_text
+        
+        # Prepare image info for AI
+        image_descriptions = []
+        for i, img in enumerate(request.all_images[:20]):  # Limit to 20 images
+            desc = f"[{i}] URL: {img.url[:100]}..."
+            if img.isSelected:
+                desc += " (SELECTED)"
+            if img.isSwatchLike:
+                desc += " (swatch-like)"
+            if img.isSmallSquare:
+                desc += " (small square)"
+            if img.context:
+                if img.context.get('title'):
+                    desc += f" title='{img.context['title']}'"
+                if img.context.get('alt'):
+                    desc += f" alt='{img.context['alt']}'"
+                if img.context.get('dataColor'):
+                    desc += f" data-color='{img.context['dataColor']}'"
+                if img.context.get('nearbyText'):
+                    desc += f" nearby='{img.context['nearbyText'][:50]}'"
+            image_descriptions.append(desc)
+        
+        images_text = "\n".join(image_descriptions) if image_descriptions else "No swatch images found"
+        
+        # Create AI chat
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"scrape-v2-{uuid.uuid4()}",
+            system_message="""You are a product data extraction expert for furniture/decor e-commerce websites.
+
+TASK 1: Extract product information from the page text.
+TASK 2: Select the CORRECT swatch/color image from the list of candidate images.
+
+IMPORTANT FOR SWATCH SELECTION:
+- The swatch image should be a small color/material sample, NOT the main product photo
+- Look for images marked as "SELECTED" or "swatch-like"
+- Images with title/alt containing color names are likely swatches
+- Small square images near "color", "finish", "fabric" text are likely swatches
+- Return the INDEX number of the correct swatch image
+
+Return ONLY valid JSON:
+{
+  "name": "product name without color suffix",
+  "sku": "alphanumeric SKU code",
+  "price": 123.45,
+  "msrp": 456.78,
+  "size": "dimensions in W x H x D format",
+  "finish_color": "color or finish name",
+  "swatch_image_index": 0
+}
+
+Rules:
+- SKU must be alphanumeric with possible dashes (not words like "Information")
+- price is dealer/your price (lower), msrp is retail/list (higher)
+- finish_color is the color/fabric/finish name, NOT dimensions
+- swatch_image_index is the [index] of the correct swatch image from the list, or null if none found"""
+        ).with_model("openai", "gpt-4o-mini")
+        
+        # Build prompt
+        prompt = f"""Extract product data and select the correct swatch image:
+
+PAGE TEXT:
+{page_text}
+
+CANDIDATE SWATCH IMAGES:
+{images_text}
+
+Return JSON with product data and swatch_image_index (the [number] of the correct swatch image, or null)."""
+        
+        user_message = UserMessage(text=prompt)
+        response = await chat.send_message(user_message)
+        
+        # Parse response
+        response_text = response.strip()
+        if response_text.startswith('```'):
+            response_text = response_text.split('\n', 1)[1]
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            response_text = response_text.strip()
+        
+        try:
+            data = json.loads(response_text)
+        except json.JSONDecodeError:
+            json_match = re.search(r'\{[^{}]*\}', response_text, re.DOTALL)
+            if json_match:
+                data = json.loads(json_match.group())
+            else:
+                data = {}
+        
+        # Get swatch image URL from index
+        swatch_url = None
+        swatch_index = data.get('swatch_image_index')
+        if swatch_index is not None and isinstance(swatch_index, int):
+            if 0 <= swatch_index < len(request.all_images):
+                swatch_url = request.all_images[swatch_index].url
+        
+        # Fallback: if AI didn't pick one, use best candidate
+        if not swatch_url:
+            # Prefer selected swatch-like images
+            for img in request.all_images:
+                if img.isSelected and img.isSwatchLike:
+                    swatch_url = img.url
+                    break
+            # Then any swatch-like image
+            if not swatch_url:
+                for img in request.all_images:
+                    if img.isSwatchLike:
+                        swatch_url = img.url
+                        break
+            # Then any small square image
+            if not swatch_url:
+                for img in request.all_images:
+                    if img.isSmallSquare:
+                        swatch_url = img.url
+                        break
+        
+        return AIScraperResponseV2(
+            name=data.get('name'),
+            sku=data.get('sku'),
+            price=float(data['price']) if data.get('price') else None,
+            msrp=float(data['msrp']) if data.get('msrp') else None,
+            size=data.get('size'),
+            finish_color=data.get('finish_color'),
+            vendor=vendor,
+            swatch_image_url=swatch_url
+        )
+        
+    except Exception as e:
+        logger.error(f"AI scrape v2 error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @api_router.get("/backup/full")
