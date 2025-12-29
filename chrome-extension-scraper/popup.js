@@ -287,8 +287,8 @@ async function sendToApp() {
     if(scrapedData.image_url) params.set('image',scrapedData.image_url);
     if(scrapedData.msrp) params.set('msrp',scrapedData.msrp);
     
-    // Go directly to the selected project's checklist
-    const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
+    // Go directly to the selected project's checklist page
+    const projectUrl = `${APP_URL}/checklist/${selectedProjectId}?${params.toString()}`;
     
     window.open(projectUrl, '_blank');
     showStatus('Sent to project!', 'success');
