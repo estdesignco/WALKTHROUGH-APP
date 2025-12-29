@@ -372,13 +372,32 @@ async function doScrape() {
     console.log('Page data:', pageData);
     showStatus('🤖 AI analyzing product...', 'info');
     
-    // Call AI backend for text extraction
-    const response = await fetch(`${BACKEND_URL}/api/ai-scrape`, {
+    // Prepare image data for AI v2 endpoint
+    const allImages = (pageData.swatchImages || []).map((img, idx) => ({
+      url: img.url,
+      type: img.type || 'img',
+      width: 50,  // Swatches are small
+      height: 50,
+      isSwatchLike: true,
+      isSelected: img.isSelected || false,
+      isSmallSquare: true,
+      context: {
+        alt: img.colorName || '',
+        title: img.colorName || '',
+        dataColor: img.colorName?.toLowerCase().replace(/\s+/g, '-') || '',
+        nearbyText: 'Select Finish'
+      }
+    }));
+    
+    // Call AI backend v2 for BOTH text extraction AND swatch selection
+    const response = await fetch(`${BACKEND_URL}/api/ai-scrape-v2`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         page_text: pageData.pageText,
-        page_url: pageData.pageUrl
+        page_url: pageData.pageUrl,
+        all_images: allImages,
+        main_image: pageData.mainProductImage || ''
       })
     });
     
@@ -388,11 +407,10 @@ async function doScrape() {
     }
     
     const aiData = await response.json();
-    console.log('AI data:', aiData);
+    console.log('AI v2 data:', aiData);
     
-    // Use our improved image detection, NOT the AI's
-    // Main image = large product photo
-    // Swatch image = small color chip from swatch area ONLY
+    // AI v2 returns BOTH product data AND best swatch selection
+    // Use client-side detection as fallback if AI doesn't find swatch
     const finalData = {
       url: pageData.pageUrl,
       name: aiData.name,
@@ -400,10 +418,10 @@ async function doScrape() {
       price: aiData.price,
       msrp: aiData.msrp,
       size: aiData.size,
-      finish_color: pageData.detectedSwatchName || aiData.finish_color,
+      finish_color: aiData.finish_color || pageData.detectedSwatchName,
       vendor: aiData.vendor,
-      image_url: pageData.mainProductImage,  // ALWAYS the large product photo
-      finish_image: pageData.detectedSwatchUrl  // ONLY small swatch from swatch area
+      image_url: pageData.mainProductImage || aiData.image_url,  // Main product photo
+      finish_image: aiData.swatch_image_url || pageData.detectedSwatchUrl  // AI-selected or client-detected swatch
     };
     
     console.log('Final data:', finalData);
