@@ -142,11 +142,17 @@ const ExactChecklistSpreadsheet = ({
       // Remove undefined values
       Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
       
+      console.log('📋 Pasting data:', updateData);
+      console.log('📋 Original clipboard:', scraperClipboard);
+      
       const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData)
       });
+      
+      const responseData = await response.json();
+      console.log('📋 API Response:', responseData);
       
       if (response.ok) {
         // Clear the clipboard after successful paste
