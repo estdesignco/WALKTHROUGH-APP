@@ -57,7 +57,7 @@ async def create_master_contact(contact: MasterContactCreate):
 async def get_master_contacts(
     search: Optional[str] = None,
     role: Optional[str] = None,
-    limit: int = 100
+    limit: int = 10000
 ):
     """Get all master contacts with optional search/filter"""
     query = {}
