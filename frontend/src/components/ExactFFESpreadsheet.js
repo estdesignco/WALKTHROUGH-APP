@@ -1828,20 +1828,23 @@ const ExactFFESpreadsheet = ({
                                                           
                                                           {/* ACTIONS - PASTE & DELETE */}
                                                           <td className="border border-[#B49B7E] px-2 py-2 text-center">
-                                                            <div className="flex items-center justify-center gap-1">
-                                                              {/* PASTE BUTTON - Only shows when scraper data is available */}
-                                                              {scraperClipboard && (
-                                                                <button 
-                                                                  onClick={() => handlePasteScrapedData(item.id)}
-                                                                  className="bg-green-600 hover:bg-green-500 text-white text-xs px-2 py-1 rounded animate-pulse"
-                                                                  title={`Paste: ${scraperClipboard.name}`}
-                                                                >
-                                                                  📋
-                                                                </button>
-                                                              )}
+                                                            <div className="flex items-center justify-center gap-2">
+                                                              {/* PASTE BUTTON - Always visible, enabled when scraper data is available */}
+                                                              <button 
+                                                                onClick={() => scraperClipboard && handlePasteScrapedData(item.id)}
+                                                                disabled={!scraperClipboard}
+                                                                className={`text-white text-xs px-3 py-1.5 rounded font-bold ${
+                                                                  scraperClipboard 
+                                                                    ? 'bg-green-600 hover:bg-green-500 animate-pulse cursor-pointer' 
+                                                                    : 'bg-gray-600 opacity-50 cursor-not-allowed'
+                                                                }`}
+                                                                title={scraperClipboard ? `Paste: ${scraperClipboard.name}` : 'No data to paste - scrape a product first'}
+                                                              >
+                                                                📋 PASTE
+                                                              </button>
                                                               <button 
                                                                 onClick={() => handleDeleteItem(item.id)}
-                                                                className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1 rounded"
+                                                                className="bg-red-600 hover:bg-red-500 text-white text-xs px-2 py-1.5 rounded"
                                                                 title="Delete Item"
                                                               >
                                                                 🗑️
