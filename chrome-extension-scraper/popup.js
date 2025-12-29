@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v5.2
-// Clean rebuild - SPECIFIC targeting for Uttermost
-// Added: Project selector dropdown with persistence
+// Design Ready Product Scraper v6.0
+// UNIVERSAL SCRAPER - Works on ANY vendor site
+// No site-specific code - uses intelligent pattern detection
 
 const APP_URL = 'https://decor-grab.preview.emergentagent.com';
 const BACKEND_URL = 'https://decor-grab.preview.emergentagent.com';
@@ -25,7 +25,6 @@ async function loadProjects() {
     if (!response.ok) throw new Error('Failed to load projects');
     const projects = await response.json();
     
-    // Clear and populate dropdown
     projectSelector.innerHTML = '<option value="">-- Select a Project --</option>';
     projects.forEach(project => {
       const option = document.createElement('option');
@@ -34,7 +33,6 @@ async function loadProjects() {
       projectSelector.appendChild(option);
     });
     
-    // Restore previously selected project
     const stored = await chrome.storage.local.get('selectedProjectId');
     if (stored.selectedProjectId) {
       projectSelector.value = stored.selectedProjectId;
@@ -46,14 +44,11 @@ async function loadProjects() {
   }
 }
 
-// Save selected project when changed
 projectSelector?.addEventListener('change', async () => {
   selectedProjectId = projectSelector.value;
   await chrome.storage.local.set({ selectedProjectId: selectedProjectId });
-  console.log('Saved project selection:', selectedProjectId);
 });
 
-// Load projects on popup open
 loadProjects();
 
 function showStatus(message, type = 'info') {
@@ -86,6 +81,9 @@ function displayResults(data) {
   document.getElementById('dataUrl').textContent = data.url || 'Not found';
 }
 
+// ============================================
+// UNIVERSAL SCRAPING FUNCTION - Works on ANY site
+// ============================================
 function scrapePageData() {
   const data = {
     url: window.location.href,
@@ -101,147 +99,320 @@ function scrapePageData() {
   };
 
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
+  const pageText = document.body.innerText || '';
   
-  // VENDOR
-  if (domain.includes('uttermost')) data.vendor = 'Uttermost';
-  else if (domain.includes('visualcomfort')) data.vendor = 'Visual Comfort';
-  else if (domain.includes('fourhands')) data.vendor = 'Four Hands';
-  else if (domain.includes('bernhardt')) data.vendor = 'Bernhardt';
-  else data.vendor = domain.split('.')[0];
-
-  // PRODUCT NAME - from H1
+  // ============================================
+  // 1. VENDOR - Extract from domain
+  // ============================================
+  const domainParts = domain.split('.');
+  data.vendor = domainParts[0].charAt(0).toUpperCase() + domainParts[0].slice(1);
+  
+  // ============================================
+  // 2. PRODUCT NAME - Usually in H1
+  // ============================================
   const h1 = document.querySelector('h1');
   if (h1) data.name = h1.innerText.trim();
-
-  // SKU - look for "SKU:" text
-  const skuEl = document.querySelector('[class*="productSku"], [class*="sku"]');
-  if (skuEl) {
-    const skuMatch = skuEl.innerText.match(/SKU[:\s]*(\w+)/i);
-    if (skuMatch) data.sku = skuMatch[1];
+  
+  // Fallback: og:title or title tag
+  if (!data.name) {
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) data.name = ogTitle.content;
   }
+  if (!data.name) {
+    data.name = document.title.split('|')[0].split('-')[0].trim();
+  }
+
+  // ============================================
+  // 3. SKU - Look for common patterns
+  // ============================================
+  const skuPatterns = [
+    /(?:SKU|Item\s*#?|Style\s*#?|Model\s*#?|Product\s*#?)[:\s]*([A-Z0-9][-A-Z0-9]{2,20})/i,
+    /(?:Item|Style|Model|SKU)[:\s#]*(\d{4,10})/i
+  ];
+  
+  for (const pattern of skuPatterns) {
+    const match = pageText.match(pattern);
+    if (match) {
+      data.sku = match[1].trim();
+      break;
+    }
+  }
+  
+  // Also check meta tags and structured data
   if (!data.sku) {
-    const bodyText = document.body.innerText;
-    const skuMatch = bodyText.match(/SKU[:\s]*(\d+)/i);
-    if (skuMatch) data.sku = skuMatch[1];
+    const skuMeta = document.querySelector('meta[property="product:sku"], meta[name="sku"]');
+    if (skuMeta) data.sku = skuMeta.content;
   }
 
-  // DIMENSIONS - "30 W X 27 H X 32 D"
-  const bodyText = document.body.innerText;
-  const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
-  if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
-
-  // PRICE & MSRP - Search the entire page text
-  // Uttermost format: "$488.00" and "Suggested retail price $1,464.00"
-  const pageText = document.body.innerText;
+  // ============================================
+  // 4. PRICE & MSRP - Smart detection
+  // ============================================
+  // Look for MSRP/Retail price first (it's usually labeled)
+  const msrpPatterns = [
+    /(?:MSRP|Retail|Suggested\s*(?:retail)?\s*price|List\s*price|Regular\s*price)[:\s]*\$\s*([\d,]+\.?\d*)/i,
+    /\$\s*([\d,]+\.?\d*)\s*(?:MSRP|Retail|List)/i
+  ];
   
-  // First get MSRP - it's clearly labeled
-  const msrpMatch = pageText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
-  if (msrpMatch) {
-    data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
-    console.log('Found MSRP:', data.msrp);
+  for (const pattern of msrpPatterns) {
+    const match = pageText.match(pattern);
+    if (match) {
+      data.msrp = parseFloat(match[1].replace(/,/g, ''));
+      break;
+    }
   }
   
-  // For dealer price, look for pattern: standalone price before "Suggested retail"
-  // Or find price near "ADD TO CART"
-  const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)\s*[\s\S]*?ADD TO CART/i);
-  if (addToCartMatch) {
-    data.price = parseFloat(addToCartMatch[1].replace(/,/g, ''));
-    console.log('Found price near ADD TO CART:', data.price);
+  // Look for dealer/your price
+  const pricePatterns = [
+    /(?:Your\s*price|Sale\s*price|Our\s*price|Price|Net)[:\s]*\$\s*([\d,]+\.?\d*)/i,
+    /\$\s*([\d,]+\.?\d*)/  // Fallback: first dollar amount
+  ];
+  
+  // Get all prices on page
+  const allPriceMatches = pageText.match(/\$\s*[\d,]+\.?\d*/g) || [];
+  const prices = allPriceMatches
+    .map(p => parseFloat(p.replace(/[$,\s]/g, '')))
+    .filter(p => p > 10 && p < 100000)
+    .sort((a, b) => a - b);
+  
+  // If we have MSRP, the dealer price is likely the lowest price less than MSRP
+  if (data.msrp && prices.length > 0) {
+    const dealerPrice = prices.find(p => p < data.msrp);
+    if (dealerPrice) data.price = dealerPrice;
   }
   
-  // Fallback: find all prices and pick the one that looks like dealer price
+  // If no MSRP, try labeled price patterns
   if (!data.price) {
-    const allPrices = pageText.match(/\$([\d,]+\.?\d*)/g) || [];
-    console.log('All prices found:', allPrices);
-    
-    for (const p of allPrices) {
-      const val = parseFloat(p.replace(/[$,]/g, ''));
-      // Dealer price should be > $50 and if we have MSRP, should be less than MSRP
-      if (val > 50 && val < 50000) {
-        if (data.msrp && val < data.msrp) {
-          data.price = val;
-          console.log('Found dealer price:', data.price);
-          break;
-        } else if (!data.msrp) {
-          data.price = val;
+    for (const pattern of pricePatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        const price = parseFloat(match[1].replace(/,/g, ''));
+        if (price > 10 && price < 100000) {
+          data.price = price;
           break;
         }
       }
     }
   }
+  
+  // Fallback: if still no price, use first reasonable price found
+  if (!data.price && prices.length > 0) {
+    data.price = prices[0];
+  }
 
-  // PRODUCT IMAGE - main product photo from carousel
+  // ============================================
+  // 5. DIMENSIONS/SIZE - Common patterns
+  // ============================================
+  const sizePatterns = [
+    /(\d+(?:\.\d+)?)\s*["']?\s*[Ww](?:idth)?\s*[Xx×]\s*(\d+(?:\.\d+)?)\s*["']?\s*[Hh](?:eight)?\s*[Xx×]\s*(\d+(?:\.\d+)?)\s*["']?\s*[Dd](?:epth)?/,
+    /(\d+(?:\.\d+)?)\s*[Ww]\s*[Xx×]\s*(\d+(?:\.\d+)?)\s*[Hh]\s*[Xx×]\s*(\d+(?:\.\d+)?)\s*[Dd]/,
+    /(?:Dimensions|Size)[:\s]*(\d+(?:\.\d+)?)\s*[Xx×]\s*(\d+(?:\.\d+)?)\s*[Xx×]\s*(\d+(?:\.\d+)?)/i,
+    /(\d+(?:\.\d+)?)\s*[Xx×]\s*(\d+(?:\.\d+)?)\s*[Xx×]\s*(\d+(?:\.\d+)?)\s*(?:in|inches|")/i
+  ];
+  
+  for (const pattern of sizePatterns) {
+    const match = pageText.match(pattern);
+    if (match) {
+      data.size = `${match[1]} W X ${match[2]} H X ${match[3]} D`;
+      break;
+    }
+  }
+
+  // ============================================
+  // 6. MAIN PRODUCT IMAGE
+  // ============================================
+  // Priority: og:image > largest product image
   const ogImage = document.querySelector('meta[property="og:image"]');
   if (ogImage?.content) {
     data.image_url = ogImage.content;
-  } else {
-    const mainImg = document.querySelector('.swiper-slide-active img, [class*="product-image"] img');
-    if (mainImg) data.image_url = mainImg.src;
+  }
+  
+  if (!data.image_url) {
+    // Find largest image that's not a logo/icon
+    let bestImg = null;
+    let bestSize = 0;
+    
+    document.querySelectorAll('img').forEach(img => {
+      const src = img.src || img.dataset.src || img.dataset.lazySrc || '';
+      if (!src || !src.startsWith('http')) return;
+      
+      // Skip small images, icons, logos
+      const srcLower = src.toLowerCase();
+      if (srcLower.includes('logo') || srcLower.includes('icon') || 
+          srcLower.includes('sprite') || srcLower.includes('pixel') ||
+          srcLower.includes('social') || srcLower.includes('footer')) return;
+      
+      const w = img.naturalWidth || img.width || 0;
+      const h = img.naturalHeight || img.height || 0;
+      const size = w * h;
+      
+      if (w > 200 && h > 200 && size > bestSize) {
+        bestSize = size;
+        bestImg = src;
+      }
+    });
+    
+    if (bestImg) data.image_url = bestImg;
   }
 
-  // COLOR NAME & SWATCH - This is the key part!
-  // On Uttermost, colors are buttons with background-image style
-  // The selected one has class containing "selected"
+  // ============================================
+  // 7. FINISH/COLOR SWATCH - Universal detection
+  // ============================================
+  // Strategy: Find color/finish selection area, then find selected swatch
   
-  // First, find the Color section
-  const colorLabel = Array.from(document.querySelectorAll('span, label, div')).find(
-    el => el.innerText?.trim().toLowerCase() === 'color'
-  );
+  // Helper: Extract background-image URL
+  function getBackgroundImageUrl(el) {
+    const style = el.getAttribute('style') || '';
+    const computed = window.getComputedStyle(el);
+    const bg = computed.backgroundImage || style;
+    const match = bg.match(/url\(["']?([^"')]+)["']?\)/);
+    if (match && match[1] && !match[1].includes('data:')) {
+      let url = match[1];
+      if (url.startsWith('/')) url = window.location.origin + url;
+      return url;
+    }
+    return null;
+  }
   
-  if (colorLabel) {
-    // Look in the parent container for swatch buttons
-    const container = colorLabel.closest('div[class*="option"], section') || colorLabel.parentElement;
+  // Helper: Check if element appears selected
+  function isSelected(el) {
+    const classes = (el.className || '').toLowerCase();
+    const ariaSelected = el.getAttribute('aria-selected');
+    const ariaChecked = el.getAttribute('aria-checked');
     
-    if (container) {
-      // Find buttons with background-image (these are the swatches)
-      const swatchButtons = container.querySelectorAll('button[style*="background-image"]');
-      
-      for (const btn of swatchButtons) {
-        // Check if this is the selected swatch
-        const classList = btn.className || '';
-        const isSelected = classList.includes('selected') || 
-                          btn.getAttribute('aria-selected') === 'true' ||
-                          btn.getAttribute('aria-label')?.includes('selected');
-        
-        if (isSelected) {
-          // Get the color name from title attribute
-          data.finish_color = btn.getAttribute('title') || '';
-          
-          // Get the swatch image from background-image
-          const style = btn.getAttribute('style') || '';
-          const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
-          if (bgMatch) {
-            let imgUrl = bgMatch[1];
-            if (imgUrl.startsWith('/')) {
-              imgUrl = window.location.origin + imgUrl;
-            }
-            data.finish_image = imgUrl;
-          }
+    return classes.includes('selected') || 
+           classes.includes('active') || 
+           classes.includes('current') ||
+           classes.includes('checked') ||
+           ariaSelected === 'true' ||
+           ariaChecked === 'true';
+  }
+  
+  // Helper: Get color name from element
+  function getColorName(el) {
+    return el.getAttribute('title') || 
+           el.getAttribute('aria-label')?.replace(/selected|button|swatch/gi, '').trim() ||
+           el.getAttribute('data-color') ||
+           el.getAttribute('data-value') ||
+           el.alt ||
+           '';
+  }
+  
+  // Look for color/finish section by common labels
+  const colorLabels = ['color', 'colour', 'finish', 'swatch', 'variant', 'option'];
+  let colorContainer = null;
+  
+  // Method 1: Find by label text
+  document.querySelectorAll('label, span, div, h3, h4, p').forEach(el => {
+    const text = (el.innerText || '').toLowerCase().trim();
+    if (colorLabels.some(label => text === label || text === label + ':' || text === label + 's')) {
+      // Found a color label, look for swatches nearby
+      let container = el.closest('div, section, fieldset') || el.parentElement;
+      for (let i = 0; i < 5 && container; i++) {
+        const hasSwatches = container.querySelectorAll('button, [role="radio"], [role="option"], img').length > 1;
+        if (hasSwatches) {
+          colorContainer = container;
           break;
         }
+        container = container.parentElement;
       }
-      
-      // If no selected found, take the first one
-      if (!data.finish_color && swatchButtons.length > 0) {
-        const firstBtn = swatchButtons[0];
-        data.finish_color = firstBtn.getAttribute('title') || '';
-        const style = firstBtn.getAttribute('style') || '';
-        const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
-        if (bgMatch) {
-          let imgUrl = bgMatch[1];
-          if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
-          data.finish_image = imgUrl;
-        }
+    }
+  });
+  
+  // Method 2: Look for swatch-like containers by class names
+  if (!colorContainer) {
+    const swatchSelectors = [
+      '[class*="swatch"]',
+      '[class*="color-option"]',
+      '[class*="color-picker"]',
+      '[class*="variant"]',
+      '[class*="finish"]',
+      '[class*="option-tile"]',
+      '[data-option="color"]',
+      '[data-option="Color"]'
+    ];
+    
+    for (const selector of swatchSelectors) {
+      const el = document.querySelector(selector);
+      if (el) {
+        colorContainer = el.closest('div, ul, fieldset') || el.parentElement;
+        break;
       }
     }
   }
   
-  // Fallback: Get color name from product name (e.g., "Abound Swivel Chair, Ginger")
-  if (!data.finish_color && data.name && data.name.includes(',')) {
-    data.finish_color = data.name.split(',').pop().trim();
+  // Now find the selected swatch in the container
+  if (colorContainer) {
+    console.log('Found color container:', colorContainer);
+    
+    // Look for selected element with background-image (buttons, divs)
+    const elementsWithBg = colorContainer.querySelectorAll('button, div, span, a');
+    for (const el of elementsWithBg) {
+      const bgUrl = getBackgroundImageUrl(el);
+      if (bgUrl && isSelected(el)) {
+        data.finish_image = bgUrl;
+        data.finish_color = getColorName(el);
+        console.log('Found selected swatch (bg-image):', data.finish_color, bgUrl);
+        break;
+      }
+    }
+    
+    // If no selected found with bg-image, try img tags
+    if (!data.finish_image) {
+      const imgs = colorContainer.querySelectorAll('img');
+      for (const img of imgs) {
+        const src = img.src || img.dataset.src || '';
+        if (!src || !src.startsWith('http')) continue;
+        
+        const parent = img.closest('button, a, div, li');
+        if (parent && isSelected(parent)) {
+          data.finish_image = src;
+          data.finish_color = getColorName(img) || getColorName(parent);
+          console.log('Found selected swatch (img):', data.finish_color, src);
+          break;
+        }
+      }
+    }
+    
+    // Fallback: take first swatch if none selected
+    if (!data.finish_image) {
+      for (const el of elementsWithBg) {
+        const bgUrl = getBackgroundImageUrl(el);
+        if (bgUrl) {
+          data.finish_image = bgUrl;
+          data.finish_color = getColorName(el);
+          console.log('Using first swatch (bg-image):', data.finish_color, bgUrl);
+          break;
+        }
+      }
+    }
+    
+    if (!data.finish_image) {
+      const firstImg = colorContainer.querySelector('img[src*="http"]');
+      if (firstImg) {
+        data.finish_image = firstImg.src;
+        data.finish_color = getColorName(firstImg);
+        console.log('Using first swatch (img):', data.finish_color);
+      }
+    }
+  }
+  
+  // Fallback: Extract color from product name (e.g., "Chair, Ginger" or "Chair - Oak")
+  if (!data.finish_color && data.name) {
+    const separators = [',', ' - ', ' – ', ' in '];
+    for (const sep of separators) {
+      if (data.name.includes(sep)) {
+        const parts = data.name.split(sep);
+        const lastPart = parts[parts.length - 1].trim();
+        // Only use if it looks like a color (short, no numbers)
+        if (lastPart.length < 30 && !/\d/.test(lastPart)) {
+          data.finish_color = lastPart;
+          break;
+        }
+      }
+    }
   }
 
-  console.log('Scraped data:', data);
+  console.log('=== UNIVERSAL SCRAPE RESULT ===', data);
   return data;
 }
 
@@ -264,7 +435,6 @@ async function doScrape() {
 async function sendToApp() {
   if (!scrapedData) return;
   
-  // Check if project is selected
   if (!selectedProjectId) {
     showStatus('Please select a project first!', 'warning');
     projectSelector.focus();
@@ -287,9 +457,7 @@ async function sendToApp() {
     if(scrapedData.image_url) params.set('image',scrapedData.image_url);
     if(scrapedData.msrp) params.set('msrp',scrapedData.msrp);
     
-    // Go directly to the selected project's checklist page
     const projectUrl = `${APP_URL}/checklist/${selectedProjectId}?${params.toString()}`;
-    
     window.open(projectUrl, '_blank');
     showStatus('Sent to project!', 'success');
   } catch(e) { showStatus('Failed', 'error'); }
@@ -315,11 +483,10 @@ rescrapeBtn.addEventListener('click', doScrape);
   try { 
     const [t] = await chrome.tabs.query({active:true,currentWindow:true}); 
     if(t?.url){
-      const d=new URL(t.url).hostname; 
-      if(d.includes('uttermost')){
-        vendorBadge.textContent='Uttermost';
-        vendorBadge.style.display='block';
-      }
+      const d = new URL(t.url).hostname.replace('www.','');
+      const vendor = d.split('.')[0];
+      vendorBadge.textContent = vendor.charAt(0).toUpperCase() + vendor.slice(1);
+      vendorBadge.style.display = 'block';
     }
   } catch(e){} 
 })();
