@@ -2381,6 +2381,19 @@ const ExactChecklistSpreadsheet = ({
                                       >
                                         ✨
                                       </button>
+                                      {/* PASTE BUTTON - Shows when scraper data is available */}
+                                      <button
+                                        onClick={() => scraperClipboard && handlePasteScrapedData(item.id)}
+                                        disabled={!scraperClipboard}
+                                        className={`text-sm px-2 py-1 rounded font-bold ${
+                                          scraperClipboard 
+                                            ? 'bg-green-600 hover:bg-green-500 text-white animate-pulse cursor-pointer' 
+                                            : 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                                        }`}
+                                        title={scraperClipboard ? `📋 Paste: ${scraperClipboard.name}` : 'No data to paste - scrape a product first'}
+                                      >
+                                        📋 PASTE
+                                      </button>
                                       <button
                                         onClick={() => handleDeleteItem(item.id)}
                                         className="text-red-400 hover:text-red-300 text-sm"
