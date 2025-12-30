@@ -14704,9 +14704,17 @@ CRITICAL EXTRACTION RULES:
 Return ONLY valid JSON. No markdown, no explanation."""
         ).with_model("openai", "gpt-4o-mini")
         
-        # Send the page text to AI
+        # Send the page text to AI with URL context
         user_message = UserMessage(
-            text=f"Extract product information from this furniture/decor product page:\n\n{page_text}"
+            text=f"""Extract ALL product information from this {vendor} product page.
+
+PAGE URL: {request.page_url}
+(The SKU may be visible in the URL path - extract it!)
+
+PAGE CONTENT:
+{page_text}
+
+Remember: SKU, finish/color, and dimensions are REQUIRED on wholesale furniture sites. Look carefully!"""
         )
         
         response = await chat.send_message(user_message)
