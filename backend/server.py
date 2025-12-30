@@ -14654,8 +14654,8 @@ async def ai_scrape_product(request: AIScraperRequest):
         }
         vendor = vendor_map.get(vendor, vendor)
         
-        # Truncate page text to avoid token limits (keep first 8000 chars)
-        page_text = request.page_text[:8000] if len(request.page_text) > 8000 else request.page_text
+        # Truncate page text to avoid token limits (keep first 15000 chars to capture more product details)
+        page_text = request.page_text[:15000] if len(request.page_text) > 15000 else request.page_text
         
         # Create the AI chat
         chat = LlmChat(
