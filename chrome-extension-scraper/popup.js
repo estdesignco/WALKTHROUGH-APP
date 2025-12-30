@@ -1,7 +1,7 @@
-// Design Ready Product Scraper v10.0
-// IMPROVED: Uses AI v2 endpoint for BOTH text extraction AND swatch selection
+// Design Ready Product Scraper v9.2
+// FIXED: Proper separation of MAIN IMAGE vs SWATCH IMAGE
 // Main image = Large product photo (NOT a swatch)
-// Swatch image = AI-selected small color/finish chip
+// Swatch image = Small color/finish chip ONLY
 
 const APP_URL = 'https://shopfetch-1.preview.emergentagent.com';
 const BACKEND_URL = 'https://shopfetch-1.preview.emergentagent.com';
