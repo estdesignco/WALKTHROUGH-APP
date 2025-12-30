@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v9.4.0 - COMPLETE REWRITE
+// Design Ready Product Scraper v9.5.0 - STRICT MAIN PRODUCT ONLY
 // December 30, 2025
-// FIXES: SVG exclusion, menu icon exclusion, proper swatch detection
+// CRITICAL FIX: Only detect swatches in MAIN PRODUCT area, not Similar Items
 
 const APP_URL = 'https://shopfetch-1.preview.emergentagent.com';
 const BACKEND_URL = 'https://shopfetch-1.preview.emergentagent.com';
@@ -83,10 +83,10 @@ function displayResults(data) {
 }
 
 // ============================================
-// COMPLETE REWRITE - v9.4.0 - December 30, 2025
+// v9.5.0 - STRICT MAIN PRODUCT DETECTION
 // ============================================
 function getPageData() {
-  console.log('🔧🔧🔧 SCRAPER v9.4.0 - Dec 30 2025 - COMPLETE REWRITE 🔧🔧🔧');
+  console.log('🔧🔧🔧 SCRAPER v9.5.0 - STRICT MAIN PRODUCT ONLY 🔧🔧🔧');
   
   const data = {
     pageText: document.body.innerText || '',
@@ -96,6 +96,103 @@ function getPageData() {
     detectedSwatchUrl: null,
     detectedSwatchName: null
   };
+
+  // HELPER: Check if element is in EXCLUDED area (Similar Items, Related, Footer, etc)
+  function isInExcludedArea(el) {
+    let parent = el;
+    for (let i = 0; i < 15 && parent; i++) {
+      const classes = (parent.className || '').toLowerCase();
+      const id = (parent.id || '').toLowerCase();
+      const tagName = parent.tagName?.toLowerCase() || '';
+      
+      // Get text content of nearby headers
+      const nearbyText = (parent.innerText || '').substring(0, 500).toLowerCase();
+      
+      // EXCLUDE these areas completely
+      if (
+        // Similar/Related products
+        classes.includes('similar') || classes.includes('related') ||
+        classes.includes('recommend') || classes.includes('also-like') ||
+        classes.includes('you-may') || classes.includes('recently') ||
+        classes.includes('cross-sell') || classes.includes('upsell') ||
+        id.includes('similar') || id.includes('related') ||
+        id.includes('recommend') || id.includes('recently') ||
+        // Navigation/Header/Footer
+        classes.includes('nav') || classes.includes('menu') ||
+        classes.includes('header') || classes.includes('footer') ||
+        classes.includes('sidebar') || classes.includes('modal') ||
+        id.includes('nav') || id.includes('menu') ||
+        id.includes('header') || id.includes('footer') ||
+        // Carousel/Slider sections that aren't the main product
+        (classes.includes('carousel') && !classes.includes('product-carousel')) ||
+        (classes.includes('slider') && !classes.includes('product-slider')) ||
+        // Check for "Similar Items" text
+        nearbyText.includes('similar items') ||
+        nearbyText.includes('you may also like') ||
+        nearbyText.includes('related products') ||
+        nearbyText.includes('recently viewed') ||
+        nearbyText.includes('customers also')
+      ) {
+        console.log('❌ EXCLUDED AREA:', classes || id || tagName);
+        return true;
+      }
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
+  // HELPER: Check if in MAIN PRODUCT swatch area
+  function isInMainProductSwatchArea(el) {
+    // First check if we're in an excluded area
+    if (isInExcludedArea(el)) {
+      return false;
+    }
+    
+    let parent = el;
+    let foundSwatchIndicator = false;
+    let foundMainProduct = false;
+    
+    for (let i = 0; i < 10 && parent; i++) {
+      const classes = (parent.className || '').toLowerCase();
+      const id = (parent.id || '').toLowerCase();
+      
+      // Check if we're in the main product detail area
+      if (classes.includes('product-detail') || classes.includes('product-info') ||
+          classes.includes('pdp-') || classes.includes('product-page') ||
+          classes.includes('product-main') || classes.includes('product-view') ||
+          id.includes('product-detail') || id.includes('pdp') ||
+          id.includes('main-product') || id.includes('product-info')) {
+        foundMainProduct = true;
+      }
+      
+      // Check for swatch indicators
+      if (classes.includes('swatch') || classes.includes('color-option') || 
+          classes.includes('finish') || classes.includes('fabric') ||
+          classes.includes('configurable') || classes.includes('variant') ||
+          id.includes('swatch') || id.includes('color-option')) {
+        foundSwatchIndicator = true;
+      }
+      
+      // Check for color/finish labels nearby
+      const labels = parent.querySelectorAll('label, legend, span, h3, h4, dt, .label');
+      for (const label of labels) {
+        const txt = (label.innerText || '').toLowerCase().trim();
+        if (txt === 'color' || txt === 'color:' || txt === 'finish' || txt === 'finish:' ||
+            txt === 'fabric' || txt === 'fabric:' || txt === 'cover' || txt === 'cover:' ||
+            txt === 'material' || txt === 'material:' ||
+            txt.startsWith('select color') || txt.startsWith('select finish') ||
+            txt.startsWith('choose color') || txt.startsWith('choose finish')) {
+          foundSwatchIndicator = true;
+          break;
+        }
+      }
+      
+      parent = parent.parentElement;
+    }
+    
+    // Must have swatch indicator, and either be in main product OR not be deep in excluded areas
+    return foundSwatchIndicator;
+  }
 
   // HELPER: Get background image URL
   function getBgImageUrl(el) {
@@ -120,7 +217,8 @@ function getPageData() {
     const classes = (el.className || '').toLowerCase();
     return classes.includes('selected') || classes.includes('active') || 
            classes.includes('current') || classes.includes('checked') ||
-           el.getAttribute('aria-selected') === 'true';
+           el.getAttribute('aria-selected') === 'true' ||
+           el.getAttribute('aria-checked') === 'true';
   }
 
   // HELPER: Get color name from element
@@ -137,113 +235,37 @@ function getPageData() {
     return null;
   }
 
-  // HELPER: Check if in swatch area (STRICT)
-  function isInSwatchArea(el) {
-    let parent = el;
-    let foundSwatchIndicator = false;
-    
-    for (let i = 0; i < 8 && parent; i++) {
-      const classes = (parent.className || '').toLowerCase();
-      const id = (parent.id || '').toLowerCase();
-      
-      // EXCLUDE navigation, menu, header, footer
-      if (classes.includes('nav') || classes.includes('menu') || 
-          classes.includes('header') || classes.includes('footer') ||
-          classes.includes('modal') || classes.includes('overlay') ||
-          id.includes('nav') || id.includes('menu') || 
-          id.includes('header') || id.includes('footer')) {
-        return false;
-      }
-      
-      // INCLUDE actual swatch areas
-      if (classes.includes('swatch') || classes.includes('color-option') || 
-          classes.includes('finish') || classes.includes('fabric') ||
-          classes.includes('configurable') || classes.includes('option-tile') ||
-          id.includes('swatch') || id.includes('color')) {
-        foundSwatchIndicator = true;
-      }
-      
-      // Check for color/finish labels
-      if (!foundSwatchIndicator) {
-        const labels = parent.querySelectorAll('label, legend, span, h3, h4, dt');
-        for (const label of labels) {
-          const txt = (label.innerText || '').toLowerCase().trim();
-          if (txt === 'color' || txt === 'color:' || txt === 'finish' || txt === 'finish:' ||
-              txt === 'fabric' || txt === 'fabric:' || txt === 'material' || txt === 'material:' ||
-              txt.startsWith('select color') || txt.startsWith('select finish')) {
-            foundSwatchIndicator = true;
-            break;
-          }
-        }
-      }
-      
-      parent = parent.parentElement;
-    }
-    return foundSwatchIndicator;
-  }
-
-  // HELPER: Check if URL is excluded (SVG, icons, etc)
+  // HELPER: Check if URL should be excluded
   function isExcludedUrl(url) {
     const lower = url.toLowerCase();
-    
-    // EXCLUDE SVG files
-    if (lower.endsWith('.svg') || lower.includes('.svg?') || lower.includes('.svg#')) {
-      console.log('❌ Excluding SVG:', url);
-      return true;
+    if (lower.endsWith('.svg') || lower.includes('.svg?')) return true;
+    const patterns = ['icon', 'logo', 'arrow', 'chevron', 'close', 'menu', 'cart', 'search',
+                      'nav', 'mobile', 'hamburger', 'lightbulb', 'bulb', 'spinner', 'loading',
+                      'placeholder', 'pixel', 'tracking', 'spacer', 'blank'];
+    for (const p of patterns) {
+      if (lower.includes(p)) return true;
     }
-    
-    // EXCLUDE icons and UI elements
-    const excludePatterns = [
-      'icon', 'logo', 'arrow', 'chevron', 'close', 'menu', 'cart', 'search',
-      'nav', 'mobile', 'hamburger', 'plus', 'minus', 'zoom', 'share', 'heart',
-      'wishlist', 'spinner', 'loading', 'play', 'video', 'lightbulb', 'bulb'
-    ];
-    
-    for (const pattern of excludePatterns) {
-      if (lower.includes(pattern)) {
-        console.log('❌ Excluding pattern "' + pattern + '":', url);
-        return true;
-      }
-    }
-    
     return false;
   }
 
   // HELPER: Check if likely a product image
   function isLikelyProductImage(img, src) {
+    if (isInExcludedArea(img)) return false;
+    if (isExcludedUrl(src)) return false;
     const w = img.naturalWidth || img.width || 0;
     const h = img.naturalHeight || img.height || 0;
     if (w < 200 || h < 200) return false;
-    if (isInSwatchArea(img)) return false;
-    if (isExcludedUrl(src)) return false;
     return true;
   }
 
-  // HELPER: Check if likely a swatch image
+  // HELPER: Check if likely a swatch image  
   function isLikelySwatchImage(el, url, w, h) {
-    // Must be small
     if (w > 150 || h > 150) return false;
-    if (w < 15 || h < 15) return false;
-    
-    // Must be roughly square
+    if (w < 10 || h < 10) return false;
     const ratio = Math.max(w, h) / Math.min(w, h);
-    if (ratio > 2) return false;
-    
-    // Must be in swatch area
-    if (!isInSwatchArea(el)) return false;
-    
-    // Must not be excluded URL
+    if (ratio > 2.5) return false;
     if (isExcludedUrl(url)) return false;
-    
-    // Check alt/title for exclusions
-    const alt = (el.getAttribute('alt') || '').toLowerCase();
-    const title = (el.getAttribute('title') || '').toLowerCase();
-    if (alt.includes('close') || alt.includes('menu') || alt.includes('icon') ||
-        title.includes('close') || title.includes('menu') || title.includes('icon')) {
-      console.log('❌ Excluding by alt/title:', url);
-      return false;
-    }
-    
+    if (!isInMainProductSwatchArea(el)) return false;
     return true;
   }
 
@@ -252,52 +274,53 @@ function getPageData() {
   // ========================================
   console.log('=== STEP 1: FINDING MAIN PRODUCT IMAGE ===');
   
-  // Try og:image first
+  // Try og:image first (most reliable)
   const ogImg = document.querySelector('meta[property="og:image"]');
   if (ogImg?.content && ogImg.content.startsWith('http')) {
     data.mainProductImage = ogImg.content;
     console.log('✅ Main image from og:image:', data.mainProductImage);
   }
   
-  // Try twitter:image
+  // Try product schema
   if (!data.mainProductImage) {
-    const twitterImg = document.querySelector('meta[name="twitter:image"]');
-    if (twitterImg?.content && twitterImg.content.startsWith('http')) {
-      data.mainProductImage = twitterImg.content;
-      console.log('✅ Main image from twitter:image:', data.mainProductImage);
-    }
-  }
-  
-  // Try JSON-LD schema
-  if (!data.mainProductImage) {
-    const schema = document.querySelector('script[type="application/ld+json"]');
-    if (schema) {
+    const schemas = document.querySelectorAll('script[type="application/ld+json"]');
+    for (const schema of schemas) {
       try {
         const json = JSON.parse(schema.textContent);
-        const imgUrl = json.image || (json['@graph']?.find(i => i.image)?.image);
-        if (imgUrl) {
-          const finalUrl = Array.isArray(imgUrl) ? imgUrl[0] : imgUrl;
-          if (finalUrl?.startsWith('http')) {
-            data.mainProductImage = finalUrl;
-            console.log('✅ Main image from schema:', data.mainProductImage);
+        let imgUrl = null;
+        if (json['@type'] === 'Product' && json.image) {
+          imgUrl = Array.isArray(json.image) ? json.image[0] : json.image;
+        } else if (json['@graph']) {
+          const product = json['@graph'].find(i => i['@type'] === 'Product');
+          if (product?.image) {
+            imgUrl = Array.isArray(product.image) ? product.image[0] : product.image;
           }
+        }
+        if (imgUrl?.startsWith('http')) {
+          data.mainProductImage = imgUrl;
+          console.log('✅ Main image from schema:', data.mainProductImage);
+          break;
         }
       } catch(e) {}
     }
   }
   
-  // Try common selectors
+  // Try common product image selectors (but NOT in similar items)
   if (!data.mainProductImage) {
     const selectors = [
-      '.product-image img', '.product-media img', '.gallery-image img',
-      '.main-image img', '.pdp-image img', '.fotorama__img',
-      '[data-gallery-role="main-image"] img', '.slick-current img'
+      '.product-media-gallery img',
+      '.product-image-container img',
+      '.product-detail img',
+      '.pdp-gallery img',
+      '[data-gallery-role="main-image"] img',
+      '.fotorama__stage img',
+      '.product-image img:first-child'
     ];
     for (const sel of selectors) {
       const img = document.querySelector(sel);
-      if (img) {
+      if (img && !isInExcludedArea(img)) {
         const src = img.src || img.dataset.src;
-        if (src?.startsWith('http')) {
+        if (src?.startsWith('http') && !isExcludedUrl(src)) {
           data.mainProductImage = src;
           console.log('✅ Main image from selector:', sel);
           break;
@@ -306,14 +329,18 @@ function getPageData() {
     }
   }
   
-  // Fallback: largest image
+  // Fallback: largest image NOT in excluded areas
   if (!data.mainProductImage) {
     let bestImg = null, bestSize = 0;
     document.querySelectorAll('img').forEach(img => {
+      if (isInExcludedArea(img)) return;
       const src = img.src || img.dataset.src;
       if (!src?.startsWith('http')) return;
-      if (!isLikelyProductImage(img, src)) return;
-      const size = (img.naturalWidth || img.width || 0) * (img.naturalHeight || img.height || 0);
+      if (isExcludedUrl(src)) return;
+      const w = img.naturalWidth || img.width || 0;
+      const h = img.naturalHeight || img.height || 0;
+      if (w < 200 || h < 200) return;
+      const size = w * h;
       if (size > bestSize) { bestSize = size; bestImg = src; }
     });
     if (bestImg) {
@@ -321,19 +348,17 @@ function getPageData() {
       console.log('✅ Main image from largest:', data.mainProductImage);
     }
   }
-  
-  console.log('Final main image:', data.mainProductImage || 'NOT FOUND');
 
   // ========================================
-  // 2. FIND SWATCH IMAGES
+  // 2. FIND SWATCH IMAGES (MAIN PRODUCT ONLY)
   // ========================================
-  console.log('=== STEP 2: FINDING SWATCH IMAGES ===');
+  console.log('=== STEP 2: FINDING SWATCH IMAGES (MAIN PRODUCT ONLY) ===');
   
   const seenUrls = new Set();
   let foundSelected = false;
   
-  // Method 1: Background images
-  document.querySelectorAll('button, a, div, span, label').forEach(el => {
+  // Method 1: Look for swatch containers with background images
+  document.querySelectorAll('button, a, div, span, label, [class*="swatch"], [class*="color"]').forEach(el => {
     const bgUrl = getBgImageUrl(el);
     if (!bgUrl || seenUrls.has(bgUrl)) return;
     
@@ -347,42 +372,44 @@ function getPageData() {
     const selected = isSelected(el);
     const colorName = getColorName(el);
     
-    console.log('✅ Found swatch (bg):', colorName, bgUrl, selected ? '[SELECTED]' : '');
+    console.log('✅ Found swatch (bg):', colorName || 'unnamed', bgUrl.substring(0, 60), selected ? '[SELECTED]' : '');
     data.swatchImages.push({ url: bgUrl, isSelected: selected, colorName: colorName });
     
     if (selected && !foundSelected) {
       data.detectedSwatchUrl = bgUrl;
       data.detectedSwatchName = colorName;
       foundSelected = true;
+      console.log('🎯 Using SELECTED swatch:', colorName);
     }
   });
   
-  // Method 2: img tags
+  // Method 2: Look for small img tags in swatch areas
   document.querySelectorAll('img').forEach(img => {
     const src = img.src || img.dataset.src;
     if (!src?.startsWith('http') || seenUrls.has(src)) return;
     
-    const w = img.naturalWidth || img.width || 50;
-    const h = img.naturalHeight || img.height || 50;
+    const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 50;
+    const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 50;
     
     if (!isLikelySwatchImage(img, src, w, h)) return;
     
     seenUrls.add(src);
-    const parent = img.closest('button, a, div, label, li');
-    const selected = parent ? isSelected(parent) : false;
+    const parent = img.closest('button, a, div, label, li, [class*="swatch"]');
+    const selected = parent ? isSelected(parent) : isSelected(img);
     const colorName = getColorName(img) || (parent ? getColorName(parent) : null);
     
-    console.log('✅ Found swatch (img):', colorName, src, selected ? '[SELECTED]' : '');
+    console.log('✅ Found swatch (img):', colorName || 'unnamed', src.substring(0, 60), selected ? '[SELECTED]' : '');
     data.swatchImages.push({ url: src, isSelected: selected, colorName: colorName });
     
     if (selected && !foundSelected) {
       data.detectedSwatchUrl = src;
       data.detectedSwatchName = colorName;
       foundSelected = true;
+      console.log('🎯 Using SELECTED swatch:', colorName);
     }
   });
   
-  // Use first valid swatch if none selected
+  // Use first valid swatch only if none selected
   if (!data.detectedSwatchUrl && data.swatchImages.length > 0) {
     data.detectedSwatchUrl = data.swatchImages[0].url;
     data.detectedSwatchName = data.swatchImages[0].colorName;
@@ -390,9 +417,10 @@ function getPageData() {
   }
   
   console.log('=== COMPLETE ===');
-  console.log('Main image:', data.mainProductImage);
+  console.log('Main image:', data.mainProductImage ? data.mainProductImage.substring(0, 60) + '...' : 'NOT FOUND');
   console.log('Swatch count:', data.swatchImages.length);
-  console.log('Selected swatch:', data.detectedSwatchUrl);
+  console.log('Selected swatch:', data.detectedSwatchUrl ? data.detectedSwatchUrl.substring(0, 60) + '...' : 'NONE');
+  console.log('Swatch name:', data.detectedSwatchName || 'NONE');
   
   return data;
 }
@@ -438,6 +466,12 @@ async function doScrape() {
     const aiData = await response.json();
     console.log('AI data:', aiData);
     
+    // IMPORTANT: Use AI finish_color if no swatch detected, or if swatch name looks wrong
+    let finalFinishColor = aiData.finish_color;
+    if (pageData.detectedSwatchName && pageData.detectedSwatchName.length > 0) {
+      finalFinishColor = pageData.detectedSwatchName;
+    }
+    
     const finalData = {
       url: pageData.pageUrl,
       name: aiData.name,
@@ -445,9 +479,9 @@ async function doScrape() {
       price: aiData.price,
       msrp: aiData.msrp,
       size: aiData.size,
-      finish_color: pageData.detectedSwatchName || aiData.finish_color,
+      finish_color: finalFinishColor,
       vendor: aiData.vendor,
-      image_url: pageData.mainProductImage,
+      image_url: pageData.mainProductImage || aiData.image_url,
       finish_image: pageData.detectedSwatchUrl
     };
     
