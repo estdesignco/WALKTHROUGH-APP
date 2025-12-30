@@ -274,16 +274,75 @@ function getPageData() {
   
   // ========================================
   // 1. FIND MAIN PRODUCT IMAGE
-  // Priority: og:image > largest product image
+  // Priority: og:image > twitter:image > largest product image > first gallery image
   // ========================================
   console.log('=== FINDING MAIN PRODUCT IMAGE ===');
   
+  // Method 1: Open Graph image (most reliable)
   const ogImg = document.querySelector('meta[property="og:image"]');
-  if (ogImg?.content) {
+  if (ogImg?.content && ogImg.content.startsWith('http')) {
     data.mainProductImage = ogImg.content;
     console.log('Main image from og:image:', data.mainProductImage);
   }
   
+  // Method 2: Twitter card image
+  if (!data.mainProductImage) {
+    const twitterImg = document.querySelector('meta[name="twitter:image"]');
+    if (twitterImg?.content && twitterImg.content.startsWith('http')) {
+      data.mainProductImage = twitterImg.content;
+      console.log('Main image from twitter:image:', data.mainProductImage);
+    }
+  }
+  
+  // Method 3: Product schema image
+  if (!data.mainProductImage) {
+    const schemaScript = document.querySelector('script[type="application/ld+json"]');
+    if (schemaScript) {
+      try {
+        const schema = JSON.parse(schemaScript.textContent);
+        const imgUrl = schema.image || (schema['@graph'] && schema['@graph'].find(i => i.image)?.image);
+        if (imgUrl) {
+          const finalUrl = Array.isArray(imgUrl) ? imgUrl[0] : imgUrl;
+          if (finalUrl && finalUrl.startsWith('http')) {
+            data.mainProductImage = finalUrl;
+            console.log('Main image from schema:', data.mainProductImage);
+          }
+        }
+      } catch(e) {}
+    }
+  }
+  
+  // Method 4: Look for common product image containers
+  if (!data.mainProductImage) {
+    const productImgSelectors = [
+      '.product-image img',
+      '.product-media img',
+      '.gallery-image img',
+      '.main-image img',
+      '.product-photo img',
+      '[data-gallery-role="main-image"] img',
+      '.product-image-container img',
+      '.pdp-image img',
+      '.product-detail img',
+      '.fotorama__img',
+      '.slick-current img',
+      '.carousel-item.active img'
+    ];
+    
+    for (const selector of productImgSelectors) {
+      const img = document.querySelector(selector);
+      if (img) {
+        const src = img.src || img.dataset.src || img.dataset.lazySrc;
+        if (src && src.startsWith('http')) {
+          data.mainProductImage = src;
+          console.log('Main image from selector:', selector, data.mainProductImage);
+          break;
+        }
+      }
+    }
+  }
+  
+  // Method 5: Largest non-swatch image as fallback
   if (!data.mainProductImage) {
     let bestImg = null, bestSize = 0;
     document.querySelectorAll('img').forEach(img => {
@@ -307,6 +366,8 @@ function getPageData() {
       console.log('Main image from largest:', data.mainProductImage);
     }
   }
+  
+  console.log('Final main image:', data.mainProductImage);
   
   // ========================================
   // 2. FIND SWATCH/COLOR IMAGES
