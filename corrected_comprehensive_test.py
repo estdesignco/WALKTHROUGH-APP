@@ -11,7 +11,7 @@ from typing import Dict, Any, List
 from datetime import datetime
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://shopfetch-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://designvault-5.preview.emergentagent.com/api"
 
 class CorrectedBackendTester:
     def __init__(self):

@@ -11,7 +11,7 @@ from datetime import datetime
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://shopfetch-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://designvault-5.preview.emergentagent.com/api"
 
 class BackendTester:
     def __init__(self):

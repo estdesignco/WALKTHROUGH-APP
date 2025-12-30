@@ -2,8 +2,8 @@
 // December 30, 2025
 // Based on actual Uttermost HTML analysis
 
-const APP_URL = 'https://shopfetch-1.preview.emergentagent.com';
-const BACKEND_URL = 'https://shopfetch-1.preview.emergentagent.com';
+const APP_URL = 'https://designvault-5.preview.emergentagent.com';
+const BACKEND_URL = 'https://designvault-5.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

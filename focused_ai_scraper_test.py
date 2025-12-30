@@ -11,7 +11,7 @@ from typing import Dict, List, Any
 import sys
 
 # Backend URL from environment
-BACKEND_URL = "https://shopfetch-1.preview.emergentagent.com"
+BACKEND_URL = "https://designvault-5.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 def test_ai_scraper_endpoint():

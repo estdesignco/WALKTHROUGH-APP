@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://shopfetch-1.preview.emergentagent.com/api
+https://designvault-5.preview.emergentagent.com/api
 ```
 
 ---

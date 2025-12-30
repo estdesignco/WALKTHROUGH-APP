@@ -20,7 +20,7 @@ import sys
 from typing import Dict, List, Any
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://shopfetch-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://designvault-5.preview.emergentagent.com/api"
 
 class BackendVerificationTest:
     def __init__(self):

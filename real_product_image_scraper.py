@@ -259,7 +259,7 @@ async def main():
     if updated_count > 0:
         print(f"\n✅ SUCCESS! {updated_count} products now have REAL images")
         print(f"\n🔗 NEXT STEPS:")
-        print(f"1. Refresh: https://shopfetch-1.preview.emergentagent.com/furniture-search")
+        print(f"1. Refresh: https://designvault-5.preview.emergentagent.com/furniture-search")
         print(f"2. You should now see the ACTUAL Four Hands chair, Uttermost table, etc.")
         print(f"3. These are the real product images, not generic stock photos")
         print(f"\n🎯 This is what you wanted - real vendor images matched to your SKUs!")
