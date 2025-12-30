@@ -14586,10 +14586,13 @@ async def download_chrome_extension():
         if os.path.exists(zip_path):
             return FileResponse(
                 path=zip_path,
-                filename="design-ready-scraper-extension.zip",
+                filename="design-ready-scraper-extension-v9.3.zip",
                 media_type="application/zip",
                 headers={
-                    "Content-Disposition": "attachment; filename=design-ready-scraper-extension.zip"
+                    "Content-Disposition": "attachment; filename=design-ready-scraper-extension-v9.3.zip",
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    "Pragma": "no-cache",
+                    "Expires": "0"
                 }
             )
     
