@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v9.5.0 - STRICT MAIN PRODUCT ONLY
+// Design Ready Product Scraper v9.6.0 - UTTERMOST STRUCTURE FIX
 // December 30, 2025
-// CRITICAL FIX: Only detect swatches in MAIN PRODUCT area, not Similar Items
+// Based on actual Uttermost HTML analysis
 
 const APP_URL = 'https://shopfetch-1.preview.emergentagent.com';
 const BACKEND_URL = 'https://shopfetch-1.preview.emergentagent.com';
@@ -83,10 +83,10 @@ function displayResults(data) {
 }
 
 // ============================================
-// v9.5.0 - STRICT MAIN PRODUCT DETECTION
+// v9.6.0 - UTTERMOST STRUCTURE-BASED FIX
 // ============================================
 function getPageData() {
-  console.log('🔧🔧🔧 SCRAPER v9.5.0 - STRICT MAIN PRODUCT ONLY 🔧🔧🔧');
+  console.log('🔧🔧🔧 SCRAPER v9.6.0 - UTTERMOST FIX 🔧🔧🔧');
   
   const data = {
     pageText: document.body.innerText || '',
@@ -97,43 +97,48 @@ function getPageData() {
     detectedSwatchName: null
   };
 
-  // HELPER: Check if element is in EXCLUDED area (Similar Items, Related, Footer, etc)
-  function isInExcludedArea(el) {
+  // CRITICAL: Check if element is in EXCLUDED sections
+  function isInExcludedSection(el) {
     let parent = el;
-    for (let i = 0; i < 15 && parent; i++) {
+    for (let i = 0; i < 20 && parent; i++) {
       const classes = (parent.className || '').toLowerCase();
       const id = (parent.id || '').toLowerCase();
       const tagName = parent.tagName?.toLowerCase() || '';
       
-      // Get text content of nearby headers
-      const nearbyText = (parent.innerText || '').substring(0, 500).toLowerCase();
-      
-      // EXCLUDE these areas completely
+      // EXCLUDED SECTIONS - be very thorough
       if (
-        // Similar/Related products
-        classes.includes('similar') || classes.includes('related') ||
-        classes.includes('recommend') || classes.includes('also-like') ||
-        classes.includes('you-may') || classes.includes('recently') ||
-        classes.includes('cross-sell') || classes.includes('upsell') ||
-        id.includes('similar') || id.includes('related') ||
-        id.includes('recommend') || id.includes('recently') ||
+        // Related/Similar products (Uttermost uses RelatedProducts)
+        classes.includes('relatedproducts') ||
+        classes.includes('related-products') ||
+        classes.includes('similar') ||
+        classes.includes('recommend') ||
+        classes.includes('also-like') ||
+        classes.includes('you-may') ||
+        classes.includes('cross-sell') ||
+        classes.includes('upsell') ||
+        classes.includes('recently-viewed') ||
+        // IDs
+        id.includes('related') ||
+        id.includes('similar') ||
+        id.includes('recommend') ||
+        id.includes('recently') ||
         // Navigation/Header/Footer
-        classes.includes('nav') || classes.includes('menu') ||
-        classes.includes('header') || classes.includes('footer') ||
-        classes.includes('sidebar') || classes.includes('modal') ||
-        id.includes('nav') || id.includes('menu') ||
-        id.includes('header') || id.includes('footer') ||
-        // Carousel/Slider sections that aren't the main product
-        (classes.includes('carousel') && !classes.includes('product-carousel')) ||
-        (classes.includes('slider') && !classes.includes('product-slider')) ||
-        // Check for "Similar Items" text
-        nearbyText.includes('similar items') ||
-        nearbyText.includes('you may also like') ||
-        nearbyText.includes('related products') ||
-        nearbyText.includes('recently viewed') ||
-        nearbyText.includes('customers also')
+        tagName === 'nav' ||
+        tagName === 'header' ||
+        tagName === 'footer' ||
+        classes.includes('nav-') ||
+        classes.includes('header-') ||
+        classes.includes('footer-') ||
+        classes.includes('menu') ||
+        classes.includes('sidebar') ||
+        classes.includes('modal') ||
+        // Social/External widgets
+        classes.includes('candid') ||
+        classes.includes('getcandid') ||
+        classes.includes('instagram') ||
+        classes.includes('social')
       ) {
-        console.log('❌ EXCLUDED AREA:', classes || id || tagName);
+        console.log('❌ EXCLUDED SECTION:', classes.substring(0, 50) || id || tagName);
         return true;
       }
       parent = parent.parentElement;
@@ -141,66 +146,22 @@ function getPageData() {
     return false;
   }
 
-  // HELPER: Check if in MAIN PRODUCT swatch area
-  function isInMainProductSwatchArea(el) {
-    // First check if we're in an excluded area
-    if (isInExcludedArea(el)) {
-      return false;
+  // Get background image from element
+  function getBgImage(el) {
+    // Check inline style first
+    const inlineStyle = el.getAttribute('style') || '';
+    const bgMatch = inlineStyle.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
+    if (bgMatch && bgMatch[1]) {
+      let url = bgMatch[1];
+      if (url.startsWith('/')) url = window.location.origin + url;
+      if (url.startsWith('http')) return url;
     }
     
-    let parent = el;
-    let foundSwatchIndicator = false;
-    let foundMainProduct = false;
-    
-    for (let i = 0; i < 10 && parent; i++) {
-      const classes = (parent.className || '').toLowerCase();
-      const id = (parent.id || '').toLowerCase();
-      
-      // Check if we're in the main product detail area
-      if (classes.includes('product-detail') || classes.includes('product-info') ||
-          classes.includes('pdp-') || classes.includes('product-page') ||
-          classes.includes('product-main') || classes.includes('product-view') ||
-          id.includes('product-detail') || id.includes('pdp') ||
-          id.includes('main-product') || id.includes('product-info')) {
-        foundMainProduct = true;
-      }
-      
-      // Check for swatch indicators
-      if (classes.includes('swatch') || classes.includes('color-option') || 
-          classes.includes('finish') || classes.includes('fabric') ||
-          classes.includes('configurable') || classes.includes('variant') ||
-          id.includes('swatch') || id.includes('color-option')) {
-        foundSwatchIndicator = true;
-      }
-      
-      // Check for color/finish labels nearby
-      const labels = parent.querySelectorAll('label, legend, span, h3, h4, dt, .label');
-      for (const label of labels) {
-        const txt = (label.innerText || '').toLowerCase().trim();
-        if (txt === 'color' || txt === 'color:' || txt === 'finish' || txt === 'finish:' ||
-            txt === 'fabric' || txt === 'fabric:' || txt === 'cover' || txt === 'cover:' ||
-            txt === 'material' || txt === 'material:' ||
-            txt.startsWith('select color') || txt.startsWith('select finish') ||
-            txt.startsWith('choose color') || txt.startsWith('choose finish')) {
-          foundSwatchIndicator = true;
-          break;
-        }
-      }
-      
-      parent = parent.parentElement;
-    }
-    
-    // Must have swatch indicator, and either be in main product OR not be deep in excluded areas
-    return foundSwatchIndicator;
-  }
-
-  // HELPER: Get background image URL
-  function getBgImageUrl(el) {
-    if (!el) return null;
+    // Check computed style
     try {
-      const bg = window.getComputedStyle(el).backgroundImage;
-      if (bg && bg !== 'none') {
-        const match = bg.match(/url\(["']?([^"')]+)["']?\)/);
+      const computed = window.getComputedStyle(el).backgroundImage;
+      if (computed && computed !== 'none') {
+        const match = computed.match(/url\(["']?([^"')]+)["']?\)/);
         if (match && match[1] && !match[1].includes('data:') && !match[1].includes('gradient')) {
           let url = match[1];
           if (url.startsWith('/')) url = window.location.origin + url;
@@ -211,62 +172,38 @@ function getPageData() {
     return null;
   }
 
-  // HELPER: Check if element is selected
-  function isSelected(el) {
-    if (!el) return false;
+  // Check if element is a selected swatch
+  function isSelectedSwatch(el) {
     const classes = (el.className || '').toLowerCase();
-    return classes.includes('selected') || classes.includes('active') || 
-           classes.includes('current') || classes.includes('checked') ||
+    return classes.includes('selected') || 
+           classes.includes('active') || 
+           classes.includes('current') || 
+           classes.includes('checked') ||
            el.getAttribute('aria-selected') === 'true' ||
            el.getAttribute('aria-checked') === 'true';
   }
 
-  // HELPER: Get color name from element
+  // Get color name from element
   function getColorName(el) {
-    if (!el) return null;
-    const attrs = ['title', 'data-color', 'data-value', 'data-option-value', 'data-name', 'alt', 'aria-label'];
-    for (const attr of attrs) {
-      let val = el.getAttribute(attr);
-      if (val) {
-        val = val.replace(/selected|button|swatch|option|click|choose/gi, '').trim();
-        if (val.length > 0 && val.length < 50) return val;
-      }
+    // Priority: title > data-* > alt > aria-label
+    const title = el.getAttribute('title');
+    if (title && title.length < 50) return title.trim();
+    
+    const dataColor = el.getAttribute('data-color') || el.getAttribute('data-value') || 
+                      el.getAttribute('data-option-value') || el.getAttribute('data-name');
+    if (dataColor && dataColor.length < 50) return dataColor.trim();
+    
+    const alt = el.getAttribute('alt');
+    if (alt && alt.length < 50) return alt.trim();
+    
+    const ariaLabel = el.getAttribute('aria-label');
+    if (ariaLabel) {
+      // Clean up aria-label (e.g., "Fashion size Porcelain button selected" -> "Porcelain")
+      const cleaned = ariaLabel.replace(/fashion size|button|selected|option|click|choose/gi, '').trim();
+      if (cleaned.length > 0 && cleaned.length < 50) return cleaned;
     }
+    
     return null;
-  }
-
-  // HELPER: Check if URL should be excluded
-  function isExcludedUrl(url) {
-    const lower = url.toLowerCase();
-    if (lower.endsWith('.svg') || lower.includes('.svg?')) return true;
-    const patterns = ['icon', 'logo', 'arrow', 'chevron', 'close', 'menu', 'cart', 'search',
-                      'nav', 'mobile', 'hamburger', 'lightbulb', 'bulb', 'spinner', 'loading',
-                      'placeholder', 'pixel', 'tracking', 'spacer', 'blank'];
-    for (const p of patterns) {
-      if (lower.includes(p)) return true;
-    }
-    return false;
-  }
-
-  // HELPER: Check if likely a product image
-  function isLikelyProductImage(img, src) {
-    if (isInExcludedArea(img)) return false;
-    if (isExcludedUrl(src)) return false;
-    const w = img.naturalWidth || img.width || 0;
-    const h = img.naturalHeight || img.height || 0;
-    if (w < 200 || h < 200) return false;
-    return true;
-  }
-
-  // HELPER: Check if likely a swatch image  
-  function isLikelySwatchImage(el, url, w, h) {
-    if (w > 150 || h > 150) return false;
-    if (w < 10 || h < 10) return false;
-    const ratio = Math.max(w, h) / Math.min(w, h);
-    if (ratio > 2.5) return false;
-    if (isExcludedUrl(url)) return false;
-    if (!isInMainProductSwatchArea(el)) return false;
-    return true;
   }
 
   // ========================================
@@ -274,69 +211,57 @@ function getPageData() {
   // ========================================
   console.log('=== STEP 1: FINDING MAIN PRODUCT IMAGE ===');
   
-  // Try og:image first (most reliable)
+  // Method 1: og:image (most reliable)
   const ogImg = document.querySelector('meta[property="og:image"]');
   if (ogImg?.content && ogImg.content.startsWith('http')) {
     data.mainProductImage = ogImg.content;
-    console.log('✅ Main image from og:image:', data.mainProductImage);
+    console.log('✅ Main from og:image:', data.mainProductImage.substring(0, 80));
   }
   
-  // Try product schema
+  // Method 2: Active slide in product gallery (Uttermost uses swiper)
   if (!data.mainProductImage) {
-    const schemas = document.querySelectorAll('script[type="application/ld+json"]');
-    for (const schema of schemas) {
-      try {
-        const json = JSON.parse(schema.textContent);
-        let imgUrl = null;
-        if (json['@type'] === 'Product' && json.image) {
-          imgUrl = Array.isArray(json.image) ? json.image[0] : json.image;
-        } else if (json['@graph']) {
-          const product = json['@graph'].find(i => i['@type'] === 'Product');
-          if (product?.image) {
-            imgUrl = Array.isArray(product.image) ? product.image[0] : product.image;
-          }
-        }
-        if (imgUrl?.startsWith('http')) {
-          data.mainProductImage = imgUrl;
-          console.log('✅ Main image from schema:', data.mainProductImage);
-          break;
-        }
-      } catch(e) {}
+    const activeSlide = document.querySelector('.swiper-slide-active img, .slick-active img, .carousel-item.active img');
+    if (activeSlide && !isInExcludedSection(activeSlide)) {
+      const src = activeSlide.src || activeSlide.dataset.src;
+      if (src?.startsWith('http')) {
+        data.mainProductImage = src;
+        console.log('✅ Main from active slide:', data.mainProductImage.substring(0, 80));
+      }
     }
   }
   
-  // Try common product image selectors (but NOT in similar items)
+  // Method 3: Product detail image containers
   if (!data.mainProductImage) {
     const selectors = [
-      '.product-media-gallery img',
+      '.productSlider-root img',
+      '.product-media img',
       '.product-image-container img',
-      '.product-detail img',
+      '.gallery-image img',
       '.pdp-gallery img',
-      '[data-gallery-role="main-image"] img',
-      '.fotorama__stage img',
-      '.product-image img:first-child'
+      '[data-gallery-role="main"] img'
     ];
     for (const sel of selectors) {
       const img = document.querySelector(sel);
-      if (img && !isInExcludedArea(img)) {
+      if (img && !isInExcludedSection(img)) {
         const src = img.src || img.dataset.src;
-        if (src?.startsWith('http') && !isExcludedUrl(src)) {
+        if (src?.startsWith('http')) {
           data.mainProductImage = src;
-          console.log('✅ Main image from selector:', sel);
+          console.log('✅ Main from selector:', sel);
           break;
         }
       }
     }
   }
   
-  // Fallback: largest image NOT in excluded areas
+  // Method 4: Largest non-excluded image
   if (!data.mainProductImage) {
     let bestImg = null, bestSize = 0;
     document.querySelectorAll('img').forEach(img => {
-      if (isInExcludedArea(img)) return;
+      if (isInExcludedSection(img)) return;
       const src = img.src || img.dataset.src;
       if (!src?.startsWith('http')) return;
-      if (isExcludedUrl(src)) return;
+      const lower = src.toLowerCase();
+      if (lower.endsWith('.svg') || lower.includes('icon') || lower.includes('logo')) return;
       const w = img.naturalWidth || img.width || 0;
       const h = img.naturalHeight || img.height || 0;
       if (w < 200 || h < 200) return;
@@ -345,82 +270,133 @@ function getPageData() {
     });
     if (bestImg) {
       data.mainProductImage = bestImg;
-      console.log('✅ Main image from largest:', data.mainProductImage);
+      console.log('✅ Main from largest image');
     }
   }
 
   // ========================================
-  // 2. FIND SWATCH IMAGES (MAIN PRODUCT ONLY)
+  // 2. FIND SELECTED COLOR SWATCH
   // ========================================
-  console.log('=== STEP 2: FINDING SWATCH IMAGES (MAIN PRODUCT ONLY) ===');
+  console.log('=== STEP 2: FINDING COLOR SWATCH ===');
   
-  const seenUrls = new Set();
-  let foundSelected = false;
+  // PRIORITY 1: Look for explicitly selected swatch buttons with background-image
+  // This is how Uttermost works: tile-root_selected-Au1 with background-image style
+  const swatchSelectors = [
+    // Uttermost-style: button with tile-root_selected class
+    'button[class*="selected"][style*="background-image"]',
+    'button[class*="active"][style*="background-image"]',
+    // Generic selected swatches
+    '[class*="swatch"][class*="selected"]',
+    '[class*="swatch"][class*="active"]',
+    '[class*="color-option"][class*="selected"]',
+    '[class*="color-option"][class*="active"]',
+    // Buttons with tile/swatch in class that are selected
+    'button[class*="tile"][class*="selected"]',
+    'button[class*="tile"][class*="active"]'
+  ];
   
-  // Method 1: Look for swatch containers with background images
-  document.querySelectorAll('button, a, div, span, label, [class*="swatch"], [class*="color"]').forEach(el => {
-    const bgUrl = getBgImageUrl(el);
-    if (!bgUrl || seenUrls.has(bgUrl)) return;
-    
-    const rect = el.getBoundingClientRect();
-    const w = rect.width || 50;
-    const h = rect.height || 50;
-    
-    if (!isLikelySwatchImage(el, bgUrl, w, h)) return;
-    
-    seenUrls.add(bgUrl);
-    const selected = isSelected(el);
-    const colorName = getColorName(el);
-    
-    console.log('✅ Found swatch (bg):', colorName || 'unnamed', bgUrl.substring(0, 60), selected ? '[SELECTED]' : '');
-    data.swatchImages.push({ url: bgUrl, isSelected: selected, colorName: colorName });
-    
-    if (selected && !foundSelected) {
-      data.detectedSwatchUrl = bgUrl;
-      data.detectedSwatchName = colorName;
-      foundSelected = true;
-      console.log('🎯 Using SELECTED swatch:', colorName);
+  for (const selector of swatchSelectors) {
+    const elements = document.querySelectorAll(selector);
+    for (const el of elements) {
+      if (isInExcludedSection(el)) {
+        console.log('❌ Skipping excluded:', selector);
+        continue;
+      }
+      
+      const bgUrl = getBgImage(el);
+      if (bgUrl) {
+        const colorName = getColorName(el);
+        console.log('✅ FOUND SELECTED SWATCH:', colorName, bgUrl.substring(0, 60));
+        data.detectedSwatchUrl = bgUrl;
+        data.detectedSwatchName = colorName;
+        data.swatchImages.push({ url: bgUrl, isSelected: true, colorName: colorName });
+        break;
+      }
     }
-  });
+    if (data.detectedSwatchUrl) break;
+  }
   
-  // Method 2: Look for small img tags in swatch areas
-  document.querySelectorAll('img').forEach(img => {
-    const src = img.src || img.dataset.src;
-    if (!src?.startsWith('http') || seenUrls.has(src)) return;
+  // PRIORITY 2: If no selected swatch found, look in option/swatch containers
+  if (!data.detectedSwatchUrl) {
+    console.log('No selected swatch found, looking for swatch containers...');
     
-    const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 50;
-    const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 50;
+    // Find containers that have "Color" or "Finish" labels
+    const optionContainers = document.querySelectorAll('[class*="option"], [class*="swatch"], [class*="variant"]');
     
-    if (!isLikelySwatchImage(img, src, w, h)) return;
-    
-    seenUrls.add(src);
-    const parent = img.closest('button, a, div, label, li, [class*="swatch"]');
-    const selected = parent ? isSelected(parent) : isSelected(img);
-    const colorName = getColorName(img) || (parent ? getColorName(parent) : null);
-    
-    console.log('✅ Found swatch (img):', colorName || 'unnamed', src.substring(0, 60), selected ? '[SELECTED]' : '');
-    data.swatchImages.push({ url: src, isSelected: selected, colorName: colorName });
-    
-    if (selected && !foundSelected) {
-      data.detectedSwatchUrl = src;
-      data.detectedSwatchName = colorName;
-      foundSelected = true;
-      console.log('🎯 Using SELECTED swatch:', colorName);
+    for (const container of optionContainers) {
+      if (isInExcludedSection(container)) continue;
+      
+      // Check if this container has a color/finish label
+      const labels = container.querySelectorAll('span, label, legend, h3, h4');
+      let hasColorLabel = false;
+      for (const label of labels) {
+        const txt = (label.innerText || '').toLowerCase().trim();
+        if (txt === 'color' || txt === 'color:' || txt === 'finish' || txt === 'finish:' ||
+            txt === 'fabric' || txt === 'fabric:') {
+          hasColorLabel = true;
+          break;
+        }
+      }
+      
+      if (!hasColorLabel) continue;
+      
+      // Look for buttons/elements with background images in this container
+      const swatchElements = container.querySelectorAll('button, [class*="swatch"], [class*="tile"]');
+      for (const el of swatchElements) {
+        if (isSelectedSwatch(el)) {
+          const bgUrl = getBgImage(el);
+          if (bgUrl) {
+            const colorName = getColorName(el);
+            console.log('✅ FOUND SWATCH in container:', colorName, bgUrl.substring(0, 60));
+            data.detectedSwatchUrl = bgUrl;
+            data.detectedSwatchName = colorName;
+            data.swatchImages.push({ url: bgUrl, isSelected: true, colorName: colorName });
+            break;
+          }
+        }
+      }
+      if (data.detectedSwatchUrl) break;
     }
-  });
+  }
   
-  // Use first valid swatch only if none selected
-  if (!data.detectedSwatchUrl && data.swatchImages.length > 0) {
-    data.detectedSwatchUrl = data.swatchImages[0].url;
-    data.detectedSwatchName = data.swatchImages[0].colorName;
-    console.log('Using first swatch:', data.detectedSwatchName);
+  // PRIORITY 3: Fall back to first swatch in a color section (if nothing selected)
+  if (!data.detectedSwatchUrl) {
+    console.log('No selected swatch, looking for any swatch in color section...');
+    
+    const allButtons = document.querySelectorAll('button[style*="background-image"], [class*="swatch"][style*="background-image"]');
+    for (const el of allButtons) {
+      if (isInExcludedSection(el)) continue;
+      
+      const bgUrl = getBgImage(el);
+      if (bgUrl) {
+        // Make sure this is in a color/option area
+        let inColorArea = false;
+        let parent = el;
+        for (let i = 0; i < 5 && parent; i++) {
+          const classes = (parent.className || '').toLowerCase();
+          if (classes.includes('option') || classes.includes('swatch') || classes.includes('color') || classes.includes('variant')) {
+            inColorArea = true;
+            break;
+          }
+          parent = parent.parentElement;
+        }
+        
+        if (inColorArea) {
+          const colorName = getColorName(el);
+          console.log('✅ Using first swatch:', colorName, bgUrl.substring(0, 60));
+          data.detectedSwatchUrl = bgUrl;
+          data.detectedSwatchName = colorName;
+          data.swatchImages.push({ url: bgUrl, isSelected: false, colorName: colorName });
+          break;
+        }
+      }
+    }
   }
   
   console.log('=== COMPLETE ===');
   console.log('Main image:', data.mainProductImage ? data.mainProductImage.substring(0, 60) + '...' : 'NOT FOUND');
-  console.log('Swatch count:', data.swatchImages.length);
-  console.log('Selected swatch:', data.detectedSwatchUrl ? data.detectedSwatchUrl.substring(0, 60) + '...' : 'NONE');
-  console.log('Swatch name:', data.detectedSwatchName || 'NONE');
+  console.log('Swatch URL:', data.detectedSwatchUrl ? data.detectedSwatchUrl.substring(0, 60) + '...' : 'NOT FOUND');
+  console.log('Swatch name:', data.detectedSwatchName || 'NOT FOUND');
   
   return data;
 }
@@ -466,9 +442,9 @@ async function doScrape() {
     const aiData = await response.json();
     console.log('AI data:', aiData);
     
-    // IMPORTANT: Use AI finish_color if no swatch detected, or if swatch name looks wrong
+    // Use detected swatch name if available, otherwise use AI's finish_color
     let finalFinishColor = aiData.finish_color;
-    if (pageData.detectedSwatchName && pageData.detectedSwatchName.length > 0) {
+    if (pageData.detectedSwatchName) {
       finalFinishColor = pageData.detectedSwatchName;
     }
     
@@ -554,8 +530,9 @@ rescrapeBtn.addEventListener('click', doScrape);
         'loloirugs': 'Loloi', 'fourhands': 'Four Hands', 'hvlgroup': 'Hudson Valley',
         'visualcomfort': 'Visual Comfort', 'globalviews': 'Global Views',
         'reginaandrew': 'Regina Andrew', 'crestviewcollection': 'Crestview',
-        'hubbardtonforge': 'Hubbardton Forge', 'villaandhouse': 'Villa & House',
-        'bassettmirror': 'Bassett Mirror'
+        'hubbardtonforge': 'Hubbardton Forge', 'vandh': 'Villa & House',
+        'bassettmirror': 'Bassett Mirror', 'myohamerica': 'Oh America',
+        'elegantlighting': 'Elegant Lighting', 'zeelighting': 'Zee Lighting'
       };
       v = vendorMap[v] || (v.charAt(0).toUpperCase() + v.slice(1));
       vendorBadge.textContent = v;
