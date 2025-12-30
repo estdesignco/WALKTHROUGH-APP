@@ -142,35 +142,60 @@ function getPageData() {
   
   function isInSwatchArea(el) {
     // Check if element is inside a color/finish/fabric selection area
+    // Must be STRICT to avoid false positives like menu icons
     let parent = el;
-    for (let i = 0; i < 10 && parent; i++) {
+    let foundSwatchIndicator = false;
+    
+    for (let i = 0; i < 8 && parent; i++) {
       const classes = (parent.className || '').toLowerCase();
-      const text = (parent.innerText || '').toLowerCase().substring(0, 200);
+      const id = (parent.id || '').toLowerCase();
       
-      // Keywords that indicate swatch/color selection area
-      if (classes.includes('swatch') || classes.includes('color-option') || 
-          classes.includes('finish') || classes.includes('fabric') ||
-          classes.includes('variant') || classes.includes('option-tile') ||
-          classes.includes('color-picker')) {
-        return true;
+      // EXCLUDE: Navigation, header, footer, menu areas
+      if (classes.includes('nav') || classes.includes('menu') || 
+          classes.includes('header') || classes.includes('footer') ||
+          classes.includes('modal') || classes.includes('popup') ||
+          classes.includes('overlay') || classes.includes('sidebar') ||
+          id.includes('nav') || id.includes('menu') || 
+          id.includes('header') || id.includes('footer')) {
+        return false;
       }
       
-      // Check for nearby labels
-      const labels = parent.querySelectorAll('label, legend, span, h3, h4, dt');
-      for (const label of labels) {
-        const labelText = (label.innerText || '').toLowerCase().trim();
-        if (labelText === 'color' || labelText === 'color:' || 
-            labelText === 'finish' || labelText === 'finish:' ||
-            labelText === 'fabric' || labelText === 'fabric:' ||
-            labelText === 'cover' || labelText === 'cover:' ||
-            labelText === 'material' || labelText === 'material:') {
-          return true;
+      // INCLUDE: Actual swatch/color selection areas
+      if (classes.includes('swatch') || classes.includes('color-option') || 
+          classes.includes('finish-option') || classes.includes('fabric-option') ||
+          classes.includes('variant-option') || classes.includes('option-tile') ||
+          classes.includes('color-picker') || classes.includes('color-select') ||
+          classes.includes('finish-select') || classes.includes('configurable-option') ||
+          id.includes('swatch') || id.includes('color-option') ||
+          id.includes('finish-option') || id.includes('fabric-option')) {
+        foundSwatchIndicator = true;
+      }
+      
+      // Check for labels that indicate swatch area
+      if (!foundSwatchIndicator) {
+        const labels = parent.querySelectorAll('label, legend, span.label, h3, h4, dt, .option-label');
+        for (const label of labels) {
+          const labelText = (label.innerText || '').toLowerCase().trim();
+          // Must be an exact or near-exact match for color/finish labels
+          if (labelText === 'color' || labelText === 'color:' || 
+              labelText === 'finish' || labelText === 'finish:' ||
+              labelText === 'fabric' || labelText === 'fabric:' ||
+              labelText === 'cover' || labelText === 'cover:' ||
+              labelText === 'material' || labelText === 'material:' ||
+              labelText.startsWith('select color') ||
+              labelText.startsWith('select finish') ||
+              labelText.startsWith('choose color') ||
+              labelText.startsWith('choose finish')) {
+            foundSwatchIndicator = true;
+            break;
+          }
         }
       }
       
       parent = parent.parentElement;
     }
-    return false;
+    
+    return foundSwatchIndicator;
   }
   
   function isLikelyProductImage(img, src) {
