@@ -14684,10 +14684,21 @@ CRITICAL EXTRACTION RULES:
    - Usually appears near the product title
 
 2. FINISH/COLOR - ALWAYS extract this. Look for:
-   - "Finish:", "Color:", "Fabric:", "Material:"
+   - "Finish:", "Color:", "Fabric:", "Material:", "Available Finishes"
+   - Text near finish icons/swatches
    - Examples: Aged Brass, Sapphire Navy, Ivory/Granite, Bronze, Natural Oak, Charcoal
-   - Selected color option, active swatch name
-   - Usually near size options or in product details
+   - IMPORTANT: Finish codes in SKUs mean specific finishes:
+     * AGB = Aged Brass
+     * BZ/BRZ = Bronze
+     * PN = Polished Nickel
+     * DB = Distressed Bronze
+     * HAB = Hand-Rubbed Antique Brass
+     * AI = Aged Iron
+     * CHR = Chrome
+     * BLK = Black
+     * WHT = White
+     * GLD = Gold
+   - If SKU ends with a finish code, decode it to the full finish name
 
 3. SIZE/DIMENSIONS - Look for:
    - W x H x D, Width x Height x Depth
