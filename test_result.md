@@ -1379,3 +1379,42 @@ The Master Contacts API limit increase is working correctly, allowing retrieval 
 
 **RECOMMENDATION**: The backend is ready for production use with these critical fixes verified.
 
+
+---
+
+## Test Session: December 30, 2025 - v9.4.0 COMPLETE REWRITE
+
+### Chrome Extension v9.4.0 - COMPLETE REWRITE
+
+**Fixes Implemented:**
+1. ✅ SVG files excluded (e.g., close-mobile-wNn.svg)
+2. ✅ Menu/close/nav icons excluded
+3. ✅ Lightbulb images excluded (Visual Comfort issue)
+4. ✅ Better swatch area detection (strict exclusion of nav/header/footer)
+5. ✅ Better main image detection (og:image, twitter:image, schema, selectors)
+6. ✅ Version marker: "🔧🔧🔧 SCRAPER v9.4.0 - Dec 30 2025"
+
+**Backend AI Scraper Test Results:**
+All 22 vendors PASSED:
+- Furniture: Four Hands, Bernhardt, Gabby, Villa House
+- Lighting: Visual Comfort, Hudson Valley, Regina Andrew, Uttermost, Hinkley, Hubbardton Forge, Elegant Lighting, Zee Lighting
+- Rugs: Loloi, Surya
+- Decor: Global Views, Crestview, Bassett Mirror, Flow Decor, Eichholtz, Oh America, Safavieh, Rowe
+
+**Image Detection Logic Test:**
+- ✅ SVG exclusion working
+- ✅ Lightbulb exclusion working
+- ✅ Menu/nav/close icon exclusion working
+- ✅ Valid swatch images included
+
+**Download URL:** https://shopfetch-1.preview.emergentagent.com/api/download/chrome-extension
+**Filename:** design-ready-scraper-extension-v9.4.zip
+
+### User Issues Addressed:
+1. Uttermost - Wrong swatch (close-mobile.svg) → FIXED with SVG exclusion
+2. Visual Comfort - Lightbulb image → FIXED with lightbulb exclusion
+3. Villa & House - No fabric detected → Backend extracts finish_color correctly
+4. Global Views - No product image → Better og:image/schema detection
+5. Bassett Mirror - Image reversal → Fixed separation of main vs swatch
+6. Bernhardt - Image reversal → Fixed separation of main vs swatch
+
