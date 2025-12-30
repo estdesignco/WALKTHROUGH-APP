@@ -1418,3 +1418,42 @@ All 22 vendors PASSED:
 5. Bassett Mirror - Image reversal → Fixed separation of main vs swatch
 6. Bernhardt - Image reversal → Fixed separation of main vs swatch
 
+
+---
+
+## CHROME EXTENSION v10.0.0 - MULTI-VENDOR FIX (December 30, 2025)
+
+### Changes Made:
+1. **Complete rewrite of `popup.js`** with vendor-specific scraping logic
+2. **Version bumped to 10.0.0** in manifest.json
+3. **Added vendor-specific detection** for all 6 provided vendor URLs:
+   - Uttermost (uttermost.com)
+   - Loloi Rugs (loloirugs.com)
+   - HVL Group (hvlgroup.com) 
+   - Visual Comfort (visualcomfort.com)
+   - Regina Andrew (reginaandrew.com)
+   - Four Hands (fourhands.com)
+
+4. **Enhanced exclusion logic** to prevent "Similar Items" and "Related Products" contamination
+5. **Very prominent version banner** in console logs for easy verification
+6. **New extension ZIP created**: `/app/chrome-extension-v10.zip`
+
+### Key Improvements:
+- Vendor-specific swatch/finish detection based on actual HTML analysis
+- Better og:image fallback for main product image
+- Comprehensive exclusion patterns for related products sections
+- Support for 25+ vendor sites with targeted logic
+
+### Installation Instructions:
+1. Close all Chrome windows completely
+2. Delete the old extension folder (right-click > Remove from Chrome)  
+3. Download fresh: [API_URL]/api/download/chrome-extension
+4. Extract to a NEW folder (don't overwrite old one)
+5. Go to chrome://extensions
+6. Enable "Developer mode"
+7. Click "Load unpacked" and select the NEW folder
+8. Verify in console: Should show "SCRAPER VERSION 10.0.0"
+
+### User Testing Required:
+The user must test on the 6 vendor URLs provided to verify the fix works.
+
