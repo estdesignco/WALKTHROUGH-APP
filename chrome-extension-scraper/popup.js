@@ -84,10 +84,12 @@ function displayResults(data) {
 }
 
 // ============================================
-// FIXED IMAGE DETECTION - v9.2
+// FIXED IMAGE DETECTION - v9.3.1 - DECEMBER 30 2025
 // Strictly separates MAIN IMAGE from SWATCH IMAGE
 // ============================================
 function getPageData() {
+  console.log('🔧 SCRAPER VERSION 9.3.1 - December 30 2025');
+  
   const data = {
     pageText: document.body.innerText || '',
     pageUrl: window.location.href,
