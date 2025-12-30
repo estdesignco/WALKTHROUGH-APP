@@ -14650,24 +14650,47 @@ async def ai_scrape_product(request: AIScraperRequest):
         chat = LlmChat(
             api_key=api_key,
             session_id=f"scrape-{uuid.uuid4()}",
-            system_message="""You are a product data extraction expert for interior design and furniture websites.
-Extract the following information from the product page text provided.
-Return ONLY a valid JSON object with these exact fields (use null for missing values):
+            system_message="""You are a product data extraction expert for interior design, furniture, and lighting wholesale websites.
+
+Your job is to extract EVERY piece of product information from the page text. These are B2B wholesale sites where SKUs, finishes, and colors are ALWAYS present.
+
+Return ONLY a valid JSON object with these exact fields:
 {
-  "name": "product name",
-  "sku": "SKU or item number (alphanumeric code like 23878, ABC-123, F3102-BRZ)",
+  "name": "Full product name",
+  "sku": "Product SKU/Item Number",
   "price": 123.45,
   "msrp": 456.78,
-  "size": "dimensions like 30 W X 27 H X 32 D",
-  "finish_color": "color or finish name like Ginger, Bronze, Charcoal, Natural/Espresso"
+  "size": "Dimensions",
+  "finish_color": "Finish, Color, or Material"
 }
 
-IMPORTANT RULES:
-- SKU should be a product code (letters and numbers), NOT words like "Information" or "Global"
-- Price should be the dealer/your price (lower price), MSRP is the retail/list price (higher price)
-- Finish/Color is the material finish, fabric, or color - NOT dimensions or sizes
-- Size should be dimensions in inches (W x H x D format)
-- Return ONLY the JSON, no explanation or markdown"""
+CRITICAL EXTRACTION RULES:
+
+1. SKU/ITEM NUMBER - ALWAYS extract this. Look for:
+   - "SKU:", "Item #", "Item:", "Style:", "Model:", "Product #"
+   - Codes like: 8822-AGB, 106172-012, ROM-03, TOB4291BZ, 23878
+   - The alphanumeric code in the URL path (e.g., /Product/8822-AGB/)
+   - Usually appears near the product title
+
+2. FINISH/COLOR - ALWAYS extract this. Look for:
+   - "Finish:", "Color:", "Fabric:", "Material:"
+   - Examples: Aged Brass, Sapphire Navy, Ivory/Granite, Bronze, Natural Oak, Charcoal
+   - Selected color option, active swatch name
+   - Usually near size options or in product details
+
+3. SIZE/DIMENSIONS - Look for:
+   - W x H x D, Width x Height x Depth
+   - Measurements in inches (", in) or feet (', ft)
+   - "Dimensions:", "Size:", "Measurements:"
+
+4. PRICES:
+   - "Your Price", "Dealer Price", "NET" = price (lower)
+   - "MSRP", "Retail", "List Price", "MAP" = msrp (higher)
+   - If only one price shown, put it in price field
+
+5. NAME - Full product name including collection if shown
+
+Return ONLY valid JSON. No markdown, no explanation."""
         ).with_model("openai", "gpt-4o-mini")
         
         # Send the page text to AI
