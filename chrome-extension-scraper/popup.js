@@ -214,9 +214,33 @@ function getPageData() {
     
     // Exclude obvious non-swatches
     const urlLower = url.toLowerCase();
+    
+    // CRITICAL: Exclude SVG files - they are icons, not swatches
+    if (urlLower.endsWith('.svg') || urlLower.includes('.svg?')) {
+      return false;
+    }
+    
+    // Exclude UI elements and icons
     if (urlLower.includes('lightbulb') || urlLower.includes('bulb') ||
         urlLower.includes('arrow') || urlLower.includes('chevron') ||
-        urlLower.includes('icon') || urlLower.includes('logo')) {
+        urlLower.includes('icon') || urlLower.includes('logo') ||
+        urlLower.includes('close') || urlLower.includes('menu') ||
+        urlLower.includes('cart') || urlLower.includes('search') ||
+        urlLower.includes('nav') || urlLower.includes('mobile') ||
+        urlLower.includes('hamburger') || urlLower.includes('plus') ||
+        urlLower.includes('minus') || urlLower.includes('zoom') ||
+        urlLower.includes('share') || urlLower.includes('heart') ||
+        urlLower.includes('wishlist') || urlLower.includes('spinner') ||
+        urlLower.includes('loading') || urlLower.includes('play') ||
+        urlLower.includes('video')) {
+      return false;
+    }
+    
+    // Check element's alt/title for non-swatch indicators
+    const alt = (el.getAttribute('alt') || '').toLowerCase();
+    const title = (el.getAttribute('title') || '').toLowerCase();
+    if (alt.includes('close') || alt.includes('menu') || alt.includes('icon') ||
+        title.includes('close') || title.includes('menu') || title.includes('icon')) {
       return false;
     }
     
