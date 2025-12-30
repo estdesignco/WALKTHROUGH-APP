@@ -14634,12 +14634,23 @@ async def ai_scrape_product(request: AIScraperRequest):
         domain = domain.replace('www.', '')
         vendor = domain.split('.')[0].title()
         
-        # Clean up vendor names
+        # Clean up vendor names - comprehensive mapping for all interior design vendors
         vendor_map = {
             'Loloirugs': 'Loloi',
             'Fourhands': 'Four Hands',
-            'Hvlgroup': 'Hudson Valley',
-            'Visualcomfort': 'Visual Comfort'
+            'Hvlgroup': 'HVL Group',
+            'Visualcomfort': 'Visual Comfort',
+            'Reginaandrew': 'Regina Andrew',
+            'Globalviews': 'Global Views',
+            'Rowefurniture': 'Rowe Furniture',
+            'Flowdecor': 'Flow Decor',
+            'Crestviewcollection': 'Crestview Collection',
+            'Bassettmirror': 'Bassett Mirror',
+            'Myohamerica': 'MYO America',
+            'Hubbardtonforge': 'Hubbardton Forge',
+            'Elegantlighting': 'Elegant Lighting',
+            'Zeelighting': 'Zee Lighting',
+            'Vandh': 'V&H'
         }
         vendor = vendor_map.get(vendor, vendor)
         
