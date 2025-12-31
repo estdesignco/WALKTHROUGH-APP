@@ -14572,31 +14572,26 @@ async def login_to_all_vendor_portals():
 
 @api_router.get("/download/chrome-extension")
 async def download_chrome_extension():
-    """Download the Chrome Extension zip file"""
+    """Download the Chrome Extension zip file - v19.0.0"""
     import os
     
-    # Try multiple locations
-    possible_paths = [
-        "/app/chrome-extension-scraper.zip",
-        "/app/backend/static/chrome-extension-scraper.zip",
-        os.path.join(os.path.dirname(__file__), "..", "chrome-extension-scraper.zip")
-    ]
+    zip_path = "/app/chrome-extension-scraper.zip"
     
-    for zip_path in possible_paths:
-        if os.path.exists(zip_path):
-            return FileResponse(
-                path=zip_path,
-                filename="design-ready-scraper-extension-v9.5.zip",
-                media_type="application/zip",
-                headers={
-                    "Content-Disposition": "attachment; filename=design-ready-scraper-extension-v9.5.zip",
-                    "Cache-Control": "no-cache, no-store, must-revalidate",
-                    "Pragma": "no-cache",
-                    "Expires": "0"
-                }
-            )
+    if not os.path.exists(zip_path):
+        raise HTTPException(status_code=404, detail="Extension file not found")
     
-    raise HTTPException(status_code=404, detail="Extension file not found")
+    return FileResponse(
+        path=zip_path,
+        filename="design-ready-scraper-v19.0.0.zip",
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": "attachment; filename=design-ready-scraper-v19.0.0.zip",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Access-Control-Allow-Origin": "*"
+        }
+    )
 
 # ============================================================================
 # AI-POWERED PRODUCT SCRAPER (Like Thunderbit)
