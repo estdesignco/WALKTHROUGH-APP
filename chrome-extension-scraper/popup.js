@@ -461,27 +461,60 @@ function getPageData() {
     }
   }
   
-  // --- UTTERMOST - FROM V10 (THIS WORKED!) ---
+  // --- UTTERMOST - FIXED: Look for Color section FIRST, check button size ---
   else if (hostname.includes('uttermost.com')) {
-    console.log('  Using Uttermost logic (V10 restored)...');
+    console.log('  Using Uttermost logic (FIXED)...');
     
-    // V10 METHOD: Look for selected swatch tiles with background-image
-    const selectedTile = document.querySelector(
-      'button[class*="selected"][style*="background-image"],' +
-      'button[class*="active"][style*="background-image"],' +
-      '[class*="tile"][class*="selected"][style*="background-image"]'
-    );
-    
-    if (selectedTile && !isInExcludedSection(selectedTile)) {
-      const bgUrl = getBgImage(selectedTile);
-      if (bgUrl) {
-        data.detectedSwatchUrl = bgUrl;
-        data.detectedSwatchName = getColorName(selectedTile);
-        console.log('✅ Uttermost swatch:', data.detectedSwatchName);
+    // STEP 1: Find the "Color" section and get the selected swatch from there
+    // This is the CORRECT approach - look in Color section first
+    const allElements = document.querySelectorAll('*');
+    for (const el of allElements) {
+      // Check if this element's direct text is "Color"
+      const directText = Array.from(el.childNodes)
+        .filter(n => n.nodeType === 3)
+        .map(n => n.textContent.trim())
+        .join('');
+      
+      if (directText.toLowerCase() === 'color') {
+        console.log('    Found Color label!');
+        // Look for swatch buttons in parent or sibling containers
+        const parent = el.parentElement;
+        if (parent) {
+          // Find all buttons with background-image in this section
+          const swatchBtns = parent.querySelectorAll('button[style*="background-image"]');
+          console.log(`    Found ${swatchBtns.length} swatch buttons in Color section`);
+          
+          for (const btn of swatchBtns) {
+            // Check size - swatches are small (< 100px typically)
+            const rect = btn.getBoundingClientRect();
+            if (rect.width > 150 || rect.height > 150) {
+              console.log('    Skipping large button (not a swatch)');
+              continue;
+            }
+            
+            // Check if selected
+            const classes = (btn.className || '').toLowerCase();
+            const ariaChecked = btn.getAttribute('aria-checked');
+            const ariaSelected = btn.getAttribute('aria-selected');
+            
+            if (classes.includes('selected') || classes.includes('active') ||
+                ariaChecked === 'true' || ariaSelected === 'true') {
+              const bgUrl = getBgImage(btn);
+              if (bgUrl) {
+                data.detectedSwatchUrl = bgUrl;
+                data.detectedSwatchName = getColorName(btn);
+                console.log('✅ Uttermost Color section swatch:', data.detectedSwatchName);
+                console.log('   URL:', bgUrl.substring(0, 60));
+                break;
+              }
+            }
+          }
+        }
+        if (data.detectedSwatchUrl) break;
       }
     }
     
-    // V10 FALLBACK: Look for option containers with "Color" label
+    // STEP 2: If Color section approach failed, try configurable options
     if (!data.detectedSwatchUrl) {
       const optionContainers = document.querySelectorAll('[class*="option"], [class*="configurable"]');
       for (const container of optionContainers) {
@@ -500,17 +533,43 @@ function getPageData() {
         if (isColorContainer) {
           const buttons = container.querySelectorAll('button[style*="background-image"]');
           for (const btn of buttons) {
+            // Size check - skip large buttons
+            const rect = btn.getBoundingClientRect();
+            if (rect.width > 150 || rect.height > 150) continue;
+            
             if (isSelectedElement(btn)) {
               const bgUrl = getBgImage(btn);
               if (bgUrl) {
                 data.detectedSwatchUrl = bgUrl;
                 data.detectedSwatchName = getColorName(btn);
-                console.log('✅ Uttermost color container swatch:', data.detectedSwatchName);
+                console.log('✅ Uttermost configurable swatch:', data.detectedSwatchName);
                 break;
               }
             }
           }
           if (data.detectedSwatchUrl) break;
+        }
+      }
+    }
+    
+    // STEP 3: Last resort - find ANY small selected button with background-image
+    if (!data.detectedSwatchUrl) {
+      const allBgButtons = document.querySelectorAll('button[style*="background-image"]');
+      for (const btn of allBgButtons) {
+        if (isInExcludedSection(btn)) continue;
+        
+        // MUST be small (swatch size)
+        const rect = btn.getBoundingClientRect();
+        if (rect.width > 100 || rect.height > 100) continue;
+        
+        if (isSelectedElement(btn)) {
+          const bgUrl = getBgImage(btn);
+          if (bgUrl) {
+            data.detectedSwatchUrl = bgUrl;
+            data.detectedSwatchName = getColorName(btn);
+            console.log('✅ Uttermost small button swatch:', data.detectedSwatchName);
+            break;
+          }
         }
       }
     }
