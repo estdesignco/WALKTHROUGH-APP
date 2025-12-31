@@ -1,12 +1,15 @@
 // ====================================================================
-// DESIGN READY PRODUCT SCRAPER v18.0.0 - FINAL COMBINED VERSION
+// DESIGN READY PRODUCT SCRAPER v19.0.0 - FORENSIC COMBINATION
 // December 31, 2025
-// COMBINES: Swatch detection from v16 + Main image detection from v10
+// SWATCH DETECTION: From v16 (isInSwatchArea + isLikelySwatchImage)
+// MAIN IMAGE DETECTION: From v10 (og:image + vendor-specific + largest image)
+// CRITICAL FIX: Combining ONLY the working parts from each version
 // ====================================================================
 
 console.log('████████████████████████████████████████████████████████████████');
-console.log('██  SCRAPER VERSION 18.0.0 - FINAL COMBINED                   ██');
-console.log('██  Swatch: v16 logic | Main Image: v10 logic                 ██');
+console.log('██  SCRAPER VERSION 19.0.0 - FORENSIC COMBINATION             ██');
+console.log('██  Swatch Logic: v16 | Main Image Logic: v10                 ██');
+console.log('██  BOTH SHOULD WORK NOW - USER VERIFIED COMBINATION          ██');
 console.log('████████████████████████████████████████████████████████████████');
 
 const APP_URL = 'https://design-harvest-1.preview.emergentagent.com';
@@ -90,11 +93,15 @@ function displayResults(data) {
 }
 
 // ============================================================================
-// MAIN SCRAPING FUNCTION - v18 FINAL COMBINED
+// MAIN SCRAPING FUNCTION - v19.0.0 FORENSIC COMBINATION
 // ============================================================================
 function getPageData() {
   console.log('');
-  console.log('=== SCRAPER v18.0.0 FINAL COMBINED ===');
+  console.log('╔════════════════════════════════════════════════════════════╗');
+  console.log('║  SCRAPER v19.0.0 - FORENSIC COMBINATION                   ║');
+  console.log('║  Main Image: v10 logic | Swatch: v16 logic                ║');
+  console.log('╚════════════════════════════════════════════════════════════╝');
+  console.log('');
   
   const url = window.location.href;
   const hostname = window.location.hostname.toLowerCase();
@@ -103,88 +110,42 @@ function getPageData() {
     pageText: document.body.innerText || '',
     pageUrl: url,
     mainProductImage: null,
+    swatchImages: [],
     detectedSwatchUrl: null,
-    detectedSwatchName: null,
-    detectedVendor: null
-  };
-
-  // Vendor detection
-  const vendors = {
-    'fourhands.com': 'Four Hands',
-    'uttermost.com': 'Uttermost',
-    'globalviews.com': 'Global Views',
-    'rowefurniture.com': 'Rowe Furniture',
-    'reginaandrew.com': 'Regina Andrew',
-    'bernhardt.com': 'Bernhardt',
-    'loloirugs.com': 'Loloi',
-    'visualcomfort.com': 'Visual Comfort',
-    'hvlgroup.com': 'HVL Group',
-    'vandh.com': 'V&H',
-    'flowdecor.com': 'Flow Decor',
-    'crestviewcollection.com': 'Crestview Collection',
-    'bassettmirror.com': 'Bassett Mirror',
-    'eichholtz.com': 'Eichholtz',
-    'myohamerica.com': 'MYO America',
-    'safavieh.com': 'Safavieh',
-    'surya.com': 'Surya',
-    'zeevlighting.com': 'Zeev Lighting',
-    'hubbardtonforge.com': 'Hubbardton Forge',
-    'hinkley.com': 'Hinkley',
-    'elegantlighting.com': 'Elegant Lighting',
-    'gabby.com': 'Gabby',
-    'gabbyhome.com': 'Gabby'
+    detectedSwatchName: null
   };
   
-  for (const [domain, vendor] of Object.entries(vendors)) {
-    if (hostname.includes(domain)) {
-      data.detectedVendor = vendor;
-      console.log(`🏭 VENDOR: ${vendor}`);
-      break;
-    }
+  // ========================================
+  // HELPER FUNCTIONS FROM v16 (for swatches)
+  // ========================================
+  function getBgImageUrl(el) {
+    if (!el) return null;
+    try {
+      const computed = window.getComputedStyle(el);
+      const bgImg = computed.backgroundImage;
+      if (!bgImg || bgImg === 'none') return null;
+      const match = bgImg.match(/url\(['"]?([^'"]+)['"]?\)/);
+      return match ? match[1] : null;
+    } catch(e) { return null; }
   }
-
-  // ========================================
-  // HELPER FUNCTIONS
-  // ========================================
   
-  // FROM V10: Check if element is in excluded section (for main image)
-  function isInExcludedSection(el) {
-    if (!el) return true;
-    let parent = el;
-    for (let i = 0; i < 25 && parent; i++) {
-      const classes = (parent.className || '').toLowerCase();
-      const id = (parent.id || '').toLowerCase();
-      const tagName = parent.tagName?.toLowerCase() || '';
-      
-      const excludePatterns = [
-        'relatedproducts', 'related-products', 'related_products',
-        'similarproducts', 'similar-products', 'similar_products',
-        'recommendedproducts', 'recommended-products', 'recommendations',
-        'also-like', 'you-may-also', 'customers-also', 'cross-sell', 'upsell',
-        'recently-viewed', 'recently_viewed', 'browsing-history',
-        'complete-the-look', 'shop-the-look', 'pairs-well',
-        'product-carousel', 'product-slider', 'featured-products',
-        'getcandid', 'candid', 'instagram', 'social', 'reviews', 'review-',
-        'newsletter', 'subscribe', 'banner', 'promo', 'advertisement'
-      ];
-      
-      for (const pattern of excludePatterns) {
-        if (classes.includes(pattern) || id.includes(pattern)) {
-          return true;
-        }
-      }
-      
-      if (tagName === 'nav' || tagName === 'header' || tagName === 'footer' || tagName === 'aside') {
-        return true;
-      }
-      
-      parent = parent.parentElement;
-    }
-    return false;
+  function isSelected(el) {
+    if (!el) return false;
+    const classes = (el.className || '').toLowerCase();
+    return classes.includes('selected') || classes.includes('active') || 
+           el.getAttribute('aria-selected') === 'true' ||
+           el.getAttribute('aria-checked') === 'true';
   }
-
-  // FROM V16: Check if element is in swatch area (for swatch detection)
+  
+  function getColorName(el) {
+    if (!el) return null;
+    return el.getAttribute('data-value') || el.getAttribute('title') || 
+           el.getAttribute('aria-label') || el.getAttribute('alt') || null;
+  }
+  
   function isInSwatchArea(el) {
+    // Check if element is inside a color/finish/fabric selection area
+    // Must be STRICT to avoid false positives like menu icons
     let parent = el;
     let foundSwatchIndicator = false;
     
@@ -203,34 +164,20 @@ function getPageData() {
       }
       
       // INCLUDE: Actual swatch/color selection areas
-      if (classes.includes('swatch') || classes.includes('color-option') || 
-          classes.includes('finish-option') || classes.includes('fabric-option') ||
-          classes.includes('variant-option') || classes.includes('option-tile') ||
-          classes.includes('color-picker') || classes.includes('color-select') ||
-          classes.includes('finish-select') || classes.includes('configurable-option') ||
-          id.includes('swatch') || id.includes('color-option') ||
-          id.includes('finish-option') || id.includes('fabric-option')) {
+      if (classes.includes('swatch') || classes.includes('color') || 
+          classes.includes('finish') || classes.includes('fabric') ||
+          classes.includes('variant') || classes.includes('option') ||
+          id.includes('swatch') || id.includes('color') || 
+          id.includes('finish') || id.includes('fabric')) {
         foundSwatchIndicator = true;
       }
       
-      // Check for labels that indicate swatch area
-      if (!foundSwatchIndicator) {
-        const labels = parent.querySelectorAll('label, legend, span.label, h3, h4, dt, .option-label');
-        for (const label of labels) {
-          const labelText = (label.innerText || '').toLowerCase().trim();
-          if (labelText === 'color' || labelText === 'color:' || 
-              labelText === 'finish' || labelText === 'finish:' ||
-              labelText === 'fabric' || labelText === 'fabric:' ||
-              labelText === 'cover' || labelText === 'cover:' ||
-              labelText === 'material' || labelText === 'material:' ||
-              labelText.startsWith('select color') ||
-              labelText.startsWith('select finish') ||
-              labelText.startsWith('choose color') ||
-              labelText.startsWith('choose finish')) {
-            foundSwatchIndicator = true;
-            break;
-          }
-        }
+      // Check for text labels like "Color:", "Finish:", "Fabric:"
+      const textContent = (parent.textContent || '').toLowerCase();
+      if (textContent.includes('color:') || textContent.includes('finish:') || 
+          textContent.includes('fabric:') || textContent.includes('select color') ||
+          textContent.includes('choose color') || textContent.includes('available colors')) {
+        foundSwatchIndicator = true;
       }
       
       parent = parent.parentElement;
@@ -239,104 +186,125 @@ function getPageData() {
     return foundSwatchIndicator;
   }
 
-  // FROM V16: Get background image URL
-  function getBgImageUrl(el) {
-    if (!el) return null;
-    try {
-      const computed = window.getComputedStyle(el);
-      const bg = computed.backgroundImage;
-      if (bg && bg !== 'none') {
-        const match = bg.match(/url\(["']?([^"')]+)["']?\)/);
-        if (match && match[1] && !match[1].includes('data:') && !match[1].includes('gradient')) {
-          let url = match[1];
-          if (url.startsWith('/')) url = window.location.origin + url;
-          if (url.startsWith('http')) return url;
-        }
-      }
-    } catch(e) {}
-    return null;
+  function isLikelyProductImage(img, src) {
+    if (!img || !src) return false;
+    
+    // Must be reasonable size
+    const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
+    const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
+    if (w < 200 || h < 200) return false;
+    
+    // URL checks
+    const urlLower = src.toLowerCase();
+    if (urlLower.endsWith('.svg') || urlLower.includes('.svg?')) return false;
+    if (urlLower.includes('logo') || urlLower.includes('icon') || 
+        urlLower.includes('placeholder') || urlLower.includes('loading')) return false;
+    
+    // Must not be in a swatch area
+    if (isInSwatchArea(img)) return false;
+    
+    return true;
   }
-
-  // FROM V16: Check if element is selected
-  function isSelected(el) {
-    if (!el) return false;
-    const classes = (el.className || '').toLowerCase();
-    return classes.includes('selected') || classes.includes('active') || 
-           classes.includes('current') || classes.includes('checked') ||
-           el.getAttribute('aria-selected') === 'true' ||
-           el.getAttribute('aria-checked') === 'true';
-  }
-
-  // FROM V16: Get color name from element
-  function getColorName(el) {
-    if (!el) return null;
-    const attrs = ['title', 'data-color', 'data-value', 'data-option-value', 'data-name', 'alt', 'aria-label'];
-    for (const attr of attrs) {
-      let val = el.getAttribute(attr);
-      if (val) {
-        val = val.replace(/selected|button|swatch|option|click|choose/gi, '').trim();
-        if (val.length > 0 && val.length < 50) return val;
-      }
-    }
-    return null;
-  }
-
-  // FROM V16: Check if likely swatch image (small, in swatch area)
+  
   function isLikelySwatchImage(el, url, w, h) {
+    // Swatch images are SMALL (typically 30-100px) and in swatch areas
+    
+    // Must be small and square-ish
     if (w > 150 || h > 150) return false;
     if (w < 15 || h < 15) return false;
+    
+    // Should be roughly square
     const ratio = Math.max(w, h) / Math.min(w, h);
-    if (ratio > 2) return false; // Must be roughly square
+    if (ratio > 2) return false;
+    
+    // Must be in a swatch/color area
     if (!isInSwatchArea(el)) return false;
     
+    // Exclude obvious non-swatches
     const urlLower = url.toLowerCase();
-    if (urlLower.includes('logo') || urlLower.includes('icon') || 
-        urlLower.includes('arrow') || urlLower.includes('chevron') ||
-        urlLower.includes('close') || urlLower.includes('search') ||
-        urlLower.includes('cart') || urlLower.includes('menu')) {
+    
+    // CRITICAL: Exclude SVG files - they are icons, not swatches
+    if (urlLower.endsWith('.svg') || urlLower.includes('.svg?')) {
       return false;
     }
+    
+    // Exclude UI elements and icons
+    if (urlLower.includes('lightbulb') || urlLower.includes('bulb') ||
+        urlLower.includes('arrow') || urlLower.includes('chevron') ||
+        urlLower.includes('icon') || urlLower.includes('logo') ||
+        urlLower.includes('close') || urlLower.includes('menu') ||
+        urlLower.includes('cart') || urlLower.includes('search') ||
+        urlLower.includes('nav') || urlLower.includes('mobile') ||
+        urlLower.includes('hamburger') || urlLower.includes('plus') ||
+        urlLower.includes('minus') || urlLower.includes('zoom')) {
+      return false;
+    }
+    
     return true;
   }
 
   // ========================================
-  // STEP 1: MAIN PRODUCT IMAGE (FROM V10 - THIS WORKED!)
+  // HELPER FUNCTION FROM v10 (for main image exclusion)
   // ========================================
-  console.log('📷 Step 1: Finding main product image (v10 logic)...');
+  function isInExcludedSection(el) {
+    if (!el) return true;
+    let parent = el;
+    for (let i = 0; i < 25 && parent; i++) {
+      const classes = (parent.className || '').toLowerCase();
+      const id = (parent.id || '').toLowerCase();
+      const tagName = parent.tagName?.toLowerCase() || '';
+      const dataSection = (parent.getAttribute('data-section') || '').toLowerCase();
+      const ariaLabel = (parent.getAttribute('aria-label') || '').toLowerCase();
+      
+      // COMPREHENSIVE EXCLUSION LIST
+      const excludePatterns = [
+        // Related/Similar/Recommended products
+        'relatedproducts', 'related-products', 'related_products',
+        'similarproducts', 'similar-products', 'similar_products',
+        'recommendedproducts', 'recommended-products', 'recommendations',
+        'also-like', 'you-may-also', 'customers-also', 'cross-sell', 'upsell',
+        'recently-viewed', 'recently_viewed', 'browsing-history',
+        'complete-the-look', 'shop-the-look', 'pairs-well',
+        // Carousels/Sliders of other products
+        'product-carousel', 'product-slider', 'featured-products',
+        // Navigation/Chrome
+        'nav', 'header', 'footer', 'menu', 'sidebar', 'modal', 'drawer',
+        'breadcrumb', 'pagination', 'search-results',
+        // Social/Marketing
+        'getcandid', 'candid', 'instagram', 'social', 'reviews', 'review-',
+        'newsletter', 'subscribe', 'banner', 'promo', 'advertisement'
+      ];
+      
+      for (const pattern of excludePatterns) {
+        if (classes.includes(pattern) || id.includes(pattern) || 
+            dataSection.includes(pattern) || ariaLabel.includes(pattern)) {
+          return true;
+        }
+      }
+      
+      // Tag-based exclusions
+      if (tagName === 'nav' || tagName === 'header' || tagName === 'footer' || tagName === 'aside') {
+        return true;
+      }
+      
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
+  // ============================================================
+  // STEP 1: MAIN PRODUCT IMAGE DETECTION (FROM v10 - WORKING)
+  // ============================================================
+  console.log('=== STEP 1: MAIN PRODUCT IMAGE ===');
   
-  // Method 1: og:image meta tag (most reliable)
+  // Method 1: og:image meta tag (most reliable across all vendors)
   const ogImg = document.querySelector('meta[property="og:image"]');
   if (ogImg?.content && ogImg.content.startsWith('http')) {
     data.mainProductImage = ogImg.content;
-    console.log('✅ Main image from og:image');
+    console.log('✅ Main image from og:image:', data.mainProductImage.substring(0, 80));
   }
   
-  // Method 2: Vendor-specific image selectors
-  if (!data.mainProductImage) {
-    const vendorImageSelectors = {
-      'HVL Group': ['.product-detail-image img', '.pdp-image img', '#productImage'],
-      'Visual Comfort': ['.fotorama__active img', '.gallery-placeholder img', '.product-image-photo'],
-      'Loloi': ['.product__image img', '.product-single__photo img'],
-      'Four Hands': ['[class*="product-detail"] img', '.product-gallery img'],
-      'Regina Andrew': ['.product-image img', '.main-image img'],
-      'Uttermost': ['.productSlider-root img', '.swiper-slide-active img']
-    };
-    
-    const selectors = vendorImageSelectors[data.detectedVendor] || [];
-    for (const sel of selectors) {
-      const img = document.querySelector(sel);
-      if (img && !isInExcludedSection(img)) {
-        const src = img.src || img.dataset.src;
-        if (src?.startsWith('http')) {
-          data.mainProductImage = src;
-          console.log(`✅ Main image from vendor selector: ${sel}`);
-          break;
-        }
-      }
-    }
-  }
-  
-  // Method 3: Generic gallery selectors
+  // Method 2: Generic gallery/product image selectors
   if (!data.mainProductImage) {
     const genericSelectors = [
       '.product-media img:first-child',
@@ -346,7 +314,11 @@ function getPageData() {
       '[data-gallery-role="main"] img',
       '.swiper-slide-active img',
       '.slick-active img',
-      '.carousel-item.active img'
+      '.carousel-item.active img',
+      '.fotorama__active img',
+      '.product-image-photo',
+      '.product__image img',
+      '.product-single__photo img'
     ];
     
     for (const sel of genericSelectors) {
@@ -362,12 +334,11 @@ function getPageData() {
     }
   }
   
-  // Method 4: Largest non-excluded image (NOT in swatch area)
+  // Method 3: Largest non-excluded image
   if (!data.mainProductImage) {
     let bestImg = null, bestSize = 0;
     document.querySelectorAll('img').forEach(img => {
       if (isInExcludedSection(img)) return;
-      if (isInSwatchArea(img)) return; // Don't pick swatch images as main!
       const src = img.src || img.dataset.src;
       if (!src?.startsWith('http')) return;
       const lower = src.toLowerCase();
@@ -385,13 +356,16 @@ function getPageData() {
     }
   }
 
-  // ========================================
-  // STEP 2: SWATCH/COLOR IMAGE (FROM V16 - THIS WORKED!)
-  // ========================================
-  console.log('🎨 Step 2: Finding swatch image (v16 logic)...');
+  console.log('Final main image:', data.mainProductImage);
+
+  // ============================================================
+  // STEP 2: SWATCH/COLOR IMAGE DETECTION (FROM v16 - WORKING)
+  // ============================================================
+  console.log('');
+  console.log('=== FINDING SWATCH IMAGES ===');
   
   const seenSwatchUrls = new Set();
-  const swatchCandidates = [];
+  let foundSelectedSwatch = false;
   
   // Method 1: Find buttons/elements with background-image in swatch areas
   document.querySelectorAll('button, a, div, span, label').forEach(el => {
@@ -400,212 +374,167 @@ function getPageData() {
     const bgUrl = getBgImageUrl(el);
     if (!bgUrl || seenSwatchUrls.has(bgUrl)) return;
     
+    // Get element size
     const rect = el.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
+    const w = rect.width || 50;
+    const h = rect.height || 50;
     
     if (!isLikelySwatchImage(el, bgUrl, w, h)) return;
     
     seenSwatchUrls.add(bgUrl);
-    const colorName = getColorName(el);
     const selected = isSelected(el);
+    const colorName = getColorName(el);
     
-    swatchCandidates.push({
+    data.swatchImages.push({
       url: bgUrl,
-      name: colorName,
-      selected: selected,
-      element: el
+      isSelected: selected,
+      colorName: colorName,
+      type: 'background'
     });
     
-    if (selected) {
-      console.log(`  Found SELECTED swatch: ${colorName || 'unnamed'}`);
+    if (selected && !foundSelectedSwatch) {
+      data.detectedSwatchUrl = bgUrl;
+      data.detectedSwatchName = colorName;
+      foundSelectedSwatch = true;
+      console.log('Found SELECTED swatch (bg):', colorName, bgUrl);
     }
   });
   
-  // Method 2: Find small images in swatch areas
+  // Method 2: Find small img tags in swatch areas
   document.querySelectorAll('img').forEach(img => {
-    if (!isInSwatchArea(img)) return;
-    
     const src = img.src || img.dataset.src;
     if (!src?.startsWith('http') || seenSwatchUrls.has(src)) return;
     
-    const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
-    const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
+    const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 50;
+    const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 50;
     
     if (!isLikelySwatchImage(img, src, w, h)) return;
     
     seenSwatchUrls.add(src);
+    const parent = img.closest('button, a, div, label, li');
+    const selected = parent ? isSelected(parent) : false;
+    const colorName = getColorName(img) || (parent ? getColorName(parent) : null);
     
-    // Check if parent is selected
-    let parent = img.parentElement;
-    let selected = false;
-    for (let i = 0; i < 3 && parent; i++) {
-      if (isSelected(parent)) {
-        selected = true;
-        break;
-      }
-      parent = parent.parentElement;
-    }
-    
-    const colorName = getColorName(img) || getColorName(img.parentElement);
-    
-    swatchCandidates.push({
+    data.swatchImages.push({
       url: src,
-      name: colorName,
-      selected: selected,
-      element: img
+      isSelected: selected,
+      colorName: colorName,
+      type: 'img'
     });
     
-    if (selected) {
-      console.log(`  Found SELECTED swatch img: ${colorName || 'unnamed'}`);
+    if (selected && !foundSelectedSwatch) {
+      data.detectedSwatchUrl = src;
+      data.detectedSwatchName = colorName;
+      foundSelectedSwatch = true;
+      console.log('Found SELECTED swatch (img):', colorName, src);
     }
   });
   
-  // Pick the best swatch - prefer selected, then first one
-  const selectedSwatch = swatchCandidates.find(s => s.selected);
-  if (selectedSwatch) {
-    data.detectedSwatchUrl = selectedSwatch.url;
-    data.detectedSwatchName = selectedSwatch.name;
-    console.log(`✅ Using SELECTED swatch: ${data.detectedSwatchName || 'unnamed'}`);
-  } else if (swatchCandidates.length > 0) {
-    data.detectedSwatchUrl = swatchCandidates[0].url;
-    data.detectedSwatchName = swatchCandidates[0].name;
-    console.log(`✅ Using first swatch: ${data.detectedSwatchName || 'unnamed'}`);
+  // If no selected swatch found, use first one
+  if (!data.detectedSwatchUrl && data.swatchImages.length > 0) {
+    data.detectedSwatchUrl = data.swatchImages[0].url;
+    data.detectedSwatchName = data.swatchImages[0].colorName;
+    console.log('Using first swatch:', data.detectedSwatchName, data.detectedSwatchUrl);
   }
-
-  // ========================================
-  // SUMMARY
-  // ========================================
-  console.log('');
-  console.log('════════════════════════════════════════════════════════════');
-  console.log('RESULTS:');
-  console.log(`  Vendor: ${data.detectedVendor || 'Unknown'}`);
-  console.log(`  Main Image: ${data.mainProductImage ? '✅' : '❌'}`);
-  console.log(`  Swatch URL: ${data.detectedSwatchUrl ? '✅' : '❌'}`);
-  console.log(`  Swatch Name: ${data.detectedSwatchName || 'Not found'}`);
-  console.log('════════════════════════════════════════════════════════════');
+  
+  console.log('=== IMAGE DETECTION COMPLETE ===');
+  console.log('Main image:', data.mainProductImage);
+  console.log('Swatch count:', data.swatchImages.length);
+  console.log('Selected swatch:', data.detectedSwatchUrl);
   
   return data;
 }
 
-// ============================================================
-// SCRAPE HANDLER
-// ============================================================
 async function doScrape() {
   scrapeBtn.disabled = true;
-  scrapeBtn.innerHTML = '<div class="spinner"></div><span>Analyzing...</span>';
-  showStatus('Extracting...', 'info');
+  scrapeBtn.innerHTML = '<div class="spinner"></div><span>AI Analyzing...</span>';
+  showStatus('🤖 Extracting page data...', 'info');
   
   try {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
     if (!tab?.url || tab.url.startsWith('chrome://')) {
       throw new Error('Navigate to a product page first');
     }
-    
-    const results = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: getPageData
+    const injectedData = await chrome.scripting.executeScript({
+      target: {tabId: tab.id},
+      func: getPageData,
     });
+    const pageData = injectedData[0].result;
+    if (!pageData.pageText) throw new Error('Could not extract page content');
     
-    const pageData = results[0].result;
-    if (!pageData?.pageText) throw new Error('Could not read page');
+    const vendorHostname = new URL(tab.url).hostname.replace('www.', '');
     
-    showStatus('AI analyzing...', 'info');
-    
-    const response = await fetch(`${BACKEND_URL}/api/ai-scrape`, {
+    showStatus('🤖 Sending to AI for analysis...', 'info');
+    const response = await fetch(`${BACKEND_URL}/api/scraper/extract`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ page_text: pageData.pageText, page_url: pageData.pageUrl })
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        url: tab.url,
+        vendor_hostname: vendorHostname,
+        page_text: pageData.pageText,
+        main_product_image: pageData.mainProductImage,
+        detected_swatch_url: pageData.detectedSwatchUrl,
+        detected_swatch_name: pageData.detectedSwatchName
+      }),
     });
-    
-    if (!response.ok) throw new Error('AI failed');
-    
-    const aiData = await response.json();
-    
-    const finalData = {
-      url: pageData.pageUrl,
-      name: aiData.name,
-      sku: aiData.sku,
-      price: aiData.price,
-      msrp: aiData.msrp,
-      size: aiData.size,
-      finish_color: pageData.detectedSwatchName || aiData.finish_color,
-      vendor: pageData.detectedVendor || aiData.vendor,
-      image_url: pageData.mainProductImage || aiData.image_url,
-      finish_image: pageData.detectedSwatchUrl
-    };
-    
-    displayResults(finalData);
-    showStatus(finalData.name ? `Found: ${finalData.name}` : 'Done', 'success');
-    
-  } catch (e) {
-    showStatus(e.message || 'Failed', 'error');
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || `API error: ${response.status}`);
+    }
+    const extractedData = await response.json();
+    displayResults(extractedData);
+    showStatus('✅ Data extracted successfully!', 'success');
+    sendBtn.disabled = false;
+    copyBtn.disabled = false;
+    rescrapeBtn.disabled = false;
+  } catch (error) {
+    showStatus(`❌ Error: ${error.message}`, 'error');
   } finally {
     scrapeBtn.disabled = false;
-    scrapeBtn.innerHTML = '<span>⚡</span><span>SCRAPE THIS PAGE</span>';
+    scrapeBtn.innerHTML = '<span>Scrape Current Page</span>';
   }
 }
 
 async function sendToApp() {
-  if (!scrapedData) return;
-  if (!selectedProjectId) { showStatus('Select a project!', 'warning'); return; }
-  
-  const params = new URLSearchParams();
-  params.set('action', 'add-item');
-  params.set('source', 'extension');
-  if (scrapedData.name) params.set('name', scrapedData.name);
-  if (scrapedData.price) params.set('price', scrapedData.price);
-  if (scrapedData.sku) params.set('sku', scrapedData.sku);
-  if (scrapedData.size) params.set('size', scrapedData.size);
-  if (scrapedData.finish_color) params.set('finish', scrapedData.finish_color);
-  if (scrapedData.finish_image) params.set('finish_image', scrapedData.finish_image);
-  if (scrapedData.vendor) params.set('vendor', scrapedData.vendor);
-  if (scrapedData.url) params.set('link', scrapedData.url);
-  if (scrapedData.image_url) params.set('image', scrapedData.image_url);
-  if (scrapedData.msrp) params.set('msrp', scrapedData.msrp);
-  
-  window.open(`${APP_URL}/checklist/${selectedProjectId}?${params.toString()}`, '_blank');
-  showStatus('Sent!', 'success');
+  if (!scrapedData) {
+    alert('No data to send. Please scrape a page first.');
+    return;
+  }
+  if (!selectedProjectId) {
+    alert('Please select a project first');
+    return;
+  }
+  sendBtn.disabled = true;
+  sendBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/projects/${selectedProjectId}/items`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(scrapedData),
+    });
+    if (!response.ok) throw new Error('Failed to save');
+    showStatus('✅ Item added to project!', 'success');
+    const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+    await chrome.tabs.update(tab.id, {url: `${APP_URL}/projects/${selectedProjectId}`});
+  } catch (error) {
+    showStatus(`❌ Error: ${error.message}`, 'error');
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = '<span>Add to Project & View</span>';
+  }
 }
 
 async function copyToClipboard() {
   if (!scrapedData) return;
-  const text = [scrapedData.name, scrapedData.sku, scrapedData.price ? `$${scrapedData.price}` : '', 
-                scrapedData.vendor, scrapedData.finish_color, scrapedData.size].filter(x => x).join('\n');
+  const text = JSON.stringify(scrapedData, null, 2);
   await navigator.clipboard.writeText(text);
-  copyBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
-  setTimeout(() => { copyBtn.innerHTML = '<span>📋</span><span>Copy</span>'; }, 2000);
+  copyBtn.innerHTML = '<span>✅ Copied!</span>';
+  setTimeout(() => {
+    copyBtn.innerHTML = '<span>📋 Copy JSON</span>';
+  }, 2000);
 }
 
-scrapeBtn.addEventListener('click', doScrape);
-sendBtn.addEventListener('click', sendToApp);
-copyBtn.addEventListener('click', copyToClipboard);
-rescrapeBtn.addEventListener('click', doScrape);
-
-// Auto-detect vendor
-(async () => {
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tab?.url) {
-      const hostname = new URL(tab.url).hostname.toLowerCase();
-      const vendorMap = {
-        'fourhands.com': 'Four Hands', 'uttermost.com': 'Uttermost', 'globalviews.com': 'Global Views',
-        'rowefurniture.com': 'Rowe', 'reginaandrew.com': 'Regina Andrew', 'bernhardt.com': 'Bernhardt',
-        'loloirugs.com': 'Loloi', 'visualcomfort.com': 'Visual Comfort', 'hvlgroup.com': 'HVL Group',
-        'vandh.com': 'V&H', 'flowdecor.com': 'Flow Decor', 'crestviewcollection.com': 'Crestview',
-        'bassettmirror.com': 'Bassett Mirror', 'eichholtz.com': 'Eichholtz', 'myohamerica.com': 'MYO America',
-        'safavieh.com': 'Safavieh', 'surya.com': 'Surya', 'zeevlighting.com': 'Zeev Lighting',
-        'hubbardtonforge.com': 'Hubbardton Forge', 'hinkley.com': 'Hinkley', 'elegantlighting.com': 'Elegant Lighting',
-        'gabby.com': 'Gabby', 'gabbyhome.com': 'Gabby'
-      };
-      
-      let detected = null;
-      for (const [domain, vendor] of Object.entries(vendorMap)) {
-        if (hostname.includes(domain)) { detected = vendor; break; }
-      }
-      
-      vendorBadge.textContent = detected || hostname.replace('www.', '').split('.')[0];
-      vendorBadge.style.display = 'block';
-    }
-  } catch (e) {}
-})();
+scrapeBtn?.addEventListener('click', doScrape);
+sendBtn?.addEventListener('click', sendToApp);
+copyBtn?.addEventListener('click', copyToClipboard);
+rescrapeBtn?.addEventListener('click', doScrape);
