@@ -243,25 +243,50 @@ function getPageData() {
         const vBind = productDetail.getAttribute('v-bind');
         if (vBind) {
           // Decode HTML entities
-          const decoded = vBind.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+          const decoded = vBind.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
           const jsonMatch = decoded.match(/\{.*\}/s);
           if (jsonMatch) {
             const productData = JSON.parse(jsonMatch[0]);
-            const activeSku = productDetail.getAttribute(':active-sku')?.replace(/&quot;/g, '"') || 
-                             productData.activeSku;
+            
+            // Get active SKU from attribute or from data
+            let activeSku = productDetail.getAttribute(':active-sku');
+            if (activeSku) {
+              activeSku = activeSku.replace(/&quot;/g, '').replace(/"/g, '');
+            }
+            if (!activeSku && productData.activeSku) {
+              activeSku = productData.activeSku;
+            }
+            
+            console.log(`  Four Hands active SKU: ${activeSku}`);
             
             // Find the active SKU's data
             if (productData.product?.skus) {
               for (const sku of productData.product.skus) {
                 if (sku.skuNumber === activeSku) {
                   data.detectedSwatchName = sku.name; // e.g., "Sapphire Navy"
+                  console.log(`  Four Hands color name: ${data.detectedSwatchName}`);
                   
-                  // Find ESS image (the swatch/essence image)
-                  if (sku.media) {
+                  // Find ESS image (the swatch/essence image) - look for _ESS in URL
+                  if (sku.media && Array.isArray(sku.media)) {
                     for (const m of sku.media) {
-                      if (m.thumbUrl?.includes('_ESS') || m.largeUrl?.includes('_ESS')) {
-                        data.detectedSwatchUrl = m.thumbUrl || m.largeUrl;
-                        console.log(`  ✓ Four Hands ESS swatch: ${data.detectedSwatchName}`);
+                      const thumbUrl = m.thumbUrl || '';
+                      const largeUrl = m.largeUrl || '';
+                      if (thumbUrl.includes('_ESS') || largeUrl.includes('_ESS') ||
+                          thumbUrl.includes('ESS.') || largeUrl.includes('ESS.')) {
+                        data.detectedSwatchUrl = thumbUrl || largeUrl;
+                        console.log(`  ✓ Four Hands ESS swatch found: ${data.detectedSwatchUrl.substring(0, 60)}`);
+                        break;
+                      }
+                    }
+                  }
+                  
+                  // If no ESS image, try to get a detail image as swatch
+                  if (!data.detectedSwatchUrl && sku.media && Array.isArray(sku.media)) {
+                    for (const m of sku.media) {
+                      const thumbUrl = m.thumbUrl || '';
+                      if (thumbUrl.includes('_DET') || thumbUrl.includes('DET_')) {
+                        data.detectedSwatchUrl = thumbUrl;
+                        console.log(`  ✓ Four Hands detail swatch: ${data.detectedSwatchUrl.substring(0, 60)}`);
                         break;
                       }
                     }
@@ -277,14 +302,28 @@ function getPageData() {
       }
     }
     
-    // Method 2: Look for SKU selector buttons
+    // Method 2: Look for color/sku selector in DOM
     if (!data.detectedSwatchUrl) {
-      const activeSkuBtn = document.querySelector('[class*="sku"][class*="active"], [class*="variant"][class*="selected"]');
-      if (activeSkuBtn) {
-        const img = activeSkuBtn.querySelector('img');
-        if (img?.src) {
-          data.detectedSwatchUrl = img.src;
-          data.detectedSwatchName = activeSkuBtn.getAttribute('title') || activeSkuBtn.innerText?.trim();
+      const colorSelectors = document.querySelectorAll('[class*="color"], [class*="sku"], [class*="variant"]');
+      for (const container of colorSelectors) {
+        const selected = container.querySelector('.active, .selected, [aria-selected="true"]');
+        if (selected) {
+          const img = selected.querySelector('img');
+          if (img?.src) {
+            data.detectedSwatchUrl = img.src;
+            data.detectedSwatchName = data.detectedSwatchName || selected.getAttribute('title') || img.alt;
+            console.log(`  ✓ Four Hands DOM swatch: ${data.detectedSwatchName}`);
+            break;
+          }
+          // Check background-image
+          const style = selected.getAttribute('style') || '';
+          const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
+          if (bgMatch?.[1]) {
+            data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
+            data.detectedSwatchName = data.detectedSwatchName || selected.getAttribute('title');
+            console.log(`  ✓ Four Hands bg swatch: ${data.detectedSwatchName}`);
+            break;
+          }
         }
       }
     }
