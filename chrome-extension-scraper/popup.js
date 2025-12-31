@@ -364,47 +364,89 @@ function getPageData() {
 
   // ---------------------------------------------------------
   // UTTERMOST
-  // React PWA - swatches are buttons with background-image
+  // React PWA - color swatches are small square buttons with background-image
+  // The selected one has aria-checked="true" or class contains "selected"
   // ---------------------------------------------------------
   else if (hostname.includes('uttermost.com')) {
     console.log('  Using Uttermost selectors...');
     
-    // Look for tile/swatch buttons with background-image
-    const swatchButtons = document.querySelectorAll('button[style*="background-image"]');
-    for (const btn of swatchButtons) {
-      // Check if this button is selected/active
+    // Find ALL buttons with background-image (potential swatches)
+    const allBgButtons = document.querySelectorAll('button[style*="background-image"]');
+    console.log(`  Found ${allBgButtons.length} buttons with background-image`);
+    
+    // Filter to find actual color swatches (small square buttons, not product images)
+    for (const btn of allBgButtons) {
+      const style = btn.getAttribute('style') || '';
+      const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
+      if (!bgMatch?.[1]) continue;
+      
+      let bgUrl = bgMatch[1];
+      if (bgUrl.startsWith('//')) bgUrl = 'https:' + bgUrl;
+      
+      // Skip if this looks like a main product image (large dimensions in URL or not a swatch)
+      const urlLower = bgUrl.toLowerCase();
+      if (urlLower.includes('/product/') && !urlLower.includes('swatch') && !urlLower.includes('color')) {
+        continue; // This is likely a product image, not a swatch
+      }
+      
+      // Check if selected
       const classes = (btn.className || '').toLowerCase();
-      if (classes.includes('selected') || classes.includes('active') || 
-          btn.getAttribute('aria-selected') === 'true') {
-        const style = btn.getAttribute('style') || '';
-        const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-        if (bgMatch?.[1]) {
-          let bgUrl = bgMatch[1];
-          if (bgUrl.startsWith('//')) bgUrl = 'https:' + bgUrl;
-          data.detectedSwatchUrl = bgUrl;
-          data.detectedSwatchName = btn.getAttribute('title') || btn.getAttribute('aria-label');
-          console.log(`  ✓ Uttermost swatch button: ${data.detectedSwatchName}`);
-          break;
+      const ariaChecked = btn.getAttribute('aria-checked');
+      const ariaSelected = btn.getAttribute('aria-selected');
+      const isSelected = classes.includes('selected') || classes.includes('active') ||
+                         ariaChecked === 'true' || ariaSelected === 'true';
+      
+      if (isSelected) {
+        data.detectedSwatchUrl = bgUrl;
+        data.detectedSwatchName = btn.getAttribute('title') || btn.getAttribute('aria-label');
+        console.log(`  ✓ Uttermost swatch: ${data.detectedSwatchName} - ${bgUrl.substring(0, 60)}`);
+        break;
+      }
+    }
+    
+    // Method 2: Find "Color" section and get selected swatch
+    if (!data.detectedSwatchUrl) {
+      // Look for sections/containers with "Color" in text
+      const allElements = document.querySelectorAll('*');
+      for (const el of allElements) {
+        const directText = el.childNodes[0]?.textContent?.trim() || '';
+        if (directText.toLowerCase() === 'color') {
+          // This element labels a color section, look for swatches nearby
+          const parent = el.parentElement;
+          if (parent) {
+            const swatchBtns = parent.querySelectorAll('button[style*="background-image"]');
+            for (const btn of swatchBtns) {
+              const ariaChecked = btn.getAttribute('aria-checked');
+              if (ariaChecked === 'true') {
+                const style = btn.getAttribute('style') || '';
+                const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
+                if (bgMatch?.[1]) {
+                  data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
+                  data.detectedSwatchName = btn.getAttribute('title') || btn.getAttribute('aria-label');
+                  console.log(`  ✓ Uttermost color section swatch: ${data.detectedSwatchName}`);
+                  break;
+                }
+              }
+            }
+          }
+          if (data.detectedSwatchUrl) break;
         }
       }
     }
     
-    // Method 2: Look in configurable options
+    // Method 3: Look for tile-root classes (Uttermost uses these)
     if (!data.detectedSwatchUrl) {
-      const optionContainers = document.querySelectorAll('[class*="option"], [class*="configurable"]');
-      for (const container of optionContainers) {
-        const label = container.querySelector('span, label');
-        if (label && (label.innerText || '').toLowerCase().includes('color')) {
-          const selectedBtn = container.querySelector('[class*="selected"], [aria-selected="true"]');
-          if (selectedBtn) {
-            const style = selectedBtn.getAttribute('style') || '';
-            const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-            if (bgMatch?.[1]) {
-              data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
-              data.detectedSwatchName = selectedBtn.getAttribute('title');
-              console.log(`  ✓ Uttermost color option: ${data.detectedSwatchName}`);
-              break;
-            }
+      const tileButtons = document.querySelectorAll('[class*="tile"][style*="background-image"]');
+      for (const btn of tileButtons) {
+        const classes = (btn.className || '').toLowerCase();
+        if (classes.includes('selected') || btn.getAttribute('aria-checked') === 'true') {
+          const style = btn.getAttribute('style') || '';
+          const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
+          if (bgMatch?.[1]) {
+            data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
+            data.detectedSwatchName = btn.getAttribute('title');
+            console.log(`  ✓ Uttermost tile swatch: ${data.detectedSwatchName}`);
+            break;
           }
         }
       }
