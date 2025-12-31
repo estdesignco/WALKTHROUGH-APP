@@ -1,14 +1,13 @@
 // ====================================================================
-// DESIGN READY PRODUCT SCRAPER v12.0.0 - FIXED SWATCH DETECTION
+// DESIGN READY PRODUCT SCRAPER v13.0.0 - RESTORED WORKING CODE
 // December 30, 2025
-// ACTUAL WORKING SELECTORS based on real HTML from vendor sites
+// COMBINED: V10 swatch detection (WORKED) + V12 main image + all 22 vendors
 // ====================================================================
 
 console.log('');
 console.log('████████████████████████████████████████████████████████████████');
-console.log('██  SCRAPER VERSION 12.1.0 - SWATCH DETECTION FIXED           ██');
-console.log('██  TESTED WITH REAL HTML FROM: HVL, Four Hands, Loloi,       ██');
-console.log('██  Visual Comfort, Uttermost, Rowe                            ██');
+console.log('██  SCRAPER VERSION 13.0.0 - RESTORED WORKING SWATCH CODE     ██');
+console.log('██  If you see old version number, REINSTALL extension!       ██');
 console.log('████████████████████████████████████████████████████████████████');
 console.log('');
 
@@ -93,12 +92,12 @@ function displayResults(data) {
 }
 
 // ============================================================================
-// MAIN SCRAPING FUNCTION - v12.0.0 WITH ACTUAL WORKING SELECTORS
+// MAIN SCRAPING FUNCTION - V13.0.0 RESTORED FROM V10 + V12
 // ============================================================================
 function getPageData() {
   console.log('');
   console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║  SCRAPER v12.0.0 - SWATCH DETECTION FIXED                 ║');
+  console.log('║  SCRAPER v13.0.0 - RESTORED WORKING SWATCH CODE           ║');
   console.log('╚════════════════════════════════════════════════════════════╝');
   
   const url = window.location.href;
@@ -113,8 +112,8 @@ function getPageData() {
     detectedVendor: null
   };
 
-  // Vendor detection
-  const vendors = {
+  // ALL 22 VENDORS
+  const vendorDetection = {
     'fourhands.com': 'Four Hands',
     'uttermost.com': 'Uttermost',
     'globalviews.com': 'Global Views',
@@ -140,8 +139,8 @@ function getPageData() {
     'gabbyhome.com': 'Gabby'
   };
   
-  for (const [domain, vendor] of Object.entries(vendors)) {
-    if (hostname.includes(domain)) {
+  for (const [domain, vendor] of Object.entries(vendorDetection)) {
+    if (hostname.includes(domain.replace('www.', ''))) {
       data.detectedVendor = vendor;
       console.log(`🏭 VENDOR: ${vendor}`);
       break;
@@ -149,144 +148,263 @@ function getPageData() {
   }
 
   // ============================================================
-  // STEP 1: MAIN PRODUCT IMAGE
+  // HELPER FUNCTIONS - RESTORED FROM V10 (THESE WORKED)
   // ============================================================
-  console.log('📷 Finding main product image...');
   
-  // og:image is most reliable
+  // Check if element is in excluded section
+  function isInExcludedSection(el) {
+    if (!el) return true;
+    let parent = el;
+    for (let i = 0; i < 25 && parent; i++) {
+      const classes = (parent.className || '').toLowerCase();
+      const id = (parent.id || '').toLowerCase();
+      const tagName = parent.tagName?.toLowerCase() || '';
+      
+      const excludePatterns = [
+        'relatedproducts', 'related-products', 'related_products',
+        'similarproducts', 'similar-products', 'similar_products',
+        'recommendedproducts', 'recommended-products', 'recommendations',
+        'also-like', 'you-may-also', 'customers-also', 'cross-sell', 'upsell',
+        'recently-viewed', 'recently_viewed', 'browsing-history',
+        'complete-the-look', 'shop-the-look', 'pairs-well',
+        'product-carousel', 'product-slider', 'featured-products',
+        'nav', 'header', 'footer', 'menu', 'sidebar', 'modal', 'drawer',
+        'breadcrumb', 'pagination', 'search-results',
+        'getcandid', 'candid', 'instagram', 'social', 'reviews', 'review-',
+        'newsletter', 'subscribe', 'banner', 'promo', 'advertisement'
+      ];
+      
+      for (const pattern of excludePatterns) {
+        if (classes.includes(pattern) || id.includes(pattern)) {
+          return true;
+        }
+      }
+      
+      if (tagName === 'nav' || tagName === 'header' || tagName === 'footer' || tagName === 'aside') {
+        return true;
+      }
+      
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
+  // Check if element is selected - FROM V10
+  function isSelectedElement(el) {
+    if (!el) return false;
+    const classes = (el.className || '').toLowerCase();
+    const ariaSelected = el.getAttribute('aria-selected');
+    const ariaChecked = el.getAttribute('aria-checked');
+    const ariaCurrent = el.getAttribute('aria-current');
+    
+    return classes.includes('selected') || 
+           classes.includes('active') || 
+           classes.includes('current') || 
+           classes.includes('checked') ||
+           classes.includes('is-active') ||
+           classes.includes('is-selected') ||
+           ariaSelected === 'true' ||
+           ariaChecked === 'true' ||
+           ariaCurrent === 'true';
+  }
+
+  // Get background-image URL - FROM V10
+  function getBgImage(el) {
+    if (!el) return null;
+    
+    const inlineStyle = el.getAttribute('style') || '';
+    const bgMatch = inlineStyle.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
+    if (bgMatch && bgMatch[1]) {
+      let url = bgMatch[1];
+      if (url.startsWith('//')) url = 'https:' + url;
+      else if (url.startsWith('/')) url = window.location.origin + url;
+      if (url.startsWith('http') && !url.includes('data:')) return url;
+    }
+    
+    try {
+      const computed = window.getComputedStyle(el).backgroundImage;
+      if (computed && computed !== 'none') {
+        const match = computed.match(/url\(["']?([^"')]+)["']?\)/);
+        if (match && match[1] && !match[1].includes('data:') && !match[1].includes('gradient')) {
+          let url = match[1];
+          if (url.startsWith('//')) url = 'https:' + url;
+          else if (url.startsWith('/')) url = window.location.origin + url;
+          if (url.startsWith('http')) return url;
+        }
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  // Get color name - FROM V10
+  function getColorName(el) {
+    if (!el) return null;
+    
+    const sources = [
+      el.getAttribute('title'),
+      el.getAttribute('data-color'),
+      el.getAttribute('data-value'),
+      el.getAttribute('data-option-value'),
+      el.getAttribute('data-name'),
+      el.getAttribute('data-finish'),
+      el.getAttribute('alt'),
+      el.getAttribute('aria-label'),
+      el.querySelector('span')?.innerText,
+      el.innerText?.trim()
+    ];
+    
+    for (const src of sources) {
+      if (src && src.length > 0 && src.length < 60) {
+        let cleaned = src.replace(/^(color|finish|option|select|choose|fashion size|button)[\s:]+/gi, '');
+        cleaned = cleaned.replace(/\s*(button|selected|option|click|choose)$/gi, '');
+        cleaned = cleaned.trim();
+        if (cleaned.length > 0 && cleaned.length < 60) return cleaned;
+      }
+    }
+    return null;
+  }
+
+  // ============================================================
+  // STEP 1: MAIN PRODUCT IMAGE - FROM V10
+  // ============================================================
+  console.log('📷 Step 1: Finding main product image...');
+  
+  // Method 1: og:image meta tag (most reliable)
   const ogImg = document.querySelector('meta[property="og:image"]');
-  if (ogImg?.content?.startsWith('http')) {
+  if (ogImg?.content && ogImg.content.startsWith('http')) {
     data.mainProductImage = ogImg.content;
-    console.log('  ✓ og:image found');
+    console.log('✅ Main image from og:image');
   }
   
-  // Fallback to common selectors
+  // Method 2: Vendor-specific image selectors
   if (!data.mainProductImage) {
-    const selectors = [
-      '.product-image img', '.product-media img', '.pdp-image img',
-      '.gallery-image img', '.product-gallery img', '.main-image img',
-      '.slick-active img', '.swiper-slide-active img'
-    ];
+    const vendorImageSelectors = {
+      'HVL Group': ['.product-detail-image img', '.pdp-image img', '#productImage'],
+      'Visual Comfort': ['.fotorama__active img', '.gallery-placeholder img', '.product-image-photo'],
+      'Loloi': ['.product__image img', '.product-single__photo img'],
+      'Four Hands': ['[class*="product-detail"] img', '.product-gallery img'],
+      'Regina Andrew': ['.product-image img', '.main-image img'],
+      'Uttermost': ['.productSlider-root img', '.swiper-slide-active img']
+    };
+    
+    const selectors = vendorImageSelectors[data.detectedVendor] || [];
     for (const sel of selectors) {
       const img = document.querySelector(sel);
-      if (img?.src?.startsWith('http')) {
-        data.mainProductImage = img.src;
-        console.log(`  ✓ Found via ${sel}`);
-        break;
+      if (img && !isInExcludedSection(img)) {
+        const src = img.src || img.dataset.src;
+        if (src?.startsWith('http')) {
+          data.mainProductImage = src;
+          console.log(`✅ Main image from vendor selector: ${sel}`);
+          break;
+        }
       }
+    }
+  }
+  
+  // Method 3: Generic selectors
+  if (!data.mainProductImage) {
+    const genericSelectors = [
+      '.product-media img:first-child',
+      '.product-image-container img:first-child',
+      '.gallery__image img',
+      '.pdp-gallery img:first-child',
+      '[data-gallery-role="main"] img',
+      '.swiper-slide-active img',
+      '.slick-active img',
+      '.carousel-item.active img'
+    ];
+    
+    for (const sel of genericSelectors) {
+      const img = document.querySelector(sel);
+      if (img && !isInExcludedSection(img)) {
+        const src = img.src || img.dataset.src;
+        if (src?.startsWith('http')) {
+          data.mainProductImage = src;
+          console.log(`✅ Main image from generic selector: ${sel}`);
+          break;
+        }
+      }
+    }
+  }
+  
+  // Method 4: Largest non-excluded image
+  if (!data.mainProductImage) {
+    let bestImg = null, bestSize = 0;
+    document.querySelectorAll('img').forEach(img => {
+      if (isInExcludedSection(img)) return;
+      const src = img.src || img.dataset.src;
+      if (!src?.startsWith('http')) return;
+      const lower = src.toLowerCase();
+      if (lower.endsWith('.svg') || lower.includes('icon') || lower.includes('logo') || 
+          lower.includes('placeholder') || lower.includes('loading')) return;
+      const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 0;
+      const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 0;
+      if (w < 200 || h < 200) return;
+      const size = w * h;
+      if (size > bestSize) { bestSize = size; bestImg = src; }
+    });
+    if (bestImg) {
+      data.mainProductImage = bestImg;
+      console.log('✅ Main image from largest');
     }
   }
 
   // ============================================================
-  // STEP 2: VENDOR-SPECIFIC SWATCH DETECTION
-  // Each vendor has completely different HTML structure
+  // STEP 2: SWATCH DETECTION - RESTORED FROM V10 (THIS WORKED!)
   // ============================================================
-  console.log('🎨 Finding color swatch...');
-
-  // ---------------------------------------------------------
-  // HVL GROUP / HUDSON VALLEY
-  // Uses: #productinfo-finish-icon, .finish-options img
-  // ---------------------------------------------------------
+  console.log('🎨 Step 2: Finding color swatch...');
+  
+  // --- HVL GROUP ---
   if (hostname.includes('hvlgroup.com')) {
-    console.log('  Using HVL Group selectors...');
+    console.log('  Using HVL Group logic...');
     
-    // Method 1: productinfo-finish-icon (the selected finish)
     const finishIcon = document.querySelector('#productinfo-finish-icon');
     if (finishIcon?.src) {
       data.detectedSwatchUrl = finishIcon.src;
-      // Get name from nearby span
       const nameSpan = document.querySelector('#productinfo-finish-name');
       if (nameSpan) {
-        data.detectedSwatchName = nameSpan.innerText.replace(/\n/g, ' ').replace(/\(.*\)/, '').trim();
+        data.detectedSwatchName = nameSpan.innerText.replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
       }
-      console.log(`  ✓ HVL finish: ${data.detectedSwatchName}`);
+      console.log(`✅ HVL finish: ${data.detectedSwatchName}`);
     }
     
-    // Method 2: .finish-options with border-hvlg-darkgray (selected)
     if (!data.detectedSwatchUrl) {
       const selectedFinish = document.querySelector('.finish-options img.border-hvlg-darkgray');
       if (selectedFinish?.src) {
         data.detectedSwatchUrl = selectedFinish.src;
         const nameEl = selectedFinish.closest('a')?.querySelector('span.p2');
         if (nameEl) {
-          data.detectedSwatchName = nameEl.innerText.replace(/\n/g, ' ').replace(/\(.*\)/, '').trim();
+          data.detectedSwatchName = nameEl.innerText.replace(/<br\s*\/?>/gi, ' ').trim();
         }
-        console.log(`  ✓ HVL selected finish: ${data.detectedSwatchName}`);
-      }
-    }
-    
-    // Method 3: productinfo-swatch-icon
-    if (!data.detectedSwatchUrl) {
-      const swatchIcon = document.querySelector('#productinfo-swatch-icon');
-      if (swatchIcon?.src) {
-        data.detectedSwatchUrl = swatchIcon.src;
-        const swatchDiv = swatchIcon.closest('div')?.querySelector('div');
-        if (swatchDiv) {
-          data.detectedSwatchName = swatchDiv.innerText.replace('Swatch', '').trim();
-        }
-        console.log(`  ✓ HVL swatch icon: ${data.detectedSwatchName}`);
       }
     }
   }
-
-  // ---------------------------------------------------------
-  // FOUR HANDS
-  // Uses: fh-product-detail with JSON data, ESS images are swatches
-  // ---------------------------------------------------------
+  
+  // --- FOUR HANDS ---
   else if (hostname.includes('fourhands.com')) {
-    console.log('  Using Four Hands selectors...');
+    console.log('  Using Four Hands logic...');
     
-    // Method 1: Parse JSON from fh-product-detail
     const productDetail = document.querySelector('fh-product-detail');
     if (productDetail) {
       try {
         const vBind = productDetail.getAttribute('v-bind');
         if (vBind) {
-          // Decode HTML entities
-          const decoded = vBind.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+          const decoded = vBind.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
           const jsonMatch = decoded.match(/\{.*\}/s);
           if (jsonMatch) {
             const productData = JSON.parse(jsonMatch[0]);
-            
-            // Get active SKU from attribute or from data
             let activeSku = productDetail.getAttribute(':active-sku');
-            if (activeSku) {
-              activeSku = activeSku.replace(/&quot;/g, '').replace(/"/g, '');
-            }
-            if (!activeSku && productData.activeSku) {
-              activeSku = productData.activeSku;
-            }
+            if (activeSku) activeSku = activeSku.replace(/&quot;/g, '').replace(/"/g, '');
             
-            console.log(`  Four Hands active SKU: ${activeSku}`);
-            
-            // Find the active SKU's data
             if (productData.product?.skus) {
               for (const sku of productData.product.skus) {
                 if (sku.skuNumber === activeSku) {
-                  data.detectedSwatchName = sku.name; // e.g., "Sapphire Navy"
-                  console.log(`  Four Hands color name: ${data.detectedSwatchName}`);
-                  
-                  // Find ESS image (the swatch/essence image) - look for _ESS in URL
+                  data.detectedSwatchName = sku.name;
                   if (sku.media && Array.isArray(sku.media)) {
                     for (const m of sku.media) {
-                      const thumbUrl = m.thumbUrl || '';
-                      const largeUrl = m.largeUrl || '';
-                      if (thumbUrl.includes('_ESS') || largeUrl.includes('_ESS') ||
-                          thumbUrl.includes('ESS.') || largeUrl.includes('ESS.')) {
-                        data.detectedSwatchUrl = thumbUrl || largeUrl;
-                        console.log(`  ✓ Four Hands ESS swatch found: ${data.detectedSwatchUrl.substring(0, 60)}`);
-                        break;
-                      }
-                    }
-                  }
-                  
-                  // If no ESS image, try to get a detail image as swatch
-                  if (!data.detectedSwatchUrl && sku.media && Array.isArray(sku.media)) {
-                    for (const m of sku.media) {
-                      const thumbUrl = m.thumbUrl || '';
-                      if (thumbUrl.includes('_DET') || thumbUrl.includes('DET_')) {
-                        data.detectedSwatchUrl = thumbUrl;
-                        console.log(`  ✓ Four Hands detail swatch: ${data.detectedSwatchUrl.substring(0, 60)}`);
+                      if ((m.thumbUrl || '').includes('ESS') || (m.largeUrl || '').includes('ESS')) {
+                        data.detectedSwatchUrl = m.thumbUrl || m.largeUrl;
+                        console.log(`✅ Four Hands ESS: ${data.detectedSwatchName}`);
                         break;
                       }
                     }
@@ -298,173 +416,97 @@ function getPageData() {
           }
         }
       } catch (e) {
-        console.log('  Four Hands JSON parse error:', e.message);
-      }
-    }
-    
-    // Method 2: Look for color/sku selector in DOM
-    if (!data.detectedSwatchUrl) {
-      const colorSelectors = document.querySelectorAll('[class*="color"], [class*="sku"], [class*="variant"]');
-      for (const container of colorSelectors) {
-        const selected = container.querySelector('.active, .selected, [aria-selected="true"]');
-        if (selected) {
-          const img = selected.querySelector('img');
-          if (img?.src) {
-            data.detectedSwatchUrl = img.src;
-            data.detectedSwatchName = data.detectedSwatchName || selected.getAttribute('title') || img.alt;
-            console.log(`  ✓ Four Hands DOM swatch: ${data.detectedSwatchName}`);
-            break;
-          }
-          // Check background-image
-          const style = selected.getAttribute('style') || '';
-          const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-          if (bgMatch?.[1]) {
-            data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
-            data.detectedSwatchName = data.detectedSwatchName || selected.getAttribute('title');
-            console.log(`  ✓ Four Hands bg swatch: ${data.detectedSwatchName}`);
-            break;
-          }
-        }
+        console.log('Four Hands parse error:', e.message);
       }
     }
   }
-
-  // ---------------------------------------------------------
-  // VISUAL COMFORT
-  // Uses: Magento swatch system with .swatch-option
-  // ---------------------------------------------------------
+  
+  // --- VISUAL COMFORT ---
   else if (hostname.includes('visualcomfort.com')) {
-    console.log('  Using Visual Comfort selectors...');
+    console.log('  Using Visual Comfort logic...');
     
-    // Method 1: Selected swatch option
     const selectedSwatch = document.querySelector('.swatch-option.selected, .swatch-attribute-selected-option');
-    if (selectedSwatch) {
-      // Get background-image
-      const style = selectedSwatch.getAttribute('style') || '';
-      const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-      if (bgMatch?.[1]) {
-        let bgUrl = bgMatch[1];
-        if (bgUrl.startsWith('//')) bgUrl = 'https:' + bgUrl;
-        data.detectedSwatchUrl = bgUrl;
-      }
+    if (selectedSwatch && !isInExcludedSection(selectedSwatch)) {
+      const bgUrl = getBgImage(selectedSwatch);
+      if (bgUrl) data.detectedSwatchUrl = bgUrl;
       data.detectedSwatchName = selectedSwatch.getAttribute('data-option-label') || 
                                 selectedSwatch.getAttribute('title') ||
                                 selectedSwatch.getAttribute('aria-label');
-      console.log(`  ✓ Visual Comfort swatch: ${data.detectedSwatchName}`);
-    }
-    
-    // Method 2: Look for swatch images
-    if (!data.detectedSwatchUrl) {
-      const swatchImgs = document.querySelectorAll('.swatch-option img, [class*="swatch"] img');
-      for (const img of swatchImgs) {
-        const parent = img.closest('.selected, .active, [aria-selected="true"]');
-        if (parent && img.src) {
-          data.detectedSwatchUrl = img.src;
-          data.detectedSwatchName = parent.getAttribute('title') || img.alt;
-          console.log(`  ✓ Visual Comfort swatch img: ${data.detectedSwatchName}`);
-          break;
-        }
-      }
+      console.log(`✅ Visual Comfort swatch: ${data.detectedSwatchName}`);
     }
   }
-
-  // ---------------------------------------------------------
-  // LOLOI RUGS
-  // Shopify site - color is in product handle, no swatch images
-  // ---------------------------------------------------------
+  
+  // --- LOLOI ---
   else if (hostname.includes('loloirugs.com')) {
-    console.log('  Using Loloi selectors...');
+    console.log('  Using Loloi logic...');
     
-    // Color is usually in the URL/handle
     const urlMatch = url.match(/\/products\/([^/?]+)/);
     if (urlMatch) {
-      const handle = urlMatch[1]; // e.g., "rom-03-ivory-granite"
+      const handle = urlMatch[1];
       const colorMatch = handle.match(/-(\d{2})-(.+)$/);
       if (colorMatch) {
-        const colorPart = colorMatch[2].replace(/-/g, ' / ').toUpperCase();
-        data.detectedSwatchName = colorPart;
-        console.log(`  ✓ Loloi color from URL: ${data.detectedSwatchName}`);
+        data.detectedSwatchName = colorMatch[2].replace(/-/g, ' / ').toUpperCase();
+        console.log(`✅ Loloi color from URL: ${data.detectedSwatchName}`);
       }
     }
     
-    // Try to find color swatch if exists
     const colorSwatches = document.querySelectorAll('[data-option-name="Color"] .selected, .product-option--color .selected');
     for (const swatch of colorSwatches) {
-      const style = swatch.getAttribute('style') || '';
-      const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-      if (bgMatch?.[1]) {
-        data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
+      const bgUrl = getBgImage(swatch);
+      if (bgUrl) {
+        data.detectedSwatchUrl = bgUrl;
         data.detectedSwatchName = swatch.getAttribute('data-value') || data.detectedSwatchName;
-        console.log(`  ✓ Loloi swatch: ${data.detectedSwatchName}`);
         break;
       }
     }
   }
-
-  // ---------------------------------------------------------
-  // UTTERMOST
-  // React PWA - color swatches are small square buttons with background-image
-  // The selected one has aria-checked="true" or class contains "selected"
-  // ---------------------------------------------------------
+  
+  // --- UTTERMOST - FROM V10 (THIS WORKED!) ---
   else if (hostname.includes('uttermost.com')) {
-    console.log('  Using Uttermost selectors...');
+    console.log('  Using Uttermost logic (V10 restored)...');
     
-    // Find ALL buttons with background-image (potential swatches)
-    const allBgButtons = document.querySelectorAll('button[style*="background-image"]');
-    console.log(`  Found ${allBgButtons.length} buttons with background-image`);
+    // V10 METHOD: Look for selected swatch tiles with background-image
+    const selectedTile = document.querySelector(
+      'button[class*="selected"][style*="background-image"],' +
+      'button[class*="active"][style*="background-image"],' +
+      '[class*="tile"][class*="selected"][style*="background-image"]'
+    );
     
-    // Filter to find actual color swatches (small square buttons, not product images)
-    for (const btn of allBgButtons) {
-      const style = btn.getAttribute('style') || '';
-      const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-      if (!bgMatch?.[1]) continue;
-      
-      let bgUrl = bgMatch[1];
-      if (bgUrl.startsWith('//')) bgUrl = 'https:' + bgUrl;
-      
-      // Skip if this looks like a main product image (large dimensions in URL or not a swatch)
-      const urlLower = bgUrl.toLowerCase();
-      if (urlLower.includes('/product/') && !urlLower.includes('swatch') && !urlLower.includes('color')) {
-        continue; // This is likely a product image, not a swatch
-      }
-      
-      // Check if selected
-      const classes = (btn.className || '').toLowerCase();
-      const ariaChecked = btn.getAttribute('aria-checked');
-      const ariaSelected = btn.getAttribute('aria-selected');
-      const isSelected = classes.includes('selected') || classes.includes('active') ||
-                         ariaChecked === 'true' || ariaSelected === 'true';
-      
-      if (isSelected) {
+    if (selectedTile && !isInExcludedSection(selectedTile)) {
+      const bgUrl = getBgImage(selectedTile);
+      if (bgUrl) {
         data.detectedSwatchUrl = bgUrl;
-        data.detectedSwatchName = btn.getAttribute('title') || btn.getAttribute('aria-label');
-        console.log(`  ✓ Uttermost swatch: ${data.detectedSwatchName} - ${bgUrl.substring(0, 60)}`);
-        break;
+        data.detectedSwatchName = getColorName(selectedTile);
+        console.log('✅ Uttermost swatch:', data.detectedSwatchName);
       }
     }
     
-    // Method 2: Find "Color" section and get selected swatch
+    // V10 FALLBACK: Look for option containers with "Color" label
     if (!data.detectedSwatchUrl) {
-      // Look for sections/containers with "Color" in text
-      const allElements = document.querySelectorAll('*');
-      for (const el of allElements) {
-        const directText = el.childNodes[0]?.textContent?.trim() || '';
-        if (directText.toLowerCase() === 'color') {
-          // This element labels a color section, look for swatches nearby
-          const parent = el.parentElement;
-          if (parent) {
-            const swatchBtns = parent.querySelectorAll('button[style*="background-image"]');
-            for (const btn of swatchBtns) {
-              const ariaChecked = btn.getAttribute('aria-checked');
-              if (ariaChecked === 'true') {
-                const style = btn.getAttribute('style') || '';
-                const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-                if (bgMatch?.[1]) {
-                  data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
-                  data.detectedSwatchName = btn.getAttribute('title') || btn.getAttribute('aria-label');
-                  console.log(`  ✓ Uttermost color section swatch: ${data.detectedSwatchName}`);
-                  break;
-                }
+      const optionContainers = document.querySelectorAll('[class*="option"], [class*="configurable"]');
+      for (const container of optionContainers) {
+        if (isInExcludedSection(container)) continue;
+        
+        const labels = container.querySelectorAll('span, label, legend');
+        let isColorContainer = false;
+        for (const lbl of labels) {
+          const txt = (lbl.innerText || '').toLowerCase();
+          if (txt.includes('color') || txt.includes('finish')) {
+            isColorContainer = true;
+            break;
+          }
+        }
+        
+        if (isColorContainer) {
+          const buttons = container.querySelectorAll('button[style*="background-image"]');
+          for (const btn of buttons) {
+            if (isSelectedElement(btn)) {
+              const bgUrl = getBgImage(btn);
+              if (bgUrl) {
+                data.detectedSwatchUrl = bgUrl;
+                data.detectedSwatchName = getColorName(btn);
+                console.log('✅ Uttermost color container swatch:', data.detectedSwatchName);
+                break;
               }
             }
           }
@@ -472,34 +514,12 @@ function getPageData() {
         }
       }
     }
-    
-    // Method 3: Look for tile-root classes (Uttermost uses these)
-    if (!data.detectedSwatchUrl) {
-      const tileButtons = document.querySelectorAll('[class*="tile"][style*="background-image"]');
-      for (const btn of tileButtons) {
-        const classes = (btn.className || '').toLowerCase();
-        if (classes.includes('selected') || btn.getAttribute('aria-checked') === 'true') {
-          const style = btn.getAttribute('style') || '';
-          const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-          if (bgMatch?.[1]) {
-            data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
-            data.detectedSwatchName = btn.getAttribute('title');
-            console.log(`  ✓ Uttermost tile swatch: ${data.detectedSwatchName}`);
-            break;
-          }
-        }
-      }
-    }
   }
-
-  // ---------------------------------------------------------
-  // ROWE FURNITURE
-  // Custom platform - fabric swatches
-  // ---------------------------------------------------------
+  
+  // --- ROWE FURNITURE ---
   else if (hostname.includes('rowefurniture.com')) {
-    console.log('  Using Rowe Furniture selectors...');
+    console.log('  Using Rowe Furniture logic...');
     
-    // Look for fabric/material swatch selectors
     const swatchContainers = document.querySelectorAll('[class*="swatch"], [class*="fabric"], [class*="material"]');
     for (const container of swatchContainers) {
       const selected = container.querySelector('.selected, .active, [aria-selected="true"]');
@@ -507,31 +527,24 @@ function getPageData() {
         const img = selected.querySelector('img');
         if (img?.src) {
           data.detectedSwatchUrl = img.src;
-          data.detectedSwatchName = selected.getAttribute('title') || selected.getAttribute('data-name') || img.alt;
-          console.log(`  ✓ Rowe swatch: ${data.detectedSwatchName}`);
+          data.detectedSwatchName = selected.getAttribute('title') || img.alt;
+          console.log(`✅ Rowe swatch: ${data.detectedSwatchName}`);
           break;
         }
-        // Check for background-image
-        const style = selected.getAttribute('style') || '';
-        const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-        if (bgMatch?.[1]) {
-          data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
-          data.detectedSwatchName = selected.getAttribute('title') || selected.getAttribute('data-name');
-          console.log(`  ✓ Rowe swatch bg: ${data.detectedSwatchName}`);
+        const bgUrl = getBgImage(selected);
+        if (bgUrl) {
+          data.detectedSwatchUrl = bgUrl;
+          data.detectedSwatchName = selected.getAttribute('title');
           break;
         }
       }
     }
   }
-
-  // ---------------------------------------------------------
-  // REGINA ANDREW
-  // NetSuite/SuiteCommerce
-  // ---------------------------------------------------------
+  
+  // --- REGINA ANDREW ---
   else if (hostname.includes('reginaandrew.com')) {
-    console.log('  Using Regina Andrew selectors...');
+    console.log('  Using Regina Andrew logic...');
     
-    // Look for product options
     const optionSelectors = document.querySelectorAll('[data-option], .product-views-option, [class*="option"]');
     for (const option of optionSelectors) {
       const label = option.querySelector('label, .option-label, span');
@@ -543,50 +556,52 @@ function getPageData() {
           if (img?.src) {
             data.detectedSwatchUrl = img.src;
             data.detectedSwatchName = selected.getAttribute('title') || img.alt;
-            console.log(`  ✓ Regina Andrew swatch: ${data.detectedSwatchName}`);
+            console.log(`✅ Regina Andrew swatch: ${data.detectedSwatchName}`);
             break;
           }
         }
       }
     }
   }
-
-  // ---------------------------------------------------------
-  // GENERIC FALLBACK for other vendors
-  // ---------------------------------------------------------
-  else {
-    console.log('  Using generic swatch detection...');
+  
+  // --- GENERIC FALLBACK - FROM V10 ---
+  if (!data.detectedSwatchUrl) {
+    console.log('  Using generic fallback...');
     
-    // Generic selected swatch selectors
-    const genericSelectors = [
-      '[class*="swatch"][class*="selected"] img',
-      '[class*="swatch"][class*="active"] img',
-      '[class*="color"][class*="selected"] img',
-      '[class*="finish"][class*="selected"] img',
-      '[aria-selected="true"] img',
-      '.selected[style*="background-image"]',
-      '.active[style*="background-image"]'
+    const selectedSwatchSelectors = [
+      'button[class*="selected"][style*="background-image"]',
+      'button[class*="active"][style*="background-image"]',
+      '[class*="swatch"][class*="selected"]',
+      '[class*="swatch"][class*="active"]',
+      '[class*="color"][class*="selected"]',
+      '[class*="color"][class*="active"]',
+      '[class*="finish"][class*="selected"]',
+      '[class*="finish"][class*="active"]',
+      '[aria-selected="true"][style*="background-image"]',
+      '[aria-checked="true"][style*="background-image"]'
     ];
     
-    for (const sel of genericSelectors) {
-      const el = document.querySelector(sel);
-      if (el) {
-        if (el.tagName === 'IMG' && el.src) {
-          data.detectedSwatchUrl = el.src;
-          data.detectedSwatchName = el.alt || el.closest('[title]')?.getAttribute('title');
-          console.log(`  ✓ Generic swatch img: ${data.detectedSwatchName}`);
+    for (const selector of selectedSwatchSelectors) {
+      const elements = document.querySelectorAll(selector);
+      for (const el of elements) {
+        if (isInExcludedSection(el)) continue;
+        
+        const bgUrl = getBgImage(el);
+        if (bgUrl) {
+          data.detectedSwatchUrl = bgUrl;
+          data.detectedSwatchName = getColorName(el);
+          console.log(`✅ Generic swatch: ${data.detectedSwatchName}`);
           break;
-        } else {
-          const style = el.getAttribute('style') || '';
-          const bgMatch = style.match(/background-image:\s*url\(["']?([^"')]+)["']?\)/i);
-          if (bgMatch?.[1]) {
-            data.detectedSwatchUrl = bgMatch[1].startsWith('//') ? 'https:' + bgMatch[1] : bgMatch[1];
-            data.detectedSwatchName = el.getAttribute('title');
-            console.log(`  ✓ Generic swatch bg: ${data.detectedSwatchName}`);
-            break;
-          }
+        }
+        
+        const img = el.querySelector('img');
+        if (img && img.src?.startsWith('http')) {
+          data.detectedSwatchUrl = img.src;
+          data.detectedSwatchName = getColorName(el) || img.alt;
+          break;
         }
       }
+      if (data.detectedSwatchUrl) break;
     }
   }
 
@@ -597,24 +612,22 @@ function getPageData() {
   console.log('════════════════════════════════════════════════════════════');
   console.log('RESULTS:');
   console.log(`  Vendor: ${data.detectedVendor || 'Unknown'}`);
-  console.log(`  Main Image: ${data.mainProductImage ? '✓ FOUND' : '✗ NOT FOUND'}`);
-  console.log(`  Swatch URL: ${data.detectedSwatchUrl ? '✓ FOUND' : '✗ NOT FOUND'}`);
+  console.log(`  Main Image: ${data.mainProductImage ? '✅' : '❌'}`);
+  console.log(`  Swatch URL: ${data.detectedSwatchUrl ? '✅' : '❌'}`);
   console.log(`  Swatch Name: ${data.detectedSwatchName || 'Not found'}`);
-  if (data.detectedSwatchUrl) {
-    console.log(`  Swatch: ${data.detectedSwatchUrl.substring(0, 60)}...`);
-  }
+  if (data.detectedSwatchUrl) console.log(`  ${data.detectedSwatchUrl.substring(0, 70)}...`);
   console.log('════════════════════════════════════════════════════════════');
   
   return data;
 }
 
 // ============================================================
-// SCRAPE BUTTON HANDLER
+// SCRAPE HANDLER
 // ============================================================
 async function doScrape() {
   scrapeBtn.disabled = true;
   scrapeBtn.innerHTML = '<div class="spinner"></div><span>Analyzing...</span>';
-  showStatus('Extracting product data...', 'info');
+  showStatus('Extracting...', 'info');
   
   try {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
@@ -628,29 +641,19 @@ async function doScrape() {
     });
     
     const pageData = results[0].result;
-    if (!pageData?.pageText) {
-      throw new Error('Could not read page content');
-    }
+    if (!pageData?.pageText) throw new Error('Could not read page');
     
-    console.log('Page data:', pageData);
     showStatus('AI analyzing...', 'info');
     
     const response = await fetch(`${BACKEND_URL}/api/ai-scrape`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        page_text: pageData.pageText,
-        page_url: pageData.pageUrl
-      })
+      body: JSON.stringify({ page_text: pageData.pageText, page_url: pageData.pageUrl })
     });
     
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.detail || 'AI failed');
-    }
+    if (!response.ok) throw new Error('AI failed');
     
     const aiData = await response.json();
-    console.log('AI data:', aiData);
     
     const finalData = {
       url: pageData.pageUrl,
@@ -669,7 +672,6 @@ async function doScrape() {
     showStatus(finalData.name ? `Found: ${finalData.name}` : 'Done', 'success');
     
   } catch (e) {
-    console.error('Error:', e);
     showStatus(e.message || 'Failed', 'error');
   } finally {
     scrapeBtn.disabled = false;
@@ -679,46 +681,33 @@ async function doScrape() {
 
 async function sendToApp() {
   if (!scrapedData) return;
-  if (!selectedProjectId) {
-    showStatus('Select a project first!', 'warning');
-    projectSelector.focus();
-    return;
-  }
+  if (!selectedProjectId) { showStatus('Select a project!', 'warning'); return; }
   
-  sendBtn.disabled = true;
-  try {
-    const params = new URLSearchParams();
-    params.set('action', 'add-item');
-    params.set('source', 'extension');
-    if (scrapedData.name) params.set('name', scrapedData.name);
-    if (scrapedData.price) params.set('price', scrapedData.price);
-    if (scrapedData.sku) params.set('sku', scrapedData.sku);
-    if (scrapedData.size) params.set('size', scrapedData.size);
-    if (scrapedData.finish_color) params.set('finish', scrapedData.finish_color);
-    if (scrapedData.finish_image) params.set('finish_image', scrapedData.finish_image);
-    if (scrapedData.vendor) params.set('vendor', scrapedData.vendor);
-    if (scrapedData.url) params.set('link', scrapedData.url);
-    if (scrapedData.image_url) params.set('image', scrapedData.image_url);
-    if (scrapedData.msrp) params.set('msrp', scrapedData.msrp);
-    
-    window.open(`${APP_URL}/checklist/${selectedProjectId}?${params.toString()}`, '_blank');
-    showStatus('Sent!', 'success');
-  } catch (e) {
-    showStatus('Failed', 'error');
-  } finally {
-    sendBtn.disabled = false;
-  }
+  const params = new URLSearchParams();
+  params.set('action', 'add-item');
+  params.set('source', 'extension');
+  if (scrapedData.name) params.set('name', scrapedData.name);
+  if (scrapedData.price) params.set('price', scrapedData.price);
+  if (scrapedData.sku) params.set('sku', scrapedData.sku);
+  if (scrapedData.size) params.set('size', scrapedData.size);
+  if (scrapedData.finish_color) params.set('finish', scrapedData.finish_color);
+  if (scrapedData.finish_image) params.set('finish_image', scrapedData.finish_image);
+  if (scrapedData.vendor) params.set('vendor', scrapedData.vendor);
+  if (scrapedData.url) params.set('link', scrapedData.url);
+  if (scrapedData.image_url) params.set('image', scrapedData.image_url);
+  if (scrapedData.msrp) params.set('msrp', scrapedData.msrp);
+  
+  window.open(`${APP_URL}/checklist/${selectedProjectId}?${params.toString()}`, '_blank');
+  showStatus('Sent!', 'success');
 }
 
 async function copyToClipboard() {
   if (!scrapedData) return;
-  try {
-    const text = [scrapedData.name, scrapedData.sku, scrapedData.price ? `$${scrapedData.price}` : '', 
-                  scrapedData.vendor, scrapedData.finish_color, scrapedData.size].filter(x => x).join('\n');
-    await navigator.clipboard.writeText(text);
-    copyBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
-    setTimeout(() => { copyBtn.innerHTML = '<span>📋</span><span>Copy</span>'; }, 2000);
-  } catch (e) {}
+  const text = [scrapedData.name, scrapedData.sku, scrapedData.price ? `$${scrapedData.price}` : '', 
+                scrapedData.vendor, scrapedData.finish_color, scrapedData.size].filter(x => x).join('\n');
+  await navigator.clipboard.writeText(text);
+  copyBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
+  setTimeout(() => { copyBtn.innerHTML = '<span>📋</span><span>Copy</span>'; }, 2000);
 }
 
 scrapeBtn.addEventListener('click', doScrape);
