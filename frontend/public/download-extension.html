@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Chrome Extension v19.0.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        .version {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .highlight {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .highlight strong {
+            color: #667eea;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin: 10px;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        .download-btn:active {
+            transform: translateY(0);
+        }
+        .secondary-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .secondary-btn:hover {
+            background: #f0f4ff;
+        }
+        .instructions {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .instructions ol {
+            padding-left: 20px;
+        }
+        .instructions li {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Design Ready Product Scraper</h1>
+        <div class="version">v19.0.0 - Forensic Combination</div>
+        
+        <div class="description">
+            <p>This version combines the <strong>working swatch detection from v16</strong> with the <strong>working main image detection from v10</strong>.</p>
+        </div>
+
+        <div class="highlight">
+            <strong>✅ What's Fixed:</strong><br>
+            • Main product image detection (og:image + smart selectors)<br>
+            • Swatch/finish color detection (size + area validation)<br>
+            • Both should work correctly now
+        </div>
+
+        <a href="/api/download/chrome-extension" class="download-btn" id="downloadBtn">
+            📥 Download Extension v19.0.0
+        </a>
+        
+        <button class="download-btn secondary-btn" onclick="copyDownloadLink()">
+            📋 Copy Download Link
+        </button>
+
+        <div id="status" class="status"></div>
+
+        <div class="instructions">
+            <h3>📝 Installation Instructions:</h3>
+            <ol>
+                <li><strong>Remove old extension:</strong> Go to <code>chrome://extensions/</code> and remove the old version</li>
+                <li><strong>Extract the ZIP:</strong> Unzip the downloaded file to a folder</li>
+                <li><strong>Load unpacked:</strong> In Chrome, go to <code>chrome://extensions/</code></li>
+                <li><strong>Enable Developer Mode:</strong> Toggle the switch in the top-right</li>
+                <li><strong>Click "Load unpacked":</strong> Select the extracted folder</li>
+                <li><strong>Verify version:</strong> Open extension popup and check console - should show v19.0.0</li>
+            </ol>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9rem;">
+            File size: ~26KB | Last updated: December 31, 2025
+        </div>
+    </div>
+
+    <script>
+        function copyDownloadLink() {
+            const link = window.location.origin + '/api/download/chrome-extension';
+            navigator.clipboard.writeText(link).then(() => {
+                const status = document.getElementById('status');
+                status.className = 'status success';
+                status.textContent = '✅ Download link copied to clipboard!';
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            }).catch(err => {
+                const status = document.getElementById('status');
+                status.className = 'status error';
+                status.textContent = '❌ Failed to copy link';
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            });
+        }
+
+        // Track download
+        document.getElementById('downloadBtn').addEventListener('click', function(e) {
+            const status = document.getElementById('status');
+            status.className = 'status success';
+            status.textContent = '⬇️ Download started... Check your Downloads folder';
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
