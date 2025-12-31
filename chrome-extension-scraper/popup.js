@@ -6,7 +6,7 @@
 
 console.log('');
 console.log('████████████████████████████████████████████████████████████');
-console.log('██  SCRAPER VERSION 11.0.0 - ALL 22 VENDORS SUPPORTED     ██');
+console.log('██  SCRAPER VERSION 15.0.0 - V11 RESTORED - ALL 22 VENDORS SUPPORTED     ██');
 console.log('██  If you see old version number, REINSTALL extension!   ██');
 console.log('████████████████████████████████████████████████████████████');
 console.log('');
