@@ -3,7 +3,7 @@
 CRITICAL VENDOR SCRAPER FIELD EXTRACTION TEST
 Testing ALL vendor scrapers for COMPLETE field extraction as requested.
 
-Backend URL: https://designvault-5.preview.emergentagent.com
+Backend URL: https://design-harvest-1.preview.emergentagent.com
 
 For EACH vendor, send POST to /api/scrape-product and verify ALL 7 fields are extracted:
 1. name
@@ -28,7 +28,7 @@ import time
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://designvault-5.preview.emergentagent.com"
+BACKEND_URL = "https://design-harvest-1.preview.emergentagent.com"
 
 # Test vendors with real product URLs
 TEST_VENDORS = [

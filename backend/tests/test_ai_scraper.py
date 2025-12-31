@@ -14,7 +14,7 @@ import os
 from typing import Dict, Any, List
 
 # Get backend URL from frontend .env
-BACKEND_URL = "https://designvault-5.preview.emergentagent.com"
+BACKEND_URL = "https://design-harvest-1.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 def log_test(test_name: str, status: str, details: str = ""):

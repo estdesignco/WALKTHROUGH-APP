@@ -27,7 +27,7 @@ cd /app
 tar -czf mobile-app.tar.gz mobile/
 ```
 
-You can download: `https://designvault-5.preview.emergentagent.com/mobile-app.tar.gz`
+You can download: `https://design-harvest-1.preview.emergentagent.com/mobile-app.tar.gz`
 
 Then extract it on your computer:
 ```bash

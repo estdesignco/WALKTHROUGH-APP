@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://designvault-5.preview.emergentagent.com';
+const BACKEND_URL = 'https://design-harvest-1.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

@@ -6,7 +6,7 @@
 
 ## 📱 ACCESS THE APP
 
-**Live URL:** https://designvault-5.preview.emergentagent.com/mobile-app
+**Live URL:** https://design-harvest-1.preview.emergentagent.com/mobile-app
 
 ---
 
@@ -483,7 +483,7 @@ After testing, grade each area:
 
 ## 🚀 READY TO TEST!
 
-**Start here:** https://designvault-5.preview.emergentagent.com/mobile-app
+**Start here:** https://design-harvest-1.preview.emergentagent.com/mobile-app
 
 **Estimated time:** 30-60 minutes for full testing
 
