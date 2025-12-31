@@ -6,7 +6,7 @@
 
 console.log('');
 console.log('████████████████████████████████████████████████████████████████');
-console.log('██  SCRAPER VERSION 13.0.0 - RESTORED WORKING SWATCH CODE     ██');
+console.log('██  SCRAPER VERSION 13.1.0 - RESTORED WORKING SWATCH CODE     ██');
 console.log('██  If you see old version number, REINSTALL extension!       ██');
 console.log('████████████████████████████████████████████████████████████████');
 console.log('');
