@@ -6,7 +6,7 @@
 
 console.log('');
 console.log('████████████████████████████████████████████████████████████████');
-console.log('██  SCRAPER VERSION 12.0.0 - SWATCH DETECTION FIXED           ██');
+console.log('██  SCRAPER VERSION 12.1.0 - SWATCH DETECTION FIXED           ██');
 console.log('██  TESTED WITH REAL HTML FROM: HVL, Four Hands, Loloi,       ██');
 console.log('██  Visual Comfort, Uttermost, Rowe                            ██');
 console.log('████████████████████████████████████████████████████████████████');
