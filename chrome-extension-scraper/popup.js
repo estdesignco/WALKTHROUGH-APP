@@ -479,13 +479,14 @@ async function doScrape() {
     }
     const extractedData = await response.json();
     
-    // Add the images we detected client-side
+    // Add the images and URL we detected client-side
     extractedData.image_url = pageData.mainProductImage;
     extractedData.finish_image = pageData.detectedSwatchUrl;
     if (pageData.detectedSwatchName && !extractedData.finish_color) {
       extractedData.finish_color = pageData.detectedSwatchName;
     }
     extractedData.url = tab.url;
+    // AI scraper already provides: name, sku, price, msrp, size, finish_color (from text)
     
     displayResults(extractedData);
     showStatus('✅ Data extracted successfully!', 'success');
