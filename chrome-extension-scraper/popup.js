@@ -422,12 +422,19 @@ function getPageData() {
     const w = img.naturalWidth || img.width || parseInt(img.getAttribute('width')) || 50;
     const h = img.naturalHeight || img.height || parseInt(img.getAttribute('height')) || 50;
     
-    if (!isLikelySwatchImage(img, src, w, h)) return;
+    console.log(`Checking img: ${src.substring(0,60)} (${w}x${h})`);
+    
+    if (!isLikelySwatchImage(img, src, w, h)) {
+      console.log(`  ❌ Not a swatch (failed isLikelySwatchImage)`);
+      return;
+    }
     
     seenSwatchUrls.add(src);
     const parent = img.closest('button, a, div, label, li');
     const selected = parent ? isSelected(parent) : false;
     const colorName = getColorName(img) || (parent ? getColorName(parent) : null);
+    
+    console.log(`  ✅ IS A SWATCH! selected=${selected}, name=${colorName}`);
     
     data.swatchImages.push({
       url: src,
