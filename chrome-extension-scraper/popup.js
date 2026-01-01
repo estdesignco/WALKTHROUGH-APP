@@ -152,6 +152,9 @@ function getPageData() {
     for (let i = 0; i < 8 && parent; i++) {
       const classes = (parent.className || '').toLowerCase();
       const id = (parent.id || '').toLowerCase();
+      const dataAttrs = Array.from(parent.attributes || [])
+        .map(attr => attr.name.toLowerCase() + '=' + attr.value.toLowerCase())
+        .join(' ');
       
       // EXCLUDE: Navigation, header, footer, menu areas
       if (classes.includes('nav') || classes.includes('menu') || 
@@ -164,11 +167,14 @@ function getPageData() {
       }
       
       // INCLUDE: Actual swatch/color selection areas
+      // Uttermost-specific: tile, option, configurable
       if (classes.includes('swatch') || classes.includes('color') || 
           classes.includes('finish') || classes.includes('fabric') ||
           classes.includes('variant') || classes.includes('option') ||
+          classes.includes('tile') || classes.includes('configurable') ||
           id.includes('swatch') || id.includes('color') || 
-          id.includes('finish') || id.includes('fabric')) {
+          id.includes('finish') || id.includes('fabric') ||
+          dataAttrs.includes('data-option') || dataAttrs.includes('data-color')) {
         foundSwatchIndicator = true;
       }
       
