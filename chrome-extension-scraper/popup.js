@@ -125,10 +125,41 @@ function scrapePageData() {
     if (skuMatch) data.sku = skuMatch[1];
   }
 
-  // DIMENSIONS - "30 W X 27 H X 32 D"
+  //  DIMENSIONS - Multiple patterns across vendors
   const bodyText = document.body.innerText;
-  const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
-  if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
+  
+  // Uttermost: "30 W X 27 H X 32 D (in)"
+  let sizeMatch = bodyText.match(/(\d+)\s*W\s*[xX×]\s*(\d+)\s*H\s*[xX×]\s*(\d+)\s*D/i);
+  if (sizeMatch) {
+    data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
+  }
+  
+  // Four Hands: '91.25"w x 34.75"d x 25.25"h'
+  if (!data.size) {
+    sizeMatch = bodyText.match(/([\d.]+)["']?\s*w\s*[xX×]\s*([\d.]+)["']?\s*d\s*[xX×]\s*([\d.]+)["']?\s*h/i);
+    if (sizeMatch) {
+      data.size = `${sizeMatch[1]}W X ${sizeMatch[3]}H X ${sizeMatch[2]}D`;
+    }
+  }
+  
+  // Rowe: 'L 32" x D 40" x H 34"' or 'Length: 32 Width: 40 Height: 34'
+  if (!data.size) {
+    sizeMatch = bodyText.match(/L[:\s]*([\d.]+)["']?\s*[xX×]\s*D[:\s]*([\d.]+)["']?\s*[xX×]\s*H[:\s]*([\d.]+)/i);
+    if (sizeMatch) {
+      data.size = `${sizeMatch[1]}W X ${sizeMatch[3]}H X ${sizeMatch[2]}D`;
+    }
+  }
+  
+  // HVL Group: "Height: 10" Length: 44.7" Weight: 16 lb"
+  if (!data.size) {
+    const heightMatch = bodyText.match(/Height[:\s]*([\d.]+)/i);
+    const lengthMatch = bodyText.match(/Length[:\s]*([\d.]+)/i);
+    const widthMatch = bodyText.match(/Width[:\s]*([\d.]+)/i);
+    if (heightMatch && lengthMatch) {
+      data.size = `${lengthMatch[1]}L X ${heightMatch[1]}H`;
+      if (widthMatch) data.size = `${lengthMatch[1]}L X ${widthMatch[1]}W X ${heightMatch[1]}H`;
+    }
+  }
 
   // PRICE & MSRP - Search the entire page text
   // Uttermost format: "$488.00" and "Suggested retail price $1,464.00"
