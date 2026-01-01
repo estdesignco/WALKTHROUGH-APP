@@ -478,6 +478,15 @@ async function doScrape() {
       throw new Error(errData.error || `API error: ${response.status}`);
     }
     const extractedData = await response.json();
+    
+    // Add the images we detected client-side
+    extractedData.image_url = pageData.mainProductImage;
+    extractedData.finish_image = pageData.detectedSwatchUrl;
+    if (pageData.detectedSwatchName && !extractedData.finish_color) {
+      extractedData.finish_color = pageData.detectedSwatchName;
+    }
+    extractedData.url = tab.url;
+    
     displayResults(extractedData);
     showStatus('✅ Data extracted successfully!', 'success');
     sendBtn.disabled = false;
