@@ -283,8 +283,25 @@ function scrapePageData() {
   }
   
   // Fallback: Get color name from product name (e.g., "Abound Swivel Chair, Ginger")
-  if (!data.finish_color && data.name && data.name.includes(',')) {
-    data.finish_color = data.name.split(',').pop().trim();
+  if (!data.finish_color && data.name) {
+    // Pattern 1: "Name, Color" (Uttermost style)
+    if (data.name.includes(',')) {
+      data.finish_color = data.name.split(',').pop().trim();
+    }
+    // Pattern 2: Color words at end of name (Four Hands: "Dylan Sofa Surrey Auburn")
+    else {
+      const words = data.name.split(/\s+/);
+      const lastWords = words.slice(-2).join(' ');
+      if (/brass|bronze|nickel|chrome|oak|walnut|gray|grey|white|black|beige|tan|brown|blue|green|red|gold|silver|copper|porcelain|linen|velvet|leather|suede|auburn|olive|navy|drift|taupe|sapphire|rider|ginger|kerbey|palermo|surrey/i.test(lastWords)) {
+        data.finish_color = lastWords;
+      }
+    }
+  }
+  
+  // Additional vendor-specific finish extraction from page text
+  if (!data.finish_color) {
+    const coverMatch = pageText.match(/Cover[:\s]*([A-Za-z\s]+?)(?:\n|•|In Stock|Overall)/i);
+    if (coverMatch) data.finish_color = coverMatch[1].trim();
   }
 
   console.log('Scraped data:', data);
