@@ -304,9 +304,25 @@ function getPageData() {
     console.log('✅ Main image from og:image:', data.mainProductImage.substring(0, 80));
   }
   
-  // Method 2: Generic gallery/product image selectors
+  // Method 2: Generic gallery/product image selectors (including Uttermost-specific)
   if (!data.mainProductImage) {
     const genericSelectors = [
+      // Uttermost-specific (React/PWA)
+      '.productSlider-root img',
+      '.productSlider-image_container img',
+      '.image-container img',
+      '[class*="productSlider"] img',
+      '[class*="galleryImage"] img',
+      '[class*="heroImage"] img',
+      // Modern React/PWA patterns
+      '.hero-image img',
+      '.main-product-image img',
+      '.product-gallery-main img',
+      '[data-testid="main-image"]',
+      '[data-testid="hero-image"]',
+      '[data-cy="product-image"]',
+      '[role="img"]',
+      // Traditional e-commerce
       '.product-media img:first-child',
       '.product-image-container img:first-child',
       '.gallery__image img',
