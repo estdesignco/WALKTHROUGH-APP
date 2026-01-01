@@ -143,10 +143,25 @@ function scrapePageData() {
   
   // For dealer price, look for pattern: standalone price before "Suggested retail"
   // Or find price near "ADD TO CART"
-  const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)\s*[\s\S]*?ADD TO CART/i);
+  const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)\s*[\s\S]{0,200}?ADD TO CART/i);
   if (addToCartMatch) {
     data.price = parseFloat(addToCartMatch[1].replace(/,/g, ''));
     console.log('Found price near ADD TO CART:', data.price);
+  }
+  
+  // Method 2: Look for first reasonable price before MSRP section
+  if (!data.price) {
+    const beforeMsrp = pageText.split(/Suggested retail|MSRP/i)[0];
+    const priceMatch = beforeMsrp.match(/\$([\d,]+\.?\d{0,2})/g);
+    if (priceMatch && priceMatch.length > 0) {
+      // Take the last price before MSRP (likely the dealer price)
+      const lastPrice = priceMatch[priceMatch.length - 1];
+      const val = parseFloat(lastPrice.replace(/[$,]/g, ''));
+      if (val > 50 && val < 50000) {
+        data.price = val;
+        console.log('Found price before MSRP section:', data.price);
+      }
+    }
   }
   
   // Fallback: find all prices and pick the one that looks like dealer price
