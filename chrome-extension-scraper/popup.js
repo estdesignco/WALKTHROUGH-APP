@@ -465,16 +465,12 @@ async function doScrape() {
     const vendorHostname = new URL(tab.url).hostname.replace('www.', '');
     
     showStatus('🤖 Sending to AI for analysis...', 'info');
-    const response = await fetch(`${BACKEND_URL}/api/scraper/extract`, {
+    const response = await fetch(`${BACKEND_URL}/api/ai-scrape`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        url: tab.url,
-        vendor_hostname: vendorHostname,
         page_text: pageData.pageText,
-        main_product_image: pageData.mainProductImage,
-        detected_swatch_url: pageData.detectedSwatchUrl,
-        detected_swatch_name: pageData.detectedSwatchName
+        page_url: tab.url
       }),
     });
     if (!response.ok) {
