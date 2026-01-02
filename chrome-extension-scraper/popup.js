@@ -187,7 +187,7 @@ function scrapePageData() {
   // ============================================================================
   // COLOR SWATCH DETECTION - ALL VENDORS
   // ============================================================================
-  const domain = window.location.hostname.toLowerCase();
+  // NOTE: 'domain' variable already declared at line 108
   
   // === UTTERMOST: button[style*="background-image"] ===
   if (domain.includes('uttermost')) {
