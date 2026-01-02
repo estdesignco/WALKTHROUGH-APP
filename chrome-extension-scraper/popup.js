@@ -113,22 +113,49 @@ function scrapePageData() {
   const h1 = document.querySelector('h1');
   if (h1) data.name = h1.innerText.trim();
 
-  // SKU - look for "SKU:" text
-  const skuEl = document.querySelector('[class*="productSku"], [class*="sku"]');
-  if (skuEl) {
-    const skuMatch = skuEl.innerText.match(/SKU[:\s]*(\w+)/i);
-    if (skuMatch) data.sku = skuMatch[1];
-  }
-  if (!data.sku) {
-    const bodyText = document.body.innerText;
-    const skuMatch = bodyText.match(/SKU[:\s]*(\d+)/i);
-    if (skuMatch) data.sku = skuMatch[1];
+  // SKU - vendor-specific logic
+  if (domain.includes('fourhands')) {
+    // Four Hands: SKU is in subtitle "Color • SKU" format
+    const subtitleEl = document.querySelector('.text-neutral-50');
+    if (subtitleEl && subtitleEl.textContent.includes('•')) {
+      const parts = subtitleEl.textContent.split('•');
+      if (parts.length >= 2) {
+        data.sku = parts[1].trim();
+      }
+    }
+    // Also try URL - Four Hands URLs end with SKU like /product/247447-002
+    if (!data.sku) {
+      const urlMatch = window.location.pathname.match(/\/product\/(\d+-\d+)/);
+      if (urlMatch) data.sku = urlMatch[1];
+    }
+  } else {
+    // Generic SKU detection
+    const skuEl = document.querySelector('[class*="productSku"], [class*="sku"]');
+    if (skuEl) {
+      const skuMatch = skuEl.innerText.match(/SKU[:\s]*(\w+)/i);
+      if (skuMatch) data.sku = skuMatch[1];
+    }
+    if (!data.sku) {
+      const bodyText = document.body.innerText;
+      const skuMatch = bodyText.match(/SKU[:\s]*(\d+)/i);
+      if (skuMatch) data.sku = skuMatch[1];
+    }
   }
 
-  // DIMENSIONS - "30 W X 27 H X 32 D"
+  // DIMENSIONS - vendor-specific logic
   const bodyText = document.body.innerText;
-  const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
-  if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
+  
+  if (domain.includes('fourhands')) {
+    // Four Hands: "21.50"w x 23.00"d x 38.50"h" format
+    const fhSizeMatch = bodyText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
+    if (fhSizeMatch) {
+      data.size = `${fhSizeMatch[1]}"W x ${fhSizeMatch[2]}"D x ${fhSizeMatch[3]}"H`;
+    }
+  } else {
+    // Generic: "30 W X 27 H X 32 D" format
+    const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
+    if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
+  }
 
   // PRICE & MSRP - Search the entire page text
   // Uttermost format: "$488.00" and "Suggested retail price $1,464.00"
