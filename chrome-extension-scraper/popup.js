@@ -182,7 +182,6 @@ function scrapePageData() {
   // ============================================================================
   // COLOR SWATCH DETECTION - ALL VENDORS
   // ============================================================================
-  const domain = window.location.hostname.toLowerCase();
   
   // === UTTERMOST: button[style*="background-image"] ===
   if (domain.includes('uttermost')) {
