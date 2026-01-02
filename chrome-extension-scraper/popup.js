@@ -193,18 +193,39 @@ function scrapePageData() {
       const container = colorLabel.closest('div[class*="option"], section') || colorLabel.parentElement;
       if (container) {
         const swatchButtons = container.querySelectorAll('button[style*="background-image"]');
+        
+        // First pass: Look for SELECTED button
         for (const btn of swatchButtons) {
-          const isSelected = btn.className?.includes('selected') || btn.getAttribute('aria-selected') === 'true';
-          if (isSelected || !data.finish_color) {
+          const classList = btn.className || '';
+          const isSelected = classList.includes('selected') || 
+                            btn.getAttribute('aria-selected') === 'true' ||
+                            btn.getAttribute('aria-label')?.includes('selected');
+          
+          if (isSelected) {
             data.finish_color = btn.getAttribute('title') || '';
             const style = btn.getAttribute('style') || '';
             const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
             if (bgMatch) {
               let imgUrl = bgMatch[1];
-              if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
+              if (imgUrl.startsWith('/')) {
+                imgUrl = window.location.origin + imgUrl;
+              }
               data.finish_image = imgUrl;
             }
-            if (isSelected) break;
+            break;
+          }
+        }
+        
+        // Fallback: If no selected found, take the first one
+        if (!data.finish_color && swatchButtons.length > 0) {
+          const firstBtn = swatchButtons[0];
+          data.finish_color = firstBtn.getAttribute('title') || '';
+          const style = firstBtn.getAttribute('style') || '';
+          const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
+          if (bgMatch) {
+            let imgUrl = bgMatch[1];
+            if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
+            data.finish_image = imgUrl;
           }
         }
       }
