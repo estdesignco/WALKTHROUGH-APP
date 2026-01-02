@@ -20,10 +20,14 @@ const projectSelector = document.getElementById('projectSelector');
 
 // Load projects from API
 async function loadProjects() {
+  console.log('🔄 Loading projects from API...');
   try {
+    console.log('Fetching from:', `${BACKEND_URL}/api/projects`);
     const response = await fetch(`${BACKEND_URL}/api/projects`);
+    console.log('Response status:', response.status);
     if (!response.ok) throw new Error('Failed to load projects');
     const projects = await response.json();
+    console.log('✅ Loaded projects:', projects.length);
     
     // Clear and populate dropdown
     projectSelector.innerHTML = '<option value="">-- Select a Project --</option>';
@@ -39,9 +43,10 @@ async function loadProjects() {
     if (stored.selectedProjectId) {
       projectSelector.value = stored.selectedProjectId;
       selectedProjectId = stored.selectedProjectId;
+      console.log('Restored project selection:', selectedProjectId);
     }
   } catch (e) {
-    console.error('Failed to load projects:', e);
+    console.error('❌ Failed to load projects:', e);
     projectSelector.innerHTML = '<option value="">-- Could not load projects --</option>';
   }
 }
