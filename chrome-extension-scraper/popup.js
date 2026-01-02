@@ -222,23 +222,63 @@ function scrapePageData() {
     }
   }
   
-  // FOUR HANDS: Round swatch images in labels
+  // FOUR HANDS: Swatches are in label elements with title attribute
+  // Structure: <label title="Color Name"><img src="swatch.jpg" alt="Color Name"></label>
   if (!data.finish_image && domain.includes('fourhands')) {
-    const allLabels = document.querySelectorAll('label');
-    for (const label of allLabels) {
-      const imgs = label.querySelectorAll('img');
-      for (const img of imgs) {
-        if (img.src && img.src.startsWith('http')) {
-          const w = img.naturalWidth || img.width || 50;
-          const h = img.naturalHeight || img.height || 50;
-          if (w < 200 && h < 200 && w > 15 && h > 15) {
+    // Look for the selected cushion/finish name from the dropdown display
+    const cushionDisplay = document.querySelector('[data-v-42a73eeb] .truncate');
+    if (cushionDisplay) {
+      data.finish_color = cushionDisplay.textContent.trim();
+    }
+    
+    // Also try the subtitle which shows "Dulane Mahogany • 247447-002"
+    if (!data.finish_color) {
+      const subtitle = document.querySelector('.text-neutral-50');
+      if (subtitle && subtitle.textContent.includes('•')) {
+        data.finish_color = subtitle.textContent.split('•')[0].trim();
+      }
+    }
+    
+    // Find swatch images in labels - look for the selected one or first one
+    const swatchLabels = document.querySelectorAll('label[title]');
+    for (const label of swatchLabels) {
+      const title = label.getAttribute('title');
+      const img = label.querySelector('img');
+      
+      // Skip placeholder images
+      if (title === 'None' || !img || !img.src || img.src.includes('PLACEHOLDER')) {
+        continue;
+      }
+      
+      // Check if this is the selected swatch (matches the finish_color we found)
+      if (data.finish_color && title && title.toLowerCase() === data.finish_color.toLowerCase()) {
+        data.finish_image = img.src;
+        break;
+      }
+      
+      // Otherwise take the first valid one
+      if (!data.finish_image && img.src.startsWith('http')) {
+        data.finish_image = img.src;
+        if (!data.finish_color) {
+          data.finish_color = title || img.alt || '';
+        }
+      }
+    }
+    
+    // Fallback: Look for circular swatch images in labels (older method)
+    if (!data.finish_image) {
+      const allLabels = document.querySelectorAll('label');
+      for (const label of allLabels) {
+        const imgs = label.querySelectorAll('img');
+        for (const img of imgs) {
+          if (img.src && img.src.startsWith('http') && !img.src.includes('PLACEHOLDER')) {
             data.finish_image = img.src;
             data.finish_color = img.alt || label.getAttribute('title') || '';
             break;
           }
         }
+        if (data.finish_image) break;
       }
-      if (data.finish_image) break;
     }
   }
   
