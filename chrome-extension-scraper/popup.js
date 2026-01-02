@@ -180,127 +180,57 @@ function scrapePageData() {
   }
 
   // COLOR NAME & SWATCH - This is the key part!
-  // VENDOR-SPECIFIC SWATCH DETECTION
+  // On Uttermost, colors are buttons with background-image style
+  // The selected one has class containing "selected"
   
-  // === UTTERMOST: Color swatch buttons with background-image ===
-  if (domain.includes('uttermost')) {
-    const colorLabel = Array.from(document.querySelectorAll('span, label, div')).find(
-      el => el.innerText?.trim().toLowerCase() === 'color'
-    );
+  // First, find the Color section
+  const colorLabel = Array.from(document.querySelectorAll('span, label, div')).find(
+    el => el.innerText?.trim().toLowerCase() === 'color'
+  );
+  
+  if (colorLabel) {
+    // Look in the parent container for swatch buttons
+    const container = colorLabel.closest('div[class*="option"], section') || colorLabel.parentElement;
     
-    if (colorLabel) {
-      const container = colorLabel.closest('div[class*="option"], section') || colorLabel.parentElement;
+    if (container) {
+      // Find buttons with background-image (these are the swatches)
+      const swatchButtons = container.querySelectorAll('button[style*="background-image"]');
       
-      if (container) {
-        const swatchButtons = container.querySelectorAll('button[style*="background-image"]');
+      for (const btn of swatchButtons) {
+        // Check if this is the selected swatch
+        const classList = btn.className || '';
+        const isSelected = classList.includes('selected') || 
+                          btn.getAttribute('aria-selected') === 'true' ||
+                          btn.getAttribute('aria-label')?.includes('selected');
         
-        for (const btn of swatchButtons) {
-          const classList = btn.className || '';
-          const isSelected = classList.includes('selected') || 
-                            btn.getAttribute('aria-selected') === 'true' ||
-                            btn.getAttribute('aria-label')?.includes('selected');
+        if (isSelected) {
+          // Get the color name from title attribute
+          data.finish_color = btn.getAttribute('title') || '';
           
-          if (isSelected) {
-            data.finish_color = btn.getAttribute('title') || '';
-            const style = btn.getAttribute('style') || '';
-            const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
-            if (bgMatch) {
-              let imgUrl = bgMatch[1];
-              if (imgUrl.startsWith('/')) {
-                imgUrl = window.location.origin + imgUrl;
-              }
-              data.finish_image = imgUrl;
-            }
-            break;
-          }
-        }
-        
-        if (!data.finish_color && swatchButtons.length > 0) {
-          const firstBtn = swatchButtons[0];
-          data.finish_color = firstBtn.getAttribute('title') || '';
-          const style = firstBtn.getAttribute('style') || '';
+          // Get the swatch image from background-image
+          const style = btn.getAttribute('style') || '';
           const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
           if (bgMatch) {
             let imgUrl = bgMatch[1];
-            if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
+            if (imgUrl.startsWith('/')) {
+              imgUrl = window.location.origin + imgUrl;
+            }
             data.finish_image = imgUrl;
           }
-        }
-      }
-    }
-  }
-  
-  // === FOUR HANDS: Small swatch images ===
-  else if (domain.includes('fourhands')) {
-    // Look for fabric/cover swatches - they're small images
-    const swatchImgs = document.querySelectorAll('img[src*="swatch"], img[alt*="swatch"], [class*="swatch"] img');
-    for (const img of swatchImgs) {
-      const w = img.naturalWidth || img.width || 50;
-      const h = img.naturalHeight || img.height || 50;
-      if (w < 200 && h < 200) {
-        const parent = img.closest('[class*="selected"], .active');
-        if (parent) {
-          data.finish_image = img.src;
-          data.finish_color = img.alt || img.getAttribute('title') || '';
           break;
         }
       }
-    }
-    // If no selected, take first swatch
-    if (!data.finish_image && swatchImgs.length > 0) {
-      const firstSwatch = swatchImgs[0];
-      data.finish_image = firstSwatch.src;
-      data.finish_color = firstSwatch.alt || firstSwatch.getAttribute('title') || '';
-    }
-  }
-  
-  // === HVL GROUP: Finish options (brass, nickel, etc.) ===
-  else if (domain.includes('hvlgroup')) {
-    // Look for finish swatches - small images with finish names
-    const finishImgs = document.querySelectorAll('[class*="finish"] img, [class*="swatch"] img');
-    for (const img of finishImgs) {
-      const parent = img.closest('[class*="selected"], .active, [aria-selected="true"]');
-      if (parent || img.closest('a')?.className?.includes('selected')) {
-        data.finish_image = img.src;
-        data.finish_color = img.alt || img.getAttribute('title') || parent?.textContent?.trim() || '';
-        break;
-      }
-    }
-    if (!data.finish_image && finishImgs.length > 0) {
-      data.finish_image = finishImgs[0].src;
-      data.finish_color = finishImgs[0].alt || '';
-    }
-  }
-  
-  // === ROWE FURNITURE: Fabric swatches ===
-  else if (domain.includes('rowe')) {
-    const fabricImgs = document.querySelectorAll('img[src*="fabric"], [class*="fabric"] img, [class*="swatch"] img');
-    for (const img of fabricImgs) {
-      const w = img.naturalWidth || img.width || 50;
-      if (w < 150) {
-        data.finish_image = img.src;
-        data.finish_color = img.alt || img.getAttribute('title') || '';
-        break;
-      }
-    }
-  }
-  
-  // === GENERIC FALLBACK: Any small swatch-like images ===
-  if (!data.finish_image) {
-    const allImgs = document.querySelectorAll('img');
-    for (const img of allImgs) {
-      const src = img.src || '';
-      const alt = (img.alt || '').toLowerCase();
-      const w = img.naturalWidth || img.width || 50;
-      const h = img.naturalHeight || img.height || 50;
       
-      // Look for small images that might be swatches
-      if (w < 150 && h < 150 && w > 20 && h > 20) {
-        if (alt.includes('swatch') || alt.includes('color') || alt.includes('finish') || alt.includes('fabric') ||
-            src.includes('swatch') || src.includes('color') || src.includes('finish')) {
-          data.finish_image = src;
-          data.finish_color = img.alt || img.getAttribute('title') || '';
-          break;
+      // If no selected found, take the first one
+      if (!data.finish_color && swatchButtons.length > 0) {
+        const firstBtn = swatchButtons[0];
+        data.finish_color = firstBtn.getAttribute('title') || '';
+        const style = firstBtn.getAttribute('style') || '';
+        const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
+        if (bgMatch) {
+          let imgUrl = bgMatch[1];
+          if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
+          data.finish_image = imgUrl;
         }
       }
     }
