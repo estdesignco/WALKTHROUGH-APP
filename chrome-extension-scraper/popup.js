@@ -368,35 +368,49 @@ function getPageData() {
     }
   }
   
-  // Strategy 6: For Four Hands - look for cover/fabric swatches
+  // Strategy 6: For Four Hands - look for cover/fabric swatches (FIXED FOR REAL)
   if (!data.swatchImage && domain.includes('fourhands')) {
-    console.log('Four Hands specific detection');
-    // Look for cover/fabric section
-    const coverSection = Array.from(document.querySelectorAll('*')).find(el => {
-      const text = (el.innerText || '').toLowerCase();
-      return text.startsWith('cover:') || text.startsWith('fabric:');
-    });
-    if (coverSection) {
-      const container = coverSection.closest('div, section');
-      if (container) {
-        const imgs = container.querySelectorAll('img');
-        for (const img of imgs) {
-          if (img.src && img.src.startsWith('http') && img.width > 20) {
-            data.swatchImage = img.src;
-            console.log('FH cover image:', img.src);
-            break;
-          }
+    console.log('🔍 Four Hands specific detection - looking for round swatch images');
+    
+    // Four Hands uses <label> elements with small round <img> inside
+    // Example: <label class="cursor-pointer"><img class="rounded-full" src="...Surrey_Auburn.png" alt="Surrey Auburn"></label>
+    
+    // Method 1: Look for ANY label with an img inside
+    const allLabels = document.querySelectorAll('label');
+    console.log(`Found ${allLabels.length} labels on page`);
+    
+    for (const label of allLabels) {
+      const img = label.querySelector('img');
+      if (img && img.src && img.src.startsWith('http')) {
+        const w = img.naturalWidth || img.width || 50;
+        const h = img.naturalHeight || img.height || 50;
+        console.log(`Label img: ${img.alt || 'no alt'}, size: ${w}x${h}, src: ${img.src.substring(0, 60)}`);
+        
+        // Swatches are small (under 200px) and round
+        if (w < 200 && h < 200 && w > 15 && h > 15) {
+          data.swatchImage = img.src;
+          data.swatchName = img.alt || label.getAttribute('title') || label.getAttribute('for') || '';
+          console.log(`✅ Found Four Hands swatch: "${data.swatchName}" - ${img.src}`);
+          break;
         }
       }
     }
-    // Also try general swatch pattern
-    const swatches = document.querySelectorAll('[class*="swatch"] img, [class*="option"] img');
-    for (const img of swatches) {
-      if (img.src && img.src.startsWith('http') && img.width > 20 && img.width < 200) {
-        data.swatchImage = img.src;
-        data.swatchColorName = img.alt || getColorName(img.closest('button, a, div'));
-        console.log('FH swatch:', data.swatchColorName, img.src);
-        break;
+    
+    // Method 2: Fallback - any small img with "swatch" or fabric name in URL
+    if (!data.swatchImage) {
+      console.log('Fallback: Looking for small images with fabric/color names');
+      const allImgs = document.querySelectorAll('img');
+      for (const img of allImgs) {
+        if (img.src && img.src.startsWith('http')) {
+          const w = img.naturalWidth || img.width || 50;
+          const urlLower = img.src.toLowerCase();
+          if (w < 200 && w > 15 && (urlLower.includes('swatch') || urlLower.includes('auburn') || urlLower.includes('sapphire') || urlLower.includes('drift'))) {
+            data.swatchImage = img.src;
+            data.swatchName = img.alt || '';
+            console.log(`✅ Found via fallback: "${data.swatchName}" - ${img.src}`);
+            break;
+          }
+        }
       }
     }
   }
