@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://design-harvest-1.preview.emergentagent.com/api
+https://furnscape.preview.emergentagent.com/api
 ```
 
 ---

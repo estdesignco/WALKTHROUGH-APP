@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://design-harvest-1.preview.emergentagent.com
+https://furnscape.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://design-harvest-1.preview.emergentagent.com/mobile-app
+https://furnscape.preview.emergentagent.com/mobile-app
 
 ---
 

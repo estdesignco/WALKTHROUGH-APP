@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://design-harvest-1.preview.emergentagent.com/mobile-app
+Test it now: https://furnscape.preview.emergentagent.com/mobile-app

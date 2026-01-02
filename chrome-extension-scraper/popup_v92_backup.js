@@ -3,8 +3,8 @@
 // Main image = Large product photo (NOT a swatch)
 // Swatch image = Small color/finish chip ONLY
 
-const APP_URL = 'https://design-harvest-1.preview.emergentagent.com';
-const BACKEND_URL = 'https://design-harvest-1.preview.emergentagent.com';
+const APP_URL = 'https://furnscape.preview.emergentagent.com';
+const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

@@ -2,8 +2,8 @@
 // Clean rebuild - SPECIFIC targeting for Uttermost
 // Added: Project selector dropdown with persistence
 
-const APP_URL = 'https://design-harvest-1.preview.emergentagent.com';
-const BACKEND_URL = 'https://design-harvest-1.preview.emergentagent.com';
+const APP_URL = 'https://furnscape.preview.emergentagent.com';
+const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

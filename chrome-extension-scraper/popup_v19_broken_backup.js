@@ -12,8 +12,8 @@ console.log('██  Swatch Logic: v16 | Main Image Logic: v10                 �
 console.log('██  BOTH SHOULD WORK NOW - USER VERIFIED COMBINATION          ██');
 console.log('████████████████████████████████████████████████████████████████');
 
-const APP_URL = 'https://design-harvest-1.preview.emergentagent.com';
-const BACKEND_URL = 'https://design-harvest-1.preview.emergentagent.com';
+const APP_URL = 'https://furnscape.preview.emergentagent.com';
+const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 
