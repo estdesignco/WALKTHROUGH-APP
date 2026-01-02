@@ -197,13 +197,33 @@ function scrapePageData() {
     }
   }
 
-  // PRODUCT IMAGE - main product photo from carousel
-  const ogImage = document.querySelector('meta[property="og:image"]');
-  if (ogImage?.content) {
-    data.image_url = ogImage.content;
-  } else {
-    const mainImg = document.querySelector('.swiper-slide-active img, [class*="product-image"] img');
-    if (mainImg) data.image_url = mainImg.src;
+  // PRODUCT IMAGE - vendor-specific main product photo
+  if (domain.includes('fourhands')) {
+    // Four Hands: Look for gallery images with PRM (primary) in filename
+    const galleryImgs = document.querySelectorAll('img[src*="_PRM_"], img[src*="_FRT_"]');
+    for (const img of galleryImgs) {
+      // Get the large version (not thumbnail)
+      if (img.src && img.src.includes('1200x1200')) {
+        data.image_url = img.src;
+        break;
+      }
+    }
+    // Fallback: get any large gallery image
+    if (!data.image_url) {
+      const largeImg = document.querySelector('img[src*="1200x1200"]');
+      if (largeImg) data.image_url = largeImg.src;
+    }
+  }
+  
+  // Generic fallbacks
+  if (!data.image_url) {
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage?.content) {
+      data.image_url = ogImage.content;
+    } else {
+      const mainImg = document.querySelector('.swiper-slide-active img, [class*="product-image"] img');
+      if (mainImg) data.image_url = mainImg.src;
+    }
   }
 
   // ============================================================================
