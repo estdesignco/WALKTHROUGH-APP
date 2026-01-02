@@ -179,49 +179,35 @@ function scrapePageData() {
     if (mainImg) data.image_url = mainImg.src;
   }
 
-  // COLOR NAME & SWATCH - This is the key part!
-  // On Uttermost, colors are buttons with background-image style
-  // The selected one has class containing "selected"
+  // ============================================================================
+  // FINISH COLOR & SWATCH IMAGE DETECTION - ALL 26 VENDORS
+  // ============================================================================
   
-  // First, find the Color section
+  // UTTERMOST: button[style*="background-image"] - WORKING, DON'T TOUCH
   const colorLabel = Array.from(document.querySelectorAll('span, label, div')).find(
     el => el.innerText?.trim().toLowerCase() === 'color'
   );
-  
   if (colorLabel) {
-    // Look in the parent container for swatch buttons
     const container = colorLabel.closest('div[class*="option"], section') || colorLabel.parentElement;
-    
     if (container) {
-      // Find buttons with background-image (these are the swatches)
       const swatchButtons = container.querySelectorAll('button[style*="background-image"]');
-      
       for (const btn of swatchButtons) {
-        // Check if this is the selected swatch
         const classList = btn.className || '';
         const isSelected = classList.includes('selected') || 
                           btn.getAttribute('aria-selected') === 'true' ||
                           btn.getAttribute('aria-label')?.includes('selected');
-        
         if (isSelected) {
-          // Get the color name from title attribute
           data.finish_color = btn.getAttribute('title') || '';
-          
-          // Get the swatch image from background-image
           const style = btn.getAttribute('style') || '';
           const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
           if (bgMatch) {
             let imgUrl = bgMatch[1];
-            if (imgUrl.startsWith('/')) {
-              imgUrl = window.location.origin + imgUrl;
-            }
+            if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
             data.finish_image = imgUrl;
           }
           break;
         }
       }
-      
-      // If no selected found, take the first one
       if (!data.finish_color && swatchButtons.length > 0) {
         const firstBtn = swatchButtons[0];
         data.finish_color = firstBtn.getAttribute('title') || '';
@@ -231,6 +217,102 @@ function scrapePageData() {
           let imgUrl = bgMatch[1];
           if (imgUrl.startsWith('/')) imgUrl = window.location.origin + imgUrl;
           data.finish_image = imgUrl;
+        }
+      }
+    }
+  }
+  
+  // FOUR HANDS: Round swatch images in labels
+  if (!data.finish_image && domain.includes('fourhands')) {
+    const allLabels = document.querySelectorAll('label');
+    for (const label of allLabels) {
+      const imgs = label.querySelectorAll('img');
+      for (const img of imgs) {
+        if (img.src && img.src.startsWith('http')) {
+          const w = img.naturalWidth || img.width || 50;
+          const h = img.naturalHeight || img.height || 50;
+          if (w < 200 && h < 200 && w > 15 && h > 15) {
+            data.finish_image = img.src;
+            data.finish_color = img.alt || label.getAttribute('title') || '';
+            break;
+          }
+        }
+      }
+      if (data.finish_image) break;
+    }
+  }
+  
+  // HVL GROUP / VISUAL COMFORT: Finish option images
+  if (!data.finish_image && (domain.includes('hvlgroup') || domain.includes('visualcomfort'))) {
+    const finishOptions = document.querySelectorAll('a[class*="finish"], button[class*="finish"], [data-finish]');
+    for (const opt of finishOptions) {
+      const img = opt.querySelector('img');
+      if (img && img.src) {
+        const w = img.naturalWidth || img.width || 50;
+        if (w < 200 && w > 20) {
+          data.finish_image = img.src;
+          data.finish_color = img.alt || opt.getAttribute('title') || opt.getAttribute('aria-label') || '';
+          if (opt.className?.includes('selected') || opt.getAttribute('aria-selected') === 'true') break;
+        }
+      }
+    }
+  }
+  
+  // ROWE FURNITURE: Fabric swatches
+  if (!data.finish_image && domain.includes('rowe')) {
+    const fabricImgs = document.querySelectorAll('img[src*="fabric"], img[alt*="fabric" i], [class*="fabric"] img');
+    for (const img of fabricImgs) {
+      const w = img.naturalWidth || img.width || 50;
+      if (w < 150 && w > 20) {
+        data.finish_image = img.src;
+        data.finish_color = img.alt || '';
+        break;
+      }
+    }
+  }
+  
+  // BERNHARDT: Fabric/Finish selectors
+  if (!data.finish_image && domain.includes('bernhardt')) {
+    const swatchImgs = document.querySelectorAll('[class*="swatch"] img, [class*="fabric"] img, [class*="finish"] img');
+    for (const img of swatchImgs) {
+      const w = img.naturalWidth || img.width || 50;
+      if (w < 200 && w > 20) {
+        data.finish_image = img.src;
+        data.finish_color = img.alt || '';
+        break;
+      }
+    }
+  }
+  
+  // LOLOI RUGS: Color swatches
+  if (!data.finish_image && domain.includes('loloi')) {
+    const colorImgs = document.querySelectorAll('[class*="color"] img, [data-color] img, [class*="swatch"] img');
+    for (const img of colorImgs) {
+      const w = img.naturalWidth || img.width || 50;
+      if (w < 200 && w > 20) {
+        data.finish_image = img.src;
+        data.finish_color = img.alt || img.getAttribute('data-color') || '';
+        break;
+      }
+    }
+  }
+  
+  // GENERIC FALLBACK for remaining vendors (Global Views, Regina Andrew, Arteriors, etc.)
+  if (!data.finish_image) {
+    const genericSwatches = document.querySelectorAll(
+      '[class*="swatch" i] img, [class*="color" i] img, [class*="finish" i] img, ' +
+      '[class*="fabric" i] img, [class*="material" i] img, ' +
+      'img[src*="swatch" i], img[src*="color" i], img[alt*="swatch" i]'
+    );
+    for (const img of genericSwatches) {
+      const w = img.naturalWidth || img.width || 50;
+      const h = img.naturalHeight || img.height || 50;
+      if (w < 200 && h < 200 && w > 15 && h > 15) {
+        const parent = img.closest('[class*="selected" i], [class*="active" i], [aria-selected="true"]');
+        if (parent || !data.finish_image) {
+          data.finish_image = img.src;
+          data.finish_color = img.alt || img.getAttribute('title') || '';
+          if (parent) break;
         }
       }
     }
