@@ -371,7 +371,8 @@ function createSidePanel() {
   // Event listeners
   document.getElementById('dr-close-btn').addEventListener('click', hidePanel);
   document.getElementById('dr-send-btn').addEventListener('click', sendToAppAndLibraries);
-  document.getElementById('dr-canva-btn').addEventListener('click', sendToCanva);
+  document.getElementById('dr-copy-image-btn').addEventListener('click', copyImage);
+  document.getElementById('dr-copy-link-btn').addEventListener('click', copyLink);
   document.getElementById('dr-rescrape-btn').addEventListener('click', () => {
     scrapeAndShow();
   });
