@@ -948,21 +948,60 @@ let canvaToken = null;
 
 async function sendToCanva() {
   if (!scrapedData || !scrapedData.image_url) {
-    showToast('⚠️ No product image');
+    showToast('⚠️ No product image to send to Canva');
     return;
   }
   
-  const html = `<a href="${window.location.href}"><img src="${scrapedData.image_url}"></a>`;
+  // Check if we have a Canva token stored
+  const stored = await chrome.storage.local.get('canvaToken');
+  canvaToken = stored.canvaToken;
   
-  await navigator.clipboard.write([
-    new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }) })
-  ]);
+  if (!canvaToken) {
+    showToast('⚠️ Please connect your Canva account first (coming soon!)');
+    // For now, we'll copy the image URL with product link
+    copyImageWithLink();
+    return;
+  }
   
-  showToast('✅ Copied!');
+  showToast('⏳ Uploading to Canva...');
+  
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/canva/upload-asset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_url: scrapedData.image_url,
+        name: `${scrapedData.name || 'Product'} - ${scrapedData.vendor || 'Unknown'}`,
+        product_url: scrapedData.url,
+        canva_token: canvaToken
+      })
+    });
+    
+    if (response.ok) {
+      showToast('✅ Uploaded to Canva! Check your Canva Media Library.');
+    } else {
+      const error = await response.json();
+      showToast(`⚠️ Canva upload failed: ${error.detail}`);
+    }
+    
+  } catch (error) {
+    console.error('Canva upload error:', error);
+    showToast('⚠️ Canva upload failed. Copying image info instead...');
+    copyImageWithLink();
+  }
 }
 
 function copyImageWithLink() {
-  sendToCanva();
+  // Fallback: Copy product info to clipboard
+  const text = `${scrapedData.name || 'Product'}
+${scrapedData.vendor || ''}
+${scrapedData.url || ''}
+
+Image: ${scrapedData.image_url || ''}`;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Product info copied! Paste into Canva.');
+  });
 }
 
 // ============================================================================
