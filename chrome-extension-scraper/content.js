@@ -947,18 +947,12 @@ async function sendToAppAndLibraries() {
 let canvaToken = null;
 
 async function sendToCanva() {
-  if (!scrapedData || !scrapedData.image_url) {
-    showToast('⚠️ No product image');
-    return;
-  }
+  // Just copy the product page URL
+  const url = window.location.href;
   
-  const html = `<a href="${window.location.href}"><img src="${scrapedData.image_url}"></a>`;
+  await navigator.clipboard.writeText(url);
   
-  await navigator.clipboard.write([
-    new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }) })
-  ]);
-  
-  showToast('✅ Copied!');
+  showToast('✅ Link copied! Paste into Canva Link field');
 }
 
 function copyImageWithLink() {
