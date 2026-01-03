@@ -343,7 +343,7 @@ function createSidePanel() {
       </button>
       <div style="display: flex; gap: 8px;">
         <button class="dr-btn-secondary" id="dr-canva-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
-          📎 Get Linked Image
+          🎨 Send to Canva
         </button>
         <button class="dr-btn-secondary" id="dr-rescrape-btn" style="flex: 1;">
           🔄 Re-scrape
@@ -810,16 +810,18 @@ function scrapePageData() {
     if (match) { data.size = formatter(match); break; }
   }
 
-  // FINISH/COLOR - be more careful, avoid grabbing navigation text
-  const finishEl = document.querySelector('[class*="color-name"], [class*="finish-name"], [data-color], [data-finish], .selected-color, .current-finish');
-  if (finishEl) {
-    const val = finishEl.innerText?.trim();
-    if (val && val.length > 1 && val.length < 40) data.finish_color = val;
-  }
-  if (!data.finish_color) {
-    // Try the page URL for color info (common pattern)
-    const urlMatch = window.location.href.match(/color=([^&]+)/i);
-    if (urlMatch) data.finish_color = decodeURIComponent(urlMatch[1]).replace(/[+_-]/g, ' ');
+  // FINISH/COLOR
+  const finishPatterns = [
+    /(?:choose\s+)?(?:body\s+)?cover[:\s]*([^\n]+)/i,
+    /(?:fabric\s+shown|body\s+fabric)[:\s]*([^\n]+)/i,
+    /(?:finish|color|option)[:\s]*([^\n]+)/i
+  ];
+  for (const pattern of finishPatterns) {
+    const match = pageText.match(pattern);
+    if (match) {
+      const val = match[1].trim().split('\n')[0].trim();
+      if (val && val.length > 1 && val.length < 50) { data.finish_color = val; break; }
+    }
   }
 
   // IMAGES
@@ -950,36 +952,13 @@ async function sendToCanva() {
     return;
   }
   
-  showToast('⏳ Creating linked image...');
+  const html = `<a href="${window.location.href}"><img src="${scrapedData.image_url}"></a>`;
   
-  // Open PDF with linked image in new tab
-  const params = new URLSearchParams({
-    image_url: scrapedData.image_url,
-    link_url: window.location.href
-  });
+  await navigator.clipboard.write([
+    new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }) })
+  ]);
   
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/clipper/linked-image-pdf`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image_url: scrapedData.image_url,
-        link_url: window.location.href
-      })
-    });
-    
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      showToast('✅ PDF opened! Copy image from PDF, paste into Canva');
-    } else {
-      showToast('⚠️ Failed to create PDF');
-    }
-  } catch (error) {
-    console.error('PDF error:', error);
-    showToast('⚠️ Error: ' + error.message);
-  }
+  showToast('✅ Copied!');
 }
 
 function copyImageWithLink() {
