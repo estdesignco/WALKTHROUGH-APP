@@ -542,6 +542,22 @@ function scrapePageData() {
   
   // HVL GROUP / VISUAL COMFORT: Finish option images
   if (!data.finish_image && (domain.includes('hvlgroup') || domain.includes('visualcomfort'))) {
+    // First try to get finish from dropdown/select text
+    if (!data.finish_color) {
+      const finishLabels = ['finish', 'color', 'option'];
+      for (const label of finishLabels) {
+        const regex = new RegExp(`${label}[:\\s]*([^\\n$]+)`, 'i');
+        const match = bodyText.match(regex);
+        if (match && match[1]) {
+          const value = match[1].trim().split('\n')[0].trim();
+          if (value && value.length > 1 && value.length < 50 && !value.match(/^(select|choose)/i)) {
+            data.finish_color = value;
+            break;
+          }
+        }
+      }
+    }
+    
     const finishOptions = document.querySelectorAll('a[class*="finish"], button[class*="finish"], [data-finish]');
     for (const opt of finishOptions) {
       const img = opt.querySelector('img');
@@ -549,21 +565,31 @@ function scrapePageData() {
         const w = img.naturalWidth || img.width || 50;
         if (w < 200 && w > 20) {
           data.finish_image = img.src;
-          data.finish_color = img.alt || opt.getAttribute('title') || opt.getAttribute('aria-label') || '';
+          if (!data.finish_color) {
+            data.finish_color = img.alt || opt.getAttribute('title') || opt.getAttribute('aria-label') || '';
+          }
           if (opt.className?.includes('selected') || opt.getAttribute('aria-selected') === 'true') break;
         }
       }
     }
   }
   
-  // ROWE FURNITURE: Fabric swatches
+  // ROWE FURNITURE: Fabric swatches and dropdown
   if (!data.finish_image && domain.includes('rowe')) {
+    // First try to get finish from "Choose Body Cover: XXX" pattern
+    if (!data.finish_color) {
+      const coverMatch = bodyText.match(/(?:choose\s+)?(?:body\s+)?cover[:\s]*([^\n]+)/i);
+      if (coverMatch) {
+        data.finish_color = coverMatch[1].trim().split('\n')[0].trim();
+      }
+    }
+    
     const fabricImgs = document.querySelectorAll('img[src*="fabric"], img[alt*="fabric" i], [class*="fabric"] img');
     for (const img of fabricImgs) {
       const w = img.naturalWidth || img.width || 50;
       if (w < 150 && w > 20) {
         data.finish_image = img.src;
-        data.finish_color = img.alt || '';
+        if (!data.finish_color) data.finish_color = img.alt || '';
         break;
       }
     }
@@ -571,14 +597,35 @@ function scrapePageData() {
   
   // BERNHARDT: Fabric/Finish selectors
   if (!data.finish_image && domain.includes('bernhardt')) {
+    // Get fabric name from "Fabric Shown: XXX" pattern
+    if (!data.finish_color) {
+      const fabricMatch = bodyText.match(/(?:fabric\s+shown|body\s+fabric)[:\s]*([^\n]+)/i);
+      if (fabricMatch) {
+        data.finish_color = fabricMatch[1].trim().split('\n')[0].trim();
+      }
+    }
+    
     const swatchImgs = document.querySelectorAll('[class*="swatch"] img, [class*="fabric"] img, [class*="finish"] img');
     for (const img of swatchImgs) {
       const w = img.naturalWidth || img.width || 50;
       if (w < 200 && w > 20) {
         data.finish_image = img.src;
-        data.finish_color = img.alt || '';
+        if (!data.finish_color) data.finish_color = img.alt || '';
         break;
       }
+    }
+  }
+  
+  // HVL GROUP - additional finish detection from URL suffix
+  if (!data.finish_color && domain.includes('hvlgroup') && data.sku) {
+    const suffixMatch = data.sku.match(/-([A-Z]+)$/);
+    if (suffixMatch) {
+      const finishCodes = {
+        'VB': 'Vintage Brass', 'PN': 'Polished Nickel', 'AB': 'Aged Brass', 
+        'OB': 'Old Bronze', 'GL': 'Gold Leaf', 'SL': 'Silver Leaf',
+        'BK': 'Black', 'WH': 'White', 'PBR': 'Patina Brass', 'AGB': 'Aged Brass'
+      };
+      data.finish_color = finishCodes[suffixMatch[1]] || suffixMatch[1];
     }
   }
   
