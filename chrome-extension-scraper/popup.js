@@ -291,51 +291,102 @@ function scrapePageData() {
   // Structure: <label title="Color Name"><img src="swatch.jpg" alt="Color Name"></label>
   // Also handles "Cover" and "Cushion" selector dropdowns
   if (!data.finish_image && domain.includes('fourhands')) {
-    // Look for the selected cover/cushion/finish name from ANY dropdown display
-    // Try multiple selectors since Four Hands uses different ones
-    const dropdownDisplays = document.querySelectorAll('.truncate, [class*="truncate"]');
-    for (const display of dropdownDisplays) {
-      const text = display.textContent.trim();
-      if (text && text !== 'None' && !text.includes('Select')) {
-        data.finish_color = text;
+    // FIRST: Try the subtitle which shows "Light Camel • 100074-008" format
+    // This is the most reliable source for the selected color
+    const subtitles = document.querySelectorAll('.text-neutral-50, [class*="text-neutral"]');
+    for (const subtitle of subtitles) {
+      if (subtitle.textContent.includes('•')) {
+        data.finish_color = subtitle.textContent.split('•')[0].trim();
         break;
       }
     }
     
-    // Also try the subtitle which shows "Light Camel • 100074-008" format
+    // SECOND: If no subtitle, look for dropdown display showing selected option
+    // The selected value is often in a truncate element inside a button or selector
     if (!data.finish_color) {
-      const subtitles = document.querySelectorAll('.text-neutral-50, [class*="text-neutral"]');
-      for (const subtitle of subtitles) {
-        if (subtitle.textContent.includes('•')) {
-          data.finish_color = subtitle.textContent.split('•')[0].trim();
+      // Look for specific option selector patterns
+      const optionButtons = document.querySelectorAll('button .truncate, [class*="option"] .truncate, [class*="select"] .truncate');
+      for (const display of optionButtons) {
+        const text = display.textContent.trim();
+        if (text && text !== 'None' && !text.includes('Select') && !text.includes('Choose')) {
+          data.finish_color = text;
           break;
         }
       }
     }
     
-    // Find swatch images in labels - look for the selected one or first valid one
+    // THIRD: Try any truncate that looks like a color name (not a label)
+    if (!data.finish_color) {
+      const dropdownDisplays = document.querySelectorAll('.truncate');
+      for (const display of dropdownDisplays) {
+        const text = display.textContent.trim();
+        // Skip if it looks like a label (ends with :, is all caps, etc)
+        if (text && text !== 'None' && !text.includes('Select') && !text.includes('Choose') && 
+            !text.endsWith(':') && text !== 'Cover' && text !== 'Cushion' && text !== 'Finish') {
+          data.finish_color = text;
+          break;
+        }
+      }
+    }
+    
+    // Find swatch images in labels - PRIORITIZE SELECTED STATES
     const swatchLabels = document.querySelectorAll('label[title]');
+    
+    // First pass: look for explicitly selected swatch
     for (const label of swatchLabels) {
       const title = label.getAttribute('title');
       const img = label.querySelector('img');
       
-      // Skip placeholder images and "None" options
       if (!title || title === 'None' || !img || !img.src || img.src.includes('PLACEHOLDER')) {
         continue;
       }
       
-      // Check if this is the selected swatch (matches the finish_color we found)
-      if (data.finish_color && title.toLowerCase() === data.finish_color.toLowerCase()) {
+      // Check if this label or its parent is marked as selected/active/checked
+      const isSelected = label.classList.contains('selected') || 
+                         label.classList.contains('active') ||
+                         label.querySelector('input:checked') ||
+                         label.closest('[class*="selected"]') ||
+                         label.closest('[class*="active"]');
+      
+      if (isSelected) {
         data.finish_image = img.src;
-        console.log('Found matching swatch for', data.finish_color, ':', img.src);
+        data.finish_color = title; // Use the title as the definitive color name
+        console.log('Found SELECTED swatch:', title, img.src);
         break;
       }
-      
-      // Otherwise take the first valid one as fallback
-      if (!data.finish_image && img.src.startsWith('http')) {
-        data.finish_image = img.src;
-        if (!data.finish_color) {
-          data.finish_color = title || img.alt || '';
+    }
+    
+    // Second pass: if no selected found, try to match by color name
+    if (!data.finish_image) {
+      for (const label of swatchLabels) {
+        const title = label.getAttribute('title');
+        const img = label.querySelector('img');
+        
+        if (!title || title === 'None' || !img || !img.src || img.src.includes('PLACEHOLDER')) {
+          continue;
+        }
+        
+        // Check if this matches the finish_color we found
+        if (data.finish_color && title.toLowerCase() === data.finish_color.toLowerCase()) {
+          data.finish_image = img.src;
+          console.log('Found matching swatch for', data.finish_color, ':', img.src);
+          break;
+        }
+      }
+    }
+    
+    // Third pass: just take first valid swatch as fallback
+    if (!data.finish_image) {
+      for (const label of swatchLabels) {
+        const title = label.getAttribute('title');
+        const img = label.querySelector('img');
+        
+        if (title && title !== 'None' && img?.src && img.src.startsWith('http') && !img.src.includes('PLACEHOLDER')) {
+          data.finish_image = img.src;
+          if (!data.finish_color) {
+            data.finish_color = title;
+          }
+          break;
         }
       }
     }
@@ -345,7 +396,6 @@ function scrapePageData() {
       const roundSwatches = document.querySelectorAll('img.rounded-full, img[class*="rounded-full"]');
       for (const img of roundSwatches) {
         if (img.src && img.src.startsWith('http') && !img.src.includes('PLACEHOLDER')) {
-          // Get parent's title or aria-label
           const parent = img.closest('label, button, [title]');
           const swatchName = parent?.getAttribute('title') || img.alt || '';
           
