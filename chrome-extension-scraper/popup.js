@@ -352,8 +352,46 @@ function scrapePageData() {
         const w = img.naturalWidth || img.width || 100;
         const h = img.naturalHeight || img.height || 100;
         if (w < 300 && h < 300 && w > 10 && h > 10) {
-          const parent = img.closest('[class*="selected"], [class*="active"], [aria-selected="true"], label');
+          const parent = img.closest('[class*="selected"], [class*="active"], [aria-selected="true"], label, [class*="current"]');
           if (parent || !data.finish_image) {
+            data.finish_image = img.src;
+            // Get color name from various sources
+            if (!data.finish_color) {
+              data.finish_color = img.alt || 
+                                  img.getAttribute('title') || 
+                                  parent?.getAttribute('title') ||
+                                  parent?.getAttribute('data-color') ||
+                                  parent?.getAttribute('data-fabric') ||
+                                  parent?.querySelector('.name, .title, .label')?.innerText?.trim() ||
+                                  '';
+            }
+            if (parent) break;
+          }
+        }
+      }
+      if (data.finish_image) break;
+    }
+  }
+
+  // Method 3: Look for any image that looks like a fabric/color swatch nearby the product
+  if (!data.finish_image) {
+    // Check for fabric grid items with images
+    const fabricItems = document.querySelectorAll('[class*="fabric"] img, [class*="swatch-grid"] img, [class*="color-option"] img');
+    for (const img of fabricItems) {
+      if (!img.src || !img.src.startsWith('http')) continue;
+      const isSelected = img.closest('[class*="selected"], [class*="active"], [class*="current"]');
+      if (isSelected) {
+        data.finish_image = img.src;
+        if (!data.finish_color) {
+          // Try to get the name from nearby text
+          const container = img.closest('div, figure, li');
+          const nameEl = container?.querySelector('.name, .title, span, p');
+          if (nameEl) data.finish_color = nameEl.innerText.trim();
+        }
+        break;
+      }
+    }
+  }
             data.finish_image = img.src;
             data.finish_color = img.alt || img.getAttribute('title') || parent?.getAttribute('title') || '';
             if (parent) break;
