@@ -168,10 +168,67 @@ function scrapePageData() {
     if (fhSizeMatch) {
       data.size = `${fhSizeMatch[1]}"W x ${fhSizeMatch[2]}"D x ${fhSizeMatch[3]}"H`;
     }
-  } else {
-    // Generic: "30 W X 27 H X 32 D" format
-    const sizeMatch = bodyText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D/i);
-    if (sizeMatch) data.size = `${sizeMatch[1]} W X ${sizeMatch[2]} H X ${sizeMatch[3]} D`;
+  }
+  
+  // Generic dimension detection - try multiple patterns if not found yet
+  if (!data.size) {
+    // Pattern 1: "30 W X 27 H X 32 D" (Uttermost)
+    let sizeMatch = bodyText.match(/(\d+(?:\.\d+)?)\s*W\s*X\s*(\d+(?:\.\d+)?)\s*H\s*X\s*(\d+(?:\.\d+)?)\s*D/i);
+    if (sizeMatch) {
+      data.size = `${sizeMatch[1]}"W x ${sizeMatch[3]}"D x ${sizeMatch[2]}"H`;
+    }
+  }
+  
+  if (!data.size) {
+    // Pattern 2: "Width: 33 Depth: 38 Height: 33" (Bernhardt, many others)
+    const wMatch = bodyText.match(/Width[:\s]*([\d.]+)/i);
+    const dMatch = bodyText.match(/Depth[:\s]*([\d.]+)/i);
+    const hMatch = bodyText.match(/Height[:\s]*([\d.]+)/i);
+    if (wMatch || hMatch) {
+      data.size = `${wMatch?.[1] || '?'}"W x ${dMatch?.[1] || '?'}"D x ${hMatch?.[1] || '?'}"H`;
+    }
+  }
+  
+  if (!data.size) {
+    // Pattern 3: "H: 18.5 W: 12 D: 12" or "H 18.5 x W 12 x D 12" (HVL, some lighting)
+    const hMatch2 = bodyText.match(/H[:\s]*([\d.]+)/i);
+    const wMatch2 = bodyText.match(/W[:\s]*([\d.]+)/i);
+    const dMatch2 = bodyText.match(/D[:\s]*([\d.]+)/i);
+    if (hMatch2 || wMatch2) {
+      data.size = `${wMatch2?.[1] || '?'}"W x ${dMatch2?.[1] || '?'}"D x ${hMatch2?.[1] || '?'}"H`;
+    }
+  }
+  
+  if (!data.size) {
+    // Pattern 4: "18"H x 12"W x 12"D" or "18" H x 12" W x 12" D"
+    let sizeMatch = bodyText.match(/([\d.]+)"?\s*H\s*[x×X]\s*([\d.]+)"?\s*W\s*[x×X]\s*([\d.]+)"?\s*D/i);
+    if (sizeMatch) {
+      data.size = `${sizeMatch[2]}"W x ${sizeMatch[3]}"D x ${sizeMatch[1]}"H`;
+    }
+  }
+  
+  if (!data.size) {
+    // Pattern 5: "12"W x 12"D x 18"H" (standard WxDxH)
+    let sizeMatch = bodyText.match(/([\d.]+)"?\s*W\s*[x×X]\s*([\d.]+)"?\s*D\s*[x×X]\s*([\d.]+)"?\s*H/i);
+    if (sizeMatch) {
+      data.size = `${sizeMatch[1]}"W x ${sizeMatch[2]}"D x ${sizeMatch[3]}"H`;
+    }
+  }
+  
+  if (!data.size) {
+    // Pattern 6: "Overall: 12w 18h 12d" (some furniture sites)
+    let sizeMatch = bodyText.match(/Overall[:\s]*([\d.]+)\s*[wW]\s*([\d.]+)\s*[hH]\s*([\d.]+)\s*[dD]/i);
+    if (sizeMatch) {
+      data.size = `${sizeMatch[1]}"W x ${sizeMatch[3]}"D x ${sizeMatch[2]}"H`;
+    }
+  }
+  
+  if (!data.size) {
+    // Pattern 7: Rug format "2'3" x 7'9"" (Loloi, Safavieh)
+    let rugMatch = bodyText.match(/(\d+'[\d."]+)\s*[x×X]\s*(\d+'[\d."]+)/);
+    if (rugMatch) {
+      data.size = `${rugMatch[1]} x ${rugMatch[2]}`;
+    }
   }
 
   // PRICE & MSRP - Search the entire page text
