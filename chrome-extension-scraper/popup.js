@@ -392,17 +392,8 @@ function scrapePageData() {
       }
     }
   }
-            data.finish_image = img.src;
-            data.finish_color = img.alt || img.getAttribute('title') || parent?.getAttribute('title') || '';
-            if (parent) break;
-          }
-        }
-      }
-      if (data.finish_image) break;
-    }
-  }
 
-  // Method 3: Get color name from product title (e.g., "Chair, Ginger" or "Chair - Brass")
+  // Method 4: Get color name from product title (e.g., "Chair, Ginger" or "Chair - Brass")
   if (!data.finish_color && data.name) {
     if (data.name.includes(',')) {
       data.finish_color = data.name.split(',').pop().trim();
