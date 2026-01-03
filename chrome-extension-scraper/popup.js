@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v6.1.1
-// Clean rebuild - SPECIFIC targeting for Uttermost + Four Hands
-// Added: Project selector dropdown with persistence, better error handling
+// Design Ready Product Scraper v6.2.0
+// FIXED: Four Hands Cover/Cushion selector detection
+// FIXED: Round swatch image detection
 
 const APP_URL = 'https://furnscape.preview.emergentagent.com';
 const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
