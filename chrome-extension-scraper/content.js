@@ -343,7 +343,7 @@ function createSidePanel() {
       </button>
       <div style="display: flex; gap: 8px;">
         <button class="dr-btn-secondary" id="dr-canva-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
-          🎨 Copy for Canva
+          🎨 Send to Canva
         </button>
         <button class="dr-btn-secondary" id="dr-rescrape-btn" style="flex: 1;">
           🔄 Re-scrape
@@ -952,115 +952,56 @@ async function sendToCanva() {
     return;
   }
   
-  // ALWAYS use the actual page URL, never the image URL
-  const productUrl = window.location.href;
-  const imageUrl = scrapedData.image_url;
-  const productName = scrapedData.name || 'Product';
+  // Check if we have a Canva token stored
+  const stored = await chrome.storage.local.get('canvaToken');
+  canvaToken = stored.canvaToken;
   
-  showToast('⏳ Copying image...');
+  if (!canvaToken) {
+    showToast('⚠️ Please connect your Canva account first (coming soon!)');
+    // For now, we'll copy the image URL with product link
+    copyImageWithLink();
+    return;
+  }
+  
+  showToast('⏳ Uploading to Canva...');
   
   try {
-    // Fetch the actual image as a blob
-    const response = await fetch(imageUrl);
-    const imageBlob = await response.blob();
-    
-    // Convert to PNG if needed (clipboard prefers PNG)
-    let pngBlob = imageBlob;
-    if (!imageBlob.type.includes('png')) {
-      // Convert to PNG using canvas
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = imageUrl;
-      });
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      
-      pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    }
-    
-    // Copy the actual image blob to clipboard
-    await navigator.clipboard.write([
-      new ClipboardItem({
-        'image/png': pngBlob
+    const response = await fetch(`${BACKEND_URL}/api/canva/upload-asset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_url: scrapedData.image_url,
+        name: `${scrapedData.name || 'Product'} - ${scrapedData.vendor || 'Unknown'}`,
+        product_url: scrapedData.url,
+        canva_token: canvaToken
       })
-    ]);
+    });
     
-    showToast('✅ Image copied! Paste into Canva, then click "Copy Link" below.');
-    
-    // Show persistent link copy button
-    showLinkCopyToast(productUrl, productName);
+    if (response.ok) {
+      showToast('✅ Uploaded to Canva! Check your Canva Media Library.');
+    } else {
+      const error = await response.json();
+      showToast(`⚠️ Canva upload failed: ${error.detail}`);
+    }
     
   } catch (error) {
-    console.error('Image copy error:', error);
-    // Fallback: copy image URL
-    try {
-      await navigator.clipboard.writeText(imageUrl);
-      showToast('📋 Image URL copied. Paste into browser to download.');
-      showLinkCopyToast(productUrl, productName);
-    } catch (e) {
-      showToast('⚠️ Copy failed. Try right-clicking the image.');
-    }
+    console.error('Canva upload error:', error);
+    showToast('⚠️ Canva upload failed. Copying image info instead...');
+    copyImageWithLink();
   }
 }
 
-function showLinkCopyToast(productUrl, productName) {
-  // Remove any existing link toast
-  const existingToast = document.getElementById('dr-link-toast');
-  if (existingToast) existingToast.remove();
-  
-  // Create persistent toast with copy link button
-  const linkToast = document.createElement('div');
-  linkToast.id = 'dr-link-toast';
-  linkToast.innerHTML = `
-    <div style="position: fixed; bottom: 80px; right: 20px; background: #1a1a2e; border: 2px solid #7c3aed; border-radius: 12px; padding: 15px; z-index: 2147483647; box-shadow: 0 4px 20px rgba(124,58,237,0.4); max-width: 300px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-      <div style="color: #fff; font-size: 13px; margin-bottom: 10px;">
-        <strong>Step 2:</strong> After pasting image in Canva, select it and add this link:
-      </div>
-      <button id="dr-copy-link-btn" style="width: 100%; padding: 10px 15px; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">
-        📋 Copy Product Link
-      </button>
-      <div style="color: #888; font-size: 11px; margin-top: 8px; word-break: break-all;">
-        ${productUrl.substring(0, 50)}...
-      </div>
-      <button id="dr-close-link-toast" style="position: absolute; top: 5px; right: 8px; background: none; border: none; color: #888; cursor: pointer; font-size: 16px;">✕</button>
-    </div>
-  `;
-  document.body.appendChild(linkToast);
-  
-  // Copy link button handler
-  document.getElementById('dr-copy-link-btn').addEventListener('click', async () => {
-    await navigator.clipboard.writeText(productUrl);
-    document.getElementById('dr-copy-link-btn').innerHTML = '✅ Link Copied!';
-    document.getElementById('dr-copy-link-btn').style.background = '#10b981';
-    setTimeout(() => {
-      document.getElementById('dr-copy-link-btn').innerHTML = '📋 Copy Product Link';
-      document.getElementById('dr-copy-link-btn').style.background = '#7c3aed';
-    }, 2000);
-  });
-  
-  // Close button handler
-  document.getElementById('dr-close-link-toast').addEventListener('click', () => {
-    linkToast.remove();
-  });
-  
-  // Auto-hide after 30 seconds
-  setTimeout(() => {
-    if (document.getElementById('dr-link-toast')) {
-      linkToast.remove();
-    }
-  }, 30000);
-}
+function copyImageWithLink() {
+  // Fallback: Copy product info to clipboard
+  const text = `${scrapedData.name || 'Product'}
+${scrapedData.vendor || ''}
+${scrapedData.url || ''}
 
-async function copyImageWithLink() {
-  await sendToCanva();
+Image: ${scrapedData.image_url || ''}`;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Product info copied! Paste into Canva.');
+  });
 }
 
 // ============================================================================
