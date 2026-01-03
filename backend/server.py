@@ -14199,6 +14199,274 @@ async def get_material_detail(material_id: str):
         logging.error(f"Error getting material detail: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================================================
+# PRODUCT LIBRARY - Global searchable product database
+# ============================================================================
+
+class ScrapedProduct(BaseModel):
+    """Product data from the scraper for the Product Library"""
+    name: str
+    vendor: str
+    sku: Optional[str] = None
+    price: Optional[float] = None
+    msrp: Optional[float] = None
+    size: Optional[str] = None
+    finish_color: Optional[str] = None
+    finish_image: Optional[str] = None
+    image_url: Optional[str] = None
+    product_url: Optional[str] = None
+    project_id: Optional[str] = None
+    category: Optional[str] = "furniture"
+
+@api_router.post("/products/library")
+async def save_product_to_library(product: ScrapedProduct):
+    """Save a product to the global Product Library"""
+    try:
+        # Check if product already exists (by SKU + vendor or URL)
+        existing_query = {"$or": []}
+        if product.sku:
+            existing_query["$or"].append({"sku": product.sku, "vendor": {"$regex": f"^{product.vendor}$", "$options": "i"}})
+        if product.product_url:
+            existing_query["$or"].append({"product_url": product.product_url})
+        
+        existing = None
+        if existing_query["$or"]:
+            existing = await db.product_library.find_one(existing_query)
+        
+        if existing:
+            # Update existing - add project to used_in_projects
+            update_ops = {
+                "$set": {
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "price": product.price or existing.get("price"),
+                    "msrp": product.msrp or existing.get("msrp")
+                }
+            }
+            if product.project_id:
+                update_ops["$addToSet"] = {"used_in_projects": product.project_id}
+            
+            await db.product_library.update_one({"id": existing["id"]}, update_ops)
+            existing.pop("_id", None)
+            return {"status": "updated", "product": existing}
+        
+        # Create new product
+        product_doc = {
+            "id": str(uuid.uuid4()),
+            "name": product.name,
+            "vendor": product.vendor,
+            "sku": product.sku or "",
+            "price": product.price,
+            "msrp": product.msrp,
+            "size": product.size or "",
+            "finish_color": product.finish_color or "",
+            "finish_image": product.finish_image or "",
+            "image_url": product.image_url or "",
+            "product_url": product.product_url or "",
+            "category": product.category or "furniture",
+            "tags": [product.vendor.lower() if product.vendor else "", product.category or "furniture"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "used_in_projects": [product.project_id] if product.project_id else []
+        }
+        
+        await db.product_library.insert_one(product_doc)
+        product_doc.pop("_id", None)
+        
+        logging.info(f"📦 Saved product to library: {product.vendor}/{product.name}")
+        return {"status": "created", "product": product_doc}
+        
+    except Exception as e:
+        logging.error(f"Error saving product to library: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/products/library")
+async def get_product_library(
+    search: Optional[str] = None,
+    vendor: Optional[str] = None,
+    category: Optional[str] = None,
+    project_id: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
+    limit: int = 100,
+    offset: int = 0
+):
+    """Get products from the global Product Library with filtering"""
+    try:
+        query = {}
+        
+        if search:
+            query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"vendor": {"$regex": search, "$options": "i"}},
+                {"sku": {"$regex": search, "$options": "i"}},
+                {"finish_color": {"$regex": search, "$options": "i"}}
+            ]
+        
+        if vendor:
+            query["vendor"] = {"$regex": vendor, "$options": "i"}
+        
+        if category:
+            query["category"] = {"$regex": category, "$options": "i"}
+        
+        if project_id:
+            query["used_in_projects"] = project_id
+        
+        if min_price is not None:
+            query["price"] = {"$gte": min_price}
+        
+        if max_price is not None:
+            if "price" in query:
+                query["price"]["$lte"] = max_price
+            else:
+                query["price"] = {"$lte": max_price}
+        
+        total = await db.product_library.count_documents(query)
+        products = await db.product_library.find(query, {"_id": 0}).sort("updated_at", -1).skip(offset).limit(limit).to_list(limit)
+        
+        return {
+            "total": total,
+            "products": products,
+            "limit": limit,
+            "offset": offset
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting product library: {str(e)}")
+        return {"total": 0, "products": [], "limit": limit, "offset": offset}
+
+@api_router.get("/products/library/{product_id}")
+async def get_product_detail(product_id: str):
+    """Get a single product's full details including projects it's used in"""
+    try:
+        product = await db.product_library.find_one({"id": product_id}, {"_id": 0})
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        # Get project names
+        if product.get("used_in_projects"):
+            projects = await db.projects.find(
+                {"id": {"$in": product["used_in_projects"]}},
+                {"_id": 0, "id": 1, "name": 1}
+            ).to_list(100)
+            product["project_details"] = projects
+        
+        return product
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting product detail: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================================================
+# CANVA PRO INTEGRATION
+# ============================================================================
+
+CANVA_CLIENT_ID = os.environ.get("CANVA_CLIENT_ID", "")
+CANVA_CLIENT_SECRET = os.environ.get("CANVA_CLIENT_SECRET", "")
+
+@api_router.get("/canva/auth-url")
+async def get_canva_auth_url(redirect_uri: str):
+    """Get the Canva OAuth authorization URL"""
+    if not CANVA_CLIENT_ID:
+        raise HTTPException(status_code=400, detail="Canva integration not configured. Please add CANVA_CLIENT_ID to environment.")
+    
+    # Canva OAuth URL
+    auth_url = f"https://www.canva.com/api/oauth/authorize?client_id={CANVA_CLIENT_ID}&redirect_uri={redirect_uri}&response_type=code&scope=asset:write design:content:write"
+    return {"auth_url": auth_url}
+
+@api_router.post("/canva/token")
+async def exchange_canva_token(code: str, redirect_uri: str):
+    """Exchange authorization code for Canva access token"""
+    import aiohttp
+    
+    if not CANVA_CLIENT_ID or not CANVA_CLIENT_SECRET:
+        raise HTTPException(status_code=400, detail="Canva integration not configured")
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "https://api.canva.com/rest/v1/oauth/token",
+                data={
+                    "grant_type": "authorization_code",
+                    "code": code,
+                    "redirect_uri": redirect_uri,
+                    "client_id": CANVA_CLIENT_ID,
+                    "client_secret": CANVA_CLIENT_SECRET
+                }
+            ) as response:
+                if response.status != 200:
+                    error_text = await response.text()
+                    raise HTTPException(status_code=response.status, detail=f"Canva auth failed: {error_text}")
+                
+                token_data = await response.json()
+                return token_data
+                
+    except aiohttp.ClientError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to connect to Canva: {str(e)}")
+
+@api_router.post("/canva/upload-asset")
+async def upload_to_canva(
+    image_url: str,
+    name: str,
+    product_url: Optional[str] = None,
+    canva_token: str = None
+):
+    """Upload an image to Canva with optional product link metadata"""
+    import aiohttp
+    
+    if not canva_token:
+        raise HTTPException(status_code=401, detail="Canva token required. Please connect your Canva account first.")
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            # First, download the image
+            async with session.get(image_url) as img_response:
+                if img_response.status != 200:
+                    raise HTTPException(status_code=400, detail="Could not download image")
+                image_data = await img_response.read()
+                content_type = img_response.headers.get("Content-Type", "image/jpeg")
+            
+            # Upload to Canva
+            headers = {
+                "Authorization": f"Bearer {canva_token}",
+            }
+            
+            # Create asset upload job
+            async with session.post(
+                "https://api.canva.com/rest/v1/asset-uploads",
+                headers=headers,
+                json={
+                    "name": name,
+                }
+            ) as create_response:
+                if create_response.status != 200:
+                    error_text = await create_response.text()
+                    raise HTTPException(status_code=create_response.status, detail=f"Canva upload failed: {error_text}")
+                
+                upload_data = await create_response.json()
+                upload_url = upload_data.get("upload_url")
+                job_id = upload_data.get("job_id")
+            
+            # Upload the actual image
+            async with session.put(
+                upload_url,
+                data=image_data,
+                headers={"Content-Type": content_type}
+            ) as upload_response:
+                if upload_response.status not in [200, 201]:
+                    raise HTTPException(status_code=upload_response.status, detail="Failed to upload image to Canva")
+            
+            return {
+                "success": True,
+                "job_id": job_id,
+                "message": f"Image '{name}' uploaded to your Canva account",
+                "product_url": product_url
+            }
+            
+    except aiohttp.ClientError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload to Canva: {str(e)}")
+
 # PRODUCT CLIPPER ENDPOINTS
 @api_router.post("/clipper/save-to-app")
 async def save_clipped_product_to_app(data: dict):
