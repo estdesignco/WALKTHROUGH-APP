@@ -339,11 +339,19 @@ function createSidePanel() {
     
     <div class="dr-actions">
       <button class="dr-btn-primary" id="dr-send-btn">
-        🚀 SEND TO APP
+        🚀 SEND TO APP + LIBRARIES
       </button>
-      <button class="dr-btn-secondary" id="dr-rescrape-btn">
-        🔄 Re-scrape Page
-      </button>
+      <div style="display: flex; gap: 8px;">
+        <button class="dr-btn-secondary" id="dr-canva-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
+          🎨 Send to Canva
+        </button>
+        <button class="dr-btn-secondary" id="dr-rescrape-btn" style="flex: 1;">
+          🔄 Re-scrape
+        </button>
+      </div>
+      <div style="font-size: 10px; color: #666; text-align: center; padding-top: 4px;">
+        Saves to: Checklist/FFE • Product Library • Materials Library
+      </div>
     </div>
   `;
   
@@ -359,7 +367,8 @@ function createSidePanel() {
   
   // Event listeners
   document.getElementById('dr-close-btn').addEventListener('click', hidePanel);
-  document.getElementById('dr-send-btn').addEventListener('click', sendToApp);
+  document.getElementById('dr-send-btn').addEventListener('click', sendToAppAndLibraries);
+  document.getElementById('dr-canva-btn').addEventListener('click', sendToCanva);
   document.getElementById('dr-rescrape-btn').addEventListener('click', () => {
     scrapeAndShow();
   });
