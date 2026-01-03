@@ -950,39 +950,48 @@ async function sendToAppAndLibraries() {
 
 let canvaToken = null;
 
-async function sendToCanva() {
+async function copyImage() {
   if (!scrapedData || !scrapedData.image_url) {
-    showToast('⚠️ No product image');
+    showToast('⚠️ No image');
     return;
   }
   
-  showToast('⏳ Creating PDF...');
-  
   try {
-    const response = await fetch(`${BACKEND_URL}/api/clipper/linked-image-pdf`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image_url: scrapedData.image_url,
-        link_url: window.location.href
-      })
+    const response = await fetch(scrapedData.image_url);
+    const blob = await response.blob();
+    
+    // Convert to PNG
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = URL.createObjectURL(blob);
     });
     
-    if (response.ok) {
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      showToast('✅ PDF opened! Copy image from PDF → paste into Canva');
-    } else {
-      showToast('⚠️ Failed');
-    }
-  } catch (error) {
-    showToast('⚠️ Error: ' + error.message);
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    
+    const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+    
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+    showToast('✅ Image copied!');
+  } catch (e) {
+    // Fallback: copy URL
+    await navigator.clipboard.writeText(scrapedData.image_url);
+    showToast('📋 Image URL copied');
   }
 }
 
+async function copyLink() {
+  await navigator.clipboard.writeText(window.location.href);
+  showToast('✅ Link copied!');
+}
+
 function copyImageWithLink() {
-  sendToCanva();
+  copyImage();
 }
 
 // ============================================================================
