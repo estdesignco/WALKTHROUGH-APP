@@ -945,12 +945,41 @@ async function sendToAppAndLibraries() {
 let canvaToken = null;
 
 async function sendToCanva() {
-  // Just copy the product page URL
-  const url = window.location.href;
+  if (!scrapedData || !scrapedData.image_url) {
+    showToast('⚠️ No product image');
+    return;
+  }
   
-  await navigator.clipboard.writeText(url);
+  showToast('⏳ Creating linked image...');
   
-  showToast('✅ Link copied! Paste into Canva Link field');
+  // Open PDF with linked image in new tab
+  const params = new URLSearchParams({
+    image_url: scrapedData.image_url,
+    link_url: window.location.href
+  });
+  
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/clipper/linked-image-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_url: scrapedData.image_url,
+        link_url: window.location.href
+      })
+    });
+    
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      showToast('✅ PDF opened! Copy image from PDF, paste into Canva');
+    } else {
+      showToast('⚠️ Failed to create PDF');
+    }
+  } catch (error) {
+    console.error('PDF error:', error);
+    showToast('⚠️ Error: ' + error.message);
+  }
 }
 
 function copyImageWithLink() {
