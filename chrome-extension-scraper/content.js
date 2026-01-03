@@ -948,60 +948,37 @@ let canvaToken = null;
 
 async function sendToCanva() {
   if (!scrapedData || !scrapedData.image_url) {
-    showToast('⚠️ No product image to send to Canva');
+    showToast('⚠️ No product image');
     return;
   }
   
-  // Check if we have a Canva token stored
-  const stored = await chrome.storage.local.get('canvaToken');
-  canvaToken = stored.canvaToken;
-  
-  if (!canvaToken) {
-    showToast('⚠️ Please connect your Canva account first (coming soon!)');
-    // For now, we'll copy the image URL with product link
-    copyImageWithLink();
-    return;
-  }
-  
-  showToast('⏳ Uploading to Canva...');
+  showToast('⏳ Creating PDF...');
   
   try {
-    const response = await fetch(`${BACKEND_URL}/api/canva/upload-asset`, {
+    const response = await fetch(`${BACKEND_URL}/api/clipper/linked-image-pdf`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         image_url: scrapedData.image_url,
-        name: `${scrapedData.name || 'Product'} - ${scrapedData.vendor || 'Unknown'}`,
-        product_url: scrapedData.url,
-        canva_token: canvaToken
+        link_url: window.location.href
       })
     });
     
     if (response.ok) {
-      showToast('✅ Uploaded to Canva! Check your Canva Media Library.');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      showToast('✅ PDF opened! Copy image from PDF → paste into Canva');
     } else {
-      const error = await response.json();
-      showToast(`⚠️ Canva upload failed: ${error.detail}`);
+      showToast('⚠️ Failed');
     }
-    
   } catch (error) {
-    console.error('Canva upload error:', error);
-    showToast('⚠️ Canva upload failed. Copying image info instead...');
-    copyImageWithLink();
+    showToast('⚠️ Error: ' + error.message);
   }
 }
 
 function copyImageWithLink() {
-  // Fallback: Copy product info to clipboard
-  const text = `${scrapedData.name || 'Product'}
-${scrapedData.vendor || ''}
-${scrapedData.url || ''}
-
-Image: ${scrapedData.image_url || ''}`;
-  
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('📋 Product info copied! Paste into Canva.');
-  });
+  sendToCanva();
 }
 
 // ============================================================================
