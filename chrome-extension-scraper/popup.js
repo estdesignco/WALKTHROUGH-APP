@@ -679,17 +679,37 @@ function scrapePageData() {
 async function doScrape() {
   scrapeBtn.disabled = true;
   scrapeBtn.innerHTML = '<div class="spinner"></div><span>Scraping...</span>';
-  showStatus('Extracting...', 'info');
+  showStatus('Opening scraper panel on page...', 'info');
+  
   try {
-    const [tab] = await chrome.tabs.query({active:true,currentWindow:true});
+    const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
     if (!tab?.url || tab.url.startsWith('chrome://')) throw new Error('Navigate to product page');
-    const results = await chrome.scripting.executeScript({ target:{tabId:tab.id}, func:scrapePageData });
-    const data = results[0].result;
-    if (!data) throw new Error('No data');
-    displayResults(data);
-    showStatus(data.name ? `Found: ${data.name}` : 'Done', 'success');
-  } catch(e) { showStatus(e.message, 'error'); }
-  finally { scrapeBtn.disabled = false; scrapeBtn.innerHTML = '<span>⚡</span><span>SCRAPE THIS PAGE</span>'; }
+    
+    // Send message to content script to open the scraper panel
+    chrome.tabs.sendMessage(tab.id, { action: 'openScraper' }, (response) => {
+      if (chrome.runtime.lastError) {
+        // Content script not loaded, inject it first
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['content.js']
+        }, () => {
+          setTimeout(() => {
+            chrome.tabs.sendMessage(tab.id, { action: 'openScraper' });
+          }, 100);
+        });
+      }
+    });
+    
+    showStatus('Scraper panel opened on page!', 'success');
+    
+    // Close popup after a brief moment
+    setTimeout(() => window.close(), 500);
+    
+  } catch(e) { 
+    showStatus(e.message, 'error'); 
+    scrapeBtn.disabled = false;
+    scrapeBtn.innerHTML = '<span>⚡</span><span>SCRAPE THIS PAGE</span>';
+  }
 }
 
 async function sendToApp() {
