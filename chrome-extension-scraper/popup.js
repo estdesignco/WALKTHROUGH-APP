@@ -142,20 +142,57 @@ function scrapePageData() {
     }
     // Also try URL - Four Hands URLs end with SKU like /product/247447-002
     if (!data.sku) {
-      const urlMatch = window.location.pathname.match(/\/product\/(\d+-\d+)/);
+      const urlMatch = window.location.pathname.match(/\/product\/([^\/]+)/i);
       if (urlMatch) data.sku = urlMatch[1];
     }
-  } else {
-    // Generic SKU detection
-    const skuEl = document.querySelector('[class*="productSku"], [class*="sku"]');
-    if (skuEl) {
-      const skuMatch = skuEl.innerText.match(/SKU[:\s]*(\w+)/i);
-      if (skuMatch) data.sku = skuMatch[1];
-    }
+  } else if (domain.includes('bernhardt')) {
+    // Bernhardt: SKU in URL /shop/B1212
+    const urlMatch = window.location.pathname.match(/\/shop\/([A-Z0-9]+)/i);
+    if (urlMatch) data.sku = urlMatch[1];
+  } else if (domain.includes('hvlgroup')) {
+    // HVL: SKU in URL /Product/507-30-VB
+    const urlMatch = window.location.pathname.match(/\/Product\/([^\/]+)/i);
+    if (urlMatch) data.sku = urlMatch[1];
+  } else if (domain.includes('visualcomfort')) {
+    // Visual Comfort: SKU in URL or title (e.g., KW2735)
+    const titleMatch = document.title?.match(/([A-Z]{2,}\d+[A-Z0-9]*)/);
+    if (titleMatch) data.sku = titleMatch[1];
     if (!data.sku) {
-      const bodyText = document.body.innerText;
-      const skuMatch = bodyText.match(/SKU[:\s]*(\d+)/i);
-      if (skuMatch) data.sku = skuMatch[1];
+      const urlMatch = window.location.pathname.match(/([a-z]{2,}\d+[a-z0-9]*)/i);
+      if (urlMatch) data.sku = urlMatch[1].toUpperCase();
+    }
+  } else {
+    // Generic SKU detection - multiple patterns
+    const skuPatterns = [
+      /SKU[:\s#]*([A-Z0-9-]+)/i,
+      /Item[:\s#]*([A-Z0-9-]+)/i,
+      /Style[:\s#]*([A-Z0-9-]+)/i,
+      /Model[:\s#]*([A-Z0-9-]+)/i,
+      /Product Code[:\s#]*([A-Z0-9-]+)/i
+    ];
+    const pageText = document.body.innerText;
+    for (const pattern of skuPatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        data.sku = match[1];
+        break;
+      }
+    }
+    // Also try from URL
+    if (!data.sku) {
+      const urlPatterns = [
+        /\/product\/([^\/]+)/i,
+        /\/p\/([^\/]+)/i,
+        /\/item\/([^\/]+)/i,
+        /[?&]sku=([^&]+)/i
+      ];
+      for (const pattern of urlPatterns) {
+        const match = window.location.href.match(pattern);
+        if (match) {
+          data.sku = match[1];
+          break;
+        }
+      }
     }
   }
 
