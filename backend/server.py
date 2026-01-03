@@ -14046,6 +14046,159 @@ async def autocomplete_paint_colors(q: str, manufacturer: Optional[str] = None, 
     except Exception as e:
         logging.error(f"Error in paint autocomplete: {str(e)}")
         return []
+
+# ============================================================================
+# MATERIALS LIBRARY - SCRAPER INTEGRATION
+# ============================================================================
+
+class ScrapedMaterial(BaseModel):
+    """Material data from the product scraper"""
+    name: str  # e.g., "Light Camel" or "1688-077 Fabric"
+    vendor: str  # e.g., "Four Hands" or "Bernhardt"
+    sku: Optional[str] = None
+    image_url: Optional[str] = None  # Swatch/finish image URL
+    product_name: Optional[str] = None  # Name of the product this came from
+    product_url: Optional[str] = None  # Link to product page
+    product_sku: Optional[str] = None  # SKU of the product
+    project_id: Optional[str] = None  # Project this is being used in
+    category: Optional[str] = "fabric"  # fabric, finish, leather, etc.
+
+@api_router.post("/materials/from-scraper")
+async def save_material_from_scraper(material: ScrapedMaterial):
+    """Save a finish/fabric/material from the product scraper to the Materials Library"""
+    try:
+        # Check if material already exists
+        existing = await db.master_materials.find_one({
+            "$or": [
+                {"name": {"$regex": f"^{material.name}$", "$options": "i"}, "manufacturer": {"$regex": f"^{material.vendor}$", "$options": "i"}},
+                {"sku": material.sku} if material.sku else {"_id": None}
+            ]
+        })
+        
+        if existing:
+            # Update existing material - add project to used_in_projects if not already there
+            update_ops = {
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            }
+            if material.image_url and not existing.get("photo_url"):
+                update_ops["$set"]["photo_url"] = material.image_url
+            if material.project_id:
+                update_ops["$addToSet"] = {"used_in_projects": material.project_id}
+            
+            await db.master_materials.update_one({"id": existing["id"]}, update_ops)
+            
+            # Return existing material
+            existing.pop("_id", None)
+            return {"status": "updated", "material": existing}
+        
+        # Create new material
+        material_doc = {
+            "id": str(uuid.uuid4()),
+            "name": material.name,
+            "category": material.category or "fabric",
+            "manufacturer": material.vendor,
+            "vendor": material.vendor,
+            "sku": material.sku or "",
+            "color": material.name,
+            "color_code": "",
+            "pattern": "",
+            "width": None,
+            "height": None,
+            "repeat": None,
+            "price_per_unit": None,
+            "unit": "yard",
+            "lead_time": "",
+            "photo_url": material.image_url or "",
+            "photo_data": "",
+            "notes": f"Scraped from: {material.product_name}" if material.product_name else "",
+            "source_product_name": material.product_name,
+            "source_product_url": material.product_url,
+            "source_product_sku": material.product_sku,
+            "tags": [material.category or "fabric", material.vendor.lower() if material.vendor else "", material.name.lower() if material.name else ""],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "used_in_projects": [material.project_id] if material.project_id else []
+        }
+        
+        await db.master_materials.insert_one(material_doc)
+        material_doc.pop("_id", None)
+        
+        logging.info(f"📦 Saved material to library: {material.vendor}/{material.name}")
+        return {"status": "created", "material": material_doc}
+        
+    except Exception as e:
+        logging.error(f"Error saving material from scraper: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/materials/library")
+async def get_materials_library(
+    search: Optional[str] = None, 
+    vendor: Optional[str] = None,
+    category: Optional[str] = None,
+    project_id: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0
+):
+    """Get materials from the global Materials Library with filtering"""
+    try:
+        query = {}
+        
+        if search:
+            query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"manufacturer": {"$regex": search, "$options": "i"}},
+                {"sku": {"$regex": search, "$options": "i"}},
+                {"color": {"$regex": search, "$options": "i"}},
+                {"tags": {"$regex": search, "$options": "i"}}
+            ]
+        
+        if vendor:
+            query["manufacturer"] = {"$regex": vendor, "$options": "i"}
+        
+        if category:
+            query["category"] = {"$regex": category, "$options": "i"}
+        
+        if project_id:
+            query["used_in_projects"] = project_id
+        
+        total = await db.master_materials.count_documents(query)
+        materials = await db.master_materials.find(query, {"_id": 0, "photo_data": 0}).sort("updated_at", -1).skip(offset).limit(limit).to_list(limit)
+        
+        return {
+            "total": total,
+            "materials": materials,
+            "limit": limit,
+            "offset": offset
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting materials library: {str(e)}")
+        return {"total": 0, "materials": [], "limit": limit, "offset": offset}
+
+@api_router.get("/materials/library/{material_id}")
+async def get_material_detail(material_id: str):
+    """Get a single material's full details including projects it's used in"""
+    try:
+        material = await db.master_materials.find_one({"id": material_id}, {"_id": 0})
+        if not material:
+            raise HTTPException(status_code=404, detail="Material not found")
+        
+        # Get project names for used_in_projects
+        if material.get("used_in_projects"):
+            projects = await db.projects.find(
+                {"id": {"$in": material["used_in_projects"]}}, 
+                {"_id": 0, "id": 1, "name": 1}
+            ).to_list(100)
+            material["project_details"] = projects
+        
+        return material
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting material detail: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # PRODUCT CLIPPER ENDPOINTS
 @api_router.post("/clipper/save-to-app")
 async def save_clipped_product_to_app(data: dict):
