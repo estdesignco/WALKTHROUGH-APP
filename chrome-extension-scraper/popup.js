@@ -119,12 +119,46 @@ function scrapePageData() {
 
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
   
-  // VENDOR
-  if (domain.includes('uttermost')) data.vendor = 'Uttermost';
-  else if (domain.includes('visualcomfort')) data.vendor = 'Visual Comfort';
-  else if (domain.includes('fourhands')) data.vendor = 'Four Hands';
-  else if (domain.includes('bernhardt')) data.vendor = 'Bernhardt';
-  else data.vendor = domain.split('.')[0];
+  // VENDOR DETECTION - All 26+ vendors
+  const vendorMap = {
+    'uttermost': 'Uttermost',
+    'visualcomfort': 'Visual Comfort',
+    'fourhands': 'Four Hands',
+    'bernhardt': 'Bernhardt',
+    'hvlgroup': 'HVL Group',
+    'gabby': 'Gabby',
+    'loloirugs': 'Loloi',
+    'loloi': 'Loloi',
+    'rowefurniture': 'Rowe Furniture',
+    'rowe': 'Rowe Furniture',
+    'globalviews': 'Global Views',
+    'reginaandrew': 'Regina Andrew',
+    'surya': 'Surya',
+    'safavieh': 'Safavieh',
+    'eichholtz': 'Eichholtz',
+    'crestviewcollection': 'Crestview Collection',
+    'bassettmirror': 'Bassett Mirror',
+    'flowdecor': 'Flow Decor',
+    'hubbardtonforge': 'Hubbardton Forge',
+    'hinkley': 'Hinkley',
+    'elegantlighting': 'Elegant Lighting',
+    'zeelighting': 'ZEE Lighting',
+    'vanguardfurniture': 'Vanguard',
+    'arteriorshome': 'Arteriors',
+    'arteriors': 'Arteriors',
+    'curreyandcompany': 'Currey & Company',
+    'currey': 'Currey & Company'
+  };
+  
+  for (const [key, name] of Object.entries(vendorMap)) {
+    if (domain.includes(key)) {
+      data.vendor = name;
+      break;
+    }
+  }
+  if (!data.vendor) {
+    data.vendor = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
+  }
 
   // PRODUCT NAME - from H1
   const h1 = document.querySelector('h1');
