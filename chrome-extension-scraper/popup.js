@@ -736,10 +736,128 @@ async function copyToClipboard() {
   } catch(e){}
 }
 
+// ============================================================================
+// CLICK TO SELECT FUNCTIONALITY
+// ============================================================================
+
+async function toggleClickToSelect() {
+  const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+  if (!tab?.id) return;
+  
+  if (clickToSelectActive) {
+    // Deactivate
+    chrome.tabs.sendMessage(tab.id, { action: 'deactivateClickToSelect' });
+    clickToSelectActive = false;
+    clickSelectBtn.classList.remove('active');
+    clickSelectBtn.innerHTML = '<span>🎯</span><span>CLICK TO SELECT</span>';
+    showStatus('Click to Select deactivated', 'info');
+  } else {
+    // Make sure we have scraped data first
+    if (!scrapedData) {
+      showStatus('Scrape the page first!', 'warning');
+      return;
+    }
+    
+    // Activate
+    chrome.tabs.sendMessage(tab.id, { action: 'activateClickToSelect' });
+    clickToSelectActive = true;
+    clickSelectBtn.classList.add('active');
+    clickSelectBtn.innerHTML = '<span>🛑</span><span>STOP SELECTING</span>';
+    showStatus('Click any element on the page to select it', 'info');
+  }
+}
+
+// Listen for messages from content script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'fieldSelected') {
+    // Update scraped data with the manually selected value
+    if (scrapedData && request.field && request.value) {
+      scrapedData[request.field] = request.value;
+      
+      // Update the display
+      updateFieldDisplay(request.field, request.value);
+      
+      showStatus(`Updated ${formatFieldName(request.field)}`, 'success');
+    }
+    sendResponse({ success: true });
+  }
+  
+  if (request.action === 'clickToSelectDeactivated') {
+    // User pressed Escape on the page
+    clickToSelectActive = false;
+    clickSelectBtn.classList.remove('active');
+    clickSelectBtn.innerHTML = '<span>🎯</span><span>CLICK TO SELECT</span>';
+    showStatus('Click to Select cancelled', 'info');
+    sendResponse({ success: true });
+  }
+  
+  return true;
+});
+
+function formatFieldName(field) {
+  const names = {
+    name: 'Product Title',
+    price: 'Price',
+    sku: 'SKU',
+    size: 'Dimensions',
+    finish_color: 'Finish/Color',
+    finish_image: 'Finish Image',
+    image_url: 'Main Image',
+    msrp: 'MSRP'
+  };
+  return names[field] || field;
+}
+
+function updateFieldDisplay(field, value) {
+  switch(field) {
+    case 'name':
+      document.getElementById('productName').textContent = value;
+      break;
+    case 'price':
+      const priceVal = parseFloat(value);
+      if (!isNaN(priceVal)) {
+        scrapedData.price = priceVal;
+        document.getElementById('productPrice').textContent = `$${priceVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('productPrice').className = 'product-price';
+        loginWarning.style.display = 'none';
+      }
+      break;
+    case 'sku':
+      document.getElementById('productSku').textContent = `SKU: ${value}`;
+      break;
+    case 'size':
+      document.getElementById('dataSize').textContent = value;
+      document.getElementById('dataSize').className = 'data-value';
+      break;
+    case 'finish_color':
+      document.getElementById('dataFinish').textContent = value;
+      document.getElementById('dataFinish').className = 'data-value';
+      document.getElementById('finishName').textContent = value;
+      break;
+    case 'finish_image':
+      document.getElementById('finishImage').src = value;
+      document.getElementById('finishImageContainer').style.display = 'flex';
+      break;
+    case 'image_url':
+      document.getElementById('productImage').src = value;
+      document.getElementById('productImage').style.display = 'block';
+      break;
+    case 'msrp':
+      const msrpVal = parseFloat(value);
+      if (!isNaN(msrpVal)) {
+        scrapedData.msrp = msrpVal;
+        document.getElementById('dataMsrp').textContent = `$${msrpVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      }
+      break;
+  }
+}
+
+// Event listeners
 scrapeBtn.addEventListener('click', doScrape);
 sendBtn.addEventListener('click', sendToApp);
 copyBtn.addEventListener('click', copyToClipboard);
 rescrapeBtn.addEventListener('click', doScrape);
+clickSelectBtn?.addEventListener('click', toggleClickToSelect);
 
 // Auto-detect vendor on popup open
 (async()=>{ 
