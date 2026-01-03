@@ -956,30 +956,18 @@ async function copyPageLink() {
   const imageUrl = scrapedData.image_url;
   const productName = scrapedData.name || 'Product';
   
-  showToast('⏳ Preparing image + link...');
-  
   try {
-    // Fetch image and convert to base64
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
+    // Create proper HTML - image wrapped in anchor, just like a webpage would have
+    const html = `<!DOCTYPE html><html><body><a href="${pageUrl}"><img src="${imageUrl}" alt="${productName}"></a></body></html>`;
     
-    const base64 = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob);
-    });
+    // Copy as HTML
+    const htmlBlob = new Blob([html], { type: 'text/html' });
+    const textBlob = new Blob([pageUrl], { type: 'text/plain' });
     
-    // Create HTML with base64 image wrapped in hyperlink
-    const html = `<a href="${pageUrl}"><img src="${base64}" alt="${productName}" style="max-width:800px;"/></a>`;
-    
-    // Also create plain text fallback
-    const text = pageUrl;
-    
-    // Copy both formats to clipboard
     await navigator.clipboard.write([
       new ClipboardItem({
-        'text/html': new Blob([html], { type: 'text/html' }),
-        'text/plain': new Blob([text], { type: 'text/plain' })
+        'text/html': htmlBlob,
+        'text/plain': textBlob
       })
     ]);
     
@@ -995,10 +983,7 @@ async function copyPageLink() {
     
   } catch (error) {
     console.error('Copy error:', error);
-    // Fallback - just copy the page URL
-    navigator.clipboard.writeText(pageUrl).then(() => {
-      showToast('📋 Link copied (image failed)');
-    });
+    showToast('⚠️ Copy failed: ' + error.message);
   }
 }
 
