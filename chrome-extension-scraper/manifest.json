@@ -9,6 +9,7 @@
     "storage"
   ],
   "host_permissions": [
+    "https://furnscape.preview.emergentagent.com/*",
     "https://*/*",
     "http://*/*"
   ],
