@@ -1,186 +1,561 @@
 // Design Ready Product Scraper - Content Script
-// Version 3.0 - Click to Select feature
-// This script runs in the context of web pages
+// Version 4.0 - Full Page-Injected UI with Click to Select
+// UI stays open on page, doesn't close like popup
 
 console.log('🛒 Design Ready Scraper loaded on:', window.location.hostname);
 
-// State for Click to Select mode
+// State
+let scrapedData = null;
 let clickToSelectActive = false;
+let selectedElements = {}; // Track which elements are selected for which fields
+let sidePanel = null;
 let highlightOverlay = null;
-let dropdownMenu = null;
-let lastHoveredElement = null;
+let fieldDropdown = null;
+let lastClickedElement = null;
 
-// If we're on the Design Ready app, save the current project URL
-if (window.location.hostname.includes('emergentagent.com') || 
-    window.location.hostname.includes('localhost')) {
-  if (window.location.pathname.includes('/project/')) {
-    chrome.storage.local.set({ 
-      lastProjectUrl: window.location.href,
-      lastProjectTime: Date.now()
-    });
-    console.log('📍 Saved project URL:', window.location.href);
-  }
-}
+// ============================================================================
+// SIDE PANEL UI - Injected into the page
+// ============================================================================
 
-// Create highlight overlay element
-function createHighlightOverlay() {
-  if (highlightOverlay) return highlightOverlay;
+function createSidePanel() {
+  if (sidePanel) return sidePanel;
   
+  sidePanel = document.createElement('div');
+  sidePanel.id = 'dr-scraper-panel';
+  sidePanel.innerHTML = `
+    <style>
+      #dr-scraper-panel {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 380px;
+        max-height: 90vh;
+        background: #0f0f1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        z-index: 2147483640;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #fff;
+        overflow: hidden;
+        display: none;
+      }
+      #dr-scraper-panel * {
+        box-sizing: border-box;
+      }
+      #dr-scraper-panel .dr-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 12px 16px;
+        border-bottom: 1px solid #333;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: move;
+      }
+      #dr-scraper-panel .dr-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #dr-scraper-panel .dr-logo {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+      #dr-scraper-panel .dr-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      #dr-scraper-panel .dr-close-btn {
+        background: none;
+        border: none;
+        color: #888;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+      }
+      #dr-scraper-panel .dr-close-btn:hover {
+        background: #333;
+        color: #fff;
+      }
+      #dr-scraper-panel .dr-content {
+        padding: 16px;
+        max-height: calc(90vh - 200px);
+        overflow-y: auto;
+      }
+      #dr-scraper-panel .dr-field {
+        margin-bottom: 12px;
+        background: #16162a;
+        border-radius: 8px;
+        padding: 10px 12px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.2s;
+      }
+      #dr-scraper-panel .dr-field:hover {
+        border-color: #4ade80;
+      }
+      #dr-scraper-panel .dr-field.selected {
+        border-color: #4ade80;
+        background: #1a2e1a;
+      }
+      #dr-scraper-panel .dr-field.selecting {
+        border-color: #f59e0b;
+        background: #2e2a1a;
+        animation: pulse-border 1s ease-in-out infinite;
+      }
+      @keyframes pulse-border {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+        50% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0); }
+      }
+      #dr-scraper-panel .dr-field-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #666;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      #dr-scraper-panel .dr-field-value {
+        font-size: 13px;
+        color: #fff;
+        word-break: break-word;
+      }
+      #dr-scraper-panel .dr-field-value.missing {
+        color: #666;
+        font-style: italic;
+      }
+      #dr-scraper-panel .dr-field-value.has-image {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      #dr-scraper-panel .dr-field-value img {
+        width: 40px;
+        height: 40px;
+        border-radius: 4px;
+        object-fit: cover;
+        border: 1px solid #333;
+      }
+      #dr-scraper-panel .dr-click-hint {
+        font-size: 9px;
+        color: #4ade80;
+        background: rgba(74, 222, 128, 0.1);
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      #dr-scraper-panel .dr-actions {
+        padding: 16px;
+        border-top: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      #dr-scraper-panel .dr-btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+        color: #000;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      #dr-scraper-panel .dr-btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+      }
+      #dr-scraper-panel .dr-btn-secondary {
+        width: 100%;
+        padding: 10px;
+        background: transparent;
+        color: #888;
+        border: 1px solid #333;
+        border-radius: 8px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      #dr-scraper-panel .dr-btn-secondary:hover {
+        background: #222;
+        color: #fff;
+      }
+      #dr-scraper-panel .dr-mode-banner {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #000;
+        padding: 10px 16px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        display: none;
+      }
+      #dr-scraper-panel .dr-mode-banner.active {
+        display: block;
+      }
+      
+      /* Highlight for selected elements on page */
+      .dr-element-highlight {
+        outline: 3px solid #4ade80 !important;
+        outline-offset: 2px !important;
+        background: rgba(74, 222, 128, 0.1) !important;
+      }
+      
+      /* Hover highlight */
+      #dr-hover-highlight {
+        position: fixed;
+        pointer-events: none;
+        border: 3px solid #f59e0b;
+        background: rgba(245, 158, 11, 0.15);
+        z-index: 2147483645;
+        border-radius: 4px;
+        display: none;
+      }
+      
+      /* Field dropdown on page */
+      #dr-field-dropdown {
+        position: fixed;
+        background: #1a1a2e;
+        border: 2px solid #4ade80;
+        border-radius: 8px;
+        padding: 8px 0;
+        z-index: 2147483647;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        min-width: 200px;
+        display: none;
+      }
+      #dr-field-dropdown .dr-dropdown-header {
+        padding: 8px 12px;
+        color: #4ade80;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        border-bottom: 1px solid #333;
+        margin-bottom: 4px;
+      }
+      #dr-field-dropdown .dr-dropdown-item {
+        padding: 10px 12px;
+        color: #fff;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #dr-field-dropdown .dr-dropdown-item:hover {
+        background: #333;
+      }
+      #dr-field-dropdown .dr-dropdown-cancel {
+        padding: 10px 12px;
+        color: #f87171;
+        font-size: 12px;
+        cursor: pointer;
+        text-align: center;
+        border-top: 1px solid #333;
+        margin-top: 4px;
+      }
+    </style>
+    
+    <div class="dr-header">
+      <div class="dr-header-left">
+        <div class="dr-logo">🛒</div>
+        <div class="dr-title">Design Ready Scraper</div>
+      </div>
+      <button class="dr-close-btn" id="dr-close-btn">×</button>
+    </div>
+    
+    <div class="dr-mode-banner" id="dr-mode-banner">
+      🎯 CLICK TO SELECT MODE - Click any element on the page
+    </div>
+    
+    <div class="dr-content" id="dr-content">
+      <div class="dr-field" data-field="name">
+        <div class="dr-field-label">
+          <span>📝 Product Title</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-name">Not found</div>
+      </div>
+      
+      <div class="dr-field" data-field="price">
+        <div class="dr-field-label">
+          <span>💰 Price</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-price">Not found</div>
+      </div>
+      
+      <div class="dr-field" data-field="sku">
+        <div class="dr-field-label">
+          <span>🏷️ SKU</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-sku">Not found</div>
+      </div>
+      
+      <div class="dr-field" data-field="size">
+        <div class="dr-field-label">
+          <span>📏 Dimensions</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-size">Not found</div>
+      </div>
+      
+      <div class="dr-field" data-field="finish_color">
+        <div class="dr-field-label">
+          <span>🎨 Finish / Color</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-finish_color">Not found</div>
+      </div>
+      
+      <div class="dr-field" data-field="finish_image">
+        <div class="dr-field-label">
+          <span>🖼️ Finish Image</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-finish_image">Not found</div>
+      </div>
+      
+      <div class="dr-field" data-field="image_url">
+        <div class="dr-field-label">
+          <span>📷 Main Image</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-image_url">Not found</div>
+      </div>
+    </div>
+    
+    <div class="dr-actions">
+      <button class="dr-btn-primary" id="dr-send-btn">
+        🚀 SEND TO APP
+      </button>
+      <button class="dr-btn-secondary" id="dr-rescrape-btn">
+        🔄 Re-scrape Page
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(sidePanel);
+  
+  // Create hover highlight element
   highlightOverlay = document.createElement('div');
-  highlightOverlay.id = 'dr-scraper-highlight';
-  highlightOverlay.style.cssText = `
-    position: fixed;
-    pointer-events: none;
-    border: 3px solid #4ade80;
-    background: rgba(74, 222, 128, 0.15);
-    z-index: 2147483646;
-    transition: all 0.1s ease;
-    border-radius: 4px;
-    display: none;
-  `;
+  highlightOverlay.id = 'dr-hover-highlight';
   document.body.appendChild(highlightOverlay);
-  return highlightOverlay;
+  
+  // Create field dropdown
+  createFieldDropdown();
+  
+  // Event listeners
+  document.getElementById('dr-close-btn').addEventListener('click', hidePanel);
+  document.getElementById('dr-send-btn').addEventListener('click', sendToApp);
+  document.getElementById('dr-rescrape-btn').addEventListener('click', () => {
+    scrapeAndShow();
+  });
+  
+  // Field click handlers - click on field in panel to select from page
+  document.querySelectorAll('#dr-scraper-panel .dr-field').forEach(field => {
+    field.addEventListener('click', () => {
+      const fieldId = field.dataset.field;
+      startFieldSelection(fieldId);
+    });
+  });
+  
+  // Make panel draggable
+  makeDraggable(sidePanel);
+  
+  return sidePanel;
 }
 
-// Create dropdown menu for field selection
-function createDropdownMenu() {
-  if (dropdownMenu) return dropdownMenu;
-  
-  dropdownMenu = document.createElement('div');
-  dropdownMenu.id = 'dr-scraper-dropdown';
-  dropdownMenu.style.cssText = `
-    position: fixed;
-    background: #1a1a2e;
-    border: 1px solid #4ade80;
-    border-radius: 8px;
-    padding: 8px 0;
-    z-index: 2147483647;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    display: none;
-    min-width: 180px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  `;
+function createFieldDropdown() {
+  fieldDropdown = document.createElement('div');
+  fieldDropdown.id = 'dr-field-dropdown';
   
   const fields = [
-    { id: 'name', label: '📝 Product Title', icon: '📝' },
-    { id: 'price', label: '💰 Price', icon: '💰' },
-    { id: 'sku', label: '🏷️ SKU', icon: '🏷️' },
-    { id: 'size', label: '📏 Dimensions', icon: '📏' },
-    { id: 'finish_color', label: '🎨 Finish/Color', icon: '🎨' },
-    { id: 'finish_image', label: '🖼️ Finish Image', icon: '🖼️' },
-    { id: 'image_url', label: '📷 Main Image', icon: '📷' },
-    { id: 'msrp', label: '💵 MSRP', icon: '💵' },
+    { id: 'name', label: 'Product Title', icon: '📝' },
+    { id: 'price', label: 'Price', icon: '💰' },
+    { id: 'sku', label: 'SKU', icon: '🏷️' },
+    { id: 'size', label: 'Dimensions', icon: '📏' },
+    { id: 'finish_color', label: 'Finish / Color', icon: '🎨' },
+    { id: 'finish_image', label: 'Finish Image', icon: '🖼️' },
+    { id: 'image_url', label: 'Main Image', icon: '📷' },
   ];
   
-  // Header
-  const header = document.createElement('div');
-  header.style.cssText = `
-    padding: 8px 12px;
-    color: #4ade80;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid #333;
-    margin-bottom: 4px;
-  `;
-  header.textContent = '➕ Add as...';
-  dropdownMenu.appendChild(header);
+  let html = '<div class="dr-dropdown-header">➕ Add as...</div>';
+  fields.forEach(f => {
+    html += `<div class="dr-dropdown-item" data-field="${f.id}">${f.icon} ${f.label}</div>`;
+  });
+  html += '<div class="dr-dropdown-cancel">✕ Cancel</div>';
   
-  fields.forEach(field => {
-    const item = document.createElement('div');
-    item.className = 'dr-dropdown-item';
-    item.dataset.field = field.id;
-    item.style.cssText = `
-      padding: 10px 12px;
-      color: #fff;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    `;
-    item.innerHTML = `<span>${field.icon}</span><span>${field.label.split(' ').slice(1).join(' ')}</span>`;
-    
-    item.addEventListener('mouseenter', () => {
-      item.style.background = '#333';
-    });
-    item.addEventListener('mouseleave', () => {
-      item.style.background = 'transparent';
-    });
+  fieldDropdown.innerHTML = html;
+  document.body.appendChild(fieldDropdown);
+  
+  // Event listeners for dropdown items
+  fieldDropdown.querySelectorAll('.dr-dropdown-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
-      handleFieldSelection(field.id);
+      const fieldId = item.dataset.field;
+      assignElementToField(fieldId);
     });
-    
-    dropdownMenu.appendChild(item);
   });
   
-  // Cancel button
-  const cancelBtn = document.createElement('div');
-  cancelBtn.style.cssText = `
-    padding: 10px 12px;
-    color: #f87171;
-    font-size: 12px;
-    cursor: pointer;
-    text-align: center;
-    border-top: 1px solid #333;
-    margin-top: 4px;
-  `;
-  cancelBtn.textContent = '✕ Cancel';
-  cancelBtn.addEventListener('click', (e) => {
+  fieldDropdown.querySelector('.dr-dropdown-cancel').addEventListener('click', (e) => {
     e.stopPropagation();
-    hideDropdown();
+    hideFieldDropdown();
   });
-  dropdownMenu.appendChild(cancelBtn);
-  
-  document.body.appendChild(dropdownMenu);
-  return dropdownMenu;
 }
 
-// Show dropdown at position
-function showDropdown(x, y) {
-  const menu = createDropdownMenu();
+function showFieldDropdown(x, y) {
+  // Adjust position to stay in viewport
+  const dropdownWidth = 200;
+  const dropdownHeight = 300;
   
-  // Adjust position to stay within viewport
-  const menuWidth = 180;
-  const menuHeight = 350;
-  
-  if (x + menuWidth > window.innerWidth) {
-    x = window.innerWidth - menuWidth - 10;
+  if (x + dropdownWidth > window.innerWidth) {
+    x = window.innerWidth - dropdownWidth - 20;
   }
-  if (y + menuHeight > window.innerHeight) {
-    y = window.innerHeight - menuHeight - 10;
+  if (y + dropdownHeight > window.innerHeight) {
+    y = window.innerHeight - dropdownHeight - 20;
   }
   
-  menu.style.left = x + 'px';
-  menu.style.top = y + 'px';
-  menu.style.display = 'block';
+  fieldDropdown.style.left = x + 'px';
+  fieldDropdown.style.top = y + 'px';
+  fieldDropdown.style.display = 'block';
 }
 
-// Hide dropdown
-function hideDropdown() {
-  if (dropdownMenu) {
-    dropdownMenu.style.display = 'none';
+function hideFieldDropdown() {
+  if (fieldDropdown) {
+    fieldDropdown.style.display = 'none';
+  }
+  lastClickedElement = null;
+}
+
+// ============================================================================
+// CLICK TO SELECT FUNCTIONALITY
+// ============================================================================
+
+let activeField = null;
+
+function startFieldSelection(fieldId) {
+  // Highlight the field being selected
+  document.querySelectorAll('#dr-scraper-panel .dr-field').forEach(f => {
+    f.classList.remove('selecting');
+  });
+  
+  const fieldEl = document.querySelector(`#dr-scraper-panel .dr-field[data-field="${fieldId}"]`);
+  if (fieldEl) {
+    fieldEl.classList.add('selecting');
+  }
+  
+  activeField = fieldId;
+  clickToSelectActive = true;
+  
+  // Show mode banner
+  document.getElementById('dr-mode-banner').classList.add('active');
+  document.getElementById('dr-mode-banner').textContent = `🎯 Click any element to set as ${getFieldLabel(fieldId)}`;
+  
+  // Change cursor
+  document.body.style.cursor = 'crosshair';
+  
+  // Add listeners
+  document.addEventListener('mousemove', handleMouseMove, true);
+  document.addEventListener('click', handlePageClick, true);
+}
+
+function stopFieldSelection() {
+  clickToSelectActive = false;
+  activeField = null;
+  
+  // Remove highlighting from field
+  document.querySelectorAll('#dr-scraper-panel .dr-field').forEach(f => {
+    f.classList.remove('selecting');
+  });
+  
+  // Hide mode banner
+  document.getElementById('dr-mode-banner').classList.remove('active');
+  
+  // Reset cursor
+  document.body.style.cursor = '';
+  
+  // Hide hover highlight
+  if (highlightOverlay) {
+    highlightOverlay.style.display = 'none';
+  }
+  
+  // Remove listeners
+  document.removeEventListener('mousemove', handleMouseMove, true);
+  document.removeEventListener('click', handlePageClick, true);
+  
+  hideFieldDropdown();
+}
+
+function handleMouseMove(e) {
+  if (!clickToSelectActive) return;
+  
+  const target = e.target;
+  
+  // Ignore our own elements
+  if (target.closest('#dr-scraper-panel') || target.closest('#dr-field-dropdown') || target.closest('#dr-hover-highlight')) {
+    highlightOverlay.style.display = 'none';
+    return;
+  }
+  
+  const rect = target.getBoundingClientRect();
+  highlightOverlay.style.left = rect.left + 'px';
+  highlightOverlay.style.top = rect.top + 'px';
+  highlightOverlay.style.width = rect.width + 'px';
+  highlightOverlay.style.height = rect.height + 'px';
+  highlightOverlay.style.display = 'block';
+}
+
+function handlePageClick(e) {
+  if (!clickToSelectActive) return;
+  
+  const target = e.target;
+  
+  // Ignore our own elements
+  if (target.closest('#dr-scraper-panel') || target.closest('#dr-field-dropdown') || target.closest('#dr-hover-highlight')) {
+    return;
+  }
+  
+  e.preventDefault();
+  e.stopPropagation();
+  
+  lastClickedElement = target;
+  
+  if (activeField) {
+    // Direct assignment if field was pre-selected
+    assignElementToField(activeField);
+    stopFieldSelection();
+  } else {
+    // Show dropdown for field selection
+    showFieldDropdown(e.clientX + 10, e.clientY + 10);
   }
 }
 
-// Handle field selection from dropdown
-function handleFieldSelection(fieldId) {
-  if (!lastHoveredElement) return;
+function assignElementToField(fieldId) {
+  if (!lastClickedElement) return;
   
   let value = '';
   
-  // Check if it's an image
-  if (lastHoveredElement.tagName === 'IMG') {
-    value = lastHoveredElement.src;
+  // Get value based on element type
+  if (lastClickedElement.tagName === 'IMG') {
+    value = lastClickedElement.src;
   } else {
-    // Get text content
-    value = lastHoveredElement.innerText?.trim() || lastHoveredElement.textContent?.trim() || '';
+    value = lastClickedElement.innerText?.trim() || lastClickedElement.textContent?.trim() || '';
     
-    // If field is price or msrp, try to extract number
-    if (fieldId === 'price' || fieldId === 'msrp') {
+    // Clean up price values
+    if (fieldId === 'price') {
       const priceMatch = value.match(/\$?([\d,]+\.?\d*)/);
       if (priceMatch) {
         value = priceMatch[1].replace(/,/g, '');
@@ -188,23 +563,133 @@ function handleFieldSelection(fieldId) {
     }
   }
   
-  console.log(`📋 Selected ${fieldId}:`, value);
+  // Update scraped data
+  if (scrapedData) {
+    scrapedData[fieldId] = value;
+  }
   
-  // Send to popup
-  chrome.runtime.sendMessage({
-    action: 'fieldSelected',
-    field: fieldId,
-    value: value
-  });
+  // Update display
+  updateFieldDisplay(fieldId, value);
   
-  hideDropdown();
+  // Highlight the element on page
+  highlightSelectedElement(lastClickedElement, fieldId);
   
-  // Show brief confirmation
-  showConfirmation(fieldId, value);
+  // Mark field as selected
+  const fieldEl = document.querySelector(`#dr-scraper-panel .dr-field[data-field="${fieldId}"]`);
+  if (fieldEl) {
+    fieldEl.classList.add('selected');
+  }
+  
+  hideFieldDropdown();
+  stopFieldSelection();
+  
+  // Show confirmation
+  showToast(`✅ ${getFieldLabel(fieldId)} updated`);
 }
 
-// Show confirmation toast
-function showConfirmation(field, value) {
+function highlightSelectedElement(element, fieldId) {
+  // Remove previous highlight for this field
+  if (selectedElements[fieldId]) {
+    selectedElements[fieldId].classList.remove('dr-element-highlight');
+  }
+  
+  // Add new highlight
+  element.classList.add('dr-element-highlight');
+  selectedElements[fieldId] = element;
+}
+
+function getFieldLabel(fieldId) {
+  const labels = {
+    name: 'Product Title',
+    price: 'Price',
+    sku: 'SKU',
+    size: 'Dimensions',
+    finish_color: 'Finish/Color',
+    finish_image: 'Finish Image',
+    image_url: 'Main Image'
+  };
+  return labels[fieldId] || fieldId;
+}
+
+function updateFieldDisplay(fieldId, value) {
+  const el = document.getElementById(`dr-field-${fieldId}`);
+  if (!el) return;
+  
+  if (fieldId === 'finish_image' || fieldId === 'image_url') {
+    if (value && value.startsWith('http')) {
+      el.innerHTML = `<img src="${value}" alt="${fieldId}"> <span>${value.split('/').pop().substring(0, 30)}...</span>`;
+      el.classList.add('has-image');
+    } else {
+      el.textContent = value || 'Not found';
+      el.classList.remove('has-image');
+    }
+  } else if (fieldId === 'price') {
+    const num = parseFloat(value);
+    if (!isNaN(num)) {
+      el.textContent = '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2});
+    } else {
+      el.textContent = value || 'Not found';
+    }
+  } else {
+    el.textContent = value || 'Not found';
+  }
+  
+  el.classList.toggle('missing', !value);
+}
+
+// ============================================================================
+// PANEL CONTROL
+// ============================================================================
+
+function showPanel() {
+  createSidePanel();
+  sidePanel.style.display = 'block';
+}
+
+function hidePanel() {
+  if (sidePanel) {
+    sidePanel.style.display = 'none';
+  }
+  stopFieldSelection();
+  
+  // Remove all element highlights
+  Object.values(selectedElements).forEach(el => {
+    el?.classList.remove('dr-element-highlight');
+  });
+  selectedElements = {};
+}
+
+function makeDraggable(element) {
+  const header = element.querySelector('.dr-header');
+  let isDragging = false;
+  let startX, startY, startLeft, startTop;
+  
+  header.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('dr-close-btn')) return;
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft = element.offsetLeft;
+    startTop = element.offsetTop;
+    document.body.style.userSelect = 'none';
+  });
+  
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    element.style.left = (startLeft + dx) + 'px';
+    element.style.top = (startTop + dy) + 'px';
+    element.style.right = 'auto';
+  });
+  
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    document.body.style.userSelect = '';
+  });
+}
+
+function showToast(message) {
   const toast = document.createElement('div');
   toast.style.cssText = `
     position: fixed;
@@ -213,20 +698,14 @@ function showConfirmation(field, value) {
     transform: translateX(-50%);
     background: #166534;
     color: #4ade80;
-    padding: 12px 20px;
+    padding: 12px 24px;
     border-radius: 8px;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     z-index: 2147483647;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    gap: 8px;
   `;
-  
-  const displayValue = value.length > 30 ? value.substring(0, 30) + '...' : value;
-  toast.innerHTML = `✅ <strong>${field}</strong> updated: ${displayValue}`;
-  
+  toast.textContent = message;
   document.body.appendChild(toast);
   
   setTimeout(() => {
@@ -236,110 +715,174 @@ function showConfirmation(field, value) {
   }, 2000);
 }
 
-// Handle mouse move for highlighting
-function handleMouseMove(e) {
-  if (!clickToSelectActive) return;
+// ============================================================================
+// SCRAPING LOGIC (copied from popup.js)
+// ============================================================================
+
+function scrapeAndShow() {
+  scrapedData = scrapePageData();
+  showPanel();
   
-  const target = e.target;
+  // Update all field displays
+  updateFieldDisplay('name', scrapedData.name);
+  updateFieldDisplay('price', scrapedData.price);
+  updateFieldDisplay('sku', scrapedData.sku);
+  updateFieldDisplay('size', scrapedData.size);
+  updateFieldDisplay('finish_color', scrapedData.finish_color);
+  updateFieldDisplay('finish_image', scrapedData.finish_image);
+  updateFieldDisplay('image_url', scrapedData.image_url);
   
-  // Ignore our own elements
-  if (target.id?.startsWith('dr-scraper') || target.closest('#dr-scraper-dropdown')) {
-    return;
+  showToast('✅ Page scraped! Click any field to manually select.');
+}
+
+function scrapePageData() {
+  const data = {
+    url: window.location.href,
+    vendor: null,
+    name: null,
+    sku: null,
+    price: null,
+    msrp: null,
+    size: null,
+    finish_color: null,
+    finish_image: null,
+    image_url: null
+  };
+
+  const domain = window.location.hostname.replace('www.', '').toLowerCase();
+  const pageText = document.body.innerText;
+
+  // VENDOR DETECTION
+  const vendorMap = {
+    'uttermost': 'Uttermost', 'visualcomfort': 'Visual Comfort', 'fourhands': 'Four Hands',
+    'bernhardt': 'Bernhardt', 'hvlgroup': 'HVL Group', 'gabby': 'Gabby',
+    'loloirugs': 'Loloi', 'loloi': 'Loloi', 'rowefurniture': 'Rowe Furniture',
+    'globalviews': 'Global Views', 'reginaandrew': 'Regina Andrew', 'surya': 'Surya',
+    'safavieh': 'Safavieh', 'eichholtz': 'Eichholtz', 'crestviewcollection': 'Crestview Collection',
+    'bassettmirror': 'Bassett Mirror', 'flowdecor': 'Flow Decor', 'hubbardtonforge': 'Hubbardton Forge',
+    'hinkley': 'Hinkley', 'elegantlighting': 'Elegant Lighting', 'zeelighting': 'ZEE Lighting',
+    'vanguardfurniture': 'Vanguard', 'arteriorshome': 'Arteriors', 'curreyandcompany': 'Currey & Company'
+  };
+  
+  for (const [key, name] of Object.entries(vendorMap)) {
+    if (domain.includes(key)) { data.vendor = name; break; }
   }
-  
-  lastHoveredElement = target;
-  
-  const overlay = createHighlightOverlay();
-  const rect = target.getBoundingClientRect();
-  
-  overlay.style.left = rect.left + 'px';
-  overlay.style.top = rect.top + 'px';
-  overlay.style.width = rect.width + 'px';
-  overlay.style.height = rect.height + 'px';
-  overlay.style.display = 'block';
-}
+  if (!data.vendor) data.vendor = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
 
-// Handle click for selection
-function handleClick(e) {
-  if (!clickToSelectActive) return;
-  
-  const target = e.target;
-  
-  // Ignore our own elements
-  if (target.id?.startsWith('dr-scraper') || target.closest('#dr-scraper-dropdown')) {
-    return;
+  // NAME - H1
+  const h1 = document.querySelector('h1');
+  if (h1) data.name = h1.innerText.trim().split('\n')[0];
+
+  // SKU - multiple patterns
+  const skuPatterns = [/SKU[:\s#]*([A-Z0-9-]+)/i, /Item[:\s#]*([A-Z0-9-]+)/i, /Style[:\s#]*([A-Z0-9-]+)/i];
+  for (const pattern of skuPatterns) {
+    const match = pageText.match(pattern);
+    if (match) { data.sku = match[1]; break; }
   }
-  
-  e.preventDefault();
-  e.stopPropagation();
-  
-  lastHoveredElement = target;
-  showDropdown(e.clientX + 10, e.clientY + 10);
-}
 
-// Activate Click to Select mode
-function activateClickToSelect() {
-  clickToSelectActive = true;
-  createHighlightOverlay();
-  createDropdownMenu();
-  
-  document.addEventListener('mousemove', handleMouseMove, true);
-  document.addEventListener('click', handleClick, true);
-  
-  // Change cursor
-  document.body.style.cursor = 'crosshair';
-  
-  // Show activation toast
-  const toast = document.createElement('div');
-  toast.id = 'dr-scraper-mode-toast';
-  toast.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-    color: #000;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    z-index: 2147483647;
-    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4);
-  `;
-  toast.textContent = '🎯 Click to Select Mode Active - Click any element';
-  document.body.appendChild(toast);
-  
-  console.log('🎯 Click to Select mode activated');
-}
-
-// Deactivate Click to Select mode
-function deactivateClickToSelect() {
-  clickToSelectActive = false;
-  
-  document.removeEventListener('mousemove', handleMouseMove, true);
-  document.removeEventListener('click', handleClick, true);
-  
-  // Reset cursor
-  document.body.style.cursor = '';
-  
-  // Hide overlay
-  if (highlightOverlay) {
-    highlightOverlay.style.display = 'none';
+  // PRICE
+  const pricePatterns = [/Trade Price[:\s]*\$([\d,]+\.?\d*)/i, /Your Price[:\s]*\$([\d,]+\.?\d*)/i, /\$([\d,]+\.?\d*)/];
+  for (const pattern of pricePatterns) {
+    const match = pageText.match(pattern);
+    if (match) { 
+      const val = parseFloat(match[1].replace(/,/g, ''));
+      if (val > 10 && val < 100000) { data.price = val; break; }
+    }
   }
+
+  // DIMENSIONS
+  const dimPatterns = [
+    [/(\d+(?:\.\d+)?)\s*W\s*X\s*(\d+(?:\.\d+)?)\s*H\s*X\s*(\d+(?:\.\d+)?)\s*D/i, (m) => `${m[1]}"W x ${m[3]}"D x ${m[2]}"H`],
+    [/Width[:\s]*([\d.]+).*?Depth[:\s]*([\d.]+).*?Height[:\s]*([\d.]+)/is, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+    [/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+  ];
+  for (const [pattern, formatter] of dimPatterns) {
+    const match = pageText.match(pattern);
+    if (match) { data.size = formatter(match); break; }
+  }
+
+  // FINISH/COLOR
+  const finishPatterns = [
+    /(?:choose\s+)?(?:body\s+)?cover[:\s]*([^\n]+)/i,
+    /(?:fabric\s+shown|body\s+fabric)[:\s]*([^\n]+)/i,
+    /(?:finish|color|option)[:\s]*([^\n]+)/i
+  ];
+  for (const pattern of finishPatterns) {
+    const match = pageText.match(pattern);
+    if (match) {
+      const val = match[1].trim().split('\n')[0].trim();
+      if (val && val.length > 1 && val.length < 50) { data.finish_color = val; break; }
+    }
+  }
+
+  // IMAGES
+  const ogImg = document.querySelector('meta[property="og:image"]');
+  if (ogImg?.content) data.image_url = ogImg.content;
   
-  // Hide dropdown
-  hideDropdown();
-  
-  // Remove mode toast
-  const toast = document.getElementById('dr-scraper-mode-toast');
-  if (toast) toast.remove();
-  
-  console.log('🎯 Click to Select mode deactivated');
+  // Swatch images
+  const swatchImgs = document.querySelectorAll('[class*="swatch"] img, label[title] img');
+  for (const img of swatchImgs) {
+    if (img.src && img.src.startsWith('http')) {
+      const w = img.naturalWidth || img.width || 100;
+      if (w < 200 && w > 10) {
+        data.finish_image = img.src;
+        break;
+      }
+    }
+  }
+
+  return data;
 }
 
-// Listen for messages from the popup
+// ============================================================================
+// SEND TO APP
+// ============================================================================
+
+function sendToApp() {
+  if (!scrapedData) return;
+  
+  const APP_URL = 'https://furnscape.preview.emergentagent.com';
+  
+  // Get selected project from storage
+  chrome.storage.local.get('selectedProjectId', (stored) => {
+    const projectId = stored.selectedProjectId;
+    
+    if (!projectId) {
+      showToast('⚠️ Please select a project in the extension popup first');
+      return;
+    }
+    
+    const params = new URLSearchParams();
+    params.set('action', 'add-item');
+    params.set('source', 'extension');
+    if (scrapedData.name) params.set('name', scrapedData.name);
+    if (scrapedData.price) params.set('price', scrapedData.price);
+    if (scrapedData.sku) params.set('sku', scrapedData.sku);
+    if (scrapedData.size) params.set('size', scrapedData.size);
+    if (scrapedData.finish_color) params.set('finish', scrapedData.finish_color);
+    if (scrapedData.finish_image) params.set('finish_image', scrapedData.finish_image);
+    if (scrapedData.vendor) params.set('vendor', scrapedData.vendor);
+    if (scrapedData.url) params.set('link', scrapedData.url);
+    if (scrapedData.image_url) params.set('image', scrapedData.image_url);
+    
+    const projectUrl = `${APP_URL}/project/${projectId}?tab=Checklist&${params.toString()}`;
+    window.open(projectUrl, '_blank');
+    
+    showToast('✅ Sent to app!');
+    hidePanel();
+  });
+}
+
+// ============================================================================
+// MESSAGE HANDLERS
+// ============================================================================
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'openScraper') {
+    scrapeAndShow();
+    sendResponse({ success: true });
+  }
+  
   if (request.action === 'getLastProject') {
     chrome.storage.local.get(['lastProjectUrl', 'lastProjectTime'], (data) => {
       sendResponse(data);
@@ -347,58 +890,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
   
-  if (request.action === 'activateClickToSelect') {
-    activateClickToSelect();
-    sendResponse({ success: true });
-    return true;
-  }
-  
-  if (request.action === 'deactivateClickToSelect') {
-    deactivateClickToSelect();
-    sendResponse({ success: true });
-    return true;
-  }
-  
-  if (request.action === 'scrape') {
-    try {
-      const data = scrapeCurrentPage();
-      sendResponse({ success: true, data });
-    } catch (error) {
-      sendResponse({ success: false, error: error.message });
-    }
-  }
   return true;
 });
 
-// Escape key to exit Click to Select mode
+// Escape key to stop selection
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && clickToSelectActive) {
-    deactivateClickToSelect();
-    chrome.runtime.sendMessage({ action: 'clickToSelectDeactivated' });
+  if (e.key === 'Escape') {
+    if (clickToSelectActive) {
+      stopFieldSelection();
+    } else if (sidePanel?.style.display === 'block') {
+      hidePanel();
+    }
   }
 });
 
-function scrapeCurrentPage() {
-  return {
-    url: window.location.href,
-    title: document.title,
-    vendor: detectVendor()
-  };
-}
-
-function detectVendor() {
-  const domain = window.location.hostname.replace('www.', '').toLowerCase();
-  const vendorMap = {
-    'uttermost': 'Uttermost',
-    'visualcomfort': 'Visual Comfort',
-    'fourhands': 'Four Hands',
-    'bernhardt': 'Bernhardt',
-    'jaipurliving': 'Jaipur Living',
-    'loloirugs': 'Loloi'
-  };
-  
-  for (const [key, val] of Object.entries(vendorMap)) {
-    if (domain.includes(key)) return val;
+// Save project URL if on app
+if (window.location.hostname.includes('emergentagent.com') || window.location.hostname.includes('localhost')) {
+  if (window.location.pathname.includes('/project/')) {
+    chrome.storage.local.set({ lastProjectUrl: window.location.href, lastProjectTime: Date.now() });
   }
-  return domain.split('.')[0];
 }
