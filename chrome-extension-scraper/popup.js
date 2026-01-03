@@ -1,6 +1,5 @@
-// Design Ready Product Scraper v6.2.0
-// FIXED: Four Hands Cover/Cushion selector detection
-// FIXED: Round swatch image detection
+// Design Ready Product Scraper v6.3.0
+// FIXED: Four Hands swatch selection bug - now properly detects selected state
 
 const APP_URL = 'https://furnscape.preview.emergentagent.com';
 const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
