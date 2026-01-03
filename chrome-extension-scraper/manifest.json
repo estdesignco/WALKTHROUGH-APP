@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "6.9.2",
+  "version": "6.9.3",
   "description": "Scrape product data from wholesale vendors and send to Design Ready app. Works with your logged-in browser session to extract prices.",
   "permissions": [
     "activeTab",
