@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v6.1.0
+// Design Ready Product Scraper v6.1.1
 // Clean rebuild - SPECIFIC targeting for Uttermost + Four Hands
-// Added: Project selector dropdown with persistence
+// Added: Project selector dropdown with persistence, better error handling
 
 const APP_URL = 'https://furnscape.preview.emergentagent.com';
 const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
