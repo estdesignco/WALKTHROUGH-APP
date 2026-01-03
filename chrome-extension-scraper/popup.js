@@ -1,5 +1,6 @@
-// Design Ready Product Scraper v7.1.0
-// FIXED: Generic logic FIRST, then vendor enhancements
+// Design Ready Product Scraper v7.2.0
+// FIXED: Added dropdown/select detection for finish/color
+// FIXED: Better swatch image name detection
 // Works across ALL vendor sites
 
 const APP_URL = 'https://furnscape.preview.emergentagent.com';
