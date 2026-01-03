@@ -14572,7 +14572,7 @@ async def login_to_all_vendor_portals():
 
 @api_router.get("/download/chrome-extension")
 async def download_chrome_extension():
-    """Download the Chrome Extension zip file - v6.2.0 FIXED Four Hands Cover selector"""
+    """Download the Chrome Extension zip file - v7.0.0 COMPLETE REWRITE multi-vendor"""
     import os
     
     zip_path = "/app/chrome-extension-scraper.zip"
@@ -14582,10 +14582,10 @@ async def download_chrome_extension():
     
     return FileResponse(
         path=zip_path,
-        filename="design-ready-scraper-v6.2.0.zip",
+        filename="design-ready-scraper-v7.0.0.zip",
         media_type="application/zip",
         headers={
-            "Content-Disposition": "attachment; filename=design-ready-scraper-v6.2.0.zip",
+            "Content-Disposition": "attachment; filename=design-ready-scraper-v7.0.0.zip",
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
             "Expires": "0",
