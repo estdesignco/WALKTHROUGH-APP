@@ -946,61 +946,35 @@ async function sendToAppAndLibraries() {
 
 let canvaToken = null;
 
-async function sendToCanva() {
-  if (!scrapedData || !scrapedData.image_url) {
-    showToast('⚠️ No product image to send to Canva');
-    return;
-  }
+function copyPageLink() {
+  const pageUrl = window.location.href;
   
-  // Check if we have a Canva token stored
-  const stored = await chrome.storage.local.get('canvaToken');
-  canvaToken = stored.canvaToken;
-  
-  if (!canvaToken) {
-    showToast('⚠️ Please connect your Canva account first (coming soon!)');
-    // For now, we'll copy the image URL with product link
-    copyImageWithLink();
-    return;
-  }
-  
-  showToast('⏳ Uploading to Canva...');
-  
-  try {
-    const response = await fetch(`${BACKEND_URL}/api/canva/upload-asset`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image_url: scrapedData.image_url,
-        name: `${scrapedData.name || 'Product'} - ${scrapedData.vendor || 'Unknown'}`,
-        product_url: scrapedData.url,
-        canva_token: canvaToken
-      })
-    });
-    
-    if (response.ok) {
-      showToast('✅ Uploaded to Canva! Check your Canva Media Library.');
-    } else {
-      const error = await response.json();
-      showToast(`⚠️ Canva upload failed: ${error.detail}`);
-    }
-    
-  } catch (error) {
-    console.error('Canva upload error:', error);
-    showToast('⚠️ Canva upload failed. Copying image info instead...');
-    copyImageWithLink();
-  }
+  navigator.clipboard.writeText(pageUrl).then(() => {
+    showToast('✅ Page link copied!');
+    // Change button text briefly
+    const btn = document.getElementById('dr-copy-link-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✅ Copied!';
+    btn.style.background = '#10b981';
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.style.background = '#7c3aed';
+    }, 2000);
+  }).catch(() => {
+    showToast('⚠️ Failed to copy link');
+  });
 }
 
 function copyImageWithLink() {
-  // Fallback: Copy product info to clipboard
+  // Copy product info to clipboard
   const text = `${scrapedData.name || 'Product'}
 ${scrapedData.vendor || ''}
-${scrapedData.url || ''}
+${window.location.href}
 
 Image: ${scrapedData.image_url || ''}`;
   
   navigator.clipboard.writeText(text).then(() => {
-    showToast('📋 Product info copied! Paste into Canva.');
+    showToast('📋 Product info copied!');
   });
 }
 
