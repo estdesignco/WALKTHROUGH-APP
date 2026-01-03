@@ -946,23 +946,60 @@ async function sendToAppAndLibraries() {
 
 let canvaToken = null;
 
-function copyPageLink() {
-  const pageUrl = window.location.href;
+async function copyPageLink() {
+  if (!scrapedData || !scrapedData.image_url) {
+    showToast('⚠️ No product image scraped yet');
+    return;
+  }
   
-  navigator.clipboard.writeText(pageUrl).then(() => {
-    showToast('✅ Page link copied!');
-    // Change button text briefly
+  const pageUrl = window.location.href;
+  const imageUrl = scrapedData.image_url;
+  const productName = scrapedData.name || 'Product';
+  
+  showToast('⏳ Preparing image + link...');
+  
+  try {
+    // Fetch image and convert to base64
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    
+    const base64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+    
+    // Create HTML with base64 image wrapped in hyperlink
+    const html = `<a href="${pageUrl}"><img src="${base64}" alt="${productName}" style="max-width:800px;"/></a>`;
+    
+    // Also create plain text fallback
+    const text = pageUrl;
+    
+    // Copy both formats to clipboard
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([text], { type: 'text/plain' })
+      })
+    ]);
+    
+    showToast('✅ Image + Link copied! Paste into Canva.');
+    
     const btn = document.getElementById('dr-copy-link-btn');
-    const originalText = btn.innerHTML;
     btn.innerHTML = '✅ Copied!';
     btn.style.background = '#10b981';
     setTimeout(() => {
-      btn.innerHTML = originalText;
+      btn.innerHTML = '🔗 Copy for Canva';
       btn.style.background = '#7c3aed';
     }, 2000);
-  }).catch(() => {
-    showToast('⚠️ Failed to copy link');
-  });
+    
+  } catch (error) {
+    console.error('Copy error:', error);
+    // Fallback - just copy the page URL
+    navigator.clipboard.writeText(pageUrl).then(() => {
+      showToast('📋 Link copied (image failed)');
+    });
+  }
 }
 
 function copyImageWithLink() {
