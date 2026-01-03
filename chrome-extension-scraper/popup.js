@@ -1,5 +1,6 @@
-// Design Ready Product Scraper v6.3.0
-// FIXED: Four Hands swatch selection bug - now properly detects selected state
+// Design Ready Product Scraper v6.4.0
+// COMPLETE: All 26 vendors supported
+// Fixed: Dimensions detection (7 patterns), SKU detection, Finish/Color from dropdowns
 
 const APP_URL = 'https://furnscape.preview.emergentagent.com';
 const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
