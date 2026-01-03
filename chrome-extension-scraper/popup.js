@@ -271,6 +271,39 @@ function scrapePageData() {
   }
 
   // --- FINISH/COLOR/SWATCH ---
+  
+  // Method 0: Check dropdowns and select elements FIRST (Rowe, Visual Comfort style)
+  // Look for selects/dropdowns near "Finish", "Color", "Cover", "Fabric" labels
+  const dropdownLabels = ['finish', 'color', 'cover', 'fabric', 'material', 'body cover'];
+  for (const label of dropdownLabels) {
+    // Pattern: "Finish: Natural Brass" or "Choose Body Cover: 100CR-28"
+    const labelRegex = new RegExp(`(?:choose\\s+)?${label}[:\\s]*([^\\n$]+)`, 'i');
+    const textMatch = pageText.match(labelRegex);
+    if (textMatch && textMatch[1]) {
+      const value = textMatch[1].trim().split('\n')[0].trim();
+      if (value && value.length > 1 && value.length < 100 && !value.match(/^(select|choose|pick)/i)) {
+        data.finish_color = value;
+        break;
+      }
+    }
+  }
+  
+  // Also try select/dropdown elements
+  if (!data.finish_color) {
+    const selects = document.querySelectorAll('select');
+    for (const select of selects) {
+      const label = select.closest('label, .form-group, [class*="option"]');
+      const labelText = label?.innerText?.toLowerCase() || select.name?.toLowerCase() || '';
+      if (dropdownLabels.some(l => labelText.includes(l))) {
+        const selected = select.options[select.selectedIndex];
+        if (selected && selected.text && selected.text !== 'Select' && selected.text !== 'Choose') {
+          data.finish_color = selected.text.trim();
+          break;
+        }
+      }
+    }
+  }
+  
   // Method 1: Selected swatch button with background-image (Uttermost style)
   const colorSection = Array.from(document.querySelectorAll('span, label, div')).find(
     el => /^(color|finish|fabric|material)$/i.test(el.innerText?.trim())
@@ -283,7 +316,10 @@ function scrapePageData() {
       for (const btn of swatchBtns) {
         const isSelected = btn.className?.includes('selected') || btn.getAttribute('aria-selected') === 'true';
         if (isSelected || swatchBtns.length === 1) {
-          data.finish_color = btn.getAttribute('title') || btn.getAttribute('aria-label') || '';
+          // Only override if we don't have a finish_color yet
+          if (!data.finish_color) {
+            data.finish_color = btn.getAttribute('title') || btn.getAttribute('aria-label') || '';
+          }
           const style = btn.getAttribute('style') || '';
           const bgMatch = style.match(/url\(["']?([^"')]+)["']?\)/);
           if (bgMatch) {
