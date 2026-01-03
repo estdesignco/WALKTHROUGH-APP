@@ -952,56 +952,43 @@ async function sendToCanva() {
     return;
   }
   
-  // Check if we have a Canva token stored
-  const stored = await chrome.storage.local.get('canvaToken');
-  canvaToken = stored.canvaToken;
-  
-  if (!canvaToken) {
-    showToast('⚠️ Please connect your Canva account first (coming soon!)');
-    // For now, we'll copy the image URL with product link
-    copyImageWithLink();
-    return;
-  }
-  
-  showToast('⏳ Uploading to Canva...');
+  const productUrl = scrapedData.url || window.location.href;
+  const imageUrl = scrapedData.image_url;
+  const productName = scrapedData.name || 'Product';
   
   try {
-    const response = await fetch(`${BACKEND_URL}/api/canva/upload-asset`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image_url: scrapedData.image_url,
-        name: `${scrapedData.name || 'Product'} - ${scrapedData.vendor || 'Unknown'}`,
-        product_url: scrapedData.url,
-        canva_token: canvaToken
-      })
-    });
+    // Create HTML with image wrapped in hyperlink
+    const html = `<a href="${productUrl}" target="_blank" title="${productName}"><img src="${imageUrl}" alt="${productName}" style="max-width:100%;"></a>`;
     
-    if (response.ok) {
-      showToast('✅ Uploaded to Canva! Check your Canva Media Library.');
-    } else {
-      const error = await response.json();
-      showToast(`⚠️ Canva upload failed: ${error.detail}`);
-    }
+    // Create blobs for clipboard
+    const htmlBlob = new Blob([html], { type: 'text/html' });
+    const textBlob = new Blob([productUrl], { type: 'text/plain' });
+    
+    // Write to clipboard with both HTML and plain text formats
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': htmlBlob,
+        'text/plain': textBlob
+      })
+    ]);
+    
+    showToast('✅ Image + Link copied! Paste into Canva.');
     
   } catch (error) {
-    console.error('Canva upload error:', error);
-    showToast('⚠️ Canva upload failed. Copying image info instead...');
-    copyImageWithLink();
+    console.error('Clipboard error:', error);
+    // Fallback: try copying just the image URL with link as text
+    try {
+      await navigator.clipboard.writeText(`${productName}\n${productUrl}\n\nImage: ${imageUrl}`);
+      showToast('📋 Info copied (fallback). Paste into Canva.');
+    } catch (e) {
+      showToast('⚠️ Copy failed. Try right-clicking the image.');
+    }
   }
 }
 
-function copyImageWithLink() {
-  // Fallback: Copy product info to clipboard
-  const text = `${scrapedData.name || 'Product'}
-${scrapedData.vendor || ''}
-${scrapedData.url || ''}
-
-Image: ${scrapedData.image_url || ''}`;
-  
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('📋 Product info copied! Paste into Canva.');
-  });
+async function copyImageWithLink() {
+  // Same as sendToCanva - copy HTML with linked image
+  await sendToCanva();
 }
 
 // ============================================================================
