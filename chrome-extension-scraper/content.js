@@ -844,23 +844,68 @@ function scrapePageData() {
 }
 
 // ============================================================================
-// SEND TO APP
+// SEND TO APP + LIBRARIES
 // ============================================================================
 
-function sendToApp() {
+const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
+
+async function sendToAppAndLibraries() {
   if (!scrapedData) return;
   
-  const APP_URL = 'https://furnscape.preview.emergentagent.com';
+  showToast('⏳ Saving to libraries...');
   
   // Get selected project from storage
-  chrome.storage.local.get('selectedProjectId', (stored) => {
-    const projectId = stored.selectedProjectId;
+  const stored = await chrome.storage.local.get('selectedProjectId');
+  const projectId = stored.selectedProjectId;
+  
+  if (!projectId) {
+    showToast('⚠️ Please select a project in the extension popup first');
+    return;
+  }
+  
+  try {
+    // 1. Save to Product Library
+    await fetch(`${BACKEND_URL}/api/products/library`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: scrapedData.name,
+        vendor: scrapedData.vendor,
+        sku: scrapedData.sku,
+        price: scrapedData.price,
+        msrp: scrapedData.msrp,
+        size: scrapedData.size,
+        finish_color: scrapedData.finish_color,
+        finish_image: scrapedData.finish_image,
+        image_url: scrapedData.image_url,
+        product_url: scrapedData.url,
+        project_id: projectId,
+        category: 'furniture'
+      })
+    });
+    console.log('✅ Saved to Product Library');
     
-    if (!projectId) {
-      showToast('⚠️ Please select a project in the extension popup first');
-      return;
+    // 2. Save Finish/Material to Materials Library (if we have finish data)
+    if (scrapedData.finish_color || scrapedData.finish_image) {
+      await fetch(`${BACKEND_URL}/api/materials/from-scraper`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: scrapedData.finish_color || 'Unknown Finish',
+          vendor: scrapedData.vendor,
+          sku: scrapedData.sku,
+          image_url: scrapedData.finish_image,
+          product_name: scrapedData.name,
+          product_url: scrapedData.url,
+          product_sku: scrapedData.sku,
+          project_id: projectId,
+          category: 'fabric'
+        })
+      });
+      console.log('✅ Saved to Materials Library');
     }
     
+    // 3. Send to App (Checklist/FFE)
     const params = new URLSearchParams();
     params.set('action', 'add-item');
     params.set('source', 'extension');
@@ -874,11 +919,88 @@ function sendToApp() {
     if (scrapedData.url) params.set('link', scrapedData.url);
     if (scrapedData.image_url) params.set('image', scrapedData.image_url);
     
-    const projectUrl = `${APP_URL}/project/${projectId}?tab=Checklist&${params.toString()}`;
+    const projectUrl = `${BACKEND_URL}/project/${projectId}?tab=Checklist&${params.toString()}`;
     window.open(projectUrl, '_blank');
     
-    showToast('✅ Sent to app!');
+    showToast('✅ Saved to App + Product Library + Materials Library!');
     hidePanel();
+    
+  } catch (error) {
+    console.error('Error saving to libraries:', error);
+    showToast('⚠️ Error saving to libraries, but opening app...');
+    
+    // Still try to open the app even if library save failed
+    const params = new URLSearchParams();
+    params.set('action', 'add-item');
+    params.set('source', 'extension');
+    if (scrapedData.name) params.set('name', scrapedData.name);
+    if (scrapedData.price) params.set('price', scrapedData.price);
+    const projectUrl = `${BACKEND_URL}/project/${projectId}?tab=Checklist&${params.toString()}`;
+    window.open(projectUrl, '_blank');
+  }
+}
+
+// ============================================================================
+// CANVA INTEGRATION
+// ============================================================================
+
+let canvaToken = null;
+
+async function sendToCanva() {
+  if (!scrapedData || !scrapedData.image_url) {
+    showToast('⚠️ No product image to send to Canva');
+    return;
+  }
+  
+  // Check if we have a Canva token stored
+  const stored = await chrome.storage.local.get('canvaToken');
+  canvaToken = stored.canvaToken;
+  
+  if (!canvaToken) {
+    showToast('⚠️ Please connect your Canva account first (coming soon!)');
+    // For now, we'll copy the image URL with product link
+    copyImageWithLink();
+    return;
+  }
+  
+  showToast('⏳ Uploading to Canva...');
+  
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/canva/upload-asset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image_url: scrapedData.image_url,
+        name: `${scrapedData.name || 'Product'} - ${scrapedData.vendor || 'Unknown'}`,
+        product_url: scrapedData.url,
+        canva_token: canvaToken
+      })
+    });
+    
+    if (response.ok) {
+      showToast('✅ Uploaded to Canva! Check your Canva Media Library.');
+    } else {
+      const error = await response.json();
+      showToast(`⚠️ Canva upload failed: ${error.detail}`);
+    }
+    
+  } catch (error) {
+    console.error('Canva upload error:', error);
+    showToast('⚠️ Canva upload failed. Copying image info instead...');
+    copyImageWithLink();
+  }
+}
+
+function copyImageWithLink() {
+  // Fallback: Copy product info to clipboard
+  const text = `${scrapedData.name || 'Product'}
+${scrapedData.vendor || ''}
+${scrapedData.url || ''}
+
+Image: ${scrapedData.image_url || ''}`;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Product info copied! Paste into Canva.');
   });
 }
 
