@@ -343,7 +343,7 @@ function createSidePanel() {
       </button>
       <div style="display: flex; gap: 8px;">
         <button class="dr-btn-secondary" id="dr-canva-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
-          📋 Copy Link
+          📎 Get Linked Image
         </button>
         <button class="dr-btn-secondary" id="dr-rescrape-btn" style="flex: 1;">
           🔄 Re-scrape
