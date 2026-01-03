@@ -21,9 +21,23 @@ const projectSelector = document.getElementById('projectSelector');
 // Load projects from API
 async function loadProjects() {
   try {
-    const response = await fetch(`${BACKEND_URL}/api/projects`);
-    if (!response.ok) throw new Error('Failed to load projects');
+    console.log('Loading projects from:', `${BACKEND_URL}/api/projects`);
+    const response = await fetch(`${BACKEND_URL}/api/projects`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      mode: 'cors'
+    });
+    
+    console.log('Response status:', response.status);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     const projects = await response.json();
+    console.log('Projects loaded:', projects.length);
     
     // Clear and populate dropdown
     projectSelector.innerHTML = '<option value="">-- Select a Project --</option>';
@@ -42,7 +56,11 @@ async function loadProjects() {
     }
   } catch (e) {
     console.error('Failed to load projects:', e);
-    projectSelector.innerHTML = '<option value="">-- Could not load projects --</option>';
+    console.error('Error details:', e.message);
+    projectSelector.innerHTML = '<option value="">-- Could not load --</option>';
+    
+    // Show error in status bar
+    showStatus(`Projects failed: ${e.message}`, 'warning');
   }
 }
 
