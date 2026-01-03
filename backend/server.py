@@ -16048,3 +16048,74 @@ async def export_ffe_to_pdf(data: dict):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
 
+
+
+# ============================================================================
+# LINKED IMAGE PDF GENERATOR FOR CANVA
+# ============================================================================
+
+@api_router.post("/clipper/linked-image-pdf")
+async def create_linked_image_pdf(data: dict):
+    """Create a PDF with an image that has a clickable hyperlink"""
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas as pdf_canvas
+    from reportlab.lib.utils import ImageReader
+    import io
+    import httpx
+    
+    image_url = data.get('image_url')
+    link_url = data.get('link_url')
+    
+    if not image_url or not link_url:
+        raise HTTPException(status_code=400, detail="image_url and link_url required")
+    
+    try:
+        # Download image
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(image_url)
+            if response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Could not download image")
+            image_data = response.content
+        
+        # Create PDF in memory
+        pdf_buffer = io.BytesIO()
+        c = pdf_canvas.Canvas(pdf_buffer, pagesize=letter)
+        
+        # Load image
+        img = ImageReader(io.BytesIO(image_data))
+        img_width, img_height = img.getSize()
+        
+        # Scale to fit page (max 500px wide)
+        max_width = 500
+        scale = min(max_width / img_width, 1.0)
+        display_width = img_width * scale
+        display_height = img_height * scale
+        
+        # Center on page
+        page_width, page_height = letter
+        x = (page_width - display_width) / 2
+        y = (page_height - display_height) / 2
+        
+        # Draw image
+        c.drawImage(img, x, y, width=display_width, height=display_height)
+        
+        # Add clickable link over the image
+        c.linkURL(link_url, (x, y, x + display_width, y + display_height), relative=0)
+        
+        c.save()
+        
+        # Return PDF
+        pdf_buffer.seek(0)
+        
+        return Response(
+            content=pdf_buffer.getvalue(),
+            media_type="application/pdf",
+            headers={"Content-Disposition": "inline; filename=linked-image.pdf"}
+        )
+        
+    except Exception as e:
+        logger.error(f"PDF creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"PDF creation failed: {str(e)}")
+
+# Include all routers
+app.include_router(api_router)
