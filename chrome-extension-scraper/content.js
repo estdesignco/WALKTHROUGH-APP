@@ -760,6 +760,7 @@ function scrapePageData() {
 
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
   const pageText = document.body.innerText;
+  const pageHtml = document.body.innerHTML;
 
   // VENDOR DETECTION
   const vendorMap = {
@@ -778,64 +779,183 @@ function scrapePageData() {
   }
   if (!data.vendor) data.vendor = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
 
-  // NAME - H1
-  const h1 = document.querySelector('h1');
-  if (h1) data.name = h1.innerText.trim().split('\n')[0];
-
-  // SKU - multiple patterns
-  const skuPatterns = [/SKU[:\s#]*([A-Z0-9-]+)/i, /Item[:\s#]*([A-Z0-9-]+)/i, /Style[:\s#]*([A-Z0-9-]+)/i];
-  for (const pattern of skuPatterns) {
-    const match = pageText.match(pattern);
-    if (match) { data.sku = match[1]; break; }
+  // ============ UTTERMOST SPECIFIC ============
+  if (domain.includes('uttermost')) {
+    // Uttermost product name
+    const uttName = document.querySelector('.product-title, .product-name, h1.title, [class*="product"] h1');
+    if (uttName) data.name = uttName.innerText.trim();
+    
+    // Uttermost SKU - they use item number
+    const uttSku = pageText.match(/Item\s*#?\s*:?\s*(\d+)/i) || pageText.match(/Style\s*#?\s*:?\s*([A-Z0-9-]+)/i);
+    if (uttSku) data.sku = uttSku[1];
+    
+    // Uttermost price
+    const uttPrice = document.querySelector('[class*="price"]:not([class*="msrp"]):not([class*="retail"])');
+    if (uttPrice) {
+      const priceMatch = uttPrice.innerText.match(/\$?([\d,]+\.?\d*)/);
+      if (priceMatch) data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
+    }
+    
+    // Uttermost dimensions - they use specific format
+    const uttDim = pageText.match(/(\d+(?:\.\d+)?)\s*"?\s*W\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*D\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*H/i);
+    if (uttDim) data.size = `${uttDim[1]}"W x ${uttDim[2]}"D x ${uttDim[3]}"H`;
+    if (!data.size) {
+      const uttDim2 = pageText.match(/(\d+(?:\.\d+)?)\s*"?\s*W\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*H/i);
+      if (uttDim2) data.size = `${uttDim2[1]}"W x ${uttDim2[2]}"H`;
+    }
+    
+    // Uttermost finish
+    const uttFinish = document.querySelector('[class*="finish"], [class*="color"], [data-option="finish"]');
+    if (uttFinish) data.finish_color = uttFinish.innerText.trim();
+    
+    // Uttermost main image
+    const uttImg = document.querySelector('.product-image img, [class*="gallery"] img, .main-image img, [class*="primary"] img');
+    if (uttImg?.src) data.image_url = uttImg.src;
   }
 
-  // PRICE
-  const pricePatterns = [/Trade Price[:\s]*\$([\d,]+\.?\d*)/i, /Your Price[:\s]*\$([\d,]+\.?\d*)/i, /\$([\d,]+\.?\d*)/];
-  for (const pattern of pricePatterns) {
-    const match = pageText.match(pattern);
-    if (match) { 
-      const val = parseFloat(match[1].replace(/,/g, ''));
-      if (val > 10 && val < 100000) { data.price = val; break; }
+  // ============ GENERAL SCRAPING (fallbacks) ============
+  
+  // NAME - H1 or product title
+  if (!data.name) {
+    const h1 = document.querySelector('h1');
+    if (h1) data.name = h1.innerText.trim().split('\n')[0];
+  }
+  if (!data.name) {
+    const prodTitle = document.querySelector('[class*="product-title"], [class*="product-name"], [itemprop="name"]');
+    if (prodTitle) data.name = prodTitle.innerText.trim();
+  }
+
+  // SKU - multiple patterns
+  if (!data.sku) {
+    const skuPatterns = [
+      /SKU[:\s#]*([A-Z0-9-]+)/i, 
+      /Item[:\s#]*([A-Z0-9-]+)/i, 
+      /Style[:\s#]*([A-Z0-9-]+)/i,
+      /Model[:\s#]*([A-Z0-9-]+)/i,
+      /Product\s*(?:Code|#|Number)[:\s]*([A-Z0-9-]+)/i
+    ];
+    for (const pattern of skuPatterns) {
+      const match = pageText.match(pattern);
+      if (match) { data.sku = match[1]; break; }
+    }
+  }
+  // Also check meta tags and data attributes
+  if (!data.sku) {
+    const skuMeta = document.querySelector('[itemprop="sku"], [data-sku], [id*="sku"]');
+    if (skuMeta) data.sku = skuMeta.content || skuMeta.dataset.sku || skuMeta.innerText?.trim();
+  }
+
+  // PRICE - multiple patterns
+  if (!data.price) {
+    const pricePatterns = [
+      /Trade\s*Price[:\s]*\$?([\d,]+\.?\d*)/i, 
+      /Your\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /Net\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /Sale\s*Price[:\s]*\$?([\d,]+\.?\d*)/i
+    ];
+    for (const pattern of pricePatterns) {
+      const match = pageText.match(pattern);
+      if (match) { 
+        const val = parseFloat(match[1].replace(/,/g, ''));
+        if (val > 10 && val < 100000) { data.price = val; break; }
+      }
+    }
+  }
+  // Check price elements
+  if (!data.price) {
+    const priceEl = document.querySelector('[class*="price"]:not([class*="msrp"]), [itemprop="price"], [data-price]');
+    if (priceEl) {
+      const priceMatch = (priceEl.content || priceEl.dataset.price || priceEl.innerText).match(/\$?([\d,]+\.?\d*)/);
+      if (priceMatch) {
+        const val = parseFloat(priceMatch[1].replace(/,/g, ''));
+        if (val > 10 && val < 100000) data.price = val;
+      }
     }
   }
 
-  // DIMENSIONS
-  const dimPatterns = [
-    [/(\d+(?:\.\d+)?)\s*W\s*X\s*(\d+(?:\.\d+)?)\s*H\s*X\s*(\d+(?:\.\d+)?)\s*D/i, (m) => `${m[1]}"W x ${m[3]}"D x ${m[2]}"H`],
-    [/Width[:\s]*([\d.]+).*?Depth[:\s]*([\d.]+).*?Height[:\s]*([\d.]+)/is, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
-    [/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
-  ];
-  for (const [pattern, formatter] of dimPatterns) {
-    const match = pageText.match(pattern);
-    if (match) { data.size = formatter(match); break; }
+  // DIMENSIONS - multiple patterns
+  if (!data.size) {
+    const dimPatterns = [
+      [/(\d+(?:\.\d+)?)\s*"?\s*W\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*D\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*H/i, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+      [/(\d+(?:\.\d+)?)\s*W\s*X\s*(\d+(?:\.\d+)?)\s*H\s*X\s*(\d+(?:\.\d+)?)\s*D/i, (m) => `${m[1]}"W x ${m[3]}"D x ${m[2]}"H`],
+      [/Width[:\s]*([\d.]+).*?Depth[:\s]*([\d.]+).*?Height[:\s]*([\d.]+)/is, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+      [/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+      [/(\d+(?:\.\d+)?)\s*"?\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?/i, (m) => `${m[1]}" x ${m[2]}" x ${m[3]}"`],
+    ];
+    for (const [pattern, formatter] of dimPatterns) {
+      const match = pageText.match(pattern);
+      if (match) { data.size = formatter(match); break; }
+    }
   }
 
   // FINISH/COLOR
-  const finishPatterns = [
-    /(?:choose\s+)?(?:body\s+)?cover[:\s]*([^\n]+)/i,
-    /(?:fabric\s+shown|body\s+fabric)[:\s]*([^\n]+)/i,
-    /(?:finish|color|option)[:\s]*([^\n]+)/i
-  ];
-  for (const pattern of finishPatterns) {
-    const match = pageText.match(pattern);
-    if (match) {
-      const val = match[1].trim().split('\n')[0].trim();
-      if (val && val.length > 1 && val.length < 50) { data.finish_color = val; break; }
+  if (!data.finish_color) {
+    const finishPatterns = [
+      /Finish[:\s]*([^\n,]+)/i,
+      /Color[:\s]*([^\n,]+)/i,
+      /(?:choose\s+)?(?:body\s+)?cover[:\s]*([^\n]+)/i,
+      /(?:fabric\s+shown|body\s+fabric)[:\s]*([^\n]+)/i
+    ];
+    for (const pattern of finishPatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        const val = match[1].trim().split('\n')[0].trim();
+        if (val && val.length > 1 && val.length < 50) { data.finish_color = val; break; }
+      }
     }
   }
 
-  // IMAGES
-  const ogImg = document.querySelector('meta[property="og:image"]');
-  if (ogImg?.content) data.image_url = ogImg.content;
-  
-  // Swatch images
-  const swatchImgs = document.querySelectorAll('[class*="swatch"] img, label[title] img');
-  for (const img of swatchImgs) {
-    if (img.src && img.src.startsWith('http')) {
-      const w = img.naturalWidth || img.width || 100;
-      if (w < 200 && w > 10) {
-        data.finish_image = img.src;
+  // IMAGES - try multiple sources
+  if (!data.image_url) {
+    // Open Graph
+    const ogImg = document.querySelector('meta[property="og:image"]');
+    if (ogImg?.content) data.image_url = ogImg.content;
+  }
+  if (!data.image_url) {
+    // Main product image selectors
+    const mainImgSelectors = [
+      '.product-image img',
+      '[class*="gallery"] img:first-child',
+      '[class*="main-image"] img',
+      '[class*="primary-image"] img',
+      '[class*="product"] img[src*="product"]',
+      '[itemprop="image"]',
+      '#product-image img',
+      '.pdp-image img'
+    ];
+    for (const sel of mainImgSelectors) {
+      const img = document.querySelector(sel);
+      if (img?.src && img.src.startsWith('http')) {
+        data.image_url = img.src;
         break;
+      }
+    }
+  }
+  if (!data.image_url) {
+    // Find largest image on page
+    const allImgs = document.querySelectorAll('img[src^="http"]');
+    let largestImg = null;
+    let largestArea = 0;
+    allImgs.forEach(img => {
+      const area = (img.naturalWidth || img.width || 0) * (img.naturalHeight || img.height || 0);
+      if (area > largestArea && area > 10000) {
+        largestArea = area;
+        largestImg = img;
+      }
+    });
+    if (largestImg) data.image_url = largestImg.src;
+  }
+  
+  // SWATCH/FINISH images
+  if (!data.finish_image) {
+    const swatchImgs = document.querySelectorAll('[class*="swatch"] img, [class*="finish"] img, label[title] img, [class*="option"] img');
+    for (const img of swatchImgs) {
+      if (img.src && img.src.startsWith('http')) {
+        const w = img.naturalWidth || img.width || 100;
+        if (w < 200 && w > 10) {
+          data.finish_image = img.src;
+          break;
+        }
       }
     }
   }
