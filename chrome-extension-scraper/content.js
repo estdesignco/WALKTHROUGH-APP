@@ -952,7 +952,8 @@ async function sendToCanva() {
     return;
   }
   
-  const productUrl = scrapedData.url || window.location.href;
+  // ALWAYS use the actual page URL, never the image URL
+  const productUrl = window.location.href;
   const imageUrl = scrapedData.image_url;
   const productName = scrapedData.name || 'Product';
   
