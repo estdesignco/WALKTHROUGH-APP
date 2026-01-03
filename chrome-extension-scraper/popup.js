@@ -1,8 +1,7 @@
-// Design Ready Product Scraper v6.6.0
-// NEW: Full page-injected UI - panel stays open on page
-// NEW: Click any field in panel to select from page
-// NEW: Visual highlight on selected elements
-// All 26 vendors supported
+// Design Ready Product Scraper v6.7.0
+// NEW: Auto-save to Product Library + Materials Library
+// NEW: Canva integration (Send to Canva button)
+// Full page-injected UI that stays open
 
 const APP_URL = 'https://furnscape.preview.emergentagent.com';
 const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
