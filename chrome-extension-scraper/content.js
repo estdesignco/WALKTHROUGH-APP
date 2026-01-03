@@ -342,8 +342,8 @@ function createSidePanel() {
         🚀 SEND TO APP + LIBRARIES
       </button>
       <div style="display: flex; gap: 8px;">
-        <button class="dr-btn-secondary" id="dr-canva-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
-          🎨 Send to Canva
+        <button class="dr-btn-secondary" id="dr-copy-link-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
+          🔗 Copy Page Link
         </button>
         <button class="dr-btn-secondary" id="dr-rescrape-btn" style="flex: 1;">
           🔄 Re-scrape
