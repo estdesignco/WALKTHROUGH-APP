@@ -289,39 +289,49 @@ function scrapePageData() {
   
   // FOUR HANDS: Swatches are in label elements with title attribute
   // Structure: <label title="Color Name"><img src="swatch.jpg" alt="Color Name"></label>
+  // Also handles "Cover" and "Cushion" selector dropdowns
   if (!data.finish_image && domain.includes('fourhands')) {
-    // Look for the selected cushion/finish name from the dropdown display
-    const cushionDisplay = document.querySelector('[data-v-42a73eeb] .truncate');
-    if (cushionDisplay) {
-      data.finish_color = cushionDisplay.textContent.trim();
-    }
-    
-    // Also try the subtitle which shows "Dulane Mahogany • 247447-002"
-    if (!data.finish_color) {
-      const subtitle = document.querySelector('.text-neutral-50');
-      if (subtitle && subtitle.textContent.includes('•')) {
-        data.finish_color = subtitle.textContent.split('•')[0].trim();
+    // Look for the selected cover/cushion/finish name from ANY dropdown display
+    // Try multiple selectors since Four Hands uses different ones
+    const dropdownDisplays = document.querySelectorAll('.truncate, [class*="truncate"]');
+    for (const display of dropdownDisplays) {
+      const text = display.textContent.trim();
+      if (text && text !== 'None' && !text.includes('Select')) {
+        data.finish_color = text;
+        break;
       }
     }
     
-    // Find swatch images in labels - look for the selected one or first one
+    // Also try the subtitle which shows "Light Camel • 100074-008" format
+    if (!data.finish_color) {
+      const subtitles = document.querySelectorAll('.text-neutral-50, [class*="text-neutral"]');
+      for (const subtitle of subtitles) {
+        if (subtitle.textContent.includes('•')) {
+          data.finish_color = subtitle.textContent.split('•')[0].trim();
+          break;
+        }
+      }
+    }
+    
+    // Find swatch images in labels - look for the selected one or first valid one
     const swatchLabels = document.querySelectorAll('label[title]');
     for (const label of swatchLabels) {
       const title = label.getAttribute('title');
       const img = label.querySelector('img');
       
-      // Skip placeholder images
-      if (title === 'None' || !img || !img.src || img.src.includes('PLACEHOLDER')) {
+      // Skip placeholder images and "None" options
+      if (!title || title === 'None' || !img || !img.src || img.src.includes('PLACEHOLDER')) {
         continue;
       }
       
       // Check if this is the selected swatch (matches the finish_color we found)
-      if (data.finish_color && title && title.toLowerCase() === data.finish_color.toLowerCase()) {
+      if (data.finish_color && title.toLowerCase() === data.finish_color.toLowerCase()) {
         data.finish_image = img.src;
+        console.log('Found matching swatch for', data.finish_color, ':', img.src);
         break;
       }
       
-      // Otherwise take the first valid one
+      // Otherwise take the first valid one as fallback
       if (!data.finish_image && img.src.startsWith('http')) {
         data.finish_image = img.src;
         if (!data.finish_color) {
@@ -330,19 +340,25 @@ function scrapePageData() {
       }
     }
     
-    // Fallback: Look for circular swatch images in labels (older method)
+    // Also look for round swatch images that might be outside labels
     if (!data.finish_image) {
-      const allLabels = document.querySelectorAll('label');
-      for (const label of allLabels) {
-        const imgs = label.querySelectorAll('img');
-        for (const img of imgs) {
-          if (img.src && img.src.startsWith('http') && !img.src.includes('PLACEHOLDER')) {
+      const roundSwatches = document.querySelectorAll('img.rounded-full, img[class*="rounded-full"]');
+      for (const img of roundSwatches) {
+        if (img.src && img.src.startsWith('http') && !img.src.includes('PLACEHOLDER')) {
+          // Get parent's title or aria-label
+          const parent = img.closest('label, button, [title]');
+          const swatchName = parent?.getAttribute('title') || img.alt || '';
+          
+          if (data.finish_color && swatchName.toLowerCase() === data.finish_color.toLowerCase()) {
             data.finish_image = img.src;
-            data.finish_color = img.alt || label.getAttribute('title') || '';
             break;
           }
+          
+          if (!data.finish_image) {
+            data.finish_image = img.src;
+            if (!data.finish_color) data.finish_color = swatchName;
+          }
         }
-        if (data.finish_image) break;
       }
     }
   }
