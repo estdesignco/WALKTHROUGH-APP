@@ -954,24 +954,18 @@ async function copyPageLink() {
   
   const pageUrl = window.location.href;
   const imageUrl = scrapedData.image_url;
-  const productName = scrapedData.name || 'Product';
   
   try {
-    // Create proper HTML - image wrapped in anchor, just like a webpage would have
-    const html = `<!DOCTYPE html><html><body><a href="${pageUrl}"><img src="${imageUrl}" alt="${productName}"></a></body></html>`;
-    
-    // Copy as HTML
-    const htmlBlob = new Blob([html], { type: 'text/html' });
-    const textBlob = new Blob([pageUrl], { type: 'text/plain' });
+    const html = `<a href="${pageUrl}"><img src="${imageUrl}"></a>`;
     
     await navigator.clipboard.write([
       new ClipboardItem({
-        'text/html': htmlBlob,
-        'text/plain': textBlob
+        'text/html': new Blob([html], { type: 'text/html' }),
+        'text/plain': new Blob([pageUrl], { type: 'text/plain' })
       })
     ]);
     
-    showToast('✅ Image + Link copied! Paste into Canva.');
+    showToast('✅ Copied! Paste anywhere.');
     
     const btn = document.getElementById('dr-copy-link-btn');
     btn.innerHTML = '✅ Copied!';
