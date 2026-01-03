@@ -1075,39 +1075,13 @@ async function copyPageLink() {
   const pageUrl = window.location.href;
   const imageUrl = scrapedData.image_url;
   
-  showToast('⏳ Copying...');
-  
   try {
-    // Fetch the actual image
-    const response = await fetch(imageUrl);
-    const imageBlob = await response.blob();
-    
-    // Convert to PNG
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = URL.createObjectURL(imageBlob);
-    });
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    
-    const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    
-    // HTML with link
+    // Only copy HTML - this forces apps to use the HTML which contains the link
     const html = `<a href="${pageUrl}"><img src="${imageUrl}"></a>`;
     
-    // Copy both image AND html
     await navigator.clipboard.write([
       new ClipboardItem({
-        'image/png': pngBlob,
-        'text/html': new Blob([html], { type: 'text/html' }),
-        'text/plain': new Blob([pageUrl], { type: 'text/plain' })
+        'text/html': new Blob([html], { type: 'text/html' })
       })
     ]);
     
