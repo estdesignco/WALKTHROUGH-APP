@@ -1,4 +1,5 @@
-// Design Ready Product Scraper v6.4.0
+// Design Ready Product Scraper v6.5.0
+// NEW: Click to Select feature - manually assign any element on page
 // COMPLETE: All 26 vendors supported
 // Fixed: Dimensions detection (7 patterns), SKU detection, Finish/Color from dropdowns
 
@@ -6,11 +7,13 @@ const APP_URL = 'https://furnscape.preview.emergentagent.com';
 const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
+let clickToSelectActive = false;
 
 const scrapeBtn = document.getElementById('scrapeBtn');
 const sendBtn = document.getElementById('sendBtn');
 const copyBtn = document.getElementById('copyBtn');
 const rescrapeBtn = document.getElementById('rescrapeBtn');
+const clickSelectBtn = document.getElementById('clickSelectBtn');
 const statusBar = document.getElementById('statusBar');
 const emptyState = document.getElementById('emptyState');
 const resultsContainer = document.getElementById('resultsContainer');
