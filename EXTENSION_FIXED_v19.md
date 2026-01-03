@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://furnscape.preview.emergentagent.com/chrome-extension-v19.zip
+https://interiorai-9.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://furnscape.preview.emergentagent.com/api/download/chrome-extension
+https://interiorai-9.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

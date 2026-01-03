@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://furnscape.preview.emergentagent.com/api
+## Backend URL: https://interiorai-9.preview.emergentagent.com/api
 
 ---
 

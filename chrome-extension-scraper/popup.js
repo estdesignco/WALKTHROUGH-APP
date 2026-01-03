@@ -3,8 +3,8 @@
 // NEW: Canva integration (Send to Canva button)
 // Full page-injected UI that stays open
 
-const APP_URL = 'https://furnscape.preview.emergentagent.com';
-const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
+const APP_URL = 'https://interiorai-9.preview.emergentagent.com';
+const BACKEND_URL = 'https://interiorai-9.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 let clickToSelectActive = false;

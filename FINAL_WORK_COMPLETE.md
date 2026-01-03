@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://furnscape.preview.emergentagent.com
+https://interiorai-9.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://furnscape.preview.emergentagent.com/mobile-app
+https://interiorai-9.preview.emergentagent.com/mobile-app
 
 ---
 

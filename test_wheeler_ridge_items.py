@@ -6,7 +6,7 @@ Final comprehensive test with WHEELER RIDGE project
 import requests
 import json
 
-BACKEND_URL = "https://furnscape.preview.emergentagent.com/api"
+BACKEND_URL = "https://interiorai-9.preview.emergentagent.com/api"
 
 def get_wheeler_ridge_subcategory():
     """Get a real subcategory_id from WHEELER RIDGE project"""

@@ -41,7 +41,7 @@ Uttermost, Four Hands, Bernhardt, Visual Comfort, HVL Group, Gabby, Loloi, Rowe,
 - **JavaScript Syntax**: Valid (confirmed by node -c)
 
 ## Download
-**Extension URL:** `https://furnscape.preview.emergentagent.com/api/download/chrome-extension`
+**Extension URL:** `https://interiorai-9.preview.emergentagent.com/api/download/chrome-extension`
 
 ## User Instructions
 1. Remove old extension from Chrome

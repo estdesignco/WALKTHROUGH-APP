@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://furnscape.preview.emergentagent.com/*"
+    "https://interiorai-9.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

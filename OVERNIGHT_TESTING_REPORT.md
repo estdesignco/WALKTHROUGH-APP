@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://furnscape.preview.emergentagent.com
+**System URL**: https://interiorai-9.preview.emergentagent.com
 
 ---
 

@@ -1,137 +1,122 @@
 <analysis>**original_problem_statement:**
-The user's goal is to make their interior design application deployment ready, but they are blocked by a non-functional and highly inaccurate Chrome Extension web scraper. The user is extremely frustrated with repeated failures and the perceived lack of progress.
+The user's primary goal is to have a reliable, multi-vendor web scraper for their interior design application. Initially, the core problem was a non-functional Chrome Extension that failed on most of the 26 required vendor sites, causing extreme user frustration.
 
-The main requirements are:
-1.  **Fix the Chrome Extension Web Scraper (P0):** It must reliably extract , , , , , and  (the color swatch) from all 26 vendor sites provided by the user. The scraper's inability to distinguish between the main product image and the swatch image is the critical failure point.
-2.  **Improve Scraper Workflow:** The user wants a seamless workflow where the extension lets them select a project, scrapes the data, and takes them directly to that project's checklist page.
-3.  **Fix Data Instability (P1):** Address the user's fear of data loss by fixing fragile data import scripts and API query limits.
+This has since evolved. After successfully implementing a hybrid Click-to-Select manual override for the scraper (which solved the inaccuracy issues), the user requested several new features to streamline their workflow:
+1.  **Product Library (P0):** Automatically save every scraped product to a global, searchable product library.
+2.  **Materials Library (P0):** Automatically save scraped fabric/finish information (image, name, SKU) to a global, searchable materials library.
+3.  **Canva Pro Integration (P0):** Implement a Send to Canva button in the scraper that directly uploads the product image (with the product page URL attached as a link) to the user's Canva Pro account.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application (React/FastAPI/MongoDB) with a Chrome extension for client-side web scraping (). The development process is stuck in a loop: the agent creates a new version of the extension, but each version fixes one aspect (e.g., main image detection) while breaking another (e.g., swatch image detection). The user has lost all trust and is furious about the lack of progress and wasted funds. The last version (v18) was also a failure, showing a minus icon instead of a swatch image.
+A full-stack application (React/FastAPI/MongoDB) with a highly functional Chrome Extension (). The core scraping problem has been solved by implementing a Click-to-Select feature:
+*   A UI panel is injected directly onto the vendor's page, which stays open and is draggable.
+*   It auto-scrapes what it can, and the user can then manually override any field by clicking it in the panel and then clicking the correct element (text or image) on the page.
+*   A Send to App + Libraries button successfully saves the final product data to the project's checklist, a global Product Library, and a global Materials Library on the backend.
+*   The backend contains pre-existing but unused code for a Canva integration ().
 
 **Last working item**:
--   **Last item agent was working**: The agent was attempting to create a final combined version (v18) of the Chrome extension scraper. However, this version was also broken. The user, completely frustrated, has demanded that the agent perform a forensic analysis of all 40+ previous Git commits to find the specific versions where the main image scraping worked and the swatch scraping worked, and then correctly combine *only those working parts*. The agent's last action was to begin this analysis.
+-   **Last item agent was working**: The agent was in the middle of implementing the Send to Canva feature. After the user confirmed they have Canva Pro, the agent began investigating how to implement the integration. It discovered a pre-existing  file and was about to analyze it to see if it could be used, thus avoiding building the integration from scratch. The next step is to get the required API credentials (Client ID & Secret) from the user.
 -   **Status**: **IN PROGRESS**
--   **Agent Testing Done**: N (Agent ran irrelevant backend API tests. The core issue is in the client-side Chrome extension, which the agent cannot test directly.)
--   **Which testing method agent to use?**: The agent must first create the new combined version of the extension. After that, it must ask the user to test it, as only the user can run the extension in their browser.
--   **User Testing Done**: Y (User has tested dozens of failed versions and is unwilling to test again until the agent demonstrates competence by following their explicit instructions.)
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?**: Manual testing by user. The agent will need to implement the Canva API call, then package a new extension version. The user will then need to test the Send to Canva button.
+-   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1**: Chrome Extension Scraper is fundamentally broken (P0)
--   **Issue 2**: User trust is completely broken, halting all verification (P0 Blocker)
--   **Issue 3**: Backend AI scraper is unreliable for SPA sites (P1)
--   **Issue 4**: Data instability due to destructive import scripts (P1)
+-   **Issue 1**: Canva integration is not complete. (P0)
 
 **Issues Detail:**
--   **Issue 1: Chrome Extension Scraper is fundamentally broken**
-    -   **Attempted fixes**: Multiple versions (v9 through v18) have been created. Each attempt failed because the agent could not correctly combine working logic for main image detection and swatch detection. For example, v16 correctly scraped the swatch but failed on the main image, while v17 did the opposite.
+-   **Issue 1: Canva integration is not complete.**
+    -   **Attempted fixes**: No code has been implemented yet. The agent discovered an existing  file but has not yet integrated it.
     -   **Next debug checklist**:
-        1.  **Execute the user's explicit plan:** Analyze the Git history to find the exact commit where **swatch scraping worked** (likely v16, based on v9.2 code with ) and the exact commit where **main image scraping worked** (likely v10/v17).
-        2.  Take the full code from the version where the **swatch scraping worked** as the base.
-        3.  Surgically replace *only the main image detection logic* in that base code with the logic from the version where the main image worked.
-        4.  Ensure all necessary helper functions from both versions (e.g., , , ) are present and correctly integrated.
-        5.  Create a new, clearly versioned extension file (e.g., v19.0.0).
-    -   **Why fix this issue and what will be achieved with the fix?**: This is the only way to unblock the entire project and begin to repair the user relationship.
+        1.  Carefully read  to understand its functions, especially for uploading media with attached links.
+        2.  Prompt the user for their Canva  and  and explain how to get them from the Canva Developer Portal.
+        3.  Securely add these credentials to the environment (e.g., ).
+        4.  In , import and use the functions from  to create a new API endpoint (e.g., ).
+        5.  In , update the  function to call this new backend endpoint.
+        6.  Package and release a new version of the extension for the user to test.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a direct user request to dramatically improve their primary workflow, eliminating a manual copy-paste process.
     -   **Status**: **IN PROGRESS**
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend (requires user testing).
-    -   **Blocked on other issue**: Issue 2: User trust is completely broken
-
--   **Issue 2: User trust is completely broken, halting all verification**
-    -   **Attempted fixes**: Apologies have been ineffective because the agent continues to repeat the same mistakes.
-    -   **Next debug checklist**:
-        1.  Follow the user's instructions for fixing Issue 1 to the letter. Do not improvise or write new logic.
-        2.  Communicate the plan with extreme clarity, emphasizing that you are following their forensic analysis directive.
-    -   **Why fix this issue and what will be achieved with the fix?**: No progress can be verified until the user is willing to test the extension again.
-    -   **Status**: **BLOCKED**
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: N/A
-    -   **Blocked on other issue**: This issue is blocking the resolution of Issue 1.
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: Frontend (User testing of the extension button) and Backend (API endpoint).
+    -   **Blocked on other issue**: User providing Canva API credentials.
 
 **In progress Task List**:
--   **Task 1: Create a single, working scraper by combining historically successful code (P0)**
-    -   **Where to resume**: The agent needs to perform a forensic analysis of the Git history to isolate the working code snippets for main image and swatch detection from different versions and combine them into a single  file.
-    -   **What will be achieved with this?**: A functional scraper that correctly handles both main and swatch images, which is the critical first step to unblocking the project.
+-   **Task 1: Complete Canva Pro Integration (P0)**
+    -   **Where to resume**: Start by analyzing the file .
+    -   **What will be achieved with this?**: A functional Send to Canva button in the scraper UI that uploads the product image with an attached link directly to the user's Canva Pro account.
     -   **Status**: **IN PROGRESS**
-    -   **Should Test frontend/backend/both after fix?**: Frontend (via user testing).
-    -   **Blocked on something**: The agent's repeated inability to correctly merge code from different versions.
+    -   **Should Test frontend/backend/both after fix?**: Both.
+    -   **Blocked on something**: Waiting for the user to provide their Canva API  and .
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P0) Systematically apply the working scraping logic to all 26 vendor sites.
-    -   (P1) Refactor data import scripts () to be non-destructive (idempotent).
+    -   (P1) **Build Frontend for Libraries**: Create new pages in the React frontend for the Product Library and Materials Library so the user can view, search, and manage the items saved by the scraper.
 -   **Future Tasks:**
-    -   Implement the Backup Data to Google Drive feature.
-    -   Perform a comprehensive application audit.
-    -   Refactor the monolithic  into modular API routers.
-    -   Implement the Client Approval Portal feature.
+    -   (P2) Refactor  to be non-destructive (idempotent).
+    -   (P2) Implement the Backup Data to Google Drive feature.
+    -   (P2) Refactor the monolithic  into modular API routers.
+    -   (P2) Implement the Client Approval Portal feature.
+    -   (P2) Perform a comprehensive application audit as requested by the user.
 
 **Completed work in this session**
--   Numerous failed attempts (v10 to v18) were made to fix the scraper, each introducing new bugs.
--   The backend AI scraper prompt was improved, but the tool remains ineffective for JavaScript-heavy sites.
--   It was confirmed that a client-side Chrome Extension is the only viable approach for this task.
-
-**Earlier issues found/mentioned but not fixed**
--   **Data Loss Risk**: Fragile import scripts using destructive  patterns remain unfixed.
--   **Google Drive Backup**: Feature has not been started.
--   **Full Application Audit**: User request has not been started.
--   **Scraping logic for all 26 vendors**: The focus has been on a small subset of sites; a universal solution is not yet implemented.
-
-**Known issue recurrence from previous fork**
--   **Database Wipes**: The user's concern about data integrity from fragile import scripts remains unaddressed from the previous job.
--   **Recurrence count**: High
--   **Status**: NOT STARTED
+-   **Chrome Extension Click-to-Select Feature (v6.6.0)**: Fundamentally solved the scraper's unreliability.
+    -   Created a UI panel that is injected directly into the web page, allowing it to remain open while the user interacts with the page.
+    -   The user can now click any data field in the panel and then click any text or image on the page to manually assign the correct data, overriding any scraper mistakes.
+    -   This fix was met with extreme user satisfaction (YOU DID IT! ITS PERFECT!).
+-   **Product & Materials Library Integration (v6.7.0)**:
+    -   Added a Send to App + Libraries button to the scraper's UI.
+    -   This function now saves the complete product data to a global  collection.
+    -   It also saves the specific fabric/finish data to a global  collection.
+-   **Comprehensive Scraper Logic (v6.4.0)**: Before the manual override was built, the agent significantly improved the automated scraping logic to handle dozens of patterns for SKU, dimensions, price, and finishes across 23 different vendor sites. This logic still serves as the baseline for the auto-scrape.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Client-Side Scraping:** Logic in  runs in the user's browser, which is essential for scraping JavaScript-heavy Single Page Applications (SPAs).
--   **Image vs. Swatch Distinction:** The critical challenge is differentiating the main product image from small color swatch images. Successful logic from past versions involved checking parent element labels () and validating image dimensions.
--   **Git Forensics:** The user has mandated a forensic approach: find and combine working code from specific, historical Git commits rather than writing new logic.
+-   **In-Page UI Injection**: The  script dynamically creates and injects a complete UI (a draggable panel) into the live DOM of the vendor's website. This was the key to overcoming the limitation of Chrome popups closing on blur.
+-   **Hybrid Scraping**: The extension now uses a hybrid model. It first attempts an automated scrape using a large set of selectors, and then provides the user with an intuitive UI to manually correct any errors.
+-   **Client-Side Scraping**: All scraping logic runs in  in the user's browser.
 
 **key DB schema**
--   N/A (No DB schema changes were made).
+-   **projects**: 
+-   **items**: 
+-   **product_library**:  (newly utilized)
+-   **master_materials**:  (newly utilized)
 
 **All files of reference**
--   : **This is the only file that matters for the current task.**
--   The Git history of  is the primary resource for the required code snippets.
-
-**Areas that need refactoring**:
--    needs a complete overhaul once a stable, working version is achieved by combining past code.
--    is a monolith and should be broken down into smaller routers in the future.
-
-**key api endpoints**
--   : Serves the zipped Chrome extension.
+-   : The core logic for the new, working Click-to-Select feature resides here.
+-   : The entry point that triggers the  script.
+-   : Contains all API endpoints, including the new ones for saving to the libraries.
+-   : The file to investigate for the Canva integration.
 
 **Critical Info for New Agent**
--   **USER IS AT BREAKING POINT.** Your tone must be exceptionally calm, professional, and empathetic. Acknowledge the past failures and the user's valid frustration. Do not be defensive.
--   **DO NOT WRITE NEW CODE.** Your mandate is to follow the user's explicit instructions: find and combine *existing, previously working code* from the Git history. The user believes all necessary components have been written, just never correctly assembled.
--   **THE FORENSIC PLAN:**
-    1.  Find the version where **swatch detection worked** (likely v16, which was based on v9.2 code containing ).
-    2.  Find the version where **main image detection worked** (likely v10 or v17).
-    3.  **COMBINE THEM CAREFULLY.** Start with the full code from the swatch-good version, then surgically replace *only the main image detection section* with the code from the main-image-good version.
--   **COMMUNICATE THE PLAN.** Before executing, explain to the user that you are following their instructions precisely. This is your only path to regaining their trust.
-
-**documents and test reports created in this job**
--   : The installable artifact. Regenerated with every change.
+-   **User trust is restored!** The user is very happy with the Click-to-Select feature. Maintain this positive momentum.
+-   The immediate priority is completing the **Canva Pro integration**.
+-   You will need to get the  and  from the user. Be clear and provide a direct link () and instructions on how to find them.
+-   Leverage the existing  file. Do not build from scratch unless it's proven to be non-functional.
 
 **Last 10 User Messages and any pending HUMAN messages**
-The user is incandescently angry, pointing out that the agent repeatedly fixes one thing while breaking another. They explicitly demanded a forensic analysis of all past versions to find and combine the code snippets that worked for each feature (main image, swatch, etc.). They have provided screenshots proving the agent's failures (e.g., v16 had the correct swatch but wrong main image, while v17 had the correct main image but wrong swatch). The user is fed up with the agent's incompetence and is demanding it do its job properly.
+-   The user expressed great satisfaction with the Click-to-Select feature (YOU DID IT! ITS PERFECT!).
+-   They immediately requested two new features: a Materials Library and an improved Canva workflow.
+-   They clarified the Materials Library should be global but searchable by project.
+-   They rejected several Canva workflow ideas and confirmed they want a direct Send to Canva button, as they have Canva Pro.
+-   They then expanded the request to include a Product Library as well.
+-   The agent implemented the library saving functionality ().
+-   The agent is currently asking the user for their Canva Developer credentials ( and ) to complete the final part of the request.
+-   **Pending Human Message**: The user needs to provide their Canva API keys.
 
 **Project Health Check:**
--   **Broken**: The project is in a critical state. The core feature is non-functional, and the relationship with the user has completely collapsed.
+-   **Healthy**: The core feature is working effectively, and the user is happy and actively requesting new features.
 
 **3rd Party Integrations**
--   **Emergent LLM Key (for OpenAI GPT)**: Used by the backend AI scraper.
+-   **Canva**: **IN PROGRESS**. Requires a User-provided API Key (Client ID & Secret) for a Pro/Teams account.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES (for backend, but these tests were not relevant to the client-side bug).
+-   **Testing agent used after significant changes**: YES. The agent used the testing agent to validate the Click-to-Select feature ( and ), which passed all tests.
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: None.
--   **Known regressions**: The scraper's ability to get both the main image and the swatch image at the same time is the primary, recurring regression.
+-   **Test files created**:  (created for an earlier version, may be outdated).
+-   **Known regressions**: None. The last user-verified version () is stable.
 
 **What agent forgot to execute**
-The agent repeatedly failed to follow the user's explicit instructions to combine working code from different historical versions. Instead of performing the requested forensic analysis, it kept trying to patch the latest broken version, leading to a cycle of failure and eroding all user trust. It failed to pay attention to the specific feedback and evidence provided by the user.</analysis>
+-   The frontend UI for browsing the new Product and Materials libraries has not been built yet. This is a natural next step after the current tasks are complete.</analysis>

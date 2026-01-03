@@ -847,7 +847,7 @@ function scrapePageData() {
 // SEND TO APP + LIBRARIES
 // ============================================================================
 
-const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
+const BACKEND_URL = 'https://interiorai-9.preview.emergentagent.com';
 
 async function sendToAppAndLibraries() {
   if (!scrapedData) return;
