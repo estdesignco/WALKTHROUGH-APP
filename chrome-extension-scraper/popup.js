@@ -1,7 +1,8 @@
-// Design Ready Product Scraper v6.5.0
-// NEW: Click to Select feature - manually assign any element on page
-// COMPLETE: All 26 vendors supported
-// Fixed: Dimensions detection (7 patterns), SKU detection, Finish/Color from dropdowns
+// Design Ready Product Scraper v6.6.0
+// NEW: Full page-injected UI - panel stays open on page
+// NEW: Click any field in panel to select from page
+// NEW: Visual highlight on selected elements
+// All 26 vendors supported
 
 const APP_URL = 'https://furnscape.preview.emergentagent.com';
 const BACKEND_URL = 'https://furnscape.preview.emergentagent.com';
