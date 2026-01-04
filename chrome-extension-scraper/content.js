@@ -815,54 +815,67 @@ function scrapePageData() {
   
   // FOUR HANDS - fourhands.com
   if (domain.includes('fourhands')) {
-    // SKU from URL: /product/100074-009 or /p/100074-009
-    const fhSkuMatch = window.location.pathname.match(/(?:\/product\/|\/p\/)([A-Z0-9-]+)/i);
+    // SKU from URL: /product/100074-009
+    const fhSkuMatch = window.location.pathname.match(/\/product\/([A-Z0-9-]+)/i) || 
+                       window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
     
-    // Color - look for "Cover:" label
-    const coverMatch = pageText.match(/Cover[:\s]+([A-Za-z][A-Za-z\s]+?)(?:\n|$)/i);
-    if (coverMatch) data.finish_color = coverMatch[1].trim();
+    // Color - "Durango Smoke • 100074-009" pattern or after "Cover" section
+    const fhColorMatch = pageText.match(/^([A-Za-z][A-Za-z\s]+?)\s*•\s*\d/m);
+    if (fhColorMatch) data.finish_color = fhColorMatch[1].trim();
     
-    // Also check for selected fabric/color option
+    // Also try looking for text right after an image in Cover section
     if (!data.finish_color) {
-      const fhSelected = document.querySelector('.selected-option, [class*="fabric"] .selected, [class*="cover"] .active');
-      if (fhSelected) data.finish_color = fhSelected.title || fhSelected.innerText?.trim();
+      const coverSection = pageText.match(/Cover\s+([A-Za-z][A-Za-z\s]+?)(?:\n|Light|$)/i);
+      if (coverSection) data.finish_color = coverSection[1].trim();
     }
+    
+    // Dimensions - "Overall Dimensions24.00"w x 27.50"d x 37.25"h"
+    const fhDimMatch = pageText.match(/(?:Overall\s*)?Dimensions?\s*([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
+    if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
   }
   
   // UTTERMOST - uttermost.com
   if (domain.includes('uttermost')) {
-    // SKU - Uttermost uses "Item #" or just the number in URL
-    const uttSkuMatch = pageText.match(/Item\s*#?\s*:?\s*(\d{4,})/i);
+    // SKU - "SKU: 53083" pattern
+    const uttSkuMatch = pageText.match(/SKU[:\s]+(\d+)/i);
     if (uttSkuMatch) data.sku = uttSkuMatch[1];
+    
+    // Also check URL for SKU - /lenoir-swivel-chair-53083
     if (!data.sku) {
-      const urlMatch = window.location.pathname.match(/\/(\d{4,})/);
-      if (urlMatch) data.sku = urlMatch[1];
+      const urlSkuMatch = window.location.pathname.match(/-(\d{4,})$/);
+      if (urlSkuMatch) data.sku = urlSkuMatch[1];
     }
     
-    // Color/Finish - look for finish name
-    const uttFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s]+?)(?:\n|Size|Dimension|$)/i);
-    if (uttFinishMatch) data.finish_color = uttFinishMatch[1].trim();
+    // Dimensions - "34 W X 29 H X 30 D (in)"
+    const uttDimMatch = pageText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D\s*\(?in/i);
+    if (uttDimMatch) data.size = `${uttDimMatch[1]}"W x ${uttDimMatch[3]}"D x ${uttDimMatch[2]}"H`;
     
-    // Also check selected swatch
+    // Color - from product name like "Conifer Dining Chair, Pine" or color options
+    const uttColorMatch = document.querySelector('.product-name')?.innerText?.match(/,\s*([A-Za-z]+)$/);
+    if (uttColorMatch) data.finish_color = uttColorMatch[1];
+    
+    // Check for color in title or selected option
     if (!data.finish_color) {
-      const uttSwatch = document.querySelector('.swatch.active, .swatch.selected, [class*="finish"].active');
-      if (uttSwatch) data.finish_color = uttSwatch.title || uttSwatch.dataset.finish || uttSwatch.innerText?.trim();
+      const titleColor = document.title.match(/,\s*([A-Za-z]+)\s*-/);
+      if (titleColor) data.finish_color = titleColor[1];
     }
   }
   
   // HVL GROUP - hvlgroup.com
   if (domain.includes('hvlgroup')) {
-    // SKU usually in URL or product code
+    // SKU from URL - /8744-AGB format
     const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
     if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
+    
+    // Also check page text
     if (!data.sku) {
-      const hvlCodeMatch = pageText.match(/(?:Product|Item|SKU)[:\s#]*([A-Z0-9]+-[A-Z0-9]+)/i);
+      const hvlCodeMatch = pageText.match(/(?:Item|SKU|Model)[:\s#]*([A-Z0-9]+-[A-Z0-9]+)/i);
       if (hvlCodeMatch) data.sku = hvlCodeMatch[1];
     }
     
     // Finish
-    const hvlFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s-]+?)(?:\n|$)/i);
+    const hvlFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
     if (hvlFinishMatch) data.finish_color = hvlFinishMatch[1].trim();
   }
 
