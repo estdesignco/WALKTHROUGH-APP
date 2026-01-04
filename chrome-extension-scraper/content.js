@@ -606,8 +606,10 @@ function assignElementToField(fieldId) {
   
   // Get value based on element type
   if (lastClickedElement.tagName === 'IMG') {
-    value = lastClickedElement.src;
+    // Could be real IMG element or our fake object with src
+    value = lastClickedElement.src || lastClickedElement.dataset?.src || '';
   } else {
+    // For text fields, get text content
     value = lastClickedElement.innerText?.trim() || lastClickedElement.textContent?.trim() || '';
     
     // Clean up price values
@@ -617,6 +619,12 @@ function assignElementToField(fieldId) {
         value = priceMatch[1].replace(/,/g, '');
       }
     }
+  }
+  
+  // If we're setting an image field but got text, it's wrong - don't update
+  if ((fieldId === 'image_url' || fieldId === 'finish_image') && value && !value.startsWith('http')) {
+    showToast('⚠️ Click directly on the image');
+    return;
   }
   
   // Update scraped data
