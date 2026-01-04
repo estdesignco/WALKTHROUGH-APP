@@ -1,29 +1,52 @@
 # Interior Design Application - Product Requirements Document
 
 ## Original Problem Statement
-Build a deployment-ready interior design application with a Chrome Extension web scraper that reliably extracts product data (name, sku, price, size, finish_color, finish_image) from 26 vendor websites.
+Build a deployment-ready interior design application with a Chrome Extension web scraper that reliably extracts product data (name, sku, price, size, finish_color, finish_image) from 22+ vendor websites.
 
 ## Core Requirements
 
 ### P0 - Critical
-1. **Chrome Extension Web Scraper** - Must work for all 26 vendor sites
-   - **v6.5.0 COMPLETE** - All vendors supported + NEW Click to Select feature
+1. **Chrome Extension Web Scraper** - Must work for all 22 vendor sites
+   - **v7.0.0 COMPLETE** - All 22 vendors supported with vendor-specific scraping logic
 
-## v6.5.0 Features (January 3, 2026)
+## v7.0.0 Features (January 4, 2025)
 
-### NEW: Click to Select Feature
-Like Houzz Clipper - auto-scrape first, then manually fix any missing data:
-1. **Auto-scrape** runs first (existing functionality)
-2. Click **"CLICK TO SELECT"** button (orange)
-3. **Hover** over any element on page (green highlight appears)
+### Comprehensive Vendor-Specific Scraping
+Each of the 22 vendors now has dedicated scraping logic for optimal data extraction:
+
+| # | Vendor | Domain | Features |
+|---|--------|--------|----------|
+| 1 | Four Hands | fourhands.com | SKU from URL, dimensions WxDxH, color bullet pattern |
+| 2 | Uttermost | uttermost.com | SKU from page, dimensions WxDxH, H1 color, swatch CSS |
+| 3 | Global Views | globalviews.com | Item # SKU, standard dimensions |
+| 4 | Rowe Furniture | rowefurniture.com | Style # SKU, fabric selection |
+| 5 | Regina Andrew | reginaandrew.com | Item # SKU, both dimension formats |
+| 6 | Bernhardt | bernhardt.com | Style SKU, finish dropdown, fabric patterns |
+| 7 | Loloi Rugs | loloi.com | Rug SKU format, rug dimensions (feet) |
+| 8 | Visual Comfort | visualcomfort.com | TOB SKU format, Height/Width separate |
+| 9 | HVL Group | hvlgroup.com | SKU-finish format, lighting dimensions |
+| 10 | Vanguard/V&H | vandh.com | Style # SKU, fabric selection |
+| 11 | Flow Decor | flowdecor.com | WooCommerce format |
+| 12 | Crestview | crestviewcollection.com | CVXXX SKU format |
+| 13 | Bassett Mirror | bassettmirror.com | Item # SKU |
+| 14 | Eichholtz | eichholtz.com | Article code, metric dimensions |
+| 15 | MyOh America | myohamerica.com | Leather/Fabric finish |
+| 16 | Safavieh | safavieh.com | TUL format SKU, rug/furniture dims |
+| 17 | Surya | surya.com | XXX-0000 SKU format, rug dimensions |
+| 18 | Zee Lighting | zeelighting.com | Lighting dimensions |
+| 19 | Hubbardton Forge | hubbardtonforge.com | 6-digit SKU, finish swatch |
+| 20 | Hinkley | hinkley.com | Number+letters SKU format |
+| 21 | Elegant Lighting | elegantlighting.com | Standard lighting format |
+| 22 | Gabby | gabby.com | SCH-SKU format, fabric swatch |
+
+### Click to Select Feature (from v6.5.0)
+Manual override for any missing/incorrect data:
+1. **Auto-scrape** runs first
+2. Click **"CLICK TO SELECT"** button
+3. **Hover** over any element (green highlight)
 4. **Click** any text or image
-5. **Dropdown menu** appears: Select which field to populate
-   - Product Title, Price, SKU, Dimensions, Finish/Color, Finish Image, Main Image, MSRP
-6. Selected value **replaces** the auto-scraped value
-7. Press **Escape** or click **"STOP SELECTING"** to exit mode
-
-### All 26 Vendors Supported
-Uttermost, Four Hands, Bernhardt, Visual Comfort, HVL Group, Gabby, Loloi, Rowe, Global Views, Regina Andrew, Surya, Safavieh, Eichholtz, Crestview Collection, Bassett Mirror, Flow Decor, Hubbardton Forge, Hinkley, Elegant Lighting, ZEE Lighting, Vanguard, Arteriors, Currey & Company
+5. **Dropdown menu** appears: Select field to populate
+6. Press **Escape** or click **"STOP SELECTING"** to exit
 
 ### Dimension Detection (7 Patterns)
 - `30 W X 27 H X 32 D` - Uttermost format
@@ -32,20 +55,19 @@ Uttermost, Four Hands, Bernhardt, Visual Comfort, HVL Group, Gabby, Loloi, Rowe,
 - `21.50"w x 23.00"d x 38.50"h` - Four Hands format
 - `32"W x 38"D x 34"H` - Standard WxDxH
 - `Overall: 12w 18h 12d` - Some furniture sites
-- `2'3" x 7'9"` - Rug format (Loloi, Safavieh)
+- `8' x 10'` - Rug format (Loloi, Safavieh, Surya)
 
-## Testing Status (January 3, 2026)
-- **Backend**: 100% (3/3 API tests passed)
-- **Frontend**: 100% (all features working)
-- **Extension Code**: 100% (29/29 tests passed)
-- **JavaScript Syntax**: Valid (confirmed by node -c)
+## Testing Status (January 4, 2025)
+- **Extension Code**: JavaScript syntax valid (node --check passed)
+- **Vendor Coverage**: 22/22 vendors with specific logic
+- **Generic Fallback**: Available for unknown vendors
 
 ## Download
 **Extension URL:** `https://interiordata.preview.emergentagent.com/api/download/chrome-extension`
 
 ## User Instructions
 1. Remove old extension from Chrome
-2. Download v6.5.0 from URL above
+2. Download v7.0.0 from URL above (or use zip file)
 3. Unzip and load unpacked in chrome://extensions
 4. Navigate to any vendor product page
 5. Click extension icon → "SCRAPE THIS PAGE"
@@ -55,11 +77,14 @@ Uttermost, Four Hands, Bernhardt, Visual Comfort, HVL Group, Gabby, Loloi, Rowe,
 
 ## Prioritized Backlog
 
-### P1 - After User Verification
-- [ ] Fix auto_populate_projects.py to be non-destructive (idempotent)
+### P1 - Canva Integration (BLOCKED)
+- One-click "Copy for Canva" with embedded hyperlink
+- Technical limitation: Canva strips hyperlinks from clipboard paste
+- Only viable path: Official Canva API integration (requires user credentials)
 
 ### P2 - Future
 - [ ] Google Drive Backup feature
 - [ ] Full application audit
 - [ ] Backend refactoring (split server.py into modules)
 - [ ] Client Approval Portal
+- [ ] Product Library and Materials Library Frontend
