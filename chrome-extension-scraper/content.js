@@ -851,11 +851,14 @@ function scrapePageData() {
     const uttDimMatch = pageText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D\s*\(?in/i);
     if (uttDimMatch) data.size = `${uttDimMatch[1]}"W x ${uttDimMatch[3]}"D x ${uttDimMatch[2]}"H`;
     
-    // Color - from product name like "Conifer Dining Chair, Pine" or color options
-    const uttColorMatch = document.querySelector('.product-name')?.innerText?.match(/,\s*([A-Za-z]+)$/);
-    if (uttColorMatch) data.finish_color = uttColorMatch[1];
+    // Color - from H1 heading like "Conifer Dining Armchair, Camel"
+    const h1Text = document.querySelector('h1')?.innerText?.trim();
+    if (h1Text) {
+      const colorMatch = h1Text.match(/,\s*([A-Za-z]+)\s*$/);
+      if (colorMatch) data.finish_color = colorMatch[1];
+    }
     
-    // Check for color in title or selected option
+    // Also check page title
     if (!data.finish_color) {
       const titleColor = document.title.match(/,\s*([A-Za-z]+)\s*-/);
       if (titleColor) data.finish_color = titleColor[1];
