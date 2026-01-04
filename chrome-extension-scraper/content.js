@@ -917,35 +917,63 @@ function scrapePageData() {
   }
 
   // ===================== FINISH/COLOR =====================
-  // Check selected swatches, color pickers, etc
+  // Check selected swatches, color pickers, option labels, etc
   const colorSelectors = [
     '.selected-color', '.active-swatch', '[class*="swatch"].active', '[class*="swatch"].selected',
     '[class*="color-name"]', '[class*="finish-name"]', '.selected-finish',
-    '[data-selected-color]', '[data-color].selected', '[data-finish].active'
+    '[data-selected-color]', '[data-color].selected', '[data-finish].active',
+    '.color-option.selected', '.finish-option.selected', '[class*="option"].active',
+    '.variant-option.selected', '[aria-selected="true"]'
   ];
   for (const sel of colorSelectors) {
     const el = document.querySelector(sel);
     if (el) {
-      const text = el.title || el.dataset.color || el.dataset.finish || el.innerText?.trim();
-      if (text && text.length > 1 && text.length < 50 && !/view|click|select/i.test(text)) {
+      const text = el.title || el.getAttribute('aria-label') || el.dataset.color || el.dataset.finish || el.dataset.value || el.innerText?.trim();
+      if (text && text.length > 1 && text.length < 50 && !/view|click|select|choose|add|cart/i.test(text)) {
         data.finish_color = text.split('\n')[0].trim();
         break;
       }
     }
   }
-  // Text patterns - be careful not to grab navigation
+  
+  // Check for color/finish in labels or nearby text
+  if (!data.finish_color) {
+    const labelSelectors = [
+      'label[for*="color"]', 'label[for*="finish"]', 'label[for*="fabric"]',
+      '[class*="color-label"]', '[class*="finish-label"]', '[class*="option-label"]',
+      '.product-option-label', '.variant-label'
+    ];
+    for (const sel of labelSelectors) {
+      const el = document.querySelector(sel);
+      if (el) {
+        // Look for the selected value near the label
+        const parent = el.closest('.product-option, .variant-selector, [class*="option"]');
+        if (parent) {
+          const selected = parent.querySelector('.selected, .active, [aria-selected="true"]');
+          if (selected) {
+            const text = selected.title || selected.innerText?.trim();
+            if (text && text.length > 1 && text.length < 50) {
+              data.finish_color = text.split('\n')[0].trim();
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Text patterns - look for specific formats
   if (!data.finish_color) {
     const finishPatterns = [
-      /Finish\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i,
-      /Color\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i,
-      /Fabric\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i,
-      /(?:Selected|Current)\s*(?:Color|Finish)\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i
+      /(?:Finish|Color|Fabric)\s*:\s*([A-Za-z][A-Za-z0-9\s\-\/]{1,35})/i,
+      /(?:Selected|Current|Chosen)\s*(?:Color|Finish|Option)\s*:\s*([A-Za-z][A-Za-z0-9\s\-\/]{1,35})/i,
+      /(?:Color|Finish)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/
     ];
     for (const pattern of finishPatterns) {
       const match = pageText.match(pattern);
       if (match) {
         const val = match[1].trim();
-        if (val.length > 1 && val.length < 40 && !/view|click|more|select|add/i.test(val)) {
+        if (val.length > 1 && val.length < 40 && !/view|click|more|select|add|cart|buy|shop/i.test(val)) {
           data.finish_color = val;
           break;
         }
