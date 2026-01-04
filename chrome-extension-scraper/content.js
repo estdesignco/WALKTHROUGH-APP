@@ -1036,7 +1036,7 @@ function scrapePageData() {
   
   // LOLOI RUGS - loloi.com / loloirugs.com
   else if (domain.includes('loloi')) {
-    // SKU - usually in format:?"?"?"?"?" or similar
+    // SKU - format like!"?"?"?"!"?" or similar
     const loSkuMatch = pageText.match(/SKU[:\s]+([A-Z]{2,}-\d+)/i) || 
                        window.location.pathname.match(/\/([A-Z]{2,}[\d-]+)/i);
     if (loSkuMatch) data.sku = loSkuMatch[1];
@@ -1085,7 +1085,7 @@ function scrapePageData() {
   }
   
   // HVL GROUP - hvlgroup.com (Hudson Valley, Troy, Mitzi, Corbett)
-  else if (domain.includes('hvlgroup') || domain.includes('?"hvl"')) {
+  else if (domain.includes('hvlgroup') || domain.includes('hudsonvalley') || domain.includes('?"mitzi"') || domain.includes('?"?"?"?"?"?"?"?"')) {
     // SKU from URL - /8744-AGB format
     const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
     if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
@@ -1209,8 +1209,8 @@ function scrapePageData() {
     if (ehMainImg?.src) data.image_url = ehMainImg.src;
   }
   
-  // MY OH AMERICA - myohamerica.com
-  else if (domain.includes('myohamerica') || domain.includes('?"myoh"')) {
+  // MY OH AMERICA / AMERICA LEATHER - myohamerica.com / americaleather.com
+  else if (domain.includes('myohamerica') || domain.includes('americaleather')) {
     // SKU
     const maSkuMatch = pageText.match(/(?:Item|SKU|Style)[:\s#]*([A-Z0-9-]+)/i);
     if (maSkuMatch) data.sku = maSkuMatch[1];
@@ -1270,8 +1270,8 @@ function scrapePageData() {
     if (syMainImg?.src) data.image_url = syMainImg.src;
   }
   
-  // ZEE LIGHTING - zeelighting.com
-  else if (domain.includes('zeelighting') || domain.includes('?"zee"')) {
+  // ZEE LIGHTING / Z-LITE - zeelighting.com /?"?"?"?"?"?"?".com
+  else if (domain.includes('zeelighting') || domain.includes('?"?"?"?"?"?"?"?')) {
     // SKU
     const zlSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*([A-Z0-9-]+)/i);
     if (zlSkuMatch) data.sku = zlSkuMatch[1];
@@ -1333,8 +1333,8 @@ function scrapePageData() {
     }
   }
   
-  // ELEGANT LIGHTING -?"?"?"?"?"?"?"?.com
-  else if (domain.includes('?"?"?"?"?"?"?"?') || domain.includes('?"?"?"?"?"?"?"?"')) {
+  // ELEGANT LIGHTING - elegantlighting.com
+  else if (domain.includes('elegantlighting')) {
     // SKU
     const elSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*([A-Z0-9-]+)/i);
     if (elSkuMatch) data.sku = elSkuMatch[1];
@@ -1348,7 +1348,7 @@ function scrapePageData() {
     if (elFinishMatch) data.finish_color = elFinishMatch[1].trim();
   }
   
-  // GABBY - gabby.?"?"?"? / gabbyhome.com
+  // GABBY - gabbyhome.com / gabby.com
   else if (domain.includes('gabby')) {
     // SKU - format like SCH-123456
     const gbSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}-?\d+)/i) ||
