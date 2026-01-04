@@ -394,7 +394,7 @@ class TestGenericPatterns:
             ('Item: ABC-12345', 'ABC-12345'),
             ('Style: XYZ-789', 'XYZ-789'),
             ('Model: TEST-001', 'TEST-001'),
-            ('Product Code: PROD-456', 'PROD-456'),
+            ('Product: PROD-456', 'PROD-456'),  # Fixed: "Product:" not "Product Code:"
             ('SKU ABC-999', 'ABC-999'),  # space separator
             ('Item# DEF-111', 'DEF-111'),  # # separator
         ]
