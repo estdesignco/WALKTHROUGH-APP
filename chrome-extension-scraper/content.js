@@ -773,6 +773,7 @@ function scrapePageData() {
 
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
   const pageText = document.body.innerText;
+  const pageHtml = document.body.innerHTML;
 
   // VENDOR DETECTION
   const vendorMap = {
@@ -791,65 +792,217 @@ function scrapePageData() {
   }
   if (!data.vendor) data.vendor = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
 
-  // NAME - H1
-  const h1 = document.querySelector('h1');
-  if (h1) data.name = h1.innerText.trim().split('\n')[0];
-
-  // SKU - multiple patterns
-  const skuPatterns = [/SKU[:\s#]*([A-Z0-9-]+)/i, /Item[:\s#]*([A-Z0-9-]+)/i, /Style[:\s#]*([A-Z0-9-]+)/i];
-  for (const pattern of skuPatterns) {
-    const match = pageText.match(pattern);
-    if (match) { data.sku = match[1]; break; }
-  }
-
-  // PRICE
-  const pricePatterns = [/Trade Price[:\s]*\$([\d,]+\.?\d*)/i, /Your Price[:\s]*\$([\d,]+\.?\d*)/i, /\$([\d,]+\.?\d*)/];
-  for (const pattern of pricePatterns) {
-    const match = pageText.match(pattern);
-    if (match) { 
-      const val = parseFloat(match[1].replace(/,/g, ''));
-      if (val > 10 && val < 100000) { data.price = val; break; }
+  // ===================== PRODUCT NAME =====================
+  // Try multiple selectors for product name
+  const nameSelectors = [
+    'h1.product-title', 'h1.product-name', 'h1[itemprop="name"]',
+    '.product-title h1', '.product-name h1', '.pdp-title',
+    '[data-testid="product-title"]', '.product-detail h1',
+    'h1'
+  ];
+  for (const sel of nameSelectors) {
+    const el = document.querySelector(sel);
+    if (el) {
+      const text = el.innerText?.trim().split('\n')[0];
+      if (text && text.length > 2 && text.length < 200) {
+        data.name = text;
+        break;
+      }
     }
   }
 
-  // DIMENSIONS
+  // ===================== SKU =====================
+  // Check data attributes first
+  const skuDataEl = document.querySelector('[data-sku], [data-product-sku], [itemprop="sku"]');
+  if (skuDataEl) {
+    data.sku = skuDataEl.dataset.sku || skuDataEl.dataset.productSku || skuDataEl.content || skuDataEl.innerText?.trim();
+  }
+  // Check URL for SKU patterns
+  if (!data.sku) {
+    const urlSkuMatch = window.location.pathname.match(/\/([A-Z]{2,}[-]?[A-Z0-9]+[-]?[A-Z0-9]*)/i);
+    if (urlSkuMatch && urlSkuMatch[1].length >= 4) data.sku = urlSkuMatch[1];
+  }
+  // Text patterns
+  if (!data.sku) {
+    const skuPatterns = [
+      /(?:SKU|Item|Style|Model|Product)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})/i,
+      /(?:Item Number|Product Code|Article)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})/i,
+      /\b([A-Z]{2,4}[-]?\d{3,}[-A-Z0-9]*)\b/
+    ];
+    for (const pattern of skuPatterns) {
+      const match = pageText.match(pattern);
+      if (match && match[1].length >= 4 && match[1].length <= 30) {
+        // Avoid matching navigation words
+        if (!/click|view|more|add|cart|buy/i.test(match[1])) {
+          data.sku = match[1];
+          break;
+        }
+      }
+    }
+  }
+
+  // ===================== PRICE =====================
+  // Check price elements first
+  const priceSelectors = [
+    '[data-price]', '[itemprop="price"]', '.product-price', '.price-value',
+    '.trade-price', '.your-price', '.sale-price', '.current-price',
+    '[class*="price"]:not([class*="compare"]):not([class*="was"]):not([class*="msrp"])'
+  ];
+  for (const sel of priceSelectors) {
+    const el = document.querySelector(sel);
+    if (el) {
+      const priceText = el.dataset.price || el.content || el.innerText;
+      const priceMatch = priceText?.match(/\$?([\d,]+\.?\d*)/);
+      if (priceMatch) {
+        const val = parseFloat(priceMatch[1].replace(/,/g, ''));
+        if (val > 5 && val < 500000) {
+          data.price = val;
+          break;
+        }
+      }
+    }
+  }
+  // Text patterns
+  if (!data.price) {
+    const pricePatterns = [
+      /Trade\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /Your\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /Net\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /Sale\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /\$([\d,]+\.\d{2})/
+    ];
+    for (const pattern of pricePatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        const val = parseFloat(match[1].replace(/,/g, ''));
+        if (val > 5 && val < 500000) {
+          data.price = val;
+          break;
+        }
+      }
+    }
+  }
+
+  // ===================== DIMENSIONS =====================
   const dimPatterns = [
-    [/(\d+(?:\.\d+)?)\s*W\s*X\s*(\d+(?:\.\d+)?)\s*H\s*X\s*(\d+(?:\.\d+)?)\s*D/i, (m) => `${m[1]}"W x ${m[3]}"D x ${m[2]}"H`],
-    [/Width[:\s]*([\d.]+).*?Depth[:\s]*([\d.]+).*?Height[:\s]*([\d.]+)/is, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
-    [/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i, (m) => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+    // W x D x H patterns
+    [/(\d+(?:\.\d+)?)\s*"?\s*W\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*D\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*H/i, 
+      m => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+    // W x H x D patterns
+    [/(\d+(?:\.\d+)?)\s*"?\s*W\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*H\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*D/i, 
+      m => `${m[1]}"W x ${m[3]}"D x ${m[2]}"H`],
+    // Width/Depth/Height labels
+    [/Width[:\s]*([\d.]+).*?Depth[:\s]*([\d.]+).*?Height[:\s]*([\d.]+)/is, 
+      m => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+    // Simple w x d x h
+    [/([\d.]+)"?\s*w\s*[xX×]\s*([\d.]+)"?\s*d\s*[xX×]\s*([\d.]+)"?\s*h/i, 
+      m => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+    // Just W x H
+    [/(\d+(?:\.\d+)?)\s*"?\s*W\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"?\s*H/i, 
+      m => `${m[1]}"W x ${m[2]}"H`],
+    // Overall: format
+    [/Overall[:\s]*([\d.]+)\s*"?\s*[wW]\s*[xX×]\s*([\d.]+)\s*"?\s*[dD]\s*[xX×]\s*([\d.]+)\s*"?\s*[hH]/i,
+      m => `${m[1]}"W x ${m[2]}"D x ${m[3]}"H`],
+    // Generic 3 numbers with quotes
+    [/(\d+(?:\.\d+)?)\s*"\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"\s*[xX×]\s*(\d+(?:\.\d+)?)\s*"/,
+      m => `${m[1]}" x ${m[2]}" x ${m[3]}"`],
   ];
   for (const [pattern, formatter] of dimPatterns) {
     const match = pageText.match(pattern);
-    if (match) { data.size = formatter(match); break; }
-  }
-
-  // FINISH/COLOR
-  const finishPatterns = [
-    /(?:choose\s+)?(?:body\s+)?cover[:\s]*([^\n]+)/i,
-    /(?:fabric\s+shown|body\s+fabric)[:\s]*([^\n]+)/i,
-    /(?:finish|color|option)[:\s]*([^\n]+)/i
-  ];
-  for (const pattern of finishPatterns) {
-    const match = pageText.match(pattern);
     if (match) {
-      const val = match[1].trim().split('\n')[0].trim();
-      if (val && val.length > 1 && val.length < 50) { data.finish_color = val; break; }
+      data.size = formatter(match);
+      break;
     }
   }
 
-  // IMAGES
+  // ===================== FINISH/COLOR =====================
+  // Check selected swatches, color pickers, etc
+  const colorSelectors = [
+    '.selected-color', '.active-swatch', '[class*="swatch"].active', '[class*="swatch"].selected',
+    '[class*="color-name"]', '[class*="finish-name"]', '.selected-finish',
+    '[data-selected-color]', '[data-color].selected', '[data-finish].active'
+  ];
+  for (const sel of colorSelectors) {
+    const el = document.querySelector(sel);
+    if (el) {
+      const text = el.title || el.dataset.color || el.dataset.finish || el.innerText?.trim();
+      if (text && text.length > 1 && text.length < 50 && !/view|click|select/i.test(text)) {
+        data.finish_color = text.split('\n')[0].trim();
+        break;
+      }
+    }
+  }
+  // Text patterns - be careful not to grab navigation
+  if (!data.finish_color) {
+    const finishPatterns = [
+      /Finish\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i,
+      /Color\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i,
+      /Fabric\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i,
+      /(?:Selected|Current)\s*(?:Color|Finish)\s*:\s*([A-Za-z][A-Za-z0-9\s-]{1,40})/i
+    ];
+    for (const pattern of finishPatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        const val = match[1].trim();
+        if (val.length > 1 && val.length < 40 && !/view|click|more|select|add/i.test(val)) {
+          data.finish_color = val;
+          break;
+        }
+      }
+    }
+  }
+
+  // ===================== MAIN IMAGE =====================
+  // Open Graph image first
   const ogImg = document.querySelector('meta[property="og:image"]');
   if (ogImg?.content) data.image_url = ogImg.content;
   
-  // Swatch images
-  const swatchImgs = document.querySelectorAll('[class*="swatch"] img, label[title] img');
-  for (const img of swatchImgs) {
-    if (img.src && img.src.startsWith('http')) {
-      const w = img.naturalWidth || img.width || 100;
-      if (w < 200 && w > 10) {
-        data.finish_image = img.src;
+  // Try product image selectors
+  if (!data.image_url) {
+    const imgSelectors = [
+      '.product-image img', '.pdp-image img', '.main-image img', '.primary-image img',
+      '[class*="product-gallery"] img', '[class*="product-image"] img',
+      '[data-main-image]', '[itemprop="image"]', '.gallery-main img',
+      '#product-image img', '.product-detail img'
+    ];
+    for (const sel of imgSelectors) {
+      const img = document.querySelector(sel);
+      if (img?.src && img.src.startsWith('http')) {
+        data.image_url = img.src;
         break;
       }
+    }
+  }
+  
+  // Find largest image as fallback
+  if (!data.image_url) {
+    let largestImg = null;
+    let largestArea = 0;
+    document.querySelectorAll('img[src^="http"]').forEach(img => {
+      const w = img.naturalWidth || img.width || 0;
+      const h = img.naturalHeight || img.height || 0;
+      const area = w * h;
+      if (area > largestArea && area > 40000 && w > 200) {
+        largestArea = area;
+        largestImg = img;
+      }
+    });
+    if (largestImg) data.image_url = largestImg.src;
+  }
+
+  // ===================== SWATCH/FINISH IMAGE =====================
+  const swatchSelectors = [
+    '[class*="swatch"].active img', '[class*="swatch"].selected img',
+    '[class*="color-swatch"] img', '[class*="finish-swatch"] img',
+    '.swatch-image img', 'label.selected img', '[data-swatch] img',
+    '[class*="swatch"] img'
+  ];
+  for (const sel of swatchSelectors) {
+    const img = document.querySelector(sel);
+    if (img?.src && img.src.startsWith('http')) {
+      data.finish_image = img.src;
+      break;
     }
   }
 
