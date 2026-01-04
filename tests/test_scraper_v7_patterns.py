@@ -386,28 +386,26 @@ class TestGenericPatterns:
     
     def test_generic_sku_patterns(self):
         """Generic SKU patterns - tests actual patterns from content.js"""
+        # These test cases match the actual pattern in content.js line 1418
+        # Pattern: (?:SKU|Item|Style|Model|Product)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})
+        # Note: The pattern only matches ONE separator (#, :, or space), not combinations
         test_texts = [
-            'SKU: ABC-123',
-            'Item #: ABC-12345',
-            'Style: XYZ-789',
-            'Model: TEST-001',
-            'Product Code: PROD-456',
+            ('SKU: ABC-123', 'ABC-123'),
+            ('Item: ABC-12345', 'ABC-12345'),
+            ('Style: XYZ-789', 'XYZ-789'),
+            ('Model: TEST-001', 'TEST-001'),
+            ('Product Code: PROD-456', 'PROD-456'),
+            ('SKU ABC-999', 'ABC-999'),  # space separator
+            ('Item# DEF-111', 'DEF-111'),  # # separator
         ]
-        # Pattern from content.js line 1418 - requires dash or alphanumeric after first char
-        patterns = [
-            r'(?:SKU|Item|Style|Model|Product)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})',
-        ]
+        pattern = r'(?:SKU|Item|Style|Model|Product)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})'
         
-        for text in test_texts:
-            matched = False
-            for pattern in patterns:
-                match = re.search(pattern, text, re.I)
-                if match:
-                    sku = match.group(1)
-                    print(f"✅ Generic SKU '{text}' -> SKU: {sku}")
-                    matched = True
-                    break
-            assert matched, f"Failed to match SKU in: {text}"
+        for text, expected_sku in test_texts:
+            match = re.search(pattern, text, re.I)
+            assert match is not None, f"Failed to match SKU in: {text}"
+            sku = match.group(1)
+            assert sku == expected_sku, f"Expected {expected_sku}, got {sku}"
+            print(f"✅ Generic SKU '{text}' -> SKU: {sku}")
     
     def test_dimension_wxdxh_pattern(self):
         """Standard W x D x H dimension pattern"""
