@@ -946,6 +946,7 @@ function scrapePageData() {
   // GLOBAL VIEWS - globalviews.com
   else if (domain.includes('globalviews')) {
     vendorDetected = 'GLOBAL VIEWS';
+    vendorDetected = 'GLOBAL VIEWS';
    {
     // SKU from page - Item #: 9.93892
     const gvSkuMatch = pageText.match(/Item\s*#?\s*:?\s*([0-9.]+)/i);
@@ -972,6 +973,7 @@ function scrapePageData() {
   
   // ROWE FURNITURE - rowefurniture.com
   else if (domain.includes('rowefurniture')) {
+    vendorDetected = 'ROWE FURNITURE';
     // SKU - Style #: N123
     const rwSkuMatch = pageText.match(/Style\s*#?\s*:?\s*([A-Z0-9-]+)/i);
     if (rwSkuMatch) data.sku = rwSkuMatch[1];
@@ -991,6 +993,7 @@ function scrapePageData() {
   
   // REGINA ANDREW - reginaandrew.com
   else if (domain.includes('reginaandrew')) {
+    vendorDetected = 'REGINA ANDREW';
     // SKU - Item #: 15-1114
     const raSkuMatch = pageText.match(/Item\s*#?\s*:?\s*([\d-]+)/i);
     if (raSkuMatch) data.sku = raSkuMatch[1];
@@ -1022,6 +1025,7 @@ function scrapePageData() {
   
   // BERNHARDT - bernhardt.com
   else if (domain.includes('bernhardt')) {
+    vendorDetected = 'BERNHARDT';
     // SKU - Style: 345-044 or Item: 345-044
     const bhSkuMatch = pageText.match(/(?:Style|Item|SKU)[:\s#]+([0-9A-Z-]+)/i);
     if (bhSkuMatch) data.sku = bhSkuMatch[1];
@@ -1043,6 +1047,7 @@ function scrapePageData() {
   
   // LOLOI RUGS - loloi.com / loloirugs.com
   else if (domain.includes('loloi')) {
+    vendorDetected = 'LOLOI RUGS';
     // SKU - format like LOLRK-01 or similar
     const loSkuMatch = pageText.match(/SKU[:\s]+([A-Z]{2,}-\d+)/i) || 
                        window.location.pathname.match(/\/([A-Z]{2,}[\d-]+)/i);
@@ -1063,6 +1068,7 @@ function scrapePageData() {
   
   // VISUAL COMFORT - visualcomfort.com
   else if (domain.includes('visualcomfort')) {
+    vendorDetected = 'VISUAL COMFORT';
     // SKU - Format: TOB 5003BZ-L or similar
     const vcSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}\s*\d+[A-Z0-9\-]+)/i);
     if (vcSkuMatch) data.sku = vcSkuMatch[1].replace(/\s+/g, ' ').trim();
