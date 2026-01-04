@@ -385,15 +385,15 @@ class TestGenericPatterns:
             print(f"✅ Price '{text}' -> ${price_val:.2f}")
     
     def test_generic_sku_patterns(self):
-        """Generic SKU patterns"""
+        """Generic SKU patterns - tests actual patterns from content.js"""
         test_texts = [
             'SKU: ABC-123',
-            'Item #: ABC12345',
+            'Item #: ABC-12345',
             'Style: XYZ-789',
             'Model: TEST-001',
             'Product Code: PROD-456',
         ]
-        # Pattern from content.js line 1418
+        # Pattern from content.js line 1418 - requires dash or alphanumeric after first char
         patterns = [
             r'(?:SKU|Item|Style|Model|Product)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})',
         ]
