@@ -867,22 +867,45 @@ function scrapePageData() {
                        window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
     
-    // Color - "Durango Smoke • 100074-009" pattern
-    const fhColorEl = document.querySelector('.text-body span, [class*="text-neutral"]');
-    if (fhColorEl) {
-      const colorText = fhColorEl.innerText?.trim();
-      if (colorText && !colorText.includes('•')) {
-        data.finish_color = colorText;
+    // PRICE - Four Hands shows trade price first, then MAP
+    // Look for the first price that's NOT labeled MAP/MSRP
+    const allPriceEls = document.querySelectorAll('[class*="price"], [class*="Price"]');
+    for (const el of allPriceEls) {
+      const text = el.innerText?.trim();
+      if (text && !text.toUpperCase().includes('MAP') && !text.toUpperCase().includes('MSRP')) {
+        const priceMatch = text.match(/\$?([\d,]+\.?\d*)/);
+        if (priceMatch) {
+          const val = parseFloat(priceMatch[1].replace(/,/g, ''));
+          if (val > 5 && val < 100000) {
+            data.price = val;
+            break;
+          }
+        }
       }
     }
-    // Also try the pattern with bullet
+    // Fallback: look for price pattern in page that's NOT MAP
+    if (!data.price) {
+      const priceMatch = pageText.match(/\$(\d+\.\d{2})(?!\s*MAP)/);
+      if (priceMatch) data.price = parseFloat(priceMatch[1]);
+    }
+    
+    // MSRP - labeled as MAP
+    const mapMatch = pageText.match(/MAP[:\s]*\$?([\d,]+\.?\d*)/i);
+    if (mapMatch) data.msrp = parseFloat(mapMatch[1].replace(/,/g, ''));
+    
+    // COLOR - "Durango Smoke • 100074-009" pattern - look for text before bullet
+    const bulletMatch = pageText.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z]{5,}/i);
+    if (bulletMatch) {
+      data.finish_color = bulletMatch[1].trim();
+    }
+    // Also check for selected swatch title
     if (!data.finish_color) {
-      const bulletMatch = pageText.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*\d{5,}/);
-      if (bulletMatch) data.finish_color = bulletMatch[1].trim();
+      const swatchEl = document.querySelector('[title][class*="rounded"], label[title], button[title]');
+      if (swatchEl?.title) data.finish_color = swatchEl.title;
     }
     
     // Swatch image from selected/expanded cover section
-    const fhSwatchImg = document.querySelector('[title][class*="group"] img.rounded-full, label[title] img');
+    const fhSwatchImg = document.querySelector('[title][class*="group"] img.rounded-full, label[title] img, [class*="swatch"] img');
     if (fhSwatchImg?.src) data.finish_image = fhSwatchImg.src;
     
     // Dimensions - "Overall Dimensions" or "24.00"w x 27.50"d x 37.25"h"
