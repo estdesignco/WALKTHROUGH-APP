@@ -1294,6 +1294,7 @@ function scrapePageData() {
   
   // ZEE LIGHTING / Z-LITE - zeelighting.com / zlite.com
   else if (domain.includes('zeelighting') || domain.includes('zlite')) {
+    vendorDetected = 'ZEE LIGHTING';
     // SKU
     const zlSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*([A-Z0-9-]+)/i);
     if (zlSkuMatch) data.sku = zlSkuMatch[1];
@@ -1309,6 +1310,7 @@ function scrapePageData() {
   
   // HUBBARDTON FORGE - hubbardtonforge.com
   else if (domain.includes('hubbardtonforge')) {
+    vendorDetected = 'HUBBARDTON FORGE';
     // SKU - 6-digit format like 126500
     const hfSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*(\d{6})/i) ||
                        window.location.pathname.match(/\/(\d{6})/);
@@ -1335,6 +1337,7 @@ function scrapePageData() {
   
   // HINKLEY - hinkley.com
   else if (domain.includes('hinkley')) {
+    vendorDetected = 'HINKLEY';
     // SKU - format like 1234BZ
     const hkSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*(\d+[A-Z]{2,})/i) ||
                        window.location.pathname.match(/\/(\d+[a-z]{2,})/i);
@@ -1357,6 +1360,7 @@ function scrapePageData() {
   
   // ELEGANT LIGHTING - elegantlighting.com
   else if (domain.includes('elegantlighting')) {
+    vendorDetected = 'ELEGANT LIGHTING';
     // SKU
     const elSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*([A-Z0-9-]+)/i);
     if (elSkuMatch) data.sku = elSkuMatch[1];
@@ -1372,6 +1376,7 @@ function scrapePageData() {
   
   // GABBY - gabbyhome.com / gabby.com
   else if (domain.includes('gabby')) {
+    vendorDetected = 'GABBY';
     // SKU - format like SCH-123456
     const gbSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}-?\d+)/i) ||
                        window.location.pathname.match(/([A-Z]{2,}-\d+)/i);
