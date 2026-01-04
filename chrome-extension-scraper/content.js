@@ -1099,6 +1099,7 @@ function scrapePageData() {
   
   // HVL GROUP - hvlgroup.com (Hudson Valley, Troy, Mitzi, Corbett)
   else if (domain.includes('hvlgroup') || domain.includes('hudsonvalley') || domain.includes('mitzi') || domain.includes('corbett') || domain.includes('troylighting')) {
+    vendorDetected = 'HVL GROUP';
     // SKU from URL - /8744-AGB format
     const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
     if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
@@ -1120,6 +1121,7 @@ function scrapePageData() {
   
   // VANGUARD FURNITURE - vanguardfurniture.com / vandh.com
   else if (domain.includes('vanguard') || domain.includes('vandh')) {
+    vendorDetected = 'VANGUARD/V&H';
     // SKU - Style #
     const vgSkuMatch = pageText.match(/(?:Style|Item|SKU)[:\s#]*([A-Z0-9-]+)/i);
     if (vgSkuMatch) data.sku = vgSkuMatch[1];
@@ -1139,6 +1141,7 @@ function scrapePageData() {
   
   // FLOW DECOR - flowdecor.com
   else if (domain.includes('flowdecor')) {
+    vendorDetected = 'FLOW DECOR';
     // SKU from page
     const fdSkuMatch = pageText.match(/SKU[:\s]+([A-Z0-9-]+)/i);
     if (fdSkuMatch) data.sku = fdSkuMatch[1];
@@ -1164,6 +1167,7 @@ function scrapePageData() {
   
   // CRESTVIEW COLLECTION - crestviewcollection.com
   else if (domain.includes('crestview')) {
+    vendorDetected = 'CRESTVIEW';
     // SKU - CVTOP3594 format in URL or page
     const cvSkuMatch = pageText.match(/([A-Z]{2,}[A-Z0-9]+)/i) ||
                        window.location.pathname.match(/([A-Z]{2,}[A-Z0-9]+)/i);
