@@ -954,41 +954,52 @@ function scrapePageData() {
   }
 
   // ===================== MAIN IMAGE =====================
-  // Open Graph image first
-  const ogImg = document.querySelector('meta[property="og:image"]');
-  if (ogImg?.content) data.image_url = ogImg.content;
-  
-  // Try product image selectors
-  if (!data.image_url) {
-    const imgSelectors = [
-      '.product-image img', '.pdp-image img', '.main-image img', '.primary-image img',
-      '[class*="product-gallery"] img', '[class*="product-image"] img',
-      '[data-main-image]', '[itemprop="image"]', '.gallery-main img',
-      '#product-image img', '.product-detail img'
-    ];
-    for (const sel of imgSelectors) {
-      const img = document.querySelector(sel);
-      if (img?.src && img.src.startsWith('http')) {
-        data.image_url = img.src;
-        break;
-      }
+  // Try product image selectors FIRST (before OG which might be logo)
+  const imgSelectors = [
+    '.product-image img', '.pdp-image img', '.main-image img', '.primary-image img',
+    '[class*="product-gallery"] img:first-child', '[class*="product-image"] img',
+    '[class*="gallery"] img:first-child', '[class*="slider"] img:first-child',
+    '[data-main-image]', '[itemprop="image"]', '.gallery-main img',
+    '#product-image img', '.product-detail img', '.hero-image img',
+    '[class*="zoom"] img', '[class*="featured"] img'
+  ];
+  for (const sel of imgSelectors) {
+    const img = document.querySelector(sel);
+    if (img?.src && img.src.startsWith('http') && !img.src.includes('logo') && !img.src.includes('icon')) {
+      data.image_url = img.src;
+      break;
     }
   }
   
-  // Find largest image as fallback
+  // Open Graph image as backup
+  if (!data.image_url) {
+    const ogImg = document.querySelector('meta[property="og:image"]');
+    if (ogImg?.content && !ogImg.content.includes('logo')) data.image_url = ogImg.content;
+  }
+  
+  // Find largest visible image as final fallback
   if (!data.image_url) {
     let largestImg = null;
     let largestArea = 0;
-    document.querySelectorAll('img[src^="http"]').forEach(img => {
-      const w = img.naturalWidth || img.width || 0;
-      const h = img.naturalHeight || img.height || 0;
+    document.querySelectorAll('img').forEach(img => {
+      const src = img.src || img.dataset.src || img.dataset.lazySrc;
+      if (!src || !src.startsWith('http')) return;
+      if (src.includes('logo') || src.includes('icon') || src.includes('sprite')) return;
+      
+      const rect = img.getBoundingClientRect();
+      const w = rect.width || img.naturalWidth || img.width || 0;
+      const h = rect.height || img.naturalHeight || img.height || 0;
       const area = w * h;
-      if (area > largestArea && area > 40000 && w > 200) {
+      
+      // Must be visible and reasonably sized
+      if (area > largestArea && w > 150 && h > 150 && rect.top < window.innerHeight) {
         largestArea = area;
         largestImg = img;
       }
     });
-    if (largestImg) data.image_url = largestImg.src;
+    if (largestImg) {
+      data.image_url = largestImg.src || largestImg.dataset.src || largestImg.dataset.lazySrc;
+    }
   }
 
   // ===================== SWATCH/FINISH IMAGE =====================
