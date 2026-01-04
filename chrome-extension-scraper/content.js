@@ -544,12 +544,46 @@ function handlePageClick(e) {
   e.preventDefault();
   e.stopPropagation();
   
-  // If clicking near an image, try to get the image
-  // Check if target is an image or has an image inside
-  if (target.tagName !== 'IMG') {
-    const nearbyImg = target.querySelector('img') || target.closest('a')?.querySelector('img') || target.closest('label')?.querySelector('img') || target.closest('div')?.querySelector('img');
-    if (nearbyImg && (activeField === 'image_url' || activeField === 'finish_image')) {
-      target = nearbyImg;
+  // For image fields, always try to find the actual image
+  if (activeField === 'image_url' || activeField === 'finish_image') {
+    // If not already an image, search for one
+    if (target.tagName !== 'IMG') {
+      // Try multiple ways to find the image
+      let foundImg = null;
+      
+      // Check if target has background-image
+      const bgImg = window.getComputedStyle(target).backgroundImage;
+      if (bgImg && bgImg !== 'none') {
+        const urlMatch = bgImg.match(/url\(["']?([^"')]+)["']?\)/);
+        if (urlMatch) {
+          // Create a fake element with the URL for our handler
+          foundImg = { tagName: 'IMG', src: urlMatch[1] };
+        }
+      }
+      
+      // Direct child img
+      if (!foundImg) foundImg = target.querySelector('img');
+      
+      // Within parent containers
+      if (!foundImg) foundImg = target.closest('button')?.querySelector('img');
+      if (!foundImg) foundImg = target.closest('a')?.querySelector('img');
+      if (!foundImg) foundImg = target.closest('label')?.querySelector('img');
+      if (!foundImg) foundImg = target.closest('[class*="swatch"]')?.querySelector('img');
+      if (!foundImg) foundImg = target.closest('[class*="color"]')?.querySelector('img');
+      if (!foundImg) foundImg = target.closest('[class*="option"]')?.querySelector('img');
+      if (!foundImg) foundImg = target.closest('div')?.querySelector('img');
+      
+      // Check data attributes for image URL
+      if (!foundImg) {
+        const imgUrl = target.dataset.src || target.dataset.image || target.dataset.img;
+        if (imgUrl) {
+          foundImg = { tagName: 'IMG', src: imgUrl };
+        }
+      }
+      
+      if (foundImg) {
+        target = foundImg;
+      }
     }
   }
   
