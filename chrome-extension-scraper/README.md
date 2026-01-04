@@ -1,6 +1,6 @@
 # Design Ready Product Scraper - Chrome Extension
 
-## 📦 Version 2.0
+## 📦 Version 7.0.0
 
 This Chrome extension scrapes product data from wholesale vendor websites and sends it directly to your Design Ready app. It works with YOUR logged-in browser session, so it can see the wholesale prices that require authentication.
 
@@ -9,7 +9,9 @@ This Chrome extension scrapes product data from wholesale vendor websites and se
 - **One-Click Scraping**: Click the extension icon, then "Scrape" to extract product data
 - **See Before You Send**: Review all extracted data in a beautiful table before sending
 - **Works With Your Login**: Uses your existing browser session to see wholesale prices
-- **22+ Vendors Supported**: Uttermost, Visual Comfort, Four Hands, Bernhardt, and more
+- **22+ Vendors Supported**: Full vendor-specific logic for optimal scraping accuracy
+- **Click-to-Select**: Manually override any scraped field by clicking on page elements
+- **Swatch Support**: Captures color swatches from CSS background-image styles
 
 ## 🚀 Installation
 
@@ -46,24 +48,36 @@ This Chrome extension scrapes product data from wholesale vendor websites and se
 - ✅ SKU/Item Number
 - ✅ Size/Dimensions
 - ✅ Finish/Color
+- ✅ Swatch/Finish Image
 - ✅ Product Image
 - ✅ Product URL
 
-## 🔧 Supported Vendors
+## 🔧 Supported Vendors (v7.0.0)
 
-| Vendor | Login Required for Price? |
-|--------|---------------------------|
-| Uttermost | ✅ Yes |
-| Visual Comfort | ✅ Yes |
-| Bernhardt | ✅ Yes |
-| Regina Andrew | ✅ Yes |
-| Four Hands | ✅ Yes |
-| Jaipur Living | ❌ No |
-| Loloi Rugs | ✅ Yes |
-| Global Views | ✅ Yes |
-| Surya | ✅ Yes |
-| Gabby Home | ✅ Yes |
-| ...and more! | |
+| Vendor | Domain | Status |
+|--------|--------|--------|
+| Four Hands | fourhands.com | ✅ Full Support |
+| Uttermost | uttermost.com | ✅ Full Support |
+| Global Views | globalviews.com | ✅ Full Support |
+| Rowe Furniture | rowefurniture.com | ✅ Full Support |
+| Regina Andrew | reginaandrew.com | ✅ Full Support |
+| Bernhardt | bernhardt.com | ✅ Full Support |
+| Loloi Rugs | loloi.com | ✅ Full Support |
+| Visual Comfort | visualcomfort.com | ✅ Full Support |
+| HVL Group | hvlgroup.com | ✅ Full Support |
+| Vanguard/V&H | vandh.com | ✅ Full Support |
+| Flow Decor | flowdecor.com | ✅ Full Support |
+| Crestview | crestviewcollection.com | ✅ Full Support |
+| Bassett Mirror | bassettmirror.com | ✅ Full Support |
+| Eichholtz | eichholtz.com | ✅ Full Support |
+| MyOh America | myohamerica.com | ✅ Full Support |
+| Safavieh | safavieh.com | ✅ Full Support |
+| Surya | surya.com | ✅ Full Support |
+| Zee Lighting | zeelighting.com | ✅ Full Support |
+| Hubbardton Forge | hubbardtonforge.com | ✅ Full Support |
+| Hinkley | hinkley.com | ✅ Full Support |
+| Elegant Lighting | elegantlighting.com | ✅ Full Support |
+| Gabby | gabby.com | ✅ Full Support |
 
 ## ❓ Troubleshooting
 
@@ -79,9 +93,9 @@ This Chrome extension scrapes product data from wholesale vendor websites and se
 4. Try scraping again
 
 ### Wrong data extracted?
+- Use the "Click-to-Select" feature to manually override fields
+- Click on the correct element on the page to capture it
 - Some vendor websites have unusual layouts
-- Use "Copy All" to manually paste the data
-- Report issues so we can improve extraction
 
 ## 📞 Support
 
@@ -92,5 +106,5 @@ If you have issues, please report:
 
 ---
 
-**Version**: 2.0.0  
-**Last Updated**: December 2024
+**Version**: 7.0.0  
+**Last Updated**: January 2025
