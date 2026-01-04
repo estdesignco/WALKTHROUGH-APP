@@ -854,6 +854,7 @@ function scrapePageData() {
   }
 
   // ===================== VENDOR-SPECIFIC SCRAPING =====================
+  // Version 7.0 - Comprehensive vendor support for ~22 sites
   
   // FOUR HANDS - fourhands.com
   if (domain.includes('fourhands')) {
@@ -892,7 +893,7 @@ function scrapePageData() {
   }
   
   // UTTERMOST - uttermost.com
-  if (domain.includes('uttermost')) {
+  else if (domain.includes('uttermost')) {
     // SKU - "SKU: 53083" pattern
     const uttSkuMatch = pageText.match(/SKU[:\s]+(\d+)/i);
     if (uttSkuMatch) data.sku = uttSkuMatch[1];
@@ -927,7 +928,6 @@ function scrapePageData() {
       if (bgStyle) {
         const urlMatch = bgStyle.match(/url\(["']?([^"')]+)["']?\)/);
         if (urlMatch) {
-          // Make absolute URL
           let swatchUrl = urlMatch[1];
           if (swatchUrl.startsWith('/')) {
             swatchUrl = window.location.origin + swatchUrl;
@@ -938,8 +938,154 @@ function scrapePageData() {
     }
   }
   
-  // HVL GROUP - hvlgroup.com
-  if (domain.includes('hvlgroup')) {
+  // GLOBAL VIEWS - globalviews.com
+  else if (domain.includes('globalviews')) {
+    // SKU from page - Item #: 9.93892
+    const gvSkuMatch = pageText.match(/Item\s*#?\s*:?\s*([0-9.]+)/i);
+    if (gvSkuMatch) data.sku = gvSkuMatch[1];
+    
+    // SKU from URL pattern
+    if (!data.sku) {
+      const urlMatch = window.location.pathname.match(/([0-9]{5,})/);
+      if (urlMatch) data.sku = urlMatch[1];
+    }
+    
+    // Dimensions - "Dimensions: 12"W x 12"D x 24"H"
+    const gvDimMatch = pageText.match(/Dimensions[:\s]*([\d.]+)"?\s*W?\s*[xX×]\s*([\d.]+)"?\s*D?\s*[xX×]\s*([\d.]+)"?\s*H?/i);
+    if (gvDimMatch) data.size = `${gvDimMatch[1]}"W x ${gvDimMatch[2]}"D x ${gvDimMatch[3]}"H`;
+    
+    // Finish/Material from specs
+    const gvFinishMatch = pageText.match(/(?:Finish|Material|Color)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (gvFinishMatch) data.finish_color = gvFinishMatch[1].trim();
+    
+    // Main image
+    const gvMainImg = document.querySelector('.product-image img, .main-image img, [class*="gallery"] img:first-child');
+    if (gvMainImg?.src) data.image_url = gvMainImg.src;
+  }
+  
+  // ROWE FURNITURE - rowefurniture.com
+  else if (domain.includes('rowefurniture')) {
+    // SKU - Style #: N123
+    const rwSkuMatch = pageText.match(/Style\s*#?\s*:?\s*([A-Z0-9-]+)/i);
+    if (rwSkuMatch) data.sku = rwSkuMatch[1];
+    
+    // Dimensions - common furniture format
+    const rwDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D\s*[xX×]\s*([\d.]+)"?\s*H/i);
+    if (rwDimMatch) data.size = `${rwDimMatch[1]}"W x ${rwDimMatch[2]}"D x ${rwDimMatch[3]}"H`;
+    
+    // Selected fabric/finish
+    const rwFinishEl = document.querySelector('.selected-fabric, .fabric-name.active, [class*="selected"] .fabric-name');
+    if (rwFinishEl) data.finish_color = rwFinishEl.innerText?.trim();
+    
+    // Swatch image
+    const rwSwatchImg = document.querySelector('.fabric-swatch.selected img, .active .swatch-image img');
+    if (rwSwatchImg?.src) data.finish_image = rwSwatchImg.src;
+  }
+  
+  // REGINA ANDREW - reginaandrew.com
+  else if (domain.includes('reginaandrew')) {
+    // SKU - Item #: 15-1114
+    const raSkuMatch = pageText.match(/Item\s*#?\s*:?\s*([\d-]+)/i);
+    if (raSkuMatch) data.sku = raSkuMatch[1];
+    
+    // URL SKU pattern
+    if (!data.sku) {
+      const urlMatch = window.location.pathname.match(/([\d]+-[\d]+)/);
+      if (urlMatch) data.sku = urlMatch[1];
+    }
+    
+    // Dimensions
+    const raDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D\s*[xX×]\s*([\d.]+)"?\s*H/i);
+    if (raDimMatch) data.size = `${raDimMatch[1]}"W x ${raDimMatch[2]}"D x ${raDimMatch[3]}"H`;
+    
+    // Also check H x W x D format
+    if (!data.size) {
+      const raDimMatch2 = pageText.match(/([\d.]+)"?\s*H\s*[xX×]\s*([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D/i);
+      if (raDimMatch2) data.size = `${raDimMatch2[2]}"W x ${raDimMatch2[3]}"D x ${raDimMatch2[1]}"H`;
+    }
+    
+    // Finish from product name or specs
+    const raFinishMatch = pageText.match(/(?:Finish|Color)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (raFinishMatch) data.finish_color = raFinishMatch[1].trim();
+    
+    // Main image
+    const raMainImg = document.querySelector('.product-image-main img, .pdp-main-image img');
+    if (raMainImg?.src) data.image_url = raMainImg.src;
+  }
+  
+  // BERNHARDT - bernhardt.com
+  else if (domain.includes('bernhardt')) {
+    // SKU - Style: 345-044 or Item: 345-044
+    const bhSkuMatch = pageText.match(/(?:Style|Item|SKU)[:\s#]+([0-9A-Z-]+)/i);
+    if (bhSkuMatch) data.sku = bhSkuMatch[1];
+    
+    // Dimensions
+    const bhDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D\s*[xX×]\s*([\d.]+)"?\s*H/i);
+    if (bhDimMatch) data.size = `${bhDimMatch[1]}"W x ${bhDimMatch[2]}"D x ${bhDimMatch[3]}"H`;
+    
+    // Finish from dropdown or specs
+    const bhFinishEl = document.querySelector('.finish-selected, .selected-finish, [class*="finish"].active');
+    if (bhFinishEl) data.finish_color = bhFinishEl.innerText?.trim() || bhFinishEl.title;
+    
+    // Fabric/Finish pattern in text
+    if (!data.finish_color) {
+      const bhFinishMatch = pageText.match(/(?:Finish|Fabric|Cover)[:\s]+([A-Za-z][A-Za-z0-9\s\-]+?)(?:\n|,|Available)/i);
+      if (bhFinishMatch) data.finish_color = bhFinishMatch[1].trim();
+    }
+  }
+  
+  // LOLOI RUGS - loloi.com / loloirugs.com
+  else if (domain.includes('loloi')) {
+    // SKU - usually in format:?"?"?"?"?" or similar
+    const loSkuMatch = pageText.match(/SKU[:\s]+([A-Z]{2,}-\d+)/i) || 
+                       window.location.pathname.match(/\/([A-Z]{2,}[\d-]+)/i);
+    if (loSkuMatch) data.sku = loSkuMatch[1];
+    
+    // Rug dimensions - "8'0" x 10'0"" or "8 x 10"
+    const loDimMatch = pageText.match(/([\d]+)'?\s*"?\s*[xX×]\s*([\d]+)'?\s*"?/);
+    if (loDimMatch) data.size = `${loDimMatch[1]}' x ${loDimMatch[2]}'`;
+    
+    // Color from product name or specs
+    const loColorMatch = pageText.match(/(?:Color|Colorway)[:\s]+([A-Za-z][A-Za-z\s\/\-]+?)(?:\n|,|$)/i);
+    if (loColorMatch) data.finish_color = loColorMatch[1].trim();
+    
+    // Main rug image
+    const loMainImg = document.querySelector('.product-image img, .pdp-image img, [class*="gallery-main"] img');
+    if (loMainImg?.src) data.image_url = loMainImg.src;
+  }
+  
+  // VISUAL COMFORT - visualcomfort.com
+  else if (domain.includes('visualcomfort')) {
+    // SKU - Format: TOB 5003BZ-L or similar
+    const vcSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}\s*\d+[A-Z0-9\-]+)/i);
+    if (vcSkuMatch) data.sku = vcSkuMatch[1].replace(/\s+/g, ' ').trim();
+    
+    // URL pattern
+    if (!data.sku) {
+      const urlMatch = window.location.pathname.match(/\/([a-z]{2,}\d+[a-z0-9-]+)/i);
+      if (urlMatch) data.sku = urlMatch[1].toUpperCase();
+    }
+    
+    // Dimensions - Height: 24" Width: 12"
+    const vcHeight = pageText.match(/Height[:\s]*([\d.]+)"/i);
+    const vcWidth = pageText.match(/Width[:\s]*([\d.]+)"/i);
+    if (vcHeight && vcWidth) {
+      data.size = `${vcWidth[1]}"W x ${vcHeight[1]}"H`;
+    }
+    
+    // Finish from selected option
+    const vcFinishEl = document.querySelector('[class*="finish"].selected, .finish-option.active, [data-finish].selected');
+    if (vcFinishEl) data.finish_color = vcFinishEl.innerText?.trim() || vcFinishEl.dataset.finish || vcFinishEl.title;
+    
+    // Finish from text
+    if (!data.finish_color) {
+      const vcFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+      if (vcFinishMatch) data.finish_color = vcFinishMatch[1].trim();
+    }
+  }
+  
+  // HVL GROUP - hvlgroup.com (Hudson Valley, Troy, Mitzi, Corbett)
+  else if (domain.includes('hvlgroup') || domain.includes('?"hvl"')) {
     // SKU from URL - /8744-AGB format
     const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
     if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
@@ -950,9 +1096,282 @@ function scrapePageData() {
       if (hvlCodeMatch) data.sku = hvlCodeMatch[1];
     }
     
+    // Dimensions
+    const hvlDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*H/i);
+    if (hvlDimMatch) data.size = `${hvlDimMatch[1]}"W x ${hvlDimMatch[2]}"H`;
+    
     // Finish
     const hvlFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
     if (hvlFinishMatch) data.finish_color = hvlFinishMatch[1].trim();
+  }
+  
+  // VANGUARD FURNITURE - vanguardfurniture.com / vandh.com
+  else if (domain.includes('vanguard') || domain.includes('vandh')) {
+    // SKU - Style #
+    const vgSkuMatch = pageText.match(/(?:Style|Item|SKU)[:\s#]*([A-Z0-9-]+)/i);
+    if (vgSkuMatch) data.sku = vgSkuMatch[1];
+    
+    // Dimensions
+    const vgDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D\s*[xX×]\s*([\d.]+)"?\s*H/i);
+    if (vgDimMatch) data.size = `${vgDimMatch[1]}"W x ${vgDimMatch[2]}"D x ${vgDimMatch[3]}"H`;
+    
+    // Selected fabric
+    const vgFabricEl = document.querySelector('.selected-fabric, .fabric-selected, [class*="fabric"].active');
+    if (vgFabricEl) data.finish_color = vgFabricEl.innerText?.trim();
+    
+    // Swatch image
+    const vgSwatchImg = document.querySelector('.fabric-swatch.selected img, .selected .fabric-image img');
+    if (vgSwatchImg?.src) data.finish_image = vgSwatchImg.src;
+  }
+  
+  // FLOW DECOR - flowdecor.com
+  else if (domain.includes('flowdecor')) {
+    // SKU from page
+    const fdSkuMatch = pageText.match(/SKU[:\s]+([A-Z0-9-]+)/i);
+    if (fdSkuMatch) data.sku = fdSkuMatch[1];
+    
+    // URL pattern - /product/lamp-name-12345/
+    if (!data.sku) {
+      const urlMatch = window.location.pathname.match(/-(\d{4,})/);
+      if (urlMatch) data.sku = urlMatch[1];
+    }
+    
+    // Dimensions
+    const fdDimMatch = pageText.match(/([\d.]+)"?\s*[wW]\s*[xX×]\s*([\d.]+)"?\s*[hH]/i);
+    if (fdDimMatch) data.size = `${fdDimMatch[1]}"W x ${fdDimMatch[2]}"H`;
+    
+    // Finish from dropdown or text
+    const fdFinishEl = document.querySelector('.variation-selected, select[name*="finish"] option:checked');
+    if (fdFinishEl) data.finish_color = fdFinishEl.innerText?.trim() || fdFinishEl.value;
+    
+    // Main image
+    const fdMainImg = document.querySelector('.woocommerce-product-gallery__image img, .product-image img');
+    if (fdMainImg?.src) data.image_url = fdMainImg.src;
+  }
+  
+  // CRESTVIEW COLLECTION - crestviewcollection.com
+  else if (domain.includes('crestview')) {
+    // SKU - CVTOP3594 format in URL or page
+    const cvSkuMatch = pageText.match(/([A-Z]{2,}[A-Z0-9]+)/i) ||
+                       window.location.pathname.match(/([A-Z]{2,}[A-Z0-9]+)/i);
+    if (cvSkuMatch) data.sku = cvSkuMatch[1].toUpperCase();
+    
+    // Dimensions - "51.6 x 1.5 x 61.6 (in)"
+    const cvDimMatch = pageText.match(/([\d.]+)\s*[xX×]\s*([\d.]+)\s*[xX×]\s*([\d.]+)\s*\(?in/i);
+    if (cvDimMatch) data.size = `${cvDimMatch[1]}"W x ${cvDimMatch[2]}"D x ${cvDimMatch[3]}"H`;
+    
+    // Finish/Material
+    const cvFinishMatch = pageText.match(/(?:Finish|Material|Color)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (cvFinishMatch) data.finish_color = cvFinishMatch[1].trim();
+    
+    // Main image
+    const cvMainImg = document.querySelector('.product-image img, [class*="gallery"] img:first-child');
+    if (cvMainImg?.src) data.image_url = cvMainImg.src;
+  }
+  
+  // BASSETT MIRROR - bassettmirror.com
+  else if (domain.includes('bassettmirror')) {
+    // SKU - Item #
+    const bmSkuMatch = pageText.match(/(?:Item|SKU|Style)[:\s#]*([A-Z0-9-]+)/i);
+    if (bmSkuMatch) data.sku = bmSkuMatch[1];
+    
+    // Dimensions
+    const bmDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D?\s*[xX×]?\s*([\d.]+)?"?\s*H?/i);
+    if (bmDimMatch) {
+      if (bmDimMatch[3]) {
+        data.size = `${bmDimMatch[1]}"W x ${bmDimMatch[2]}"D x ${bmDimMatch[3]}"H`;
+      } else {
+        data.size = `${bmDimMatch[1]}"W x ${bmDimMatch[2]}"H`;
+      }
+    }
+    
+    // Finish
+    const bmFinishMatch = pageText.match(/(?:Finish|Frame)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (bmFinishMatch) data.finish_color = bmFinishMatch[1].trim();
+  }
+  
+  // EICHHOLTZ - eichholtz.com
+  else if (domain.includes('eichholtz')) {
+    // SKU - Article code or product code
+    const ehSkuMatch = pageText.match(/(?:Article|Code|SKU)[:\s#]*([0-9]+)/i);
+    if (ehSkuMatch) data.sku = ehSkuMatch[1];
+    
+    // Dimensions - metric or imperial
+    const ehDimMatch = pageText.match(/([\d.]+)\s*(?:cm|")?\s*[xX×]\s*([\d.]+)\s*(?:cm|")?\s*[xX×]\s*([\d.]+)\s*(?:cm|")?/i);
+    if (ehDimMatch) data.size = `${ehDimMatch[1]} x ${ehDimMatch[2]} x ${ehDimMatch[3]}`;
+    
+    // Finish/Material
+    const ehFinishMatch = pageText.match(/(?:Finish|Material|Color)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (ehFinishMatch) data.finish_color = ehFinishMatch[1].trim();
+    
+    // Main image
+    const ehMainImg = document.querySelector('.product-image img, .gallery-main img, .fotorama__img');
+    if (ehMainImg?.src) data.image_url = ehMainImg.src;
+  }
+  
+  // MY OH AMERICA - myohamerica.com
+  else if (domain.includes('myohamerica') || domain.includes('?"myoh"')) {
+    // SKU
+    const maSkuMatch = pageText.match(/(?:Item|SKU|Style)[:\s#]*([A-Z0-9-]+)/i);
+    if (maSkuMatch) data.sku = maSkuMatch[1];
+    
+    // Dimensions
+    const maDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D\s*[xX×]\s*([\d.]+)"?\s*H/i);
+    if (maDimMatch) data.size = `${maDimMatch[1]}"W x ${maDimMatch[2]}"D x ${maDimMatch[3]}"H`;
+    
+    // Finish
+    const maFinishMatch = pageText.match(/(?:Finish|Leather|Fabric)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (maFinishMatch) data.finish_color = maFinishMatch[1].trim();
+  }
+  
+  // SAFAVIEH - safavieh.com / salavieh (possible typo in list)
+  else if (domain.includes('safavieh') || domain.includes('salavieh')) {
+    // SKU - format like TUL272A
+    const sfSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}\d+[A-Z]*)/i) ||
+                       window.location.pathname.match(/\/([A-Z]{2,}\d+[A-Z]*)/i);
+    if (sfSkuMatch) data.sku = sfSkuMatch[1].toUpperCase();
+    
+    // Rug dimensions - "8' x 10'" or "8'0" x 10'0""
+    const sfDimMatch = pageText.match(/([\d]+)'?\s*"?\s*[xX×]\s*([\d]+)'?\s*"?/);
+    if (sfDimMatch) data.size = `${sfDimMatch[1]}' x ${sfDimMatch[2]}'`;
+    
+    // Also check W x D x H for furniture
+    if (!data.size) {
+      const sfDimMatch2 = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D\s*[xX×]\s*([\d.]+)"?\s*H/i);
+      if (sfDimMatch2) data.size = `${sfDimMatch2[1]}"W x ${sfDimMatch2[2]}"D x ${sfDimMatch2[3]}"H`;
+    }
+    
+    // Color
+    const sfColorMatch = pageText.match(/(?:Color|Colorway)[:\s]+([A-Za-z][A-Za-z\s\/\-]+?)(?:\n|,|$)/i);
+    if (sfColorMatch) data.finish_color = sfColorMatch[1].trim();
+    
+    // Main image
+    const sfMainImg = document.querySelector('.product-image img, [class*="gallery-main"] img, .fotorama__img');
+    if (sfMainImg?.src) data.image_url = sfMainImg.src;
+  }
+  
+  // SURYA - surya.com
+  else if (domain.includes('surya')) {
+    // SKU - format like AAA-2300 or AMOR-001
+    const sySkuMatch = pageText.match(/([A-Z]{2,}-\d+)/i) ||
+                       window.location.pathname.match(/\/([A-Z]{2,}-\d+)/i);
+    if (sySkuMatch) data.sku = sySkuMatch[1].toUpperCase();
+    
+    // Rug dimensions
+    const syDimMatch = pageText.match(/([\d]+)'?\s*"?\s*[xX×]\s*([\d]+)'?\s*"?/);
+    if (syDimMatch) data.size = `${syDimMatch[1]}' x ${syDimMatch[2]}'`;
+    
+    // Color
+    const syColorMatch = pageText.match(/(?:Color|Colors?)[:\s]+([A-Za-z][A-Za-z\s\/,\-]+?)(?:\n|$)/i);
+    if (syColorMatch) data.finish_color = syColorMatch[1].split(',')[0].trim();
+    
+    // Main image
+    const syMainImg = document.querySelector('.product-image img, [class*="gallery"] img:first-child');
+    if (syMainImg?.src) data.image_url = syMainImg.src;
+  }
+  
+  // ZEE LIGHTING - zeelighting.com
+  else if (domain.includes('zeelighting') || domain.includes('?"zee"')) {
+    // SKU
+    const zlSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*([A-Z0-9-]+)/i);
+    if (zlSkuMatch) data.sku = zlSkuMatch[1];
+    
+    // Dimensions
+    const zlDimMatch = pageText.match(/([\d.]+)"?\s*[wW]?\s*[xX×]\s*([\d.]+)"?\s*[hH]?/i);
+    if (zlDimMatch) data.size = `${zlDimMatch[1]}"W x ${zlDimMatch[2]}"H`;
+    
+    // Finish
+    const zlFinishMatch = pageText.match(/(?:Finish|Color)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (zlFinishMatch) data.finish_color = zlFinishMatch[1].trim();
+  }
+  
+  // HUBBARDTON FORGE - hubbardtonforge.com
+  else if (domain.includes('hubbardtonforge')) {
+    // SKU - 6-digit format like 126500
+    const hfSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*(\d{6})/i) ||
+                       window.location.pathname.match(/\/(\d{6})/);
+    if (hfSkuMatch) data.sku = hfSkuMatch[1];
+    
+    // Dimensions
+    const hfDimMatch = pageText.match(/([\d.]+)"?\s*[wW]\s*[xX×]\s*([\d.]+)"?\s*[hH]/i);
+    if (hfDimMatch) data.size = `${hfDimMatch[1]}"W x ${hfDimMatch[2]}"H`;
+    
+    // Finish - selected option
+    const hfFinishEl = document.querySelector('.finish-selected, [class*="finish"].active, .selected-finish');
+    if (hfFinishEl) data.finish_color = hfFinishEl.innerText?.trim() || hfFinishEl.title;
+    
+    // Finish from text
+    if (!data.finish_color) {
+      const hfFinishMatch = pageText.match(/(?:Finish|Color)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+      if (hfFinishMatch) data.finish_color = hfFinishMatch[1].trim();
+    }
+    
+    // Swatch image
+    const hfSwatchImg = document.querySelector('.finish-swatch.selected img, [class*="finish"].active img');
+    if (hfSwatchImg?.src) data.finish_image = hfSwatchImg.src;
+  }
+  
+  // HINKLEY - hinkley.com
+  else if (domain.includes('hinkley')) {
+    // SKU - format like 1234BZ
+    const hkSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*(\d+[A-Z]{2,})/i) ||
+                       window.location.pathname.match(/\/(\d+[a-z]{2,})/i);
+    if (hkSkuMatch) data.sku = hkSkuMatch[1].toUpperCase();
+    
+    // Dimensions
+    const hkDimMatch = pageText.match(/([\d.]+)"?\s*[wW]\s*[xX×]\s*([\d.]+)"?\s*[hH]/i);
+    if (hkDimMatch) data.size = `${hkDimMatch[1]}"W x ${hkDimMatch[2]}"H`;
+    
+    // Finish
+    const hkFinishEl = document.querySelector('.finish-selected, [class*="finish"].active, select[name*="finish"] option:checked');
+    if (hkFinishEl) data.finish_color = hkFinishEl.innerText?.trim() || hkFinishEl.value;
+    
+    // Finish from text
+    if (!data.finish_color) {
+      const hkFinishMatch = pageText.match(/(?:Finish)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+      if (hkFinishMatch) data.finish_color = hkFinishMatch[1].trim();
+    }
+  }
+  
+  // ELEGANT LIGHTING -?"?"?"?"?"?"?"?.com
+  else if (domain.includes('?"?"?"?"?"?"?"?') || domain.includes('?"?"?"?"?"?"?"?"')) {
+    // SKU
+    const elSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*([A-Z0-9-]+)/i);
+    if (elSkuMatch) data.sku = elSkuMatch[1];
+    
+    // Dimensions
+    const elDimMatch = pageText.match(/([\d.]+)"?\s*[wW]\s*[xX×]\s*([\d.]+)"?\s*[hH]/i);
+    if (elDimMatch) data.size = `${elDimMatch[1]}"W x ${elDimMatch[2]}"H`;
+    
+    // Finish
+    const elFinishMatch = pageText.match(/(?:Finish|Color)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+    if (elFinishMatch) data.finish_color = elFinishMatch[1].trim();
+  }
+  
+  // GABBY - gabby.?"?"?"? / gabbyhome.com
+  else if (domain.includes('gabby')) {
+    // SKU - format like SCH-123456
+    const gbSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}-?\d+)/i) ||
+                       window.location.pathname.match(/([A-Z]{2,}-\d+)/i);
+    if (gbSkuMatch) data.sku = gbSkuMatch[1].toUpperCase();
+    
+    // Dimensions
+    const gbDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*D\s*[xX×]\s*([\d.]+)"?\s*H/i);
+    if (gbDimMatch) data.size = `${gbDimMatch[1]}"W x ${gbDimMatch[2]}"D x ${gbDimMatch[3]}"H`;
+    
+    // Finish/Fabric
+    const gbFinishEl = document.querySelector('.selected-fabric, .finish-selected, [class*="option"].active');
+    if (gbFinishEl) data.finish_color = gbFinishEl.innerText?.trim();
+    
+    // Finish from text
+    if (!data.finish_color) {
+      const gbFinishMatch = pageText.match(/(?:Finish|Fabric|Cover)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
+      if (gbFinishMatch) data.finish_color = gbFinishMatch[1].trim();
+    }
+    
+    // Swatch image
+    const gbSwatchImg = document.querySelector('.fabric-swatch.selected img, .selected .swatch-image img');
+    if (gbSwatchImg?.src) data.finish_image = gbSwatchImg.src;
   }
 
   // ===================== GENERIC SKU (fallback) =====================
