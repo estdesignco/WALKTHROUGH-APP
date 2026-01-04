@@ -946,8 +946,6 @@ function scrapePageData() {
   // GLOBAL VIEWS - globalviews.com
   else if (domain.includes('globalviews')) {
     vendorDetected = 'GLOBAL VIEWS';
-    vendorDetected = 'GLOBAL VIEWS';
-   {
     // SKU from page - Item #: 9.93892
     const gvSkuMatch = pageText.match(/Item\s*#?\s*:?\s*([0-9.]+)/i);
     if (gvSkuMatch) data.sku = gvSkuMatch[1];
