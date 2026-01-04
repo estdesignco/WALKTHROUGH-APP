@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 import uuid
 
-BASE_URL = "https://interiorai-9.preview.emergentagent.com/api"
+BASE_URL = "https://interiordata.preview.emergentagent.com/api"
 
 def test_update_delete_operations():
     """Test PUT and DELETE operations"""

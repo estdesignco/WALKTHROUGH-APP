@@ -14,7 +14,7 @@ from datetime import datetime
 import uuid
 
 # Get backend URL from environment
-BACKEND_URL = "https://interiorai-9.preview.emergentagent.com/api"
+BACKEND_URL = "https://interiordata.preview.emergentagent.com/api"
 
 class CorrectedDeploymentTest:
     def __init__(self):

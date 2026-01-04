@@ -3,8 +3,8 @@
 // Main image = Large product photo (NOT a swatch)
 // Swatch image = Small color/finish chip ONLY
 
-const APP_URL = 'https://interiorai-9.preview.emergentagent.com';
-const BACKEND_URL = 'https://interiorai-9.preview.emergentagent.com';
+const APP_URL = 'https://interiordata.preview.emergentagent.com';
+const BACKEND_URL = 'https://interiordata.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://interiorai-9.preview.emergentagent.com/*",
+    "https://interiordata.preview.emergentagent.com/*",
     "https://*/*",
     "http://*/*"
   ],

@@ -9,7 +9,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://interiorai-9.preview.emergentagent.com"
+BACKEND_URL = "https://interiordata.preview.emergentagent.com"
 
 def test_single_url(vendor, url, expected_finish):
     """Test a single URL with detailed logging"""
