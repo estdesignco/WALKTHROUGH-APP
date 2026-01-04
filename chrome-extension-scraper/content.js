@@ -817,6 +817,127 @@ function scrapePageData() {
   const pageText = document.body.innerText;
   const pageHtml = document.body.innerHTML;
 
+  // ===================== HELPER: EXTRACT TRADE PRICE (NOT MSRP) =====================
+  function extractTradePrice() {
+    // Priority 1: Look for explicitly labeled trade/wholesale/your price
+    const tradePricePatterns = [
+      /(?:Trade|Wholesale|Your|Net|Dealer)\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
+      /(?:Trade|NET|YOUR PRICE)[:\s]*\$?([\d,]+\.?\d*)/i
+    ];
+    for (const pattern of tradePricePatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        const val = parseFloat(match[1].replace(/,/g, ''));
+        if (val > 1 && val < 500000) return val;
+      }
+    }
+    
+    // Priority 2: Look for price elements that are NOT msrp/retail/compare
+    const priceSelectors = [
+      '[class*="trade-price"]', '[class*="your-price"]', '[class*="net-price"]',
+      '[class*="sale-price"]', '[class*="current-price"]', '[class*="our-price"]',
+      '[data-price]:not([class*="msrp"]):not([class*="retail"])',
+      '[itemprop="price"]',
+      '.price:not(.msrp):not(.retail):not(.compare):not(.was)',
+      '[class*="price"]:not([class*="msrp"]):not([class*="retail"]):not([class*="compare"]):not([class*="was"]):not([class*="original"]):not([class*="list"])'
+    ];
+    for (const sel of priceSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el) {
+          const text = el.dataset?.price || el.content || el.innerText || '';
+          // Skip if text contains MSRP/Retail/Compare/List
+          if (/msrp|retail|compare|was|list|original|suggested/i.test(text)) continue;
+          const match = text.match(/\$?([\d,]+\.?\d*)/);
+          if (match) {
+            const val = parseFloat(match[1].replace(/,/g, ''));
+            if (val > 1 && val < 500000) return val;
+          }
+        }
+      } catch(e) {}
+    }
+    
+    // Priority 3: Find first price in text that's NOT labeled as MSRP
+    // Look for patterns like "$500.05" that come BEFORE "MAP" or "MSRP"
+    const allPrices = pageText.match(/\$[\d,]+\.?\d*/g) || [];
+    for (const priceStr of allPrices) {
+      // Check context around this price
+      const idx = pageText.indexOf(priceStr);
+      const context = pageText.substring(Math.max(0, idx - 30), idx + priceStr.length + 30);
+      if (!/msrp|retail|compare|was|list|original|suggested|map\s*\$/i.test(context)) {
+        const val = parseFloat(priceStr.replace(/[$,]/g, ''));
+        if (val > 1 && val < 500000) return val;
+      }
+    }
+    
+    return null;
+  }
+  
+  // ===================== HELPER: EXTRACT MSRP =====================
+  function extractMSRP() {
+    const msrpPatterns = [
+      /(?:MSRP|MAP|Retail|List|Suggested)[:\s]*\$?([\d,]+\.?\d*)/i,
+      /\$?([\d,]+\.?\d*)\s*(?:MSRP|MAP|Retail|List)/i
+    ];
+    for (const pattern of msrpPatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        const val = parseFloat(match[1].replace(/,/g, ''));
+        if (val > 1 && val < 500000) return val;
+      }
+    }
+    return null;
+  }
+  
+  // ===================== HELPER: EXTRACT COLOR/FINISH =====================
+  function extractColor() {
+    // Check for selected swatch/option with title attribute
+    const swatchSelectors = [
+      '[class*="selected"][title]', '[class*="active"][title]', 
+      'button.selected[title]', 'label.selected[title]',
+      '[class*="swatch"].selected[title]', '[class*="color"].selected[title]',
+      '[class*="finish"].selected[title]', '[aria-checked="true"][title]'
+    ];
+    for (const sel of swatchSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el?.title && el.title.length > 1 && el.title.length < 50) {
+          return el.title;
+        }
+      } catch(e) {}
+    }
+    
+    // Check for selected option text
+    const selectedSelectors = [
+      '.selected-color', '.selected-finish', '.color-name.selected',
+      '.finish-name.selected', '[class*="selected"] .color-name',
+      '[class*="selected"] .finish-name', '.variation-selected'
+    ];
+    for (const sel of selectedSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el?.innerText) {
+          const text = el.innerText.trim();
+          if (text.length > 1 && text.length < 50) return text;
+        }
+      } catch(e) {}
+    }
+    
+    // Check page text for labeled color/finish
+    const colorPatterns = [
+      /(?:Color|Finish|Colorway)[:\s]+([A-Za-z][A-Za-z\s\-\/]+?)(?:\n|,|\||$)/i,
+      /(?:Selected|Current)[:\s]+([A-Za-z][A-Za-z\s\-\/]+?)(?:\n|,|\||$)/i
+    ];
+    for (const pattern of colorPatterns) {
+      const match = pageText.match(pattern);
+      if (match && match[1].trim().length > 1 && match[1].trim().length < 50) {
+        return match[1].trim();
+      }
+    }
+    
+    return null;
+  }
+
   // VENDOR DETECTION
   const vendorMap = {
     'uttermost': 'Uttermost', 'visualcomfort': 'Visual Comfort', 'fourhands': 'Four Hands',
