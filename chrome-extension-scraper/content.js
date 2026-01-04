@@ -856,8 +856,12 @@ function scrapePageData() {
   // ===================== VENDOR-SPECIFIC SCRAPING =====================
   // Version 7.0 - Comprehensive vendor support for ~22 sites
   
+  // Debug: Log which vendor was detected
+  let vendorDetected = 'GENERIC';
+  
   // FOUR HANDS - fourhands.com
   if (domain.includes('fourhands')) {
+    vendorDetected = 'FOUR HANDS';
     // SKU from URL: /product/100074-009
     const fhSkuMatch = window.location.pathname.match(/\/product\/([A-Z0-9-]+)/i) || 
                        window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
