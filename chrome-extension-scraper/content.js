@@ -1188,6 +1188,7 @@ function scrapePageData() {
   
   // BASSETT MIRROR - bassettmirror.com
   else if (domain.includes('bassettmirror')) {
+    vendorDetected = 'BASSETT MIRROR';
     // SKU - Item #
     const bmSkuMatch = pageText.match(/(?:Item|SKU|Style)[:\s#]*([A-Z0-9-]+)/i);
     if (bmSkuMatch) data.sku = bmSkuMatch[1];
@@ -1209,6 +1210,7 @@ function scrapePageData() {
   
   // EICHHOLTZ - eichholtz.com
   else if (domain.includes('eichholtz')) {
+    vendorDetected = 'EICHHOLTZ';
     // SKU - Article code or product code
     const ehSkuMatch = pageText.match(/(?:Article|Code|SKU)[:\s#]*([0-9]+)/i);
     if (ehSkuMatch) data.sku = ehSkuMatch[1];
@@ -1228,6 +1230,7 @@ function scrapePageData() {
   
   // MY OH AMERICA / AMERICA LEATHER - myohamerica.com / americaleather.com
   else if (domain.includes('myohamerica') || domain.includes('americaleather')) {
+    vendorDetected = 'MYOH AMERICA';
     // SKU
     const maSkuMatch = pageText.match(/(?:Item|SKU|Style)[:\s#]*([A-Z0-9-]+)/i);
     if (maSkuMatch) data.sku = maSkuMatch[1];
@@ -1243,6 +1246,7 @@ function scrapePageData() {
   
   // SAFAVIEH - safavieh.com / salavieh (possible typo in list)
   else if (domain.includes('safavieh') || domain.includes('salavieh')) {
+    vendorDetected = 'SAFAVIEH';
     // SKU - format like TUL272A
     const sfSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}\d+[A-Z]*)/i) ||
                        window.location.pathname.match(/\/([A-Z]{2,}\d+[A-Z]*)/i);
@@ -1269,6 +1273,7 @@ function scrapePageData() {
   
   // SURYA - surya.com
   else if (domain.includes('surya')) {
+    vendorDetected = 'SURYA';
     // SKU - format like AAA-2300 or AMOR-001
     const sySkuMatch = pageText.match(/([A-Z]{2,}-\d+)/i) ||
                        window.location.pathname.match(/\/([A-Z]{2,}-\d+)/i);
