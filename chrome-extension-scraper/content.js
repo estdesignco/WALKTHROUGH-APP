@@ -1085,7 +1085,7 @@ function scrapePageData() {
   }
   
   // HVL GROUP - hvlgroup.com (Hudson Valley, Troy, Mitzi, Corbett)
-  else if (domain.includes('hvlgroup') || domain.includes('hudsonvalley') || domain.includes('mitzi') || domain.includes('?"?"?"?"?lighting')) {
+  else if (domain.includes('hvlgroup') || domain.includes('hudsonvalley') || domain.includes('?"?"?"?"?') || domain.includes('corbett')) {
     // SKU from URL - /8744-AGB format
     const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
     if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
