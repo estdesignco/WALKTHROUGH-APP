@@ -1036,7 +1036,7 @@ function scrapePageData() {
   
   // LOLOI RUGS - loloi.com / loloirugs.com
   else if (domain.includes('loloi')) {
-    // SKU - format like!"?"?"?"!"?" or similar
+    // SKU - format like LOLRK-01 or similar
     const loSkuMatch = pageText.match(/SKU[:\s]+([A-Z]{2,}-\d+)/i) || 
                        window.location.pathname.match(/\/([A-Z]{2,}[\d-]+)/i);
     if (loSkuMatch) data.sku = loSkuMatch[1];
@@ -1085,7 +1085,7 @@ function scrapePageData() {
   }
   
   // HVL GROUP - hvlgroup.com (Hudson Valley, Troy, Mitzi, Corbett)
-  else if (domain.includes('hvlgroup') || domain.includes('hudsonvalley') || domain.includes('?"mitzi"') || domain.includes('?"?"?"?"?"?"?"?"')) {
+  else if (domain.includes('hvlgroup') || domain.includes('hudsonvalley') || domain.includes('mitzi') || domain.includes('?"?"?"?"?')) {
     // SKU from URL - /8744-AGB format
     const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
     if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
@@ -1270,8 +1270,8 @@ function scrapePageData() {
     if (syMainImg?.src) data.image_url = syMainImg.src;
   }
   
-  // ZEE LIGHTING / Z-LITE - zeelighting.com /?"?"?"?"?"?"?".com
-  else if (domain.includes('zeelighting') || domain.includes('?"?"?"?"?"?"?"?')) {
+  // ZEE LIGHTING / Z-LITE - zeelighting.com / zlite.com
+  else if (domain.includes('zeelighting') || domain.includes('zlite')) {
     // SKU
     const zlSkuMatch = pageText.match(/(?:SKU|Item|Model)[:\s#]*([A-Z0-9-]+)/i);
     if (zlSkuMatch) data.sku = zlSkuMatch[1];
