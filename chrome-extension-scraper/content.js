@@ -932,6 +932,35 @@ function scrapePageData() {
       if (urlSkuMatch) data.sku = urlSkuMatch[1];
     }
     
+    // PRICE - Uttermost shows "Your Price" or trade price
+    const uttPriceMatch = pageText.match(/Your\s*Price[:\s]*\$?([\d,]+\.?\d*)/i) ||
+                          pageText.match(/Trade[:\s]*\$?([\d,]+\.?\d*)/i) ||
+                          pageText.match(/Net[:\s]*\$?([\d,]+\.?\d*)/i);
+    if (uttPriceMatch) {
+      data.price = parseFloat(uttPriceMatch[1].replace(/,/g, ''));
+    }
+    // Fallback - find price that's NOT MSRP/Retail
+    if (!data.price) {
+      const priceEls = document.querySelectorAll('[class*="price"]');
+      for (const el of priceEls) {
+        const text = el.innerText?.toLowerCase() || '';
+        if (!text.includes('msrp') && !text.includes('retail') && !text.includes('compare')) {
+          const match = text.match(/\$?([\d,]+\.?\d*)/);
+          if (match) {
+            const val = parseFloat(match[1].replace(/,/g, ''));
+            if (val > 5 && val < 100000) {
+              data.price = val;
+              break;
+            }
+          }
+        }
+      }
+    }
+    
+    // MSRP
+    const uttMsrpMatch = pageText.match(/(?:MSRP|Retail|Suggested)[:\s]*\$?([\d,]+\.?\d*)/i);
+    if (uttMsrpMatch) data.msrp = parseFloat(uttMsrpMatch[1].replace(/,/g, ''));
+    
     // Dimensions - "34 W X 29 H X 30 D (in)"
     const uttDimMatch = pageText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D\s*\(?in/i);
     if (uttDimMatch) data.size = `${uttDimMatch[1]}"W x ${uttDimMatch[3]}"D x ${uttDimMatch[2]}"H`;
@@ -947,6 +976,12 @@ function scrapePageData() {
     if (!data.finish_color) {
       const titleColor = document.title.match(/,\s*([A-Za-z]+)\s*-/);
       if (titleColor) data.finish_color = titleColor[1];
+    }
+    
+    // Also look for selected color name in swatches
+    if (!data.finish_color) {
+      const selectedSwatch = document.querySelector('.tile-root_selected-Au1[title], [class*="selected"][title], button.selected[title]');
+      if (selectedSwatch?.title) data.finish_color = selectedSwatch.title;
     }
     
     // Get swatch image from selected color button (has background-image style)
