@@ -1166,10 +1166,16 @@ function scrapePageData() {
   // CRESTVIEW COLLECTION - crestviewcollection.com
   else if (domain.includes('crestview')) {
     vendorDetected = 'CRESTVIEW';
-    // SKU - CVTOP3594 format in URL or page
-    const cvSkuMatch = pageText.match(/([A-Z]{2,}[A-Z0-9]+)/i) ||
-                       window.location.pathname.match(/([A-Z]{2,}[A-Z0-9]+)/i);
-    if (cvSkuMatch) data.sku = cvSkuMatch[1].toUpperCase();
+    // SKU - CVTOP3594, CVCZR287, etc. format (starts with CV or is in URL like /mistbound-cvtop3594)
+    const cvUrlMatch = window.location.pathname.match(/[_-]?(cv[a-z]{2,}\d+)/i) ||
+                       window.location.pathname.match(/(cv[a-z]+\d+)/i);
+    if (cvUrlMatch) {
+      data.sku = cvUrlMatch[1].toUpperCase();
+    } else {
+      // Look for Crestview SKU patterns in text: CV followed by 2+ letters then numbers
+      const cvTextMatch = pageText.match(/\b(CV[A-Z]{2,}\d+)\b/i);
+      if (cvTextMatch) data.sku = cvTextMatch[1].toUpperCase();
+    }
     
     // Dimensions - "51.6 x 1.5 x 61.6 (in)"
     const cvDimMatch = pageText.match(/([\d.]+)\s*[xX×]\s*([\d.]+)\s*[xX×]\s*([\d.]+)\s*\(?in/i);
