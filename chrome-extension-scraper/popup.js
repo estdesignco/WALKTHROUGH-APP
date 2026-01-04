@@ -1,7 +1,6 @@
-// Design Ready Product Scraper v6.7.0
-// NEW: Auto-save to Product Library + Materials Library
-// NEW: Canva integration (Send to Canva button)
-// Full page-injected UI that stays open
+// Design Ready Product Scraper v7.0.2
+// VENDOR-SPECIFIC SCRAPING for 22 vendors
+// Debug logging enabled in console
 
 const APP_URL = 'https://interiordata.preview.emergentagent.com';
 const BACKEND_URL = 'https://interiordata.preview.emergentagent.com';
