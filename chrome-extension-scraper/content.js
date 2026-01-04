@@ -534,7 +534,7 @@ function handleMouseMove(e) {
 function handlePageClick(e) {
   if (!clickToSelectActive) return;
   
-  const target = e.target;
+  let target = e.target;
   
   // Ignore our own elements
   if (target.closest('#dr-scraper-panel') || target.closest('#dr-field-dropdown') || target.closest('#dr-hover-highlight')) {
@@ -543,6 +543,15 @@ function handlePageClick(e) {
   
   e.preventDefault();
   e.stopPropagation();
+  
+  // If clicking near an image, try to get the image
+  // Check if target is an image or has an image inside
+  if (target.tagName !== 'IMG') {
+    const nearbyImg = target.querySelector('img') || target.closest('a')?.querySelector('img') || target.closest('label')?.querySelector('img') || target.closest('div')?.querySelector('img');
+    if (nearbyImg && (activeField === 'image_url' || activeField === 'finish_image')) {
+      target = nearbyImg;
+    }
+  }
   
   lastClickedElement = target;
   
