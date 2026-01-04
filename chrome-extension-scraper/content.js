@@ -898,6 +898,7 @@ function scrapePageData() {
   
   // UTTERMOST - uttermost.com
   else if (domain.includes('uttermost')) {
+    vendorDetected = 'UTTERMOST';
     // SKU - "SKU: 53083" pattern
     const uttSkuMatch = pageText.match(/SKU[:\s]+(\d+)/i);
     if (uttSkuMatch) data.sku = uttSkuMatch[1];
