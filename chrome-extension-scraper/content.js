@@ -1584,6 +1584,24 @@ function scrapePageData() {
     if (gbSwatchImg?.src) data.finish_image = gbSwatchImg.src;
   }
 
+  // ===================== UNIVERSAL PRICE/COLOR EXTRACTION =====================
+  // Apply to ALL vendors - use helper functions for consistency
+  
+  // Extract TRADE price (not MSRP) if vendor-specific didn't find it
+  if (!data.price) {
+    data.price = extractTradePrice();
+  }
+  
+  // Extract MSRP if available
+  if (!data.msrp) {
+    data.msrp = extractMSRP();
+  }
+  
+  // Extract color/finish if vendor-specific didn't find it
+  if (!data.finish_color) {
+    data.finish_color = extractColor();
+  }
+
   // ===================== GENERIC SKU (fallback) =====================
   if (!data.sku) {
     // Check data attributes first
