@@ -862,19 +862,33 @@ function scrapePageData() {
                        window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
     
-    // Color - "Durango Smoke • 100074-009" pattern or after "Cover" section
-    const fhColorMatch = pageText.match(/^([A-Za-z][A-Za-z\s]+?)\s*•\s*\d/m);
-    if (fhColorMatch) data.finish_color = fhColorMatch[1].trim();
-    
-    // Also try looking for text right after an image in Cover section
+    // Color - "Durango Smoke • 100074-009" pattern
+    const fhColorEl = document.querySelector('.text-body span, [class*="text-neutral"]');
+    if (fhColorEl) {
+      const colorText = fhColorEl.innerText?.trim();
+      if (colorText && !colorText.includes('•')) {
+        data.finish_color = colorText;
+      }
+    }
+    // Also try the pattern with bullet
     if (!data.finish_color) {
-      const coverSection = pageText.match(/Cover\s+([A-Za-z][A-Za-z\s]+?)(?:\n|Light|$)/i);
-      if (coverSection) data.finish_color = coverSection[1].trim();
+      const bulletMatch = pageText.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*\d{5,}/);
+      if (bulletMatch) data.finish_color = bulletMatch[1].trim();
     }
     
-    // Dimensions - "Overall Dimensions24.00"w x 27.50"d x 37.25"h"
-    const fhDimMatch = pageText.match(/(?:Overall\s*)?Dimensions?\s*([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
+    // Swatch image from selected/expanded cover section
+    const fhSwatchImg = document.querySelector('[title][class*="group"] img.rounded-full, label[title] img');
+    if (fhSwatchImg?.src) data.finish_image = fhSwatchImg.src;
+    
+    // Dimensions - "Overall Dimensions" or "24.00"w x 27.50"d x 37.25"h"
+    const fhDimMatch = pageText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
     if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
+    
+    // Main image
+    const fhMainImg = document.querySelector('img[alt*="DINING" i], img[alt*="CHAIR" i], img[alt*="SOFA" i], img[alt*="TABLE" i], button img[alt]');
+    if (fhMainImg?.src && fhMainImg.src.includes('S1200x1200')) {
+      data.image_url = fhMainImg.src;
+    }
   }
   
   // UTTERMOST - uttermost.com
