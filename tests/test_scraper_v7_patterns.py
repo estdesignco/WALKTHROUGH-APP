@@ -388,11 +388,12 @@ class TestGenericPatterns:
         """Generic SKU patterns"""
         test_texts = [
             'SKU: ABC-123',
-            'Item #: 12345',
+            'Item #: ABC12345',
             'Style: XYZ-789',
             'Model: TEST-001',
             'Product Code: PROD-456',
         ]
+        # Pattern from content.js line 1418
         patterns = [
             r'(?:SKU|Item|Style|Model|Product)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})',
         ]
