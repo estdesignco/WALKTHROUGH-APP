@@ -811,29 +811,84 @@ function scrapePageData() {
     }
   }
 
-  // ===================== SKU =====================
-  // Check data attributes first
-  const skuDataEl = document.querySelector('[data-sku], [data-product-sku], [itemprop="sku"]');
-  if (skuDataEl) {
-    data.sku = skuDataEl.dataset.sku || skuDataEl.dataset.productSku || skuDataEl.content || skuDataEl.innerText?.trim();
+  // ===================== VENDOR-SPECIFIC SCRAPING =====================
+  
+  // FOUR HANDS - fourhands.com
+  if (domain.includes('fourhands')) {
+    // SKU from URL: /product/100074-009 or /p/100074-009
+    const fhSkuMatch = window.location.pathname.match(/(?:\/product\/|\/p\/)([A-Z0-9-]+)/i);
+    if (fhSkuMatch) data.sku = fhSkuMatch[1];
+    
+    // Color - look for "Cover:" label
+    const coverMatch = pageText.match(/Cover[:\s]+([A-Za-z][A-Za-z\s]+?)(?:\n|$)/i);
+    if (coverMatch) data.finish_color = coverMatch[1].trim();
+    
+    // Also check for selected fabric/color option
+    if (!data.finish_color) {
+      const fhSelected = document.querySelector('.selected-option, [class*="fabric"] .selected, [class*="cover"] .active');
+      if (fhSelected) data.finish_color = fhSelected.title || fhSelected.innerText?.trim();
+    }
   }
-  // Check URL for SKU patterns
+  
+  // UTTERMOST - uttermost.com
+  if (domain.includes('uttermost')) {
+    // SKU - Uttermost uses "Item #" or just the number in URL
+    const uttSkuMatch = pageText.match(/Item\s*#?\s*:?\s*(\d{4,})/i);
+    if (uttSkuMatch) data.sku = uttSkuMatch[1];
+    if (!data.sku) {
+      const urlMatch = window.location.pathname.match(/\/(\d{4,})/);
+      if (urlMatch) data.sku = urlMatch[1];
+    }
+    
+    // Color/Finish - look for finish name
+    const uttFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s]+?)(?:\n|Size|Dimension|$)/i);
+    if (uttFinishMatch) data.finish_color = uttFinishMatch[1].trim();
+    
+    // Also check selected swatch
+    if (!data.finish_color) {
+      const uttSwatch = document.querySelector('.swatch.active, .swatch.selected, [class*="finish"].active');
+      if (uttSwatch) data.finish_color = uttSwatch.title || uttSwatch.dataset.finish || uttSwatch.innerText?.trim();
+    }
+  }
+  
+  // HVL GROUP - hvlgroup.com
+  if (domain.includes('hvlgroup')) {
+    // SKU usually in URL or product code
+    const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
+    if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
+    if (!data.sku) {
+      const hvlCodeMatch = pageText.match(/(?:Product|Item|SKU)[:\s#]*([A-Z0-9]+-[A-Z0-9]+)/i);
+      if (hvlCodeMatch) data.sku = hvlCodeMatch[1];
+    }
+    
+    // Finish
+    const hvlFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s-]+?)(?:\n|$)/i);
+    if (hvlFinishMatch) data.finish_color = hvlFinishMatch[1].trim();
+  }
+
+  // ===================== GENERIC SKU (fallback) =====================
   if (!data.sku) {
-    const urlSkuMatch = window.location.pathname.match(/\/([A-Z]{2,}[-]?[A-Z0-9]+[-]?[A-Z0-9]*)/i);
+    // Check data attributes first
+    const skuDataEl = document.querySelector('[data-sku], [data-product-sku], [itemprop="sku"]');
+    if (skuDataEl) {
+      data.sku = skuDataEl.dataset.sku || skuDataEl.dataset.productSku || skuDataEl.content || skuDataEl.innerText?.trim();
+    }
+  }
+  if (!data.sku) {
+    // Check URL for SKU patterns - numbers with dashes
+    const urlSkuMatch = window.location.pathname.match(/\/(\d{3,}[-]?\d*[-A-Z0-9]*)/i);
     if (urlSkuMatch && urlSkuMatch[1].length >= 4) data.sku = urlSkuMatch[1];
   }
-  // Text patterns
   if (!data.sku) {
+    // Text patterns
     const skuPatterns = [
       /(?:SKU|Item|Style|Model|Product)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})/i,
-      /(?:Item Number|Product Code|Article)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})/i,
-      /\b([A-Z]{2,4}[-]?\d{3,}[-A-Z0-9]*)\b/
+      /(?:Item Number|Product Code|Article)\s*(?:#|:|\s)\s*([A-Z0-9][-A-Z0-9]{2,})/i
     ];
     for (const pattern of skuPatterns) {
       const match = pageText.match(pattern);
       if (match && match[1].length >= 4 && match[1].length <= 30) {
-        // Avoid matching navigation words
-        if (!/click|view|more|add|cart|buy/i.test(match[1])) {
+        if (!/click|view|more|add|cart|buy|product/i.test(match[1])) {
           data.sku = match[1];
           break;
         }
