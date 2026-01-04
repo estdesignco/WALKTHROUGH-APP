@@ -905,6 +905,23 @@ function scrapePageData() {
       const titleColor = document.title.match(/,\s*([A-Za-z]+)\s*-/);
       if (titleColor) data.finish_color = titleColor[1];
     }
+    
+    // Get swatch image from selected color button (has background-image style)
+    const selectedSwatch = document.querySelector('.tile-root_selected-Au1[style*="background-image"], button[title].tile-root_selected-Au1');
+    if (selectedSwatch) {
+      const bgStyle = selectedSwatch.style.backgroundImage;
+      if (bgStyle) {
+        const urlMatch = bgStyle.match(/url\(["']?([^"')]+)["']?\)/);
+        if (urlMatch) {
+          // Make absolute URL
+          let swatchUrl = urlMatch[1];
+          if (swatchUrl.startsWith('/')) {
+            swatchUrl = window.location.origin + swatchUrl;
+          }
+          data.finish_image = swatchUrl;
+        }
+      }
+    }
   }
   
   // HVL GROUP - hvlgroup.com
