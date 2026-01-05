@@ -13986,13 +13986,30 @@ async def get_project_materials(project_id: Optional[str] = None, category: Opti
 
 @api_router.post("/materials")
 async def create_project_material(material: dict):
-    """Create a new material for a project"""
+    """Create a new material for a project (with duplicate checking)"""
     try:
+        project_id = material.get("project_id")
+        material_name = material.get("name", "").strip()
+        manufacturer = material.get("manufacturer", "").strip()
+        
+        # Check for duplicates in project materials
+        if project_id and material_name:
+            existing = await db.project_materials.find_one({
+                "project_id": project_id,
+                "name": {"$regex": f"^{material_name}$", "$options": "i"},
+                "manufacturer": {"$regex": f"^{manufacturer}$", "$options": "i"} if manufacturer else {"$exists": True}
+            })
+            
+            if existing:
+                # Already exists - just return the existing one
+                existing.pop("_id", None)
+                return {"status": "duplicate", "material": existing, "message": f"Material '{material_name}' already exists in project"}
+        
         material_doc = {
             "id": str(uuid.uuid4()),
-            "name": material.get("name", ""),
+            "name": material_name,
             "category": material.get("category", "fabric"),
-            "manufacturer": material.get("manufacturer", ""),
+            "manufacturer": manufacturer,
             "sku": material.get("sku", ""),
             "color": material.get("color", ""),
             "color_code": material.get("color_code", ""),
@@ -14005,26 +14022,33 @@ async def create_project_material(material: dict):
             "photo_data": material.get("photo_data", ""),  # Base64 image data
             "notes": material.get("notes", ""),
             "tags": material.get("tags", []),
-            "project_id": material.get("project_id"),
+            "project_id": project_id,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         
         await db.project_materials.insert_one(material_doc)
         
-        # AUTO-SYNC: Also add to master materials database
-        if material.get("name"):
-            existing = await db.master_materials.find_one({
-                "name": material.get("name"),
-                "manufacturer": material.get("manufacturer", "")
+        # AUTO-SYNC: Also add to master materials database (with duplicate check)
+        if material_name:
+            existing_master = await db.master_materials.find_one({
+                "name": {"$regex": f"^{material_name}$", "$options": "i"},
+                "manufacturer": {"$regex": f"^{manufacturer}$", "$options": "i"} if manufacturer else {"$exists": True}
             })
-            if not existing:
+            if existing_master:
+                # Update existing master material to track project usage
+                if project_id:
+                    await db.master_materials.update_one(
+                        {"id": existing_master["id"]},
+                        {"$addToSet": {"used_in_projects": project_id}}
+                    )
+            else:
                 master_material = {
                     "id": str(uuid.uuid4()),
-                    "name": material.get("name"),
+                    "name": material_name,
                     "category": material.get("category", "fabric"),
-                    "manufacturer": material.get("manufacturer", ""),
-                    "vendor": material.get("manufacturer", ""),
+                    "manufacturer": manufacturer,
+                    "vendor": manufacturer,
                     "sku": material.get("sku", ""),
                     "color": material.get("color", ""),
                     "color_code": material.get("color_code", ""),
@@ -14041,13 +14065,13 @@ async def create_project_material(material: dict):
                     "tags": material.get("tags", []) + [material.get("category", "fabric")],
                     "created_at": datetime.now(timezone.utc).isoformat(),
                     "updated_at": datetime.now(timezone.utc).isoformat(),
-                    "used_in_projects": [material.get("project_id")] if material.get("project_id") else []
+                    "used_in_projects": [project_id] if project_id else []
                 }
                 await db.master_materials.insert_one(master_material)
         
         # Remove MongoDB _id from response
         material_doc.pop('_id', None)
-        return material_doc
+        return {"status": "created", "material": material_doc}
     except Exception as e:
         logging.error(f"Error creating material: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
