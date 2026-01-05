@@ -549,6 +549,61 @@ const ExactChecklistSpreadsheet = ({
       if (response.ok) {
         console.log(`✅ Item ${field} updated successfully to:`, value);
         
+        // If finish_color was updated, sync to Material Libraries
+        if (field === 'finish_color' && value && value.trim()) {
+          // Find the item to get vendor, name, sku info
+          let itemData = null;
+          filteredProject?.rooms?.forEach(room => {
+            room.categories?.forEach(category => {
+              category.subcategories?.forEach(subcategory => {
+                subcategory.items?.forEach(item => {
+                  if (item.id === itemId) {
+                    itemData = item;
+                  }
+                });
+              });
+            });
+          });
+          
+          if (itemData) {
+            // Sync to Material Libraries (with duplicate check)
+            try {
+              const materialData = {
+                name: value.trim(),
+                category: 'finish',
+                manufacturer: itemData.vendor || '',
+                vendor: itemData.vendor || '',
+                sku: itemData.sku ? `${itemData.sku}-FINISH` : '',
+                color: value.trim(),
+                photo_url: itemData.finish_image || '',
+                notes: `From product: ${itemData.name || 'Unknown'}`,
+                tags: ['scraped', 'auto-added', itemData.vendor || ''].filter(Boolean).join(','),
+                project_id: project?.id || null
+              };
+              
+              // Add to Global Master Materials (with duplicate check)
+              await fetch(`${backendUrl}/api/materials/from-scraper`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(materialData)
+              });
+              console.log('📚 Synced finish to Global Materials Library:', value);
+              
+              // Add to Project Materials (with duplicate check)
+              if (project?.id) {
+                await fetch(`${backendUrl}/api/materials`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(materialData)
+                });
+                console.log('📚 Synced finish to Project Materials Library:', value);
+              }
+            } catch (materialErr) {
+              console.warn('⚠️ Could not sync to Materials Library:', materialErr);
+            }
+          }
+        }
+        
         // Update local state
         const updatedProject = JSON.parse(JSON.stringify(filteredProject));
         updatedProject.rooms?.forEach(room => {
