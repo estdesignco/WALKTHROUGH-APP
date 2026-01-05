@@ -348,12 +348,13 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
           />
         </div>
 
-        {/* Add Room Modal */}
+        {/* Add Multiple Rooms Modal */}
         {showAddRoom && (
-          <AddRoomModal
+          <AddMultipleRoomsModal
             onClose={() => setShowAddRoom(false)}
             onSubmit={handleAddRoom}
             roomColors={roomColors}
+            existingRooms={project?.rooms || []}
           />
         )}
       </div>
