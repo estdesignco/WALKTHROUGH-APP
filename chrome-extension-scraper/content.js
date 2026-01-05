@@ -345,24 +345,23 @@ function createSidePanel() {
     
     <div class="dr-actions">
       <button class="dr-btn-primary" id="dr-send-btn">
-        🚀 SEND TO APP + LIBRARIES
+        🚀 SEND TO APP
       </button>
-      <button class="dr-btn-secondary" id="dr-copy-link-btn" style="width: 100%; background: #2563eb; color: white; border-color: #2563eb; padding: 12px; font-size: 14px; font-weight: bold;">
-        🔗 COPY PRODUCT LINK
-      </button>
-      <div style="display: flex; gap: 8px;">
+      <div style="display: flex; gap: 6px;">
+        <button class="dr-btn-secondary" id="dr-copy-link-btn" style="flex: 1; background: #2563eb; color: white; border-color: #2563eb;">
+          🔗 Copy Link
+        </button>
         <button class="dr-btn-secondary" id="dr-copy-image-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
           📷 Copy Image
         </button>
+      </div>
+      <div style="display: flex; gap: 6px;">
         <button class="dr-btn-secondary" id="dr-copy-nobg-btn" style="flex: 1; background: #059669; color: white; border-color: #059669;">
           ✨ No Background
         </button>
-      </div>
-      <button class="dr-btn-secondary" id="dr-rescrape-btn" style="width: 100%;">
-        🔄 Re-scrape
-      </button>
-      <div style="font-size: 10px; color: #666; text-align: center; padding-top: 4px;">
-        Saves to: Checklist/FFE • Product Library • Materials Library
+        <button class="dr-btn-secondary" id="dr-rescrape-btn" style="flex: 1;">
+          🔄 Re-scrape
+        </button>
       </div>
     </div>
   `;
