@@ -12761,7 +12761,6 @@ async def get_project_design_materials(project_id: str):
     print(f"🔍 GET MATERIALS CALLED FOR PROJECT: {project_id}")
     try:
         materials = []
-        print(f"Getting materials for project: {project_id}")
         
         # Source 1: design_data collection (legacy)
         design_data = await db.design_data.find_one({"project_id": project_id}, {"_id": 0})
@@ -12777,39 +12776,51 @@ async def get_project_design_materials(project_id: str):
         materials.extend(project_materials)
         print(f"Found {len(project_materials)} materials in project_materials")
         
-        # Source 3: Extract finishes from project items
-        project = await db.projects.find_one({"id": project_id}, {"_id": 0})
-        print(f"Found project: {project is not None}")
-        if project:
-            print(f"Project has {len(project.get('rooms', []))} rooms")
-            seen_finishes = set()
-            for room in project.get("rooms", []):
-                room_name = room.get("name", "Unknown Room")
-                for category in room.get("categories", []):
-                    for subcategory in category.get("subcategories", []):
-                        for item in subcategory.get("items", []):
-                            finish = item.get("finish_color")
-                            vendor = item.get("vendor", "")
-                            if finish and finish.strip():
-                                finish_key = f"{finish.lower()}|{vendor.lower()}"
-                                if finish_key not in seen_finishes:
-                                    seen_finishes.add(finish_key)
-                                    materials.append({
-                                        "id": f"item-{item.get('id', '')}",
-                                        "name": finish,
-                                        "type": "finish",
-                                        "category": "finish",
-                                        "vendor": vendor,
-                                        "manufacturer": vendor,
-                                        "source": f"From: {item.get('name', 'Unknown')}",
-                                        "image": item.get("finish_image", ""),
-                                        "photo_url": item.get("finish_image", ""),
-                                        "room": room_name,
-                                        "product_name": item.get("name", ""),
-                                        "product_sku": item.get("sku", "")
-                                    })
-            print(f"Extracted {len(seen_finishes)} unique finishes from items")
+        # Source 3: Extract finishes from project items (rooms are in separate collection!)
+        # Get rooms from the rooms collection
+        rooms = await db.rooms.find({"project_id": project_id}).to_list(length=1000)
+        print(f"Found {len(rooms)} rooms in rooms collection")
         
+        seen_finishes = set()
+        for room_data in rooms:
+            room_id = room_data.get("id")
+            room_name = room_data.get("name", "Unknown Room")
+            
+            # Get categories for this room
+            categories = await db.categories.find({"room_id": room_id}).to_list(length=1000)
+            for category in categories:
+                category_id = category.get("id")
+                
+                # Get subcategories for this category
+                subcategories = await db.subcategories.find({"category_id": category_id}).to_list(length=1000)
+                for subcategory in subcategories:
+                    subcategory_id = subcategory.get("id")
+                    
+                    # Get items for this subcategory
+                    items = await db.items.find({"subcategory_id": subcategory_id}).to_list(length=1000)
+                    for item in items:
+                        finish = item.get("finish_color")
+                        vendor = item.get("vendor", "")
+                        if finish and finish.strip():
+                            finish_key = f"{finish.lower()}|{vendor.lower()}"
+                            if finish_key not in seen_finishes:
+                                seen_finishes.add(finish_key)
+                                materials.append({
+                                    "id": f"item-{item.get('id', '')}",
+                                    "name": finish,
+                                    "type": "finish",
+                                    "category": "finish",
+                                    "vendor": vendor,
+                                    "manufacturer": vendor,
+                                    "source": f"From: {item.get('name', 'Unknown')}",
+                                    "image": item.get("finish_image", ""),
+                                    "photo_url": item.get("finish_image", ""),
+                                    "room": room_name,
+                                    "product_name": item.get("name", ""),
+                                    "product_sku": item.get("sku", "")
+                                })
+        
+        print(f"Extracted {len(seen_finishes)} unique finishes from items")
         print(f"Total materials: {len(materials)}")
         return {"materials": materials, "count": len(materials)}
     except Exception as e:
