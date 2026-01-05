@@ -1241,16 +1241,6 @@ function scrapePageData() {
     const uttMainImg = document.querySelector('.product-image img, [class*="gallery"] img, img[src*="uttermost"]');
     if (uttMainImg?.src) data.image_url = uttMainImg.src;
   }
-    
-    // Main image
-    const uttMainImg = document.querySelector('.product-image img, [class*="gallery"] img, img[src*="uttermost"]');
-    if (uttMainImg?.src) {
-      data.image_url = uttMainImg.src;
-      console.log('[UTT] Main image found');
-    }
-    
-    console.log('[UTT v7.7.0] Extraction complete');
-  }
   
   // GLOBAL VIEWS - globalviews.com
   else if (domain.includes('globalviews')) {
