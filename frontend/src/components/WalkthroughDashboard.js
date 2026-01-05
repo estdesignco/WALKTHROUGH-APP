@@ -6,7 +6,7 @@ import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
 import SimpleWalkthroughSpreadsheet from './SimpleWalkthroughSpreadsheet';
 import StatusOverview from './StatusOverview';
 import PhotoManagerModal from './PhotoManagerModal';
-import AddRoomModal from './AddRoomModal';
+import AddMultipleRoomsModal from './AddMultipleRoomsModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
 
