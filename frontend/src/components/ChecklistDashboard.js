@@ -471,12 +471,13 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         onRoomCanvaImport={openRoomCanvaImport}
       />
 
-      {/* Add Room Modal */}
+      {/* Add Multiple Rooms Modal */}
       {showAddRoom && (
-        <AddRoomModal
+        <AddMultipleRoomsModal
           onClose={() => setShowAddRoom(false)}
           onSubmit={handleAddRoom}
           roomColors={roomColors}
+          existingRooms={project?.rooms || []}
         />
       )}
 
