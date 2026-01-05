@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import BarcodeScannerModal from './BarcodeScannerModal';
 import CalculatorPopup from './CalculatorPopup';
 
-const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], loading }) => {
+const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], loading, projectId }) => {
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
