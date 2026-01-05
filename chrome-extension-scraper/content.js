@@ -1072,12 +1072,59 @@ function scrapePageData() {
   // FOUR HANDS - fourhands.com
   if (domain.includes('fourhands')) {
     vendorDetected = 'FOUR HANDS';
+    
     // SKU from URL: /product/100074-009
     const fhSkuMatch = window.location.pathname.match(/\/product\/([A-Z0-9-]+)/i) || 
                        window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
     
-    // PRICE - Four Hands: Find ALL dollar amounts, take first that's NOT MAP
+    // ===== COLOR EXTRACTION =====
+    // On Four Hands, the color appears as "Durango Smoke • 100074-009" 
+    const allTextNodes = document.body.innerText;
+    if (data.sku) {
+      // Look for pattern: "Color Name • SKU" or "Color Name · SKU"
+      const colorSkuPattern = new RegExp(`([A-Za-z][A-Za-z\\s]+?)\\s*[•·]\\s*${data.sku}`, 'i');
+      const colorMatch = allTextNodes.match(colorSkuPattern);
+      if (colorMatch) {
+        data.finish_color = colorMatch[1].trim();
+        console.log('[FH Debug] Found Color:', data.finish_color);
+      }
+    }
+    
+    // Fallback color strategies
+    if (!data.finish_color) {
+      const productArea = document.querySelector('h1')?.parentElement?.parentElement;
+      if (productArea) {
+        const textInArea = productArea.innerText;
+        const bulletMatch = textInArea.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z-]+/i);
+        if (bulletMatch && !bulletMatch[1].match(/seating|dining|chairs|tables|bedroom|living/i)) {
+          data.finish_color = bulletMatch[1].trim();
+        }
+      }
+    }
+    
+    if (!data.finish_color) {
+      const selectedSwatch = document.querySelector('[class*="selected"][title], [class*="active"][title], button[aria-selected="true"][title], label[aria-checked="true"][title]');
+      if (selectedSwatch?.title && selectedSwatch.title.length > 2 && selectedSwatch.title.length < 40) {
+        if (!/seating|dining|bedroom|tables|chairs|living|office/i.test(selectedSwatch.title)) {
+          data.finish_color = selectedSwatch.title;
+        }
+      }
+    }
+    
+    // SWATCH IMAGE
+    const fhSwatchImg = document.querySelector('label img.rounded-full, .rounded-full img, [title] img.rounded-full');
+    if (fhSwatchImg?.src) {
+      data.finish_image = fhSwatchImg.src;
+      console.log('[FH Debug] Found Swatch Image:', data.finish_image);
+    }
+    
+    // DIMENSIONS - "24.00"w x 27.50"d x 37.25"h"
+    const fhDimMatch = pageText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
+    if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
+    
+    // ===== PRICE EXTRACTION =====
+    // Four Hands: Find ALL dollar amounts, take first that's NOT MAP
     // The trade price appears BEFORE the MAP price on the page
     const allDollarAmounts = pageText.match(/\$[\d,]+\.?\d*/g) || [];
     console.log('[FH Debug] All prices found:', allDollarAmounts);
@@ -1092,54 +1139,16 @@ function scrapePageData() {
       
       if (val > 5 && val < 500000) {
         if (/MAP/i.test(surroundingText)) {
-          // This is the MAP price, save as MSRP
           data.msrp = val;
           console.log('[FH Debug] Found MAP/MSRP:', val);
         } else if (!data.price) {
-          // This is the trade price (first non-MAP price)
           data.price = val;
           console.log('[FH Debug] Found Trade Price:', val);
         }
       }
     }
     
-    // COLOR - "Durango Smoke • 100074-009" pattern
-    // Look in the specific div that shows "Durango Smoke • 100074-009"
-    const colorDiv = document.querySelector('.text-body.text-neutral-50, [class*="text-neutral"]');
-    if (colorDiv) {
-      const colorText = colorDiv.innerText?.trim();
-      // Extract color before the bullet point
-      const colorMatch = colorText?.match(/^([A-Za-z][A-Za-z\s]+?)(?:\s*[•·]|$)/);
-      if (colorMatch) {
-        data.finish_color = colorMatch[1].trim();
-        console.log('[FH Debug] Found Color:', data.finish_color);
-      }
-    }
-    
-    // Fallback color from page text
-    if (!data.finish_color) {
-      const bulletMatch = pageText.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z]{5,}/i);
-      if (bulletMatch) data.finish_color = bulletMatch[1].trim();
-    }
-    
-    // Also try swatch title attribute
-    if (!data.finish_color) {
-      const swatchEl = document.querySelector('label[title], button[title], [title*="Smoke"], [title*="Camel"]');
-      if (swatchEl?.title) data.finish_color = swatchEl.title;
-    }
-    
-    // Swatch image - look for the small round swatch image
-    const fhSwatchImg = document.querySelector('img.rounded-full, label img.rounded-full, [class*="swatch"] img');
-    if (fhSwatchImg?.src) {
-      data.finish_image = fhSwatchImg.src;
-      console.log('[FH Debug] Found Swatch Image:', data.finish_image);
-    }
-    
-    // Dimensions - "24.00"w x 27.50"d x 37.25"h"
-    const fhDimMatch = pageText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
-    if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
-    
-    // Main image - the large product image
+    // MAIN IMAGE
     const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[src*="cloudfront.net"][src*="FRT"], [class*="product-image"] img, [class*="gallery"] img');
     if (fhMainImg?.src) {
       data.image_url = fhMainImg.src;
