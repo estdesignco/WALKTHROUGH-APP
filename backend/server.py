@@ -14096,6 +14096,50 @@ async def get_project_materials(project_id: Optional[str] = None, category: Opti
     try:
         materials = []
         
+        # Helper function to determine if an item is soft goods (fabric) vs hard goods (finish)
+        def get_material_type(item_name, subcategory_name, category_name):
+            """
+            Soft goods (FABRIC): Sofas, Chairs, Ottomans, Sectionals, Beds, Headboards, Cushions, Upholstery
+            Hard goods (FINISH): Tables, Lighting, Case Goods, Hardware, Accessories, Mirrors
+            """
+            item_lower = (item_name or "").lower()
+            subcat_lower = (subcategory_name or "").lower()
+            cat_lower = (category_name or "").lower()
+            
+            # Keywords indicating FABRIC (soft goods)
+            fabric_keywords = [
+                'sofa', 'couch', 'chair', 'ottoman', 'sectional', 'loveseat', 
+                'bench', 'bed', 'headboard', 'cushion', 'pillow', 'throw',
+                'upholster', 'seating', 'lounge', 'settee', 'chaise', 'daybed',
+                'mattress', 'bedding', 'duvet', 'curtain', 'drape', 'shade',
+                'rug', 'carpet', 'runner'
+            ]
+            
+            # Keywords indicating FINISH (hard goods)
+            finish_keywords = [
+                'table', 'desk', 'light', 'lamp', 'chandelier', 'pendant', 'sconce',
+                'cabinet', 'dresser', 'nightstand', 'console', 'sideboard', 'buffet',
+                'mirror', 'frame', 'hardware', 'knob', 'pull', 'handle', 'hinge',
+                'shelf', 'shelving', 'bookcase', 'etagere', 'credenza', 'armoire',
+                'vase', 'sculpture', 'art', 'clock', 'tray', 'box', 'basket',
+                'faucet', 'fixture', 'appliance'
+            ]
+            
+            combined = f"{item_lower} {subcat_lower} {cat_lower}"
+            
+            # Check for fabric keywords first
+            for kw in fabric_keywords:
+                if kw in combined:
+                    return 'fabric'
+            
+            # Check for finish keywords
+            for kw in finish_keywords:
+                if kw in combined:
+                    return 'finish'
+            
+            # Default to finish for unknown items
+            return 'finish'
+        
         # Source 1: project_materials collection (explicit materials)
         query = {}
         if project_id:
@@ -14127,39 +14171,47 @@ async def get_project_materials(project_id: Optional[str] = None, category: Opti
                 categories_list = await db.categories.find({"room_id": room_id}).to_list(length=1000)
                 for cat in categories_list:
                     category_id = cat.get("id")
+                    category_name = cat.get("name", "")
                     
                     subcategories = await db.subcategories.find({"category_id": category_id}).to_list(length=1000)
                     for subcategory in subcategories:
                         subcategory_id = subcategory.get("id")
+                        subcategory_name = subcategory.get("name", "")
                         
                         items = await db.items.find({"subcategory_id": subcategory_id}).to_list(length=1000)
                         for item in items:
                             finish = item.get("finish_color")
                             vendor = item.get("vendor", "")
+                            item_name = item.get("name", "")
+                            
                             if finish and finish.strip():
-                                # Skip if category filter is set and doesn't match "finish"
-                                if category and "finish" not in category.lower():
+                                # Determine material type based on item/category
+                                material_type = get_material_type(item_name, subcategory_name, category_name)
+                                
+                                # Skip if category filter is set and doesn't match
+                                if category and material_type != category.lower():
                                     continue
                                 # Skip if search term doesn't match
                                 if search and search.lower() not in finish.lower() and search.lower() not in vendor.lower():
                                     continue
                                     
-                                finish_key = f"{finish.lower()}|{vendor.lower()}"
+                                finish_key = f"{finish.lower()}|{vendor.lower()}|{material_type}"
                                 if finish_key not in seen_finishes and finish.lower() not in stored_names:
                                     seen_finishes.add(finish_key)
                                     materials.append({
                                         "id": f"auto-{item.get('id', '')}",
                                         "name": finish,
-                                        "category": "finish",
+                                        "category": material_type,
                                         "manufacturer": vendor,
                                         "vendor": vendor,
                                         "sku": item.get("sku", ""),
                                         "color": finish,
                                         "swatch_url": item.get("finish_image", ""),
                                         "photo_url": item.get("finish_image", ""),
-                                        "notes": f"Auto-extracted from: {item.get('name', 'Unknown')}",
+                                        "notes": f"Auto-extracted from: {item_name}",
                                         "room": room_name,
-                                        "product_name": item.get("name", ""),
+                                        "product_name": item_name,
+                                        "product_category": category_name,
                                         "auto_extracted": True,
                                         "project_id": project_id
                                     })
