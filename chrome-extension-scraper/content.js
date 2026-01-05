@@ -26,10 +26,10 @@ function createSidePanel() {
     <style>
       #dr-scraper-panel {
         position: fixed;
-        top: 20px;
+        top: 10px;
         right: 20px;
-        width: 380px;
-        max-height: 90vh;
+        width: 360px;
+        max-height: 95vh;
         background: #0f0f1a;
         border: 1px solid #333;
         border-radius: 12px;
@@ -37,7 +37,7 @@ function createSidePanel() {
         z-index: 2147483640;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         color: #fff;
-        overflow: hidden;
+        overflow-y: auto;
         display: none;
       }
       #dr-scraper-panel * {
@@ -45,37 +45,40 @@ function createSidePanel() {
       }
       #dr-scraper-panel .dr-header {
         background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        padding: 12px 16px;
+        padding: 10px 14px;
         border-bottom: 1px solid #333;
         display: flex;
         align-items: center;
         justify-content: space-between;
         cursor: move;
+        position: sticky;
+        top: 0;
+        z-index: 10;
       }
       #dr-scraper-panel .dr-header-left {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
       }
       #dr-scraper-panel .dr-logo {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
         background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
         border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 14px;
+        font-size: 12px;
       }
       #dr-scraper-panel .dr-title {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 600;
       }
       #dr-scraper-panel .dr-close-btn {
         background: none;
         border: none;
         color: #888;
-        font-size: 20px;
+        font-size: 18px;
         cursor: pointer;
         padding: 4px 8px;
         border-radius: 4px;
@@ -85,12 +88,12 @@ function createSidePanel() {
         color: #fff;
       }
       #dr-scraper-panel .dr-content {
-        padding: 16px;
-        max-height: calc(90vh - 200px);
+        padding: 12px;
+        max-height: 45vh;
         overflow-y: auto;
       }
       #dr-scraper-panel .dr-field {
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         background: #16162a;
         border-radius: 8px;
         padding: 10px 12px;
