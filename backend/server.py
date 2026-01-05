@@ -12758,15 +12758,16 @@ async def add_color(project_id: str, color: dict):
 @api_router.get("/design-data/{project_id}/materials")
 async def get_project_design_materials(project_id: str):
     """Get all materials for a project from multiple sources"""
+    print(f"🔍 GET MATERIALS CALLED FOR PROJECT: {project_id}")
     try:
         materials = []
-        logging.info(f"Getting materials for project: {project_id}")
+        print(f"Getting materials for project: {project_id}")
         
         # Source 1: design_data collection (legacy)
         design_data = await db.design_data.find_one({"project_id": project_id}, {"_id": 0})
         if design_data and design_data.get("materials"):
             materials.extend(design_data.get("materials", []))
-            logging.info(f"Found {len(design_data.get('materials', []))} materials in design_data")
+            print(f"Found {len(design_data.get('materials', []))} materials in design_data")
         
         # Source 2: project_materials collection (new)
         project_materials = await db.project_materials.find(
@@ -12774,13 +12775,13 @@ async def get_project_design_materials(project_id: str):
             {"_id": 0}
         ).to_list(length=1000)
         materials.extend(project_materials)
-        logging.info(f"Found {len(project_materials)} materials in project_materials")
+        print(f"Found {len(project_materials)} materials in project_materials")
         
         # Source 3: Extract finishes from project items
         project = await db.projects.find_one({"id": project_id}, {"_id": 0})
-        logging.info(f"Found project: {project is not None}")
+        print(f"Found project: {project is not None}")
         if project:
-            logging.info(f"Project has {len(project.get('rooms', []))} rooms")
+            print(f"Project has {len(project.get('rooms', []))} rooms")
             seen_finishes = set()
             for room in project.get("rooms", []):
                 room_name = room.get("name", "Unknown Room")
@@ -12807,11 +12808,12 @@ async def get_project_design_materials(project_id: str):
                                         "product_name": item.get("name", ""),
                                         "product_sku": item.get("sku", "")
                                     })
-            logging.info(f"Extracted {len(seen_finishes)} unique finishes from items")
+            print(f"Extracted {len(seen_finishes)} unique finishes from items")
         
-        logging.info(f"Total materials: {len(materials)}")
+        print(f"Total materials: {len(materials)}")
         return {"materials": materials, "count": len(materials)}
     except Exception as e:
+        print(f"Error getting project materials: {str(e)}")
         logging.error(f"Error getting project materials: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
