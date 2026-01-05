@@ -924,12 +924,35 @@ function scrapePageData() {
   
   // ===================== HELPER: EXTRACT COLOR/FINISH =====================
   function extractColor() {
-    // Check for selected swatch/option with title attribute
+    // Priority 1: Check H1 for color pattern like "Product Name - Color" or "Product Name, Color"
+    const h1 = document.querySelector('h1');
+    if (h1) {
+      const h1Text = h1.innerText?.trim();
+      // Pattern: "LOE-03 NATURAL / ESPRESSO" or "Chair Name, Camel" or "Product - Bronze"
+      const h1ColorMatch = h1Text?.match(/(?:[-,]\s*|\s{2,})([A-Z][A-Za-z\s\/]+)$/i);
+      if (h1ColorMatch) {
+        const color = h1ColorMatch[1].trim();
+        if (color.length > 1 && color.length < 50 && !/add|cart|buy|shop/i.test(color)) {
+          return color;
+        }
+      }
+      // Pattern: "SKU-123 COLOR NAME" (uppercase color after SKU)
+      const skuColorMatch = h1Text?.match(/[A-Z]{2,}-\d+\s+([A-Z][A-Za-z\s\/]+)/);
+      if (skuColorMatch) {
+        const color = skuColorMatch[1].trim();
+        if (color.length > 1 && color.length < 50) {
+          return color;
+        }
+      }
+    }
+    
+    // Priority 2: Check for selected swatch/option with title attribute
     const swatchSelectors = [
       '[class*="selected"][title]', '[class*="active"][title]', 
       'button.selected[title]', 'label.selected[title]',
       '[class*="swatch"].selected[title]', '[class*="color"].selected[title]',
-      '[class*="finish"].selected[title]', '[aria-checked="true"][title]'
+      '[class*="finish"].selected[title]', '[aria-checked="true"][title]',
+      '[class*="option"].selected[title]', '.selected[title]'
     ];
     for (const sel of swatchSelectors) {
       try {
@@ -940,11 +963,13 @@ function scrapePageData() {
       } catch(e) {}
     }
     
-    // Check for selected option text
+    // Priority 3: Check for selected option text
     const selectedSelectors = [
       '.selected-color', '.selected-finish', '.color-name.selected',
       '.finish-name.selected', '[class*="selected"] .color-name',
-      '[class*="selected"] .finish-name', '.variation-selected'
+      '[class*="selected"] .finish-name', '.variation-selected',
+      '.color-selected', '.finish-selected', '.active-color',
+      '[class*="color"].active', '[class*="finish"].active'
     ];
     for (const sel of selectedSelectors) {
       try {
@@ -956,10 +981,28 @@ function scrapePageData() {
       } catch(e) {}
     }
     
-    // Check page text for labeled color/finish
+    // Priority 4: Check for color/finish in product info sections
+    const infoSelectors = [
+      '[class*="product-info"] [class*="color"]',
+      '[class*="product-info"] [class*="finish"]',
+      '[class*="variant"] [class*="color"]',
+      '[class*="option-value"]'
+    ];
+    for (const sel of infoSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el?.innerText) {
+          const text = el.innerText.trim();
+          if (text.length > 1 && text.length < 50 && !/select|choose/i.test(text)) return text;
+        }
+      } catch(e) {}
+    }
+    
+    // Priority 5: Check page text for labeled color/finish
     const colorPatterns = [
       /(?:Color|Finish|Colorway)[:\s]+([A-Za-z][A-Za-z\s\-\/]+?)(?:\n|,|\||$)/i,
-      /(?:Selected|Current)[:\s]+([A-Za-z][A-Za-z\s\-\/]+?)(?:\n|,|\||$)/i
+      /(?:Selected|Current)[:\s]+([A-Za-z][A-Za-z\s\-\/]+?)(?:\n|,|\||$)/i,
+      /(?:Fabric|Material|Cover)[:\s]+([A-Za-z][A-Za-z\s\-\/]+?)(?:\n|,|\||$)/i
     ];
     for (const pattern of colorPatterns) {
       const match = pageText.match(pattern);
