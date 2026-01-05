@@ -1158,6 +1158,7 @@ function scrapePageData() {
   // UTTERMOST - uttermost.com
   else if (domain.includes('uttermost')) {
     vendorDetected = 'UTTERMOST';
+    
     // SKU - "SKU: 53083" pattern
     const uttSkuMatch = pageText.match(/SKU[:\s]+(\d+)/i);
     if (uttSkuMatch) data.sku = uttSkuMatch[1];
@@ -1204,8 +1205,8 @@ function scrapePageData() {
     // Color - from H1 heading like "Conifer Dining Armchair, Camel"
     const h1Text = document.querySelector('h1')?.innerText?.trim();
     if (h1Text) {
-      const colorMatch = h1Text.match(/,\s*([A-Za-z]+)\s*$/);
-      if (colorMatch) data.finish_color = colorMatch[1];
+      const colorMatch = h1Text.match(/,\s*([A-Za-z][A-Za-z\s]+?)\s*$/);
+      if (colorMatch) data.finish_color = colorMatch[1].trim();
     }
     
     // Also check page title
@@ -1235,6 +1236,10 @@ function scrapePageData() {
         }
       }
     }
+    
+    // Main image
+    const uttMainImg = document.querySelector('.product-image img, [class*="gallery"] img, img[src*="uttermost"]');
+    if (uttMainImg?.src) data.image_url = uttMainImg.src;
   }
     
     // Main image
