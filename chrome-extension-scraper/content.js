@@ -1140,7 +1140,7 @@ function scrapePageData() {
     if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
     
     // Main image - the large product image
-    const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[alt*="BRADEN"], img[alt*="DINING"], img[alt*="CHAIR"]');
+    const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[src*="cloudfront.net"][src*="FRT"], [class*="product-image"] img, [class*="gallery"] img');
     if (fhMainImg?.src) {
       data.image_url = fhMainImg.src;
     }
