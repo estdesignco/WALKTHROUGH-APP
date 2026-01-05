@@ -870,8 +870,9 @@ function scrapePageData() {
       const after = pageText.substring(idx, Math.min(pageText.length, idx + priceStr.length + 30)).toLowerCase();
       const context = before + after;
       
-      // Skip if this is clearly an MSRP/MAP/Retail price OR in a price range
-      if (/map|msrp|retail|list|compare|was|original|regular|suggested|range|filter|from|to/i.test(context)) {
+      // Skip if this is clearly an MSRP/MAP/Retail price OR in a price range filter
+      // BUT don't skip "size" or "selected" which often precede the actual price
+      if (/\b(map|msrp|retail|list|compare|was|original|regular|suggested|range|filter)\b/i.test(context)) {
         console.log('[Price Debug] Skipping MSRP/Range price:', val);
         continue;
       }
