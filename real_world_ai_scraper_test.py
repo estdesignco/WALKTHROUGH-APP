@@ -14,7 +14,7 @@ import re
 from urllib.parse import urljoin, urlparse
 
 # Backend URL from environment
-BACKEND_URL = "https://interiordata.preview.emergentagent.com"
+BACKEND_URL = "https://scrapefixer.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 class RealWorldScraperTest:

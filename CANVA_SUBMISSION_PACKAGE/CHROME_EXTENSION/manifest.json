@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://interiordata.preview.emergentagent.com/*"
+    "https://scrapefixer.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

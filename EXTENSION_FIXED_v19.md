@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://interiordata.preview.emergentagent.com/chrome-extension-v19.zip
+https://scrapefixer.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://interiordata.preview.emergentagent.com/api/download/chrome-extension
+https://scrapefixer.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

@@ -3,7 +3,7 @@
 VENDOR SCRAPER COMPREHENSIVE TEST
 Testing ALL vendor scrapers systematically for complete field extraction.
 
-Backend URL: https://interiordata.preview.emergentagent.com
+Backend URL: https://scrapefixer.preview.emergentagent.com
 Endpoint: POST /api/scrape-product
 
 Testing 6 vendors for ALL 7 required fields:
@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://interiordata.preview.emergentagent.com"
+BACKEND_URL = "https://scrapefixer.preview.emergentagent.com"
 SCRAPE_ENDPOINT = f"{BACKEND_URL}/api/scrape-product"
 
 # Test vendors with their URLs

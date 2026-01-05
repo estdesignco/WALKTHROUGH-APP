@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://interiordata.preview.emergentagent.com"
+BACKEND_URL = "https://scrapefixer.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test URLs for vendor finish/color extraction

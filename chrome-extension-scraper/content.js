@@ -1997,7 +1997,7 @@ function scrapePageData() {
 // SEND TO APP + LIBRARIES
 // ============================================================================
 
-const BACKEND_URL = 'https://interiordata.preview.emergentagent.com';
+const BACKEND_URL = 'https://scrapefixer.preview.emergentagent.com';
 
 async function sendToAppAndLibraries() {
   if (!scrapedData) return;

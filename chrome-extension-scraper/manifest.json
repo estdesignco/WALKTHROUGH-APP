@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://interiordata.preview.emergentagent.com/*",
+    "https://scrapefixer.preview.emergentagent.com/*",
     "https://*/*",
     "http://*/*"
   ],

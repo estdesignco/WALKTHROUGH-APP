@@ -63,7 +63,7 @@ Manual override for any missing/incorrect data:
 - **Generic Fallback**: Available for unknown vendors
 
 ## Download
-**Extension URL:** `https://interiordata.preview.emergentagent.com/api/download/chrome-extension`
+**Extension URL:** `https://scrapefixer.preview.emergentagent.com/api/download/chrome-extension`
 
 ## User Instructions
 1. Remove old extension from Chrome
