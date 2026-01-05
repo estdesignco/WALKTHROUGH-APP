@@ -2343,9 +2343,6 @@ async function copyLink() {
   console.log('[Scraper] Full URL for manual copy:', url);
 }
 
-// Backend URL for API calls
-const BACKEND_URL = 'https://clipboard-tool.preview.emergentagent.com';
-
 async function copyImageNoBackground() {
   if (!scrapedData || !scrapedData.image_url) {
     showToast('⚠️ No image available');
