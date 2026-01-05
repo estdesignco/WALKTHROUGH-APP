@@ -14993,20 +14993,34 @@ async def login_to_all_vendor_portals():
 
 @api_router.get("/download/chrome-extension")
 async def download_chrome_extension():
-    """Download Chrome Extension v7.6.0 - Universal Price/Color Extraction"""
+    """Download Chrome Extension v7.7.0 - Fixed Four Hands, Uttermost, Loloi"""
     import os
+    import glob
     
-    zip_path = "/app/chrome-extension-scraper.zip"
+    # Find the latest versioned zip file in static folder
+    static_dir = "/app/backend/static"
+    pattern = os.path.join(static_dir, "design-ready-scraper-v*.zip")
+    zip_files = glob.glob(pattern)
+    
+    if zip_files:
+        # Sort by version number (newest first)
+        zip_files.sort(reverse=True)
+        zip_path = zip_files[0]
+        filename = os.path.basename(zip_path)
+    else:
+        # Fallback to old location
+        zip_path = "/app/chrome-extension-scraper.zip"
+        filename = "design-ready-scraper.zip"
     
     if not os.path.exists(zip_path):
         raise HTTPException(status_code=404, detail="Extension file not found")
     
     return FileResponse(
         path=zip_path,
-        filename="design-ready-scraper-v7.6.0.zip",
+        filename=filename,
         media_type="application/zip",
         headers={
-            "Content-Disposition": "attachment; filename=design-ready-scraper-v7.6.0.zip",
+            "Content-Disposition": f"attachment; filename={filename}",
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
             "Expires": "0",
