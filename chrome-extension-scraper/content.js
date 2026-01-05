@@ -2324,14 +2324,43 @@ async function copyImage() {
 }
 
 async function copyLink() {
-  try {
-    const url = scrapedData?.url || window.location.href;
-    await navigator.clipboard.writeText(url);
-    showToast('✅ Link copied to clipboard!');
-  } catch (e) {
-    console.error('[Scraper] Copy link failed:', e);
-    showToast('❌ Copy failed - try Ctrl+L, Ctrl+C');
+  const url = scrapedData?.url || window.location.href;
+  console.log('[Scraper] Copying link:', url);
+  
+  // Method 1: Modern clipboard API
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('✅ Link copied!');
+      return;
+    } catch (e) {
+      console.log('[Scraper] Clipboard API failed:', e.message);
+    }
   }
+  
+  // Method 2: Fallback using execCommand
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = url;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    textArea.style.top = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const success = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    if (success) {
+      showToast('✅ Link copied!');
+      return;
+    }
+  } catch (e) {
+    console.log('[Scraper] execCommand failed:', e.message);
+  }
+  
+  // Method 3: Show the URL for manual copy
+  showToast('📋 URL: ' + url.substring(0, 50) + '...');
+  console.log('[Scraper] Full URL for manual copy:', url);
 }
 
 function copyImageWithLink() {
