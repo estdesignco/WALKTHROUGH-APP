@@ -1574,7 +1574,12 @@ const ExactFFESpreadsheet = ({
                                                                 contentEditable={true}
                                                                 suppressContentEditableWarning={true}
                                                                 className="flex-1 bg-transparent text-white text-sm outline-none"
-                                                                onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                                                onBlur={(e) => {
+                                                                  const newValue = e.target.textContent?.trim();
+                                                                  if (newValue !== item.finish_color) {
+                                                                    handleUpdateItemField(item.id, 'finish_color', newValue);
+                                                                  }
+                                                                }}
                                                               >
                                                                 {item.finish_color || ''}
                                                               </div>
