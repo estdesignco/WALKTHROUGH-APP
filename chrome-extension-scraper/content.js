@@ -1494,54 +1494,103 @@ function scrapePageData() {
   // VISUAL COMFORT - visualcomfort.com
   else if (domain.includes('visualcomfort')) {
     vendorDetected = 'VISUAL COMFORT';
-    // SKU - Format: TOB 5003BZ-L or similar
-    const vcSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z]{2,}\s*\d+[A-Z0-9\-]+)/i);
-    if (vcSkuMatch) data.sku = vcSkuMatch[1].replace(/\s+/g, ' ').trim();
+    // SKU - Format: 700MDP3 or TOB 5003BZ-L
+    const vcSkuMatch = pageText.match(/(?:SKU|Item|Style)[:\s#]*([A-Z0-9]{3,}[A-Z0-9\-]*)/i);
+    if (vcSkuMatch) data.sku = vcSkuMatch[1].replace(/\s+/g, '').trim();
     
-    // URL pattern
+    // URL pattern - /modernrail-pendant-700mdp3
     if (!data.sku) {
-      const urlMatch = window.location.pathname.match(/\/([a-z]{2,}\d+[a-z0-9-]+)/i);
+      const urlMatch = window.location.pathname.match(/-([0-9]+[a-z0-9]*)/i);
       if (urlMatch) data.sku = urlMatch[1].toUpperCase();
     }
     
-    // Dimensions - Height: 24" Width: 12"
+    // Dimensions - Length: 12.8" Width: 12.8" Height: 36"
+    const vcLength = pageText.match(/Length[:\s]*([\d.]+)"/i);
     const vcHeight = pageText.match(/Height[:\s]*([\d.]+)"/i);
     const vcWidth = pageText.match(/Width[:\s]*([\d.]+)"/i);
-    if (vcHeight && vcWidth) {
+    if (vcWidth && vcHeight) {
       data.size = `${vcWidth[1]}"W x ${vcHeight[1]}"H`;
+    } else if (vcLength && vcHeight) {
+      data.size = `${vcLength[1]}"W x ${vcHeight[1]}"H`;
     }
     
-    // Finish from selected option
-    const vcFinishEl = document.querySelector('[class*="finish"].selected, .finish-option.active, [data-finish].selected');
-    if (vcFinishEl) data.finish_color = vcFinishEl.innerText?.trim() || vcFinishEl.dataset.finish || vcFinishEl.title;
+    // Finish from selected option - look for specific finish selector
+    const vcFinishEl = document.querySelector('[class*="finish"].selected, .finish-option.active, [data-finish].selected, [class*="swatch"][class*="selected"]');
+    if (vcFinishEl) {
+      const finishText = vcFinishEl.innerText?.trim() || vcFinishEl.dataset.finish || vcFinishEl.title;
+      // Only use if it looks like a finish name, not location
+      if (finishText && finishText.length < 40 && !/united|states|country|ship/i.test(finishText)) {
+        data.finish_color = finishText;
+      }
+    }
     
-    // Finish from text
+    // Fallback - look for Finish: in a structured way
     if (!data.finish_color) {
-      const vcFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
-      if (vcFinishMatch) data.finish_color = vcFinishMatch[1].trim();
+      // Look for finish in the product specs area, NOT general page text
+      const specElements = document.querySelectorAll('[class*="spec"], [class*="detail"], table td, dl dd');
+      for (const el of specElements) {
+        const prevText = el.previousElementSibling?.innerText?.toLowerCase() || '';
+        if (prevText.includes('finish')) {
+          const finishText = el.innerText?.trim();
+          if (finishText && finishText.length < 40 && !/united|states|country|ship/i.test(finishText)) {
+            data.finish_color = finishText;
+            break;
+          }
+        }
+      }
     }
   }
   
   // HVL GROUP - hvlgroup.com (Hudson Valley, Troy, Mitzi, Corbett)
   else if (domain.includes('hvlgroup') || domain.includes('hudsonvalley') || domain.includes('mitzi') || domain.includes('corbett') || domain.includes('troylighting')) {
     vendorDetected = 'HVL GROUP';
-    // SKU from URL - /8744-AGB format
-    const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
-    if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
     
-    // Also check page text
+    // PRODUCT NAME - from H1 (e.g., "Scarlett")
+    const hvlH1 = document.querySelector('h1');
+    if (hvlH1) data.name = hvlH1.innerText?.trim();
+    
+    // SKU from page text - "SKU: H300701-GL/BK"
+    const hvlSkuTextMatch = pageText.match(/SKU[:\s]*([A-Z0-9]+-[A-Z0-9\/]+)/i);
+    if (hvlSkuTextMatch) data.sku = hvlSkuTextMatch[1];
+    
+    // SKU from URL fallback - /Product/H300701-GL/BK/
     if (!data.sku) {
-      const hvlCodeMatch = pageText.match(/(?:Item|SKU|Model)[:\s#]*([A-Z0-9]+-[A-Z0-9]+)/i);
-      if (hvlCodeMatch) data.sku = hvlCodeMatch[1];
+      const hvlSkuMatch = window.location.pathname.match(/\/([A-Z0-9]+-[A-Z0-9]+)/i);
+      if (hvlSkuMatch) data.sku = hvlSkuMatch[1];
     }
     
-    // Dimensions
-    const hvlDimMatch = pageText.match(/([\d.]+)"?\s*W\s*[xX×]\s*([\d.]+)"?\s*H/i);
-    if (hvlDimMatch) data.size = `${hvlDimMatch[1]}"W x ${hvlDimMatch[2]}"H`;
+    // Dimensions - Width/Diameter: 5" Height: 16.75"
+    const hvlWidth = pageText.match(/(?:Width|Diameter)[:\s]*([\d.]+)"/i);
+    const hvlHeight = pageText.match(/Height[:\s]*([\d.]+)"/i);
+    if (hvlWidth && hvlHeight) {
+      data.size = `${hvlWidth[1]}"W x ${hvlHeight[1]}"H`;
+    }
     
-    // Finish
-    const hvlFinishMatch = pageText.match(/Finish[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)/i);
-    if (hvlFinishMatch) data.finish_color = hvlFinishMatch[1].trim();
+    // Finish/Color - look for "Living Finish" section or "Finish" in specs
+    // On HVL, the finish is often in a table row
+    const hvlFinishRow = document.evaluate(
+      "//td[contains(text(),'Finish') or contains(text(),'Living Finish')]/following-sibling::td",
+      document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
+    ).singleNodeValue;
+    if (hvlFinishRow) {
+      data.finish_color = hvlFinishRow.innerText?.trim();
+    }
+    
+    // Fallback - look for finish pattern in text
+    if (!data.finish_color) {
+      const hvlFinishMatch = pageText.match(/(?:Living\s*)?Finish[:\s]+([A-Za-z][A-Za-z\s\-\/]+?)(?:\n|,|Width|Height|$)/i);
+      if (hvlFinishMatch && hvlFinishMatch[1].trim().length > 1) {
+        data.finish_color = hvlFinishMatch[1].trim();
+      }
+    }
+    
+    // Main image
+    const hvlMainImg = document.querySelector('.product-image img, [class*="gallery"] img, img[src*="mitzi"], img[src*="hudson"]');
+    if (hvlMainImg?.src) data.image_url = hvlMainImg.src;
+    
+    // Swatch image
+    const hvlSwatchImg = document.querySelector('img[src*="SWATCH"], img[src*="swatch"], [class*="swatch"] img');
+    if (hvlSwatchImg?.src) data.finish_image = hvlSwatchImg.src;
   }
   
   // VANGUARD FURNITURE - vanguardfurniture.com / vandh.com
