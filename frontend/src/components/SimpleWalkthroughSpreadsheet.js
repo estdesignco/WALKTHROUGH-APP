@@ -1203,7 +1203,12 @@ const SimpleWalkthroughSpreadsheet = ({
                                           suppressContentEditableWarning={true}
                                           className="w-full bg-transparent text-sm outline-none"
                                           style={{ color: '#F5F5DC' }}
-                                          onBlur={(e) => console.log('Finish/Color updated:', e.target.textContent)}
+                                          onBlur={(e) => {
+                                            const newValue = e.target.textContent?.trim();
+                                            if (newValue !== item.finish_color) {
+                                              handleUpdateItemField(item.id, 'finish_color', newValue);
+                                            }
+                                          }}
                                         >
                                           {item.finish_color || ''}
                                         </div>
