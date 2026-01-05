@@ -41,11 +41,12 @@ export default function MaterialLibraryCatalog({ projectId, onBack }) {
   });
 
   const categories = [
+    { id: 'finish', name: 'Finish', icon: '🎨', color: 'from-amber-500 to-amber-700' },
     { id: 'fabric', name: 'Fabric', icon: '🧵', color: 'from-purple-500 to-purple-700' },
-    { id: 'wallpaper', name: 'Wallpaper', icon: '🎨', color: 'from-pink-500 to-pink-700' },
+    { id: 'wallpaper', name: 'Wallpaper', icon: '🖼️', color: 'from-pink-500 to-pink-700' },
     { id: 'paint', name: 'Paint', icon: '🖌️', color: 'from-blue-500 to-blue-700' },
     { id: 'tile', name: 'Tile', icon: '🔲', color: 'from-cyan-500 to-cyan-700' },
-    { id: 'flooring', name: 'Flooring', icon: '🪵', color: 'from-amber-500 to-amber-700' },
+    { id: 'flooring', name: 'Flooring', icon: '🪵', color: 'from-stone-500 to-stone-700' },
     { id: 'lighting', name: 'Lighting', icon: '💡', color: 'from-yellow-500 to-yellow-700' },
     { id: 'hardware', name: 'Hardware', icon: '🔧', color: 'from-gray-500 to-gray-700' },
     { id: 'accessory', name: 'Accessory', icon: '✨', color: 'from-emerald-500 to-emerald-700' },
