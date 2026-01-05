@@ -2343,6 +2343,83 @@ async function copyLink() {
   console.log('[Scraper] Full URL for manual copy:', url);
 }
 
+// Backend URL for API calls
+const BACKEND_URL = 'https://clipboard-tool.preview.emergentagent.com';
+
+async function copyImageNoBackground() {
+  if (!scrapedData || !scrapedData.image_url) {
+    showToast('⚠️ No image available');
+    return;
+  }
+  
+  const imageUrl = scrapedData.image_url;
+  console.log('[Scraper] Removing background from:', imageUrl);
+  showToast('⏳ Removing background...');
+  
+  // Update button to show loading
+  const btn = document.getElementById('dr-copy-nobg-btn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Processing...';
+  btn.disabled = true;
+  
+  try {
+    // Call backend API to remove background
+    const response = await fetch(`${BACKEND_URL}/api/remove-background`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ image_url: imageUrl })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Background removal failed');
+    }
+    
+    const result = await response.json();
+    
+    if (result.success && result.image_base64) {
+      // Convert base64 to blob
+      const binaryString = atob(result.image_base64);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: 'image/png' });
+      
+      // Try to copy to clipboard
+      if (navigator.clipboard && navigator.clipboard.write) {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': blob })
+          ]);
+          showToast('✅ Image copied (no background)!');
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          return;
+        } catch (clipErr) {
+          console.log('[Scraper] Clipboard write failed:', clipErr.message);
+        }
+      }
+      
+      // Fallback: Open image in new tab for manual copy
+      const dataUrl = `data:image/png;base64,${result.image_base64}`;
+      window.open(dataUrl, '_blank');
+      showToast('📷 Image opened in new tab - right-click to copy');
+    } else {
+      throw new Error('No image data received');
+    }
+    
+  } catch (error) {
+    console.error('[Scraper] Background removal error:', error);
+    showToast('❌ ' + error.message);
+  }
+  
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
+
 function copyImageWithLink() {
   copyImage();
 }
