@@ -1978,27 +1978,29 @@ function scrapePageData() {
   }
 
   // ===================== PRICE =====================
-  // Check price elements first
-  const priceSelectors = [
-    '[data-price]', '[itemprop="price"]', '.product-price', '.price-value',
-    '.trade-price', '.your-price', '.sale-price', '.current-price',
-    '[class*="price"]:not([class*="compare"]):not([class*="was"]):not([class*="msrp"])'
-  ];
-  for (const sel of priceSelectors) {
-    const el = document.querySelector(sel);
-    if (el) {
-      const priceText = el.dataset.price || el.content || el.innerText;
-      const priceMatch = priceText?.match(/\$?([\d,]+\.?\d*)/);
-      if (priceMatch) {
-        const val = parseFloat(priceMatch[1].replace(/,/g, ''));
-        if (val > 5 && val < 500000) {
-          data.price = val;
-          break;
+  // ONLY run generic price extraction if vendor-specific code didn't find a price
+  if (!data.price) {
+    const priceSelectors = [
+      '[data-price]', '[itemprop="price"]', '.product-price', '.price-value',
+      '.trade-price', '.your-price', '.sale-price', '.current-price',
+      '[class*="price"]:not([class*="compare"]):not([class*="was"]):not([class*="msrp"])'
+    ];
+    for (const sel of priceSelectors) {
+      const el = document.querySelector(sel);
+      if (el) {
+        const priceText = el.dataset.price || el.content || el.innerText;
+        const priceMatch = priceText?.match(/\$?([\d,]+\.?\d*)/);
+        if (priceMatch) {
+          const val = parseFloat(priceMatch[1].replace(/,/g, ''));
+          if (val > 5 && val < 500000) {
+            data.price = val;
+            break;
+          }
         }
       }
     }
   }
-  // Text patterns
+  // Text patterns - also only if no price yet
   if (!data.price) {
     const pricePatterns = [
       /Trade\s*Price[:\s]*\$?([\d,]+\.?\d*)/i,
