@@ -1270,7 +1270,7 @@ function scrapePageData() {
       data.sku = urlSkuMatch[1].toUpperCase();
     }
     if (!data.sku) {
-      const pageSkuMatch = pageText.match(/([A-Z]{2,}-\d{2})/);
+      const pageSkuMatch = pageText.match(/([A-Z]{2,}-\d+)/i);
       if (pageSkuMatch) data.sku = pageSkuMatch[1];
     }
     
