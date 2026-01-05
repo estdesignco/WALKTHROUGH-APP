@@ -2536,6 +2536,7 @@ const ExactChecklistSpreadsheet = ({
           availableStatuses={itemStatuses}
           itemStatuses={itemStatuses}
           vendorTypes={vendorTypes}
+          projectId={project?.id}
         />
       )}
 
