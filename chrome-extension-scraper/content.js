@@ -832,17 +832,37 @@ function scrapePageData() {
       const match = pageText.match(pattern);
       if (match) {
         const val = parseFloat(match[1].replace(/,/g, ''));
-        if (val > 1 && val < 500000) {
+        if (val > 1 && val < 50000) {
           console.log('[Price Debug] Found labeled trade price:', val);
           return val;
         }
       }
     }
     
-    // Priority 2: Take the FIRST price that is NOT near MAP/MSRP/Retail keywords
+    // Priority 2: Look for Add to Cart button price
+    const addToCartBtn = document.querySelector('[class*="add-to-cart"], button[type="submit"], .add-to-cart');
+    if (addToCartBtn) {
+      const btnText = addToCartBtn.innerText;
+      const priceMatch = btnText?.match(/\$(\d+(?:,\d{3})*(?:\.\d{2})?)/);
+      if (priceMatch) {
+        const val = parseFloat(priceMatch[1].replace(/,/g, ''));
+        if (val > 1 && val < 50000) {
+          console.log('[Price Debug] Found Add to Cart price:', val);
+          return val;
+        }
+      }
+    }
+    
+    // Priority 3: Take the FIRST REASONABLE price that is NOT near MAP/MSRP keywords
+    // Skip prices over $50,000 as they're likely filters or errors
     for (const priceStr of allPrices) {
       const val = parseFloat(priceStr.replace(/[$,]/g, ''));
-      if (val <= 1 || val >= 500000) continue;
+      
+      // SKIP unreasonable prices - most furniture/rugs are under $50k
+      if (val <= 1 || val >= 50000) {
+        console.log('[Price Debug] Skipping unreasonable price:', val);
+        continue;
+      }
       
       // Find this price in the text and check surrounding context
       const idx = pageText.indexOf(priceStr);
@@ -852,7 +872,7 @@ function scrapePageData() {
       
       // Skip if this is clearly an MSRP/MAP/Retail price
       if (/map|msrp|retail|list|compare|was|original|regular|suggested/i.test(context)) {
-        console.log('[Price Debug] Skipping MSRP price:', val, 'context:', context.substring(0,50));
+        console.log('[Price Debug] Skipping MSRP price:', val);
         continue;
       }
       
@@ -860,13 +880,15 @@ function scrapePageData() {
       return val;
     }
     
-    // Priority 3: If we still have nothing, just take the first reasonable price
-    for (const priceStr of allPrices) {
-      const val = parseFloat(priceStr.replace(/[$,]/g, ''));
-      if (val > 1 && val < 500000) {
-        console.log('[Price Debug] Fallback - using first price:', val);
-        return val;
-      }
+    // Priority 4: If still nothing, take the smallest reasonable price (likely the trade price)
+    const reasonablePrices = allPrices
+      .map(p => parseFloat(p.replace(/[$,]/g, '')))
+      .filter(v => v > 10 && v < 50000)
+      .sort((a, b) => a - b);
+    
+    if (reasonablePrices.length > 0) {
+      console.log('[Price Debug] Fallback - using smallest reasonable price:', reasonablePrices[0]);
+      return reasonablePrices[0];
     }
     
     return null;
