@@ -15431,6 +15431,65 @@ async def download_chrome_extension():
     )
 
 # ============================================================================
+# BACKGROUND REMOVAL API (for Chrome Extension)
+# ============================================================================
+
+from io import BytesIO
+
+@api_router.post("/remove-background")
+async def remove_background_from_url(request: dict):
+    """
+    Remove background from an image URL and return PNG with transparent background.
+    Used by Chrome extension for "Copy Image (No BG)" feature.
+    """
+    image_url = request.get("image_url")
+    if not image_url:
+        raise HTTPException(status_code=400, detail="image_url is required")
+    
+    try:
+        # Import rembg here to avoid loading model until needed
+        from rembg import remove
+        from PIL import Image
+        import aiohttp
+        
+        print(f"[BG Removal] Processing: {image_url[:80]}...")
+        
+        # Download the image
+        async with aiohttp.ClientSession() as session:
+            async with session.get(image_url, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                if response.status != 200:
+                    raise HTTPException(status_code=400, detail=f"Failed to download image: HTTP {response.status}")
+                image_data = await response.read()
+        
+        # Process with rembg
+        input_image = Image.open(BytesIO(image_data))
+        output_image = remove(input_image)
+        
+        # Convert to PNG bytes
+        output_buffer = BytesIO()
+        output_image.save(output_buffer, format="PNG")
+        output_bytes = output_buffer.getvalue()
+        
+        # Return as base64 for easy clipboard handling
+        import base64
+        base64_image = base64.b64encode(output_bytes).decode('utf-8')
+        
+        print(f"[BG Removal] Success! Output size: {len(output_bytes)} bytes")
+        
+        return {
+            "success": True,
+            "image_base64": base64_image,
+            "content_type": "image/png"
+        }
+        
+    except ImportError as e:
+        print(f"[BG Removal] rembg not installed: {e}")
+        raise HTTPException(status_code=500, detail="Background removal service not available")
+    except Exception as e:
+        print(f"[BG Removal] Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Background removal failed: {str(e)}")
+
+# ============================================================================
 # AI-POWERED PRODUCT SCRAPER (Like Thunderbit)
 # ============================================================================
 
