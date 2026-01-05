@@ -15395,7 +15395,7 @@ async def login_to_all_vendor_portals():
 
 @api_router.get("/download/chrome-extension")
 async def download_chrome_extension():
-    """Download Chrome Extension v7.7.0 - Fixed Four Hands, Uttermost, Loloi"""
+    """Download Chrome Extension v7.7.4 - Fixed Copy Image and Copy Link buttons"""
     import os
     import glob
     
