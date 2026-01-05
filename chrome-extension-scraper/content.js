@@ -1079,30 +1079,28 @@ function scrapePageData() {
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
     
     // ===== COLOR EXTRACTION =====
-    // On Four Hands, the color appears as "Durango Smoke • 100074-009" 
-    const allTextNodes = document.body.innerText;
-    if (data.sku) {
-      // Look for pattern: "Color Name • SKU" or "Color Name · SKU"
-      const colorSkuPattern = new RegExp(`([A-Za-z][A-Za-z\\s]+?)\\s*[•·]\\s*${data.sku}`, 'i');
-      const colorMatch = allTextNodes.match(colorSkuPattern);
-      if (colorMatch) {
-        data.finish_color = colorMatch[1].trim();
-        console.log('[FH Debug] Found Color:', data.finish_color);
+    // On Four Hands, color shows as "Durango Smoke • 100074-009" below the title
+    // OR in the "Cover" section showing "Durango Smoke"
+    
+    // Strategy 1: Look for "Cover" label with color name
+    const coverMatch = pageText.match(/Cover[:\s]*([A-Za-z][A-Za-z\s]+?)(?:\n|$)/i);
+    if (coverMatch && coverMatch[1].trim().length > 2 && coverMatch[1].trim().length < 40) {
+      data.finish_color = coverMatch[1].trim();
+      console.log('[FH Debug] Found Color from Cover:', data.finish_color);
+    }
+    
+    // Strategy 2: Look right below the product name for "Color • SKU" pattern
+    // But ONLY get the last 2-3 words before the bullet (to avoid breadcrumb)
+    if (!data.finish_color && data.sku) {
+      const shortPattern = new RegExp(`([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)?)\\s*[•·]\\s*${data.sku}`, 'i');
+      const shortMatch = pageText.match(shortPattern);
+      if (shortMatch) {
+        data.finish_color = shortMatch[1].trim();
+        console.log('[FH Debug] Found Color from short pattern:', data.finish_color);
       }
     }
     
-    // Fallback color strategies
-    if (!data.finish_color) {
-      const productArea = document.querySelector('h1')?.parentElement?.parentElement;
-      if (productArea) {
-        const textInArea = productArea.innerText;
-        const bulletMatch = textInArea.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z-]+/i);
-        if (bulletMatch && !bulletMatch[1].match(/seating|dining|chairs|tables|bedroom|living/i)) {
-          data.finish_color = bulletMatch[1].trim();
-        }
-      }
-    }
-    
+    // Strategy 3: Selected swatch with title attribute
     if (!data.finish_color) {
       const selectedSwatch = document.querySelector('[class*="selected"][title], [class*="active"][title], button[aria-selected="true"][title], label[aria-checked="true"][title]');
       if (selectedSwatch?.title && selectedSwatch.title.length > 2 && selectedSwatch.title.length < 40) {
