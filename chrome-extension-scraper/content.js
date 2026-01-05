@@ -1225,8 +1225,11 @@ function scrapePageData() {
   }
   
   // UTTERMOST - uttermost.com
+  // v7.7.0 - Improved with better logging and extraction
   else if (domain.includes('uttermost')) {
     vendorDetected = 'UTTERMOST';
+    console.log('[UTT v7.7.0] Starting Uttermost extraction...');
+    
     // SKU - "SKU: 53083" pattern
     const uttSkuMatch = pageText.match(/SKU[:\s]+(\d+)/i);
     if (uttSkuMatch) data.sku = uttSkuMatch[1];
@@ -1236,6 +1239,7 @@ function scrapePageData() {
       const urlSkuMatch = window.location.pathname.match(/-(\d{4,})$/);
       if (urlSkuMatch) data.sku = urlSkuMatch[1];
     }
+    console.log('[UTT] SKU:', data.sku);
     
     // PRICE - Uttermost shows "Your Price" or trade price
     const uttPriceMatch = pageText.match(/Your\s*Price[:\s]*\$?([\d,]+\.?\d*)/i) ||
@@ -1243,6 +1247,7 @@ function scrapePageData() {
                           pageText.match(/Net[:\s]*\$?([\d,]+\.?\d*)/i);
     if (uttPriceMatch) {
       data.price = parseFloat(uttPriceMatch[1].replace(/,/g, ''));
+      console.log('[UTT] Price from text pattern:', data.price);
     }
     // Fallback - find price that's NOT MSRP/Retail
     if (!data.price) {
@@ -1255,6 +1260,7 @@ function scrapePageData() {
             const val = parseFloat(match[1].replace(/,/g, ''));
             if (val > 5 && val < 100000) {
               data.price = val;
+              console.log('[UTT] Price from element:', data.price);
               break;
             }
           }
@@ -1264,29 +1270,44 @@ function scrapePageData() {
     
     // MSRP
     const uttMsrpMatch = pageText.match(/(?:MSRP|Retail|Suggested)[:\s]*\$?([\d,]+\.?\d*)/i);
-    if (uttMsrpMatch) data.msrp = parseFloat(uttMsrpMatch[1].replace(/,/g, ''));
+    if (uttMsrpMatch) {
+      data.msrp = parseFloat(uttMsrpMatch[1].replace(/,/g, ''));
+      console.log('[UTT] MSRP:', data.msrp);
+    }
     
     // Dimensions - "34 W X 29 H X 30 D (in)"
     const uttDimMatch = pageText.match(/(\d+)\s*W\s*X\s*(\d+)\s*H\s*X\s*(\d+)\s*D\s*\(?in/i);
-    if (uttDimMatch) data.size = `${uttDimMatch[1]}"W x ${uttDimMatch[3]}"D x ${uttDimMatch[2]}"H`;
+    if (uttDimMatch) {
+      data.size = `${uttDimMatch[1]}"W x ${uttDimMatch[3]}"D x ${uttDimMatch[2]}"H`;
+      console.log('[UTT] Dimensions:', data.size);
+    }
     
     // Color - from H1 heading like "Conifer Dining Armchair, Camel"
     const h1Text = document.querySelector('h1')?.innerText?.trim();
     if (h1Text) {
-      const colorMatch = h1Text.match(/,\s*([A-Za-z]+)\s*$/);
-      if (colorMatch) data.finish_color = colorMatch[1];
+      const colorMatch = h1Text.match(/,\s*([A-Za-z][A-Za-z\s]+?)\s*$/);
+      if (colorMatch) {
+        data.finish_color = colorMatch[1].trim();
+        console.log('[UTT] Color from H1:', data.finish_color);
+      }
     }
     
     // Also check page title
     if (!data.finish_color) {
       const titleColor = document.title.match(/,\s*([A-Za-z]+)\s*-/);
-      if (titleColor) data.finish_color = titleColor[1];
+      if (titleColor) {
+        data.finish_color = titleColor[1];
+        console.log('[UTT] Color from title:', data.finish_color);
+      }
     }
     
     // Also look for selected color name in swatches
     if (!data.finish_color) {
       const selectedSwatch = document.querySelector('.tile-root_selected-Au1[title], [class*="selected"][title], button.selected[title]');
-      if (selectedSwatch?.title) data.finish_color = selectedSwatch.title;
+      if (selectedSwatch?.title) {
+        data.finish_color = selectedSwatch.title;
+        console.log('[UTT] Color from swatch:', data.finish_color);
+      }
     }
     
     // Get swatch image from selected color button (has background-image style)
@@ -1301,9 +1322,19 @@ function scrapePageData() {
             swatchUrl = window.location.origin + swatchUrl;
           }
           data.finish_image = swatchUrl;
+          console.log('[UTT] Swatch image found');
         }
       }
     }
+    
+    // Main image
+    const uttMainImg = document.querySelector('.product-image img, [class*="gallery"] img, img[src*="uttermost"]');
+    if (uttMainImg?.src) {
+      data.image_url = uttMainImg.src;
+      console.log('[UTT] Main image found');
+    }
+    
+    console.log('[UTT v7.7.0] Extraction complete');
   }
   
   // GLOBAL VIEWS - globalviews.com
