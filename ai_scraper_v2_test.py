@@ -12,7 +12,7 @@ import sys
 from urllib.parse import urljoin
 
 # Backend URL from environment
-BACKEND_URL = "https://scrapefixer.preview.emergentagent.com"
+BACKEND_URL = "https://clipboard-tool.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 class VendorScrapeTest:

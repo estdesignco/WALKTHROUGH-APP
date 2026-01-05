@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Configuration - Use external URL from frontend .env
-BACKEND_URL = "https://scrapefixer.preview.emergentagent.com/api"
+BACKEND_URL = "https://clipboard-tool.preview.emergentagent.com/api"
 
 class ComprehensiveBackendTester:
     def __init__(self):

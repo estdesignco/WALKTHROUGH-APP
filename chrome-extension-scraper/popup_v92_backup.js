@@ -3,8 +3,8 @@
 // Main image = Large product photo (NOT a swatch)
 // Swatch image = Small color/finish chip ONLY
 
-const APP_URL = 'https://scrapefixer.preview.emergentagent.com';
-const BACKEND_URL = 'https://scrapefixer.preview.emergentagent.com';
+const APP_URL = 'https://clipboard-tool.preview.emergentagent.com';
+const BACKEND_URL = 'https://clipboard-tool.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

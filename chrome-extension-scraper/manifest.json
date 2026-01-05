@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://scrapefixer.preview.emergentagent.com/*",
+    "https://clipboard-tool.preview.emergentagent.com/*",
     "https://*/*",
     "http://*/*"
   ],

@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://scrapefixer.preview.emergentagent.com/api
+https://clipboard-tool.preview.emergentagent.com/api
 ```
 
 ---

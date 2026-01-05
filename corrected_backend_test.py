@@ -11,7 +11,7 @@ from datetime import datetime
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://scrapefixer.preview.emergentagent.com/api"
+BACKEND_URL = "https://clipboard-tool.preview.emergentagent.com/api"
 
 class CorrectedBackendTester:
     def __init__(self):

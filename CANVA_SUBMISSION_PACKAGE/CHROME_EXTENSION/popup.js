@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://scrapefixer.preview.emergentagent.com';
+const BACKEND_URL = 'https://clipboard-tool.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

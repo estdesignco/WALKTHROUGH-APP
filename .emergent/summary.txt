@@ -1,146 +1,145 @@
 <analysis>**original_problem_statement:**
-The user's primary goal is a reliable, multi-vendor web scraper for their interior design application. The initial task was to implement a Send to Canva button that would copy a product's image with an embedded hyperlink of the product page URL in a single action. This proved technically challenging, leading to significant user frustration.
+The user initially requested fixes for a highly unreliable web scraper Chrome Extension, which was causing extreme frustration due to repeated failures and regressions. After several volatile iterations, the user abandoned the scraper issue and requested a new feature: a Select Multiple Rooms modal for the Walkthrough, Checklist, and FFE pages.
 
-The problem has evolved into two distinct, high-priority issues:
-1.  **Scraper Reliability (P0):** The Chrome Extension's auto-scraping functionality is highly unreliable. The latest version (v7.6.0) has introduced severe regressions, breaking vendors that previously worked (e.g., Uttermost) and failing to fix others (Four Hands, Loloi). The core issue is the failure to consistently capture ground zero data: product title, SKU, price, dimensions, main image, and color name/swatch. The user is extremely frustrated with the repeated cycle of failed fixes.
-2.  **One-Click Copy for Canva (P1):** The user wants a single button that copies the product image with the product page URL embedded as a hyperlink. This is considered technically infeasible with current web APIs and should not be worked on.
+After that feature was implemented, the user reported two major recurring bugs:
+1.  Materials added or edited directly in the spreadsheet (finish/color field) were not being synced to the global and project-specific material libraries. The system also needed to handle duplicates and correctly categorize materials as Fabric (for items like sofas, chairs) or Finish (for items like tables, lights).
+2.  All contacts and vendor information were missing from the application again.
+
+The most recent issue reported is that the Copy Image and Copy Link buttons on the web scraper popup are now broken.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application (React/FastAPI/MongoDB) with a Chrome Extension ().
-- The extension () contains vendor-specific scraping logic in .
-- The agent attempted to create universal helper functions (, ) to apply to all vendors, but this approach failed and caused regressions.
-- A recurring bug where the backend served an outdated extension  file has been fixed. The  endpoint in  now serves a dynamically named file to prevent browser caching issues.
-- The user is extremely frustrated and has lost all trust in the agent's ability to test and deliver working code.
+- A full-stack application (React/FastAPI/MongoDB).
+- A Chrome Extension scraper () which has had numerous fixes applied but was abandoned by the user due to ongoing frustration. It is not considered fully reliable.
+- A new Select Multiple Rooms modal () has been successfully integrated into the , , and  pages.
+- The missing contacts issue was resolved by adding new  endpoints in  to correctly serve data from the  collection.
+- The material library sync feature has been implemented. Inline edits to the  field in the , , and  now trigger an API call to save the material.
+- The backend now correctly categorizes these materials as Fabric or Finish based on keywords in the item's name.
+- The project-specific material library page ( and ) now correctly fetches and displays all materials, including auto-extracted ones.
 
 **Last working item**:
--   **Last item agent was working**: Improving the universal  and  helper functions in  (v7.6.0) to work across all 22 vendors. This effort failed, causing regressions on previously working vendors and not fixing the reported issues.
--   **Status**: IN PROGRESS
--   **Agent Testing Done**: Y (Agent used both  and custom scripts, but testing was ineffective as it did not catch the real-world regressions reported by the user.)
--   **Which testing method agent to use?**: The agent's current testing methods are insufficient. The next agent must rely on the HTML crawled from actual product pages and the user's screenshots/console logs to write specific selectors. The agent CANNOT see prices as it is not logged in, but the extension runs in the user's authenticated session, so the selectors must be written for the logged-in view.
--   **User Testing Done**: Y (User has confirmed v7.6.0 is broken for Uttermost, Four Hands, and Loloi.)
+-   **Last item agent was working**: Investigating why the Copy Image and Copy Link buttons on the Chrome extension popup ( / ) are no longer working. The agent had started looking at the relevant files before being interrupted.
+-   **Status**: NOT STARTED
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?**: Manual testing. The agent needs to examine  to understand the event listeners and clipboard logic for the copy buttons and fix any errors. A new extension version will need to be built and provided to the user.
+-   **User Testing Done**: Y (User reported the feature is broken).
 
 **All Pending/In progress Issue list**:
--   Issue 1: Scraper is broken and unreliable for all vendors. (P0 - CRITICAL)
--   Issue 2: The one-click copy linked image for Canva is unresolved. (P1)
+-   Issue 1: Copy Image and Copy Link buttons on the scraper popup are broken. (P0)
+-   Issue 2: The web scraper's overall reliability is still questionable across all 22 vendors. (P1)
 
 **Issues Detail:**
--   **Issue 1: Scraper is broken and unreliable for all vendors.**
-    -   **Attempted fixes**: The agent created universal helper functions in v7.6.0. This was a catastrophic failure, causing regressions. Previous attempts involved fixing vendor-by-vendor, which was more successful. The agent also fixed a backend issue where the download link served a stale, hardcoded file.
+-   **Issue 1: Copy Image and Copy Link buttons on the scraper popup are broken.**
+    -   **Attempted fixes**: None. The agent was just beginning to investigate.
     -   **Next debug checklist**:
-        1.  **Acknowledge the failure.** The universal helper function approach was a mistake. It must be abandoned.
-        2.  **Revert to vendor-by-vendor fixes.** The only way to regain user trust is to deliver a working scraper for one or two vendors at a time. Start with Uttermost and Four Hands, as they were the source of the user's latest complaint.
-        3.  **Analyze the crawled HTML.** The agent has successfully crawled the unauthenticated HTML for Uttermost and Four Hands. Use this as a starting point to write hyper-specific selectors in .
-        4.  **Fix Uttermost**: Re-implement robust, specific selectors for SKU, price, and color. The universal logic broke the previously working implementation.
-        5.  **Fix Four Hands**: Implement specific selectors for price and color. The current logic fails because the agent is not logged in to see the price, and the color selector is not robust.
-        6.  **Fix Loloi**: The agent incorrectly extracted a price from a Price Range text. The logic needs to be much more specific to the actual price element and ignore text that contains ranges or other non-price numbers.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is the application's core feature. It is completely unusable. Fixing this is the only way to salvage the project.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend (the extension).
+        1.  View  to identify the button IDs/classes.
+        2.  View  to find the corresponding event listeners for those buttons.
+        3.  Analyze the  or similar functions to identify the cause of the failure (e.g., incorrect data access, broken API, syntax error).
+        4.  Fix the logic in .
+        5.  Increment the version in  to .
+        6.  Re-zip the extension and update  to serve the new version.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a core function of the scraper popup. Fixing it will restore basic usability that the user expects.
+    -   **Status**: NOT STARTED
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: Frontend (Chrome Extension).
     -   **Blocked on other issue**: None.
 
--   **Issue 2: The one-click copy linked image for Canva is unresolved.**
-    -   **Attempted fixes**: Multiple clipboard API attempts failed. Backend PDF generation was rejected.
-    -   **Next debug checklist**: **DO NOT WORK ON THIS.** This is blocked by technical limitations. All effort must be focused on fixing the scraper (Issue 1).
-    -   **Status**: BLOCKED
+-   **Issue 2: The web scraper's overall reliability is still questionable across all 22 vendors.**
+    -   **Attempted fixes**: The agent went through multiple versions (v7.7.0 to v7.7.3), fixing an overwrite bug and addressing specific vendor issues for Four Hands, Uttermost, Loloi, Visual Comfort, and HVL Group. However, the user lost patience before all vendors could be verified.
+    -   **Next debug checklist**: This issue is on hold per the user's request. Do not work on this unless the user brings it up again. If they do, the strategy should be to fix vendors one by one and get explicit confirmation from the user after each fix.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the application's primary feature. A fully reliable scraper is the main goal of the project.
+    -   **Status**: NOT STARTED (On hold by user)
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend.
-    -   **Blocked on other issue**: Blocked by technical limitations of Canva's clipboard handling.
+    -   **Should Test frontend/backend/both after fix?**: Frontend (Chrome Extension).
+    -   **Blocked on other issue**: Blocked by user's request to work on other tasks.
 
 **In progress Task List**:
--   **Task 1: Systematically Fix Scraper for All Vendors (P0)**
-    -   **Where to resume**: .
-    -   **What will be achieved with this?**: A reliable scraper that correctly captures product data, restoring the app's core functionality and rebuilding user trust.
-    -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: Frontend.
-    -   **Blocked on something**: The agent's failed universal approach. Needs to revert to a more focused, vendor-specific strategy.
+-   None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
     -   (P1) Re-attempt Canva Integration using the official API, once the scraper is stable.
-    -   (P2) Build Frontend for Product Library and Materials Library.
+    -   (P2) Build Frontend for Product Library.
 -   **Future Tasks:**
-    -   (P2) Refactor  to be non-destructive.
     -   (P2) Implement Backup Data to Google Drive feature.
     -   (P2) Refactor the monolithic  into modular API routers.
     -   (P2) Implement the Client Approval Portal feature.
     -   (P2) Perform a comprehensive application audit.
 
 **Completed work in this session**
--   Attempted a universal fix for price/color scraping by creating helper functions in  (FAILED, caused regressions).
--   Fixed a critical backend bug where the  endpoint served an outdated, hardcoded file. It now serves a dynamically named file to prevent caching issues.
--   Added debug logging () to the extension to trace which vendor's logic is being executed.
--   Used the testing agent, which helped identify some regex bugs but failed to prevent major real-world failures.
--   Crawled the unauthenticated HTML of Uttermost and Four Hands product pages, providing a basis for the next fix.
+-   **Multi-Select Rooms Feature**: Implemented a new modal () allowing users to select multiple rooms at once and integrated it into the Walkthrough, Checklist, and FFE dashboards.
+-   **Missing Contacts Restored**: Fixed a critical bug where contacts were not showing up. Added new endpoints () to  to fetch from the correct  collection and fixed the frontend routing to load the page.
+-   **Material Library Sync from Inline Edits**: Implemented functionality in  and  to automatically add a material to the library when the  field is edited directly in the spreadsheet.
+-   **Material Categorization (Fabric vs. Finish)**: Added backend logic to intelligently categorize auto-detected materials as Fabric (for chairs, sofas, rugs) or Finish (for tables, lights) based on the item's name.
+-   **Project Material Library Fix**: Resolved an issue where the project-specific material library appeared empty. This involved adding a  endpoint for project materials and ensuring the backend queries the correct collections ( and ) to aggregate the data.
+-   **Chrome Scraper v7.7.0 - v7.7.3**: Iteratively fixed major bugs in the scraper, including a price-overwriting logic error, a syntax error that crashed the extension, and specific data extraction issues for Four Hands, Visual Comfort, and HVL Group.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: One-Click Copy for Canva is unresolved.** This remains a major point of user frustration. All attempts have failed, and the only remaining path appears to be the Canva API integration.
+-   **Issue 1: One-Click Copy for Canva is unresolved.** This remains a major point of user frustration but is blocked by technical limitations. No work should be done on this.
 
 **Known issue recurrence from previous fork**
-- The scraper's unreliability and the agent's inability to test it effectively is a chronic, recurring problem. The latest attempt to fix it with a universal solution made the situation significantly worse.
+-   The scraper's unreliability and the agent's inability to test it effectively is a chronic, recurring problem.
+-   Data disappearing (like contacts) is a recurring issue, often due to API endpoints pointing to the wrong database collections or non-existent endpoints.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Authenticated vs. Unauthenticated Scraping**: This is the core problem. The agent's  cannot log in and therefore cannot see critical data like prices. The extension selectors must be written to work in the user's logged-in browser context.
--   **Universal vs. Specific Logic**: The attempt to create universal helper functions (, ) was a failure. The codebase must revert to using highly specific selectors inside each vendor's  block.
--   **Dynamic File Serving**: The backend download endpoint in  was fixed to generate a dynamic filename (e.g., ) to defeat browser caching of old extension versions.
+-   **Authenticated vs. Unauthenticated Scraping**: A core challenge for the scraper. The agent cannot see logged-in data like prices.
+-   **Event-driven API calls from Frontend**: Implemented logic where inline edits (onBlur) in spreadsheet cells trigger backend API calls to update related data collections (e.g., saving a  to the  library).
+-   **Dynamic Data Aggregation**: The backend now dynamically aggregates a material library on the fly by querying separate  and  collections, rather than relying on a single static collection.
+-   **Dynamic Material Categorization**: The backend uses a keyword-based approach to categorize materials as Fabric or Finish based on the associated item's name.
 
 **key DB schema**
-- No changes in this session.
-
-**changes in tech stack**
-- No changes in this session.
+-   : Stores the global list of all contacts.
+-   : Stores the global list of all materials.
+-   : Stores materials specific to a project.
+-   : Stores project metadata.
+-   : Stores rooms belonging to a project. Items are nested within rooms.
 
 **All files of reference**
--   : This file contains all the failed logic. It needs to be the focus of the next agent.
--   : The download endpoint fix is located here.
--   : Confirms the current version number.
-
-**Areas that need refactoring**
--   The  function in . The universal helper functions (, ) should be heavily modified or removed in favor of putting specific, robust logic back inside each vendor's conditional block.
-
-**key api endpoints**
--   : Serves the latest Chrome Extension zip file with a dynamic filename to prevent caching issues.
+-   : **Primary file for the next task.** Contains the broken copy logic.
+-   : Contains all the latest scraping logic (v7.7.3).
+-   : Contains all backend API endpoints, including the new fixes for contacts and material libraries.
+-   : Example of a file with the new inline-edit-sync logic.
+-   : The new multi-select room component.
 
 **Critical Info for New Agent**
--   **User trust is zero.** The user is incredibly angry due to repeated failures and regressions. Every response must be direct, acknowledge the failure, and propose a concrete, immediate fix.
--   **ABANDON THE UNIVERSAL FIX.** The generic helper functions in  broke the scraper. Do not try to improve them. Revert to the strategy of writing specific, robust selectors for each vendor, one at a time.
--   **FIX THE REGRESSIONS FIRST.** Start by fixing Uttermost and Four Hands to demonstrate you can restore lost functionality. This is critical to rebuilding any amount of trust.
--   **YOU CANNOT SEE PRICES.** Your crawl tools are not logged in. The user is. Acknowledge this limitation. Write selectors based on the user's screenshots and the assumption that price elements *do* exist in their authenticated session.
--   **STOP OVER-PROMISING AND UNDER-DELIVERING.** Do not claim you have fixed all 22 vendors. Fix one or two, confirm with the user that they work, and then move to the next. An incremental, successful approach is required.
+-   **User trust is extremely low.** The user is highly volatile and gets frustrated quickly by regressions or repeated failures. Acknowledge issues directly and prioritize delivering working fixes.
+-   **The user pivots tasks frequently.** Be prepared to drop a task (like the scraper) and pick up a completely new one on demand.
+-   **The scraper problem is paused, not solved.** The user gave up on it for now, but it's the app's core feature and will likely come back. The work done on v7.7.3 is the current baseline.
+-   **Database collection mismatches are a recurring bug.** When data is missing, a common cause is the frontend calling an endpoint that queries the wrong collection (e.g.,  vs. ). Always verify API endpoints and the collections they interact with.
+-   **Project IDs may be inconsistent.** The user may refer to a project ID that does not exist in the current database state. You may need to query for existing projects to find one with data to test against.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Reports the extension isn't working on any site and broke Uttermost, which was previously working. Expresses extreme frustration.
-2.  **Agent:** Promises to fix all 22 vendors.
-3.  **User:** Reports v7.5.0 didn't fix the Loloi price bug (9k).
-4.  **Agent:** Delivers v7.3.0 with a supposed fix for the Loloi price bug.
-5.  **User:** Reports v7.2.0 is still getting the wrong price on a different site.
-6.  **Agent:** Delivers v7.2.0 with a supposed fix for Four Hands price.
-7.  **User:** Reports the v7.1.0 download is still v7.0.3. Expresses extreme anger at being treated like a dumbass.
-8.  **Agent:** Delivers v7.1.0 with universal price and color extraction.
-9.  **User:** Reports the extension still doesn't get price or color right and that Uttermost is now broken.
-10. **User:** Reports that v7.0.3 has a bug where the project list fails to load (HTTP 404).
+1.  **User:** Reports the project-specific material library is empty despite adding items. (FIXED)
+2.  **User:** Clarifies that materials should be categorized as Fabric (sofas, chairs) or Finish (tables, lights). (FIXED)
+3.  **User:** Reports the Copy Image and Copy Link functions on the scraper popup are broken. (**CURRENT PENDING ISSUE**)
+4.  **Agent:** Starts investigating the broken copy buttons.
+5.  **User:** Interrupts with finish your work first.
+6.  **Agent:** Finishes the previous task (Material Categorization).
+7.  **User:** Reports that the copy functions are broken.
+8.  **Agent:** Summarizes the material categorization fix.
+9.  **User:** Reports fabric/finish categorization is now working.
+10. **Agent:** Summarizes the fix for the project-specific material library.
 
 **Project Health Check:**
--   **Broken**: Core scraping functionality is fundamentally broken and has regressed. User satisfaction is critically low, and the project is at risk.
+-   **Broken**: The Copy Image and Copy Link functions on the Chrome Extension are broken.
+-   **Mocked**: None.
 
 **3rd Party Integrations**
--   **Canva**: BLOCKED. Do not attempt to work on this.
+-   None active. Canva integration is a future task but currently blocked.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES, but it was ineffective and failed to catch the critical, real-world bugs and regressions.
+-   **Testing agent used after significant changes**: NO (for the most recent features).
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**:  (for regex patterns),  (for price logic simulation). These tests are insufficient.
--   **Known regressions**: The scrapers for Uttermost and Four Hands were working in previous versions but are now broken in .
+-   **Test files created**: None in this session.
+-   **Known regressions**: Copy Image and Copy Link functionality in the Chrome Extension popup.
 
 **Credentials to test flow:**
--   None available. The agent cannot log into vendor sites.
+-   None.
 
 **What agent forgot to execute**
-- The agent failed to respect the complexity of the task and attempted a premature, universal optimization that backfired, causing major regressions.
-- The agent did not have a reliable testing strategy that could account for the differences between an unauthenticated and authenticated user session, leading to repeated failures in price extraction.
-- The agent repeatedly failed to validate that the correct file version was being served, eroding user trust.</analysis>
+- The agent has repeatedly struggled with providing fully tested solutions for the Chrome scraper, leading to a cycle of fixes and regressions that eroded user trust.
+- The agent did not initially understand the user's workflow for adding materials (inline editing vs. modal), which required re-doing the implementation.</analysis>
