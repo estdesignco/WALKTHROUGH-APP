@@ -1241,21 +1241,88 @@ function scrapePageData() {
   // LOLOI RUGS - loloi.com / loloirugs.com
   else if (domain.includes('loloi')) {
     vendorDetected = 'LOLOI RUGS';
-    // SKU - format like LOLRK-01 or similar
-    const loSkuMatch = pageText.match(/SKU[:\s]+([A-Z]{2,}-\d+)/i) || 
-                       window.location.pathname.match(/\/([A-Z]{2,}[\d-]+)/i);
-    if (loSkuMatch) data.sku = loSkuMatch[1];
     
-    // Rug dimensions - "8'0" x 10'0"" or "8 x 10"
-    const loDimMatch = pageText.match(/([\d]+)'?\s*"?\s*[xX×]\s*([\d]+)'?\s*"?/);
-    if (loDimMatch) data.size = `${loDimMatch[1]}' x ${loDimMatch[2]}'`;
+    // SKU - from URL like /products/loe-03-natural-e or from page
+    const urlSkuMatch = window.location.pathname.match(/\/products\/([a-z]{2,}-\d+)/i);
+    if (urlSkuMatch) {
+      data.sku = urlSkuMatch[1].toUpperCase();
+    }
+    if (!data.sku) {
+      const pageSkuMatch = pageText.match(/([A-Z]{2,}-\d{2})/);
+      if (pageSkuMatch) data.sku = pageSkuMatch[1];
+    }
     
-    // Color from product name or specs
-    const loColorMatch = pageText.match(/(?:Color|Colorway)[:\s]+([A-Za-z][A-Za-z\s\/\-]+?)(?:\n|,|$)/i);
-    if (loColorMatch) data.finish_color = loColorMatch[1].trim();
+    // COLOR - from product title like "LOE-03 NATURAL / ESPRESSO"
+    const h1 = document.querySelector('h1');
+    if (h1) {
+      const h1Text = h1.innerText?.trim();
+      // Extract color after the SKU pattern (e.g., "LOE-03 NATURAL / ESPRESSO" -> "NATURAL / ESPRESSO")
+      const colorMatch = h1Text?.match(/[A-Z]{2,}-\d+\s+(.+)/i);
+      if (colorMatch) {
+        data.finish_color = colorMatch[1].trim();
+      }
+    }
+    // Fallback - look for color in breadcrumb or page
+    if (!data.finish_color) {
+      const colorMatch = pageText.match(/(?:Color|Colorway)[:\s]+([A-Za-z][A-Za-z\s\/\-]+?)(?:\n|,|$)/i);
+      if (colorMatch) data.finish_color = colorMatch[1].trim();
+    }
+    
+    // PRICE - Look for the selected size price, NOT the max price
+    // Loloi shows prices like "$649" and "$1,589 MAP"
+    // The Add to Cart button shows the real price
+    const addToCartBtn = document.querySelector('[class*="add-to-cart"], button[type="submit"]');
+    if (addToCartBtn) {
+      const btnText = addToCartBtn.innerText;
+      const priceMatch = btnText?.match(/\$(\d+(?:,\d{3})*(?:\.\d{2})?)/);
+      if (priceMatch) {
+        data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
+      }
+    }
+    
+    // Also look for price in the size selector or near "In Stock"
+    if (!data.price) {
+      // Find price that's NOT labeled MAP
+      const priceEls = document.querySelectorAll('[class*="price"]');
+      for (const el of priceEls) {
+        const text = el.innerText?.trim();
+        if (text && !text.includes('MAP') && !text.includes('MSRP')) {
+          const match = text.match(/\$(\d+(?:,\d{3})*)/);
+          if (match) {
+            const val = parseFloat(match[1].replace(/,/g, ''));
+            // Skip obviously wrong prices like 99999
+            if (val > 10 && val < 50000) {
+              data.price = val;
+              break;
+            }
+          }
+        }
+      }
+    }
+    
+    // MSRP - labeled as MAP
+    const mapMatch = pageText.match(/\$(\d+(?:,\d{3})*)\s*MAP/i);
+    if (mapMatch) {
+      data.msrp = parseFloat(mapMatch[1].replace(/,/g, ''));
+    }
+    
+    // Rug dimensions - from selected size like "8'6" x 11'6""
+    const selectedSize = document.querySelector('[class*="selected"] [class*="size"], .size-option.selected, [aria-checked="true"]');
+    if (selectedSize) {
+      const sizeText = selectedSize.innerText?.trim();
+      const dimMatch = sizeText?.match(/([\d'\"]+)\s*x\s*([\d'\"]+)/i);
+      if (dimMatch) {
+        data.size = `${dimMatch[1]} x ${dimMatch[2]}`;
+      }
+    }
+    // Fallback dimension pattern
+    if (!data.size) {
+      const loDimMatch = pageText.match(/([\d]+[''][\d]*["]?)\s*x\s*([\d]+[''][\d]*["]?)/);
+      if (loDimMatch) data.size = `${loDimMatch[1]} x ${loDimMatch[2]}`;
+    }
     
     // Main rug image
-    const loMainImg = document.querySelector('.product-image img, .pdp-image img, [class*="gallery-main"] img');
+    const loMainImg = document.querySelector('.product-image img, .pdp-image img, [class*="gallery"] img, img[src*="loloi"]');
     if (loMainImg?.src) data.image_url = loMainImg.src;
   }
   
