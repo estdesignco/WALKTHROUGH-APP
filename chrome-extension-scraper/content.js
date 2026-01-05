@@ -377,6 +377,7 @@ function createSidePanel() {
   document.getElementById('dr-close-btn').addEventListener('click', hidePanel);
   document.getElementById('dr-send-btn').addEventListener('click', sendToAppAndLibraries);
   document.getElementById('dr-copy-image-btn').addEventListener('click', copyImage);
+  document.getElementById('dr-copy-nobg-btn').addEventListener('click', copyImageNoBackground);
   document.getElementById('dr-copy-link-btn').addEventListener('click', copyLink);
   document.getElementById('dr-rescrape-btn').addEventListener('click', () => {
     scrapeAndShow();
