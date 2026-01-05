@@ -244,12 +244,13 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
         onReload={loadSimpleProject}
       />
 
-      {/* Add Room Modal */}
+      {/* Add Multiple Rooms Modal */}
       {showAddRoom && (
-        <AddRoomModal
+        <AddMultipleRoomsModal
           onClose={() => setShowAddRoom(false)}
           onSubmit={handleAddRoom}
           roomColors={roomColors}
+          existingRooms={project?.rooms || []}
         />
       )}
     </CompletePageLayout>
