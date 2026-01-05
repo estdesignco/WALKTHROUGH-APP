@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { projectAPI, roomAPI, categoryAPI, itemAPI } from '../App';
 import ExactChecklistSpreadsheet from './ExactChecklistSpreadsheet';
 import ChecklistStatusOverview from './ChecklistStatusOverview';
-import AddRoomModal from './AddRoomModal';
+import AddMultipleRoomsModal from './AddMultipleRoomsModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
 import RoomSpecificCanvaImporter from './RoomSpecificCanvaImporter';
