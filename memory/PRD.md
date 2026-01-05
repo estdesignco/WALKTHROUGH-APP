@@ -7,9 +7,27 @@ Build a deployment-ready interior design application with a Chrome Extension web
 
 ### P0 - Critical
 1. **Chrome Extension Web Scraper** - Must work for all 22 vendor sites
-   - **v7.0.0 COMPLETE** - All 22 vendors supported with vendor-specific scraping logic
+   - **v7.7.4 CURRENT** - Fixed Copy Image and Copy Link buttons
 
-## v7.0.0 Features (January 4, 2025)
+## Changelog
+
+### v7.7.4 (January 5, 2025)
+- **Fixed**: "Copy Image" and "Copy Link" buttons in side panel scraper
+  - Copy Image now uses multiple fallback methods:
+    1. First tries to copy image directly from page (bypasses CORS)
+    2. Falls back to fetch with CORS credentials
+    3. Final fallback: copies image URL to clipboard
+  - Copy Link now properly handles errors and copies the product URL
+
+### v7.7.3 (January 5, 2025)
+- Fixed price-overwriting logic error
+- Fixed Four Hands, Visual Comfort, HVL Group specific issues
+
+### v7.7.0 - v7.7.2 (January 4-5, 2025)
+- Multi-vendor scraping improvements
+- Syntax error fixes
+
+### v7.0.0 (January 4, 2025)
 
 ### Comprehensive Vendor-Specific Scraping
 Each of the 22 vendors now has dedicated scraping logic for optimal data extraction:
