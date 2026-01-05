@@ -454,7 +454,7 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
       await onSubmit(formData);
       console.log('✅ onSubmit completed');
       
-      // Add finish/color to Materials Library if checkbox is checked
+      // Add finish/color to BOTH Material Libraries if checkbox is checked
       const addToMaterialsCheckbox = document.getElementById('add-to-materials');
       if (formData.finish_color && addToMaterialsCheckbox?.checked) {
         try {
@@ -468,15 +468,27 @@ const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], 
             color: formData.finish_color,
             photo_url: formData.finish_image || '',
             notes: `From product: ${formData.name}`,
-            tags: ['scraped', 'auto-added', formData.vendor || ''].filter(Boolean).join(',')
+            tags: ['scraped', 'auto-added', formData.vendor || ''].filter(Boolean).join(','),
+            project_id: projectId || null
           };
           
-          await fetch(`${backendUrl}/api/master/materials`, {
+          // 1. Add to GLOBAL Master Materials Library
+          await fetch(`${backendUrl}/api/materials/from-scraper`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(materialData)
           });
-          console.log('📚 Added finish to Materials Library:', formData.finish_color);
+          console.log('📚 Added finish to Global Materials Library:', formData.finish_color);
+          
+          // 2. Add to PROJECT-SPECIFIC Materials Library (if projectId is available)
+          if (projectId) {
+            await fetch(`${backendUrl}/api/materials`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(materialData)
+            });
+            console.log('📚 Added finish to Project Materials Library:', formData.finish_color);
+          }
         } catch (materialErr) {
           console.warn('⚠️ Could not add to Materials Library:', materialErr);
           // Don't fail the whole operation if materials library fails
