@@ -1962,6 +1962,7 @@ const ExactFFESpreadsheet = ({
           itemStatuses={itemStatuses}
           vendorTypes={vendorTypes}
           loading={false}
+          projectId={project?.id}
         />
       )}
 
