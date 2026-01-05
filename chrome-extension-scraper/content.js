@@ -878,10 +878,13 @@ function scrapePageData() {
         continue;
       }
       
-      // Also skip if MAP/MSRP comes RIGHT AFTER the price (within 5 chars)
-      const immediateAfter = pageText.substring(idx + priceStr.length, idx + priceStr.length + 10).toLowerCase();
-      if (/^\s*(map|msrp)/i.test(immediateAfter)) {
-        console.log('[Price Debug] Skipping - MAP/MSRP right after price:', val);
+      // Check what comes RIGHT AFTER the price
+      const immediateAfter = pageText.substring(idx + priceStr.length, idx + priceStr.length + 5).trim().toLowerCase();
+      
+      // Skip if this IS the MAP price (pattern: "$1,589 MAP" without colon)
+      // But ACCEPT if pattern is "$649 MAP: $xxx" (the $649 is trade, $xxx is MAP)
+      if (/^map/i.test(immediateAfter) && !immediateAfter.includes(':')) {
+        console.log('[Price Debug] Skipping - this IS the MAP price:', val);
         continue;
       }
       
