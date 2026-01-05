@@ -1407,8 +1407,10 @@ function scrapePageData() {
   }
   
   // LOLOI RUGS - loloi.com / loloirugs.com
+  // v7.7.0 - Fixed price extraction to avoid $99k bug from price ranges
   else if (domain.includes('loloi')) {
     vendorDetected = 'LOLOI RUGS';
+    console.log('[LOLOI v7.7.0] Starting Loloi extraction...');
     
     // SKU - from URL like /products/loe-03-natural-e or from page
     const urlSkuMatch = window.location.pathname.match(/\/products\/([a-z]{2,}-\d+)/i);
@@ -1419,6 +1421,7 @@ function scrapePageData() {
       const pageSkuMatch = pageText.match(/([A-Z]{2,}-\d+)/i);
       if (pageSkuMatch) data.sku = pageSkuMatch[1];
     }
+    console.log('[LOLOI] SKU:', data.sku);
     
     // COLOR - from product title like "LOE-03 NATURAL / ESPRESSO"
     const h1 = document.querySelector('h1');
@@ -1428,50 +1431,101 @@ function scrapePageData() {
       const colorMatch = h1Text?.match(/[A-Z]{2,}-\d+\s+(.+)/i);
       if (colorMatch) {
         data.finish_color = colorMatch[1].trim();
+        console.log('[LOLOI] Color from H1:', data.finish_color);
       }
     }
     // Fallback - look for color in breadcrumb or page
     if (!data.finish_color) {
       const colorMatch = pageText.match(/(?:Color|Colorway)[:\s]+([A-Za-z][A-Za-z\s\/\-]+?)(?:\n|,|$)/i);
-      if (colorMatch) data.finish_color = colorMatch[1].trim();
-    }
-    
-    // PRICE - Look for the selected size price, NOT the max price
-    // Loloi shows prices like "$649" and "$1,589 MAP"
-    // The Add to Cart button shows the real price
-    const addToCartBtn = document.querySelector('[class*="add-to-cart"], button[type="submit"]');
-    if (addToCartBtn) {
-      const btnText = addToCartBtn.innerText;
-      const priceMatch = btnText?.match(/\$(\d+(?:,\d{3})*(?:\.\d{2})?)/);
-      if (priceMatch) {
-        data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
+      if (colorMatch) {
+        data.finish_color = colorMatch[1].trim();
+        console.log('[LOLOI] Color from text pattern:', data.finish_color);
       }
     }
     
-    // Also look for price in the size selector or near "In Stock"
+    // ===== PRICE EXTRACTION - v7.7.0 =====
+    // CRITICAL: Loloi shows "Price Range: $99 - $99,999" which caused the $99k bug
+    // We must ONLY extract the ACTUAL price for the SELECTED size, not the max range price
+    
+    // Strategy 1: Look for a price element that's NOT part of a range
+    // The actual price is typically displayed prominently, often near the selected size or Add to Cart
+    
+    // First, identify and SKIP any "Price Range" or "$XX - $XX" patterns
+    const priceRangePattern = /\$[\d,]+\s*[-–—]\s*\$[\d,]+/g;
+    const hasRange = pageText.match(priceRangePattern);
+    if (hasRange) {
+      console.log('[LOLOI] Price range detected - will avoid extracting from range:', hasRange[0]);
+    }
+    
+    // Strategy 2: Find prices associated with the selected size option
+    // On Loloi, each size has its own price displayed
+    const selectedSizeEl = document.querySelector('[class*="selected"], [aria-checked="true"], .active');
+    if (selectedSizeEl) {
+      // Look for price within or near the selected element
+      let priceInSelected = selectedSizeEl.innerText?.match(/\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/);
+      if (priceInSelected) {
+        const val = parseFloat(priceInSelected[1].replace(/,/g, ''));
+        // Sanity check: rug prices should be reasonable (most rugs $50 - $15,000)
+        if (val > 30 && val < 20000) {
+          data.price = val;
+          console.log('[LOLOI] Price from selected size element:', data.price);
+        }
+      }
+    }
+    
+    // Strategy 3: Look for Add to Cart button with price
     if (!data.price) {
-      // Find price that's NOT labeled MAP
-      const priceEls = document.querySelectorAll('[class*="price"]');
-      for (const el of priceEls) {
-        const text = el.innerText?.trim();
-        if (text && !text.includes('MAP') && !text.includes('MSRP')) {
-          const match = text.match(/\$(\d+(?:,\d{3})*)/);
-          if (match) {
-            const val = parseFloat(match[1].replace(/,/g, ''));
-            // Skip obviously wrong prices like 99999
-            if (val > 10 && val < 50000) {
-              data.price = val;
-              break;
-            }
+      const addToCartBtn = document.querySelector('[class*="add-to-cart"], button[type="submit"], button[name="add"]');
+      if (addToCartBtn) {
+        const btnText = addToCartBtn.innerText;
+        const priceMatch = btnText?.match(/\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/);
+        if (priceMatch) {
+          const val = parseFloat(priceMatch[1].replace(/,/g, ''));
+          if (val > 30 && val < 20000) {
+            data.price = val;
+            console.log('[LOLOI] Price from Add to Cart button:', data.price);
           }
         }
       }
     }
     
-    // MSRP - labeled as MAP
-    const mapMatch = pageText.match(/\$(\d+(?:,\d{3})*)\s*MAP/i);
+    // Strategy 4: Look for standalone price elements (NOT in a range context)
+    if (!data.price) {
+      const priceEls = document.querySelectorAll('[class*="price"], [data-price]');
+      for (const el of priceEls) {
+        const elText = el.innerText?.trim() || '';
+        // SKIP if this element contains a range (dash between two prices)
+        if (/\$[\d,]+\s*[-–—]\s*\$[\d,]+/.test(elText)) {
+          console.log('[LOLOI] Skipping price range element:', elText);
+          continue;
+        }
+        // SKIP if labeled as MAP/MSRP
+        if (/MAP|MSRP|retail|compare/i.test(elText)) {
+          continue;
+        }
+        const match = elText.match(/\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/);
+        if (match) {
+          const val = parseFloat(match[1].replace(/,/g, ''));
+          // STRICT validation: Skip obviously wrong prices
+          if (val > 30 && val < 15000) {
+            data.price = val;
+            console.log('[LOLOI] Price from element:', data.price, '- text was:', elText);
+            break;
+          } else {
+            console.log('[LOLOI] Skipping unreasonable price:', val);
+          }
+        }
+      }
+    }
+    
+    // MSRP - labeled as MAP (but NOT from a range)
+    const mapMatch = pageText.match(/\$(\d{1,3}(?:,\d{3})*)\s*MAP/i);
     if (mapMatch) {
-      data.msrp = parseFloat(mapMatch[1].replace(/,/g, ''));
+      const msrpVal = parseFloat(mapMatch[1].replace(/,/g, ''));
+      if (msrpVal < 50000) {
+        data.msrp = msrpVal;
+        console.log('[LOLOI] MSRP (MAP):', data.msrp);
+      }
     }
     
     // Rug dimensions - from selected size like "8'6" x 11'6""
@@ -1481,17 +1535,26 @@ function scrapePageData() {
       const dimMatch = sizeText?.match(/([\d'\"]+)\s*x\s*([\d'\"]+)/i);
       if (dimMatch) {
         data.size = `${dimMatch[1]} x ${dimMatch[2]}`;
+        console.log('[LOLOI] Size from selected:', data.size);
       }
     }
     // Fallback dimension pattern
     if (!data.size) {
       const loDimMatch = pageText.match(/([\d]+[''][\d]*["]?)\s*x\s*([\d]+[''][\d]*["]?)/);
-      if (loDimMatch) data.size = `${loDimMatch[1]} x ${loDimMatch[2]}`;
+      if (loDimMatch) {
+        data.size = `${loDimMatch[1]} x ${loDimMatch[2]}`;
+        console.log('[LOLOI] Size from text pattern:', data.size);
+      }
     }
     
     // Main rug image
     const loMainImg = document.querySelector('.product-image img, .pdp-image img, [class*="gallery"] img, img[src*="loloi"]');
-    if (loMainImg?.src) data.image_url = loMainImg.src;
+    if (loMainImg?.src) {
+      data.image_url = loMainImg.src;
+      console.log('[LOLOI] Main image found');
+    }
+    
+    console.log('[LOLOI v7.7.0] Extraction complete');
   }
   
   // VISUAL COMFORT - visualcomfort.com
