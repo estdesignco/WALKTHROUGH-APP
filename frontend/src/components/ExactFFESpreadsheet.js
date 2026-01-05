@@ -265,6 +265,99 @@ const ExactFFESpreadsheet = ({
     }
   };
 
+  // Handle updating any item field (vendor, quantity, size, finish_color, cost, etc.)
+  const handleUpdateItemField = async (itemId, field, value) => {
+    console.log('🔄 FFE: Updating item field:', { itemId, field, value });
+    
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: value })
+      });
+      
+      if (response.ok) {
+        console.log(`✅ FFE: Item ${field} updated successfully to:`, value);
+        
+        // If finish_color was updated, sync to Material Libraries
+        if (field === 'finish_color' && value && value.trim()) {
+          // Find the item to get vendor, name, sku info
+          let itemData = null;
+          filteredProject?.rooms?.forEach(room => {
+            room.categories?.forEach(category => {
+              category.subcategories?.forEach(subcategory => {
+                subcategory.items?.forEach(item => {
+                  if (item.id === itemId) {
+                    itemData = item;
+                  }
+                });
+              });
+            });
+          });
+          
+          if (itemData) {
+            // Sync to Material Libraries (with duplicate check)
+            try {
+              const materialData = {
+                name: value.trim(),
+                category: 'finish',
+                manufacturer: itemData.vendor || '',
+                vendor: itemData.vendor || '',
+                sku: itemData.sku ? `${itemData.sku}-FINISH` : '',
+                color: value.trim(),
+                photo_url: itemData.finish_image || '',
+                notes: `From product: ${itemData.name || 'Unknown'}`,
+                tags: ['scraped', 'auto-added', itemData.vendor || ''].filter(Boolean).join(','),
+                project_id: project?.id || null
+              };
+              
+              // Add to Global Master Materials (with duplicate check)
+              await fetch(`${backendUrl}/api/materials/from-scraper`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(materialData)
+              });
+              console.log('📚 FFE: Synced finish to Global Materials Library:', value);
+              
+              // Add to Project Materials (with duplicate check)
+              if (project?.id) {
+                await fetch(`${backendUrl}/api/materials`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(materialData)
+                });
+                console.log('📚 FFE: Synced finish to Project Materials Library:', value);
+              }
+            } catch (materialErr) {
+              console.warn('⚠️ FFE: Could not sync to Materials Library:', materialErr);
+            }
+          }
+        }
+        
+        // Update local state
+        const updatedProject = JSON.parse(JSON.stringify(filteredProject));
+        updatedProject.rooms?.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                if (item.id === itemId) {
+                  item[field] = value;
+                }
+              });
+            });
+          });
+        });
+        setFilteredProject(updatedProject);
+      } else {
+        console.error(`❌ FFE: Failed to update item ${field}:`, response.status);
+      }
+    } catch (error) {
+      console.error(`❌ FFE: Error updating item ${field}:`, error);
+    }
+  };
+
   // APPLY FILTERS - SIMPLE WORKING VERSION
   useEffect(() => {
     console.log('🔍 Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, selectedCarrier });
