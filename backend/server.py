@@ -10584,6 +10584,105 @@ async def delete_contact(contact_id: str):
         logging.error(f"Delete contact error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===========================================
+# MASTER CONTACTS ENDPOINTS (Global Contacts)
+# ===========================================
+
+@api_router.get("/master/contacts")
+async def get_master_contacts(search: str = None, role: str = None):
+    """Get all master contacts (global vendor list)"""
+    try:
+        query = {}
+        if search:
+            query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"company": {"$regex": search, "$options": "i"}},
+                {"email": {"$regex": search, "$options": "i"}},
+                {"phone": {"$regex": search, "$options": "i"}}
+            ]
+        if role:
+            query["role"] = {"$regex": role, "$options": "i"}
+        
+        contacts = await db.master_contacts.find(query, {"_id": 0}).sort("company", 1).to_list(length=1000)
+        return contacts
+    except Exception as e:
+        logging.error(f"Get master contacts error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/master/contacts/roles/list")
+async def get_master_contact_roles():
+    """Get distinct roles from master contacts"""
+    try:
+        roles = await db.master_contacts.distinct("role")
+        roles = [r for r in roles if r]  # Filter out empty roles
+        default_roles = [
+            "Vendor", "Sales Rep", "Account Manager", "Customer Service",
+            "Warehouse", "Delivery", "Installer", "Designer", "Contractor",
+            "Architect", "Client", "Other"
+        ]
+        all_roles = list(set(roles + default_roles))
+        return {"roles": sorted(all_roles)}
+    except Exception as e:
+        logging.error(f"Get master contact roles error: {str(e)}")
+        return {"roles": []}
+
+@api_router.post("/master/contacts")
+async def create_master_contact(contact: dict):
+    """Create a new master contact"""
+    try:
+        contact_doc = {
+            "id": str(uuid.uuid4()),
+            "name": contact.get("name", ""),
+            "company": contact.get("company", ""),
+            "phone": contact.get("phone", ""),
+            "email": contact.get("email", ""),
+            "role": contact.get("role", "Vendor"),
+            "address": contact.get("address", ""),
+            "website": contact.get("website", ""),
+            "notes": contact.get("notes", ""),
+            "tags": contact.get("tags", []),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.master_contacts.insert_one(contact_doc)
+        return {"success": True, "contact": {k: v for k, v in contact_doc.items() if k != "_id"}}
+    except Exception as e:
+        logging.error(f"Create master contact error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/master/contacts/{contact_id}")
+async def update_master_contact(contact_id: str, updates: dict):
+    """Update a master contact"""
+    try:
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        result = await db.master_contacts.update_one(
+            {"id": contact_id},
+            {"$set": updates}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Contact not found")
+        contact = await db.master_contacts.find_one({"id": contact_id}, {"_id": 0})
+        return {"success": True, "contact": contact}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Update master contact error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/master/contacts/{contact_id}")
+async def delete_master_contact(contact_id: str):
+    """Delete a master contact"""
+    try:
+        result = await db.master_contacts.delete_one({"id": contact_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Contact not found")
+        return {"success": True, "message": "Contact deleted"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Delete master contact error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/calendar-events")
 async def get_calendar_events(project_id: str = None):
     """Get calendar events, optionally filtered by project_id"""
