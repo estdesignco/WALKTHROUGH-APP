@@ -2324,8 +2324,14 @@ async function copyImage() {
 }
 
 async function copyLink() {
-  await navigator.clipboard.writeText(window.location.href);
-  showToast('✅ Link copied!');
+  try {
+    const url = scrapedData?.url || window.location.href;
+    await navigator.clipboard.writeText(url);
+    showToast('✅ Link copied to clipboard!');
+  } catch (e) {
+    console.error('[Scraper] Copy link failed:', e);
+    showToast('❌ Copy failed - try Ctrl+L, Ctrl+C');
+  }
 }
 
 function copyImageWithLink() {
