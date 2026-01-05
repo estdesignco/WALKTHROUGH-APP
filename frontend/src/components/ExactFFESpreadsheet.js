@@ -1592,7 +1592,13 @@ const ExactFFESpreadsheet = ({
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
                                                               className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Cost updated:', e.target.textContent)}
+                                                              onBlur={(e) => {
+                                                                const newValue = e.target.textContent?.replace(/[$,]/g, '').trim();
+                                                                const numValue = parseFloat(newValue);
+                                                                if (!isNaN(numValue) && numValue !== item.cost) {
+                                                                  handleUpdateItemField(item.id, 'cost', numValue);
+                                                                }
+                                                              }}
                                                             >
                                                               {item.cost ? `$${item.cost}` : ''}
                                                             </div>
