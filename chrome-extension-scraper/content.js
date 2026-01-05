@@ -839,18 +839,31 @@ function scrapePageData() {
       }
     }
     
-    // Priority 2: Look for Add to Cart button price
-    const addToCartBtn = document.querySelector('[class*="add-to-cart"], button[type="submit"], .add-to-cart');
-    if (addToCartBtn) {
-      const btnText = addToCartBtn.innerText;
-      const priceMatch = btnText?.match(/\$(\d+(?:,\d{3})*(?:\.\d{2})?)/);
-      if (priceMatch) {
-        const val = parseFloat(priceMatch[1].replace(/,/g, ''));
-        if (val > 1 && val < 50000) {
-          console.log('[Price Debug] Found Add to Cart price:', val);
-          return val;
+    // Priority 2: Look for Add to Cart button price or main price element
+    const priceElementSelectors = [
+      '[class*="add-to-cart"]', 'button[type="submit"]', '.add-to-cart',
+      '[class*="current-price"]', '[class*="sale-price"]', '[class*="our-price"]',
+      '[class*="trade-price"]', '[class*="your-price"]', '[class*="net-price"]',
+      '.price:not(.msrp):not(.was):not(.compare)',
+      '[itemprop="price"]', '[data-price]'
+    ];
+    for (const sel of priceElementSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el) {
+          const text = el.innerText || el.dataset?.price || el.content || '';
+          // Skip if contains MSRP/MAP keywords
+          if (/msrp|map|retail|compare|was|list/i.test(text)) continue;
+          const priceMatch = text.match(/\$?(\d+(?:,\d{3})*(?:\.\d{2})?)/);
+          if (priceMatch) {
+            const val = parseFloat(priceMatch[1].replace(/,/g, ''));
+            if (val > 1 && val < 50000) {
+              console.log('[Price Debug] Found price element:', val, 'from', sel);
+              return val;
+            }
+          }
         }
-      }
+      } catch(e) {}
     }
     
     // Priority 3: Take the FIRST REASONABLE price that is NOT near MAP/MSRP keywords
