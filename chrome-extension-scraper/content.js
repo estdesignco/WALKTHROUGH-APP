@@ -1072,75 +1072,65 @@ function scrapePageData() {
   // FOUR HANDS - fourhands.com
   if (domain.includes('fourhands')) {
     vendorDetected = 'FOUR HANDS';
+    
     // SKU from URL: /product/100074-009
     const fhSkuMatch = window.location.pathname.match(/\/product\/([A-Z0-9-]+)/i) || 
                        window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
     
-    // PRICE - Four Hands: Find ALL dollar amounts, take first that's NOT MAP
-    // The trade price appears BEFORE the MAP price on the page
-    const allDollarAmounts = pageText.match(/\$[\d,]+\.?\d*/g) || [];
-    console.log('[FH Debug] All prices found:', allDollarAmounts);
+    // COLOR - from the "Durango Smoke • 100074-009" div
+    // Selector: div.text-body.text-neutral-50 or similar
+    const colorDiv = document.querySelector('.text-neutral-50, [class*="text-neutral"]');
+    if (colorDiv) {
+      const colorText = colorDiv.innerText?.trim();
+      // Extract color before the bullet: "Durango Smoke • 100074-009" -> "Durango Smoke"
+      const parts = colorText?.split(/[•·]/);
+      if (parts && parts[0]) {
+        data.finish_color = parts[0].trim();
+        console.log('[FH] Color from text-neutral div:', data.finish_color);
+      }
+    }
     
-    for (let i = 0; i < allDollarAmounts.length; i++) {
-      const priceStr = allDollarAmounts[i];
-      const val = parseFloat(priceStr.replace(/[$,]/g, ''));
-      
-      // Skip if this price is immediately followed by "MAP" or preceded by "MAP"
-      const priceIdx = pageText.indexOf(priceStr);
-      const surroundingText = pageText.substring(Math.max(0, priceIdx - 10), priceIdx + priceStr.length + 10);
-      
-      if (val > 5 && val < 500000) {
-        if (/MAP/i.test(surroundingText)) {
-          // This is the MAP price, save as MSRP
-          data.msrp = val;
-          console.log('[FH Debug] Found MAP/MSRP:', val);
-        } else if (!data.price) {
-          // This is the trade price (first non-MAP price)
+    // Fallback: look for swatch label with title attribute
+    if (!data.finish_color) {
+      const swatchLabel = document.querySelector('label[title]:not([title=""]), button[title]:not([title=""])');
+      if (swatchLabel?.title && swatchLabel.title.length > 1 && swatchLabel.title.length < 50) {
+        data.finish_color = swatchLabel.title;
+        console.log('[FH] Color from swatch title:', data.finish_color);
+      }
+    }
+    
+    // SWATCH IMAGE - from the small round swatch
+    const fhSwatchImg = document.querySelector('label img.rounded-full, .rounded-full img, [title] img.rounded-full');
+    if (fhSwatchImg?.src) {
+      data.finish_image = fhSwatchImg.src;
+    }
+    
+    // DIMENSIONS - "24.00"w x 27.50"d x 37.25"h"
+    const fhDimMatch = pageText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
+    if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
+    
+    // PRICE - Only visible when logged in. Look for price elements
+    // The trade price should appear first, MAP/MSRP labeled separately
+    const priceElements = document.querySelectorAll('[class*="price"], [data-price]');
+    for (const el of priceElements) {
+      const text = el.innerText?.trim() || el.dataset?.price || '';
+      if (!text) continue;
+      // Skip if this is MAP/MSRP
+      if (/map|msrp|retail|compare/i.test(text)) continue;
+      const match = text.match(/\$?([\d,]+\.?\d*)/);
+      if (match) {
+        const val = parseFloat(match[1].replace(/,/g, ''));
+        if (val > 5 && val < 50000) {
           data.price = val;
-          console.log('[FH Debug] Found Trade Price:', val);
+          console.log('[FH] Price from element:', data.price);
+          break;
         }
       }
     }
     
-    // COLOR - "Durango Smoke • 100074-009" pattern
-    // Look in the specific div that shows "Durango Smoke • 100074-009"
-    const colorDiv = document.querySelector('.text-body.text-neutral-50, [class*="text-neutral"]');
-    if (colorDiv) {
-      const colorText = colorDiv.innerText?.trim();
-      // Extract color before the bullet point
-      const colorMatch = colorText?.match(/^([A-Za-z][A-Za-z\s]+?)(?:\s*[•·]|$)/);
-      if (colorMatch) {
-        data.finish_color = colorMatch[1].trim();
-        console.log('[FH Debug] Found Color:', data.finish_color);
-      }
-    }
-    
-    // Fallback color from page text
-    if (!data.finish_color) {
-      const bulletMatch = pageText.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z]{5,}/i);
-      if (bulletMatch) data.finish_color = bulletMatch[1].trim();
-    }
-    
-    // Also try swatch title attribute
-    if (!data.finish_color) {
-      const swatchEl = document.querySelector('label[title], button[title], [title*="Smoke"], [title*="Camel"]');
-      if (swatchEl?.title) data.finish_color = swatchEl.title;
-    }
-    
-    // Swatch image - look for the small round swatch image
-    const fhSwatchImg = document.querySelector('img.rounded-full, label img.rounded-full, [class*="swatch"] img');
-    if (fhSwatchImg?.src) {
-      data.finish_image = fhSwatchImg.src;
-      console.log('[FH Debug] Found Swatch Image:', data.finish_image);
-    }
-    
-    // Dimensions - "24.00"w x 27.50"d x 37.25"h"
-    const fhDimMatch = pageText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
-    if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
-    
-    // Main image - the large product image
-    const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[alt*="BRADEN"], img[alt*="DINING"], img[alt*="CHAIR"]');
+    // MAIN IMAGE
+    const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[alt*="BRADEN"], img[alt*="DINING"]');
     if (fhMainImg?.src) {
       data.image_url = fhMainImg.src;
     }
