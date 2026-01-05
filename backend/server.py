@@ -12718,16 +12718,70 @@ async def get_time_entries(project_id: str):
 # DESIGN TOOLS ENDPOINTS
 @api_router.get("/design-data/{project_id}")
 async def get_design_data(project_id: str):
-    """Get all design data for a project"""
+    """Get all design data for a project including auto-extracted materials"""
     try:
-        design_data = await db.design_data.find_one({"project_id": project_id})
+        design_data = await db.design_data.find_one({"project_id": project_id}, {"_id": 0})
         if not design_data:
-            return {
+            design_data = {
                 "color_palettes": [],
                 "materials": [],
                 "inspiration_images": [],
                 "before_after_photos": []
             }
+        
+        # Also include auto-extracted materials from items
+        auto_materials = []
+        
+        # Get materials from project_materials collection
+        project_materials = await db.project_materials.find(
+            {"project_id": project_id}, 
+            {"_id": 0}
+        ).to_list(length=1000)
+        auto_materials.extend(project_materials)
+        
+        # Extract finishes from project items (rooms are in separate collection)
+        rooms = await db.rooms.find({"project_id": project_id}).to_list(length=1000)
+        seen_finishes = set()
+        
+        for room_data in rooms:
+            room_id = room_data.get("id")
+            room_name = room_data.get("name", "Unknown Room")
+            
+            categories = await db.categories.find({"room_id": room_id}).to_list(length=1000)
+            for category in categories:
+                category_id = category.get("id")
+                
+                subcategories = await db.subcategories.find({"category_id": category_id}).to_list(length=1000)
+                for subcategory in subcategories:
+                    subcategory_id = subcategory.get("id")
+                    
+                    items = await db.items.find({"subcategory_id": subcategory_id}).to_list(length=1000)
+                    for item in items:
+                        finish = item.get("finish_color")
+                        vendor = item.get("vendor", "")
+                        if finish and finish.strip():
+                            finish_key = f"{finish.lower()}|{vendor.lower()}"
+                            if finish_key not in seen_finishes:
+                                seen_finishes.add(finish_key)
+                                auto_materials.append({
+                                    "id": f"item-{item.get('id', '')}",
+                                    "name": finish,
+                                    "type": "finish",
+                                    "category": "finish",
+                                    "vendor": vendor,
+                                    "manufacturer": vendor,
+                                    "source": f"From: {item.get('name', 'Unknown')}",
+                                    "image": item.get("finish_image", ""),
+                                    "photo_url": item.get("finish_image", ""),
+                                    "room": room_name,
+                                    "product_name": item.get("name", ""),
+                                    "product_sku": item.get("sku", "")
+                                })
+        
+        # Combine stored materials with auto-extracted materials
+        all_materials = design_data.get("materials", []) + auto_materials
+        design_data["materials"] = all_materials
+        
         return design_data
     except Exception as e:
         logging.error(f"Error getting design data: {str(e)}")
