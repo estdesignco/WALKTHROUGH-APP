@@ -14092,8 +14092,11 @@ async def delete_project_vendor(vendor_id: str):
 
 @api_router.get("/materials")
 async def get_project_materials(project_id: Optional[str] = None, category: Optional[str] = None, search: Optional[str] = None):
-    """Get materials for a project or all materials"""
+    """Get materials for a project or all materials (including auto-extracted from items)"""
     try:
+        materials = []
+        
+        # Source 1: project_materials collection (explicit materials)
         query = {}
         if project_id:
             query["project_id"] = project_id
@@ -14105,7 +14108,62 @@ async def get_project_materials(project_id: Optional[str] = None, category: Opti
                 {"manufacturer": {"$regex": search, "$options": "i"}},
                 {"sku": {"$regex": search, "$options": "i"}}
             ]
-        materials = await db.project_materials.find(query, {"_id": 0}).to_list(1000)
+        stored_materials = await db.project_materials.find(query, {"_id": 0}).to_list(1000)
+        materials.extend(stored_materials)
+        
+        # Source 2: Auto-extract finishes from items IF a project_id is provided
+        if project_id:
+            # Get rooms from the rooms collection
+            rooms = await db.rooms.find({"project_id": project_id}).to_list(length=1000)
+            seen_finishes = set()
+            
+            # Get list of already-stored material names to avoid duplicates
+            stored_names = set(m.get("name", "").lower() for m in stored_materials)
+            
+            for room_data in rooms:
+                room_id = room_data.get("id")
+                room_name = room_data.get("name", "Unknown Room")
+                
+                categories_list = await db.categories.find({"room_id": room_id}).to_list(length=1000)
+                for cat in categories_list:
+                    category_id = cat.get("id")
+                    
+                    subcategories = await db.subcategories.find({"category_id": category_id}).to_list(length=1000)
+                    for subcategory in subcategories:
+                        subcategory_id = subcategory.get("id")
+                        
+                        items = await db.items.find({"subcategory_id": subcategory_id}).to_list(length=1000)
+                        for item in items:
+                            finish = item.get("finish_color")
+                            vendor = item.get("vendor", "")
+                            if finish and finish.strip():
+                                # Skip if category filter is set and doesn't match "finish"
+                                if category and "finish" not in category.lower():
+                                    continue
+                                # Skip if search term doesn't match
+                                if search and search.lower() not in finish.lower() and search.lower() not in vendor.lower():
+                                    continue
+                                    
+                                finish_key = f"{finish.lower()}|{vendor.lower()}"
+                                if finish_key not in seen_finishes and finish.lower() not in stored_names:
+                                    seen_finishes.add(finish_key)
+                                    materials.append({
+                                        "id": f"auto-{item.get('id', '')}",
+                                        "name": finish,
+                                        "category": "finish",
+                                        "manufacturer": vendor,
+                                        "vendor": vendor,
+                                        "sku": item.get("sku", ""),
+                                        "color": finish,
+                                        "swatch_url": item.get("finish_image", ""),
+                                        "photo_url": item.get("finish_image", ""),
+                                        "notes": f"Auto-extracted from: {item.get('name', 'Unknown')}",
+                                        "room": room_name,
+                                        "product_name": item.get("name", ""),
+                                        "auto_extracted": True,
+                                        "project_id": project_id
+                                    })
+        
         return materials
     except Exception as e:
         logging.error(f"Error getting materials: {str(e)}")
