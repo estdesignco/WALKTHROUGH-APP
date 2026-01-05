@@ -345,13 +345,18 @@ function createSidePanel() {
         <button class="dr-btn-secondary" id="dr-copy-image-btn" style="flex: 1; background: #7c3aed; color: white; border-color: #7c3aed;">
           📷 Copy Image
         </button>
+        <button class="dr-btn-secondary" id="dr-copy-nobg-btn" style="flex: 1; background: #059669; color: white; border-color: #059669;">
+          ✨ No Background
+        </button>
+      </div>
+      <div style="display: flex; gap: 8px; margin-top: 8px;">
         <button class="dr-btn-secondary" id="dr-copy-link-btn" style="flex: 1; background: #2563eb; color: white; border-color: #2563eb;">
           🔗 Copy Link
         </button>
+        <button class="dr-btn-secondary" id="dr-rescrape-btn" style="flex: 1;">
+          🔄 Re-scrape
+        </button>
       </div>
-      <button class="dr-btn-secondary" id="dr-rescrape-btn" style="width: 100%;">
-        🔄 Re-scrape
-      </button>
       <div style="font-size: 10px; color: #666; text-align: center; padding-top: 4px;">
         Saves to: Checklist/FFE • Product Library • Materials Library
       </div>
