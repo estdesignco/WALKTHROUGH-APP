@@ -2234,36 +2234,92 @@ let canvaToken = null;
 
 async function copyImage() {
   if (!scrapedData || !scrapedData.image_url) {
-    showToast('⚠️ No image');
+    showToast('⚠️ No image available');
     return;
   }
   
+  const imageUrl = scrapedData.image_url;
+  console.log('[Scraper] Attempting to copy image:', imageUrl);
+  
+  // Method 1: Try to find the actual image on the page and copy it directly
   try {
-    const response = await fetch(scrapedData.image_url);
-    const blob = await response.blob();
+    // Find the image element on the page that matches our URL
+    const imgElements = document.querySelectorAll('img');
+    let targetImg = null;
     
-    // Convert to PNG
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = URL.createObjectURL(blob);
-    });
+    for (const img of imgElements) {
+      if (img.src === imageUrl || img.src.includes(imageUrl.split('?')[0].split('/').pop())) {
+        targetImg = img;
+        break;
+      }
+    }
     
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    canvas.getContext('2d').drawImage(img, 0, 0);
-    
-    const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-    
-    await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
-    showToast('✅ Image copied!');
-  } catch (e) {
-    // Fallback: copy URL
-    await navigator.clipboard.writeText(scrapedData.image_url);
-    showToast('📋 Image URL copied');
+    if (targetImg && targetImg.complete && targetImg.naturalWidth > 0) {
+      // Create canvas from the existing image on the page (no CORS issue since it's already loaded)
+      const canvas = document.createElement('canvas');
+      canvas.width = targetImg.naturalWidth;
+      canvas.height = targetImg.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      
+      try {
+        ctx.drawImage(targetImg, 0, 0);
+        const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        
+        if (pngBlob) {
+          await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+          showToast('✅ Image copied to clipboard!');
+          return;
+        }
+      } catch (canvasErr) {
+        console.log('[Scraper] Canvas method failed (CORS):', canvasErr.message);
+      }
+    }
+  } catch (method1Err) {
+    console.log('[Scraper] Method 1 failed:', method1Err.message);
+  }
+  
+  // Method 2: Try fetch with no-cors mode (limited but worth trying)
+  try {
+    const response = await fetch(imageUrl, { mode: 'cors', credentials: 'include' });
+    if (response.ok) {
+      const blob = await response.blob();
+      
+      // Try to convert to PNG
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+        const objUrl = URL.createObjectURL(blob);
+        img.src = objUrl;
+        setTimeout(() => reject(new Error('Image load timeout')), 5000);
+      });
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      
+      const pngBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+      
+      if (pngBlob) {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+        showToast('✅ Image copied to clipboard!');
+        return;
+      }
+    }
+  } catch (method2Err) {
+    console.log('[Scraper] Method 2 (fetch) failed:', method2Err.message);
+  }
+  
+  // Fallback: Copy the image URL to clipboard
+  try {
+    await navigator.clipboard.writeText(imageUrl);
+    showToast('📋 Image URL copied (paste in browser to view)');
+  } catch (fallbackErr) {
+    console.error('[Scraper] All copy methods failed:', fallbackErr);
+    showToast('❌ Copy failed - try right-click > Copy Image');
   }
 }
 
