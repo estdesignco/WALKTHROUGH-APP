@@ -2061,7 +2061,7 @@ function scrapePageData() {
 
   // ===================== DEBUG LOGGING =====================
   // v7.7.0 - Log vendor detection and extracted data for troubleshooting
-  console.log('%c[Design Ready Scraper v7.7.1]', 'background: #6366f1; color: white; padding: 2px 6px; border-radius: 3px;');
+  console.log('%c[Design Ready Scraper v7.7.2]', 'background: #6366f1; color: white; padding: 2px 6px; border-radius: 3px;');
   console.log('Domain:', domain);
   console.log('Vendor Logic Used:', vendorDetected);
   console.log('Extracted Data:', JSON.stringify(data, null, 2));
