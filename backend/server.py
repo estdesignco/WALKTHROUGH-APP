@@ -12755,6 +12755,59 @@ async def add_color(project_id: str, color: dict):
         logging.error(f"Error adding color: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/design-data/{project_id}/materials")
+async def get_project_materials(project_id: str):
+    """Get all materials for a project from multiple sources"""
+    try:
+        materials = []
+        
+        # Source 1: design_data collection (legacy)
+        design_data = await db.design_data.find_one({"project_id": project_id}, {"_id": 0})
+        if design_data and design_data.get("materials"):
+            materials.extend(design_data.get("materials", []))
+        
+        # Source 2: project_materials collection (new)
+        project_materials = await db.project_materials.find(
+            {"project_id": project_id}, 
+            {"_id": 0}
+        ).to_list(length=1000)
+        materials.extend(project_materials)
+        
+        # Source 3: Extract finishes from project items
+        project = await db.projects.find_one({"id": project_id}, {"_id": 0})
+        if project:
+            seen_finishes = set()
+            for room in project.get("rooms", []):
+                room_name = room.get("name", "Unknown Room")
+                for category in room.get("categories", []):
+                    for subcategory in category.get("subcategories", []):
+                        for item in subcategory.get("items", []):
+                            finish = item.get("finish_color")
+                            vendor = item.get("vendor", "")
+                            if finish and finish.strip():
+                                finish_key = f"{finish.lower()}|{vendor.lower()}"
+                                if finish_key not in seen_finishes:
+                                    seen_finishes.add(finish_key)
+                                    materials.append({
+                                        "id": f"item-{item.get('id', '')}",
+                                        "name": finish,
+                                        "type": "finish",
+                                        "category": "finish",
+                                        "vendor": vendor,
+                                        "manufacturer": vendor,
+                                        "source": f"From: {item.get('name', 'Unknown')}",
+                                        "image": item.get("finish_image", ""),
+                                        "photo_url": item.get("finish_image", ""),
+                                        "room": room_name,
+                                        "product_name": item.get("name", ""),
+                                        "product_sku": item.get("sku", "")
+                                    })
+        
+        return {"materials": materials, "count": len(materials)}
+    except Exception as e:
+        logging.error(f"Error getting project materials: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/design-data/{project_id}/materials")
 async def add_material(project_id: str, material: dict):
     """Add a material to library"""
