@@ -12720,6 +12720,41 @@ async def get_time_entries(project_id: str):
 async def get_design_data(project_id: str):
     """Get all design data for a project including auto-extracted materials"""
     try:
+        # Helper function to determine if an item is soft goods (fabric) vs hard goods (finish)
+        def get_material_type(item_name, subcategory_name, category_name):
+            item_lower = (item_name or "").lower()
+            subcat_lower = (subcategory_name or "").lower()
+            cat_lower = (category_name or "").lower()
+            
+            fabric_keywords = [
+                'sofa', 'couch', 'chair', 'ottoman', 'sectional', 'loveseat', 
+                'bench', 'bed', 'headboard', 'cushion', 'pillow', 'throw',
+                'upholster', 'seating', 'lounge', 'settee', 'chaise', 'daybed',
+                'mattress', 'bedding', 'duvet', 'curtain', 'drape', 'shade',
+                'rug', 'carpet', 'runner'
+            ]
+            
+            finish_keywords = [
+                'table', 'desk', 'light', 'lamp', 'chandelier', 'pendant', 'sconce',
+                'cabinet', 'dresser', 'nightstand', 'console', 'sideboard', 'buffet',
+                'mirror', 'frame', 'hardware', 'knob', 'pull', 'handle', 'hinge',
+                'shelf', 'shelving', 'bookcase', 'etagere', 'credenza', 'armoire',
+                'vase', 'sculpture', 'art', 'clock', 'tray', 'box', 'basket',
+                'faucet', 'fixture', 'appliance'
+            ]
+            
+            combined = f"{item_lower} {subcat_lower} {cat_lower}"
+            
+            for kw in fabric_keywords:
+                if kw in combined:
+                    return 'fabric'
+            
+            for kw in finish_keywords:
+                if kw in combined:
+                    return 'finish'
+            
+            return 'finish'
+        
         design_data = await db.design_data.find_one({"project_id": project_id}, {"_id": 0})
         if not design_data:
             design_data = {
@@ -12750,31 +12785,38 @@ async def get_design_data(project_id: str):
             categories = await db.categories.find({"room_id": room_id}).to_list(length=1000)
             for category in categories:
                 category_id = category.get("id")
+                category_name = category.get("name", "")
                 
                 subcategories = await db.subcategories.find({"category_id": category_id}).to_list(length=1000)
                 for subcategory in subcategories:
                     subcategory_id = subcategory.get("id")
+                    subcategory_name = subcategory.get("name", "")
                     
                     items = await db.items.find({"subcategory_id": subcategory_id}).to_list(length=1000)
                     for item in items:
                         finish = item.get("finish_color")
                         vendor = item.get("vendor", "")
+                        item_name = item.get("name", "")
+                        
                         if finish and finish.strip():
-                            finish_key = f"{finish.lower()}|{vendor.lower()}"
+                            material_type = get_material_type(item_name, subcategory_name, category_name)
+                            finish_key = f"{finish.lower()}|{vendor.lower()}|{material_type}"
+                            
                             if finish_key not in seen_finishes:
                                 seen_finishes.add(finish_key)
                                 auto_materials.append({
                                     "id": f"item-{item.get('id', '')}",
                                     "name": finish,
-                                    "type": "finish",
-                                    "category": "finish",
+                                    "type": material_type,
+                                    "category": material_type,
                                     "vendor": vendor,
                                     "manufacturer": vendor,
-                                    "source": f"From: {item.get('name', 'Unknown')}",
+                                    "source": f"From: {item_name}",
                                     "image": item.get("finish_image", ""),
                                     "photo_url": item.get("finish_image", ""),
                                     "room": room_name,
-                                    "product_name": item.get("name", ""),
+                                    "product_name": item_name,
+                                    "product_category": category_name,
                                     "product_sku": item.get("sku", "")
                                 })
         
