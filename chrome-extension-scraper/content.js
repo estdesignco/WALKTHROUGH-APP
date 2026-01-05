@@ -1070,33 +1070,74 @@ function scrapePageData() {
   let vendorDetected = 'GENERIC';
   
   // FOUR HANDS - fourhands.com
+  // v7.7.0 - Complete rewrite with specific selectors
   if (domain.includes('fourhands')) {
     vendorDetected = 'FOUR HANDS';
+    console.log('[FH v7.7.0] Starting Four Hands extraction...');
     
     // SKU from URL: /product/100074-009
     const fhSkuMatch = window.location.pathname.match(/\/product\/([A-Z0-9-]+)/i) || 
                        window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
+    console.log('[FH] SKU:', data.sku);
     
-    // COLOR - from the "Durango Smoke • 100074-009" div
-    // Selector: div.text-body.text-neutral-50 or similar
-    const colorDiv = document.querySelector('.text-neutral-50, [class*="text-neutral"]');
-    if (colorDiv) {
-      const colorText = colorDiv.innerText?.trim();
-      // Extract color before the bullet: "Durango Smoke • 100074-009" -> "Durango Smoke"
-      const parts = colorText?.split(/[•·]/);
-      if (parts && parts[0]) {
-        data.finish_color = parts[0].trim();
-        console.log('[FH] Color from text-neutral div:', data.finish_color);
+    // ===== COLOR EXTRACTION - v7.7.0 =====
+    // On Four Hands, the color appears as "Durango Smoke • 100074-009" 
+    // This text is in a div below the product name, containing the bullet separator
+    
+    // Strategy 1: Find text containing bullet (•) followed by SKU
+    const allTextNodes = document.body.innerText;
+    if (data.sku) {
+      // Look for pattern: "Color Name • SKU" or "Color Name · SKU"
+      const colorSkuPattern = new RegExp(`([A-Za-z][A-Za-z\\s]+?)\\s*[•·]\\s*${data.sku}`, 'i');
+      const colorMatch = allTextNodes.match(colorSkuPattern);
+      if (colorMatch) {
+        data.finish_color = colorMatch[1].trim();
+        console.log('[FH] Color from SKU pattern:', data.finish_color);
       }
     }
     
-    // Fallback: look for swatch label with title attribute
+    // Strategy 2: Look at the area right below the product title
     if (!data.finish_color) {
-      const swatchLabel = document.querySelector('label[title]:not([title=""]), button[title]:not([title=""])');
-      if (swatchLabel?.title && swatchLabel.title.length > 1 && swatchLabel.title.length < 50) {
-        data.finish_color = swatchLabel.title;
-        console.log('[FH] Color from swatch title:', data.finish_color);
+      // Find all spans/divs near the product title that might contain color info
+      const productArea = document.querySelector('h1')?.parentElement?.parentElement;
+      if (productArea) {
+        const textInArea = productArea.innerText;
+        // Look for the bullet pattern in this area
+        const bulletMatch = textInArea.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z-]+/i);
+        if (bulletMatch && !bulletMatch[1].match(/seating|dining|chairs|tables|bedroom|living/i)) {
+          data.finish_color = bulletMatch[1].trim();
+          console.log('[FH] Color from product area:', data.finish_color);
+        }
+      }
+    }
+    
+    // Strategy 3: Selected swatch with title attribute
+    if (!data.finish_color) {
+      // Look for a selected/active swatch with a title
+      const selectedSwatch = document.querySelector('[class*="selected"][title], [class*="active"][title], button[aria-selected="true"][title], label[aria-checked="true"][title]');
+      if (selectedSwatch?.title && selectedSwatch.title.length > 2 && selectedSwatch.title.length < 40) {
+        // Skip titles that are categories, not colors
+        if (!/seating|dining|bedroom|tables|chairs|living|office/i.test(selectedSwatch.title)) {
+          data.finish_color = selectedSwatch.title;
+          console.log('[FH] Color from selected swatch title:', data.finish_color);
+        }
+      }
+    }
+    
+    // Strategy 4: Any swatch label with meaningful title
+    if (!data.finish_color) {
+      const swatchLabels = document.querySelectorAll('label[title], button[title]');
+      for (const label of swatchLabels) {
+        const title = label.title?.trim();
+        if (title && title.length > 2 && title.length < 40) {
+          // Skip categories and generic text
+          if (!/seating|dining|bedroom|tables|chairs|living|office|add|cart|select|choose/i.test(title)) {
+            data.finish_color = title;
+            console.log('[FH] Color from swatch label:', data.finish_color);
+            break;
+          }
+        }
       }
     }
     
@@ -1104,36 +1145,83 @@ function scrapePageData() {
     const fhSwatchImg = document.querySelector('label img.rounded-full, .rounded-full img, [title] img.rounded-full');
     if (fhSwatchImg?.src) {
       data.finish_image = fhSwatchImg.src;
+      console.log('[FH] Swatch image found');
     }
     
     // DIMENSIONS - "24.00"w x 27.50"d x 37.25"h"
     const fhDimMatch = pageText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
-    if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
+    if (fhDimMatch) {
+      data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
+      console.log('[FH] Dimensions:', data.size);
+    }
     
-    // PRICE - Only visible when logged in. Look for price elements
-    // The trade price should appear first, MAP/MSRP labeled separately
-    const priceElements = document.querySelectorAll('[class*="price"], [data-price]');
-    for (const el of priceElements) {
-      const text = el.innerText?.trim() || el.dataset?.price || '';
-      if (!text) continue;
-      // Skip if this is MAP/MSRP
-      if (/map|msrp|retail|compare/i.test(text)) continue;
-      const match = text.match(/\$?([\d,]+\.?\d*)/);
-      if (match) {
-        const val = parseFloat(match[1].replace(/,/g, ''));
-        if (val > 5 && val < 50000) {
-          data.price = val;
-          console.log('[FH] Price from element:', data.price);
-          break;
+    // ===== PRICE EXTRACTION - v7.7.0 =====
+    // On Four Hands, logged-in users see: "$500.05" with "$1,099" crossed out
+    // The FIRST price shown is the trade price, the crossed out one is MSRP
+    
+    // Strategy 1: Find the main price display - usually a large price near add to cart
+    // The trade price is typically NOT crossed out and appears first/larger
+    const allPricesOnPage = [];
+    document.querySelectorAll('*').forEach(el => {
+      if (el.childNodes.length === 1 && el.childNodes[0].nodeType === Node.TEXT_NODE) {
+        const text = el.innerText?.trim();
+        if (text && text.match(/^\$[\d,]+\.?\d*$/)) {
+          // Check if this element has strikethrough styling
+          const style = window.getComputedStyle(el);
+          const isStrikethrough = style.textDecoration.includes('line-through') || 
+                                   el.closest('s, strike, del') !== null ||
+                                   el.classList.toString().includes('strike') ||
+                                   el.classList.toString().includes('line-through');
+          const priceVal = parseFloat(text.replace(/[$,]/g, ''));
+          if (priceVal > 5 && priceVal < 100000) {
+            allPricesOnPage.push({ value: priceVal, strikethrough: isStrikethrough, element: el });
+          }
+        }
+      }
+    });
+    console.log('[FH] All prices found:', allPricesOnPage.map(p => ({ value: p.value, strikethrough: p.strikethrough })));
+    
+    // The trade price is the one WITHOUT strikethrough
+    const tradePriceObj = allPricesOnPage.find(p => !p.strikethrough);
+    if (tradePriceObj) {
+      data.price = tradePriceObj.value;
+      console.log('[FH] Trade price (no strikethrough):', data.price);
+    }
+    
+    // MSRP is the one WITH strikethrough
+    const msrpPriceObj = allPricesOnPage.find(p => p.strikethrough);
+    if (msrpPriceObj) {
+      data.msrp = msrpPriceObj.value;
+      console.log('[FH] MSRP (strikethrough):', data.msrp);
+    }
+    
+    // Strategy 2: Fallback - look at text patterns
+    if (!data.price) {
+      // Look for pattern like "$500.05" that's NOT followed by "MAP" or "MSRP"
+      const priceMatches = pageText.match(/\$(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g) || [];
+      for (const priceStr of priceMatches) {
+        const idx = pageText.indexOf(priceStr);
+        const after = pageText.substring(idx + priceStr.length, idx + priceStr.length + 20).toLowerCase();
+        // Skip if this is labeled as MAP/MSRP
+        if (!/map|msrp|retail|compare|was/i.test(after)) {
+          const val = parseFloat(priceStr.replace(/[$,]/g, ''));
+          if (val > 10 && val < 50000) {
+            data.price = val;
+            console.log('[FH] Trade price from text pattern:', data.price);
+            break;
+          }
         }
       }
     }
     
-    // MAIN IMAGE
-    const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[alt*="BRADEN"], img[alt*="DINING"]');
+    // MAIN IMAGE - look for high-res product image
+    const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[src*="cloudfront.net"][src*="FRT"], [class*="product-image"] img, [class*="gallery"] img');
     if (fhMainImg?.src) {
       data.image_url = fhMainImg.src;
+      console.log('[FH] Main image found');
     }
+    
+    console.log('[FH v7.7.0] Extraction complete');
   }
   
   // UTTERMOST - uttermost.com
