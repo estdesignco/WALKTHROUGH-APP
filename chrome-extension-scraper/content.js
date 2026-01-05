@@ -156,20 +156,23 @@ function createSidePanel() {
         border-radius: 4px;
       }
       #dr-scraper-panel .dr-actions {
-        padding: 16px;
+        padding: 12px;
         border-top: 1px solid #333;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
+        position: sticky;
+        bottom: 0;
+        background: #0f0f1a;
       }
       #dr-scraper-panel .dr-btn-primary {
         width: 100%;
-        padding: 14px;
+        padding: 12px;
         background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
         color: #000;
         border: none;
         border-radius: 8px;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 700;
         cursor: pointer;
         display: flex;
