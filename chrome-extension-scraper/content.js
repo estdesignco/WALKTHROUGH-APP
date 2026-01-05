@@ -988,54 +988,71 @@ function scrapePageData() {
                        window.location.pathname.match(/\/p\/([A-Z0-9-]+)/i);
     if (fhSkuMatch) data.sku = fhSkuMatch[1];
     
-    // PRICE - Four Hands shows trade price first, then MAP
-    // Look for the first price that's NOT labeled MAP/MSRP
-    const allPriceEls = document.querySelectorAll('[class*="price"], [class*="Price"]');
-    for (const el of allPriceEls) {
-      const text = el.innerText?.trim();
-      if (text && !text.toUpperCase().includes('MAP') && !text.toUpperCase().includes('MSRP')) {
-        const priceMatch = text.match(/\$?([\d,]+\.?\d*)/);
-        if (priceMatch) {
-          const val = parseFloat(priceMatch[1].replace(/,/g, ''));
-          if (val > 5 && val < 100000) {
-            data.price = val;
-            break;
-          }
+    // PRICE - Four Hands: Find ALL dollar amounts, take first that's NOT MAP
+    // The trade price appears BEFORE the MAP price on the page
+    const allDollarAmounts = pageText.match(/\$[\d,]+\.?\d*/g) || [];
+    console.log('[FH Debug] All prices found:', allDollarAmounts);
+    
+    for (let i = 0; i < allDollarAmounts.length; i++) {
+      const priceStr = allDollarAmounts[i];
+      const val = parseFloat(priceStr.replace(/[$,]/g, ''));
+      
+      // Skip if this price is immediately followed by "MAP" or preceded by "MAP"
+      const priceIdx = pageText.indexOf(priceStr);
+      const surroundingText = pageText.substring(Math.max(0, priceIdx - 10), priceIdx + priceStr.length + 10);
+      
+      if (val > 5 && val < 500000) {
+        if (/MAP/i.test(surroundingText)) {
+          // This is the MAP price, save as MSRP
+          data.msrp = val;
+          console.log('[FH Debug] Found MAP/MSRP:', val);
+        } else if (!data.price) {
+          // This is the trade price (first non-MAP price)
+          data.price = val;
+          console.log('[FH Debug] Found Trade Price:', val);
         }
       }
     }
-    // Fallback: look for price pattern in page that's NOT MAP
-    if (!data.price) {
-      const priceMatch = pageText.match(/\$(\d+\.\d{2})(?!\s*MAP)/);
-      if (priceMatch) data.price = parseFloat(priceMatch[1]);
+    
+    // COLOR - "Durango Smoke • 100074-009" pattern
+    // Look in the specific div that shows "Durango Smoke • 100074-009"
+    const colorDiv = document.querySelector('.text-body.text-neutral-50, [class*="text-neutral"]');
+    if (colorDiv) {
+      const colorText = colorDiv.innerText?.trim();
+      // Extract color before the bullet point
+      const colorMatch = colorText?.match(/^([A-Za-z][A-Za-z\s]+?)(?:\s*[•·]|$)/);
+      if (colorMatch) {
+        data.finish_color = colorMatch[1].trim();
+        console.log('[FH Debug] Found Color:', data.finish_color);
+      }
     }
     
-    // MSRP - labeled as MAP
-    const mapMatch = pageText.match(/MAP[:\s]*\$?([\d,]+\.?\d*)/i);
-    if (mapMatch) data.msrp = parseFloat(mapMatch[1].replace(/,/g, ''));
-    
-    // COLOR - "Durango Smoke • 100074-009" pattern - look for text before bullet
-    const bulletMatch = pageText.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z]{5,}/i);
-    if (bulletMatch) {
-      data.finish_color = bulletMatch[1].trim();
-    }
-    // Also check for selected swatch title
+    // Fallback color from page text
     if (!data.finish_color) {
-      const swatchEl = document.querySelector('[title][class*="rounded"], label[title], button[title]');
+      const bulletMatch = pageText.match(/([A-Za-z][A-Za-z\s]+?)\s*[•·]\s*[\dA-Z]{5,}/i);
+      if (bulletMatch) data.finish_color = bulletMatch[1].trim();
+    }
+    
+    // Also try swatch title attribute
+    if (!data.finish_color) {
+      const swatchEl = document.querySelector('label[title], button[title], [title*="Smoke"], [title*="Camel"]');
       if (swatchEl?.title) data.finish_color = swatchEl.title;
     }
     
-    // Swatch image from selected/expanded cover section
-    const fhSwatchImg = document.querySelector('[title][class*="group"] img.rounded-full, label[title] img, [class*="swatch"] img');
-    if (fhSwatchImg?.src) data.finish_image = fhSwatchImg.src;
+    // Swatch image - look for the small round swatch image
+    const fhSwatchImg = document.querySelector('img.rounded-full, label img.rounded-full, [class*="swatch"] img');
+    if (fhSwatchImg?.src) {
+      data.finish_image = fhSwatchImg.src;
+      console.log('[FH Debug] Found Swatch Image:', data.finish_image);
+    }
     
-    // Dimensions - "Overall Dimensions" or "24.00"w x 27.50"d x 37.25"h"
+    // Dimensions - "24.00"w x 27.50"d x 37.25"h"
     const fhDimMatch = pageText.match(/([\d.]+)"?\s*w\s*x\s*([\d.]+)"?\s*d\s*x\s*([\d.]+)"?\s*h/i);
     if (fhDimMatch) data.size = `${fhDimMatch[1]}"W x ${fhDimMatch[2]}"D x ${fhDimMatch[3]}"H`;
     
-    // Main image
-    const fhMainImg = document.querySelector('img[alt*="DINING" i], img[alt*="CHAIR" i], img[alt*="SOFA" i], img[alt*="TABLE" i], button img[alt]');
-    if (fhMainImg?.src && fhMainImg.src.includes('S1200x1200')) {
+    // Main image - the large product image
+    const fhMainImg = document.querySelector('img[src*="S1200x1200"], img[alt*="BRADEN"], img[alt*="DINING"], img[alt*="CHAIR"]');
+    if (fhMainImg?.src) {
       data.image_url = fhMainImg.src;
     }
   }
