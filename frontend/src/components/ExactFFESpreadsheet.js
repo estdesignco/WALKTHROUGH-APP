@@ -550,7 +550,8 @@ const ExactFFESpreadsheet = ({
         finish_color: scraperClipboard.finish_color || undefined,
         finish_image: scraperClipboard.finish_image || undefined,
         image_url: scraperClipboard.image_url || undefined,
-        link: scraperClipboard.link || scraperClipboard.url || undefined
+        link: scraperClipboard.link || scraperClipboard.url || undefined,
+        remarks: scraperClipboard.remarks || undefined
       };
       
       // Remove undefined values
