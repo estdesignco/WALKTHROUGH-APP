@@ -302,24 +302,8 @@ function ProjectMenuScreen({ project, onNavigate }) {
     </div>
   );
 }
-            onClick={() => onNavigate('measurements-files')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-5xl md:text-6xl mb-3">📐</div>
-              <div className="font-bold text-[#FFD700] text-2xl md:text-3xl mb-2">Measurements & Files</div>
-              <div className="text-sm md:text-base text-gray-300">View all measured photos and project files</div>
-              <div className="mt-3 text-sm md:text-base text-[#D4A574]">✨ Export to Canva & Desktop</div>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
-// ===== PROJECT LIST SCREEN =====
+// ===== PROJECT LIST SCREEN - MATCHES DESKTOP =====
 function MobileProjectListScreen({ onNavigate, onSelectProject }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -342,62 +326,75 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center bg-black">
-        <div className="text-[#D4C5A9] text-xl md:text-2xl">Loading...</div>
+        <div className="text-stone-300 text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
-      {/* Logo Header - Black logo on gold container */}
-      <div className="text-center mb-6 md:mb-8">
-        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0">
+    <div className="h-full overflow-auto bg-black">
+      <style>{shimmerStyle}</style>
+      
+      {/* Gold Header */}
+      <div className="w-full h-24 shimmer-gold" style={{ 
+        background: STYLES.goldGradient,
+        boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+      }}>
+        <div className="flex items-center justify-center h-full relative px-6">
           <img 
-            src={`${process.env.PUBLIC_URL}/established-logo.png`}
-            alt="ESTABLISHED" 
-            className="h-12 md:h-16 object-contain"
-            style={{ 
-              maxWidth: '220px',
-              filter: 'brightness(0)',
-              display: 'block'
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+            alt="ESTABLISHED DESIGN CO." 
+            className="h-14 object-contain"
+            style={{
+              filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4))',
+              maxWidth: '100%'
             }}
           />
         </div>
       </div>
       
-      <div className="max-w-5xl mx-auto">
+      <div className="px-6 py-6">
+        {/* Back Button */}
         <button 
           onClick={() => onNavigate('home')}
-          className="bg-gradient-to-br from-gray-900 to-black text-[#D4C5A9] border-2 border-[#D4A574]/50 px-6 py-3 md:px-8 md:py-4 rounded-2xl mb-6 md:mb-8 font-semibold hover:border-[#D4A574] transition-all text-base md:text-lg shadow-lg"
+          className="text-stone-300 px-4 py-2 rounded-lg mb-6 transition-all hover:scale-105"
+          style={{
+            background: STYLES.darkGradient,
+            border: STYLES.goldBorder,
+            boxShadow: STYLES.goldShadow
+          }}
         >
           ← Back
         </button>
         
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">Projects</h2>
+        <h2 className="text-2xl font-bold mb-6" style={{ color: '#d4af37' }}>Projects</h2>
 
-        {/* iPad Grid Layout - 2 columns on larger screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 md:gap-6">
+        {/* Projects Grid */}
+        <div className="grid grid-cols-1 gap-4">
           {projects.map((project) => (
             <button
               key={project.id}
               onClick={() => onSelectProject(project)}
-              className="bg-gradient-to-br from-gray-900 to-black border-2 border-[#D4A574]/50 rounded-3xl p-6 md:p-8 text-left transition-all duration-300 transform hover:scale-105 hover:border-[#D4A574] relative overflow-hidden group shadow-2xl"
+              className="text-left rounded-lg p-5 transition-all hover:scale-102 active:scale-98"
+              style={{
+                background: STYLES.darkGradient,
+                border: STYLES.goldBorder,
+                boxShadow: STYLES.goldShadow
+              }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="font-bold text-[#D4C5A9] text-xl md:text-2xl">{project.name}</div>
-                  <div className="text-[#D4A574] text-2xl md:text-3xl">→</div>
+              <div className="flex justify-between items-start mb-2">
+                <div className="font-bold text-stone-200 text-lg">{project.name}</div>
+                <div style={{ color: '#d4af37' }} className="text-xl">→</div>
+              </div>
+              {project.client_info && (
+                <div className="space-y-1 text-sm mb-3">
+                  <div className="text-stone-400">👤 {project.client_info.full_name}</div>
+                  <div style={{ color: '#8b7355' }}>📍 {project.client_info.address}</div>
                 </div>
-                {project.client_info && (
-                  <div className="space-y-2 text-base md:text-lg mb-4">
-                    <div className="text-gray-300">👤 {project.client_info.full_name}</div>
-                    <div className="text-[#D4A574]">📍 {project.client_info.address}</div>
-                  </div>
-                )}
-                <div className="flex justify-between items-center pt-4 border-t-2 border-[#D4A574]/30">
-                  <span className="text-sm md:text-base text-[#D4C5A9] font-semibold">{project.project_type || 'Renovation'}</span>
-                  <span className="text-sm md:text-base text-[#D4A574] font-medium">{project.rooms?.length || 0} rooms</span>
+              )}
+              <div className="flex justify-between items-center pt-3" style={{ borderTop: '1px solid #8b7355' }}>
+                <span className="text-sm text-stone-400">{project.project_type || 'Renovation'}</span>
+                <span className="text-sm" style={{ color: '#d4af37' }}>{project.rooms?.length || 0} rooms</span>
                 </div>
               </div>
             </button>
