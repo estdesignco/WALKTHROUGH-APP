@@ -13375,19 +13375,6 @@ async def generate_movers_ffe(project_id: str):
     except Exception as e:
         logging.error(f"Error generating mover's FFE: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-        </style></head><body>
-        <div class="logo"><img src="https://clipboard-tool.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
-        <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
-        <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
-        <table><thead><tr><th>IMAGE</th><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>QTY</th><th>CHECKED</th></tr></thead>
-        <tbody>{items_html}</tbody></table>
-        </body></html>"""
-        
-        return Response(content=html, media_type="text/html")
-        
-    except Exception as e:
-        logging.error(f"Error generating mover's FFE: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 # CUSTOMER SHEETS EXPORT
