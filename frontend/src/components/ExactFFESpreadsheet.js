@@ -1496,6 +1496,16 @@ const ExactFFESpreadsheet = ({
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
                                   }}>NOTES</td>
                                                         <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #6B46C1FF 0%, #6B46C1AA 20%, #6B46C1 40%, #6B46C1AA 80%, #6B46C1FF 100%)',
+                                    boxShadow: '0 0 20px #6B46C150, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>REMARKS</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
+                                    background: 'linear-gradient(135deg, #059669FF 0%, #059669AA 20%, #059669 40%, #059669AA 80%, #059669FF 100%)',
+                                    boxShadow: '0 0 20px #05966950, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                  }}>INSTALL NOTES</td>
+                                                        <td className="border border-[#B49B7E] px-3 py-2 text-xs font-bold text-white" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
