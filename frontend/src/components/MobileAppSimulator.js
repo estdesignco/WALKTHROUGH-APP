@@ -170,114 +170,138 @@ function MobileHomeScreen({ onNavigate }) {
   );
 }
 
-// ===== PROJECT MENU SCREEN =====
+// ===== PROJECT MENU SCREEN - MATCHES DESKTOP =====
 function ProjectMenuScreen({ project, onNavigate }) {
   return (
-    <div className="h-full overflow-auto p-6 md:p-8 lg:p-12 bg-black">
-      {/* Logo Header - Black logo on gold container */}
-      <div className="text-center mb-6 md:mb-8">
-        <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0">
+    <div className="h-full overflow-auto bg-black">
+      <style>{shimmerStyle}</style>
+      
+      {/* Gold Header - EXACT MATCH */}
+      <div className="w-full h-24 shimmer-gold" style={{ 
+        background: STYLES.goldGradient,
+        boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+      }}>
+        <div className="flex items-center justify-center h-full relative px-6">
           <img 
-            src={`${process.env.PUBLIC_URL}/established-logo.png`}
-            alt="ESTABLISHED" 
-            className="h-12 md:h-16 object-contain"
-            style={{ 
-              maxWidth: '220px',
-              filter: 'brightness(0)',
-              display: 'block'
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+            alt="ESTABLISHED DESIGN CO." 
+            className="h-14 object-contain"
+            style={{
+              filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4))',
+              maxWidth: '100%'
             }}
           />
         </div>
       </div>
       
-      <div className="max-w-5xl mx-auto">
+      <div className="px-6 py-6">
+        {/* Back Button */}
         <button 
           onClick={() => onNavigate('projects')}
-          className="bg-gradient-to-br from-gray-900 to-black text-[#D4C5A9] border-2 border-[#D4A574]/50 px-6 py-3 md:px-8 md:py-4 rounded-2xl mb-6 md:mb-8 font-semibold hover:border-[#D4A574] transition-all text-base md:text-lg shadow-lg"
+          className="text-stone-300 px-4 py-2 rounded-lg mb-6 transition-all hover:scale-105"
+          style={{
+            background: STYLES.darkGradient,
+            border: STYLES.goldBorder,
+            boxShadow: STYLES.goldShadow
+          }}
         >
           ← Back to Projects
         </button>
         
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-[#D4C5A9] to-[#BCA888] bg-clip-text text-transparent">{project?.name}</h2>
-        <p className="text-[#D4A574] text-base md:text-lg mb-8">Select which sheet to view</p>
+        {/* Project Title */}
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#d4af37' }}>{project?.name}</h2>
+        <p className="text-stone-400 text-sm mb-6">Select sheet to view</p>
 
-        <div className="space-y-5 md:space-y-6">
+        {/* Menu Grid */}
+        <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => onNavigate('walkthrough')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-5xl md:text-6xl mb-3">📋</div>
-              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">Walkthrough</div>
-              <div className="text-sm md:text-base text-gray-300">On-site checklist - Check off items as you inspect</div>
-            </div>
+            <div className="text-3xl mb-2">📋</div>
+            <div className="font-bold text-base">Walkthrough</div>
+            <div className="text-xs text-stone-500 mt-1">On-site checklist</div>
           </button>
 
           <button
             onClick={() => onNavigate('ffe')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-5xl md:text-6xl mb-3">📖</div>
-              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">FFE</div>
-              <div className="text-sm md:text-base text-gray-300">Your complete inventory - Status, tracking, delivery info</div>
-              <div className="mt-3 text-sm md:text-base text-[#D4A574]">🔄 Real-time sync for jobsite use!</div>
-            </div>
+            <div className="text-3xl mb-2">📖</div>
+            <div className="font-bold text-base">FF&E</div>
+            <div className="text-xs text-stone-500 mt-1">Complete inventory</div>
           </button>
 
           <button
             onClick={() => onNavigate('measurements-files')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#FFD700]/50 shadow-2xl"
+            className="text-white p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95 shimmer-gold"
+            style={{
+              background: STYLES.goldGradient,
+              border: STYLES.goldHighlight,
+              boxShadow: STYLES.goldShadowStrong
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FFD700]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-5xl md:text-6xl mb-3">📐</div>
-              <div className="font-bold text-[#FFD700] text-2xl md:text-3xl mb-2">Measurements</div>
-              <div className="text-sm md:text-base text-gray-300">All photos with measurements organized by room</div>
-              <div className="mt-3 text-sm md:text-base text-[#FFD700]">📸 Export to Canva & PDF reports</div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => onNavigate('project-details')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-5xl md:text-6xl mb-3">📄</div>
-              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">Project Details</div>
-              <div className="text-sm md:text-base text-gray-300">View complete questionnaire & project information</div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => onNavigate('contacts')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-5xl md:text-6xl mb-3">📇</div>
-              <div className="font-bold text-[#D4C5A9] text-2xl md:text-3xl mb-2">Contacts</div>
-              <div className="text-sm md:text-base text-gray-300">View all project contacts with tap-to-call</div>
-            </div>
+            <div className="text-3xl mb-2">📐</div>
+            <div className="font-bold text-base">Measurements</div>
+            <div className="text-xs text-stone-200 mt-1">Photos & dimensions</div>
           </button>
 
           <button
             onClick={() => onNavigate('photos')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-5xl md:text-6xl mb-3">📸</div>
-              <div className="font-bold text-[#D4A574] text-2xl md:text-3xl mb-2">Photo Management</div>
-              <div className="text-sm md:text-base text-gray-300">Capture photos with measurements by room</div>
-              <div className="mt-3 text-sm md:text-base text-[#D4A574]">📏 Leica D5 integration</div>
-            </div>
+            <div className="text-3xl mb-2">📸</div>
+            <div className="font-bold text-base">Photos</div>
+            <div className="text-xs text-stone-500 mt-1">Capture by room</div>
           </button>
 
           <button
+            onClick={() => onNavigate('contacts')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">📇</div>
+            <div className="font-bold text-base">Contacts</div>
+            <div className="text-xs text-stone-500 mt-1">Tap to call</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('project-details')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">📄</div>
+            <div className="font-bold text-base">Details</div>
+            <div className="text-xs text-stone-500 mt-1">Project info</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
             onClick={() => onNavigate('measurements-files')}
             className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 text-left transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
           >
