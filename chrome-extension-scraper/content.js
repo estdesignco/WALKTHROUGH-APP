@@ -829,7 +829,8 @@ function scrapePageData() {
     size: null,
     finish_color: null,
     finish_image: null,
-    image_url: null
+    image_url: null,
+    remarks: null
   };
 
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
