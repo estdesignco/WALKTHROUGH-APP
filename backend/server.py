@@ -13311,6 +13311,10 @@ async def generate_movers_ffe(project_id: str):
                             "name": item.get("name"),
                             "vendor": item.get("vendor", ""),
                             "quantity": item.get("quantity", 1),
+                            "size": item.get("size", ""),
+                            "finish_color": item.get("finish_color", ""),
+                            "remarks": item.get("remarks", ""),
+                            "install_notes": item.get("install_notes", ""),
                             "image_url": item.get("image_url", "")
                         })
         
@@ -13320,14 +13324,30 @@ async def generate_movers_ffe(project_id: str):
         for room_name, room_items in items_by_room.items():
             if room_items:
                 # Room header row
-                items_html += f'<tr class="room-header-row"><td colspan="6"><strong>{room_name.upper()}</strong></td></tr>'
+                items_html += f'<tr class="room-header-row"><td colspan="8"><strong>{room_name.upper()}</strong></td></tr>'
                 
                 # Items for this room
                 for item in room_items:
                     bg = "#f9f9f9" if row_num % 2 == 0 else "white"
                     img_html = f'<img src="{item["image_url"]}" style="max-width: 80px; max-height: 80px;">' if item.get("image_url") else '<div style="width: 80px; height: 80px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #999;">No Image</div>'
                     
-                    items_html += f'<tr style="background: {bg};"><td style="text-align: center;">{img_html}</td><td>{room_name}</td><td>{item["name"]}</td><td>{item["vendor"]}</td><td style="text-align: center;"><strong>{item["quantity"]}</strong></td><td style="width: 60px;"></td></tr>'
+                    size_finish = ""
+                    if item.get("size"): size_finish += item["size"]
+                    if item.get("finish_color"): size_finish += f" / {item['finish_color']}" if size_finish else item["finish_color"]
+                    
+                    remarks_html = f'<span style="color: #666; font-size: 11px;">{item["remarks"]}</span>' if item.get("remarks") else '—'
+                    install_html = f'<span style="color: #059669; font-size: 11px; font-weight: bold;">{item["install_notes"]}</span>' if item.get("install_notes") else '—'
+                    
+                    items_html += f'''<tr style="background: {bg};">
+                        <td style="text-align: center;">{img_html}</td>
+                        <td>{room_name}</td>
+                        <td><strong>{item["name"]}</strong></td>
+                        <td>{item["vendor"]}</td>
+                        <td style="font-size: 11px;">{size_finish or "—"}</td>
+                        <td style="text-align: center;"><strong>{item["quantity"]}</strong></td>
+                        <td style="font-size: 11px;">{remarks_html}</td>
+                        <td style="width: 50px;"></td>
+                    </tr>'''
                     row_num += 1
         
         html = f"""<!DOCTYPE html><html><head><title>Mover's FFE</title>
@@ -13335,13 +13355,26 @@ async def generate_movers_ffe(project_id: str):
             @media print {{ @page {{ margin: 0.5in; }} }}
             body {{ font-family: 'Century Gothic', Arial, sans-serif; margin: 20px; background: white; color: black; }}
             .logo {{ text-align: center; margin-bottom: 20px; }}
-            .logo img {{ height: 150px; filter: grayscale(100%); }}
-            h1 {{ color: black; text-align: center; font-weight: bold; }}
-            table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
-            th {{ background: black; color: white; padding: 12px; text-align: left; border: 1px solid black; font-weight: bold; }}
-            td {{ padding: 10px; border: 1px solid black; color: black; vertical-align: middle; }}
+            .logo img {{ height: 100px; filter: grayscale(100%); }}
+            h1 {{ color: black; text-align: center; font-weight: bold; font-size: 24px; }}
+            table {{ width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }}
+            th {{ background: black; color: white; padding: 10px 6px; text-align: left; border: 1px solid black; font-weight: bold; font-size: 11px; }}
+            td {{ padding: 8px 6px; border: 1px solid black; color: black; vertical-align: middle; }}
             .room-header-row {{ background: black !important; }}
-            .room-header-row td {{ color: white; font-weight: bold; font-size: 18px; padding: 15px; text-align: center; }}
+            .room-header-row td {{ color: white; font-weight: bold; font-size: 16px; padding: 12px; text-align: center; }}
+        </style></head><body>
+        <div class="logo"><img src="https://clipboard-tool.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
+        <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
+        <table><thead><tr><th>IMAGE</th><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>SIZE/FINISH</th><th>QTY</th><th>REMARKS</th><th>✓</th></tr></thead>
+        <tbody>{items_html}</tbody></table>
+        </body></html>"""
+        
+        return Response(content=html, media_type="text/html")
+        
+    except Exception as e:
+        logging.error(f"Error generating mover's FFE: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
         </style></head><body>
         <div class="logo"><img src="https://clipboard-tool.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
