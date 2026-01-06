@@ -813,6 +813,7 @@ function scrapeAndShow() {
   updateFieldDisplay('finish_color', scrapedData.finish_color);
   updateFieldDisplay('finish_image', scrapedData.finish_image);
   updateFieldDisplay('image_url', scrapedData.image_url);
+  updateFieldDisplay('remarks', scrapedData.remarks);
   
   showToast('✅ Page scraped! Click any field to manually select.');
 }
