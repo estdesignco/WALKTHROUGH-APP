@@ -13231,14 +13231,34 @@ async def generate_load_in_sheets(project_id: str):
                         room_items.append({
                             "name": item.get("name"),
                             "quantity": item.get("quantity", 1),
+                            "size": item.get("size", ""),
+                            "finish_color": item.get("finish_color", ""),
+                            "vendor": item.get("vendor", ""),
+                            "remarks": item.get("remarks", ""),
+                            "install_notes": item.get("install_notes", ""),
                             "image_url": item.get("image_url", "")
                         })
             
             if room_items:
                 items_grid = ""
-                for item in room_items[:4]:
-                    img = f'<img src="{item["image_url"]}">' if item.get("image_url") else '<div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; font-size: 48px;">📦</div>'
-                    items_grid += f'<div class="item-card">{img}<div class="item-name">{item["name"]}</div><div class="item-qty">Qty: {item["quantity"]}</div></div>'
+                for item in room_items:
+                    img = f'<img src="{item["image_url"]}">' if item.get("image_url") else '<div style="height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 36px;">📦</div>'
+                    specs = f'<div class="item-specs">'
+                    if item.get("size"): specs += f'<div>Size: {item["size"]}</div>'
+                    if item.get("finish_color"): specs += f'<div>Finish: {item["finish_color"]}</div>'
+                    if item.get("vendor"): specs += f'<div>Vendor: {item["vendor"]}</div>'
+                    specs += '</div>'
+                    remarks_html = f'<div class="item-remarks">📋 {item["remarks"]}</div>' if item.get("remarks") else ''
+                    install_html = f'<div class="item-install">🔧 {item["install_notes"]}</div>' if item.get("install_notes") else ''
+                    
+                    items_grid += f'''<div class="item-card">
+                        {img}
+                        <div class="item-name">{item["name"]}</div>
+                        <div class="item-qty">Qty: {item["quantity"]}</div>
+                        {specs}
+                        {remarks_html}
+                        {install_html}
+                    </div>'''
                 
                 pages_html += f'<div class="room-page"><div class="room-header">{room.get("name").upper()}</div><div class="item-grid">{items_grid}</div></div>'
         
@@ -13247,14 +13267,18 @@ async def generate_load_in_sheets(project_id: str):
             @media print {{ @page {{ size: letter; margin: 0.25in; }} .room-page {{ page-break-after: always; }} }}
             body {{ margin: 0; background: white; font-family: 'Century Gothic', Arial, sans-serif; color: black; }}
             .logo {{ text-align: center; margin: 20px 0; }}
-            .logo img {{ height: 150px; filter: grayscale(100%); }}
-            .room-page {{ padding: 20px; page-break-after: always; }}
-            .room-header {{ background: black; color: white; text-align: center; padding: 30px; font-size: 48px; font-weight: bold; margin-bottom: 20px; }}
-            .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
-            .item-card {{ border: 4px solid black; padding: 20px; text-align: center; }}
-            .item-card img {{ max-width: 100%; max-height: 350px; margin-bottom: 15px; }}
-            .item-name {{ font-size: 28px; font-weight: bold; color: black; margin-bottom: 10px; }}
-            .item-qty {{ font-size: 22px; color: black; }}
+            .logo img {{ height: 100px; filter: grayscale(100%); }}
+            .room-page {{ padding: 15px; page-break-after: always; }}
+            .room-header {{ background: black; color: white; text-align: center; padding: 20px; font-size: 36px; font-weight: bold; margin-bottom: 15px; }}
+            .item-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }}
+            .item-card {{ border: 3px solid black; padding: 15px; text-align: center; page-break-inside: avoid; }}
+            .item-card img {{ max-width: 100%; max-height: 200px; margin-bottom: 10px; }}
+            .item-name {{ font-size: 20px; font-weight: bold; color: black; margin-bottom: 5px; }}
+            .item-qty {{ font-size: 18px; color: black; font-weight: bold; }}
+            .item-specs {{ font-size: 12px; color: #333; margin-top: 8px; text-align: left; }}
+            .item-specs div {{ margin: 2px 0; }}
+            .item-remarks {{ font-size: 11px; color: #666; margin-top: 8px; padding: 5px; background: #f5f5f5; border-radius: 4px; text-align: left; }}
+            .item-install {{ font-size: 11px; color: #059669; margin-top: 5px; padding: 5px; background: #ecfdf5; border-radius: 4px; text-align: left; font-weight: bold; }}
         </style></head><body>
         <div class="logo"><img src="https://clipboard-tool.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         {pages_html}</body></html>"""
