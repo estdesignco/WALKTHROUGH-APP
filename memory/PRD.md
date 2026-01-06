@@ -7,27 +7,53 @@ Build a deployment-ready interior design application with a Chrome Extension web
 
 ### P0 - Critical
 1. **Chrome Extension Web Scraper** - Must work for all 22 vendor sites
-   - **v7.7.4 CURRENT** - Fixed Copy Image and Copy Link buttons
+   - **v7.8.2 CURRENT** - Added REMARKS field, Reverse Selection, Background Removal
 
 ## Changelog
 
-### v7.7.4 (January 5, 2025)
-- **Fixed**: "Copy Image" and "Copy Link" buttons in side panel scraper
-  - Copy Image now uses multiple fallback methods:
-    1. First tries to copy image directly from page (bypasses CORS)
-    2. Falls back to fetch with CORS credentials
-    3. Final fallback: copies image URL to clipboard
-  - Copy Link now properly handles errors and copies the product URL
+### v7.8.2 (January 6, 2026)
+- **Fixed**: Reverse Selection Mode now works correctly
+  - Captures text selection on mousedown before click clears it
+  - Highlight text on page → Click field in panel to populate
+
+### v7.8.1 (January 6, 2026)
+- **Added**: REMARKS field to scraper panel
+- **Added**: Reverse Selection Mode (highlight text → click field)
+- **Added**: REMARKS column to FFE spreadsheet
+- **Added**: INSTALL NOTES column to FFE spreadsheet (editable, green highlight)
+- **Updated**: Electrician Sheet export includes REMARKS
+- **Updated**: Load-In Sheets export includes all fields (size, finish, vendor, remarks, install_notes)
+- **Updated**: Movers FFE export includes SIZE/FINISH and REMARKS columns
+
+### v7.7.9 (January 5, 2026)
+- **Fixed**: Panel scrolling and layout - no longer cut off at bottom
+- **Fixed**: Buttons arranged in compact 2x2 grid
+
+### v7.7.6-7.7.8 (January 5, 2026)
+- **Added**: ✨ No Background button for AI-powered background removal
+- Uses rembg (open source, no API key needed)
+- Backend endpoint: POST /api/remove-background
+
+### v7.7.4-7.7.5 (January 5, 2026)
+- **Fixed**: Copy Image and Copy Link buttons with robust fallbacks
+- Uses execCommand fallback when clipboard API fails
 
 ### v7.7.3 (January 5, 2025)
 - Fixed price-overwriting logic error
 - Fixed Four Hands, Visual Comfort, HVL Group specific issues
 
-### v7.7.0 - v7.7.2 (January 4-5, 2025)
-- Multi-vendor scraping improvements
-- Syntax error fixes
+## PWA Mobile App (iPad)
+- **Version**: 1.0.0
+- **App Name**: ESTABLISHED Design Co.
+- **Icons**: All sizes generated (72-512px)
+- **Installation**: Add to Home Screen on iPad Safari
 
-### v7.0.0 (January 4, 2025)
+## Test Results (January 6, 2026)
+- Backend: 92% (24/26 tests passed)
+- Frontend: 100% (all pages load correctly)
+- All export endpoints working
+- Chrome extension download working
+- Background removal working
 
 ### Comprehensive Vendor-Specific Scraping
 Each of the 22 vendors now has dedicated scraping logic for optimal data extraction:
