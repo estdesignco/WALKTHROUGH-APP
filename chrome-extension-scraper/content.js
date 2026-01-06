@@ -395,10 +395,31 @@ function createSidePanel() {
   });
   
   // Field click handlers - click on field in panel to select from page
+  // ALSO supports REVERSE: highlight text first, then click field to populate
   document.querySelectorAll('#dr-scraper-panel .dr-field').forEach(field => {
     field.addEventListener('click', () => {
       const fieldId = field.dataset.field;
-      startFieldSelection(fieldId);
+      
+      // Check if there's highlighted/selected text on the page
+      const selectedText = window.getSelection().toString().trim();
+      
+      if (selectedText) {
+        // REVERSE MODE: User highlighted text first, now clicking field to populate
+        console.log('[Scraper] Reverse select - using highlighted text:', selectedText);
+        
+        // Update the field with highlighted text
+        if (scrapedData) {
+          scrapedData[fieldId] = selectedText;
+          updateFieldDisplay(fieldId, selectedText);
+          showToast(`✅ ${formatFieldName(fieldId)} updated from selection!`);
+          
+          // Clear the selection
+          window.getSelection().removeAllRanges();
+        }
+      } else {
+        // NORMAL MODE: Click field first, then click element on page
+        startFieldSelection(fieldId);
+      }
     });
   });
   
