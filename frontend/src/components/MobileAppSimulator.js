@@ -8,73 +8,161 @@ import { saveContactsOffline, getContactsOffline, saveQuestionnaireOffline, getQ
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
-// ===== HOME SCREEN =====
+// DESKTOP-MATCHED STYLES
+const STYLES = {
+  goldGradient: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+  darkGradient: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
+  goldBorder: '1px solid #8b7355',
+  goldHighlight: '1px solid #d4af37',
+  goldShadow: '0 4px 15px rgba(139, 115, 85, 0.2)',
+  goldShadowStrong: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+  shimmer: 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+};
+
+// Shimmer animation CSS
+const shimmerStyle = `
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .shimmer-gold {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-gold::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.1) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+    pointer-events: none;
+  }
+`;
+
+// ===== HOME SCREEN - MATCHES DESKTOP EXACTLY =====
 function MobileHomeScreen({ onNavigate }) {
   return (
-    <div className="h-full overflow-auto bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A]">
-      {/* EXACT DESKTOP HEADER STYLE */}
-      <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 md:p-8 border-b-4 border-[#D4A574] shadow-2xl">
-        <div className="text-center mb-6">
-          <div className="inline-block bg-gradient-to-r from-[#D4A574] to-[#BCA888] p-0 mb-4">
-            <img 
-              src={`${process.env.PUBLIC_URL}/established-logo.png`}
-              alt="ESTABLISHED" 
-              className="h-16 md:h-20 lg:h-24 object-contain"
-              style={{ 
-                maxWidth: '280px',
-                filter: 'brightness(0)',
-                display: 'block'
-              }}
-            />
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#D4A574] mb-3">
-            Interior Design Manager
-          </h1>
-          <p className="text-[#D4C5A9] text-lg md:text-xl">On-Site Project Management</p>
+    <div className="h-full overflow-auto bg-black">
+      <style>{shimmerStyle}</style>
+      
+      {/* Gold Header - EXACT MATCH to MainDashboard.js */}
+      <div className="w-full h-32 shimmer-gold" style={{ 
+        background: STYLES.goldGradient,
+        boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+      }}>
+        <div className="flex items-center justify-center h-full relative px-8">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10"></div>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+            alt="ESTABLISHED DESIGN CO." 
+            className="w-full h-20 object-contain"
+            style={{
+              filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.2))',
+              maxWidth: '100%'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-transparent to-yellow-400 opacity-5"></div>
         </div>
       </div>
 
-      {/* CONTENT - iPad Optimized Layout */}
-      <div className="p-6 md:p-8 lg:p-12">
-        <div className="max-w-5xl mx-auto space-y-6 mb-8">
+      {/* Main Content */}
+      <div className="px-6 py-8">
+        {/* Navigation Grid - MATCHES DESKTOP */}
+        <div className="max-w-4xl mx-auto grid grid-cols-2 gap-4 mb-8">
           <button
             onClick={() => onNavigate('projects')}
-            className="w-full bg-gradient-to-br from-gray-900 to-black hover:from-gray-800 hover:to-gray-900 rounded-3xl p-8 md:p-10 transition-all duration-300 transform hover:scale-105 relative overflow-hidden group border-2 border-[#D4A574]/50 shadow-2xl"
+            className="text-stone-300 p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4A574]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative z-10">
-              <div className="text-6xl md:text-7xl mb-4">📋</div>
-              <div className="text-2xl md:text-3xl font-bold text-[#D4C5A9] mb-2">Projects</div>
-              <div className="text-base md:text-lg text-gray-300">View all projects & spreadsheets</div>
-            </div>
+            <div className="text-4xl mb-3">📋</div>
+            <div className="text-lg font-medium">Projects</div>
+            <div className="text-xs text-stone-500 mt-1">View & manage</div>
           </button>
-
-          <div className="grid grid-cols-3 gap-4 md:gap-6">
-            <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
-              <div className="text-4xl md:text-5xl mb-3">📸</div>
-              <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Photos</div>
-            </button>
-
-            <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
-              <div className="text-4xl md:text-5xl mb-3">📏</div>
-              <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Measure</div>
-            </button>
-
-            <button className="bg-gradient-to-br from-gray-900 to-black rounded-2xl p-6 md:p-8 border-2 border-[#D4A574]/50 hover:border-[#D4A574] transition-all shadow-xl">
-              <div className="text-4xl md:text-5xl mb-3">🔄</div>
-              <div className="text-sm md:text-base font-bold text-[#D4C5A9]">Sync</div>
-            </button>
-          </div>
+          
+          <button
+            onClick={() => onNavigate('photos')}
+            className="text-stone-300 p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-4xl mb-3">📸</div>
+            <div className="text-lg font-medium">Photos</div>
+            <div className="text-xs text-stone-500 mt-1">Capture & organize</div>
+          </button>
+          
+          <button
+            onClick={() => onNavigate('measure')}
+            className="text-stone-300 p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-4xl mb-3">📏</div>
+            <div className="text-lg font-medium">Measure</div>
+            <div className="text-xs text-stone-500 mt-1">Leica integration</div>
+          </button>
+          
+          <button
+            onClick={() => onNavigate('sync')}
+            className="text-white p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 shimmer-gold"
+            style={{
+              background: STYLES.goldGradient,
+              border: STYLES.goldHighlight,
+              boxShadow: STYLES.goldShadowStrong
+            }}
+          >
+            <div className="text-4xl mb-3">🔄</div>
+            <div className="text-lg font-medium">Sync</div>
+            <div className="text-xs text-stone-200 mt-1">Upload to cloud</div>
+          </button>
         </div>
 
-        <div className="max-w-5xl mx-auto bg-gradient-to-br from-gray-900 to-black rounded-3xl p-6 md:p-8 border-2 border-[#D4A574]/50 shadow-2xl">
-          <p className="font-bold text-[#D4A574] mb-4 text-xl md:text-2xl">✨ Jobsite Features</p>
-          <div className="space-y-3 text-base md:text-lg text-gray-300">
-            <p>• Full Walkthrough spreadsheet</p>
-            <p>• <strong className="text-[#D4C5A9]">FFE</strong> - Your complete inventory</p>
-            <p>• Works offline with auto-sync</p>
-            <p>• Photo capture by room</p>
-            <p>• Real-time status updates</p>
+        {/* Quick Stats - GOLD ACCENT STYLING */}
+        <div className="max-w-4xl mx-auto p-6 rounded-lg mb-6" style={{
+          background: STYLES.darkGradient,
+          border: STYLES.goldBorder,
+          boxShadow: STYLES.goldShadow
+        }}>
+          <h3 className="text-lg font-bold mb-4" style={{ color: '#d4af37' }}>✨ Mobile Features</h3>
+          <div className="space-y-3 text-stone-300 text-sm">
+            <p className="flex items-center gap-2">
+              <span className="text-[#8b7355]">•</span>
+              <span>Full walkthrough spreadsheet access</span>
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="text-[#8b7355]">•</span>
+              <span><strong className="text-[#d4af37]">Offline mode</strong> - work without internet</span>
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="text-[#8b7355]">•</span>
+              <span>Auto-sync when connected</span>
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="text-[#8b7355]">•</span>
+              <span>Photo capture by room</span>
+            </p>
+          </div>
+        </div>
+        
+        {/* Connection Status */}
+        <div className="max-w-4xl mx-auto text-center">
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${isOnline() ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}
+            style={{ border: isOnline() ? '1px solid #22c55e' : '1px solid #ef4444' }}>
+            <div className={`w-2 h-2 rounded-full ${isOnline() ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            {isOnline() ? 'Connected' : 'Offline Mode'}
           </div>
         </div>
       </div>
