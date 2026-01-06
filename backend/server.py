@@ -13153,6 +13153,8 @@ async def generate_electrician_sheet(project_id: str):
             for item in room_items:
                 img_html = f'<img src="{item["image_url"]}" alt="{item["name"]}">' if item.get("image_url") else '<div style="width: 200px; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; color: #999;">No Image</div>'
                 
+                remarks_html = f'<div class="spec-row"><div class="spec-label">Remarks:</div><div class="spec-value">{item.get("remarks") or "—"}</div></div>' if item.get('remarks') else ''
+                
                 items_html += f"""
                 <div class="item">
                     <div class="item-header"><strong>{item['name']}</strong></div>
@@ -13162,12 +13164,15 @@ async def generate_electrician_sheet(project_id: str):
                             <div class="spec-row"><div class="spec-label">Size:</div><div class="spec-value">{item['size']}</div></div>
                             <div class="spec-row"><div class="spec-label">Finish/Color:</div><div class="spec-value">{item['finish_color']}</div></div>
                             <div class="spec-row"><div class="spec-label">Vendor:</div><div class="spec-value">{item['vendor']}</div></div>
+                            {remarks_html}
                         </div>
                         {img_html}
                     </div>
                     <div class="notes-box">
                         <strong>Installation Notes:</strong><br>
-                        {item.get('installation_notes') or item.get('notes') or '_____________________________________'}
+                        <div contenteditable="true" style="min-height: 40px; padding: 5px; border: 1px solid #ccc; margin-top: 5px;">
+                            {item.get('install_notes') or item.get('installation_notes') or item.get('notes') or ''}
+                        </div>
                     </div>
                 </div>
                 """
