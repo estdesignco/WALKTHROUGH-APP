@@ -10585,6 +10585,61 @@ async def delete_contact(contact_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===========================================
+# CONTACTS ALIAS ENDPOINT (for backwards compatibility)
+# ===========================================
+
+@api_router.get("/contacts")
+async def get_contacts_alias(search: str = None, role: str = None):
+    """Alias for /master/contacts - Get all contacts"""
+    try:
+        query = {}
+        if search:
+            query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"company": {"$regex": search, "$options": "i"}},
+                {"email": {"$regex": search, "$options": "i"}},
+                {"phone": {"$regex": search, "$options": "i"}}
+            ]
+        if role:
+            query["role"] = {"$regex": role, "$options": "i"}
+        
+        contacts = await db.master_contacts.find(query, {"_id": 0}).sort("company", 1).to_list(length=1000)
+        return contacts
+    except Exception as e:
+        logging.error(f"Get contacts error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===========================================
+# PRODUCTS ENDPOINT (Product Library)
+# ===========================================
+
+@api_router.get("/products")
+async def get_all_products(search: str = None, vendor: str = None, category: str = None):
+    """Get all products from the product library"""
+    try:
+        query = {}
+        if search:
+            query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"sku": {"$regex": search, "$options": "i"}},
+                {"vendor": {"$regex": search, "$options": "i"}}
+            ]
+        if vendor:
+            query["vendor"] = {"$regex": vendor, "$options": "i"}
+        if category:
+            query["category"] = {"$regex": category, "$options": "i"}
+        
+        # Try product_library collection first, then products
+        products = await db.product_library.find(query, {"_id": 0}).sort("name", 1).to_list(length=1000)
+        if not products:
+            products = await db.products.find(query, {"_id": 0}).sort("name", 1).to_list(length=1000)
+        
+        return products
+    except Exception as e:
+        logging.error(f"Get products error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===========================================
 # MASTER CONTACTS ENDPOINTS (Global Contacts)
 # ===========================================
 
