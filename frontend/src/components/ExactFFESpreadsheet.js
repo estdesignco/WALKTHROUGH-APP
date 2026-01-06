@@ -1896,8 +1896,31 @@ const ExactFFESpreadsheet = ({
                                                             <input 
                                                               type="text" 
                                                               placeholder="Notes"
+                                                              defaultValue={item.notes || ''}
                                                               className="w-full bg-transparent border-none text-white text-sm"
-                                                              onChange={(e) => console.log('Notes changed:', e.target.value)}
+                                                              onBlur={(e) => handleUpdateItem(item.id, { notes: e.target.value })}
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* REMARKS - EDITABLE */}
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
+                                                            <input 
+                                                              type="text" 
+                                                              placeholder="Remarks"
+                                                              defaultValue={item.remarks || ''}
+                                                              className="w-full bg-transparent border-none text-white text-sm"
+                                                              onBlur={(e) => handleUpdateItem(item.id, { remarks: e.target.value })}
+                                                            />
+                                                          </td>
+                                                          
+                                                          {/* INSTALL NOTES - EDITABLE */}
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]" style={{ background: 'rgba(5, 150, 105, 0.15)' }}>
+                                                            <input 
+                                                              type="text" 
+                                                              placeholder="Install notes..."
+                                                              defaultValue={item.install_notes || ''}
+                                                              className="w-full bg-transparent border-none text-green-300 text-sm"
+                                                              onBlur={(e) => handleUpdateItem(item.id, { install_notes: e.target.value })}
                                                             />
                                                           </td>
                                                           
