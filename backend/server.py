@@ -10589,31 +10589,6 @@ async def delete_contact(contact_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===========================================
-# CONTACTS ALIAS ENDPOINT (for backwards compatibility)
-# ===========================================
-
-@api_router.get("/contacts")
-async def get_contacts_alias(search: str = None, role: str = None):
-    """Alias for /master/contacts - Get all contacts"""
-    try:
-        query = {}
-        if search:
-            query["$or"] = [
-                {"name": {"$regex": search, "$options": "i"}},
-                {"company": {"$regex": search, "$options": "i"}},
-                {"email": {"$regex": search, "$options": "i"}},
-                {"phone": {"$regex": search, "$options": "i"}}
-            ]
-        if role:
-            query["role"] = {"$regex": role, "$options": "i"}
-        
-        contacts = await db.master_contacts.find(query, {"_id": 0}).sort("company", 1).to_list(length=1000)
-        return contacts
-    except Exception as e:
-        logging.error(f"Get contacts error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-# ===========================================
 # PRODUCTS ENDPOINT (Product Library)
 # ===========================================
 
