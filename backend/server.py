@@ -10500,8 +10500,12 @@ async def get_contacts(project_id: str = None):
         query = {}
         if project_id:
             query["project_id"] = project_id
+        # First try project contacts, then master contacts
         contacts = await db.contacts.find(query, {"_id": 0}).to_list(length=500)
-        return {"success": True, "contacts": contacts, "count": len(contacts)}
+        if not contacts and not project_id:
+            # If no project contacts found, return master contacts
+            contacts = await db.master_contacts.find({}, {"_id": 0}).to_list(length=1000)
+        return contacts
     except Exception as e:
         logging.error(f"Get contacts error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
