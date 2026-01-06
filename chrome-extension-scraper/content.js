@@ -341,6 +341,14 @@ function createSidePanel() {
         </div>
         <div class="dr-field-value" id="dr-field-image_url">Not found</div>
       </div>
+      
+      <div class="dr-field" data-field="remarks">
+        <div class="dr-field-label">
+          <span>📋 Remarks</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <div class="dr-field-value" id="dr-field-remarks">Not found</div>
+      </div>
     </div>
     
     <div class="dr-actions">
