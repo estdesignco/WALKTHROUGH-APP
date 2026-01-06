@@ -89,7 +89,9 @@ const ExactFFESpreadsheet = ({
           const parsed = JSON.parse(data);
           setScraperClipboard(parsed);
           setShowScraperNotification(true);
-        } catch (e) {}
+        } catch (e) {
+          // Ignore JSON parse errors for invalid clipboard data
+        }
       }
     };
     
