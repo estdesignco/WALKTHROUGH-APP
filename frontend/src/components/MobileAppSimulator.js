@@ -395,7 +395,6 @@ function MobileProjectListScreen({ onNavigate, onSelectProject }) {
               <div className="flex justify-between items-center pt-3" style={{ borderTop: '1px solid #8b7355' }}>
                 <span className="text-sm text-stone-400">{project.project_type || 'Renovation'}</span>
                 <span className="text-sm" style={{ color: '#d4af37' }}>{project.rooms?.length || 0} rooms</span>
-                </div>
               </div>
             </button>
           ))}
