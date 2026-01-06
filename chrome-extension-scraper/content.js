@@ -740,6 +740,21 @@ function updateFieldDisplay(fieldId, value) {
   el.classList.toggle('missing', !value);
 }
 
+function formatFieldName(fieldId) {
+  const names = {
+    name: 'Product Title',
+    price: 'Price',
+    sku: 'SKU',
+    size: 'Dimensions',
+    finish_color: 'Finish/Color',
+    finish_image: 'Finish Image',
+    image_url: 'Main Image',
+    remarks: 'Remarks',
+    msrp: 'MSRP'
+  };
+  return names[fieldId] || fieldId;
+}
+
 // ============================================================================
 // PANEL CONTROL
 // ============================================================================
