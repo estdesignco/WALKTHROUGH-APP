@@ -2260,6 +2260,7 @@ async function sendToAppAndLibraries() {
     if (scrapedData.vendor) params.set('vendor', scrapedData.vendor);
     if (scrapedData.url) params.set('link', scrapedData.url);
     if (scrapedData.image_url) params.set('image', scrapedData.image_url);
+    if (scrapedData.remarks) params.set('remarks', scrapedData.remarks);
     
     const projectUrl = `${BACKEND_URL}/project/${projectId}?tab=Checklist&${params.toString()}`;
     window.open(projectUrl, '_blank');
