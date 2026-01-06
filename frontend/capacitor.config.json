@@ -1,5 +1,29 @@
 {
   "appId": "com.establisheddesign.ffe",
-  "appName": "ESTABLISHED Design",
-  "webDir": "build"
+  "appName": "ESTABLISHED",
+  "webDir": "build",
+  "server": {
+    "url": "https://clipboard-tool.preview.emergentagent.com/mobile-app",
+    "cleartext": true
+  },
+  "ios": {
+    "contentInset": "always",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true,
+    "backgroundColor": "#0F172A"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#0F172A",
+      "showSpinner": false,
+      "androidSpinnerStyle": "small",
+      "iosSpinnerStyle": "small",
+      "spinnerColor": "#D4A574"
+    },
+    "Keyboard": {
+      "resize": "native",
+      "resizeOnFullScreen": true
+    }
+  }
 }
