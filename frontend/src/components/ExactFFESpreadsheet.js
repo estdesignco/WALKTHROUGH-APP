@@ -1898,7 +1898,7 @@ const ExactFFESpreadsheet = ({
                                                               placeholder="Notes"
                                                               defaultValue={item.notes || ''}
                                                               className="w-full bg-transparent border-none text-white text-sm"
-                                                              onBlur={(e) => handleUpdateItem(item.id, { notes: e.target.value })}
+                                                              onBlur={(e) => handleUpdateItemField(item.id, 'notes', e.target.value)}
                                                             />
                                                           </td>
                                                           
@@ -1909,7 +1909,7 @@ const ExactFFESpreadsheet = ({
                                                               placeholder="Remarks"
                                                               defaultValue={item.remarks || ''}
                                                               className="w-full bg-transparent border-none text-white text-sm"
-                                                              onBlur={(e) => handleUpdateItem(item.id, { remarks: e.target.value })}
+                                                              onBlur={(e) => handleUpdateItemField(item.id, 'remarks', e.target.value)}
                                                             />
                                                           </td>
                                                           
@@ -1920,7 +1920,7 @@ const ExactFFESpreadsheet = ({
                                                               placeholder="Install notes..."
                                                               defaultValue={item.install_notes || ''}
                                                               className="w-full bg-transparent border-none text-green-300 text-sm"
-                                                              onBlur={(e) => handleUpdateItem(item.id, { install_notes: e.target.value })}
+                                                              onBlur={(e) => handleUpdateItemField(item.id, 'install_notes', e.target.value)}
                                                             />
                                                           </td>
                                                           
