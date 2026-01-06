@@ -420,6 +420,7 @@ function createFieldDropdown() {
     { id: 'finish_color', label: 'Finish / Color', icon: '🎨' },
     { id: 'finish_image', label: 'Finish Image', icon: '🖼️' },
     { id: 'image_url', label: 'Main Image', icon: '📷' },
+    { id: 'remarks', label: 'Remarks', icon: '📋' },
   ];
   
   let html = '<div class="dr-dropdown-header">➕ Add as...</div>';
