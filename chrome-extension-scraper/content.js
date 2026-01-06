@@ -394,28 +394,39 @@ function createSidePanel() {
     scrapeAndShow();
   });
   
+  // Store the selection before click clears it
+  let pendingSelection = '';
+  
+  // Capture selection on mousedown (before it gets cleared by click)
+  document.querySelectorAll('#dr-scraper-panel .dr-field').forEach(field => {
+    field.addEventListener('mousedown', (e) => {
+      // Capture the current selection before click clears it
+      pendingSelection = window.getSelection().toString().trim();
+      console.log('[Scraper] Captured selection on mousedown:', pendingSelection);
+    });
+  });
+  
   // Field click handlers - click on field in panel to select from page
   // ALSO supports REVERSE: highlight text first, then click field to populate
   document.querySelectorAll('#dr-scraper-panel .dr-field').forEach(field => {
-    field.addEventListener('click', () => {
+    field.addEventListener('click', (e) => {
       const fieldId = field.dataset.field;
       
-      // Check if there's highlighted/selected text on the page
-      const selectedText = window.getSelection().toString().trim();
-      
-      if (selectedText) {
+      // Use the selection we captured on mousedown
+      if (pendingSelection) {
         // REVERSE MODE: User highlighted text first, now clicking field to populate
-        console.log('[Scraper] Reverse select - using highlighted text:', selectedText);
+        console.log('[Scraper] Reverse select - using captured text:', pendingSelection);
         
         // Update the field with highlighted text
         if (scrapedData) {
-          scrapedData[fieldId] = selectedText;
-          updateFieldDisplay(fieldId, selectedText);
-          showToast(`✅ ${formatFieldName(fieldId)} updated from selection!`);
-          
-          // Clear the selection
-          window.getSelection().removeAllRanges();
+          scrapedData[fieldId] = pendingSelection;
+          updateFieldDisplay(fieldId, pendingSelection);
+          showToast(`✅ ${formatFieldName(fieldId)} updated!`);
         }
+        
+        // Clear the pending selection
+        pendingSelection = '';
+        window.getSelection().removeAllRanges();
       } else {
         // NORMAL MODE: Click field first, then click element on page
         startFieldSelection(fieldId);
