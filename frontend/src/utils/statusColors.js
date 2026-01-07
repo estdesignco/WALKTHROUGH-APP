@@ -8,6 +8,10 @@ export const STATUS_COLORS = {
   'PENDING APPROVAL': '#F59E0B',        // Amber/Yellow
   'APPROVED': '#10B981',                // Emerald green
   'ORDERED': '#06B6D4',                 // Cyan (NOT green)
+  'ORDER SAMPLES': '#818CF8',           // Violet - NEW
+  'CHANGE OUT': '#F472B6',              // Pink - NEW
+  'ASK NEIL': '#FBBF24',                // Amber/Yellow - NEW
+  'ASK JALA': '#EC4899',                // Pink - NEW
   'PICKED': '#FFD700',                  // Gold
   'CONFIRMED': '#84CC16',               // Lime (yellow-green)
   'IN PRODUCTION': '#F97316',           // Orange
