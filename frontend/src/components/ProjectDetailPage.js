@@ -806,139 +806,166 @@ export default function ProjectDetailPage() {
         );
     };
 
+    // TABS ORGANIZED BY CATEGORY - Like items grouped together
     const tabs = [
-        { name: "Questionnaire", icon: FileQuestion, component: <CompleteFilledQuestionnaire /> },
-        { name: "Walkthrough", icon: Aperture, component: project ? (
+        // ═══════════════════════════════════════════════════════════════
+        // 📋 PROJECT DATA & SPREADSHEETS
+        // ═══════════════════════════════════════════════════════════════
+        { name: "Questionnaire", icon: FileQuestion, group: "data", component: <CompleteFilledQuestionnaire /> },
+        { name: "Walkthrough", icon: Aperture, group: "data", component: project ? (
             <div className="walkthrough-content">
                 <WalkthroughDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading walkthrough...</div> },
-        { name: "Checklist", icon: CheckSquare, component: project ? (
+        { name: "Checklist", icon: CheckSquare, group: "data", component: project ? (
             <div className="checklist-content">
                 <ChecklistDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading checklist...</div> },
-        { name: "FF&E", icon: Trello, component: project ? (
+        { name: "FF&E", icon: Trello, group: "data", component: project ? (
             <div className="ffe-content">
                 <FFEDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
-        { name: "Measurements", icon: Aperture, component: project ? (
-            <div className="measurements-content">
-                <MeasurementsAndFilesPage projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading measurements...</div> },
-        { name: "To Do", icon: ListTodo, component: project ? (
-            <div className="todo-content">
-                <ToDoList projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading to-do list...</div> },
-        { name: "Calendar", icon: Calendar, component: project ? (
-            <div className="calendar-content">
-                <InstallationCalendar projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
-        { name: "Deliveries", icon: Truck, component: project ? (
-            <div className="deliveries-content">
-                <DeliveryScheduler project={project} embedded={true} onUpdate={() => window.location.reload()} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading deliveries...</div> },
-        { name: "Contacts", icon: Users, component: project ? (
-            <div className="contacts-content">
-                <ContactSheet projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading contacts...</div> },
-        { name: "Design", icon: Palette, component: project ? (
-            <div className="design-content">
-                <DesignToolsDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
-        { name: "Finance", icon: DollarSign, component: project ? (
-            <div className="finance-content">
-                <FinanceDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading finance...</div> },
-        { name: "Critical Path", icon: BarChart3, component: project ? (
-            <div className="critical-path-content">
-                <CriticalPathDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading critical path...</div> },
-
-        { name: "Calculators", icon: Calculator, component: project ? (
-            <div className="calculators-content">
-                <CalculatorDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading calculators...</div> },
-        { name: "Budget", icon: DollarSign, component: project ? (
-            <div className="budget-content">
-                <BudgetTracker projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading budget...</div> },
-        { name: "Vendors", icon: Phone, component: project ? (
-            <div className="vendors-content">
-                <VendorContactManager projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading vendors...</div> },
-        { name: "Materials", icon: Package, component: project ? (
-            <div className="materials-content">
-                <MaterialLibraryCatalog projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading materials...</div> },
-        { name: "Automation", icon: Zap, component: project ? (
-            <div className="automation-content">
-                <AutomationDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading automation...</div> },
-        { name: "Reports", icon: BarChart3, component: project ? (
-            <div className="reports-content">
-                <ReportsDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading reports...</div> },
-        { name: "Exports", icon: FileText, component: project ? (
-            <div className="exports-content">
-                <ExportsDashboard projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading exports...</div> },
-        { name: "AI Assistant", icon: Bot, component: (
-            <div className="ai-assistant-content">
-                <AIDesignDashboard project={project} />
-            </div>
-        ) },
-        { name: "Design Tools", icon: Layout, component: project ? (
-            <div className="design-tools-hub-content">
-                <DesignToolsHub projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
-        { name: "Team Chat", icon: MessageSquare, component: project ? (
-            <div className="team-chat-content">
-                <TeamChat projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading chat...</div> },
-        { name: "Punch List", icon: Clipboard, component: project ? (
-            <div className="punch-list-content">
-                <PunchList projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading punch list...</div> },
-        { name: "Shipping", icon: Truck, component: project ? (
-            <div className="shipping-content">
-                <ShippingTracker projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading shipping...</div> },
-        { name: "Trade Discounts", icon: Percent, component: project ? (
-            <div className="trade-discounts-content">
-                <TradeDiscountManager projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading discounts...</div> },
-        { name: "Samples", icon: Package, component: project ? (
-            <div className="samples-content">
-                <SampleTracker projectId={projectId} />
-            </div>
-        ) : <div className="text-center text-stone-300 py-8">Loading samples...</div> },
-        { name: "Whole Home Finishes", icon: Home, component: project ? (
+        { name: "Whole Home Finishes", icon: Home, group: "data", component: project ? (
             <div className="whole-home-finishes-content">
                 <WholeHomeFinishes projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading whole home finishes...</div> },
+        { name: "Samples", icon: Package, group: "data", component: project ? (
+            <div className="samples-content">
+                <SampleTracker projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading samples...</div> },
+        { name: "Measurements", icon: Aperture, group: "data", component: project ? (
+            <div className="measurements-content">
+                <MeasurementsAndFilesPage projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading measurements...</div> },
+        
+        // ═══════════════════════════════════════════════════════════════
+        // 🚚 LOGISTICS & TRACKING
+        // ═══════════════════════════════════════════════════════════════
+        { name: "Shipping", icon: Truck, group: "logistics", component: project ? (
+            <div className="shipping-content">
+                <ShippingTracker projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading shipping...</div> },
+        { name: "Deliveries", icon: Truck, group: "logistics", component: project ? (
+            <div className="deliveries-content">
+                <DeliveryScheduler project={project} embedded={true} onUpdate={() => window.location.reload()} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading deliveries...</div> },
+        { name: "Critical Path", icon: BarChart3, group: "logistics", component: project ? (
+            <div className="critical-path-content">
+                <CriticalPathDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading critical path...</div> },
+        { name: "Punch List", icon: Clipboard, group: "logistics", component: project ? (
+            <div className="punch-list-content">
+                <PunchList projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading punch list...</div> },
+        
+        // ═══════════════════════════════════════════════════════════════
+        // 📊 REPORTS & EXPORTS
+        // ═══════════════════════════════════════════════════════════════
+        { name: "Exports", icon: FileText, group: "reports", component: project ? (
+            <div className="exports-content">
+                <ExportsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading exports...</div> },
+        { name: "Reports", icon: BarChart3, group: "reports", component: project ? (
+            <div className="reports-content">
+                <ReportsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading reports...</div> },
+        
+        // ═══════════════════════════════════════════════════════════════
+        // 💰 FINANCE & BUDGET
+        // ═══════════════════════════════════════════════════════════════
+        { name: "Finance", icon: DollarSign, group: "finance", component: project ? (
+            <div className="finance-content">
+                <FinanceDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading finance...</div> },
+        { name: "Budget", icon: DollarSign, group: "finance", component: project ? (
+            <div className="budget-content">
+                <BudgetTracker projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading budget...</div> },
+        { name: "Trade Discounts", icon: Percent, group: "finance", component: project ? (
+            <div className="trade-discounts-content">
+                <TradeDiscountManager projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading discounts...</div> },
+        { name: "Calculators", icon: Calculator, group: "finance", component: project ? (
+            <div className="calculators-content">
+                <CalculatorDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading calculators...</div> },
+        
+        // ═══════════════════════════════════════════════════════════════
+        // 👥 CONTACTS & VENDORS
+        // ═══════════════════════════════════════════════════════════════
+        { name: "Contacts", icon: Users, group: "contacts", component: project ? (
+            <div className="contacts-content">
+                <ContactSheet projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading contacts...</div> },
+        { name: "Vendors", icon: Phone, group: "contacts", component: project ? (
+            <div className="vendors-content">
+                <VendorContactManager projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading vendors...</div> },
+        { name: "Team Chat", icon: MessageSquare, group: "contacts", component: project ? (
+            <div className="team-chat-content">
+                <TeamChat projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading chat...</div> },
+        
+        // ═══════════════════════════════════════════════════════════════
+        // 🎨 DESIGN & TOOLS
+        // ═══════════════════════════════════════════════════════════════
+        { name: "Design", icon: Palette, group: "design", component: project ? (
+            <div className="design-content">
+                <DesignToolsDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
+        { name: "Design Tools", icon: Layout, group: "design", component: project ? (
+            <div className="design-tools-hub-content">
+                <DesignToolsHub projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading design tools...</div> },
+        { name: "Materials", icon: Package, group: "design", component: project ? (
+            <div className="materials-content">
+                <MaterialLibraryCatalog projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading materials...</div> },
+        { name: "AI Assistant", icon: Bot, group: "design", component: (
+            <div className="ai-assistant-content">
+                <AIDesignDashboard project={project} />
+            </div>
+        ) },
+        
+        // ═══════════════════════════════════════════════════════════════
+        // 📅 SCHEDULING & TASKS
+        // ═══════════════════════════════════════════════════════════════
+        { name: "Calendar", icon: Calendar, group: "schedule", component: project ? (
+            <div className="calendar-content">
+                <InstallationCalendar projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
+        { name: "To Do", icon: ListTodo, group: "schedule", component: project ? (
+            <div className="todo-content">
+                <ToDoList projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading to-do list...</div> },
+        { name: "Automation", icon: Zap, group: "schedule", component: project ? (
+            <div className="automation-content">
+                <AutomationDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading automation...</div> },
     ];
 
     if (isLoading) {
