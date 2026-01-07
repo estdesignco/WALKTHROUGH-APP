@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import TabbedWalkthroughSpreadsheet from './TabbedWalkthroughSpreadsheet';
+import MobileWalkthroughSpreadsheet from './MobileWalkthroughSpreadsheet';
+import MobileFFESpreadsheet from './MobileFFESpreadsheet';
 import MobilePhotoManagement from './MobilePhotoManagement';
 import MeasurementsAndFilesPage from './MeasurementsAndFilesPage';
 import { saveContactsOffline, getContactsOffline, saveQuestionnaireOffline, getQuestionnaireOffline, isOnline } from '../utils/offlineStorage';
