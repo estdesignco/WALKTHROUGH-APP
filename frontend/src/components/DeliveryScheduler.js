@@ -121,8 +121,8 @@ const DeliveryScheduler = ({ project, onClose, onUpdate, embedded = false }) => 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-[#D4A574]/30">
+    <div className={embedded ? "" : "fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"}>
+      <div className={`bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl w-full ${embedded ? '' : 'max-w-4xl max-h-[90vh]'} overflow-hidden border border-[#D4A574]/30`}>
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#D4A574]/30 flex justify-between items-center"
              style={{ background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(180, 155, 126, 0.1) 100%)' }}>
@@ -141,9 +141,11 @@ const DeliveryScheduler = ({ project, onClose, onUpdate, embedded = false }) => 
               <Plus className="w-4 h-4" />
               Schedule Delivery
             </button>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">
-              <X className="w-6 h-6" />
-            </button>
+            {!embedded && onClose && (
+              <button onClick={onClose} className="text-gray-400 hover:text-white">
+                <X className="w-6 h-6" />
+              </button>
+            )}
           </div>
         </div>
 
