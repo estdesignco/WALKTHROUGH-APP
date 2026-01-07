@@ -132,5 +132,5 @@ for i in range(5):
     time.sleep(3)
 
 print(f"\n🎉 Done! {success}/5 succeeded")
-print(f"Check: https://clipboard-tool.preview.emergentagent.com/furniture-search\n")
+print(f"Check: https://dashmaster-15.preview.emergentagent.com/furniture-search\n")
 client.close()

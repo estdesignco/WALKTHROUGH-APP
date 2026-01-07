@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://clipboard-tool.preview.emergentagent.com/api
+## Backend URL: https://dashmaster-15.preview.emergentagent.com/api
 
 ---
 

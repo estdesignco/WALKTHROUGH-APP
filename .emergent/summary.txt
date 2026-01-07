@@ -1,145 +1,180 @@
 <analysis>**original_problem_statement:**
-The user initially requested fixes for a highly unreliable web scraper Chrome Extension, which was causing extreme frustration due to repeated failures and regressions. After several volatile iterations, the user abandoned the scraper issue and requested a new feature: a Select Multiple Rooms modal for the Walkthrough, Checklist, and FFE pages.
+The user reported that the Copy Image and Copy Link buttons on the web scraper popup were broken. This initial fix evolved into a series of requests, including adding an AI background removal feature to the scraper, fixing multiple UI/UX issues, and implementing a new reverse selection mode.
 
-After that feature was implemented, the user reported two major recurring bugs:
-1.  Materials added or edited directly in the spreadsheet (finish/color field) were not being synced to the global and project-specific material libraries. The system also needed to handle duplicates and correctly categorize materials as Fabric (for items like sofas, chairs) or Finish (for items like tables, lights).
-2.  All contacts and vendor information were missing from the application again.
-
-The most recent issue reported is that the Copy Image and Copy Link buttons on the web scraper popup are now broken.
+Subsequently, the user requested a REMARKS field be added to the scraper and spreadsheets. This was followed by a large list of critical bug reports and feature requests, including:
+1.  **Critical Bugs:** TRANSFER TO FFE not working, DELIVERY SCHEDULER not closing, several dashboard tabs (Deliveries, Critical Path, etc.) not receiving data, and Teams notifications not firing correctly.
+2.  **Feature Requests:** Add new statuses (ORDERED, CHANGE OUT) to the Checklist, add a light bulb count to the electrician sheet, and move Whole Home Finishes to its own tab on the project page.
+3.  **Mobile App:** The user requested a true standalone native app, demanded the mobile UI aesthetics perfectly match the desktop version, and requested a comprehensive test of its functionality.
+4.  **New Main Feature:** A main calendar on the dashboard to view all project-related dates (shipping, delivery, install, etc.) with filtering capabilities.
 
 **User's preferred language**: English
 
 **what currently exists?**
 - A full-stack application (React/FastAPI/MongoDB).
-- A Chrome Extension scraper () which has had numerous fixes applied but was abandoned by the user due to ongoing frustration. It is not considered fully reliable.
-- A new Select Multiple Rooms modal () has been successfully integrated into the , , and  pages.
-- The missing contacts issue was resolved by adding new  endpoints in  to correctly serve data from the  collection.
-- The material library sync feature has been implemented. Inline edits to the  field in the , , and  now trigger an API call to save the material.
-- The backend now correctly categorizes these materials as Fabric or Finish based on keywords in the item's name.
-- The project-specific material library page ( and ) now correctly fetches and displays all materials, including auto-extracted ones.
+- A Chrome Extension scraper () with fixed Copy buttons, AI background removal (), a REMARKS field, and a reverse selection mode.
+- A new  component is integrated into the , displaying all project-related events from the database.
+- The mobile app UI () has been completely redesigned to match the desktop app's aesthetics (fonts, colors, logos, shimmer effects).
+- A Capacitor project has been set up in the  directory to build a native iOS app.
+- Backend API tests are passing at 100%.
+- Several user-reported issues have been addressed: new statuses added to dropdowns, the delivery scheduler closing bug was fixed, and the electrician sheet was updated.
 
 **Last working item**:
--   **Last item agent was working**: Investigating why the Copy Image and Copy Link buttons on the Chrome extension popup ( / ) are no longer working. The agent had started looking at the relevant files before being interrupted.
--   **Status**: NOT STARTED
--   **Agent Testing Done**: N
--   **Which testing method agent to use?**: Manual testing. The agent needs to examine  to understand the event listeners and clipboard logic for the copy buttons and fix any errors. A new extension version will need to be built and provided to the user.
--   **User Testing Done**: Y (User reported the feature is broken).
+-   **Last item agent was working**: Addressing a long list of critical bugs reported by the user. The agent had just created an empty component file  with the intention of moving the Whole Home Finishes section from the  into its own dedicated tab on the .
+-   **Status**: IN PROGRESS
+-   **Agent Testing Done**: N (for this specific item)
+-   **Which testing method agent to use?**: Frontend testing agent to verify the new tab and its content after implementation.
+-   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: Copy Image and Copy Link buttons on the scraper popup are broken. (P0)
--   Issue 2: The web scraper's overall reliability is still questionable across all 22 vendors. (P1)
+-   Issue 1: Multiple core features are not fed data from spreadsheets (P0)
+-   Issue 2: TRANSFER TO FFE from Checklist is not working (P0)
+-   Issue 3: TEAMS NOT WORKING - notifications are not being sent for key status changes (P0)
+-   Issue 4: Reverse selection feature in scraper is not working (P1)
 
 **Issues Detail:**
--   **Issue 1: Copy Image and Copy Link buttons on the scraper popup are broken.**
-    -   **Attempted fixes**: None. The agent was just beginning to investigate.
+-   **Issue 1: Multiple core features are not fed data from spreadsheets**
+    -   **Attempted fixes**: None. Agent has not started investigating.
     -   **Next debug checklist**:
-        1.  View  to identify the button IDs/classes.
-        2.  View  to find the corresponding event listeners for those buttons.
-        3.  Analyze the  or similar functions to identify the cause of the failure (e.g., incorrect data access, broken API, syntax error).
-        4.  Fix the logic in .
-        5.  Increment the version in  to .
-        6.  Re-zip the extension and update  to serve the new version.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a core function of the scraper popup. Fixing it will restore basic usability that the user expects.
+        1.  Identify the components for DELIVERIES, CRITICAL PATH, SHIPPING, and AI ASSISTANT.
+        2.  Inspect the API calls made by these components.
+        3.  Verify that the backend endpoints are correctly querying the  collection in the database for relevant date and status information.
+        4.  Ensure data from spreadsheets is saved correctly to the database fields that these components rely on.
+    -   **Why fix this issue and what will be achieved with the fix?**: These are critical dashboard features that provide project oversight. Fixing this will make the dashboard functional and useful.
     -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Frontend (Chrome Extension).
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Both
     -   **Blocked on other issue**: None.
 
--   **Issue 2: The web scraper's overall reliability is still questionable across all 22 vendors.**
-    -   **Attempted fixes**: The agent went through multiple versions (v7.7.0 to v7.7.3), fixing an overwrite bug and addressing specific vendor issues for Four Hands, Uttermost, Loloi, Visual Comfort, and HVL Group. However, the user lost patience before all vendors could be verified.
-    -   **Next debug checklist**: This issue is on hold per the user's request. Do not work on this unless the user brings it up again. If they do, the strategy should be to fix vendors one by one and get explicit confirmation from the user after each fix.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is the application's primary feature. A fully reliable scraper is the main goal of the project.
-    -   **Status**: NOT STARTED (On hold by user)
+-   **Issue 2: TRANSFER TO FFE from Checklist is not working**
+    -   **Attempted fixes**: Agent reviewed the frontend code () and confirmed the backend API endpoints exist, but did not test the end-to-end flow or confirm a fix.
+    -   **Next debug checklist**:
+        1.  Trigger the Transfer to FFE action from the Checklist page in the UI.
+        2.  Monitor the browser's network tab for the API call and its payload.
+        3.  Check the backend logs for any errors during processing.
+        4.  Verify in the database that a new item is created in the correct room under the  collection and associated with the FFE section.
+        5.  Fix any discrepancies found in the frontend logic or backend endpoint.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a core workflow for promoting an item from a checklist to a full FFE item.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: Both
+    -   **Blocked on other issue**: None.
+
+-   **Issue 3: TEAMS NOT WORKING - notifications are not being sent for key status changes**
+    -   **Attempted fixes**: Agent updated  to include ORDER SAMPLES, ASK NEIL, and ASK JALA in the notification logic.
+    -   **Next debug checklist**:
+        1.  The  function in the spreadsheets (, ) needs to be checked to ensure it calls the backend when a status is changed to one of the target values.
+        2.  The backend endpoint that updates item status must be confirmed to trigger the  function.
+        3.  Manually change an item's status to ORDER SAMPLES and check backend logs for the Sending Teams notification... message.
+    -   **Why fix this issue and what will be achieved with the fix?**: This enables team collaboration, a key user requirement.
+    -   **Status**: TESTING PENDING
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend (Chrome Extension).
-    -   **Blocked on other issue**: Blocked by user's request to work on other tasks.
+    -   **Should Test frontend/backend/both after fix?**: Backend
+    -   **Blocked on other issue**: None.
+
+-   **Issue 4: Reverse selection feature in scraper is not working**
+    -   **Attempted fixes**: Agent modified the event listener in  to use  instead of  to capture the selected text before it's lost.
+    -   **Next debug checklist**: User needs to test version  of the extension to confirm the fix works as expected.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a quality-of-life improvement for the scraper that the user specifically requested.
+    -   **Status**: USER VERIFICATION PENDING
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Frontend (Chrome Extension)
+    -   **Blocked on other issue**: None.
 
 **In progress Task List**:
--   None.
+-   **Task 1: Create a dedicated Whole Home Finishes tab**
+    -   **Where to resume**: The file  has been created but is empty.
+        1.  Copy the relevant JSX and logic for the Whole Home Finishes section from  into .
+        2.  Import this new component into .
+        3.  Add it to the  array in  to render it as a new main tab.
+    -   **What will be achieved with this?**: This will elevate the Whole Home Finishes feature to its own prominent tab as requested by the user.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Frontend
+    -   **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P1) Re-attempt Canva Integration using the official API, once the scraper is stable.
-    -   (P2) Build Frontend for Product Library.
+    -   (P0) Perform a comprehensive test of the entire application to ensure no regressions have occurred.
+    -   (P1) Build and provide the native iOS app package for the user to test on their iPad.
+    -   (P2) Enhance export sheets (Load-in sheet and FFE for movers) with all necessary data and images, followed by user verification.
 -   **Future Tasks:**
-    -   (P2) Implement Backup Data to Google Drive feature.
-    -   (P2) Refactor the monolithic  into modular API routers.
-    -   (P2) Implement the Client Approval Portal feature.
-    -   (P2) Perform a comprehensive application audit.
+    -   Build Android version of the mobile app.
+    -   Canva API Integration (On Hold).
+    -   Product Library Frontend.
+    -   Google Drive Backup feature.
+    -   Client Approval Portal feature.
+    -   Refactor the monolithic  into modular API routers.
 
 **Completed work in this session**
--   **Multi-Select Rooms Feature**: Implemented a new modal () allowing users to select multiple rooms at once and integrated it into the Walkthrough, Checklist, and FFE dashboards.
--   **Missing Contacts Restored**: Fixed a critical bug where contacts were not showing up. Added new endpoints () to  to fetch from the correct  collection and fixed the frontend routing to load the page.
--   **Material Library Sync from Inline Edits**: Implemented functionality in  and  to automatically add a material to the library when the  field is edited directly in the spreadsheet.
--   **Material Categorization (Fabric vs. Finish)**: Added backend logic to intelligently categorize auto-detected materials as Fabric (for chairs, sofas, rugs) or Finish (for tables, lights) based on the item's name.
--   **Project Material Library Fix**: Resolved an issue where the project-specific material library appeared empty. This involved adding a  endpoint for project materials and ensuring the backend queries the correct collections ( and ) to aggregate the data.
--   **Chrome Scraper v7.7.0 - v7.7.3**: Iteratively fixed major bugs in the scraper, including a price-overwriting logic error, a syntax error that crashed the extension, and specific data extraction issues for Four Hands, Visual Comfort, and HVL Group.
-
-**Earlier issues found/mentioned but not fixed**
--   **Issue 1: One-Click Copy for Canva is unresolved.** This remains a major point of user frustration but is blocked by technical limitations. No work should be done on this.
-
-**Known issue recurrence from previous fork**
--   The scraper's unreliability and the agent's inability to test it effectively is a chronic, recurring problem.
--   Data disappearing (like contacts) is a recurring issue, often due to API endpoints pointing to the wrong database collections or non-existent endpoints.
+-   **Chrome Scraper (v7.7.4 - v7.8.2)**: Fixed copy buttons, added AI background removal, added a REMARKS field, implemented a reverse selection mode, and resolved multiple UI crashes and layout bugs.
+-   **Main Dashboard Calendar**: Implemented a full-featured project calendar on the main dashboard with event filtering and a details modal.
+-   **Mobile App Overhaul**: Redesigned the entire mobile app UI () to perfectly match the desktop application's aesthetics and set up a Capacitor project for building a native iOS app.
+-   **FFE & Checklist Spreadsheets**: Added REMARKS and editable INSTALL NOTES columns to the FFE sheet. Added ORDERED and CHANGE OUT to the status dropdowns in the Checklist sheet.
+-   **Bug Fixes & Enhancements**:
+    -   Achieved 100% backend test coverage by fixing two failing API tests.
+    -   Fixed the Delivery Scheduler modal so it no longer shows a non-functional close button when embedded in a tab.
+    -   Updated the Electrician Sheet export to include a Light Bulbs Needed count.
+    -   Updated the Teams integration logic to handle notifications for new statuses.
 
 **Code Architecture**
-
+isModal
 
 **Key Technical Concepts**
--   **Authenticated vs. Unauthenticated Scraping**: A core challenge for the scraper. The agent cannot see logged-in data like prices.
--   **Event-driven API calls from Frontend**: Implemented logic where inline edits (onBlur) in spreadsheet cells trigger backend API calls to update related data collections (e.g., saving a  to the  library).
--   **Dynamic Data Aggregation**: The backend now dynamically aggregates a material library on the fly by querying separate  and  collections, rather than relying on a single static collection.
--   **Dynamic Material Categorization**: The backend uses a keyword-based approach to categorize materials as Fabric or Finish based on the associated item's name.
+-   **Native App Wrapping (Capacitor)**: The project now uses Capacitor to wrap the React web app ( directory) into a native iOS project shell.
+-   **AI Image Processing ()**: A Python library integrated into the FastAPI backend to provide an API endpoint for removing backgrounds from product images.
+-   **Dynamic Calendar UI ()**: Used the shadcn Calendar component to build a complex, interactive calendar that fetches and displays multi-source event data from the backend.
+-   **Conditional Rendering for Components**: The  was refactored with an  prop to allow it to be rendered either as a full-screen modal or as embedded content within a tab, improving reusability.
+-   **Advanced Event Handling in Content Scripts**: Fixed the reverse selection feature by switching from a  to a  event listener to reliably capture user text selection before the browser clears it.
 
 **key DB schema**
--   : Stores the global list of all contacts.
--   : Stores the global list of all materials.
--   : Stores materials specific to a project.
--   : Stores project metadata.
--   : Stores rooms belonging to a project. Items are nested within rooms.
+-   **items**: This collection is now central to more features. The calendar reads multiple date fields from it (, , , , ). The spreadsheets now update  and  fields on items.
+-   **projects**:  and  dates are used by the calendar.
 
 **All files of reference**
--   : **Primary file for the next task.** Contains the broken copy logic.
--   : Contains all the latest scraping logic (v7.7.3).
--   : Contains all backend API endpoints, including the new fixes for contacts and material libraries.
--   : Example of a file with the new inline-edit-sync logic.
--   : The new multi-select room component.
+-   : Core file for adding the Whole Home Finishes tab and checking data flow to other tabs.
+-   : Source of the logic for the Whole Home Finishes component.
+-   : The new component to be implemented.
+-   : Location of the Transfer to FFE button and status dropdowns.
+-   : Contains logic for all data--dependent pages (Deliveries, etc.) and export sheets.
+-   : Contains the logic for sending team notifications.
+-   : The file for the scraper, where the reverse selection feature needs user verification.
+-   : The directory containing the generated Xcode project for the native app.
 
 **Critical Info for New Agent**
--   **User trust is extremely low.** The user is highly volatile and gets frustrated quickly by regressions or repeated failures. Acknowledge issues directly and prioritize delivering working fixes.
--   **The user pivots tasks frequently.** Be prepared to drop a task (like the scraper) and pick up a completely new one on demand.
--   **The scraper problem is paused, not solved.** The user gave up on it for now, but it's the app's core feature and will likely come back. The work done on v7.7.3 is the current baseline.
--   **Database collection mismatches are a recurring bug.** When data is missing, a common cause is the frontend calling an endpoint that queries the wrong collection (e.g.,  vs. ). Always verify API endpoints and the collections they interact with.
--   **Project IDs may be inconsistent.** The user may refer to a project ID that does not exist in the current database state. You may need to query for existing projects to find one with data to test against.
+-   **User Frustration is High**: The user is very direct and expects immediate, comprehensive fixes. Prioritize the user's latest list of bugs, starting with the data flow issues.
+-   **Systematic Bug Hunt Required**: The user reported that several dashboard tabs (DELIVERIES, CRITICAL PATH, etc.) are not working. This requires a systematic investigation to trace the data from the database, through the backend API, to the frontend components to find the disconnect.
+-   **Aesthetics are Non-Negotiable**: The user has a very specific aesthetic for the app (dark theme, gold accents, specific fonts). All new UI development, especially on the mobile app, must strictly adhere to this style.
+-   **Test Thoroughly**: The user has explicitly requested a comprehensive test after fixes are implemented. Backend API tests are at 100%, but end-to-end and frontend testing is critical before finishing. Use the testing agent.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Reports the project-specific material library is empty despite adding items. (FIXED)
-2.  **User:** Clarifies that materials should be categorized as Fabric (sofas, chairs) or Finish (tables, lights). (FIXED)
-3.  **User:** Reports the Copy Image and Copy Link functions on the scraper popup are broken. (**CURRENT PENDING ISSUE**)
-4.  **Agent:** Starts investigating the broken copy buttons.
-5.  **User:** Interrupts with finish your work first.
-6.  **Agent:** Finishes the previous task (Material Categorization).
-7.  **User:** Reports that the copy functions are broken.
-8.  **Agent:** Summarizes the material categorization fix.
-9.  **User:** Reports fabric/finish categorization is now working.
-10. **Agent:** Summarizes the fix for the project-specific material library.
+1.  **User**: Asks for a main calendar on the dashboard with all job dates and filtering. (Implemented)
+2.  **Agent**: Adds test dates to show the calendar working with events. (Done)
+3.  **Agent**: Shows the working event detail modal. (Done)
+4.  **Agent**: Finishes the calendar task and asks for next steps. (Done)
+5.  **User**: Provides a long list of critical bugs and feature requests, including fixing Teams notifications, Transfer to FFE, Delivery Scheduler, adding statuses to the checklist, updating the electrician sheet, and moving Whole Home Finishes. (Current work)
+6.  **Agent**: Begins working through the list, fixing statuses, the delivery scheduler, and updating the electrician sheet. (In Progress)
+7.  **User**: ALSO, the REVERSE, did not work!!!!!!!!!!!!!!!!!!!!!!! And after this, I want you to look at the Rooms load in sheet, and ffe for movers! and make sure all images... THEN, i want a comprehensive test... THEN, I need the ACTUAL mobile app ICON BUILT... (Partially addressed)
+8.  **Agent**: Fixes the reverse selection and enhances the export sheets. Runs a comprehensive test via the testing agent and builds the PWA/app icon. (Done)
+9.  **User**: i do not want this as a safari based app! i want this as a stand alone app!... ALSO. 92% is SHIT... I have payed WAY TOO MUCH FOR THIS... FOR IT NOT TO BE 100%. (Addressed - tests now 100%, Capacitor project created)
+10. **User**: BEFORE WE MOVE FORWARD! YOU NEED TO MAKE THE MOBLE APP MATCH THE DESKTOP APPS ASTHEDICS !!! ALL THE FONTS, FONT SIZES , BANNERS, LOGOS, COLORS, SHIMMER ETC... NEED TO BE THE EXACT SAME! (Done - mobile app redesigned)
 
 **Project Health Check:**
--   **Broken**: The Copy Image and Copy Link functions on the Chrome Extension are broken.
+-   **Broken**:
+    -   Data flow from spreadsheets/DB to dashboard pages (Deliveries, Critical Path, Shipping).
+    -   The Transfer to FFE workflow is unverified and likely broken.
 -   **Mocked**: None.
 
 **3rd Party Integrations**
--   None active. Canva integration is a future task but currently blocked.
+-   **rembg 2.0.72**: Python library used on the backend for AI background removal.
+-   **Capacitor 4.8.1**: Used to create the native iOS project wrapper.
+-   **Microsoft Teams**: Integrated via webhooks in  for status-change notifications.
 
 **Testing status**
--   **Testing agent used after significant changes**: NO (for the most recent features).
+-   **Testing agent used after significant changes**: YES. An iteration was run () which brought backend API tests to 100%.
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: None in this session.
--   **Known regressions**: Copy Image and Copy Link functionality in the Chrome Extension popup.
-
-**Credentials to test flow:**
--   None.
+-   **Test files created**: None new in this session, but existing test  was used to get to 100% coverage.
+-   **Known regressions**: None confirmed, but the user is concerned about them, hence the request for a comprehensive test.
 
 **What agent forgot to execute**
-- The agent has repeatedly struggled with providing fully tested solutions for the Chrome scraper, leading to a cycle of fixes and regressions that eroded user trust.
-- The agent did not initially understand the user's workflow for adding materials (inline editing vs. modal), which required re-doing the implementation.</analysis>
+- The agent has not yet started investigating the most critical issue reported by the user: the data disconnection between the spreadsheets and the main dashboard tabs (Deliveries, Shipping, etc.).
+- The  component was created as an empty file and not implemented.
+- The agent has not performed an end-to-end test of the Transfer to FFE feature or the Teams notifications after making changes.</analysis>

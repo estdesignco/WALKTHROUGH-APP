@@ -33,7 +33,7 @@ from datetime import datetime
 from typing import Dict, Any, List, Tuple
 
 class ExhaustiveBackendTester:
-    def __init__(self, base_url="https://clipboard-tool.preview.emergentagent.com"):
+    def __init__(self, base_url="https://dashmaster-15.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_base = f"{base_url}/api"
         self.tests_run = 0

@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import Dict, Any, List
 
 # Configuration
-BACKEND_URL = "https://clipboard-tool.preview.emergentagent.com/api"
+BACKEND_URL = "https://dashmaster-15.preview.emergentagent.com/api"
 PROJECT_ID = "3881a2be-300c-46de-90d0-a03c6f068e1b"  # Modern Kitchen Design project
 
 class LaunchReadinessTester:
@@ -211,7 +211,7 @@ class LaunchReadinessTester:
     def run_launch_readiness_tests(self):
         """Run launch readiness tests based on review request"""
         print(f"🚀 Starting Launch Readiness Backend Testing")
-        print(f"App URL: https://clipboard-tool.preview.emergentagent.com")
+        print(f"App URL: https://dashmaster-15.preview.emergentagent.com")
         print(f"Backend URL: {self.base_url}")
         print(f"Project ID: {self.project_id} (Modern Kitchen Design)")
         print(f"Timestamp: {datetime.now().isoformat()}")

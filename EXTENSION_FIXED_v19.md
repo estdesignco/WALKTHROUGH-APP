@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://clipboard-tool.preview.emergentagent.com/chrome-extension-v19.zip
+https://dashmaster-15.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://clipboard-tool.preview.emergentagent.com/api/download/chrome-extension
+https://dashmaster-15.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

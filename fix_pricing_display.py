@@ -110,7 +110,7 @@ async def test_pricing_api():
     
     import aiohttp
     
-    base_url = "https://clipboard-tool.preview.emergentagent.com/api/furniture"
+    base_url = "https://dashmaster-15.preview.emergentagent.com/api/furniture"
     
     try:
         async with aiohttp.ClientSession() as session:

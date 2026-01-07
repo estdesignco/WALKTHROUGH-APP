@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://clipboard-tool.preview.emergentagent.com"
+BACKEND_URL = "https://dashmaster-15.preview.emergentagent.com"
 
 def test_comprehensive_scrape_product():
     """Test the /api/scrape-product endpoint for finish_color extraction on all vendor URLs"""

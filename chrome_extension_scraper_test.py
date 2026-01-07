@@ -20,7 +20,7 @@ import tempfile
 from urllib.parse import urlparse
 
 # Backend URL from environment
-BACKEND_URL = "https://clipboard-tool.preview.emergentagent.com"
+BACKEND_URL = "https://dashmaster-15.preview.emergentagent.com"
 
 def log_test(message, status="INFO"):
     """Log test messages with timestamp"""

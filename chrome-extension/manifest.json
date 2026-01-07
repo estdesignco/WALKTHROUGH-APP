@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://clipboard-tool.preview.emergentagent.com/*"
+    "https://dashmaster-15.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

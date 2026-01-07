@@ -9,8 +9,8 @@ console.log('██  SCRAPER VERSION 18.0.0 - FINAL COMBINED                   �
 console.log('██  Swatch: v16 logic | Main Image: v10 logic                 ██');
 console.log('████████████████████████████████████████████████████████████████');
 
-const APP_URL = 'https://clipboard-tool.preview.emergentagent.com';
-const BACKEND_URL = 'https://clipboard-tool.preview.emergentagent.com';
+const APP_URL = 'https://dashmaster-15.preview.emergentagent.com';
+const BACKEND_URL = 'https://dashmaster-15.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

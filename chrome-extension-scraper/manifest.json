@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://clipboard-tool.preview.emergentagent.com/*",
+    "https://dashmaster-15.preview.emergentagent.com/*",
     "https://*/*",
     "http://*/*"
   ],

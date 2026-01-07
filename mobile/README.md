@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://clipboard-tool.preview.emergentagent.com
-API_URL=https://clipboard-tool.preview.emergentagent.com/api
+BACKEND_URL=https://dashmaster-15.preview.emergentagent.com
+API_URL=https://dashmaster-15.preview.emergentagent.com/api
 ```
 
 ### App Configuration
