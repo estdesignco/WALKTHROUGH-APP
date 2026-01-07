@@ -165,7 +165,11 @@ class TeamsIntegration:
             "READY FOR INSTALL",
             "ON HOLD",
             "OUT FOR DELIVERY",
-            "INSTALLING"
+            "INSTALLING",
+            "ASK NEIL",
+            "ASK JALA",
+            "ASK CHARLENE",
+            "CHANGE OUT"
         ]
         medium_priority = ["PENDING APPROVAL", "ORDERED", "IN TRANSIT", "APPROVED"]
         
