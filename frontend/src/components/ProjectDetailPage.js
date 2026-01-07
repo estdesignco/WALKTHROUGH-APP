@@ -30,6 +30,7 @@ import PunchList from './PunchList';
 import ShippingTracker from './ShippingTracker';
 import TradeDiscountManager from './TradeDiscountManager';
 import SampleTracker from './SampleTracker';
+import WholeHomeFinishes from './WholeHomeFinishes';
 
 import EditableQuestionnaireView from './EditableQuestionnaireView';
 
@@ -933,6 +934,11 @@ export default function ProjectDetailPage() {
                 <SampleTracker projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading samples...</div> },
+        { name: "Whole Home Finishes", icon: Home, component: project ? (
+            <div className="whole-home-finishes-content">
+                <WholeHomeFinishes projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading whole home finishes...</div> },
     ];
 
     if (isLoading) {
