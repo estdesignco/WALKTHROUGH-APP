@@ -139,14 +139,15 @@ class TeamsIntegration:
             "DAMAGED": "Process return/exchange with vendor",
             "RETURNED": "Reorder replacement or select alternative",
             "CANCELLED": "Update project plan and select replacement",
-            "ORDER SAMPLES": "Order material samples from vendor",
+            "ORDER SAMPLES": "🎀 Order material samples from vendor - NOTIFY FAVORITE GIRLS",
             "SAMPLES ARRIVED": "Review samples with client and get approval",
-            "ASK NEIL": "Neil needs to review and provide input",
-            "ASK CHARLENE": "Charlene needs to review and provide input", 
-            "ASK JALA": "Jala needs to review and provide input",
+            "ASK NEIL": "📞 URGENT: Neil needs to review and provide input immediately",
+            "ASK CHARLENE": "📞 Charlene needs to review and provide input", 
+            "ASK JALA": "📞 URGENT: Jala needs to review and provide input immediately",
             "GET QUOTE": "Request pricing quote from vendor",
             "WAITING ON QT": "Follow up on pending quote request",
-            "READY FOR PRESENTATION": "Prepare item for client presentation"
+            "READY FOR PRESENTATION": "Prepare item for client presentation",
+            "CHANGE OUT": "⚠️ Item needs to be changed/replaced - find alternative"
         }
         return actions.get(status, f"Follow up on item with status: {status}")
     
