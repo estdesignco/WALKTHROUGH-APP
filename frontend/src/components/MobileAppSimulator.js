@@ -704,14 +704,14 @@ function ContactsScreen({ project, onNavigate }) {
   const loadContacts = async () => {
     try {
       if (isOnline()) {
-        // Online: Load from server and cache
-        const response = await axios.get(`${API_URL}/contacts/project/${project.id}`);
+        // Online: Load MASTER contacts from server (these are the 134+ contacts)
+        const response = await axios.get(`${API_URL}/master/contacts`);
         const serverContacts = response.data || [];
         setContacts(serverContacts);
         setLastSynced(new Date());
         // Save to offline storage
         await saveContactsOffline(serverContacts, project.id);
-        console.log('✅ Contacts synced and cached');
+        console.log('✅ Master contacts synced and cached:', serverContacts.length);
       } else {
         // Offline: Load from cache
         const cachedContacts = await getContactsOffline(project.id);
