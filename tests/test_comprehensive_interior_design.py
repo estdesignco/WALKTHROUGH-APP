@@ -653,11 +653,12 @@ class TestMasterMaterials:
 
 
 class TestCalendarEvents:
-    """Test Calendar Events - /api/calendar/events"""
+    """Test Calendar Events - /api/calendar-events"""
     
     def test_get_calendar_events(self):
         """Test getting calendar events"""
-        response = requests.get(f"{BASE_URL}/api/calendar/events")
+        # Correct endpoint is /api/calendar-events (with hyphen)
+        response = requests.get(f"{BASE_URL}/api/calendar-events")
         
         if response.status_code == 404:
             print(f"⚠️ Calendar events endpoint not found")
