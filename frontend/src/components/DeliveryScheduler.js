@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Truck, Calendar, Clock, MapPin, Package, X, Plus, Check, AlertTriangle } from 'lucide-react';
 
-const DeliveryScheduler = ({ project, onClose, onUpdate }) => {
+const DeliveryScheduler = ({ project, onClose, onUpdate, embedded = false }) => {
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
