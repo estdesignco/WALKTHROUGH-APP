@@ -145,9 +145,11 @@ class TestMasterContactsCRITICAL:
         response = requests.post(f"{BASE_URL}/api/master/contacts", json=contact_data)
         assert response.status_code == 200, f"Create master contact failed: {response.status_code} - {response.text}"
         data = response.json()
-        assert "id" in data
-        print(f"✅ Created master contact: {data.get('id')}")
-        return data
+        # API returns {success: true, contact: {...}}
+        contact = data.get("contact", data)
+        assert "id" in contact, f"No id in response: {data}"
+        print(f"✅ Created master contact: {contact.get('id')}")
+        return contact
     
     def test_master_contacts_crud_update(self):
         """Test updating a master contact"""
@@ -161,7 +163,10 @@ class TestMasterContactsCRITICAL:
         if create_response.status_code != 200:
             pytest.skip("Could not create contact for update test")
         
-        contact_id = create_response.json().get("id")
+        # API returns {success: true, contact: {...}}
+        create_data = create_response.json()
+        contact = create_data.get("contact", create_data)
+        contact_id = contact.get("id")
         
         # Update the contact
         update_data = {"company": "Updated Company Name"}
@@ -180,7 +185,10 @@ class TestMasterContactsCRITICAL:
         if create_response.status_code != 200:
             pytest.skip("Could not create contact for delete test")
         
-        contact_id = create_response.json().get("id")
+        # API returns {success: true, contact: {...}}
+        create_data = create_response.json()
+        contact = create_data.get("contact", create_data)
+        contact_id = contact.get("id")
         
         # Delete the contact
         delete_response = requests.delete(f"{BASE_URL}/api/master/contacts/{contact_id}")
