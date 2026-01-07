@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAPI } from '../App';
+import ProjectCalendar from './ProjectCalendar';
 
 const MainDashboard = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const MainDashboard = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
   const [extensionData, setExtensionData] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(true);
 
   // Check for extension data in URL params
   useEffect(() => {
