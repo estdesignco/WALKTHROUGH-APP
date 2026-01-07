@@ -14151,6 +14151,46 @@ async def get_questionnaire(project_id: str):
         raise HTTPException(status_code=400, detail=f"Failed to get questionnaire: {str(e)}")
 
 # ============================================
+# WHOLE HOME FINISHES
+# ============================================
+
+@api_router.get("/projects/{project_id}/whole-home-finishes")
+async def get_whole_home_finishes(project_id: str):
+    """Get whole home finishes for a project"""
+    try:
+        finishes = await db.whole_home_finishes.find_one({"project_id": project_id})
+        if finishes:
+            return {k: v for k, v in finishes.items() if k != '_id'}
+        return {}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to get whole home finishes: {str(e)}")
+
+@api_router.post("/projects/{project_id}/whole-home-finishes")
+async def save_whole_home_finishes(project_id: str, data: dict):
+    """Save whole home finishes for a project"""
+    try:
+        finishes_doc = {
+            "project_id": project_id,
+            "doorHardware": data.get("doorHardware", {}),
+            "paint": data.get("paint", {}),
+            "flooring": data.get("flooring", {}),
+            "electrical": data.get("electrical", {}),
+            "plumbing": data.get("plumbing", {}),
+            "customSections": data.get("customSections", []),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.whole_home_finishes.replace_one(
+            {"project_id": project_id},
+            finishes_doc,
+            upsert=True
+        )
+        
+        return {"success": True, "message": "Whole home finishes saved"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to save whole home finishes: {str(e)}")
+
+# ============================================
 # PROJECT VENDORS MANAGEMENT
 # ============================================
 
