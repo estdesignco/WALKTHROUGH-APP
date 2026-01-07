@@ -13244,11 +13244,31 @@ async def generate_electrician_sheet(project_id: str):
             .spec-value {{ flex: 1; color: black; }}
             img {{ max-width: 200px; max-height: 200px; border: 1px solid black; }}
             .notes-box {{ background: white; border: 2px dashed black; padding: 10px; margin-top: 10px; min-height: 60px; }}
+            .bulb-summary {{ background: #FEF3C7; border: 3px solid #B45309; padding: 20px; margin: 20px 0; border-radius: 10px; }}
+            .bulb-count {{ font-size: 36px; font-weight: bold; color: #B45309; }}
         </style></head><body>
         <div class="logo"><img src="https://clipboard-tool.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
-        <h1>ELECTRICIAN INSTALLATION SHEET</h1>
+        <h1>💡 ELECTRICIAN INSTALLATION SHEET</h1>
         <h2>{project.get('name', 'Project')} - {project.get('client_info', {}).get('full_name', '')}</h2>
-        <p style="text-align: center;"><strong>Total Lighting Items:</strong> {len(lighting_items)}</p>
+        
+        <div class="bulb-summary">
+            <div style="display: flex; justify-content: space-around; text-align: center;">
+                <div>
+                    <div class="bulb-count">{len(lighting_items)}</div>
+                    <div>Total Fixtures</div>
+                </div>
+                <div>
+                    <div class="bulb-count">____</div>
+                    <div>Total Light Bulbs Needed<br><small>(fill in after reviewing each fixture)</small></div>
+                </div>
+                <div>
+                    <div class="bulb-count">{len(items_by_room)}</div>
+                    <div>Rooms</div>
+                </div>
+            </div>
+        </div>
+        
+        <p style="text-align: center; background: #000; color: #fff; padding: 10px;">📋 Review each fixture and fill in bulbs per fixture to calculate total bulbs needed</p>
         <hr style="border: 1px solid black; margin: 20px 0;">
         {items_html}
         </body></html>"""
