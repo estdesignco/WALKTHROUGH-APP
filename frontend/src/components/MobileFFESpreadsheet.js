@@ -690,5 +690,6 @@ export default function MobileFFESpreadsheet({ projectId }) {
         />
       )}
       </div>
+    </div>
   );
 }
