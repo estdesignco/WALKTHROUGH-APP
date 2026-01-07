@@ -346,10 +346,14 @@ class TestProjectContacts:
     def test_get_project_contacts(self):
         """Test getting contacts for a project"""
         project_id = TEST_PROJECTS["modern_kitchen"]
-        response = requests.get(f"{BASE_URL}/api/projects/{project_id}/contacts")
+        response = requests.get(f"{BASE_URL}/api/contacts/project/{project_id}")
         assert response.status_code == 200
         contacts = response.json()
         print(f"✅ Project contacts: {len(contacts)} contacts")
+        
+        # Verify contacts were auto-created from questionnaire
+        contact_names = [c.get("name", "") for c in contacts]
+        print(f"  Contact names: {contact_names}")
     
     def test_contact_roles_endpoint(self):
         """Test contact roles endpoint"""
