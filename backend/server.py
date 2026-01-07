@@ -13180,21 +13180,34 @@ async def generate_electrician_sheet(project_id: str):
                 items_by_room[room] = []
             items_by_room[room].append(item)
         
+        # Calculate total light bulbs
+        total_bulbs = 0
+        for item in lighting_items:
+            qty = item.get('quantity', 1) or 1
+            bulbs_per_fixture = item.get('bulbs_per_fixture', 1) or 1
+            total_bulbs += qty * bulbs_per_fixture
+        
         items_html = ""
         for room_name, room_items in items_by_room.items():
-            items_html += f'<div class="room-section"><h3 class="room-header">{room_name.upper()}</h3>'
+            room_bulb_count = sum((item.get('quantity', 1) or 1) * (item.get('bulbs_per_fixture', 1) or 1) for item in room_items)
+            items_html += f'<div class="room-section"><h3 class="room-header">{room_name.upper()} <span style="font-size: 14px; font-weight: normal;">({len(room_items)} fixtures, ~{room_bulb_count} bulbs)</span></h3>'
             
             for item in room_items:
                 img_html = f'<img src="{item["image_url"]}" alt="{item["name"]}">' if item.get("image_url") else '<div style="width: 200px; height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-center; color: #999;">No Image</div>'
                 
                 remarks_html = f'<div class="spec-row"><div class="spec-label">Remarks:</div><div class="spec-value">{item.get("remarks") or "—"}</div></div>' if item.get('remarks') else ''
                 
+                qty = item.get('quantity', 1) or 1
+                bulbs = item.get('bulbs_per_fixture', 1) or 1
+                total_item_bulbs = qty * bulbs
+                
                 items_html += f"""
                 <div class="item">
                     <div class="item-header"><strong>{item['name']}</strong></div>
                     <div style="display: flex; gap: 20px;">
                         <div style="flex: 1;">
-                            <div class="spec-row"><div class="spec-label">Quantity:</div><div class="spec-value">{item['quantity']}</div></div>
+                            <div class="spec-row"><div class="spec-label">Quantity:</div><div class="spec-value">{qty}</div></div>
+                            <div class="spec-row"><div class="spec-label">💡 Bulbs/Fixture:</div><div class="spec-value" style="color: #B45309; font-weight: bold;">___ (enter manually)</div></div>
                             <div class="spec-row"><div class="spec-label">Size:</div><div class="spec-value">{item['size']}</div></div>
                             <div class="spec-row"><div class="spec-label">Finish/Color:</div><div class="spec-value">{item['finish_color']}</div></div>
                             <div class="spec-row"><div class="spec-label">Vendor:</div><div class="spec-value">{item['vendor']}</div></div>
