@@ -251,7 +251,8 @@ ITEM_STATUSES = [
     {'status': 'ASK JALA', 'color': '#EC4899', 'phase': 'checklist'},
     {'status': 'GET QUOTE', 'color': '#06B6D4', 'phase': 'checklist'},
     {'status': 'WAITING ON QT', 'color': '#F97316', 'phase': 'checklist'},
-    {'status': 'READY FOR PRESENTATION', 'color': '#84CC16', 'phase': 'checklist'}
+    {'status': 'READY FOR PRESENTATION', 'color': '#84CC16', 'phase': 'checklist'},
+    {'status': 'CHANGE OUT', 'color': '#FF6347', 'phase': 'exception'}
 ]
 
 # Enhanced Carrier Options with Colors like your screenshots
