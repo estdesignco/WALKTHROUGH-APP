@@ -372,6 +372,32 @@ const MainDashboard = () => {
           </button>
         </div>
 
+        {/* MAIN CALENDAR SECTION */}
+        <div className="max-w-6xl mx-auto mb-12">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-light text-stone-400">Project Calendar</h2>
+            <button
+              onClick={() => setShowCalendar(!showCalendar)}
+              className="text-stone-400 hover:text-white px-4 py-2 rounded-lg transition-all"
+              style={{
+                background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
+                border: '1px solid #8b7355',
+              }}
+            >
+              {showCalendar ? '▼ Hide Calendar' : '▶ Show Calendar'}
+            </button>
+          </div>
+          {showCalendar && (
+            <ProjectCalendar 
+              onEventClick={(event) => {
+                if (event.projectId) {
+                  handleNavigation(`/project/${event.projectId}?tab=FF&E`);
+                }
+              }}
+            />
+          )}
+        </div>
+
         {/* Studio Projects Title - Moved Below */}
         <div className="text-center mb-12">
           <h2 className="text-2xl font-light text-stone-400 mb-2">Studio Projects</h2>
