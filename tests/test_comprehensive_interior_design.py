@@ -251,9 +251,11 @@ class TestProjectSpecificContacts:
         response = requests.post(f"{BASE_URL}/api/contacts", json=contact_data)
         assert response.status_code == 200, f"Create project contact failed: {response.status_code} - {response.text}"
         data = response.json()
-        assert "id" in data
-        print(f"✅ Created project contact: {data.get('id')}")
-        return data
+        # API returns {success: true, contact: {...}}
+        contact = data.get("contact", data)
+        assert "id" in contact, f"No id in response: {data}"
+        print(f"✅ Created project contact: {contact.get('id')}")
+        return contact
     
     def test_contact_roles_endpoint(self):
         """Test getting available contact roles"""
