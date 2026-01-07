@@ -15588,6 +15588,30 @@ async def download_chrome_extension():
         }
     )
 
+@api_router.get("/download/ios-app")
+async def download_ios_app():
+    """Download iOS App Xcode Project (17MB) - Ready to build in Xcode"""
+    import os
+    
+    zip_path = "/app/ESTABLISHED_iOS_App.zip"
+    filename = "ESTABLISHED_iOS_App.zip"
+    
+    if not os.path.exists(zip_path):
+        raise HTTPException(status_code=404, detail="iOS app project not found")
+    
+    return FileResponse(
+        path=zip_path,
+        filename=filename,
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+            "Access-Control-Allow-Origin": "*"
+        }
+    )
+
 # ============================================================================
 # BACKGROUND REMOVAL API (for Chrome Extension)
 # ============================================================================
