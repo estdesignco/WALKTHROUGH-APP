@@ -1474,6 +1474,8 @@ const ExactChecklistSpreadsheet = ({
             >
               <option value="">All Status</option>
               <option value="PICKED">PICKED</option>
+              <option value="ORDERED">ORDERED</option>
+              <option value="CHANGE OUT">CHANGE OUT</option>
               <option value="ORDER SAMPLES">ORDER SAMPLES</option>
               <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
               <option value="ASK NEIL">ASK NEIL</option>
@@ -1482,6 +1484,8 @@ const ExactChecklistSpreadsheet = ({
               <option value="GET QUOTE">GET QUOTE</option>
               <option value="WAITING ON QT">WAITING ON QT</option>
               <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="ON HOLD">ON HOLD</option>
             </select>
           </div>
           
