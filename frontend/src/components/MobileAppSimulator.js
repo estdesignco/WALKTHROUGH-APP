@@ -891,7 +891,7 @@ export default function MobileAppSimulator() {
               ← Back
             </button>
             <div className="flex-1 overflow-hidden">
-              <TabbedWalkthroughSpreadsheet projectId={selectedProject?.id} />
+              <MobileWalkthroughSpreadsheet projectId={selectedProject?.id} />
             </div>
           </div>
         );
@@ -905,7 +905,7 @@ export default function MobileAppSimulator() {
               ← Back
             </button>
             <div className="flex-1 overflow-hidden">
-              <TabbedWalkthroughSpreadsheet projectId={selectedProject?.id} sheetType="ffe" />
+              <MobileFFESpreadsheet projectId={selectedProject?.id} />
             </div>
           </div>
         );
