@@ -856,6 +856,7 @@ class ItemStatus(str, Enum):
     GET_QUOTE = "GET QUOTE"
     WAITING_ON_QT = "WAITING ON QT"
     READY_FOR_PRESENTATION = "READY FOR PRESENTATION"
+    CHANGE_OUT = "CHANGE OUT"
     
 # Vendor dropdown options - ONLY YOUR WHOLESALE SITES
 class VendorType(str, Enum):
