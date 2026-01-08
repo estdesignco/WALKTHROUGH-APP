@@ -210,13 +210,13 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     loadAvailableCategories();
   }, [projectId]);
 
-  // REAL-TIME SYNC FOR FFE - Auto-refresh every 30 seconds when online
+  // REAL-TIME SYNC - Auto-refresh every 10 seconds when online (for both walkthrough and FFE)
   useEffect(() => {
-    if (sheetType === 'ffe' && online) {
+    if (online) {
       const interval = setInterval(() => {
-        console.log('🔄 FFE Real-time sync...');
+        console.log(`🔄 ${sheetType.toUpperCase()} Real-time sync...`);
         loadProject();
-      }, 30000); // Every 30 seconds
+      }, 10000); // Every 10 seconds for live sync
       
       return () => clearInterval(interval);
     }
