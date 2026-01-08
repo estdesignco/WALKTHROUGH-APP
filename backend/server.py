@@ -3916,6 +3916,9 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                     
                     wt_items = await db.items.find(item_query).to_list(1000)
                     
+                    # Get list of PICKED item names for cleanup
+                    picked_item_names = [item.get("name", "") for item in wt_items]
+                    
                     for wt_item in wt_items:
                         # Check if item already exists in checklist by name
                         existing_cl_item = await db.items.find_one({
@@ -3938,6 +3941,20 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                             new_cl_item.pop("_id", None)  # Remove MongoDB _id if present
                             await db.items.insert_one(new_cl_item)
                             synced_items += 1
+                    
+                    # CLEANUP: Remove items from checklist that are no longer PICKED in walkthrough
+                    if not sync_options.sync_all:
+                        # Find all synced items in this checklist subcategory
+                        synced_items_in_checklist = await db.items.find({
+                            "subcategory_id": checklist_subcategory_id,
+                            "synced_from_walkthrough": True
+                        }).to_list(1000)
+                        
+                        for cl_item in synced_items_in_checklist:
+                            if cl_item.get("name", "") not in picked_item_names:
+                                # This item is no longer PICKED, remove from checklist
+                                await db.items.delete_one({"id": cl_item.get("id")})
+                                logger.info(f"  🗑️ Removed unchecked item from checklist: {cl_item.get('name')}")
             
             synced_details.append({
                 "room": wt_room_name,
