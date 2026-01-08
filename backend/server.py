@@ -10743,10 +10743,46 @@ async def get_calendar_events(project_id: str = None):
         query = {}
         if project_id:
             query["project_id"] = project_id
-        events = await db.calendar_events.find(query, {"_id": 0}).sort("start_date", 1).to_list(length=500)
-        return {"success": True, "events": events, "count": len(events)}
+        events = await db.calendar_events.find(query, {"_id": 0}).sort("date", 1).to_list(length=500)
+        # Return as list for frontend compatibility
+        return events if events else []
     except Exception as e:
         logging.error(f"Get calendar events error: {str(e)}")
+        return []
+
+@api_router.post("/calendar-events")
+async def create_calendar_event(event: dict):
+    """Create a new independent calendar event"""
+    try:
+        new_event = {
+            "id": str(uuid.uuid4()),
+            "title": event.get("title"),
+            "date": event.get("date"),
+            "type": event.get("type", "project"),
+            "description": event.get("description", ""),
+            "project_id": event.get("project_id"),
+            "project_name": event.get("project_name", "Independent"),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.calendar_events.insert_one(new_event)
+        new_event.pop('_id', None)
+        
+        return {"success": True, "event": new_event}
+    except Exception as e:
+        logging.error(f"Create calendar event error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/calendar-events/{event_id}")
+async def delete_calendar_event(event_id: str):
+    """Delete a calendar event"""
+    try:
+        result = await db.calendar_events.delete_one({"id": event_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Event not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Delete calendar event error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/todos")
