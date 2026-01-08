@@ -2592,7 +2592,8 @@ async def update_item(item_id: str, item_update: ItemUpdate):
         raise HTTPException(status_code=404, detail="Item not found")
     
     old_status = current_item_doc.get("status", "")
-    new_status = item_update.status if item_update.status is not None else old_status
+    # Convert enum to string value if needed
+    new_status = item_update.status.value if item_update.status is not None else old_status
     
     update_data = {k: v for k, v in item_update.dict().items() if v is not None}
     update_data["updated_at"] = datetime.utcnow()
