@@ -1174,18 +1174,27 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                                   checked={item.status === 'PICKED'}
                                   onChange={async (e) => {
                                     const newStatus = e.target.checked ? 'PICKED' : '';
+                                    const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                     
                                     // DIRECT BACKEND SAVE
                                     try {
-                                      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                       await fetch(`${BACKEND_URL}/api/items/${item.id}`, {
                                         method: 'PUT',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ status: newStatus })
                                       });
                                       console.log('✅ Mobile checkbox saved to backend!');
+                                      
+                                      // AUTO-SYNC TO CHECKLIST: Only PICKED items sync to desktop
+                                      await fetch(`${BACKEND_URL}/api/sync/walkthrough-to-checklist/${project.id}`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ sync_all: false })
+                                      });
+                                      console.log('✅ Auto-synced to checklist!');
+                                      
                                     } catch (err) {
-                                      console.error('❌ Failed to save checkbox:', err);
+                                      console.error('❌ Failed to save/sync:', err);
                                     }
                                     
                                     // Update local state immediately - NO RELOAD
