@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://dashmaster-15.preview.emergentagent.com/email-template.html
+https://designer-hub-45.preview.emergentagent.com/email-template.html
 
 ---
 

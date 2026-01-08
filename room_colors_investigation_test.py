@@ -9,7 +9,7 @@ import json
 from typing import Dict, Any
 
 # Backend URL from environment
-BACKEND_URL = "https://dashmaster-15.preview.emergentagent.com/api"
+BACKEND_URL = "https://designer-hub-45.preview.emergentagent.com/api"
 
 # Project ID from review request
 PROJECT_ID = "5d42e515-f84b-4c3d-a4cc-6c3dcc4417a2"

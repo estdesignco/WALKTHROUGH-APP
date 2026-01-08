@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://dashmaster-15.preview.emergentagent.com/*",
+    "https://designer-hub-45.preview.emergentagent.com/*",
     "https://*/*",
     "http://*/*"
   ],

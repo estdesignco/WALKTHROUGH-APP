@@ -3,7 +3,7 @@
 ## ✅ What Was Built
 
 ### 1. **Canva Live Checklist** (WORKING!)
-**URL:** `https://dashmaster-15.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+**URL:** `https://designer-hub-45.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
 
 **Features:**
 - ✅ Clean, simple UI with dark gold theme
@@ -25,7 +25,7 @@
 ---
 
 ### 2. **Chrome Extension** (COMPLETE!)
-**Download:** `https://dashmaster-15.preview.emergentagent.com/chrome-extension.zip`
+**Download:** `https://designer-hub-45.preview.emergentagent.com/chrome-extension.zip`
 
 **Features:**
 - ✅ Scans entire Canva boards for images with links
@@ -55,7 +55,7 @@
 ---
 
 ### 3. **Comprehensive Documentation**
-**Guide:** `https://dashmaster-15.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+**Guide:** `https://designer-hub-45.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
 
 Complete visual guide with:
 - Setup instructions
@@ -205,11 +205,11 @@ Complete visual guide with:
 4. **Bulk Import Tool:** `bulk-import.html` (backup option)
 
 ### All URLs:
-- Main App: `https://dashmaster-15.preview.emergentagent.com`
-- Live Checklist: `https://dashmaster-15.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
-- Extension: `https://dashmaster-15.preview.emergentagent.com/chrome-extension.zip`
-- Guide: `https://dashmaster-15.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
-- Bulk Import: `https://dashmaster-15.preview.emergentagent.com/bulk-import.html`
+- Main App: `https://designer-hub-45.preview.emergentagent.com`
+- Live Checklist: `https://designer-hub-45.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+- Extension: `https://designer-hub-45.preview.emergentagent.com/chrome-extension.zip`
+- Guide: `https://designer-hub-45.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+- Bulk Import: `https://designer-hub-45.preview.emergentagent.com/bulk-import.html`
 
 ---
 

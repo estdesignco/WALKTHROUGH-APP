@@ -23,7 +23,7 @@ from datetime import datetime
 import uuid
 
 # Get backend URL from environment
-BACKEND_URL = "https://dashmaster-15.preview.emergentagent.com/api"
+BACKEND_URL = "https://designer-hub-45.preview.emergentagent.com/api"
 
 class DeploymentReadinessTest:
     def __init__(self):

@@ -3,7 +3,7 @@
   "appName": "ESTABLISHED",
   "webDir": "build",
   "server": {
-    "url": "https://dashmaster-15.preview.emergentagent.com/mobile-app",
+    "url": "https://designer-hub-45.preview.emergentagent.com/mobile-app",
     "cleartext": true
   },
   "ios": {

@@ -3,7 +3,7 @@
 COMPREHENSIVE BACKEND AUDIT - Launch Readiness Test
 Find ALL bugs and disconnects before launch
 
-Backend URL: https://dashmaster-15.preview.emergentagent.com
+Backend URL: https://designer-hub-45.preview.emergentagent.com
 Test ALL systems exhaustively
 """
 
@@ -15,7 +15,7 @@ import uuid
 import sys
 
 # Configuration
-BASE_URL = "https://dashmaster-15.preview.emergentagent.com/api"
+BASE_URL = "https://designer-hub-45.preview.emergentagent.com/api"
 HEADERS = {
     'Content-Type': 'application/json',
     'Accept': 'application/json'

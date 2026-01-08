@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://dashmaster-15.preview.emergentagent.com
+https://designer-hub-45.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://dashmaster-15.preview.emergentagent.com/mobile-app
+https://designer-hub-45.preview.emergentagent.com/mobile-app
 
 ---
 

@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://dashmaster-15.preview.emergentagent.com/chrome-extension-v19.zip
+https://designer-hub-45.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://dashmaster-15.preview.emergentagent.com/api/download/chrome-extension
+https://designer-hub-45.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

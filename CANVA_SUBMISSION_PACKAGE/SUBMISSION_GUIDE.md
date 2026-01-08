@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://dashmaster-15.preview.emergentagent.com";
+const BACKEND_URL = "https://designer-hub-45.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

@@ -2200,7 +2200,7 @@ function scrapePageData() {
 // SEND TO APP + LIBRARIES
 // ============================================================================
 
-const BACKEND_URL = 'https://dashmaster-15.preview.emergentagent.com';
+const BACKEND_URL = 'https://designer-hub-45.preview.emergentagent.com';
 
 async function sendToAppAndLibraries() {
   if (!scrapedData) return;

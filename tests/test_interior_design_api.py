@@ -7,7 +7,7 @@ import requests
 import os
 import json
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dashmaster-15.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://designer-hub-45.preview.emergentagent.com').rstrip('/')
 
 class TestHealthAndBasicEndpoints:
     """Test basic API health and utility endpoints"""
