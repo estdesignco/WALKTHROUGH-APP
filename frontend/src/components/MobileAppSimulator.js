@@ -1111,6 +1111,62 @@ export default function MobileAppSimulator() {
             </div>
           </div>
         );
+      case 'critical-path':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <CriticalPathDashboard projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'reports':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <ReportsDashboard projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'shipping':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <ShippingTracker projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'master-contacts':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('home')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <ContactsScreen project={null} onNavigate={handleNavigate} showMasterContacts={true} />
+            </div>
+          </div>
+        );
       default:
         return <MobileHomeScreen onNavigate={handleNavigate} />;
     }
