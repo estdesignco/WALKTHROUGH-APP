@@ -96,7 +96,10 @@ class TeamsIntegration:
             
             # If webhook URL is configured, send to Teams
             if self.webhook_url:
-                return await self._send_teams_webhook(teams_card)
+                print(f"📤 Calling _send_teams_webhook...")
+                result = await self._send_teams_webhook(teams_card)
+                print(f"📤 Webhook result: {result}")
+                return result
             else:
                 # Log for now if webhook not configured
                 logging.info(f"Teams Todo Created: {todo_title}")
