@@ -310,6 +310,40 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
     return counts;
   }, [events]);
 
+  // Save independent calendar event
+  const saveCalendarEvent = async () => {
+    if (!newEvent.title || !newEvent.date) {
+      alert('Please enter a title and date');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_URL}/calendar-events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: newEvent.title,
+          date: newEvent.date,
+          type: newEvent.type,
+          description: newEvent.description,
+          project_id: newEvent.project_id || null,
+          project_name: projects.find(p => p.id === newEvent.project_id)?.name || 'Independent'
+        })
+      });
+      
+      if (response.ok) {
+        setShowAddEvent(false);
+        setNewEvent({ title: '', date: '', type: 'project', description: '', project_id: '' });
+        fetchCalendarData(); // Refresh
+      } else {
+        alert('Failed to save event');
+      }
+    } catch (error) {
+      console.error('Error saving event:', error);
+      alert('Failed to save event');
+    }
+  };
+
   if (loading) {
     return (
       <div className="rounded-lg p-8 text-center" style={{
