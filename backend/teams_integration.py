@@ -18,6 +18,12 @@ class TeamsIntegration:
         self.teams_password = os.getenv('TEAMS_PASSWORD')
         self.webhook_url = os.getenv('TEAMS_WEBHOOK_URL', '')
         
+        # Log webhook URL status
+        if self.webhook_url:
+            logging.info(f"✅ Teams webhook URL configured ({len(self.webhook_url)} chars)")
+        else:
+            logging.warning("❌ TEAMS_WEBHOOK_URL not set - webhook notifications disabled")
+        
         # Validate required credentials (only warn, don't fail - Teams is optional)
         if not self.teams_email or not self.teams_password:
             logging.warning("Teams credentials not configured. Teams integration will be disabled.")
