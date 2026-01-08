@@ -211,8 +211,7 @@ async def notify_status_change(project_name: str, item_name: str, old_status: st
     """
     Convenience function to create Teams todo when item status changes
     """
-    print(f"🔔 notify_status_change called: {item_name} {old_status} → {new_status}")
-    logging.warning(f"🔔 notify_status_change called: {item_name} {old_status} → {new_status}")
+    logging.info(f"🔔 Teams notification: {item_name} {old_status} → {new_status}")
     return await teams_integration.create_todo_item(
         project_name, item_name, old_status, new_status, 
         room_name, vendor, cost
