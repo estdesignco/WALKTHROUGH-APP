@@ -32,6 +32,52 @@ export default function PunchList({ projectId, roomId = null }) {
     loadPunchList();
   }, [projectId, filter]);
 
+  // Load FFE items for linking
+  useEffect(() => {
+    loadFfeItems();
+  }, [projectId]);
+
+  const loadFfeItems = async () => {
+    try {
+      const response = await fetch(`${API_URL}/projects/${projectId}?sheet_type=ffe`);
+      if (response.ok) {
+        const data = await response.json();
+        // Flatten all items from all rooms
+        const allItems = [];
+        if (data.rooms) {
+          data.rooms.forEach(room => {
+            room.categories?.forEach(cat => {
+              cat.sub_categories?.forEach(subCat => {
+                subCat.items?.forEach(item => {
+                  allItems.push({
+                    ...item,
+                    roomName: room.name,
+                    categoryName: cat.name
+                  });
+                });
+              });
+            });
+          });
+        }
+        setFfeItems(allItems);
+      }
+    } catch (error) {
+      console.error('Failed to load FFE items:', error);
+    }
+  };
+
+  // Filter FFE items by search query
+  const filteredFfeItems = ffeItems.filter(item => {
+    if (!ffeSearchQuery) return true;
+    const query = ffeSearchQuery.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(query) ||
+      item.sku?.toLowerCase().includes(query) ||
+      item.roomName?.toLowerCase().includes(query) ||
+      item.vendor?.toLowerCase().includes(query)
+    );
+  }).slice(0, 10); // Limit to 10 results
+
   const loadPunchList = async () => {
     try {
       let url = `${API_URL}/punch-list/project/${projectId}`;
