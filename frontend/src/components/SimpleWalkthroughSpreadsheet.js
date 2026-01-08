@@ -14,9 +14,29 @@ const SimpleWalkthroughSpreadsheet = ({
   onReload 
 }) => {
   
-  // State to track checked items for transfer
+  // State to track checked items for transfer - Initialize from PICKED status
   const [checkedItems, setCheckedItems] = useState(new Set());
   console.log('🎯 SimpleWalkthroughSpreadsheet rendering with project:', project);
+
+  // Initialize checkedItems from items with PICKED status
+  useEffect(() => {
+    if (project?.rooms) {
+      const pickedItemIds = new Set();
+      project.rooms.forEach(room => {
+        room.categories?.forEach(cat => {
+          cat.subcategories?.forEach(subcat => {
+            subcat.items?.forEach(item => {
+              if (item.status === 'PICKED') {
+                pickedItemIds.add(item.id);
+              }
+            });
+          });
+        });
+      });
+      setCheckedItems(pickedItemIds);
+      console.log('✅ Initialized checkedItems from PICKED status:', pickedItemIds.size, 'items');
+    }
+  }, [project]);
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
