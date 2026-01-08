@@ -628,6 +628,97 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
           </div>
         </div>
       )}
+
+      {/* Add Event Modal */}
+      {showAddEvent && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-lg p-6 w-full max-w-md" style={{ border: '1px solid #8b7355' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-[#d4af37]">Add Calendar Event</h3>
+              <button onClick={() => setShowAddEvent(false)} className="text-stone-400 hover:text-white">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Event Title *</label>
+                <input
+                  type="text"
+                  value={newEvent.title}
+                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                  className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:border-[#d4af37] outline-none"
+                  placeholder="Enter event title"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Date *</label>
+                <input
+                  type="date"
+                  value={newEvent.date}
+                  onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                  className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:border-[#d4af37] outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Event Type</label>
+                <select
+                  value={newEvent.type}
+                  onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
+                  className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:border-[#d4af37] outline-none"
+                >
+                  {Object.entries(EVENT_TYPES).map(([key, { label, icon }]) => (
+                    <option key={key} value={key}>{icon} {label}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Link to Project (Optional)</label>
+                <select
+                  value={newEvent.project_id}
+                  onChange={(e) => setNewEvent({ ...newEvent, project_id: e.target.value })}
+                  className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:border-[#d4af37] outline-none"
+                >
+                  <option value="">-- Independent Event --</option>
+                  {projects.map(project => (
+                    <option key={project.id} value={project.id}>{project.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Description (Optional)</label>
+                <textarea
+                  value={newEvent.description}
+                  onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                  className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:border-[#d4af37] outline-none"
+                  rows={3}
+                  placeholder="Enter description"
+                />
+              </div>
+              
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowAddEvent(false)}
+                  className="flex-1 px-4 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveCalendarEvent}
+                  className="flex-1 px-4 py-2 rounded font-semibold transition-colors"
+                  style={{ background: '#d4af37', color: 'black' }}
+                >
+                  Save Event
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
