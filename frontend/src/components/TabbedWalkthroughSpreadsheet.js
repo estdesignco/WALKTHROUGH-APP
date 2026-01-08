@@ -1489,7 +1489,6 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
               </div>
             </div>
             )}
-        )}
       </div>
 
       {/* PHOTO EDITOR MODAL - EDIT EXISTING PHOTOS */}
