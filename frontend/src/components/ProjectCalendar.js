@@ -61,11 +61,34 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/projects`);
-      const projects = await response.json();
+      const projectsData = await response.json();
+      setProjects(projectsData); // Store projects for dropdown
       
       const calendarEvents = [];
       
-      for (const project of projects) {
+      // Also fetch independent calendar events
+      try {
+        const eventsResponse = await fetch(`${API_URL}/calendar-events`);
+        const independentEvents = await eventsResponse.json();
+        if (Array.isArray(independentEvents)) {
+          independentEvents.forEach(evt => {
+            calendarEvents.push({
+              id: evt.id,
+              type: evt.type || 'project',
+              title: evt.title,
+              date: new Date(evt.date),
+              project: evt.project_name || 'Independent',
+              projectId: evt.project_id,
+              description: evt.description,
+              isIndependent: true
+            });
+          });
+        }
+      } catch (e) {
+        console.log('No independent events endpoint');
+      }
+      
+      for (const project of projectsData) {
         // Add project dates
         if (project.start_date) {
           calendarEvents.push({
