@@ -627,14 +627,99 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   };
 
   return (
-    <div className="w-full h-full" style={{ backgroundColor: '#0F172A', overflow: 'auto' }}>
+    <div className="w-full h-full ffe-container" style={{ backgroundColor: '#0F172A', overflow: 'auto' }}>
+      {/* Responsive CSS for Portrait/Landscape orientation on iPad */}
+      <style>{`
+        /* Base styles for mobile portrait */
+        .ffe-container {
+          font-size: 14px;
+        }
+        
+        /* Portrait mode on tablets */
+        @media (max-width: 1024px) and (orientation: portrait) {
+          .ffe-container .room-tabs {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+          .ffe-container .room-tabs::-webkit-scrollbar {
+            display: none;
+          }
+          .ffe-container .category-grid {
+            grid-template-columns: 1fr !important;
+          }
+          .ffe-container .item-row {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .ffe-container .item-fields {
+            width: 100%;
+            flex-wrap: wrap;
+          }
+          .ffe-container .field-input {
+            min-width: 100px;
+            flex: 1 1 45%;
+          }
+          .ffe-container .header-title {
+            font-size: 1.5rem !important;
+          }
+        }
+        
+        /* Landscape mode on tablets */
+        @media (min-width: 768px) and (orientation: landscape) {
+          .ffe-container {
+            font-size: 12px;
+          }
+          .ffe-container .room-tabs {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+            overflow-x: auto;
+          }
+          .ffe-container .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+          }
+          .ffe-container .item-row {
+            flex-direction: row;
+            align-items: center;
+          }
+          .ffe-container .item-fields {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+          }
+          .ffe-container .field-input {
+            min-width: 80px;
+            flex: 0 0 auto;
+          }
+        }
+        
+        /* iPad Pro landscape */
+        @media (min-width: 1024px) and (orientation: landscape) {
+          .ffe-container {
+            font-size: 14px;
+          }
+          .ffe-container .item-fields {
+            gap: 0.75rem;
+          }
+        }
+        
+        /* Full desktop */
+        @media (min-width: 1280px) {
+          .ffe-container {
+            font-size: 16px;
+          }
+        }
+      `}</style>
+      
       {/* EXACT DESKTOP HEADER - WITH ENHANCED SHIMMER */}
       <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-6 border-b-4 border-[#D4A574] shadow-2xl" style={{
         boxShadow: '0 4px 20px rgba(212, 165, 116, 0.3), inset 0 0 60px rgba(212, 165, 116, 0.05)'
       }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-6">
-            <h1 className="text-5xl font-bold text-[#D4A574] mb-2 tracking-wide" style={{
+            <h1 className="text-5xl font-bold text-[#D4A574] mb-2 tracking-wide header-title" style={{
               textShadow: '0 0 20px rgba(212, 165, 116, 0.4), 0 0 40px rgba(212, 165, 116, 0.2)'
             }}>
               {displayProject?.name || 'PROJECT NAME'}
