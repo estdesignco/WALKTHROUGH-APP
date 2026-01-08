@@ -51,6 +51,8 @@ class TeamsIntegration:
             bool: True if successful, False otherwise
         """
         try:
+            print(f"📝 create_todo_item called with webhook_url: {bool(self.webhook_url)}")
+            
             # Create meaningful to-do title and description
             todo_title = f"🏠 {project_name}: {item_name} → {new_status}"
             
