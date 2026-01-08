@@ -2492,22 +2492,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                 Cancel
               </button>
               <button 
-                onClick={async () => {
-                  // Add custom room if entered
-                  if (newRoomName.trim()) {
-                    await handleAddRoom();
-                  }
-                  // Add all selected rooms
-                  if (selectedRoomsToAdd?.length > 0) {
-                    for (const roomName of selectedRoomsToAdd) {
-                      setNewRoomName(roomName);
-                      await handleAddRoom();
-                    }
-                  }
-                  setSelectedRoomsToAdd([]);
-                  setNewRoomName('');
-                  setShowAddRoom(false);
-                }}
+                onClick={handleAddRooms}
                 disabled={!newRoomName.trim() && (!selectedRoomsToAdd || selectedRoomsToAdd.length === 0)}
                 className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-500 disabled:to-gray-600 text-white px-8 py-4 rounded-xl font-bold text-xl"
               >
