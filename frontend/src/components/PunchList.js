@@ -523,6 +523,75 @@ export default function PunchList({ projectId, roomId = null }) {
                     </p>
                   )}
                   
+                  {/* Linked FFE Item Display */}
+                  {item.linked_ffe_item ? (
+                    <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/30">
+                      <span className="text-[#D4A574]">🔗</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[#D4A574] text-sm font-medium truncate">
+                          {item.linked_ffe_item.name}
+                        </div>
+                        <div className="text-gray-500 text-xs">
+                          {item.linked_ffe_item.roomName} • {item.linked_ffe_item.vendor} • SKU: {item.linked_ffe_item.sku}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => unlinkFfeFromPunch(item.id)}
+                        className="text-red-400 hover:text-red-300 text-xs"
+                        title="Unlink FFE item"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : linkingItemId === item.id ? (
+                    <div className="mt-2 relative">
+                      <input
+                        type="text"
+                        value={ffeSearchQuery}
+                        onChange={(e) => {
+                          setFfeSearchQuery(e.target.value);
+                          setShowFfeDropdown(true);
+                        }}
+                        onFocus={() => setShowFfeDropdown(true)}
+                        placeholder="Search FFE items..."
+                        className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
+                        autoFocus
+                      />
+                      {showFfeDropdown && filteredFfeItems.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-gray-900 border border-[#B49B7E]/30 rounded-lg max-h-40 overflow-y-auto shadow-xl">
+                          {filteredFfeItems.map(ffeItem => (
+                            <button
+                              key={ffeItem.id}
+                              onClick={() => linkPunchToFfe(item.id, ffeItem)}
+                              className="w-full px-3 py-2 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
+                            >
+                              <div className="text-white text-sm">{ffeItem.name}</div>
+                              <div className="text-gray-400 text-xs">
+                                {ffeItem.roomName} • {ffeItem.vendor || 'No vendor'}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          setLinkingItemId(null);
+                          setFfeSearchQuery('');
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setLinkingItemId(item.id)}
+                      className="mt-2 text-xs text-[#D4A574] hover:text-[#B49B7E] flex items-center gap-1"
+                    >
+                      🔗 Link to FFE Item
+                    </button>
+                  )}
+                  
                   <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                     <span className={getStatusColor(item.status)}>
                       {item.status.replace('_', ' ')}
