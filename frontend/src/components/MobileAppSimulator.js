@@ -1026,6 +1026,104 @@ export default function MobileAppSimulator() {
         return <ProjectDetailsScreen project={selectedProject} onNavigate={handleNavigate} />;
       case 'contacts':
         return <ContactsScreen project={selectedProject} onNavigate={handleNavigate} />;
+      case 'whole-home-finishes':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <WholeHomeFinishes projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'calculators':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <CalculatorDashboard projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'calendar':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <InstallationCalendar projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'design-tools':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <DesignToolsHub projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'exports':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <ExportsDashboard projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'todo':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <ToDoList projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
+      case 'punch-list':
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <PunchList projectId={selectedProject?.id} />
+            </div>
+          </div>
+        );
       default:
         return <MobileHomeScreen onNavigate={handleNavigate} />;
     }
