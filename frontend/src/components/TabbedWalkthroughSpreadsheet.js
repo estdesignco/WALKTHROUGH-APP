@@ -48,6 +48,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [newRoomName, setNewRoomName] = useState('');
+  const [selectedRoomsToAdd, setSelectedRoomsToAdd] = useState([]);  // Multi-room selection
   const [availableCategories, setAvailableCategories] = useState([]);
   const [roomPhotos, setRoomPhotos] = useState({});
   
