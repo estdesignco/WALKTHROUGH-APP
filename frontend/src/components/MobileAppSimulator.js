@@ -61,7 +61,7 @@ function MobileHomeScreen({ onNavigate }) {
       <style>{shimmerStyle}</style>
       
       {/* Gold Header - EXACT MATCH to MainDashboard.js */}
-      <div className="w-full h-32 shimmer-gold" style={{ 
+      <div className="w-full h-24 shimmer-gold" style={{ 
         background: STYLES.goldGradient,
         boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
       }}>
@@ -70,107 +70,71 @@ function MobileHomeScreen({ onNavigate }) {
           <img 
             src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
             alt="ESTABLISHED DESIGN CO." 
-            className="w-full h-20 object-contain"
+            className="w-full h-16 object-contain"
             style={{
               filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.2))',
               maxWidth: '100%'
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-transparent to-yellow-400 opacity-5"></div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="px-6 py-8">
-        {/* Navigation Grid - MATCHES DESKTOP */}
-        <div className="max-w-4xl mx-auto grid grid-cols-2 gap-4 mb-8">
+      {/* Main Content - Desktop-like layout */}
+      <div className="px-4 py-4">
+        {/* Quick Navigation Grid - Like Desktop */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
           <button
             onClick={() => onNavigate('projects')}
-            className="text-stone-300 p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{
-              background: STYLES.darkGradient,
-              border: STYLES.goldBorder,
-              boxShadow: STYLES.goldShadow
-            }}
+            className="text-stone-300 p-3 rounded-lg transition-all hover:scale-105 active:scale-95"
+            style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}
           >
-            <div className="text-4xl mb-3">📋</div>
-            <div className="text-lg font-medium">Projects</div>
-            <div className="text-xs text-stone-500 mt-1">View & manage</div>
+            <div className="text-xl mb-1">📋</div>
+            <div className="text-xs">Projects</div>
           </button>
           
           <button
-            onClick={() => onNavigate('photos')}
-            className="text-stone-300 p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{
-              background: STYLES.darkGradient,
-              border: STYLES.goldBorder,
-              boxShadow: STYLES.goldShadow
-            }}
+            onClick={() => onNavigate('master-contacts')}
+            className="text-white p-3 rounded-lg transition-all hover:scale-105 active:scale-95"
+            style={{ background: STYLES.goldGradient, border: STYLES.goldHighlight }}
           >
-            <div className="text-4xl mb-3">📸</div>
-            <div className="text-lg font-medium">Photos</div>
-            <div className="text-xs text-stone-500 mt-1">Capture & organize</div>
+            <div className="text-xl mb-1">👥</div>
+            <div className="text-xs font-medium">Contacts</div>
           </button>
           
           <button
-            onClick={() => onNavigate('measure')}
-            className="text-stone-300 p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
-            style={{
-              background: STYLES.darkGradient,
-              border: STYLES.goldBorder,
-              boxShadow: STYLES.goldShadow
-            }}
+            onClick={() => onNavigate('calculators')}
+            className="text-stone-300 p-3 rounded-lg transition-all hover:scale-105 active:scale-95"
+            style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}
           >
-            <div className="text-4xl mb-3">📏</div>
-            <div className="text-lg font-medium">Measure</div>
-            <div className="text-xs text-stone-500 mt-1">Leica integration</div>
+            <div className="text-xl mb-1">🧮</div>
+            <div className="text-xs">Calculators</div>
           </button>
           
           <button
             onClick={() => onNavigate('sync')}
-            className="text-white p-6 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 shimmer-gold"
-            style={{
-              background: STYLES.goldGradient,
-              border: STYLES.goldHighlight,
-              boxShadow: STYLES.goldShadowStrong
-            }}
+            className="text-white p-3 rounded-lg transition-all hover:scale-105 active:scale-95 shimmer-gold"
+            style={{ background: STYLES.goldGradient, border: STYLES.goldHighlight }}
           >
-            <div className="text-4xl mb-3">🔄</div>
-            <div className="text-lg font-medium">Sync</div>
-            <div className="text-xs text-stone-200 mt-1">Upload to cloud</div>
+            <div className="text-xl mb-1">🔄</div>
+            <div className="text-xs font-medium">Sync</div>
           </button>
         </div>
 
-        {/* Quick Stats - GOLD ACCENT STYLING */}
-        <div className="max-w-4xl mx-auto p-6 rounded-lg mb-6" style={{
-          background: STYLES.darkGradient,
-          border: STYLES.goldBorder,
-          boxShadow: STYLES.goldShadow
-        }}>
-          <h3 className="text-lg font-bold mb-4" style={{ color: '#d4af37' }}>✨ Mobile Features</h3>
-          <div className="space-y-3 text-stone-300 text-sm">
-            <p className="flex items-center gap-2">
-              <span className="text-[#8b7355]">•</span>
-              <span>Full walkthrough spreadsheet access</span>
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="text-[#8b7355]">•</span>
-              <span><strong className="text-[#d4af37]">Offline mode</strong> - work without internet</span>
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="text-[#8b7355]">•</span>
-              <span>Auto-sync when connected</span>
-            </p>
-            <p className="flex items-center gap-2">
-              <span className="text-[#8b7355]">•</span>
-              <span>Photo capture by room</span>
-            </p>
+        {/* Master Calendar Section */}
+        <div className="mb-4 rounded-lg overflow-hidden" style={{ border: STYLES.goldBorder }}>
+          <div className="px-4 py-2" style={{ background: STYLES.goldGradient }}>
+            <h2 className="text-white font-bold flex items-center gap-2">
+              <span>📅</span> Master Calendar
+            </h2>
+          </div>
+          <div className="bg-gray-900 p-2">
+            <ProjectCalendar compact={true} />
           </div>
         </div>
         
         {/* Connection Status */}
-        <div className="max-w-4xl mx-auto text-center">
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm ${isOnline() ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}
+        <div className="text-center">
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs ${isOnline() ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}
             style={{ border: isOnline() ? '1px solid #22c55e' : '1px solid #ef4444' }}>
             <div className={`w-2 h-2 rounded-full ${isOnline() ? 'bg-green-500' : 'bg-red-500'}`}></div>
             {isOnline() ? 'Connected' : 'Offline Mode'}
