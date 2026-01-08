@@ -31,22 +31,8 @@ class TeamsIntegration:
                              room_name: str, vendor: str = "", cost: float = 0.0) -> bool:
         """
         Create a to-do item in Microsoft Teams when furniture status changes
-        
-        Args:
-            project_name: Name of the interior design project
-            item_name: Name of the furniture/fixture item
-            old_status: Previous status of the item
-            new_status: New status of the item
-            room_name: Which room the item is for
-            vendor: Vendor name if applicable
-            cost: Item cost if applicable
-            
-        Returns:
-            bool: True if successful, False otherwise
         """
         try:
-            print(f"📝 create_todo_item called with webhook_url: {bool(self.webhook_url)}")
-            
             # Create meaningful to-do title and description
             todo_title = f"🏠 {project_name}: {item_name} → {new_status}"
             
