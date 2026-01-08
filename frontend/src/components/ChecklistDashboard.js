@@ -94,6 +94,18 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     }
   }, [projectId, paramProjectId, propProjectId]);
 
+  // REAL-TIME SYNC - Auto-refresh every 10 seconds to pick up changes from mobile app
+  useEffect(() => {
+    if (projectId) {
+      const interval = setInterval(() => {
+        console.log('🔄 Checklist Real-time sync - refreshing from server...');
+        loadSimpleProject();
+      }, 10000); // Every 10 seconds for live sync
+      
+      return () => clearInterval(interval);
+    }
+  }, [projectId]);
+
   const loadSimpleProject = async () => {
     try {
       console.log('🚀 Loading CHECKLIST project data for:', projectId);
