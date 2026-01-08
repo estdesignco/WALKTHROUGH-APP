@@ -97,6 +97,7 @@ class TeamsIntegration:
     async def _send_teams_webhook(self, card_payload: Dict[str, Any]) -> bool:
         """Send webhook message to Microsoft Teams"""
         try:
+            logging.info(f"📤 Sending Teams webhook to: {self.webhook_url[:50]}...")
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     self.webhook_url,
