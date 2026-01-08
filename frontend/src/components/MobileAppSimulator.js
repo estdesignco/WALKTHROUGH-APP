@@ -4,6 +4,13 @@ import axios from 'axios';
 import TabbedWalkthroughSpreadsheet from './TabbedWalkthroughSpreadsheet';
 import MobilePhotoManagement from './MobilePhotoManagement';
 import MeasurementsAndFilesPage from './MeasurementsAndFilesPage';
+import WholeHomeFinishes from './WholeHomeFinishes';
+import CalculatorDashboard from './CalculatorDashboard';
+import InstallationCalendar from './InstallationCalendar';
+import DesignToolsHub from './DesignToolsHub';
+import ExportsDashboard from './ExportsDashboard';
+import ToDoList from './ToDoList';
+import PunchList from './PunchList';
 import { saveContactsOffline, getContactsOffline, saveQuestionnaireOffline, getQuestionnaireOffline, isOnline } from '../utils/offlineStorage';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
