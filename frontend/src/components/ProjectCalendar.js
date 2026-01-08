@@ -381,6 +381,17 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
             >
               Today
             </button>
+            <button
+              onClick={() => setShowAddEvent(true)}
+              className="px-3 py-1 text-sm rounded transition-all hover:scale-105 font-semibold"
+              style={{
+                background: '#22c55e',
+                color: 'white',
+                border: '1px solid #16a34a',
+              }}
+            >
+              + Add Event
+            </button>
           </div>
           
           {/* Month Navigation */}
