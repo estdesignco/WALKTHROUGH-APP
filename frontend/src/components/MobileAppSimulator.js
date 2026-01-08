@@ -1092,10 +1092,17 @@ export default function MobileAppSimulator() {
       case 'projects':
         return <MobileProjectListScreen onNavigate={handleNavigate} onSelectProject={handleSelectProject} />;
       case 'project-menu':
-        return <ProjectMenuScreen project={selectedProject} onNavigate={handleNavigate} />;
+        // Use tabbed view by default
+        return <ProjectTabbedView project={selectedProject} onNavigate={handleNavigate} initialTab="walkthrough" />;
       case 'walkthrough':
+        return <ProjectTabbedView project={selectedProject} onNavigate={handleNavigate} initialTab="walkthrough" />;
+      case 'ffe':
+        return <ProjectTabbedView project={selectedProject} onNavigate={handleNavigate} initialTab="ffe" />;
+      case 'checklist':
+        return <ProjectTabbedView project={selectedProject} onNavigate={handleNavigate} initialTab="checklist" />;
+      case 'photos':
         return (
-          <div className="h-full flex flex-col">
+          <div className="h-full flex flex-col bg-black">
             <button 
               onClick={() => handleNavigate('project-menu')}
               className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
