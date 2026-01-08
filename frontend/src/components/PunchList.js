@@ -4,6 +4,7 @@ const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + 
 
 /**
  * PunchList - Manage punch list items for a project with AI suggestions
+ * Now includes FFE linking feature to reference items from the FF&E spreadsheet
  */
 export default function PunchList({ projectId, roomId = null }) {
   const [punchItems, setPunchItems] = useState([]);
@@ -12,11 +13,19 @@ export default function PunchList({ projectId, roomId = null }) {
   const [generating, setGenerating] = useState(false);
   const [filter, setFilter] = useState('all'); // all, pending, in_progress, completed
   
+  // FFE Linking states
+  const [ffeItems, setFfeItems] = useState([]);
+  const [ffeSearchQuery, setFfeSearchQuery] = useState('');
+  const [showFfeDropdown, setShowFfeDropdown] = useState(false);
+  const [selectedFfeItem, setSelectedFfeItem] = useState(null);
+  const [linkingItemId, setLinkingItemId] = useState(null); // For linking existing punch items
+  
   const [newItem, setNewItem] = useState({
     title: '',
     description: '',
     priority: 'medium',
-    assigned_to: ''
+    assigned_to: '',
+    linked_ffe_item_id: null
   });
 
   useEffect(() => {
