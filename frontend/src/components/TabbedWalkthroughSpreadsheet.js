@@ -2359,7 +2359,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
             boxShadow: '0 0 60px rgba(212, 165, 116, 0.3), inset 0 0 80px rgba(212, 165, 116, 0.05)'
           }}>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-3xl font-bold text-[#D4A574]">Add New Room</h3>
+              <h3 className="text-3xl font-bold text-[#D4A574]">Add New Room(s)</h3>
               <button
                 onClick={() => setShowAddRoom(false)}
                 className="text-[#D4A574] text-3xl hover:text-red-400 font-bold"
@@ -2369,12 +2369,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
             </div>
             
             <div className="mb-8">
-              <label className="text-[#D4C5A9] text-lg font-bold mb-3 block">Room Name *</label>
+              <label className="text-[#D4C5A9] text-lg font-bold mb-3 block">Custom Room Name</label>
               <input
                 type="text"
                 value={newRoomName}
                 onChange={(e) => setNewRoomName(e.target.value)}
-                placeholder="Enter room name..."
+                placeholder="Enter custom room name..."
                 className="w-full bg-gray-900 text-[#D4C5A9] px-6 py-4 rounded-xl text-xl border-2 border-[#B49B7E] focus:border-[#D4A574] focus:outline-none"
                 style={{
                   background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
@@ -2384,7 +2384,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
             </div>
 
             <div className="mb-8">
-              <h4 className="text-[#D4C5A9] text-lg font-bold mb-4">Quick Select Common Rooms</h4>
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="text-[#D4C5A9] text-lg font-bold">Quick Select Rooms (Multi-Select)</h4>
+                <span className="text-[#D4A574] text-sm">
+                  {selectedRoomsToAdd?.length || 0} room(s) selected
+                </span>
+              </div>
               <div className="grid grid-cols-3 gap-4">
                 {[
                   'Living Room', 'Kitchen', 'Master Bedroom',
@@ -2397,21 +2402,31 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                   'Patio', 'Balcony', 'Foyer'
                 ].map((roomName) => {
                   const roomColor = getRoomColor(roomName);
+                  const isSelected = selectedRoomsToAdd?.includes(roomName);
                   return (
                     <button
                       key={roomName}
-                      onClick={() => setNewRoomName(roomName)}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSelectedRoomsToAdd(prev => prev.filter(r => r !== roomName));
+                        } else {
+                          setSelectedRoomsToAdd(prev => [...(prev || []), roomName]);
+                        }
+                      }}
                       className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 overflow-hidden ${
-                        newRoomName === roomName ? 'border-[#D4A574] text-[#D4A574]' : 'border-[#B49B7E] hover:border-[#D4A574] text-[#D4C5A9]'
+                        isSelected ? 'border-green-500 text-green-400' : 'border-[#B49B7E] hover:border-[#D4A574] text-[#D4C5A9]'
                       }`}
                       style={{ 
-                        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
-                        borderTop: `4px solid ${roomColor}`,
-                        boxShadow: newRoomName === roomName 
-                          ? `0 0 25px ${roomColor}90, 0 -3px 15px ${roomColor}60, inset 0 0 30px ${roomColor}10` 
+                        background: isSelected 
+                          ? 'linear-gradient(135deg, rgba(34,197,94,0.2) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(34,197,94,0.2) 100%)'
+                          : 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                        borderTop: `4px solid ${isSelected ? '#22c55e' : roomColor}`,
+                        boxShadow: isSelected 
+                          ? `0 0 25px rgba(34,197,94,0.5), 0 -3px 15px rgba(34,197,94,0.3), inset 0 0 30px rgba(34,197,94,0.1)` 
                           : `0 -2px 8px ${roomColor}40, inset 0 0 20px ${roomColor}05`
                       }}
                     >
+                      {isSelected && <span className="mr-2">✓</span>}
                       {roomName}
                     </button>
                   );
@@ -2421,23 +2436,36 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
 
             <div className="flex gap-6">
               <button 
-                onClick={() => setShowAddRoom(false)}
+                onClick={() => {
+                  setShowAddRoom(false);
+                  setSelectedRoomsToAdd([]);
+                  setNewRoomName('');
+                }}
                 className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-bold text-xl"
               >
                 Cancel
               </button>
               <button 
-                onClick={() => {
+                onClick={async () => {
+                  // Add custom room if entered
                   if (newRoomName.trim()) {
-                    handleAddRoom();
-                  } else {
-                    alert('Please enter a room name');
+                    await handleAddRoom();
                   }
+                  // Add all selected rooms
+                  if (selectedRoomsToAdd?.length > 0) {
+                    for (const roomName of selectedRoomsToAdd) {
+                      setNewRoomName(roomName);
+                      await handleAddRoom();
+                    }
+                  }
+                  setSelectedRoomsToAdd([]);
+                  setNewRoomName('');
+                  setShowAddRoom(false);
                 }}
-                disabled={!newRoomName.trim()}
+                disabled={!newRoomName.trim() && (!selectedRoomsToAdd || selectedRoomsToAdd.length === 0)}
                 className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-500 disabled:to-gray-600 text-white px-8 py-4 rounded-xl font-bold text-xl"
               >
-                Add Room
+                Add {(selectedRoomsToAdd?.length || 0) + (newRoomName.trim() ? 1 : 0)} Room(s)
               </button>
             </div>
           </div>
