@@ -154,7 +154,96 @@ function MobileHomeScreen({ onNavigate }) {
   );
 }
 
-// ===== PROJECT MENU SCREEN - MATCHES DESKTOP =====
+// ===== PROJECT TABBED VIEW - TABS AT TOP LIKE DESKTOP =====
+function ProjectTabbedView({ project, onNavigate, initialTab = 'walkthrough' }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
+  
+  const tabs = [
+    { id: 'walkthrough', label: 'Walk', icon: '📋' },
+    { id: 'ffe', label: 'FFE', icon: '🛋️' },
+    { id: 'checklist', label: 'Check', icon: '✅' },
+    { id: 'whole-home', label: 'Home', icon: '🏠' },
+    { id: 'samples', label: 'Samp', icon: '📦' },
+    { id: 'contacts', label: 'Cont', icon: '👥' },
+    { id: 'calendar', label: 'Cal', icon: '📅' },
+    { id: 'exports', label: 'Exp', icon: '📤' },
+    { id: 'punch', label: 'Punch', icon: '🔨' },
+    { id: 'critical', label: 'Crit', icon: '🎯' },
+    { id: 'shipping', label: 'Ship', icon: '🚚' },
+    { id: 'reports', label: 'Rep', icon: '📊' },
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'walkthrough':
+        return <TabbedWalkthroughSpreadsheet projectId={project?.id} />;
+      case 'ffe':
+        return <TabbedWalkthroughSpreadsheet projectId={project?.id} sheetType="ffe" />;
+      case 'checklist':
+        return <TabbedWalkthroughSpreadsheet projectId={project?.id} sheetType="checklist" />;
+      case 'whole-home':
+        return <WholeHomeFinishes projectId={project?.id} />;
+      case 'samples':
+        return <div className="p-4 text-stone-400">Sample Tracker coming soon...</div>;
+      case 'contacts':
+        return <ContactsScreen project={project} onNavigate={onNavigate} />;
+      case 'calendar':
+        return <InstallationCalendar projectId={project?.id} />;
+      case 'exports':
+        return <ExportsDashboard projectId={project?.id} />;
+      case 'punch':
+        return <PunchList projectId={project?.id} />;
+      case 'critical':
+        return <CriticalPathDashboard projectId={project?.id} />;
+      case 'shipping':
+        return <ShippingTracker projectId={project?.id} />;
+      case 'reports':
+        return <ReportsDashboard projectId={project?.id} />;
+      default:
+        return <TabbedWalkthroughSpreadsheet projectId={project?.id} />;
+    }
+  };
+
+  return (
+    <div className="h-full flex flex-col bg-black">
+      {/* Compact Header with Project Name */}
+      <div className="flex items-center px-2 py-1" style={{ background: STYLES.goldGradient }}>
+        <button 
+          onClick={() => onNavigate('projects')}
+          className="text-white text-sm px-2 py-1 rounded hover:bg-white/20"
+        >
+          ← 
+        </button>
+        <span className="text-white font-semibold text-sm truncate flex-1 ml-2">{project?.name}</span>
+      </div>
+      
+      {/* Tab Bar - Scrollable horizontally */}
+      <div className="flex overflow-x-auto bg-gray-900 border-b border-[#8b7355]/30" style={{ scrollbarWidth: 'none' }}>
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-shrink-0 px-2 py-2 text-xs transition-colors ${
+              activeTab === tab.id 
+                ? 'text-[#d4af37] border-b-2 border-[#d4af37] bg-black/50' 
+                : 'text-stone-400 hover:text-stone-200'
+            }`}
+          >
+            <span className="text-sm">{tab.icon}</span>
+            <div className="text-[10px]">{tab.label}</div>
+          </button>
+        ))}
+      </div>
+      
+      {/* Tab Content */}
+      <div className="flex-1 overflow-auto">
+        {renderTabContent()}
+      </div>
+    </div>
+  );
+}
+
+// ===== PROJECT MENU SCREEN - TILE VIEW (as fallback) =====
 function ProjectMenuScreen({ project, onNavigate }) {
   return (
     <div className="h-full overflow-auto bg-black">
