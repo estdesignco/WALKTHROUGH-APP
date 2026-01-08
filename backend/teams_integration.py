@@ -23,8 +23,10 @@ class TeamsIntegration:
         
         # Log webhook URL status
         if self.webhook_url:
-            logging.info(f"✅ Teams webhook URL configured ({len(self.webhook_url)} chars)")
+            print(f"✅ Teams webhook URL configured ({len(self.webhook_url)} chars)")
+            logging.warning(f"✅ Teams webhook URL configured ({len(self.webhook_url)} chars)")
         else:
+            print("❌ TEAMS_WEBHOOK_URL not set - webhook notifications disabled")
             logging.warning("❌ TEAMS_WEBHOOK_URL not set - webhook notifications disabled")
         
         # Validate required credentials (only warn, don't fail - Teams is optional)
