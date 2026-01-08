@@ -818,7 +818,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
       <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto" style={{
         boxShadow: 'inset 0 0 40px rgba(212, 165, 116, 0.08)'
       }}>
-        <div className="flex">
+        <div className="flex room-tabs">
           {project.rooms.map((room, index) => (
             <button
               key={room.id}
