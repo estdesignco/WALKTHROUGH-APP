@@ -285,6 +285,104 @@ function ProjectMenuScreen({ project, onNavigate }) {
           </button>
 
           <button
+            onClick={() => onNavigate('whole-home-finishes')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">🏠</div>
+            <div className="font-bold text-base">Whole Home</div>
+            <div className="text-xs text-stone-500 mt-1">Finishes & materials</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('calculators')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">🧮</div>
+            <div className="font-bold text-base">Calculators</div>
+            <div className="text-xs text-stone-500 mt-1">Quick math tools</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('calendar')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">📅</div>
+            <div className="font-bold text-base">Calendar</div>
+            <div className="text-xs text-stone-500 mt-1">Project schedule</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('design-tools')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">🎨</div>
+            <div className="font-bold text-base">Design Tools</div>
+            <div className="text-xs text-stone-500 mt-1">Room planning</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('exports')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">📤</div>
+            <div className="font-bold text-base">Exports</div>
+            <div className="text-xs text-stone-500 mt-1">Generate reports</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('todo')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">✅</div>
+            <div className="font-bold text-base">To Do</div>
+            <div className="text-xs text-stone-500 mt-1">Task list</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('punch-list')}
+            className="text-white p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95 shimmer-gold"
+            style={{
+              background: STYLES.goldGradient,
+              border: STYLES.goldHighlight,
+              boxShadow: STYLES.goldShadowStrong
+            }}
+          >
+            <div className="text-3xl mb-2">🔨</div>
+            <div className="font-bold text-base">Punch List</div>
+            <div className="text-xs text-stone-200 mt-1">Final walkthrough</div>
+          </button>
+
+          <button
             onClick={() => onNavigate('project-details')}
             className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
             style={{
