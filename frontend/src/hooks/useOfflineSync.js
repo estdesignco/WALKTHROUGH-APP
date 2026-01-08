@@ -1,4 +1,4 @@
-// React Hook for Offline Sync
+// React Hook for Offline Sync - REAL-TIME SYNC ENABLED
 import { useState, useEffect, useCallback } from 'react';
 import {
   isOnline,
@@ -85,11 +85,14 @@ export const useOfflineSync = (projectId) => {
     }
   }, [checkPendingCount]);
 
-  // Update item (works offline)
+  // Update item - REAL-TIME SYNC when online
   const updateItemOffline = useCallback(async (itemId, updates) => {
     try {
-      if (online) {
-        // If online, try to update directly
+      if (online && navigator.onLine) {
+        // REAL-TIME: If online, update immediately and show feedback
+        console.log('🔄 Real-time sync: Updating item', itemId, updates);
+        setSyncStatus('syncing');
+        
         const response = await fetch(`${API_URL}/items/${itemId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -97,15 +100,25 @@ export const useOfflineSync = (projectId) => {
         });
         
         if (response.ok) {
-          console.log('✅ Item updated online');
-          return { success: true, mode: 'online' };
+          console.log('✅ Item synced to server in real-time');
+          setSyncStatus('success');
+          setLastSyncTime(new Date());
+          setTimeout(() => setSyncStatus('idle'), 1500);
+          return { success: true, mode: 'realtime' };
+        } else {
+          // If server update failed, queue for retry
+          console.log('⚠️ Server update failed, queuing for retry');
+          await queueItemUpdate(itemId, updates);
+          await checkPendingCount();
+          setSyncStatus('error');
+          return { success: true, mode: 'queued' };
         }
       }
       
-      // If offline or online update failed, queue for sync
+      // If offline, queue for sync
       await queueItemUpdate(itemId, updates);
       await checkPendingCount();
-      console.log('💾 Item queued for sync');
+      console.log('💾 Item queued for sync (offline)');
       return { success: true, mode: 'offline' };
       
     } catch (error) {
@@ -114,6 +127,7 @@ export const useOfflineSync = (projectId) => {
       // Queue for sync even on error
       await queueItemUpdate(itemId, updates);
       await checkPendingCount();
+      setSyncStatus('error');
       return { success: true, mode: 'offline' };
     }
   }, [online, checkPendingCount]);
