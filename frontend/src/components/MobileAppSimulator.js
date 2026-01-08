@@ -11,6 +11,10 @@ import DesignToolsHub from './DesignToolsHub';
 import ExportsDashboard from './ExportsDashboard';
 import ToDoList from './ToDoList';
 import PunchList from './PunchList';
+import ProjectCalendar from './ProjectCalendar';
+import CriticalPathDashboard from './CriticalPathDashboard';
+import ReportsDashboard from './ReportsDashboard';
+import ShippingTracker from './ShippingTracker';
 import { saveContactsOffline, getContactsOffline, saveQuestionnaireOffline, getQuestionnaireOffline, isOnline } from '../utils/offlineStorage';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
