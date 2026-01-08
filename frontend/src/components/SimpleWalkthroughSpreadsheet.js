@@ -1172,15 +1172,30 @@ const SimpleWalkthroughSpreadsheet = ({
                                         <input 
                                           type="checkbox" 
                                           className="w-6 h-6 cursor-pointer" 
-                                          checked={checkedItems.has(item.id)}
-                                          onChange={(e) => {
+                                          checked={checkedItems.has(item.id) || item.status === 'PICKED'}
+                                          onChange={async (e) => {
+                                            const newStatus = e.target.checked ? 'PICKED' : '';
                                             const newCheckedItems = new Set(checkedItems);
+                                            
                                             if (e.target.checked) {
                                               newCheckedItems.add(item.id);
                                             } else {
                                               newCheckedItems.delete(item.id);
                                             }
                                             setCheckedItems(newCheckedItems);
+                                            
+                                            // SAVE TO BACKEND
+                                            try {
+                                              const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+                                              await fetch(`${BACKEND_URL}/api/items/${item.id}`, {
+                                                method: 'PUT',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ status: newStatus })
+                                              });
+                                              console.log('✅ Desktop checkbox saved to backend!', item.name, newStatus);
+                                            } catch (err) {
+                                              console.error('❌ Failed to save checkbox:', err);
+                                            }
                                           }}
                                         />
                                       </td>
