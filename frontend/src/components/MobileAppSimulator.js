@@ -358,6 +358,48 @@ function ProjectMenuScreen({ project, onNavigate }) {
           </button>
 
           <button
+            onClick={() => onNavigate('critical-path')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">🎯</div>
+            <div className="font-bold text-base">Critical Path</div>
+            <div className="text-xs text-stone-500 mt-1">Key milestones</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('reports')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">📊</div>
+            <div className="font-bold text-base">Reports</div>
+            <div className="text-xs text-stone-500 mt-1">Analytics</div>
+          </button>
+
+          <button
+            onClick={() => onNavigate('shipping')}
+            className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
+            style={{
+              background: STYLES.darkGradient,
+              border: STYLES.goldBorder,
+              boxShadow: STYLES.goldShadow
+            }}
+          >
+            <div className="text-3xl mb-2">🚚</div>
+            <div className="font-bold text-base">Shipping</div>
+            <div className="text-xs text-stone-500 mt-1">Track deliveries</div>
+          </button>
+
+          <button
             onClick={() => onNavigate('project-details')}
             className="text-stone-300 p-5 rounded-lg text-left transition-all hover:scale-105 active:scale-95"
             style={{
