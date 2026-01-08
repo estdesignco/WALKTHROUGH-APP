@@ -59,11 +59,11 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
       console.log('🚀 FF&E useEffect: Starting load for projectId:', projectId);
       loadSimpleProject();
       
-      // AUTO-REFRESH: Reload FF&E data every 30 seconds to show mobile changes
+      // REAL-TIME SYNC: Reload FF&E data every 10 seconds for live sync with mobile
       const interval = setInterval(() => {
-        console.log('🔄 Auto-refreshing FF&E data...');
+        console.log('🔄 FF&E Real-time sync - refreshing from server...');
         loadSimpleProject();
-      }, 30000);
+      }, 10000);
       
       return () => clearInterval(interval);
     }
