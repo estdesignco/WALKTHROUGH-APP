@@ -107,18 +107,77 @@ export default function PunchList({ projectId, roomId = null }) {
         body: JSON.stringify({
           project_id: projectId,
           room_id: roomId,
-          ...newItem
+          ...newItem,
+          linked_ffe_item: selectedFfeItem ? {
+            id: selectedFfeItem.id,
+            name: selectedFfeItem.name,
+            sku: selectedFfeItem.sku,
+            vendor: selectedFfeItem.vendor,
+            roomName: selectedFfeItem.roomName
+          } : null
         })
       });
       
       if (response.ok) {
         const data = await response.json();
         setPunchItems(prev => [data.punch_item, ...prev]);
-        setNewItem({ title: '', description: '', priority: 'medium', assigned_to: '' });
+        setNewItem({ title: '', description: '', priority: 'medium', assigned_to: '', linked_ffe_item_id: null });
+        setSelectedFfeItem(null);
+        setFfeSearchQuery('');
         setShowAddForm(false);
       }
     } catch (error) {
       console.error('Failed to create punch item:', error);
+    }
+  };
+
+  // Link an existing punch item to an FFE item
+  const linkPunchToFfe = async (punchItemId, ffeItem) => {
+    try {
+      const response = await fetch(`${API_URL}/punch-list/${punchItemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          linked_ffe_item: {
+            id: ffeItem.id,
+            name: ffeItem.name,
+            sku: ffeItem.sku,
+            vendor: ffeItem.vendor,
+            roomName: ffeItem.roomName
+          }
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPunchItems(prev => prev.map(item => 
+          item.id === punchItemId ? data.punch_item : item
+        ));
+        setLinkingItemId(null);
+        setFfeSearchQuery('');
+      }
+    } catch (error) {
+      console.error('Failed to link punch item to FFE:', error);
+    }
+  };
+
+  // Unlink FFE from punch item
+  const unlinkFfeFromPunch = async (punchItemId) => {
+    try {
+      const response = await fetch(`${API_URL}/punch-list/${punchItemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ linked_ffe_item: null })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPunchItems(prev => prev.map(item => 
+          item.id === punchItemId ? data.punch_item : item
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to unlink FFE:', error);
     }
   };
 
