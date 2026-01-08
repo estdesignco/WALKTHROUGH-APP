@@ -349,6 +349,69 @@ export default function PunchList({ projectId, roomId = null }) {
               rows={2}
               className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none resize-none"
             />
+            
+            {/* FFE Linking Section */}
+            <div className="relative">
+              <label className="text-xs text-[#D4A574] font-medium mb-1 block">
+                🔗 Link to FFE Item (Optional)
+              </label>
+              {selectedFfeItem ? (
+                <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/50">
+                  <div className="flex-1">
+                    <div className="text-white font-medium text-sm">{selectedFfeItem.name}</div>
+                    <div className="text-gray-400 text-xs">
+                      {selectedFfeItem.roomName} • {selectedFfeItem.vendor} • SKU: {selectedFfeItem.sku}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedFfeItem(null);
+                      setFfeSearchQuery('');
+                    }}
+                    className="text-red-400 hover:text-red-300 text-lg"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    value={ffeSearchQuery}
+                    onChange={(e) => {
+                      setFfeSearchQuery(e.target.value);
+                      setShowFfeDropdown(true);
+                    }}
+                    onFocus={() => setShowFfeDropdown(true)}
+                    placeholder="Search FFE items by name, SKU, vendor..."
+                    className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
+                  />
+                  {showFfeDropdown && filteredFfeItems.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-gray-900 border border-[#B49B7E]/30 rounded-lg max-h-60 overflow-y-auto shadow-xl">
+                      {filteredFfeItems.map(item => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedFfeItem(item);
+                            setShowFfeDropdown(false);
+                            setFfeSearchQuery('');
+                          }}
+                          className="w-full px-4 py-3 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
+                        >
+                          <div className="text-white font-medium text-sm">{item.name}</div>
+                          <div className="text-gray-400 text-xs">
+                            {item.roomName} • {item.vendor || 'No vendor'} • SKU: {item.sku || 'N/A'}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
             <div className="flex gap-3">
               <select
                 value={newItem.priority}
@@ -377,7 +440,11 @@ export default function PunchList({ projectId, roomId = null }) {
               </button>
               <button
                 type="button"
-                onClick={() => setShowAddForm(false)}
+                onClick={() => {
+                  setShowAddForm(false);
+                  setSelectedFfeItem(null);
+                  setFfeSearchQuery('');
+                }}
                 className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
               >
                 Cancel
