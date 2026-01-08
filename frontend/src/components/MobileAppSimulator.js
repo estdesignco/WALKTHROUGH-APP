@@ -56,6 +56,8 @@ const shimmerStyle = `
 
 // ===== HOME SCREEN - MATCHES DESKTOP EXACTLY =====
 function MobileHomeScreen({ onNavigate }) {
+  const [calendarExpanded, setCalendarExpanded] = useState(false);
+  
   return (
     <div className="h-full overflow-auto bg-black">
       <style>{shimmerStyle}</style>
@@ -120,16 +122,23 @@ function MobileHomeScreen({ onNavigate }) {
           </button>
         </div>
 
-        {/* Master Calendar Section */}
+        {/* Master Calendar Section - COLLAPSIBLE */}
         <div className="mb-4 rounded-lg overflow-hidden" style={{ border: STYLES.goldBorder }}>
-          <div className="px-4 py-2" style={{ background: STYLES.goldGradient }}>
+          <button 
+            onClick={() => setCalendarExpanded(!calendarExpanded)}
+            className="w-full px-4 py-2 flex items-center justify-between" 
+            style={{ background: STYLES.goldGradient }}
+          >
             <h2 className="text-white font-bold flex items-center gap-2">
               <span>📅</span> Master Calendar
             </h2>
-          </div>
-          <div className="bg-gray-900 p-2">
-            <ProjectCalendar compact={true} />
-          </div>
+            <span className="text-white text-xl">{calendarExpanded ? '▼' : '▶'}</span>
+          </button>
+          {calendarExpanded && (
+            <div className="bg-gray-900 p-2">
+              <ProjectCalendar compact={true} />
+            </div>
+          )}
         </div>
         
         {/* Connection Status */}
