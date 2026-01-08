@@ -8,9 +8,12 @@ import logging
 from typing import Dict, Any, Optional
 from datetime import datetime
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load .env from the backend directory
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
 
 class TeamsIntegration:
     def __init__(self):
