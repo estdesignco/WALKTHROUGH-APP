@@ -1014,7 +1014,19 @@ export default function MobileAppSimulator() {
           </div>
         );
       case 'photos':
-        return <MobilePhotoManagement projectId={selectedProject?.id} onClose={() => handleNavigate('project-menu')} />;
+        return (
+          <div className="h-full flex flex-col bg-black">
+            <button 
+              onClick={() => handleNavigate('project-menu')}
+              className="bg-gray-700 text-white px-4 py-2 m-2 rounded font-semibold flex-shrink-0"
+            >
+              ← Back
+            </button>
+            <div className="flex-1 overflow-auto">
+              <MobilePhotoManagement projectId={selectedProject?.id} onClose={() => handleNavigate('project-menu')} />
+            </div>
+          </div>
+        );
       case 'measurements-files':
         return (
           <div className="h-full flex flex-col">
