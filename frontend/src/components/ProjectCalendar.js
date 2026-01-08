@@ -34,7 +34,7 @@ const shimmerStyle = `
   }
 `;
 
-const ProjectCalendar = ({ onEventClick }) => {
+const ProjectCalendar = ({ onEventClick, compact = false }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +42,15 @@ const ProjectCalendar = ({ onEventClick }) => {
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [hoveredEvent, setHoveredEvent] = useState(null);
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    date: '',
+    type: 'project',
+    description: '',
+    project_id: ''
+  });
+  const [projects, setProjects] = useState([]);
 
   // Fetch all projects and extract dates
   useEffect(() => {
