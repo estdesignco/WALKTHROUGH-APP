@@ -287,26 +287,71 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     }
   };
 
-  const handleAddRoom = async () => {
-    if (!newRoomName.trim()) return;
+  // Add a single room by name
+  const addSingleRoom = async (roomName, currentIndex = 0) => {
     try {
       await axios.post(`${API_URL}/rooms`, {
-        name: newRoomName,
+        name: roomName,
         project_id: projectId,
         sheet_type: 'walkthrough',
         auto_populate: true,
         comprehensive: true,
-        color: getRoomColor(newRoomName),
-        order_index: project?.rooms?.length || 0
+        color: getRoomColor(roomName),
+        order_index: (project?.rooms?.length || 0) + currentIndex
       });
-      await loadProject();
-      setShowAddRoom(false);
-      setNewRoomName('');
-      alert(`✅ Room "${newRoomName}" added with full categories and items!`);
+      return true;
     } catch (error) {
-      console.error('Failed to add room:', error);
-      alert('Failed to add room: ' + error.message);
+      console.error(`Failed to add room "${roomName}":`, error);
+      return false;
     }
+  };
+
+  // Handle adding multiple rooms at once
+  const handleAddRooms = async () => {
+    const roomsToAdd = [];
+    
+    // Add custom room if entered
+    if (newRoomName.trim()) {
+      roomsToAdd.push(newRoomName.trim());
+    }
+    
+    // Add all selected preset rooms
+    if (selectedRoomsToAdd?.length > 0) {
+      roomsToAdd.push(...selectedRoomsToAdd);
+    }
+    
+    if (roomsToAdd.length === 0) return;
+    
+    const results = [];
+    for (let i = 0; i < roomsToAdd.length; i++) {
+      const success = await addSingleRoom(roomsToAdd[i], i);
+      results.push({ room: roomsToAdd[i], success });
+    }
+    
+    await loadProject();
+    
+    const successCount = results.filter(r => r.success).length;
+    const failedRooms = results.filter(r => !r.success).map(r => r.room);
+    
+    if (failedRooms.length > 0) {
+      alert(`✅ Added ${successCount} room(s)\n❌ Failed: ${failedRooms.join(', ')}`);
+    } else {
+      alert(`✅ Successfully added ${successCount} room(s) with full categories and items!`);
+    }
+    
+    setShowAddRoom(false);
+    setSelectedRoomsToAdd([]);
+    setNewRoomName('');
+  };
+
+  // Legacy single room add (for backwards compatibility)
+  const handleAddRoom = async () => {
+    if (!newRoomName.trim()) return;
+    await addSingleRoom(newRoomName.trim());
+    await loadProject();
+    setShowAddRoom(false);
+    setNewRoomName('');
+    alert(`✅ Room "${newRoomName}" added with full categories and items!`);
   };
 
   const handleDeleteItem = async (itemId) => {
