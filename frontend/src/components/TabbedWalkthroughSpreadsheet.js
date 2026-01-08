@@ -1864,9 +1864,9 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                   
                   <div className="text-xs text-gray-400">
                     <p className="font-bold mb-1">Examples:</p>
-                    <p>• 3 × 8'6&quot; (multiply)</p>
-                    <p>• 12'3&quot; + 5'9&quot; (add)</p>
-                    <p>• 20'0&quot; - 3'4&quot; (subtract)</p>
+                    <p>• 3 × 8&apos;6&quot; (multiply)</p>
+                    <p>• 12&apos;3&quot; + 5&apos;9&quot; (add)</p>
+                    <p>• 20&apos;0&quot; - 3&apos;4&quot; (subtract)</p>
                   </div>
                 </div>
               </div>
