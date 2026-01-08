@@ -66,8 +66,8 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
       
       loadProjectData();
       
-      // AUTO-REFRESH: Reload project data every 30 seconds
-      const interval = setInterval(loadProjectData, 30000);
+      // REAL-TIME SYNC: Reload project data every 10 seconds for live sync with mobile
+      const interval = setInterval(loadProjectData, 10000);
       return () => clearInterval(interval);
     } else {
       setLoading(false);
