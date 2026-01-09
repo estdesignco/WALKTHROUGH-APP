@@ -2746,6 +2746,7 @@ async def update_item(item_id: str, item_update: ItemUpdate):
                         print(f"  Project found: {bool(project_doc)}")
                         if project_doc:
                             # Create Teams notification
+                            print(f"  🔔 About to call notify_status_change for: {current_item_doc['name']}")
                             await notify_status_change(
                                 project_name=project_doc["name"],
                                 item_name=current_item_doc["name"],
@@ -2755,6 +2756,7 @@ async def update_item(item_id: str, item_update: ItemUpdate):
                                 vendor=current_item_doc.get("vendor", ""),
                                 cost=current_item_doc.get("cost", 0.0)
                             )
+                            print(f"  ✅ notify_status_change completed")
                             logging.info(f"🔔 Teams notification created: {current_item_doc['name']} → {new_status}")
         except Exception as e:
             logging.error(f"Failed to create Teams notification: {str(e)}")
