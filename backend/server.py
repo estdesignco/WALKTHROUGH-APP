@@ -2730,15 +2730,20 @@ async def update_item(item_id: str, item_update: ItemUpdate):
     
     # If status changed, create Teams to-do item
     if new_status != old_status and new_status:
+        print(f"📋 Status changed: {old_status} → {new_status}")
         try:
             # Get project and room information for context
             subcategory_doc = await db.subcategories.find_one({"id": current_item_doc["subcategory_id"]})
+            print(f"  Subcategory found: {bool(subcategory_doc)}")
             if subcategory_doc:
                 category_doc = await db.categories.find_one({"id": subcategory_doc["category_id"]})
+                print(f"  Category found: {bool(category_doc)}")
                 if category_doc:
                     room_doc = await db.rooms.find_one({"id": category_doc["room_id"]})
+                    print(f"  Room found: {bool(room_doc)}")
                     if room_doc:
                         project_doc = await db.projects.find_one({"id": room_doc["project_id"]})
+                        print(f"  Project found: {bool(project_doc)}")
                         if project_doc:
                             # Create Teams notification
                             await notify_status_change(
@@ -2753,6 +2758,7 @@ async def update_item(item_id: str, item_update: ItemUpdate):
                             logging.info(f"🔔 Teams notification created: {current_item_doc['name']} → {new_status}")
         except Exception as e:
             logging.error(f"Failed to create Teams notification: {str(e)}")
+            print(f"❌ Teams notification error: {str(e)}")
             # Don't fail the update if Teams notification fails
     
     return await get_item(item_id)
