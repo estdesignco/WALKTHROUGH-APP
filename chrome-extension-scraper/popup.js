@@ -2,8 +2,8 @@
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
 // Debug logging enabled in console
 
-const APP_URL = 'https://designer-hub-45.preview.emergentagent.com';
-const BACKEND_URL = 'https://designer-hub-45.preview.emergentagent.com';
+const APP_URL = 'https://procuretrack-4.preview.emergentagent.com';
+const BACKEND_URL = 'https://procuretrack-4.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 let clickToSelectActive = false;

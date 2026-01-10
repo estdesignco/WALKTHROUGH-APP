@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://designer-hub-45.preview.emergentagent.com
+https://procuretrack-4.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://designer-hub-45.preview.emergentagent.com/mobile-app
+https://procuretrack-4.preview.emergentagent.com/mobile-app
 
 ---
 

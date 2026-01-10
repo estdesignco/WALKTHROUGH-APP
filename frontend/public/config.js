@@ -1,5 +1,5 @@
 // Runtime configuration - injected at deployment
 window.ENV = {
-  REACT_APP_BACKEND_URL: 'https://designer-hub-45.preview.emergentagent.com'
+  REACT_APP_BACKEND_URL: 'https://procuretrack-4.preview.emergentagent.com'
 };
 console.log('✅ Runtime config loaded:', window.ENV);

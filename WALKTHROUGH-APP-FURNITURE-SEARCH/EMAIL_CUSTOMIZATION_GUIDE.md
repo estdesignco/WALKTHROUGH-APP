@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://designer-hub-45.preview.emergentagent.com/email-template.html
+https://procuretrack-4.preview.emergentagent.com/email-template.html
 
 ---
 

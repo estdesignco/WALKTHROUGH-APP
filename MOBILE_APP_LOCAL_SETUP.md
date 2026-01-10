@@ -27,7 +27,7 @@ cd /app
 tar -czf mobile-app.tar.gz mobile/
 ```
 
-You can download: `https://designer-hub-45.preview.emergentagent.com/mobile-app.tar.gz`
+You can download: `https://procuretrack-4.preview.emergentagent.com/mobile-app.tar.gz`
 
 Then extract it on your computer:
 ```bash

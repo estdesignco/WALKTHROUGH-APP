@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://designer-hub-45.preview.emergentagent.com/*"
+    "https://procuretrack-4.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
