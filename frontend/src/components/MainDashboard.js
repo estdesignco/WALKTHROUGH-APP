@@ -252,6 +252,19 @@ const MainDashboard = () => {
             <div className="text-sm font-medium">Master Materials</div>
           </button>
 
+          <button
+            onClick={() => handleNavigation('/master-todo')}
+            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #7C3AED 100%)`,
+              border: '1px solid #8B5CF6',
+              boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            <div className="text-2xl mb-2">📋</div>
+            <div className="text-sm font-medium">Master To-Do</div>
+          </button>
+
           {/* AI TOOLS - Same styling as other buttons */}
           <button
             onClick={() => handleNavigation('/ai-assistant')}
