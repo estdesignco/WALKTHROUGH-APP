@@ -1589,7 +1589,12 @@ const ExactFFESpreadsheet = ({
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
                                                               className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Vendor updated:', e.target.textContent)}
+                                                              onBlur={(e) => {
+                                                                const newValue = e.target.textContent?.trim();
+                                                                if (newValue !== item.vendor) {
+                                                                  handleUpdateItemField(item.id, 'vendor', newValue);
+                                                                }
+                                                              }}
                                                             >
                                                               {item.vendor || ''}
                                                             </div>
@@ -1601,7 +1606,13 @@ const ExactFFESpreadsheet = ({
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
                                                               className="w-full bg-transparent text-white text-sm text-center outline-none"
-                                                              onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                                              onBlur={(e) => {
+                                                                const newValue = e.target.textContent?.trim();
+                                                                const numValue = parseInt(newValue);
+                                                                if (!isNaN(numValue) && numValue !== item.quantity) {
+                                                                  handleUpdateItemField(item.id, 'quantity', numValue);
+                                                                }
+                                                              }}
                                                             >
                                                               {item.quantity || ''}
                                                             </div>
@@ -1613,7 +1624,12 @@ const ExactFFESpreadsheet = ({
                                                               contentEditable={true}
                                                               suppressContentEditableWarning={true}
                                                               className="w-full bg-transparent text-white text-sm outline-none"
-                                                              onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                                              onBlur={(e) => {
+                                                                const newValue = e.target.textContent?.trim();
+                                                                if (newValue !== item.size) {
+                                                                  handleUpdateItemField(item.id, 'size', newValue);
+                                                                }
+                                                              }}
                                                             >
                                                               {item.size || ''}
                                                             </div>
