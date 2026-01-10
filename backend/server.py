@@ -1839,13 +1839,17 @@ async def get_project(project_id: str, sheet_type: str = None):
     if not project_data:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # Fetch rooms filtered by sheet_type to make them independent (if sheet_type specified)
-    # EXCEPTION: FFE view shows ALL rooms regardless of sheet_type (it's the master list)
-    if sheet_type and sheet_type != 'ffe':
+    # CRITICAL FIX: Each sheet_type is COMPLETELY INDEPENDENT
+    # Checklist only shows checklist rooms, FFE only shows FFE rooms, Walkthrough only shows walkthrough rooms
+    # They do NOT share data - deleting from one does NOT affect the other
+    if sheet_type:
+        # Filter by specific sheet_type - FULLY INDEPENDENT
         rooms = await db.rooms.find({"project_id": project_id, "sheet_type": sheet_type}).sort("order_index", 1).to_list(1000)
+        print(f"📊 Loading {sheet_type.upper()} rooms only: {len(rooms)} rooms found")
     else:
-        # FFE or no filter: get all rooms
+        # No filter specified - get all rooms (for backward compatibility)
         rooms = await db.rooms.find({"project_id": project_id}).sort("order_index", 1).to_list(1000)
+        print(f"📊 Loading ALL rooms (no filter): {len(rooms)} rooms found")
     project_data["rooms"] = []
     
     for room_data in rooms:
