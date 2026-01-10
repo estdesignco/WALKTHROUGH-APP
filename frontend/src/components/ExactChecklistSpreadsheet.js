@@ -444,20 +444,36 @@ const ExactChecklistSpreadsheet = ({
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
   // Initialize all rooms and categories as expanded
+  // Also initialize checkedItems with items that have 'PICKED' status
   useEffect(() => {
     if (project?.rooms) {
       const roomExpansion = {};
       const categoryExpansion = {};
+      const initialCheckedItems = new Set();
       
       project.rooms.forEach(room => {
         roomExpansion[room.id] = true;
         room.categories?.forEach(category => {
           categoryExpansion[category.id] = true;
+          // Initialize checkedItems with PICKED status items
+          category.subcategories?.forEach(subcategory => {
+            subcategory.items?.forEach(item => {
+              if (item.status === 'PICKED') {
+                initialCheckedItems.add(item.id);
+              }
+            });
+          });
         });
       });
       
       setExpandedRooms(roomExpansion);
       setExpandedCategories(categoryExpansion);
+      
+      // CRITICAL: Initialize checkedItems with items that already have PICKED status
+      if (initialCheckedItems.size > 0) {
+        console.log(`📋 Initialized ${initialCheckedItems.size} pre-checked items from PICKED status`);
+        setCheckedItems(initialCheckedItems);
+      }
     }
   }, [project]);
 
