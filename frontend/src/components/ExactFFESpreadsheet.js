@@ -50,6 +50,9 @@ const ExactFFESpreadsheet = ({
   const [selectedItemForPaste, setSelectedItemForPaste] = useState(null); // Which item row is selected
   const [showScraperNotification, setShowScraperNotification] = useState(false);
   
+  // 🔗 PUNCH LIST LINKED ITEMS - For highlighting items on punch list
+  const [linkedPunchItems, setLinkedPunchItems] = useState({});
+  
   // Check for URL parameters from extension (action=add-item&source=extension)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
