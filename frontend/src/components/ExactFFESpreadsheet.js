@@ -1551,15 +1551,36 @@ const ExactFFESpreadsheet = ({
                                                       {/* INSTALLEDS GO DIRECTLY UNDER RED HEADER */}
                                                       {/* ACTUAL INSTALLEDS FROM BACKEND DATA */}
                                                       {category.subcategories?.map((subcategory) => (
-                                                        subcategory.items?.map((item, itemIndex) => (
+                                                        subcategory.items?.map((item, itemIndex) => {
+                                                          // Check if item is linked to punch list
+                                                          const punchLink = linkedPunchItems[item.id];
+                                                          const isOnPunchList = !!punchLink;
+                                                          const punchCompleted = punchLink?.is_completed;
+                                                          
+                                                          return (
                                                         <tr key={item.id} style={{ 
-                                                          background: itemIndex % 2 === 0 
-                                                            ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
-                                                            : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
+                                                          background: isOnPunchList 
+                                                            ? (punchCompleted 
+                                                              ? 'linear-gradient(135deg, rgba(0, 100, 0, 0.3) 0%, rgba(20, 60, 20, 0.4) 50%, rgba(0, 80, 0, 0.3) 100%)'  // Green for completed
+                                                              : 'linear-gradient(135deg, rgba(180, 100, 0, 0.3) 0%, rgba(120, 80, 20, 0.4) 50%, rgba(160, 90, 0, 0.3) 100%)') // Orange for pending
+                                                            : (itemIndex % 2 === 0 
+                                                              ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+                                                              : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'),
+                                                          boxShadow: isOnPunchList ? (punchCompleted ? '0 0 8px rgba(0, 255, 0, 0.3)' : '0 0 8px rgba(255, 165, 0, 0.4)') : 'none'
                                                         }}>
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E]">
-                                                            {item.name}
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm text-[#B49B7E] relative">
+                                                            <div className="flex items-center gap-2">
+                                                              {isOnPunchList && (
+                                                                <span 
+                                                                  className={`text-xs px-1.5 py-0.5 rounded ${punchCompleted ? 'bg-green-600 text-white' : 'bg-orange-500 text-black'}`}
+                                                                  title={`Punch List: ${punchLink.punch_title} (${punchLink.punch_status})`}
+                                                                >
+                                                                  {punchCompleted ? '✓ DONE' : '📋 PUNCH'}
+                                                                </span>
+                                                              )}
+                                                              <span>{item.name}</span>
+                                                            </div>
                                                           </td>
                                                           
                                                           {/* VENDOR/SKU - EDITABLE INLINE */}
