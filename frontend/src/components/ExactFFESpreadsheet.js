@@ -2005,7 +2005,12 @@ const ExactFFESpreadsheet = ({
                                                                   item.link = e.target.value;
                                                                   item.link_url = e.target.value;
                                                                 }}
-                                                                onBlur={(e) => console.log('Link updated:', e.target.value)}
+                                                                onBlur={(e) => {
+                                                                  const newValue = e.target.value?.trim();
+                                                                  if (newValue !== item.link) {
+                                                                    handleUpdateItemField(item.id, 'link', newValue);
+                                                                  }
+                                                                }}
                                                               />
                                                               <div className="flex gap-1">
                                                                 {(item.link || item.link_url) && (
