@@ -113,6 +113,30 @@ const ExactFFESpreadsheet = ({
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedCarrier, setSelectedCarrier] = useState('');
   
+  // 🔗 Load punch list linked items for highlighting
+  useEffect(() => {
+    const loadLinkedPunchItems = async () => {
+      if (!project?.id) return;
+      
+      try {
+        const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+        const response = await fetch(`${backendUrl}/api/punch-list/linked-ffe/${project.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setLinkedPunchItems(data.linked_ffe_items || {});
+          console.log('🔗 Loaded punch list links:', Object.keys(data.linked_ffe_items || {}).length);
+        }
+      } catch (error) {
+        console.error('Failed to load punch list links:', error);
+      }
+    };
+    
+    loadLinkedPunchItems();
+    // Refresh every 30 seconds
+    const interval = setInterval(loadLinkedPunchItems, 30000);
+    return () => clearInterval(interval);
+  }, [project?.id]);
+  
   // Load photos for all rooms from walkthrough
   useEffect(() => {
     const loadRoomPhotos = async () => {
