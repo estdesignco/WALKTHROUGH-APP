@@ -1201,10 +1201,10 @@ const ExactChecklistSpreadsheet = ({
       let successCount = 0;
       const createdStructures = new Map();
       
-      console.log(`🏢 Creating FFE structure for ALL ${allItemsToTransfer.length} written items`);
+      console.log(`🏢 Creating FFE structure for ${itemsToTransfer.length} checked items`);
 
-      // Process each written item individually
-      for (const itemContext of allItemsToTransfer) {
+      // Process each checked item individually
+      for (const itemContext of itemsToTransfer) {
         try {
           const roomKey = `${itemContext.roomName}_ffe`;
           const categoryKey = `${roomKey}_${itemContext.categoryName}`;
