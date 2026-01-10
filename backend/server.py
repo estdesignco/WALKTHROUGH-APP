@@ -9729,6 +9729,40 @@ async def delete_punch_list_item(item_id: str):
         logger.error(f"Delete punch list item error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete punch list item: {str(e)}")
 
+@api_router.get("/punch-list/linked-ffe/{project_id}")
+async def get_linked_ffe_items(project_id: str):
+    """Get all FFE item IDs that are linked to punch list items for a project.
+    Used for highlighting FFE items in the spreadsheet."""
+    try:
+        # Find all punch list items with linked_ffe_item
+        punch_items = await db.punch_list.find({
+            "project_id": project_id,
+            "linked_ffe_item": {"$ne": None}
+        }, {"_id": 0}).to_list(1000)
+        
+        linked_items = {}
+        for punch in punch_items:
+            ffe_link = punch.get("linked_ffe_item", {})
+            if ffe_link and ffe_link.get("id"):
+                ffe_id = ffe_link["id"]
+                linked_items[ffe_id] = {
+                    "punch_id": punch.get("id"),
+                    "punch_title": punch.get("title"),
+                    "punch_status": punch.get("status"),
+                    "punch_priority": punch.get("priority"),
+                    "is_completed": punch.get("status") in ["completed", "verified"]
+                }
+        
+        return {
+            "success": True,
+            "linked_ffe_items": linked_items,
+            "count": len(linked_items)
+        }
+        
+    except Exception as e:
+        logger.error(f"Get linked FFE items error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to get linked FFE items: {str(e)}")
+
 @api_router.post("/punch-list/ai-suggest/{project_id}")
 async def ai_suggest_punch_items(project_id: str):
     """Generate AI suggestions for punch list items based on project data"""
