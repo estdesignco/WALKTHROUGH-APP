@@ -10897,8 +10897,69 @@ async def delete_todo(todo_id: str):
     except Exception as e:
         logging.error(f"Delete todo error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-        logging.error(f"Delete photo error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to delete photo: {str(e)}")
+
+# ====================================
+# COMPANY-WIDE TO-DO ENDPOINTS
+# ====================================
+
+@api_router.get("/todos/company")
+async def get_company_todos():
+    """Get company-wide to-do items (Established Design Co internal tasks)"""
+    try:
+        todos = await db.company_todos.find({}).sort("created_at", -1).to_list(length=None)
+        for todo in todos:
+            todo.pop('_id', None)
+        return {"success": True, "todos": todos}
+    except Exception as e:
+        logging.error(f"Get company todos error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/todos/company")
+async def create_company_todo(todo: dict):
+    """Create a company-wide to-do item"""
+    try:
+        new_todo = {
+            "id": str(uuid.uuid4()),
+            "text": todo.get("text"),
+            "priority": todo.get("priority", "Medium"),
+            "completed": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.company_todos.insert_one(new_todo)
+        new_todo.pop('_id', None)
+        
+        return {"success": True, "todo": new_todo}
+    except Exception as e:
+        logging.error(f"Create company todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/todos/company/{todo_id}")
+async def update_company_todo(todo_id: str, update: dict):
+    """Update a company-wide to-do item"""
+    try:
+        result = await db.company_todos.update_one(
+            {"id": todo_id},
+            {"$set": update}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Company to-do not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Update company todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/todos/company/{todo_id}")
+async def delete_company_todo(todo_id: str):
+    """Delete a company-wide to-do item"""
+    try:
+        result = await db.company_todos.delete_one({"id": todo_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Company to-do not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Delete company todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ====================================
 # LEICA D5 MEASUREMENT ENDPOINTS
