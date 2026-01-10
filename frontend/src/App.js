@@ -39,6 +39,7 @@ import CanvaCallbackHandler from './components/CanvaCallbackHandler';
 import PowerFeaturesDashboard from './components/PowerFeaturesDashboard';
 import MasterContactsPage from './components/MasterContactsPage';
 import MasterMaterialsPage from './components/MasterMaterialsPage';
+import MasterToDoList from './components/MasterToDoList';
 import CalculatorsPage from './components/CalculatorsPage';
 // REMOVED: SourcingCatalog - too many missing images
 import VendorMirror from './components/VendorMirror';
