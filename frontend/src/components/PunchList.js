@@ -39,15 +39,17 @@ export default function PunchList({ projectId, roomId = null }) {
 
   const loadFfeItems = async () => {
     try {
-      const response = await fetch(`${API_URL}/projects/${projectId}?sheet_type=ffe`);
+      // Fetch ALL rooms (no sheet_type filter) to get FFE items
+      const response = await fetch(`${API_URL}/projects/${projectId}`);
       if (response.ok) {
         const data = await response.json();
-        // Flatten all items from all rooms
+        // Flatten all items from all rooms - use CORRECT property name 'subcategories'
         const allItems = [];
         if (data.rooms) {
           data.rooms.forEach(room => {
             room.categories?.forEach(cat => {
-              cat.sub_categories?.forEach(subCat => {
+              // FIXED: Use 'subcategories' not 'sub_categories'
+              cat.subcategories?.forEach(subCat => {
                 subCat.items?.forEach(item => {
                   allItems.push({
                     ...item,
@@ -59,6 +61,7 @@ export default function PunchList({ projectId, roomId = null }) {
             });
           });
         }
+        console.log(`📦 PunchList: Loaded ${allItems.length} FFE items for linking`);
         setFfeItems(allItems);
       }
     } catch (error) {
