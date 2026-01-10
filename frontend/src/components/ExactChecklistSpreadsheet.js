@@ -2471,7 +2471,12 @@ const ExactChecklistSpreadsheet = ({
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
                                       className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
-                                      onBlur={(e) => console.log('Remarks updated:', e.target.textContent)}
+                                      onBlur={(e) => {
+                                        const newValue = e.target.textContent?.trim();
+                                        if (newValue !== item.remarks) {
+                                          handleUpdateItemField(item.id, 'remarks', newValue);
+                                        }
+                                      }}
                                     >
                                       {item.remarks || ''}
                                     </div>
