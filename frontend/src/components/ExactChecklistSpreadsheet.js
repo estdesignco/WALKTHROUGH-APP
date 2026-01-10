@@ -1142,22 +1142,30 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
-  // CHECKLIST → FFE TRANSFER: Transfer ALL written items (using proven logic)
+  // CHECKLIST → FFE TRANSFER: Transfer ONLY CHECKED items (like walkthrough)
   const handleTransferToFFE = async () => {
     try {
-      console.log('🚀 TRANSFER TO FFE: ALL WRITTEN ITEMS (using proven walkthrough logic)');
+      console.log('🚀 TRANSFER TO FFE: ONLY CHECKED ITEMS');
       
-      // Step 1: Collect ALL items that have real content (not just "New Item")
-      const allItemsToTransfer = [];
+      // Step 1: Validate - must have checked items
+      if (checkedItems.size === 0) {
+        alert('Please check the items you want to transfer to FFE first.');
+        return;
+      }
+      
+      // Step 2: Collect ONLY checked items
+      const checkedItemIds = Array.from(checkedItems);
+      const itemsToTransfer = [];
       
       if (filteredProject?.rooms) {
         filteredProject.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
-                // Transfer ALL items with real names (not empty or "New Item")
-                if (item.name && item.name.trim() !== '' && item.name !== 'New Item') {
-                  allItemsToTransfer.push({
+                // ONLY include if this item is CHECKED
+                if (checkedItemIds.includes(item.id)) {
+                  console.log(`✅ CHECKED ITEM: "${item.name}" (ID: ${item.id})`);
+                  itemsToTransfer.push({
                     item,
                     roomId: room.id,
                     roomName: room.name,
@@ -1173,20 +1181,25 @@ const ExactChecklistSpreadsheet = ({
         });
       }
       
-      console.log(`📝 EXACT COUNT: ${allItemsToTransfer.length} ALL written items to transfer to FFE`);
-      console.log('📋 All items:', allItemsToTransfer.map(ci => ci.item.name));
+      console.log(`📝 EXACT COUNT: ${itemsToTransfer.length} CHECKED items to transfer to FFE`);
+      console.log('📋 Items:', itemsToTransfer.map(ci => ci.item.name));
 
-      if (allItemsToTransfer.length === 0) {
-        alert('No written items found for transfer to FFE.');
+      if (itemsToTransfer.length === 0) {
+        alert('No checked items found for transfer to FFE.');
+        return;
+      }
+      
+      // Confirm transfer
+      if (!confirm(`Transfer ${itemsToTransfer.length} checked items to FFE?`)) {
         return;
       }
 
-      // Step 2: Transfer ALL written items to FFE (create minimal structure as needed)
+      // Step 3: Transfer checked items to FFE
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const projectId = filteredProject.id;
       
       let successCount = 0;
-      const createdStructures = new Map(); // Track what we've already created
+      const createdStructures = new Map();
       
       console.log(`🏢 Creating FFE structure for ALL ${allItemsToTransfer.length} written items`);
 
