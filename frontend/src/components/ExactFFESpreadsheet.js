@@ -2041,7 +2041,8 @@ const ExactFFESpreadsheet = ({
                                                             </div>
                                                           </td>
                                                         </tr>
-                                                        ))
+                                                        );
+                                                        })
                                                       ))}
                                                       
                                                       {/* INLINE ADD ITEM ROW */}
