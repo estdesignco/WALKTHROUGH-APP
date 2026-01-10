@@ -8,10 +8,60 @@ export default function ToDoList({ projectId }) {
   const [newTodo, setNewTodo] = useState('');
   const [newPriority, setNewPriority] = useState('Medium');
   const [loading, setLoading] = useState(true);
+  
+  // FFE Linking states (same pattern as PunchList)
+  const [ffeItems, setFfeItems] = useState([]);
+  const [ffeSearchQuery, setFfeSearchQuery] = useState('');
+  const [showFfeDropdown, setShowFfeDropdown] = useState(false);
+  const [selectedFfeItem, setSelectedFfeItem] = useState(null);
+  const [linkingTodoId, setLinkingTodoId] = useState(null);
 
   useEffect(() => {
     loadTodos();
+    loadFfeItems();
   }, [projectId]);
+
+  // Load FFE items for linking (same as PunchList)
+  const loadFfeItems = async () => {
+    try {
+      const response = await fetch(`${API_URL}/projects/${projectId}`);
+      if (response.ok) {
+        const data = await response.json();
+        const allItems = [];
+        if (data.rooms) {
+          data.rooms.forEach(room => {
+            room.categories?.forEach(cat => {
+              cat.subcategories?.forEach(subCat => {
+                subCat.items?.forEach(item => {
+                  allItems.push({
+                    ...item,
+                    roomName: room.name,
+                    categoryName: cat.name
+                  });
+                });
+              });
+            });
+          });
+        }
+        console.log(`📦 ToDoList: Loaded ${allItems.length} FFE items for linking`);
+        setFfeItems(allItems);
+      }
+    } catch (error) {
+      console.error('Failed to load FFE items:', error);
+    }
+  };
+
+  // Filter FFE items by search query
+  const filteredFfeItems = ffeItems.filter(item => {
+    if (!ffeSearchQuery) return true;
+    const query = ffeSearchQuery.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(query) ||
+      item.sku?.toLowerCase().includes(query) ||
+      item.roomName?.toLowerCase().includes(query) ||
+      item.vendor?.toLowerCase().includes(query)
+    );
+  }).slice(0, 10);
 
   const loadTodos = async () => {
     try {
@@ -32,15 +82,54 @@ export default function ToDoList({ projectId }) {
         project_id: projectId,
         text: newTodo.trim(),
         priority: newPriority,
-        completed: false
+        completed: false,
+        linked_ffe_item: selectedFfeItem ? {
+          id: selectedFfeItem.id,
+          name: selectedFfeItem.name,
+          sku: selectedFfeItem.sku,
+          vendor: selectedFfeItem.vendor,
+          roomName: selectedFfeItem.roomName
+        } : null
       });
       
       setNewTodo('');
       setNewPriority('Medium');
+      setSelectedFfeItem(null);
+      setFfeSearchQuery('');
       await loadTodos();
       alert('✅ To-Do added! Teams notification sent.');
     } catch (error) {
       alert('❌ Failed to add to-do: ' + error.message);
+    }
+  };
+
+  // Link existing todo to FFE item
+  const linkTodoToFfe = async (todoId, ffeItem) => {
+    try {
+      await axios.put(`${API_URL}/todos/${todoId}`, {
+        linked_ffe_item: {
+          id: ffeItem.id,
+          name: ffeItem.name,
+          sku: ffeItem.sku,
+          vendor: ffeItem.vendor,
+          roomName: ffeItem.roomName
+        }
+      });
+      setLinkingTodoId(null);
+      setFfeSearchQuery('');
+      await loadTodos();
+    } catch (error) {
+      console.error('Failed to link todo to FFE:', error);
+    }
+  };
+
+  // Unlink FFE from todo
+  const unlinkFfeFromTodo = async (todoId) => {
+    try {
+      await axios.put(`${API_URL}/todos/${todoId}`, { linked_ffe_item: null });
+      await loadTodos();
+    } catch (error) {
+      console.error('Failed to unlink FFE:', error);
     }
   };
 
@@ -115,6 +204,64 @@ export default function ToDoList({ projectId }) {
               ➕ ADD
             </button>
           </div>
+          
+          {/* FFE Link Option for New To-Do */}
+          <div className="mt-3 relative">
+            <div className="text-sm text-gray-400 mb-2">🔗 Link to FFE Item (Optional)</div>
+            {selectedFfeItem ? (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/30">
+                <span className="text-[#D4A574]">🔗</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[#D4A574] text-sm font-medium truncate">{selectedFfeItem.name}</div>
+                  <div className="text-gray-500 text-xs">{selectedFfeItem.roomName} • {selectedFfeItem.vendor}</div>
+                </div>
+                <button
+                  onClick={() => setSelectedFfeItem(null)}
+                  className="text-red-400 hover:text-red-300 text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  value={ffeSearchQuery}
+                  onChange={(e) => {
+                    setFfeSearchQuery(e.target.value);
+                    setShowFfeDropdown(true);
+                  }}
+                  onFocus={() => setShowFfeDropdown(true)}
+                  placeholder={ffeItems.length > 0 ? "Search FFE items to link..." : "No FFE items available - add items to FFE first"}
+                  disabled={ffeItems.length === 0}
+                  className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm placeholder-gray-500 focus:border-[#D4A574] focus:outline-none disabled:opacity-50"
+                />
+                {showFfeDropdown && filteredFfeItems.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-gray-900 border border-[#B49B7E]/30 rounded-lg max-h-40 overflow-y-auto shadow-xl">
+                    {filteredFfeItems.map(ffeItem => (
+                      <button
+                        key={ffeItem.id}
+                        onClick={() => {
+                          setSelectedFfeItem(ffeItem);
+                          setShowFfeDropdown(false);
+                          setFfeSearchQuery('');
+                        }}
+                        className="w-full px-3 py-2 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
+                      >
+                        <div className="text-white text-sm">{ffeItem.name}</div>
+                        <div className="text-gray-400 text-xs">{ffeItem.roomName} • {ffeItem.vendor || 'No vendor'}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {ffeItems.length === 0 && (
+                  <div className="text-xs text-yellow-500 mt-1">
+                    ⚠️ No FFE items available. Transfer items from Checklist to FFE first.
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
 
         {/* To-Do Items */}
@@ -125,7 +272,7 @@ export default function ToDoList({ projectId }) {
             todos.map((todo) => (
               <div
                 key={todo.id}
-                className="p-4 rounded-lg border border-[#B49B7E] flex items-center justify-between"
+                className="p-4 rounded-lg border border-[#B49B7E]"
                 style={{
                   background: todo.completed 
                     ? 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(16,185,129,0.1) 50%, rgba(16,185,129,0.2) 100%)'
@@ -135,38 +282,107 @@ export default function ToDoList({ projectId }) {
                     : '0 0 10px rgba(212, 165, 116, 0.2), inset 0 0 20px rgba(212, 165, 116, 0.05)'
                 }}
               >
-                <div className="flex items-center gap-3 flex-1">
-                  <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => toggleTodo(todo.id, todo.completed)}
-                    className="w-5 h-5 cursor-pointer"
-                  />
-                  <span 
-                    className="px-3 py-1 rounded-full text-xs font-bold border"
-                    style={{
-                      background: todo.priority === 'High' 
-                        ? 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)'
-                        : todo.priority === 'Low'
-                        ? 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)'
-                        : 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)',
-                      borderColor: todo.priority === 'High' ? '#EF4444' : todo.priority === 'Low' ? '#10B981' : '#F59E0B',
-                      color: 'white',
-                      boxShadow: `0 0 10px ${todo.priority === 'High' ? '#EF444450' : todo.priority === 'Low' ? '#10B98150' : '#F59E0B50'}`
-                    }}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 flex-1">
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => toggleTodo(todo.id, todo.completed)}
+                      className="w-5 h-5 cursor-pointer"
+                    />
+                    <span 
+                      className="px-3 py-1 rounded-full text-xs font-bold border"
+                      style={{
+                        background: todo.priority === 'High' 
+                          ? 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)'
+                          : todo.priority === 'Low'
+                          ? 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)'
+                          : 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)',
+                        borderColor: todo.priority === 'High' ? '#EF4444' : todo.priority === 'Low' ? '#10B981' : '#F59E0B',
+                        color: 'white',
+                        boxShadow: `0 0 10px ${todo.priority === 'High' ? '#EF444450' : todo.priority === 'Low' ? '#10B98150' : '#F59E0B50'}`
+                      }}
+                    >
+                      {todo.priority === 'High' ? '🔴' : todo.priority === 'Low' ? '🟢' : '🟡'} {todo.priority}
+                    </span>
+                    <span className={`text-lg ${todo.completed ? 'line-through text-[#10B981]' : 'text-[#D4C5A9]'}`}>
+                      {todo.text}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => deleteTodo(todo.id)}
+                    className="text-red-400 hover:text-red-300 font-bold text-xl"
                   >
-                    {todo.priority === 'High' ? '🔴' : todo.priority === 'Low' ? '🟢' : '🟡'} {todo.priority}
-                  </span>
-                  <span className={`text-lg ${todo.completed ? 'line-through text-[#10B981]' : 'text-[#D4C5A9]'}`}>
-                    {todo.text}
-                  </span>
+                    🗑️
+                  </button>
                 </div>
-                <button
-                  onClick={() => deleteTodo(todo.id)}
-                  className="text-red-400 hover:text-red-300 font-bold text-xl"
-                >
-                  🗑️
-                </button>
+                
+                {/* FFE Link Display/Add for existing todos */}
+                <div className="mt-3 ml-8">
+                  {todo.linked_ffe_item ? (
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/30">
+                      <span className="text-[#D4A574]">🔗</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[#D4A574] text-sm font-medium truncate">{todo.linked_ffe_item.name}</div>
+                        <div className="text-gray-500 text-xs">
+                          {todo.linked_ffe_item.roomName} • {todo.linked_ffe_item.vendor} • SKU: {todo.linked_ffe_item.sku}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => unlinkFfeFromTodo(todo.id)}
+                        className="text-red-400 hover:text-red-300 text-xs"
+                        title="Unlink FFE item"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : linkingTodoId === todo.id ? (
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={ffeSearchQuery}
+                        onChange={(e) => {
+                          setFfeSearchQuery(e.target.value);
+                          setShowFfeDropdown(true);
+                        }}
+                        onFocus={() => setShowFfeDropdown(true)}
+                        placeholder="Search FFE items..."
+                        className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
+                        autoFocus
+                      />
+                      {showFfeDropdown && filteredFfeItems.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-gray-900 border border-[#B49B7E]/30 rounded-lg max-h-40 overflow-y-auto shadow-xl">
+                          {filteredFfeItems.map(ffeItem => (
+                            <button
+                              key={ffeItem.id}
+                              onClick={() => linkTodoToFfe(todo.id, ffeItem)}
+                              className="w-full px-3 py-2 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
+                            >
+                              <div className="text-white text-sm">{ffeItem.name}</div>
+                              <div className="text-gray-400 text-xs">{ffeItem.roomName} • {ffeItem.vendor || 'No vendor'}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          setLinkingTodoId(null);
+                          setFfeSearchQuery('');
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setLinkingTodoId(todo.id)}
+                      className="text-xs text-[#D4A574] hover:text-[#B49B7E] flex items-center gap-1"
+                    >
+                      🔗 Link to FFE Item
+                    </button>
+                  )}
+                </div>
               </div>
             ))
           )}
