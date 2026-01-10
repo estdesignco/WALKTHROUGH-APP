@@ -374,6 +374,10 @@ export default function PunchList({ projectId, roomId = null }) {
                     ✕
                   </button>
                 </div>
+              ) : ffeItems.length === 0 ? (
+                <div className="px-4 py-3 rounded-lg bg-yellow-900/20 border border-yellow-600/30 text-yellow-400 text-sm">
+                  ⚠️ No FFE items available. Transfer items from Checklist to FFE first, or add items to FFE spreadsheet.
+                </div>
               ) : (
                 <>
                   <input
@@ -384,28 +388,34 @@ export default function PunchList({ projectId, roomId = null }) {
                       setShowFfeDropdown(true);
                     }}
                     onFocus={() => setShowFfeDropdown(true)}
-                    placeholder="Search FFE items by name, SKU, vendor..."
+                    placeholder={`Search ${ffeItems.length} FFE items by name, SKU, vendor...`}
                     className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
                   />
-                  {showFfeDropdown && filteredFfeItems.length > 0 && (
+                  {showFfeDropdown && (
                     <div className="absolute z-10 w-full mt-1 bg-gray-900 border border-[#B49B7E]/30 rounded-lg max-h-60 overflow-y-auto shadow-xl">
-                      {filteredFfeItems.map(item => (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedFfeItem(item);
-                            setShowFfeDropdown(false);
-                            setFfeSearchQuery('');
-                          }}
-                          className="w-full px-4 py-3 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
-                        >
-                          <div className="text-white font-medium text-sm">{item.name}</div>
-                          <div className="text-gray-400 text-xs">
-                            {item.roomName} • {item.vendor || 'No vendor'} • SKU: {item.sku || 'N/A'}
-                          </div>
-                        </button>
-                      ))}
+                      {filteredFfeItems.length > 0 ? (
+                        filteredFfeItems.map(item => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedFfeItem(item);
+                              setShowFfeDropdown(false);
+                              setFfeSearchQuery('');
+                            }}
+                            className="w-full px-4 py-3 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
+                          >
+                            <div className="text-white font-medium text-sm">{item.name}</div>
+                            <div className="text-gray-400 text-xs">
+                              {item.roomName} • {item.vendor || 'No vendor'} • SKU: {item.sku || 'N/A'}
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-gray-400 text-sm">
+                          {ffeSearchQuery ? 'No matching items found' : 'Type to search FFE items...'}
+                        </div>
+                      )}
                     </div>
                   )}
                 </>
