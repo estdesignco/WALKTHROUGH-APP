@@ -9600,6 +9600,17 @@ class PunchListItem(BaseModel):
     voice_notes: List[str] = []  # Voice note IDs
     ai_suggested: bool = False  # Whether this was AI-suggested
     metadata: Optional[dict] = None
+    linked_ffe_item: Optional[dict] = None  # FFE item link: {id, name, sku, vendor, roomName}
+
+class PunchListUpdate(BaseModel):
+    """Model for updating punch list items"""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    status: Optional[str] = None
+    assigned_to: Optional[str] = None
+    due_date: Optional[str] = None
+    linked_ffe_item: Optional[dict] = None
 
 @api_router.post("/punch-list")
 async def create_punch_list_item(item: PunchListItem):
