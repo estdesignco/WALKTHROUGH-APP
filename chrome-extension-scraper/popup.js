@@ -1,4 +1,4 @@
-// Design Ready Product Scraper v7.0.2
+// Design Ready Product Scraper v7.9.0
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
 // Debug logging enabled in console
 
@@ -24,26 +24,34 @@ const projectSelector = document.getElementById('projectSelector');
 async function loadProjects() {
   try {
     const apiUrl = `${BACKEND_URL}/api/projects`;
-    console.log('[v7.0.2] Loading projects from:', apiUrl);
+    console.log('[v7.9.0] Loading projects from:', apiUrl);
     
-    const response = await fetch(apiUrl, {
+    // Add a cache-busting parameter
+    const cacheBuster = `?_t=${Date.now()}`;
+    const fullUrl = apiUrl + cacheBuster;
+    console.log('[v7.9.0] Full URL with cache buster:', fullUrl);
+    
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json'
-      }
+        'Accept': 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      mode: 'cors'
     });
     
-    console.log('[v7.0.2] Response status:', response.status);
-    console.log('[v7.0.2] Response URL:', response.url);
+    console.log('[v7.9.0] Response status:', response.status);
+    console.log('[v7.9.0] Response URL:', response.url);
+    console.log('[v7.9.0] Response ok:', response.ok);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[v7.0.2] Error response body:', errorText);
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.error('[v7.9.0] Error response body:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
     }
     
     const projects = await response.json();
-    console.log('[v7.0.2] Projects loaded:', projects.length);
+    console.log('[v7.9.0] Projects loaded:', projects.length);
     
     // Clear and populate dropdown
     projectSelector.innerHTML = '<option value="">-- Select a Project --</option>';
@@ -60,14 +68,17 @@ async function loadProjects() {
       projectSelector.value = stored.selectedProjectId;
       selectedProjectId = stored.selectedProjectId;
     }
+    
+    showStatus(`✓ Loaded ${projects.length} projects`, 'success');
   } catch (e) {
-    console.error('[v7.0.2] Failed to load projects:', e);
-    console.error('[v7.0.2] Error type:', e.name);
-    console.error('[v7.0.2] Error message:', e.message);
+    console.error('[v7.9.0] Failed to load projects:', e);
+    console.error('[v7.9.0] Error type:', e.name);
+    console.error('[v7.9.0] Error message:', e.message);
+    console.error('[v7.9.0] Error stack:', e.stack);
     projectSelector.innerHTML = '<option value="">-- Could not load --</option>';
     
-    // Show error in status bar
-    showStatus(`Projects failed: ${e.message}`, 'warning');
+    // Show error in status bar with more details
+    showStatus(`⚠ Projects failed: ${e.message}`, 'warning');
   }
 }
 
