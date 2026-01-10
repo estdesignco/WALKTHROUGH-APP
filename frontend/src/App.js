@@ -319,6 +319,10 @@ const App = () => {
                       path="/ffe/:projectId" 
                       element={<FFEDashboard isOffline={isOffline} />}
                     />
+                    <Route 
+                      path="/master-todo" 
+                      element={<MasterToDoList />}
+                    />
                     {/* Generic project detail route - MUST be AFTER specific routes */}
                     <Route 
                       path="/project/:projectId" 
