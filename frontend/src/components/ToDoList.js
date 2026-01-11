@@ -4,6 +4,7 @@ import axios from 'axios';
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function ToDoList({ projectId }) {
+  console.log('🔥🔥🔥 ToDoList RENDER - projectId:', projectId);
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const [newPriority, setNewPriority] = useState('Medium');
