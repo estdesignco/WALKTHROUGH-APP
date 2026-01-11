@@ -4,7 +4,6 @@ import axios from 'axios';
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function ToDoList({ projectId }) {
-  console.error('🔥🔥🔥 ToDoList RENDER - projectId:', projectId);
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const [newPriority, setNewPriority] = useState('Medium');
@@ -17,57 +16,39 @@ export default function ToDoList({ projectId }) {
   const [selectedFfeItem, setSelectedFfeItem] = useState(null);
   const [linkingTodoId, setLinkingTodoId] = useState(null);
 
-  // Load FFE items function - defined before useEffect
+  // Load FFE items function - FIXED to load both checklist and FFE
   const loadFfeItems = async () => {
-    console.error('🔥 ToDoList: loadFfeItems called with projectId:', projectId);
-    if (!projectId) {
-      console.error('🔥 ToDoList: No projectId, skipping');
-      return;
-    }
+    if (!projectId) return;
     try {
       const allItems = [];
-      const sheetTypes = ['checklist', 'ffe'];
-      
-      for (const sheetType of sheetTypes) {
-        try {
-          const url = `${API_URL}/projects/${projectId}?sheet_type=${sheetType}`;
-          console.error(`🔥 ToDoList: Fetching ${sheetType} from ${url}`);
-          const res = await fetch(url);
-          console.error(`🔥 ToDoList: ${sheetType} response status: ${res.status}`);
-          if (res.ok) {
-            const data = await res.json();
-            console.error(`🔥 ToDoList: ${sheetType} returned ${data.rooms?.length || 0} rooms`);
-            if (data.rooms) {
-              data.rooms.forEach(room => {
-                room.categories?.forEach(cat => {
-                  cat.subcategories?.forEach(subCat => {
-                    subCat.items?.forEach(item => {
-                      allItems.push({
-                        ...item,
-                        roomName: room.name,
-                        categoryName: cat.name,
-                        sourceType: sheetType.toUpperCase()
-                      });
-                    });
+      // Load from CHECKLIST and FFE
+      for (const sheetType of ['checklist', 'ffe']) {
+        const res = await fetch(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
+        if (res.ok) {
+          const data = await res.json();
+          (data.rooms || []).forEach(room => {
+            (room.categories || []).forEach(cat => {
+              (cat.subcategories || []).forEach(subCat => {
+                (subCat.items || []).forEach(item => {
+                  allItems.push({
+                    ...item,
+                    roomName: room.name,
+                    categoryName: cat.name,
+                    sourceType: sheetType.toUpperCase()
                   });
                 });
               });
-            }
-          }
-        } catch (e) {
-          console.error(`🔥 ToDoList: Error loading ${sheetType}:`, e);
+            });
+          });
         }
       }
-      
-      console.error(`🔥 ToDoList: Total items loaded: ${allItems.length}`);
       setFfeItems(allItems);
     } catch (error) {
-      console.error('🔥 ToDoList: Failed to load items:', error);
+      // Silent fail
     }
   };
 
   useEffect(() => {
-    console.error('🔥 ToDoList useEffect running, projectId:', projectId);
     loadTodos();
     loadFfeItems();
   }, [projectId]);
