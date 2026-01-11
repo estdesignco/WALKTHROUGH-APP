@@ -10972,6 +10972,20 @@ async def create_company_todo(todo: dict):
         await db.company_todos.insert_one(new_todo)
         new_todo.pop('_id', None)
         
+        # Send Teams notification for company todo
+        try:
+            await notify_status_change(
+                project_name="Established Design Co",
+                item_name=f"Company To-Do: {todo.get('text', '')[:50]}",
+                old_status="",
+                new_status=f"NEW - {todo.get('priority', 'Medium').upper()} priority",
+                room_name="Company Tasks",
+                vendor="",
+                cost=0.0
+            )
+        except Exception as notify_error:
+            logging.error(f"Teams notification failed: {str(notify_error)}")
+        
         return {"success": True, "todo": new_todo}
     except Exception as e:
         logging.error(f"Create company todo error: {str(e)}")
