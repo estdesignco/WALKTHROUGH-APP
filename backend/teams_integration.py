@@ -20,12 +20,18 @@ class TeamsIntegration:
         self.teams_email = os.getenv('TEAMS_EMAIL')
         self.teams_password = os.getenv('TEAMS_PASSWORD')
         self.webhook_url = os.getenv('TEAMS_WEBHOOK_URL', '')
+        self.company_webhook_url = os.getenv('COMPANY_TEAMS_WEBHOOK_URL', '')
         
         # Log webhook URL status
         if self.webhook_url:
             logging.info(f"✅ Teams webhook configured ({len(self.webhook_url)} chars)")
         else:
             logging.warning("TEAMS_WEBHOOK_URL not set - webhook notifications disabled")
+        
+        if self.company_webhook_url:
+            logging.info(f"✅ Company Teams webhook configured ({len(self.company_webhook_url)} chars)")
+        else:
+            logging.warning("COMPANY_TEAMS_WEBHOOK_URL not set - company webhook disabled")
         
     async def create_todo_item(self, project_name: str, item_name: str, old_status: str, new_status: str, 
                              room_name: str, vendor: str = "", cost: float = 0.0) -> bool:
