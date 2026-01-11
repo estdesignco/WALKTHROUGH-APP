@@ -4,7 +4,7 @@ import axios from 'axios';
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 export default function ToDoList({ projectId }) {
-  console.log('🔥🔥🔥 ToDoList RENDER - projectId:', projectId);
+  console.error('🔥🔥🔥 ToDoList RENDER - projectId:', projectId);
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState('');
   const [newPriority, setNewPriority] = useState('Medium');
@@ -19,9 +19,9 @@ export default function ToDoList({ projectId }) {
 
   // Load FFE items function - defined before useEffect
   const loadFfeItems = async () => {
-    console.log('🔥 ToDoList: loadFfeItems called with projectId:', projectId);
+    console.error('🔥 ToDoList: loadFfeItems called with projectId:', projectId);
     if (!projectId) {
-      console.log('🔥 ToDoList: No projectId, skipping');
+      console.error('🔥 ToDoList: No projectId, skipping');
       return;
     }
     try {
@@ -31,18 +31,17 @@ export default function ToDoList({ projectId }) {
       for (const sheetType of sheetTypes) {
         try {
           const url = `${API_URL}/projects/${projectId}?sheet_type=${sheetType}`;
-          console.log(`🔥 ToDoList: Fetching ${sheetType} from ${url}`);
+          console.error(`🔥 ToDoList: Fetching ${sheetType} from ${url}`);
           const res = await fetch(url);
-          console.log(`🔥 ToDoList: ${sheetType} response status: ${res.status}`);
+          console.error(`🔥 ToDoList: ${sheetType} response status: ${res.status}`);
           if (res.ok) {
             const data = await res.json();
-            console.log(`🔥 ToDoList: ${sheetType} returned ${data.rooms?.length || 0} rooms`);
+            console.error(`🔥 ToDoList: ${sheetType} returned ${data.rooms?.length || 0} rooms`);
             if (data.rooms) {
               data.rooms.forEach(room => {
                 room.categories?.forEach(cat => {
                   cat.subcategories?.forEach(subCat => {
                     subCat.items?.forEach(item => {
-                      console.log(`🔥 ToDoList: Found item "${item.name}" from ${sheetType}`);
                       allItems.push({
                         ...item,
                         roomName: room.name,
@@ -60,7 +59,7 @@ export default function ToDoList({ projectId }) {
         }
       }
       
-      console.log(`🔥 ToDoList: Total items loaded: ${allItems.length}`);
+      console.error(`🔥 ToDoList: Total items loaded: ${allItems.length}`);
       setFfeItems(allItems);
     } catch (error) {
       console.error('🔥 ToDoList: Failed to load items:', error);
@@ -68,7 +67,7 @@ export default function ToDoList({ projectId }) {
   };
 
   useEffect(() => {
-    console.log('🔥 ToDoList useEffect running, projectId:', projectId);
+    console.error('🔥 ToDoList useEffect running, projectId:', projectId);
     loadTodos();
     loadFfeItems();
   }, [projectId]);
