@@ -540,9 +540,18 @@ export default function PunchList({ projectId, roomId = null }) {
                     }`}>
                       {item.title}
                     </h4>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white`}>
-                      {item.priority}
-                    </span>
+                    {/* PRIORITY - EDITABLE DROPDOWN */}
+                    <select
+                      value={item.priority || 'medium'}
+                      onChange={(e) => updatePunchItem(item.id, { priority: e.target.value })}
+                      className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white cursor-pointer border-none outline-none`}
+                      style={{ background: 'inherit' }}
+                    >
+                      <option value="low" className="bg-gray-800">Low</option>
+                      <option value="medium" className="bg-gray-800">Medium</option>
+                      <option value="high" className="bg-gray-800">High</option>
+                      <option value="urgent" className="bg-gray-800">Urgent</option>
+                    </select>
                     {item.ai_suggested && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-purple-600/30 text-purple-300">
                         🤖 AI
