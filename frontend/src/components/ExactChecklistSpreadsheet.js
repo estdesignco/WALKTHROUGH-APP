@@ -2264,12 +2264,18 @@ const ExactChecklistSpreadsheet = ({
                             </tr>
                                 {/* ITEMS UNDER THIS SUBCATEGORY - Items on To-Do/Punch List at TOP with BRIGHT highlighter colors */}
                                 {(() => {
-                                  // Sort items: Items on To-Do or Punch List FIRST, then others
+                                  // Sort items: Items on INCOMPLETE To-Do or Punch List FIRST, then others
                                   const sortedItems = [...(subcategory.items || [])].sort((a, b) => {
-                                    const aOnList = todoLinkedItems.has(a.id) || punchLinkedItems.has(a.id);
-                                    const bOnList = todoLinkedItems.has(b.id) || punchLinkedItems.has(b.id);
-                                    if (aOnList && !bOnList) return -1;
-                                    if (!aOnList && bOnList) return 1;
+                                    const aTodoInfo = todoLinkedItems.get(a.id);
+                                    const aPunchInfo = punchLinkedItems.get(a.id);
+                                    const aOnIncompleteList = (aTodoInfo && !aTodoInfo.completed) || (aPunchInfo && !aPunchInfo.completed);
+                                    
+                                    const bTodoInfo = todoLinkedItems.get(b.id);
+                                    const bPunchInfo = punchLinkedItems.get(b.id);
+                                    const bOnIncompleteList = (bTodoInfo && !bTodoInfo.completed) || (bPunchInfo && !bPunchInfo.completed);
+                                    
+                                    if (aOnIncompleteList && !bOnIncompleteList) return -1;
+                                    if (!aOnIncompleteList && bOnIncompleteList) return 1;
                                     return 0;
                                   });
                                   
