@@ -10581,6 +10581,88 @@ async def get_items_with_tracking(project_id: str):
         logger.error(f"Get items with tracking error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to get items: {str(e)}")
 
+# ====================================
+# COMPANY-WIDE TO-DO ENDPOINTS
+# IMPORTANT: These routes MUST be defined BEFORE /todos/{project_id}
+# otherwise FastAPI will capture "company" as a project_id parameter
+# ====================================
+
+@api_router.get("/todos/company")
+async def get_company_todos():
+    """Get company-wide to-do items (Established Design Co internal tasks)"""
+    try:
+        todos = await db.company_todos.find({}).sort("created_at", -1).to_list(length=None)
+        for todo in todos:
+            todo.pop('_id', None)
+        logging.info(f"🏢 Found {len(todos)} company todos")
+        return {"success": True, "todos": todos}
+    except Exception as e:
+        logging.error(f"Get company todos error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/todos/company")
+async def create_company_todo(todo: dict):
+    """Create a company-wide to-do item"""
+    try:
+        new_todo = {
+            "id": str(uuid.uuid4()),
+            "text": todo.get("text"),
+            "description": todo.get("description", ""),
+            "priority": todo.get("priority", "Medium"),
+            "deadline": todo.get("deadline"),
+            "assigned_to": todo.get("assigned_to", ""),
+            "status": todo.get("status", "pending"),
+            "completed": False,
+            "linked_ffe_item": todo.get("linked_ffe_item"),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.company_todos.insert_one(new_todo)
+        new_todo.pop('_id', None)
+        
+        # Send Teams notification to COMPANY webhook (separate from Design Den)
+        try:
+            await notify_company_todo(
+                text=todo.get('text', ''),
+                priority=todo.get('priority', 'Medium'),
+                deadline=todo.get('deadline'),
+                assigned_to=todo.get('assigned_to')
+            )
+        except Exception as notify_error:
+            logging.error(f"Company Teams notification failed: {str(notify_error)}")
+        
+        return {"success": True, "todo": new_todo}
+    except Exception as e:
+        logging.error(f"Create company todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/todos/company/{todo_id}")
+async def update_company_todo(todo_id: str, update: dict):
+    """Update a company-wide to-do item"""
+    try:
+        result = await db.company_todos.update_one(
+            {"id": todo_id},
+            {"$set": update}
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Company to-do not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Update company todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/todos/company/{todo_id}")
+async def delete_company_todo(todo_id: str):
+    """Delete a company-wide to-do item"""
+    try:
+        result = await db.company_todos.delete_one({"id": todo_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Company to-do not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Delete company todo error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ===== TO-DO LIST ENDPOINTS =====
 @api_router.get("/todos/{project_id}")
 async def get_todos(project_id: str):
