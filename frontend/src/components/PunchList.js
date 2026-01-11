@@ -120,10 +120,11 @@ export default function PunchList({ projectId, roomId = null }) {
           ...newItem,
           linked_ffe_item: selectedFfeItem ? {
             id: selectedFfeItem.id,
-            name: selectedFfeItem.name,
-            sku: selectedFfeItem.sku,
-            vendor: selectedFfeItem.vendor,
-            roomName: selectedFfeItem.roomName
+            name: selectedFfeItem.name || 'Unknown',
+            sku: selectedFfeItem.sku || '',
+            vendor: selectedFfeItem.vendor || '',
+            roomName: selectedFfeItem.roomName || '',
+            sourceType: selectedFfeItem.sourceType || 'FFE'
           } : null
         })
       });
