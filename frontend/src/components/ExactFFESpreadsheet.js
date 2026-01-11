@@ -52,6 +52,8 @@ const ExactFFESpreadsheet = ({
   
   // 🔗 PUNCH LIST LINKED ITEMS - For highlighting items on punch list
   const [linkedPunchItems, setLinkedPunchItems] = useState({});
+  // 🔗 TO-DO LINKED ITEMS - For highlighting items on to-do list
+  const [todoLinkedItems, setTodoLinkedItems] = useState(new Set());
   
   // Check for URL parameters from extension (action=add-item&source=extension)
   useEffect(() => {
