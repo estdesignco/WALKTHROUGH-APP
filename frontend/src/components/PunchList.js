@@ -41,58 +41,42 @@ export default function PunchList({ projectId, roomId = null }) {
     try {
       const allItems = [];
       
-      // Load CHECKLIST items
-      try {
-        const checklistRes = await fetch(`${API_URL}/projects/${projectId}?sheet_type=checklist`);
-        if (checklistRes.ok) {
-          const checklistData = await checklistRes.json();
-          if (checklistData.rooms) {
-            checklistData.rooms.forEach(room => {
-              room.categories?.forEach(cat => {
-                cat.subcategories?.forEach(subCat => {
-                  subCat.items?.forEach(item => {
-                    allItems.push({
-                      ...item,
-                      roomName: room.name,
-                      categoryName: cat.name,
-                      sourceType: 'CHECKLIST'
+      // Load ALL items from ALL sheet types (walkthrough, checklist, ffe)
+      const sheetTypes = ['walkthrough', 'checklist', 'ffe'];
+      
+      for (const sheetType of sheetTypes) {
+        try {
+          const res = await fetch(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.rooms) {
+              data.rooms.forEach(room => {
+                room.categories?.forEach(cat => {
+                  cat.subcategories?.forEach(subCat => {
+                    subCat.items?.forEach(item => {
+                      allItems.push({
+                        ...item,
+                        roomName: room.name,
+                        categoryName: cat.name,
+                        sourceType: sheetType.toUpperCase()
+                      });
                     });
                   });
                 });
               });
-            });
+            }
           }
+        } catch (e) {
+          console.log(`No ${sheetType} items`);
         }
-      } catch (e) {
-        console.log('No checklist items');
       }
       
-      // Load FFE items
-      try {
-        const ffeRes = await fetch(`${API_URL}/projects/${projectId}?sheet_type=ffe`);
-        if (ffeRes.ok) {
-          const ffeData = await ffeRes.json();
-          if (ffeData.rooms) {
-            ffeData.rooms.forEach(room => {
-              room.categories?.forEach(cat => {
-                cat.subcategories?.forEach(subCat => {
-                  subCat.items?.forEach(item => {
-                    allItems.push({
-                      ...item,
-                      roomName: room.name,
-                      categoryName: cat.name,
-                      sourceType: 'FFE'
-                    });
-                  });
-                });
-              });
-            });
-          }
-        }
-      } catch (e) {
-        console.log('No FFE items');
-      }
-      
+      console.log(`📦 PunchList: Loaded ${allItems.length} items for linking`);
+      setFfeItems(allItems);
+    } catch (error) {
+      console.error('Failed to load items:', error);
+    }
+  };
       console.log(`📦 PunchList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
       setFfeItems(allItems);
     } catch (error) {
