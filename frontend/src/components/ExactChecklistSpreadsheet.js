@@ -2271,7 +2271,15 @@ const ExactChecklistSpreadsheet = ({
                                     const isChecked = checkedItems.has(item.id) || item.status === 'PICKED';
                                     const isOnTodo = todoLinkedItems.has(item.id);
                                     const isOnPunch = punchLinkedItems.has(item.id);
-                                    const shouldHighlight = isOnTodo || isOnPunch;
+                                    
+                                    // Check if item is COMPLETE - if so, don't highlight!
+                                    const isComplete = item.status?.toUpperCase() === 'COMPLETE' || 
+                                                       item.status?.toUpperCase() === 'COMPLETED' ||
+                                                       item.status?.toUpperCase() === 'INSTALLED' ||
+                                                       item.status?.toUpperCase() === 'DONE';
+                                    
+                                    // Only highlight if on list AND not complete
+                                    const shouldHighlight = (isOnTodo || isOnPunch) && !isComplete;
                                     
                                     // BRIGHT alternating highlighter colors - ONLY for items on To-Do or Punch List
                                     const highlighterColors = [
