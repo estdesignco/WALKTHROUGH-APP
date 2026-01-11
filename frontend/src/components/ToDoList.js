@@ -23,20 +23,26 @@ export default function ToDoList({ projectId }) {
 
   // Load ONLY Checklist AND FFE items for linking (NOT walkthrough)
   const loadFfeItems = async () => {
+    console.log('🔥 ToDoList: loadFfeItems called with projectId:', projectId);
     try {
       const allItems = [];
       const sheetTypes = ['checklist', 'ffe'];
       
       for (const sheetType of sheetTypes) {
         try {
-          const res = await fetch(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
+          const url = `${API_URL}/projects/${projectId}?sheet_type=${sheetType}`;
+          console.log(`🔥 ToDoList: Fetching ${sheetType} from ${url}`);
+          const res = await fetch(url);
+          console.log(`🔥 ToDoList: ${sheetType} response status: ${res.status}`);
           if (res.ok) {
             const data = await res.json();
+            console.log(`🔥 ToDoList: ${sheetType} returned ${data.rooms?.length || 0} rooms`);
             if (data.rooms) {
               data.rooms.forEach(room => {
                 room.categories?.forEach(cat => {
                   cat.subcategories?.forEach(subCat => {
                     subCat.items?.forEach(item => {
+                      console.log(`🔥 ToDoList: Found item "${item.name}" from ${sheetType}`);
                       allItems.push({
                         ...item,
                         roomName: room.name,
@@ -50,14 +56,14 @@ export default function ToDoList({ projectId }) {
             }
           }
         } catch (e) {
-          console.log(`No ${sheetType} items`);
+          console.error(`🔥 ToDoList: Error loading ${sheetType}:`, e);
         }
       }
       
-      console.log(`📦 ToDoList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
+      console.log(`🔥 ToDoList: Total items loaded: ${allItems.length}`);
       setFfeItems(allItems);
     } catch (error) {
-      console.error('Failed to load items:', error);
+      console.error('🔥 ToDoList: Failed to load items:', error);
     }
   };
 
