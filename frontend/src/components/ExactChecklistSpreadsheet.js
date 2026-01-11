@@ -757,6 +757,60 @@ const ExactChecklistSpreadsheet = ({
       if (response.ok) {
         console.log('✅ Checklist status updated successfully');
         
+        // AUTO-CREATE TO-DO for specific statuses
+        const autoTodoStatuses = ['CHANGE OUT', 'GET QUOTE', 'ORDER SAMPLES'];
+        if (autoTodoStatuses.includes(newStatus.toUpperCase())) {
+          // Find the item details for the To-Do
+          let itemName = '';
+          let roomName = '';
+          let vendorName = '';
+          
+          filteredProject?.rooms?.forEach(room => {
+            room.categories?.forEach(category => {
+              category.subcategories?.forEach(subcategory => {
+                subcategory.items?.forEach(item => {
+                  if (item.id === itemId) {
+                    itemName = item.name || 'Unknown Item';
+                    roomName = room.name || '';
+                    vendorName = item.vendor || '';
+                  }
+                });
+              });
+            });
+          });
+          
+          // Create the To-Do automatically
+          try {
+            const todoText = `${newStatus}: ${itemName}${roomName ? ` (${roomName})` : ''}`;
+            const todoResponse = await fetch(`${backendUrl}/api/todos`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                project_id: project?.id,
+                text: todoText,
+                description: `Auto-created from Checklist status change. Vendor: ${vendorName || 'N/A'}`,
+                priority: newStatus.toUpperCase() === 'CHANGE OUT' ? 'high' : 'medium',
+                status: 'pending',
+                linked_ffe_item: {
+                  id: itemId,
+                  name: itemName,
+                  roomName: roomName,
+                  vendor: vendorName,
+                  sourceType: 'CHECKLIST'
+                }
+              })
+            });
+            
+            if (todoResponse.ok) {
+              console.log('✅ Auto-created To-Do for status:', newStatus, todoText);
+            } else {
+              console.warn('⚠️ Failed to auto-create To-Do:', await todoResponse.text());
+            }
+          } catch (todoError) {
+            console.error('❌ Error auto-creating To-Do:', todoError);
+          }
+        }
+        
         // Update local state to avoid scroll jump - create proper deep copy
         const updatedProject = JSON.parse(JSON.stringify(filteredProject));
         let itemFound = false;
