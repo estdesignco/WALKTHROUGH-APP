@@ -102,7 +102,12 @@ export default function MasterToDoList() {
   const toggleTodo = async (todoId, completed, isCompany = false) => {
     try {
       const endpoint = isCompany ? `${API_URL}/todos/company/${todoId}` : `${API_URL}/todos/${todoId}`;
-      await axios.put(endpoint, { completed: !completed });
+      // Set BOTH completed AND status to ensure proper tracking
+      const newCompleted = !completed;
+      await axios.put(endpoint, { 
+        completed: newCompleted,
+        status: newCompleted ? 'completed' : 'pending'
+      });
       await loadAllData();
     } catch (error) { console.error('Failed:', error); }
   };
