@@ -2141,8 +2141,8 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                         </tr>
                                                         );
-                                                        })
-                                                      ))}
+                                                        });
+                                                      })()}
                                                       
                                                       {/* INLINE ADD ITEM ROW */}
                                                       <tr className="hover:bg-[#1a1a2a]">
