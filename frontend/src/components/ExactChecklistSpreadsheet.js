@@ -486,7 +486,7 @@ const ExactChecklistSpreadsheet = ({
   }, [project]);
 
   // Load items that are linked to To-Do or Punch List
-  const loadLinkedItems = async () => {
+  const loadLinkedItems = useCallback(async () => {
     if (!project?.id) return;
     const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
     
@@ -538,7 +538,23 @@ const ExactChecklistSpreadsheet = ({
     } catch (e) {
       console.log('No punch list items loaded');
     }
-  };
+  }, [project?.id]);
+
+  // Poll for linked item status changes every 10 seconds
+  // This allows highlights to disappear when items are completed on Master To-Do List
+  useEffect(() => {
+    if (!project?.id) return;
+    
+    // Initial load
+    loadLinkedItems();
+    
+    // Set up polling interval - refresh every 10 seconds
+    const pollInterval = setInterval(() => {
+      loadLinkedItems();
+    }, 10000);
+    
+    return () => clearInterval(pollInterval);
+  }, [project?.id, loadLinkedItems]);
 
   // Fetch available categories from backend API
   useEffect(() => {
