@@ -2199,37 +2199,40 @@ const ExactChecklistSpreadsheet = ({
                                 </div>
                               </td>
                             </tr>
-                                {/* ITEMS UNDER THIS SUBCATEGORY - Checked items first with alternating highlighter colors */}
+                                {/* ITEMS UNDER THIS SUBCATEGORY - Items on To-Do/Punch List at TOP with BRIGHT highlighter colors */}
                                 {(() => {
-                                  // Sort items: checked/PICKED first, then unchecked
+                                  // Sort items: Items on To-Do or Punch List FIRST, then others
                                   const sortedItems = [...(subcategory.items || [])].sort((a, b) => {
-                                    const aChecked = checkedItems.has(a.id) || a.status === 'PICKED';
-                                    const bChecked = checkedItems.has(b.id) || b.status === 'PICKED';
-                                    if (aChecked && !bChecked) return -1;
-                                    if (!aChecked && bChecked) return 1;
+                                    const aOnList = todoLinkedItems.has(a.id) || punchLinkedItems.has(a.id);
+                                    const bOnList = todoLinkedItems.has(b.id) || punchLinkedItems.has(b.id);
+                                    if (aOnList && !bOnList) return -1;
+                                    if (!aOnList && bOnList) return 1;
                                     return 0;
                                   });
                                   
-                                  // Count checked items for alternating colors
-                                  let checkedIndex = 0;
+                                  // Count highlighted items for alternating colors
+                                  let highlightIndex = 0;
                                   
                                   return sortedItems.map((item, itemIndex) => {
                                     const isChecked = checkedItems.has(item.id) || item.status === 'PICKED';
+                                    const isOnTodo = todoLinkedItems.has(item.id);
+                                    const isOnPunch = punchLinkedItems.has(item.id);
+                                    const shouldHighlight = isOnTodo || isOnPunch;
                                     
-                                    // Alternating highlighter colors for checked items
+                                    // BRIGHT alternating highlighter colors - ONLY for items on To-Do or Punch List
                                     const highlighterColors = [
-                                      'rgba(255, 255, 0, 0.25)',    // Yellow
-                                      'rgba(0, 255, 127, 0.25)',    // Spring Green
-                                      'rgba(255, 182, 193, 0.25)',  // Light Pink
-                                      'rgba(135, 206, 250, 0.25)',  // Light Sky Blue
-                                      'rgba(255, 165, 0, 0.25)',    // Orange
-                                      'rgba(221, 160, 221, 0.25)',  // Plum
+                                      '#FFFF00',  // Bright Yellow
+                                      '#00FF7F',  // Bright Spring Green
+                                      '#FF69B4',  // Hot Pink
+                                      '#00BFFF',  // Deep Sky Blue
+                                      '#FFA500',  // Bright Orange
+                                      '#DA70D6',  // Orchid/Plum
                                     ];
                                     
                                     let rowStyle;
-                                    if (isChecked) {
-                                      rowStyle = { background: highlighterColors[checkedIndex % highlighterColors.length] };
-                                      checkedIndex++;
+                                    if (shouldHighlight) {
+                                      rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length] };
+                                      highlightIndex++;
                                     } else {
                                       rowStyle = { 
                                         background: itemIndex % 2 === 0 
@@ -2240,6 +2243,18 @@ const ExactChecklistSpreadsheet = ({
                                     
                                     return (
                                       <tr key={item.id} style={rowStyle}>
+                                        {/* Highlight indicator for To-Do/Punch */}
+                                        {shouldHighlight && (
+                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16" style={{ background: 'inherit' }}>
+                                            <span className="text-xs font-bold text-black">
+                                              {isOnTodo && '📋'}
+                                              {isOnPunch && '🔨'}
+                                            </span>
+                                          </td>
+                                        )}
+                                        {!shouldHighlight && (
+                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16"></td>
+                                        )}
                                         {/* CHECKBOX - AUTO SET TO PICKED */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
