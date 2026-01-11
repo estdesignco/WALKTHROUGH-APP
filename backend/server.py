@@ -10944,7 +10944,17 @@ async def delete_todo(todo_id: str):
 async def get_company_todos():
     """Get company-wide to-do items (Established Design Co internal tasks)"""
     try:
-        todos = await db.company_todos.find({}).sort("created_at", -1).to_list(length=None)
+        logging.info(f"🏢 Getting company todos from db: {db.name}")
+        
+        # Debug: Check if collection exists
+        collections = await db.list_collection_names()
+        logging.info(f"Collections available: {collections}")
+        
+        cursor = db.company_todos.find({})
+        todos = await cursor.sort("created_at", -1).to_list(length=None)
+        
+        logging.info(f"🏢 Found {len(todos)} company todos")
+        
         for todo in todos:
             todo.pop('_id', None)
         return {"success": True, "todos": todos}
