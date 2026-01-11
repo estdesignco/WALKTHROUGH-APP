@@ -1597,12 +1597,18 @@ const ExactFFESpreadsheet = ({
                                                           });
                                                         });
                                                         
-                                                        // Sort: Items on To-Do or Punch List FIRST
+                                                        // Sort: Items on INCOMPLETE To-Do or Punch List FIRST
                                                         const sortedItems = allItems.sort((a, b) => {
-                                                          const aOnList = todoLinkedItems.has(a.id) || !!linkedPunchItems[a.id];
-                                                          const bOnList = todoLinkedItems.has(b.id) || !!linkedPunchItems[b.id];
-                                                          if (aOnList && !bOnList) return -1;
-                                                          if (!aOnList && bOnList) return 1;
+                                                          const aTodoInfo = todoLinkedItems.get(a.id);
+                                                          const aPunchInfo = linkedPunchItems[a.id];
+                                                          const aOnIncompleteList = (aTodoInfo && !aTodoInfo.completed) || (aPunchInfo && !aPunchInfo.is_completed);
+                                                          
+                                                          const bTodoInfo = todoLinkedItems.get(b.id);
+                                                          const bPunchInfo = linkedPunchItems[b.id];
+                                                          const bOnIncompleteList = (bTodoInfo && !bTodoInfo.completed) || (bPunchInfo && !bPunchInfo.is_completed);
+                                                          
+                                                          if (aOnIncompleteList && !bOnIncompleteList) return -1;
+                                                          if (!aOnIncompleteList && bOnIncompleteList) return 1;
                                                           return 0;
                                                         });
                                                         
