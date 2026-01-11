@@ -1628,18 +1628,14 @@ const ExactFFESpreadsheet = ({
                                                         return sortedItems.map((item, itemIndex) => {
                                                           // Check if item is linked to punch list or to-do
                                                           const punchLink = linkedPunchItems[item.id];
+                                                          const todoInfo = todoLinkedItems.get(item.id);
                                                           const isOnPunchList = !!punchLink;
-                                                          const isOnTodo = todoLinkedItems.has(item.id);
+                                                          const isOnTodo = !!todoInfo;
                                                           const punchCompleted = punchLink?.is_completed;
+                                                          const todoCompleted = todoInfo?.completed;
                                                           
-                                                          // Check if item is COMPLETE - if so, don't highlight!
-                                                          const isComplete = item.status?.toUpperCase() === 'COMPLETE' || 
-                                                                             item.status?.toUpperCase() === 'COMPLETED' ||
-                                                                             item.status?.toUpperCase() === 'INSTALLED' ||
-                                                                             item.status?.toUpperCase() === 'DONE';
-                                                          
-                                                          // Only highlight if on list AND not complete
-                                                          const shouldHighlight = (isOnPunchList || isOnTodo) && !isComplete;
+                                                          // Only highlight if on list AND the linked item is NOT complete
+                                                          const shouldHighlight = (isOnPunchList && !punchCompleted) || (isOnTodo && !todoCompleted);
                                                           
                                                           // Determine row style
                                                           let rowStyle;
