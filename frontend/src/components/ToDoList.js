@@ -27,9 +27,12 @@ export default function ToDoList({ projectId }) {
         .catch(() => setLoading(false));
       
       // Load FFE and Checklist items for linking
+      // FFE items take priority (load FFE FIRST so they appear at top)
       const loadItems = async () => {
-        const allItems = [];
-        for (const sheetType of ['checklist', 'ffe']) {
+        const itemsMap = new Map(); // Use Map to dedupe by ID, FFE takes priority
+        
+        // Load FFE FIRST so FFE items appear first
+        for (const sheetType of ['ffe', 'checklist']) {
           try {
             const res = await fetch(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
             if (res.ok) {
@@ -38,12 +41,15 @@ export default function ToDoList({ projectId }) {
                 (room.categories || []).forEach(cat => {
                   (cat.subcategories || []).forEach(subCat => {
                     (subCat.items || []).forEach(item => {
-                      allItems.push({
-                        ...item,
-                        roomName: room.name,
-                        categoryName: cat.name,
-                        sourceType: sheetType.toUpperCase()
-                      });
+                      // Only add if not already in map (FFE takes priority since loaded first)
+                      if (!itemsMap.has(item.id)) {
+                        itemsMap.set(item.id, {
+                          ...item,
+                          roomName: room.name,
+                          categoryName: cat.name,
+                          sourceType: sheetType.toUpperCase()
+                        });
+                      }
                     });
                   });
                 });
@@ -51,7 +57,7 @@ export default function ToDoList({ projectId }) {
             }
           } catch (e) {}
         }
-        setFfeItems(allItems);
+        setFfeItems(Array.from(itemsMap.values()));
       };
       loadItems();
     }
