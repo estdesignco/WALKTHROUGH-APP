@@ -21,64 +21,40 @@ export default function ToDoList({ projectId }) {
     loadFfeItems();
   }, [projectId]);
 
-  // Load BOTH Checklist AND FFE items for linking
+  // Load ALL items from ALL sheet types for linking
   const loadFfeItems = async () => {
     try {
       const allItems = [];
+      const sheetTypes = ['walkthrough', 'checklist', 'ffe'];
       
-      // Load CHECKLIST items
-      try {
-        const checklistRes = await fetch(`${API_URL}/projects/${projectId}?sheet_type=checklist`);
-        if (checklistRes.ok) {
-          const checklistData = await checklistRes.json();
-          if (checklistData.rooms) {
-            checklistData.rooms.forEach(room => {
-              room.categories?.forEach(cat => {
-                cat.subcategories?.forEach(subCat => {
-                  subCat.items?.forEach(item => {
-                    allItems.push({
-                      ...item,
-                      roomName: room.name,
-                      categoryName: cat.name,
-                      sourceType: 'CHECKLIST'
+      for (const sheetType of sheetTypes) {
+        try {
+          const res = await fetch(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.rooms) {
+              data.rooms.forEach(room => {
+                room.categories?.forEach(cat => {
+                  cat.subcategories?.forEach(subCat => {
+                    subCat.items?.forEach(item => {
+                      allItems.push({
+                        ...item,
+                        roomName: room.name,
+                        categoryName: cat.name,
+                        sourceType: sheetType.toUpperCase()
+                      });
                     });
                   });
                 });
               });
-            });
+            }
           }
+        } catch (e) {
+          console.log(`No ${sheetType} items`);
         }
-      } catch (e) {
-        console.log('No checklist items');
       }
       
-      // Load FFE items
-      try {
-        const ffeRes = await fetch(`${API_URL}/projects/${projectId}?sheet_type=ffe`);
-        if (ffeRes.ok) {
-          const ffeData = await ffeRes.json();
-          if (ffeData.rooms) {
-            ffeData.rooms.forEach(room => {
-              room.categories?.forEach(cat => {
-                cat.subcategories?.forEach(subCat => {
-                  subCat.items?.forEach(item => {
-                    allItems.push({
-                      ...item,
-                      roomName: room.name,
-                      categoryName: cat.name,
-                      sourceType: 'FFE'
-                    });
-                  });
-                });
-              });
-            });
-          }
-        }
-      } catch (e) {
-        console.log('No FFE items');
-      }
-      
-      console.log(`📦 ToDoList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
+      console.log(`📦 ToDoList: Loaded ${allItems.length} items for linking`);
       setFfeItems(allItems);
     } catch (error) {
       console.error('Failed to load items:', error);
