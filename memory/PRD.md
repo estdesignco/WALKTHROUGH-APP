@@ -94,5 +94,5 @@ Full-stack interior design project management application with multiple spreadsh
 6. Root cause investigation for recurring data loss
 
 ## Known Issues
-- Chrome Scraper (v7.10.0) - User reported "DIDNT WORK" but no specific details provided
+- Chrome Scraper - Fixed missing `/api/scraper/save` endpoint that was causing HTTP 404
 - Recurring data loss - Root cause not yet identified
