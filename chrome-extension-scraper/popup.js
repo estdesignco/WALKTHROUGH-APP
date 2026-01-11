@@ -1,4 +1,4 @@
-// Design Ready Product Scraper v7.10.0
+// Design Ready Product Scraper v7.11.0
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
 // Debug logging enabled in console
 
@@ -24,12 +24,12 @@ const projectSelector = document.getElementById('projectSelector');
 async function loadProjects() {
   try {
     const apiUrl = `${BACKEND_URL}/api/projects`;
-    console.log('[v7.10.0] Loading projects from:', apiUrl);
+    console.log('[v7.11.0] Loading projects from:', apiUrl);
     
     // Add a cache-busting parameter
     const cacheBuster = `?_t=${Date.now()}`;
     const fullUrl = apiUrl + cacheBuster;
-    console.log('[v7.10.0] Full URL with cache buster:', fullUrl);
+    console.log('[v7.11.0] Full URL with cache buster:', fullUrl);
     
     const response = await fetch(fullUrl, {
       method: 'GET',
@@ -40,20 +40,20 @@ async function loadProjects() {
       mode: 'cors'
     });
     
-    console.log('[v7.10.0] Response status:', response.status);
-    console.log('[v7.10.0] Response URL:', response.url);
-    console.log('[v7.10.0] Response ok:', response.ok);
+    console.log('[v7.11.0] Response status:', response.status);
+    console.log('[v7.11.0] Response URL:', response.url);
+    console.log('[v7.11.0] Response ok:', response.ok);
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[v7.10.0] Error response body:', errorText);
+      console.error('[v7.11.0] Error response body:', errorText);
       throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
     }
     
     const data = await response.json();
     // Handle both array and object responses
     const projects = Array.isArray(data) ? data : (data.projects || []);
-    console.log('[v7.10.0] Projects loaded:', projects.length);
+    console.log('[v7.11.0] Projects loaded:', projects.length);
     
     // Clear and populate dropdown
     projectSelector.innerHTML = '<option value="">-- Select a Project --</option>';
@@ -73,10 +73,10 @@ async function loadProjects() {
     
     showStatus(`✓ Loaded ${projects.length} projects`, 'success');
   } catch (e) {
-    console.error('[v7.10.0] Failed to load projects:', e);
-    console.error('[v7.10.0] Error type:', e.name);
-    console.error('[v7.10.0] Error message:', e.message);
-    console.error('[v7.10.0] Error stack:', e.stack);
+    console.error('[v7.11.0] Failed to load projects:', e);
+    console.error('[v7.11.0] Error type:', e.name);
+    console.error('[v7.11.0] Error message:', e.message);
+    console.error('[v7.11.0] Error stack:', e.stack);
     projectSelector.innerHTML = '<option value="">-- Could not load --</option>';
     
     // Show error in status bar with more details
