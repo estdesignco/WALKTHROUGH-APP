@@ -479,9 +479,6 @@ const ExactChecklistSpreadsheet = ({
         console.log(`📋 Initialized ${initialCheckedItems.size} pre-checked items from PICKED status`);
         setCheckedItems(initialCheckedItems);
       }
-      
-      // Load items that are on To-Do or Punch List
-      loadLinkedItems();
     }
   }, [project]);
 
