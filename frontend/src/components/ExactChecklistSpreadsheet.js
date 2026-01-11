@@ -2321,8 +2321,11 @@ const ExactChecklistSpreadsheet = ({
                                     
                                     let rowStyle;
                                     // Text color: BLACK for highlighted rows, normal for others
+                                    // Use inline style to FORCE the color
                                     const textColor = shouldHighlight ? '#000000' : '#B49B7E';
-                                    const textClass = shouldHighlight ? 'text-black font-semibold' : 'text-[#B49B7E]';
+                                    const inputStyle = shouldHighlight 
+                                      ? { color: '#000000', fontWeight: '600', background: 'transparent' }
+                                      : { color: '#B49B7E', background: 'transparent' };
                                     
                                     if (shouldHighlight) {
                                       rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length] };
@@ -2337,18 +2340,23 @@ const ExactChecklistSpreadsheet = ({
                                     
                                     return (
                                       <tr key={item.id} style={rowStyle}>
-                                        {/* Highlight indicator for To-Do/Punch */}
-                                        {shouldHighlight && (
-                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16" style={{ background: 'inherit' }}>
-                                            <span className="text-xs font-bold text-black">
-                                              {isOnTodo && '📋'}
-                                              {isOnPunch && '🔨'}
-                                            </span>
-                                          </td>
-                                        )}
-                                        {!shouldHighlight && (
-                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16"></td>
-                                        )}
+                                        {/* TO-DO / PUNCH BADGE - Always show if linked */}
+                                        <td className="border border-[#B49B7E] px-1 py-1 text-center w-20" style={{ color: textColor }}>
+                                          <div className="flex flex-col gap-1 items-center">
+                                            {isOnTodo && !todoComplete && (
+                                              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-blue-600 text-white">TO-DO</span>
+                                            )}
+                                            {isOnPunch && !punchComplete && (
+                                              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-red-600 text-white">PUNCH</span>
+                                            )}
+                                            {isOnTodo && todoComplete && (
+                                              <span className="text-xs px-1.5 py-0.5 rounded bg-green-600 text-white">✓ DONE</span>
+                                            )}
+                                            {isOnPunch && punchComplete && (
+                                              <span className="text-xs px-1.5 py-0.5 rounded bg-green-600 text-white">✓ DONE</span>
+                                            )}
+                                          </div>
+                                        </td>
                                         {/* CHECKBOX - AUTO SET TO PICKED */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
@@ -2386,28 +2394,16 @@ const ExactChecklistSpreadsheet = ({
                                             }}
                                           />
                                         </td>
-                                        {/* ITEM - EDITABLE WITH AUTOCOMPLETE */}
-                                        <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
-                                          <InlineProductAutocomplete
-                                            value={item.name}
-                                            onChange={(newName) => {
-                                              if (newName !== item.name) {
-                                                handleUpdateItemField(item.id, 'name', newName);
-                                              }
-                                            }}
-                                            onProductSelect={async (product) => {
-                                              // Auto-fill all fields when product is selected
-                                              console.log('🎯 Product selected from autocomplete:', product);
-                                              
-                                              // Check if this product has variants (other finishes/colors)
-                                              try {
-                                                const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
-                                                const response = await fetch(`${backendUrl}/api/product-variants/${encodeURIComponent(product.sku)}`);
-                                                const variantData = await response.json();
-                                                
-                                                if (variantData.success && variantData.variant_count > 1) {
-                                                  // Has multiple variants - show picker
-                                                  console.log('📦 Product has variants:', variantData.variant_count);
+                                        {/* ITEM NAME - EDITABLE */}
+                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                          <input
+                                            type="text"
+                                            value={item.name || ''}
+                                            onChange={(e) => handleUpdateItemField(item.id, 'name', e.target.value)}
+                                            className="w-full bg-transparent border-none outline-none text-sm"
+                                            style={inputStyle}
+                                            placeholder="Item name..."
+                                          />
                                                   setVariantPickerSku(product.sku);
                                                   setPendingVariantItem(item);
                                                   setPendingVariantProduct(product);
