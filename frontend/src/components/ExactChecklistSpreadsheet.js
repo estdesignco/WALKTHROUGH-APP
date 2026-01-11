@@ -2482,13 +2482,14 @@ const ExactChecklistSpreadsheet = ({
                                   
                                   {/* COST - CLICK TO OPEN CALCULATOR */}
                                   <td 
-                                    className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
+                                    className="border border-[#B49B7E] px-2 py-1 text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
+                                    style={{ color: textColor }}
                                     onClick={() => openCalculator(item, category.name)}
                                     title="Click to open calculator"
                                   >
                                     <div className="flex items-center justify-between">
-                                      <span>${item.cost || 0}</span>
-                                      <span className="text-[#8B7355] opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
+                                      <span style={{ color: textColor }}>${item.cost || 0}</span>
+                                      <span className="opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
                                     </div>
                                   </td>
                                   
