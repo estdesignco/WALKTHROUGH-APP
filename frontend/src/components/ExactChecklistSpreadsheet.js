@@ -47,8 +47,9 @@ const ExactChecklistSpreadsheet = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   
   // State to track items on To-Do or Punch List (for highlighting)
-  const [todoLinkedItems, setTodoLinkedItems] = useState(new Set());
-  const [punchLinkedItems, setPunchLinkedItems] = useState(new Set());
+  // Map format: { itemId: { completed: boolean, status: string } }
+  const [todoLinkedItems, setTodoLinkedItems] = useState(new Map());
+  const [punchLinkedItems, setPunchLinkedItems] = useState(new Map());
   
   // Load expanded states from localStorage
   const [expandedRooms, setExpandedRooms] = useState(() => {
