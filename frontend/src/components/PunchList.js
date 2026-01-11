@@ -150,10 +150,11 @@ export default function PunchList({ projectId, roomId = null }) {
         body: JSON.stringify({
           linked_ffe_item: {
             id: ffeItem.id,
-            name: ffeItem.name,
-            sku: ffeItem.sku,
-            vendor: ffeItem.vendor,
-            roomName: ffeItem.roomName
+            name: ffeItem.name || 'Unknown',
+            sku: ffeItem.sku || '',
+            vendor: ffeItem.vendor || '',
+            roomName: ffeItem.roomName || '',
+            sourceType: ffeItem.sourceType || 'FFE'
           }
         })
       });
