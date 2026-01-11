@@ -216,9 +216,51 @@ async def notify_status_change(project_name: str, item_name: str, old_status: st
                               cost: float = 0.0) -> bool:
     """
     Convenience function to create Teams todo when item status changes
+    Uses the Design Den webhook (for projects, punch list, project to-dos)
     """
     logging.info(f"🔔 Teams notification: {item_name} {old_status} → {new_status}")
     return await teams_integration.create_todo_item(
         project_name, item_name, old_status, new_status, 
         room_name, vendor, cost
     )
+
+async def notify_company_todo(text: str, priority: str, deadline: str = None, 
+                              assigned_to: str = None) -> bool:
+    """
+    Send Company To-Do notifications to the SEPARATE Company Teams webhook
+    """
+    logging.info(f"🏢 Company Teams notification: {text}")
+    
+    if not teams_integration.company_webhook_url:
+        logging.warning("Company webhook URL not configured")
+        return False
+    
+    try:
+        deadline_text = f"\n**Deadline:** {deadline}" if deadline else ""
+        assigned_text = f"\n**Assigned To:** {assigned_to}" if assigned_to else ""
+        
+        message_text = f"""🏢 COMPANY TO-DO
+
+**Task:** {text}
+**Priority:** {priority.upper()}
+{deadline_text}{assigned_text}
+
+⏰ {datetime.now().strftime('%B %d, %Y at %I:%M %p')}"""
+        
+        card_payload = {"text": message_text}
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                teams_integration.company_webhook_url,
+                json=card_payload,
+                headers={'Content-Type': 'application/json'}
+            ) as response:
+                if response.status in [200, 204]:
+                    logging.info(f"✅ Company Teams webhook sent successfully")
+                    return True
+                else:
+                    logging.error(f"Company Teams webhook failed: {response.status}")
+                    return False
+    except Exception as e:
+        logging.error(f"Company Teams webhook error: {str(e)}")
+        return False
