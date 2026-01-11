@@ -2490,7 +2490,7 @@ const ExactChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
                                     <div className="flex items-center gap-2">
                                       {/* Swatch Image */}
                                       {item.finish_image && (
@@ -2505,7 +2505,8 @@ const ExactChecklistSpreadsheet = ({
                                       <div 
                                         contentEditable={true}
                                         suppressContentEditableWarning={true}
-                                        className="flex-1 bg-transparent text-[#D4C5A9] text-sm outline-none"
+                                        className="flex-1 bg-transparent text-sm outline-none"
+                                        style={{ color: textColor }}
                                         onBlur={(e) => {
                                           const newValue = e.target.textContent;
                                           if (newValue !== item.finish_color) {
@@ -2520,12 +2521,13 @@ const ExactChecklistSpreadsheet = ({
                                   
                                   {/* COST - CLICK TO OPEN CALCULATOR */}
                                   <td 
-                                    className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
+                                    className="border border-[#B49B7E] px-2 py-1 text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
+                                    style={cellStyle}
                                     onClick={() => openCalculator(item, category.name)}
                                     title="Click to open calculator"
                                   >
                                     <div className="flex items-center justify-between">
-                                      <span>${item.cost || 0}</span>
+                                      <span style={{ color: textColor }}>${item.cost || 0}</span>
                                       <span className="text-[#8B7355] opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
                                     </div>
                                   </td>
@@ -2665,11 +2667,12 @@ const ExactChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* REMARKS - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
+                                      className="w-full bg-transparent text-sm outline-none"
+                                      style={{ color: textColor }}
                                       onBlur={(e) => {
                                         const newValue = e.target.textContent?.trim();
                                         if (newValue !== item.remarks) {
