@@ -2746,8 +2746,7 @@ const ExactChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                 </tr>
-                                    );
-                                  });
+                                    });
                                 })()}
                           </React.Fragment>
                         ))}
