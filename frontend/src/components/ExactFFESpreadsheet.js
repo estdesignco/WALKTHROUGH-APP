@@ -151,14 +151,19 @@ const ExactFFESpreadsheet = ({
         const response = await fetch(`${backendUrl}/api/todos/${project.id}`);
         if (response.ok) {
           const data = await response.json();
-          const linkedIds = new Set();
+          const linkedMap = new Map();
           (data.todos || []).forEach(todo => {
             if (todo.linked_ffe_item?.id) {
-              linkedIds.add(todo.linked_ffe_item.id);
+              // Track completion status of the TO-DO, not the item
+              const isComplete = todo.completed || todo.status === 'completed';
+              linkedMap.set(todo.linked_ffe_item.id, {
+                completed: isComplete,
+                status: todo.status
+              });
             }
           });
-          setTodoLinkedItems(linkedIds);
-          console.log('📋 FFE: Found', linkedIds.size, 'items linked to To-Do');
+          setTodoLinkedItems(linkedMap);
+          console.log('📋 FFE: Found', linkedMap.size, 'items linked to To-Do');
         }
       } catch (error) {
         console.error('Failed to load to-do links:', error);
