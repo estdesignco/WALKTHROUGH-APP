@@ -267,7 +267,7 @@ export default function ToDoList({ projectId }) {
                     setShowFfeDropdown(true);
                   }}
                   onFocus={() => setShowFfeDropdown(true)}
-                  placeholder={ffeItems.length > 0 ? "Search FFE items to link..." : "No FFE items available - add items to FFE first"}
+                  placeholder={ffeItems.length > 0 ? "Search Checklist & FFE items to link..." : "No items available - add items to Checklist or FFE first"}
                   disabled={ffeItems.length === 0}
                   className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm placeholder-gray-500 focus:border-[#D4A574] focus:outline-none disabled:opacity-50"
                 />
@@ -283,15 +283,20 @@ export default function ToDoList({ projectId }) {
                         }}
                         className="w-full px-3 py-2 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
                       >
-                        <div className="text-white text-sm">{ffeItem.name}</div>
-                        <div className="text-gray-400 text-xs">{ffeItem.roomName} • {ffeItem.vendor || 'No vendor'}</div>
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded ${ffeItem.sourceType === 'CHECKLIST' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
+                            {ffeItem.sourceType}
+                          </span>
+                          <span className="text-white text-sm">{ffeItem.name}</span>
+                        </div>
+                        <div className="text-gray-400 text-xs mt-1">{ffeItem.roomName} • {ffeItem.vendor || 'No vendor'}</div>
                       </button>
                     ))}
                   </div>
                 )}
                 {ffeItems.length === 0 && (
                   <div className="text-xs text-yellow-500 mt-1">
-                    ⚠️ No FFE items available. Transfer items from Checklist to FFE first.
+                    ⚠️ No items available. Add items to Checklist or FFE first.
                   </div>
                 )}
               </>
