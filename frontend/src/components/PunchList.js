@@ -440,15 +440,20 @@ export default function PunchList({ projectId, roomId = null }) {
                             }}
                             className="w-full px-4 py-3 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
                           >
-                            <div className="text-white font-medium text-sm">{item.name}</div>
-                            <div className="text-gray-400 text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xs font-bold px-2 py-0.5 rounded ${item.sourceType === 'CHECKLIST' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
+                                {item.sourceType}
+                              </span>
+                              <span className="text-white font-medium text-sm">{item.name}</span>
+                            </div>
+                            <div className="text-gray-400 text-xs mt-1">
                               {item.roomName} • {item.vendor || 'No vendor'} • SKU: {item.sku || 'N/A'}
                             </div>
                           </button>
                         ))
                       ) : (
                         <div className="px-4 py-3 text-gray-400 text-sm">
-                          {ffeSearchQuery ? 'No matching items found' : 'Type to search FFE items...'}
+                          {ffeSearchQuery ? 'No matching items found' : 'Type to search Checklist & FFE items...'}
                         </div>
                       )}
                     </div>
