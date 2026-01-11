@@ -131,7 +131,7 @@ export default function PunchList({ projectId, roomId = null }) {
       if (response.ok) {
         const data = await response.json();
         setPunchItems(prev => [data.punch_item, ...prev]);
-        setNewItem({ title: '', description: '', priority: 'medium', assigned_to: '', linked_ffe_item_id: null });
+        setNewItem({ title: '', description: '', priority: 'medium', assigned_to: '', due_date: '', linked_ffe_item_id: null });
         setSelectedFfeItem(null);
         setFfeSearchQuery('');
         setShowAddForm(false);
