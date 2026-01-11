@@ -485,6 +485,17 @@ const ExactChecklistSpreadsheet = ({
     }
   }, [project]);
 
+  // Auto-refresh linked items every 5 seconds to pick up changes from To-Do/Punch list
+  useEffect(() => {
+    if (!project?.id) return;
+    
+    const interval = setInterval(() => {
+      loadLinkedItems();
+    }, 5000); // Refresh every 5 seconds
+    
+    return () => clearInterval(interval);
+  }, [project?.id]);
+
   // Load items that are linked to To-Do or Punch List
   const loadLinkedItems = async () => {
     if (!project?.id) return;
