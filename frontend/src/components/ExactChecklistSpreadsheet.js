@@ -2284,6 +2284,10 @@ const ExactChecklistSpreadsheet = ({
                                     ];
                                     
                                     let rowStyle;
+                                    // Text color: BLACK for highlighted rows, normal for others
+                                    const textColor = shouldHighlight ? '#000000' : '#B49B7E';
+                                    const textClass = shouldHighlight ? 'text-black font-semibold' : 'text-[#B49B7E]';
+                                    
                                     if (shouldHighlight) {
                                       rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length] };
                                       highlightIndex++;
@@ -2347,7 +2351,7 @@ const ExactChecklistSpreadsheet = ({
                                           />
                                         </td>
                                         {/* ITEM - EDITABLE WITH AUTOCOMPLETE */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                        <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
                                           <InlineProductAutocomplete
                                             value={item.name}
                                             onChange={(newName) => {
@@ -2398,12 +2402,13 @@ const ExactChecklistSpreadsheet = ({
                                               handleBatchUpdateItem(item.id, updates);
                                             }}
                                             placeholder="Type to search products..."
-                                            className="text-[#B49B7E] text-sm"
+                                            className={`${textClass} text-sm`}
+                                            style={{ color: textColor }}
                                           />
                                         </td>
                                   
                                   {/* VENDOR/SKU - EDITABLE WITH DROPDOWN */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                  <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
                                     <div className="flex flex-col gap-1">
                                       <VendorDropdown
                                         value={item.vendor || ''}
@@ -2412,7 +2417,8 @@ const ExactChecklistSpreadsheet = ({
                                             handleUpdateItemField(item.id, 'vendor', newVendor);
                                           }
                                         }}
-                                        className="text-[#B49B7E] text-sm"
+                                        className={`${textClass} text-sm`}
+                                        style={{ color: textColor }}
                                       />
                                       <input
                                         type="text"
