@@ -2464,7 +2464,290 @@ const ExactChecklistSpreadsheet = ({
                                         </td>
                                       </tr>
                                     );
-                                    });
+                                            value={item.name || ''}
+                                            onChange={(e) => handleUpdateItemField(item.id, 'name', e.target.value)}
+                                            className="w-full bg-transparent border-none outline-none text-sm"
+                                            style={inputStyle}
+                                            placeholder="Item name..."
+                                          />
+                                        </td>
+                                  
+                                  {/* VENDOR/SKU - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                    <div className="flex flex-col gap-1">
+                                      <input
+                                        type="text"
+                                        value={item.vendor || ''}
+                                        onChange={(e) => handleUpdateItemField(item.id, 'vendor', e.target.value)}
+                                        placeholder="Vendor..."
+                                        className="w-full bg-transparent border-none outline-none text-sm"
+                                        style={inputStyle}
+                                      />
+                                      <input
+                                        type="text"
+                                        value={item.sku || ''}
+                                        onChange={(e) => handleUpdateItemField(item.id, 'sku', e.target.value)}
+                                        placeholder="SKU..."
+                                        className="w-full bg-transparent text-xs outline-none border-t border-gray-600 pt-1"
+                                        style={inputStyle}
+                                      />
+                                    </div>
+                                  </td>
+                                  
+                                  {/* QTY - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm text-center" style={{ color: textColor }}>
+                                    <input
+                                      type="number"
+                                      value={item.quantity || ''}
+                                      onChange={(e) => handleUpdateItemField(item.id, 'quantity', parseInt(e.target.value) || 0)}
+                                      className="w-full bg-transparent text-sm text-center outline-none border-none"
+                                      style={inputStyle}
+                                    />
+                                  </td>
+                                  
+                                  {/* SIZE - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                    <input
+                                      type="text"
+                                      value={item.size || ''}
+                                      onChange={(e) => handleUpdateItemField(item.id, 'size', e.target.value)}
+                                      placeholder="Size..."
+                                      className="w-full bg-transparent text-sm outline-none border-none"
+                                      style={inputStyle}
+                                    />
+                                  </td>
+                                  
+                                  {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                    <div className="flex items-center gap-2">
+                                      {/* Swatch Image */}
+                                      {item.finish_image && (
+                                        <img 
+                                          src={item.finish_image} 
+                                          alt={item.finish_color || 'Swatch'} 
+                                          className="w-8 h-8 rounded border border-[#B49B7E] object-cover flex-shrink-0"
+                                          onError={(e) => { e.target.style.display = 'none'; }}
+                                        />
+                                      )}
+                                      {/* Color Name - Editable */}
+                                      <input
+                                        type="text"
+                                        value={item.finish_color || ''}
+                                        onChange={(e) => handleUpdateItemField(item.id, 'finish_color', e.target.value)}
+                                        placeholder="Finish/Color..."
+                                        className="flex-1 bg-transparent text-sm outline-none border-none"
+                                        style={inputStyle}
+                                      />
+                                    </div>
+                                  </td>
+                                  
+                                  {/* COST - CLICK TO OPEN CALCULATOR */}
+                                  <td 
+                                    className="border border-[#B49B7E] px-2 py-1 text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
+                                    style={{ color: textColor }}
+                                    onClick={() => openCalculator(item, category.name)}
+                                    title="Click to open calculator"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span style={{ color: textColor }}>${item.cost || 0}</span>
+                                      <span className="opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
+                                    </div>
+                                  </td>
+                                  
+                                  {/* STATUS - DROPDOWN WITH GRADIENT SHIMMER CELL */}
+                                  <td 
+                                    className="border border-[#B49B7E] px-1 py-1 text-white text-sm"
+                                    style={{ 
+                                      background: item.status ? `linear-gradient(135deg, ${getStatusColor(item.status)}FF 0%, ${getStatusColor(item.status)}AA 20%, ${getStatusColor(item.status)} 40%, ${getStatusColor(item.status)}AA 80%, ${getStatusColor(item.status)}FF 100%)` : 'transparent',
+                                      boxShadow: item.status ? `0 0 15px ${getStatusColor(item.status)}40, inset 0 0 30px rgba(255, 255, 255, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.3)` : 'none',
+                                      minWidth: '120px'
+                                    }}
+                                  >
+                                    <select 
+                                      className="w-full text-[#D4C5A9] text-xs"
+                                      value={item.status || ''}
+                                      style={{ 
+                                        backgroundColor: getStatusColor(item.status || ''),
+                                        background: getStatusColor(item.status || ''),
+                                        color: 'white !important',
+                                        border: '2px solid ' + getStatusColor(item.status || ''),
+                                        borderRadius: '4px',
+                                        padding: '2px',
+                                        outline: 'none',
+                                        fontWeight: 'bold'
+                                      }}
+                                      onChange={(e) => handleStatusChange(item.id, e.target.value)}
+                                    >
+                                      <option value=""></option>
+                                      <option value="PICKED">PICKED</option>
+                                      <option value="ORDERED">ORDERED</option>
+                                      <option value="CHANGE OUT">CHANGE OUT</option>
+                                      <option value="ORDER SAMPLES">ORDER SAMPLES</option>
+                                      <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
+                                      <option value="ASK NEIL">ASK NEIL</option>
+                                      <option value="ASK CHARLENE">ASK CHARLENE</option>
+                                      <option value="ASK JALA">ASK JALA</option>
+                                      <option value="GET QUOTE">GET QUOTE</option>
+                                      <option value="WAITING ON QT">WAITING ON QT</option>
+                                      <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
+                                      <option value="APPROVED">APPROVED</option>
+                                      <option value="ON HOLD">ON HOLD</option>
+                                    </select>
+                                  </td>
+                                  
+                                  {/* IMAGE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm w-20">
+                                    {item.image_url ? (
+                                      <img 
+                                        src={item.image_url} 
+                                        alt={item.name}
+                                        className="w-12 h-12 object-cover cursor-pointer hover:scale-150 transition-transform duration-200 z-10"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          console.log('🖼️ Opening LARGE image popup - 98vw x 95vh');
+                                          // Create full-size overlay with better styling
+                                          const overlay = document.createElement('div');
+                                          overlay.style.cssText = `
+                                            position: fixed;
+                                            top: 0;
+                                            left: 0;
+                                            width: 100%;
+                                            height: 100%;
+                                            background: rgba(0, 0, 0, 0.8);
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            z-index: 9999;
+                                            cursor: pointer;
+                                          `;
+                                          
+                                          const container = document.createElement('div');
+                                          container.style.cssText = `
+                                            width: 100vw;
+                                            height: 100vh;
+                                            padding: 10px;
+                                            text-align: center;
+                                            display: flex;
+                                            flex-direction: column;
+                                            align-items: center;
+                                            justify-content: center;
+                                          `;
+                                          
+                                          const img = document.createElement('img');
+                                          img.src = item.image_url;
+                                          img.alt = item.name;
+                                          img.style.cssText = `
+                                            max-width: 98vw;
+                                            max-height: 95vh;
+                                            width: auto;
+                                            height: auto;
+                                            object-fit: contain;
+                                            border-radius: 8px;
+                                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+                                          `;
+                                          
+                                          const title = document.createElement('p');
+                                          title.textContent = item.name;
+                                          title.style.cssText = `
+                                            color: white;
+                                            margin-top: 15px;
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                          `;
+                                          
+                                          container.appendChild(img);
+                                          container.appendChild(title);
+                                          overlay.appendChild(container);
+                                          
+                                          overlay.addEventListener('click', () => {
+                                            document.body.removeChild(overlay);
+                                          });
+                                          
+                                          document.body.appendChild(overlay);
+                                        }}
+                                      />
+                                    ) : (
+                                      <div className="w-12 h-12 bg-gray-600 flex items-center justify-center text-xs">No Image</div>
+                                    )}
+                                  </td>
+                                  
+                                  {/* PRODUCT LINK - CLICKABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-center w-24">
+                                    {item.link ? (
+                                      <a 
+                                        href={item.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded transition-colors duration-200"
+                                        title={`Open ${item.name} in new tab`}
+                                      >
+                                        🔗 VIEW
+                                      </a>
+                                    ) : (
+                                      <span className="text-gray-500 text-xs">No Link</span>
+                                    )}
+                                  </td>
+                                  
+                                  {/* REMARKS - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                    <input
+                                      type="text"
+                                      value={item.remarks || ''}
+                                      onChange={(e) => handleUpdateItemField(item.id, 'remarks', e.target.value)}
+                                      placeholder="Remarks..."
+                                      className="w-full bg-transparent text-sm outline-none border-none"
+                                      style={inputStyle}
+                                    />
+                                  </td>
+                                  
+                                  {/* ACTION BUTTONS: Add, Alternatives, Delete */}
+                                  <td className="border border-[#B49B7E] px-1 py-1 text-center w-20">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedSubCategoryId(subcategory.id);
+                                          setShowAddItem(true);
+                                        }}
+                                        className="text-green-400 hover:text-green-300 text-sm font-bold"
+                                        title="Add New Item"
+                                      >
+                                        +
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setAlternativesItem({...item, category_name: category.name});
+                                          setShowAlternatives(true);
+                                        }}
+                                        className="text-[#D4A574] hover:text-[#E8D4B8] text-sm"
+                                        title="Find Alternatives"
+                                      >
+                                        ✨
+                                      </button>
+                                      {/* PASTE BUTTON - Shows when scraper data is available */}
+                                      <button
+                                        onClick={() => scraperClipboard && handlePasteScrapedData(item.id)}
+                                        disabled={!scraperClipboard}
+                                        className={`text-sm px-2 py-1 rounded font-bold ${
+                                          scraperClipboard 
+                                            ? 'bg-green-600 hover:bg-green-500 text-white animate-pulse cursor-pointer' 
+                                            : 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                                        }`}
+                                        title={scraperClipboard ? `📋 Paste: ${scraperClipboard.name}` : 'No data to paste - scrape a product first'}
+                                      >
+                                        📋 PASTE
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteItem(item.id)}
+                                        className="text-red-400 hover:text-red-300 text-sm"
+                                        title="Delete Item"
+                                      >
+                                        🗑️
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                                    );
+                                  });
                                 })()}
                           </React.Fragment>
                         ))}
