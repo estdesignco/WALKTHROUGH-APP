@@ -2278,17 +2278,19 @@ const ExactChecklistSpreadsheet = ({
                                   
                                   return sortedItems.map((item, itemIndex) => {
                                     const isChecked = checkedItems.has(item.id) || item.status === 'PICKED';
-                                    const isOnTodo = todoLinkedItems.has(item.id);
-                                    const isOnPunch = punchLinkedItems.has(item.id);
                                     
-                                    // Check if item is COMPLETE - if so, don't highlight!
-                                    const isComplete = item.status?.toUpperCase() === 'COMPLETE' || 
-                                                       item.status?.toUpperCase() === 'COMPLETED' ||
-                                                       item.status?.toUpperCase() === 'INSTALLED' ||
-                                                       item.status?.toUpperCase() === 'DONE';
+                                    // Get linked To-Do and Punch info
+                                    const todoInfo = todoLinkedItems.get(item.id);
+                                    const punchInfo = punchLinkedItems.get(item.id);
+                                    const isOnTodo = !!todoInfo;
+                                    const isOnPunch = !!punchInfo;
                                     
-                                    // Only highlight if on list AND not complete
-                                    const shouldHighlight = (isOnTodo || isOnPunch) && !isComplete;
+                                    // Check if the LINKED To-Do or Punch is complete (not the item itself!)
+                                    const todoComplete = todoInfo?.completed === true;
+                                    const punchComplete = punchInfo?.completed === true;
+                                    
+                                    // Only highlight if on list AND the linked item is NOT complete
+                                    const shouldHighlight = (isOnTodo && !todoComplete) || (isOnPunch && !punchComplete);
                                     
                                     // BRIGHT alternating highlighter colors - ONLY for items on To-Do or Punch List
                                     const highlighterColors = [
