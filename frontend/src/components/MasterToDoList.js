@@ -13,6 +13,10 @@ const JOB_COLORS = [
   { bg: 'linear-gradient(135deg, #1A3A5C 0%, #2A5080 100%)', border: '#4682B4', accent: '#87CEEB' },
 ];
 
+/**
+ * MasterToDoList - Aggregates all to-dos and punch items across projects
+ * Company To-Do section rebuilt to match PunchList interface per user request
+ */
 export default function MasterToDoList() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -22,8 +26,17 @@ export default function MasterToDoList() {
   const [companyTodos, setCompanyTodos] = useState([]);
   const [activeSection, setActiveSection] = useState('all');
   const [expandedProjects, setExpandedProjects] = useState({});
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newTodo, setNewTodo] = useState({ text: '', priority: 'Medium', type: 'company', project_id: null });
+  
+  // Company To-Do form state - MATCHING PUNCHLIST
+  const [showCompanyAddForm, setShowCompanyAddForm] = useState(false);
+  const [companyFilter, setCompanyFilter] = useState('all');
+  const [newCompanyTodo, setNewCompanyTodo] = useState({
+    text: '',
+    description: '',
+    priority: 'medium',
+    assigned_to: '',
+    deadline: ''
+  });
 
   useEffect(() => { loadAllData(); }, []);
 
@@ -61,24 +74,45 @@ export default function MasterToDoList() {
     finally { setLoading(false); }
   };
 
-  const addTodo = async () => {
-    if (!newTodo.text.trim()) return;
+  // Create company to-do - MATCHING PUNCHLIST interface
+  const createCompanyTodo = async (e) => {
+    e.preventDefault();
+    if (!newCompanyTodo.text.trim()) return;
+    
     try {
-      if (newTodo.type === 'company') {
-        await axios.post(`${API_URL}/todos/company`, { text: newTodo.text.trim(), priority: newTodo.priority, completed: false });
-      } else {
-        await axios.post(`${API_URL}/todos`, { project_id: newTodo.project_id, text: newTodo.text.trim(), priority: newTodo.priority, completed: false });
-      }
-      setNewTodo({ text: '', priority: 'Medium', type: 'company', project_id: null });
-      setShowAddForm(false);
+      await axios.post(`${API_URL}/todos/company`, {
+        text: newCompanyTodo.text.trim(),
+        description: newCompanyTodo.description,
+        priority: newCompanyTodo.priority,
+        assigned_to: newCompanyTodo.assigned_to,
+        deadline: newCompanyTodo.deadline || null,
+        status: 'pending',
+        completed: false
+      });
+      
+      setNewCompanyTodo({ text: '', description: '', priority: 'medium', assigned_to: '', deadline: '' });
+      setShowCompanyAddForm(false);
       await loadAllData();
-    } catch (error) { alert('Failed: ' + error.message); }
+    } catch (error) {
+      alert('Failed to create: ' + error.message);
+    }
   };
 
   const toggleTodo = async (todoId, completed, isCompany = false) => {
     try {
       const endpoint = isCompany ? `${API_URL}/todos/company/${todoId}` : `${API_URL}/todos/${todoId}`;
       await axios.put(endpoint, { completed: !completed });
+      await loadAllData();
+    } catch (error) { console.error('Failed:', error); }
+  };
+
+  const updateCompanyTodoStatus = async (todoId, newStatus) => {
+    try {
+      const newCompleted = newStatus === 'completed';
+      await axios.put(`${API_URL}/todos/company/${todoId}`, { 
+        status: newStatus,
+        completed: newCompleted
+      });
       await loadAllData();
     } catch (error) { console.error('Failed:', error); }
   };
@@ -92,7 +126,7 @@ export default function MasterToDoList() {
   };
 
   const deleteTodo = async (todoId, isCompany = false) => {
-    if (!window.confirm('Delete?')) return;
+    if (!window.confirm('Delete this item?')) return;
     try {
       const endpoint = isCompany ? `${API_URL}/todos/company/${todoId}` : `${API_URL}/todos/${todoId}`;
       await axios.delete(endpoint);
@@ -100,141 +134,393 @@ export default function MasterToDoList() {
     } catch (error) { console.error('Failed:', error); }
   };
 
-  const getPriorityStyle = (priority) => {
-    const p = (priority || 'medium').toLowerCase();
-    if (p === 'high' || p === 'urgent') return '#DC2626';
-    if (p === 'low') return '#059669';
-    return '#D97706';
+  const deletePunchItem = async (itemId) => {
+    if (!window.confirm('Delete this punch item?')) return;
+    try {
+      await fetch(`${API_URL}/punch-list/${itemId}`, { method: 'DELETE' });
+      await loadAllData();
+    } catch (error) { console.error('Failed:', error); }
   };
 
-  const getStatusIcon = (status) => ({ pending: '⏳', in_progress: '🔄', completed: '✅', verified: '✓✓' }[status] || '⏳');
-  const toggleProjectExpanded = (projectId) => { setExpandedProjects(prev => ({ ...prev, [projectId]: !prev[projectId] })); };
+  const getPriorityColor = (priority) => {
+    const colors = {
+      low: 'bg-gray-600', Low: 'bg-gray-600',
+      medium: 'bg-cyan-600', Medium: 'bg-cyan-600',  // CHANGED from yellow to cyan
+      high: 'bg-orange-600', High: 'bg-orange-600',
+      urgent: 'bg-red-600'
+    };
+    return colors[priority] || 'bg-gray-600';
+  };
 
-  const totalCompanyTodos = companyTodos.length;
-  const totalProjectTodos = Object.values(projectTodos).flat().length;
-  const totalPunchItems = Object.values(projectPunchItems).flat().length;
-  const totalAll = totalCompanyTodos + totalProjectTodos + totalPunchItems;
+  const getStatusColor = (status, completed) => {
+    if (completed) return 'text-green-400';
+    const colors = { pending: 'text-gray-400', in_progress: 'text-blue-400', completed: 'text-green-400', verified: 'text-purple-400' };
+    return colors[status] || 'text-gray-400';
+  };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#0F172A' }}><div className="text-[#D4A574] text-2xl">Loading...</div></div>;
+  const getStatusIcon = (status, completed) => {
+    if (completed) return '✅';
+    const icons = { pending: '⏳', in_progress: '🔄', completed: '✅', verified: '✓✓' };
+    return icons[status] || '⏳';
+  };
+
+  // Filter company todos
+  const filteredCompanyTodos = companyTodos.filter(todo => {
+    if (companyFilter === 'all') return true;
+    if (companyFilter === 'completed') return todo.completed || todo.status === 'completed';
+    if (companyFilter === 'pending') return !todo.completed && todo.status !== 'completed' && todo.status !== 'in_progress';
+    if (companyFilter === 'in_progress') return todo.status === 'in_progress';
+    return true;
+  });
+
+  const companyCounts = {
+    all: companyTodos.length,
+    pending: companyTodos.filter(t => !t.completed && t.status !== 'completed' && t.status !== 'in_progress').length,
+    in_progress: companyTodos.filter(t => t.status === 'in_progress').length,
+    completed: companyTodos.filter(t => t.completed || t.status === 'completed').length
+  };
+
+  const totalPending = Object.values(projectTodos).flat().filter(t => !t.completed).length +
+    Object.values(projectPunchItems).flat().filter(p => p.status !== 'completed' && p.status !== 'verified').length +
+    companyTodos.filter(t => !t.completed).length;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, rgba(20,20,30,0.98) 0%, rgba(30,30,40,0.95) 100%)' }}>
+        <div className="text-[#D4A574] text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#0F172A' }}>
-      <div className="p-6 max-w-6xl mx-auto">
-        <button onClick={() => navigate('/')} className="mb-4 px-4 py-2 rounded-lg text-[#D4A574] hover:text-white flex items-center gap-2" style={{ background: 'linear-gradient(135deg, rgba(139, 115, 85, 0.3) 0%, rgba(160, 132, 92, 0.2) 100%)', border: '1px solid #B49B7E' }}>← Back to Dashboard</button>
-        <div className="mb-8"><h1 className="text-4xl font-bold text-[#D4A574] mb-2">Master To-Do List</h1><p className="text-[#B49B7E]">All tasks across company and jobs</p></div>
-
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          {[['all', totalAll, 'All'], ['company', totalCompanyTodos, 'Company'], ['todos', totalProjectTodos, 'Job To-Dos'], ['punch', totalPunchItems, 'Punch List']].map(([key, count, label]) => (
-            <div key={key} className={`p-4 rounded-xl cursor-pointer ${activeSection === key ? 'ring-2 ring-[#D4A574]' : ''}`} style={{ background: 'rgba(0,0,0,0.8)', border: '1px solid #B49B7E' }} onClick={() => setActiveSection(key)}>
-              <div className="text-3xl font-bold text-[#D4A574]">{count}</div>
-              <div className="text-sm text-[#B49B7E]">{label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mb-6">
-          <button onClick={() => setShowAddForm(!showAddForm)} className="px-6 py-3 rounded-lg font-bold text-black" style={{ background: 'linear-gradient(135deg, #D4A574 0%, #B49B7E 100%)', border: '2px solid #D4A574' }}>{showAddForm ? '✕ Cancel' : '+ Add New Task'}</button>
-        </div>
-
-        {showAddForm && (
-          <div className="mb-6 p-6 rounded-xl" style={{ background: 'rgba(0,0,0,0.9)', border: '1px solid #B49B7E' }}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <select value={newTodo.type} onChange={(e) => setNewTodo(prev => ({ ...prev, type: e.target.value, project_id: null }))} className="px-4 py-3 rounded-lg text-[#D4C5A9]" style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid #B49B7E' }}>
-                <option value="company">Established Design Co</option><option value="project">Job-Specific</option>
-              </select>
-              {newTodo.type === 'project' && (
-                <select value={newTodo.project_id || ''} onChange={(e) => setNewTodo(prev => ({ ...prev, project_id: e.target.value }))} className="px-4 py-3 rounded-lg text-[#D4C5A9]" style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid #B49B7E' }}>
-                  <option value="">Select Job...</option>
-                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-              )}
-              <select value={newTodo.priority} onChange={(e) => setNewTodo(prev => ({ ...prev, priority: e.target.value }))} className="px-4 py-3 rounded-lg text-white font-bold" style={{ background: getPriorityStyle(newTodo.priority) }}>
-                <option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
-              </select>
-            </div>
-            <div className="flex gap-4">
-              <input type="text" value={newTodo.text} onChange={(e) => setNewTodo(prev => ({ ...prev, text: e.target.value }))} onKeyPress={(e) => e.key === 'Enter' && addTodo()} placeholder="What needs to be done?" className="flex-1 px-4 py-3 rounded-lg text-[#D4C5A9] placeholder-[#B49B7E]/50" style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid #B49B7E' }} />
-              <button onClick={addTodo} disabled={!newTodo.text.trim() || (newTodo.type === 'project' && !newTodo.project_id)} className="px-8 py-3 rounded-lg font-bold text-white disabled:opacity-50" style={{ background: '#059669' }}>+ Add</button>
-            </div>
+    <div className="min-h-screen p-6" style={{ background: 'linear-gradient(135deg, rgba(20,20,30,0.98) 0%, rgba(30,30,40,0.95) 100%)' }}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <button onClick={() => navigate(-1)} className="text-[#D4A574] hover:text-white text-2xl">←</button>
+          <div>
+            <h1 className="text-3xl font-bold text-[#D4A574]">Master To-Do List</h1>
+            <p className="text-gray-400">{totalPending} items pending across all projects</p>
           </div>
-        )}
+        </div>
+      </div>
 
-        {(activeSection === 'all' || activeSection === 'company') && (
-          <div className="mb-8">
-            <div className="flex items-center gap-3 px-4 py-3 rounded-t-xl" style={{ background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 100%)', border: '1px solid #D4A574' }}>
-              <span className="text-2xl">🏢</span><h2 className="text-xl font-bold text-white">Established Design Co</h2>
-              <span className="ml-auto bg-black/30 px-3 py-1 rounded-full text-sm text-white">{companyTodos.length} tasks</span>
-            </div>
-            <div className="rounded-b-xl overflow-hidden" style={{ border: '1px solid #B49B7E', borderTop: 'none' }}>
-              {companyTodos.length === 0 ? <div className="p-6 text-center text-[#B49B7E]" style={{ background: 'rgba(0,0,0,0.8)' }}>No company tasks yet</div> : companyTodos.map((todo, idx) => (
-                <div key={todo.id} className="p-4 flex items-center gap-4" style={{ background: idx % 2 === 0 ? 'rgba(0,0,0,0.8)' : 'rgba(30,30,30,0.8)', borderBottom: '1px solid #B49B7E30' }}>
-                  <input type="checkbox" checked={todo.completed} onChange={() => toggleTodo(todo.id, todo.completed, true)} className="w-5 h-5" />
-                  <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ background: getPriorityStyle(todo.priority) }}>{todo.priority}</span>
-                  <span className={`flex-1 ${todo.completed ? 'line-through text-[#B49B7E]/50' : 'text-[#D4C5A9]'}`}>{todo.text}</span>
-                  <button onClick={() => deleteTodo(todo.id, true)} className="text-red-400">🗑️</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Section Tabs */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {['all', 'company', 'projects'].map(section => (
+          <button
+            key={section}
+            onClick={() => setActiveSection(section)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeSection === section
+                ? 'bg-[#D4A574] text-black'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+            }`}
+          >
+            {section === 'all' ? '📋 All Tasks' : section === 'company' ? '🏢 Company Tasks' : '🏠 Project Tasks'}
+          </button>
+        ))}
+      </div>
 
-        {(activeSection === 'all' || activeSection === 'todos' || activeSection === 'punch') && projects.map((project, projectIndex) => {
-          const todos = projectTodos[project.id] || [];
-          const punchItems = projectPunchItems[project.id] || [];
-          const showTodos = activeSection === 'all' || activeSection === 'todos';
-          const showPunch = activeSection === 'all' || activeSection === 'punch';
-          const hasTodos = showTodos && todos.length > 0;
-          const hasPunch = showPunch && punchItems.length > 0;
-          if (!hasTodos && !hasPunch) return null;
-          const jobColor = JOB_COLORS[projectIndex % JOB_COLORS.length];
+      {/* COMPANY SECTION - REBUILT TO MATCH PUNCHLIST */}
+      {(activeSection === 'all' || activeSection === 'company') && (
+        <div className="rounded-xl border border-[#D4A574]/30 overflow-hidden mb-6"
+             data-testid="company-todo-container"
+             style={{ background: 'linear-gradient(135deg, rgba(20,20,30,0.95) 0%, rgba(30,30,40,0.9) 100%)' }}>
           
-          return (
-            <div key={project.id} className="mb-6">
-              <div className="flex items-center gap-3 px-4 py-3 rounded-t-xl cursor-pointer" style={{ background: jobColor.bg, border: `1px solid ${jobColor.border}` }} onClick={() => toggleProjectExpanded(project.id)}>
-                <span className="text-xl text-white">{expandedProjects[project.id] ? '▼' : '▶'}</span>
-                <div className="flex-1"><h2 className="text-lg font-bold text-white">JOB: {project.name}</h2><p className="text-sm" style={{ color: jobColor.accent }}>{project.client_info?.name || 'No Client'}</p></div>
+          {/* Company Header */}
+          <div 
+            className="px-6 py-4 flex items-center justify-between border-b border-[#B49B7E]/20"
+            style={{ background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(160, 82, 45, 0.2) 100%)' }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🏢</span>
+              <div>
+                <h3 className="text-[#D4A574] font-bold text-lg">Established Design Co - Company Tasks</h3>
+                <p className="text-gray-500 text-sm">
+                  {companyCounts.pending} pending • {companyCounts.completed} completed
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowCompanyAddForm(true)}
+              data-testid="add-company-todo-btn"
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white px-3 py-2 rounded-lg font-bold text-sm"
+            >
+              + Add Company Task
+            </button>
+          </div>
+          
+          {/* Company Filter Tabs */}
+          <div className="flex border-b border-[#B49B7E]/20">
+            {['all', 'pending', 'in_progress', 'completed'].map(status => (
+              <button
+                key={status}
+                onClick={() => setCompanyFilter(status)}
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  companyFilter === status 
+                    ? 'text-[#D4A574] border-b-2 border-[#D4A574] bg-[#D4A574]/10' 
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                {status === 'all' ? 'All' : status.replace('_', ' ').toUpperCase()}
+                <span className="ml-2 text-xs opacity-70">({companyCounts[status] || 0})</span>
+              </button>
+            ))}
+          </div>
+          
+          {/* Company Add Form - MATCHING PUNCHLIST EXACTLY */}
+          {showCompanyAddForm && (
+            <div className="p-4 border-b border-[#B49B7E]/20 bg-black/30">
+              <form onSubmit={createCompanyTodo} className="space-y-3">
+                <input
+                  type="text"
+                  value={newCompanyTodo.text}
+                  onChange={(e) => setNewCompanyTodo(prev => ({ ...prev, text: e.target.value }))}
+                  placeholder="What needs to be done?"
+                  data-testid="company-todo-text-input"
+                  className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
+                  required
+                />
+                <textarea
+                  value={newCompanyTodo.description}
+                  onChange={(e) => setNewCompanyTodo(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Additional details (optional)"
+                  rows={2}
+                  className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none resize-none"
+                />
+                
+                <div className="flex gap-3 flex-wrap">
+                  <select
+                    value={newCompanyTodo.priority}
+                    onChange={(e) => setNewCompanyTodo(prev => ({ ...prev, priority: e.target.value }))}
+                    className="px-4 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white focus:border-[#D4A574] focus:outline-none"
+                  >
+                    <option value="low">Low Priority</option>
+                    <option value="medium">Medium Priority</option>
+                    <option value="high">High Priority</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                  <input
+                    type="text"
+                    value={newCompanyTodo.assigned_to}
+                    onChange={(e) => setNewCompanyTodo(prev => ({ ...prev, assigned_to: e.target.value }))}
+                    placeholder="Assign to (optional)"
+                    className="flex-1 px-4 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
+                  />
+                  <input
+                    type="date"
+                    value={newCompanyTodo.deadline}
+                    onChange={(e) => setNewCompanyTodo(prev => ({ ...prev, deadline: e.target.value }))}
+                    data-testid="company-deadline-input"
+                    className="px-4 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white focus:border-[#D4A574] focus:outline-none"
+                    title="Deadline"
+                  />
+                </div>
                 <div className="flex gap-2">
-                  {hasTodos && <span className="bg-black/30 px-3 py-1 rounded-full text-sm text-white font-bold">📋 {todos.length}</span>}
-                  {hasPunch && <span className="bg-black/30 px-3 py-1 rounded-full text-sm text-white font-bold">🔨 {punchItems.length}</span>}
+                  <button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold text-sm"
+                  >
+                    Add Company Task
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCompanyAddForm(false)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+          
+          {/* Company Items List - MATCHING PUNCHLIST */}
+          <div className="divide-y divide-[#B49B7E]/10">
+            {filteredCompanyTodos.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-gray-500 mb-4">No company tasks yet.</p>
+                <button
+                  onClick={() => setShowCompanyAddForm(true)}
+                  className="text-[#D4A574] hover:text-[#B49B7E]"
+                >
+                  + Add your first company task
+                </button>
+              </div>
+            ) : (
+              filteredCompanyTodos.map(todo => (
+                <div 
+                  key={todo.id} 
+                  data-testid={`company-todo-${todo.id}`}
+                  className={`p-4 hover:bg-black/20 transition-colors ${
+                    todo.completed || todo.status === 'completed' ? 'opacity-60' : ''
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Status Toggle */}
+                    <button
+                      onClick={() => {
+                        const nextStatus = {
+                          pending: 'in_progress',
+                          in_progress: 'completed',
+                          completed: 'pending',
+                          undefined: 'in_progress'
+                        };
+                        updateCompanyTodoStatus(todo.id, nextStatus[todo.status || 'pending']);
+                      }}
+                      className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        todo.completed || todo.status === 'completed'
+                          ? 'border-green-500 bg-green-500/20 text-green-400'
+                          : 'border-gray-500 hover:border-[#D4A574]'
+                      }`}
+                    >
+                      {getStatusIcon(todo.status, todo.completed)}
+                    </button>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className={`font-medium ${
+                          todo.completed || todo.status === 'completed' 
+                            ? 'line-through text-gray-500' 
+                            : 'text-white'
+                        }`}>
+                          {todo.text}
+                        </h4>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(todo.priority)} text-white`}>
+                          {todo.priority}
+                        </span>
+                      </div>
+                      
+                      {todo.description && (
+                        <p className="text-gray-400 text-sm mt-1 line-clamp-2">
+                          {todo.description}
+                        </p>
+                      )}
+                      
+                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 flex-wrap">
+                        <span className={getStatusColor(todo.status, todo.completed)}>
+                          {(todo.status || 'pending').replace('_', ' ')}
+                        </span>
+                        {todo.assigned_to && (
+                          <span>👤 {todo.assigned_to}</span>
+                        )}
+                        {todo.deadline && (
+                          <span className="text-amber-400">📅 {new Date(todo.deadline).toLocaleDateString()}</span>
+                        )}
+                        <span>
+                          {new Date(todo.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Actions */}
+                    <button
+                      onClick={() => deleteTodo(todo.id, true)}
+                      className="text-red-400 hover:text-red-300 p-1"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* PROJECT SECTIONS */}
+      {(activeSection === 'all' || activeSection === 'projects') && projects.map((project, idx) => {
+        const todos = projectTodos[project.id] || [];
+        const punchItems = projectPunchItems[project.id] || [];
+        const color = JOB_COLORS[idx % JOB_COLORS.length];
+        const hasTasks = todos.length > 0 || punchItems.length > 0;
+        
+        if (!hasTasks) return null;
+        
+        return (
+          <div key={project.id} className="mb-6 rounded-xl overflow-hidden border" style={{ borderColor: color.border, background: color.bg }}>
+            <div 
+              className="px-6 py-4 flex items-center justify-between cursor-pointer"
+              onClick={() => setExpandedProjects(prev => ({ ...prev, [project.id]: !prev[project.id] }))}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🏠</span>
+                <div>
+                  <h3 className="font-bold text-lg" style={{ color: color.accent }}>{project.name}</h3>
+                  <p className="text-gray-400 text-sm">
+                    {todos.filter(t => !t.completed).length} to-dos • {punchItems.filter(p => p.status !== 'completed').length} punch items
+                  </p>
                 </div>
               </div>
-              {expandedProjects[project.id] && (
-                <div className="rounded-b-xl overflow-hidden" style={{ border: `1px solid ${jobColor.border}`, borderTop: 'none' }}>
-                  {hasTodos && (
-                    <div className={hasPunch ? 'border-b-2' : ''} style={{ borderColor: jobColor.border }}>
-                      <div className="px-4 py-2 text-sm font-bold text-white" style={{ background: 'rgba(0,0,0,0.5)' }}>📋 TO-DO LIST</div>
-                      {todos.map((todo, idx) => (
-                        <div key={todo.id} className="p-4 flex items-center gap-4" style={{ background: idx % 2 === 0 ? 'rgba(0,0,0,0.8)' : 'rgba(30,30,30,0.8)' }}>
-                          <input type="checkbox" checked={todo.completed} onChange={() => toggleTodo(todo.id, todo.completed, false)} className="w-5 h-5" />
-                          <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ background: getPriorityStyle(todo.priority) }}>{todo.priority}</span>
-                          <span className={`flex-1 ${todo.completed ? 'line-through text-[#B49B7E]/50' : 'text-[#D4C5A9]'}`}>{todo.text}</span>
-                          {todo.linked_ffe_item && <span className="text-xs px-2 py-1 rounded" style={{ background: jobColor.border + '30', color: jobColor.accent }}>🔗 {todo.linked_ffe_item.name}</span>}
-                          <button onClick={() => deleteTodo(todo.id, false)} className="text-red-400">🗑️</button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {hasPunch && (
-                    <div>
-                      <div className="px-4 py-2 text-sm font-bold text-white" style={{ background: 'rgba(0,0,0,0.5)' }}>🔨 PUNCH LIST</div>
-                      {punchItems.map((item, idx) => (
-                        <div key={item.id} className="p-4 flex items-center gap-4" style={{ background: idx % 2 === 0 ? 'rgba(0,0,0,0.8)' : 'rgba(30,30,30,0.8)' }}>
-                          <button onClick={() => togglePunchItem(item.id, item.status)} className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${item.status === 'completed' || item.status === 'verified' ? 'border-green-500 bg-green-500/20 text-green-400' : 'border-[#D4A574] text-[#D4A574]'}`}>{getStatusIcon(item.status)}</button>
-                          <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ background: getPriorityStyle(item.priority) }}>{item.priority}</span>
-                          <div className="flex-1"><span className={item.status === 'completed' || item.status === 'verified' ? 'line-through text-[#B49B7E]/50' : 'text-[#D4C5A9]'}>{item.title}</span>{item.description && <p className="text-[#B49B7E]/70 text-sm mt-1">{item.description}</p>}</div>
-                          <span className="text-xs text-[#B49B7E] uppercase">{(item.status || 'pending').replace('_', ' ')}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+              <span className="text-white text-xl">{expandedProjects[project.id] ? '▼' : '▶'}</span>
             </div>
-          );
-        })}
+            
+            {expandedProjects[project.id] && (
+              <div className="px-6 pb-4 space-y-2">
+                {/* Project To-Dos */}
+                {todos.map(todo => (
+                  <div key={todo.id} className="flex items-center gap-3 p-3 rounded-lg bg-black/20">
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => toggleTodo(todo.id, todo.completed)}
+                      className="w-5 h-5 cursor-pointer"
+                    />
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(todo.priority)} text-white`}>
+                      {todo.priority}
+                    </span>
+                    <span className={`flex-1 ${todo.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                      {todo.text}
+                    </span>
+                    {todo.deadline && (
+                      <span className="text-amber-400 text-xs">📅 {new Date(todo.deadline).toLocaleDateString()}</span>
+                    )}
+                    <span className="text-xs bg-blue-600 px-2 py-0.5 rounded text-white">TO-DO</span>
+                    <button onClick={() => deleteTodo(todo.id)} className="text-red-400 hover:text-red-300">🗑️</button>
+                  </div>
+                ))}
+                
+                {/* Punch Items */}
+                {punchItems.map(item => (
+                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-lg bg-black/20">
+                    <button
+                      onClick={() => togglePunchItem(item.id, item.status)}
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs ${
+                        item.status === 'completed' || item.status === 'verified'
+                          ? 'border-green-500 bg-green-500/20 text-green-400'
+                          : 'border-gray-500 hover:border-[#D4A574]'
+                      }`}
+                    >
+                      {item.status === 'completed' || item.status === 'verified' ? '✓' : ''}
+                    </button>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white`}>
+                      {item.priority}
+                    </span>
+                    <span className={`flex-1 ${item.status === 'completed' ? 'line-through text-gray-500' : 'text-white'}`}>
+                      {item.title}
+                    </span>
+                    {item.due_date && (
+                      <span className="text-amber-400 text-xs">📅 {new Date(item.due_date).toLocaleDateString()}</span>
+                    )}
+                    <span className="text-xs bg-orange-600 px-2 py-0.5 rounded text-white">PUNCH</span>
+                    <button onClick={() => deletePunchItem(item.id)} className="text-red-400 hover:text-red-300">🗑️</button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
 
-        {totalAll === 0 && <div className="text-center py-12"><div className="text-6xl mb-4">📋</div><div className="text-xl text-[#D4A574]">No tasks yet</div><div className="text-[#B49B7E] mt-2">Add tasks above or from within each job</div></div>}
-      </div>
+      {/* Empty state */}
+      {!loading && projects.length === 0 && companyTodos.length === 0 && (
+        <div className="text-center py-12 text-gray-400">
+          <p className="text-xl mb-4">No tasks found</p>
+          <p>Create projects and add to-do items to see them here.</p>
+        </div>
+      )}
     </div>
   );
 }
