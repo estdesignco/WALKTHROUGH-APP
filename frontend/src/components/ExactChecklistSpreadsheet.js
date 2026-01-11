@@ -46,6 +46,10 @@ const ExactChecklistSpreadsheet = ({
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [availableCategories, setAvailableCategories] = useState([]);
   
+  // State to track items on To-Do or Punch List (for highlighting)
+  const [todoLinkedItems, setTodoLinkedItems] = useState(new Set());
+  const [punchLinkedItems, setPunchLinkedItems] = useState(new Set());
+  
   // Load expanded states from localStorage
   const [expandedRooms, setExpandedRooms] = useState(() => {
     const saved = localStorage.getItem('checklist_expandedRooms');
