@@ -491,41 +491,49 @@ const ExactChecklistSpreadsheet = ({
     const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
     
     try {
-      // Load To-Do items
+      // Load To-Do items - track completion status
       const todoRes = await fetch(`${backendUrl}/api/todos/${project.id}`);
       if (todoRes.ok) {
         const todoData = await todoRes.json();
         const todos = todoData.todos || [];
-        const linkedTodoIds = new Set();
+        const linkedTodoMap = new Map();
         todos.forEach(todo => {
           if (todo.linked_ffe_item?.id) {
-            linkedTodoIds.add(todo.linked_ffe_item.id);
+            // Track if the TO-DO is completed, not the item
+            const isComplete = todo.completed || todo.status === 'completed';
+            linkedTodoMap.set(todo.linked_ffe_item.id, { 
+              completed: isComplete,
+              status: todo.status 
+            });
           }
         });
-        setTodoLinkedItems(linkedTodoIds);
-        console.log(`📋 Found ${linkedTodoIds.size} items linked to To-Do`);
+        setTodoLinkedItems(linkedTodoMap);
+        console.log(`📋 Found ${linkedTodoMap.size} items linked to To-Do`);
       }
     } catch (e) {
       console.log('No todos loaded');
     }
     
     try {
-      // Load Punch List items
+      // Load Punch List items - track completion status
       const punchRes = await fetch(`${backendUrl}/api/punch-list/project/${project.id}`);
       if (punchRes.ok) {
         const punchData = await punchRes.json();
         const punchItems = punchData.punch_items || punchData || [];
-        const linkedPunchIds = new Set();
+        const linkedPunchMap = new Map();
         punchItems.forEach(item => {
-          if (item.linked_ffe_item_id) {
-            linkedPunchIds.add(item.linked_ffe_item_id);
-          }
-          if (item.linked_ffe_item?.id) {
-            linkedPunchIds.add(item.linked_ffe_item.id);
+          const itemId = item.linked_ffe_item_id || item.linked_ffe_item?.id;
+          if (itemId) {
+            // Track if the PUNCH LIST item is completed, not the checklist item
+            const isComplete = item.status === 'completed' || item.status === 'verified';
+            linkedPunchMap.set(itemId, {
+              completed: isComplete,
+              status: item.status
+            });
           }
         });
-        setPunchLinkedItems(linkedPunchIds);
-        console.log(`🔨 Found ${linkedPunchIds.size} items linked to Punch List`);
+        setPunchLinkedItems(linkedPunchMap);
+        console.log(`🔨 Found ${linkedPunchMap.size} items linked to Punch List`);
       }
     } catch (e) {
       console.log('No punch list items loaded');
