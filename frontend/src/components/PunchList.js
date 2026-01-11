@@ -625,12 +625,15 @@ export default function PunchList({ projectId, roomId = null }) {
                     </button>
                   )}
                   
-                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 flex-wrap">
                     <span className={getStatusColor(item.status)}>
                       {item.status.replace('_', ' ')}
                     </span>
                     {item.assigned_to && (
                       <span>👤 {item.assigned_to}</span>
+                    )}
+                    {item.due_date && (
+                      <span className="text-amber-400">📅 {new Date(item.due_date).toLocaleDateString()}</span>
                     )}
                     <span>
                       {new Date(item.created_at).toLocaleDateString()}
