@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
@@ -7,16 +8,17 @@ const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + 
  * MasterToDoList - A unified view of ALL to-dos across all projects and company-wide
  * Includes:
  * - Company-wide to-dos (Established Design Co internal tasks)
- * - Per-project to-dos organized by customer/project
- * - Punch list items integrated as to-dos
+ * - Per-project to-dos organized by JOB/customer
+ * - Punch list items integrated (marked as PUNCH LIST)
  */
 export default function MasterToDoList() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
   const [projectTodos, setProjectTodos] = useState({});
   const [projectPunchItems, setProjectPunchItems] = useState({});
   const [companyTodos, setCompanyTodos] = useState([]);
-  const [activeSection, setActiveSection] = useState('all'); // all, company, projects
+  const [activeSection, setActiveSection] = useState('all');
   const [expandedProjects, setExpandedProjects] = useState({});
   
   // New item form state
@@ -24,7 +26,7 @@ export default function MasterToDoList() {
   const [newTodo, setNewTodo] = useState({
     text: '',
     priority: 'Medium',
-    type: 'company', // company or project
+    type: 'company',
     project_id: null
   });
 
@@ -37,10 +39,10 @@ export default function MasterToDoList() {
     try {
       // Load all projects
       const projectsRes = await axios.get(`${API_URL}/projects`);
-      const projectsList = projectsRes.data.projects || [];
+      const projectsList = projectsRes.data.projects || projectsRes.data || [];
       setProjects(projectsList);
       
-      // Initialize expanded state
+      // Initialize expanded state - all expanded by default
       const expanded = {};
       projectsList.forEach(p => { expanded[p.id] = true; });
       setExpandedProjects(expanded);
@@ -51,19 +53,22 @@ export default function MasterToDoList() {
       
       for (const project of projectsList) {
         try {
-          // Load project todos
           const todosRes = await axios.get(`${API_URL}/todos/${project.id}`);
-          todosMap[project.id] = todosRes.data.todos || [];
+          const todos = todosRes.data.todos || todosRes.data || [];
+          todosMap[project.id] = todos;
+          console.log(`📋 Project ${project.name}: ${todos.length} todos`);
         } catch (e) {
+          console.log(`No todos for ${project.name}`);
           todosMap[project.id] = [];
         }
         
         try {
-          // Load punch list items
           const punchRes = await fetch(`${API_URL}/punch-list/project/${project.id}`);
           if (punchRes.ok) {
             const punchData = await punchRes.json();
-            punchMap[project.id] = punchData.punch_items || [];
+            const items = punchData.punch_items || punchData || [];
+            punchMap[project.id] = items;
+            console.log(`🔨 Project ${project.name}: ${items.length} punch items`);
           } else {
             punchMap[project.id] = [];
           }
@@ -78,8 +83,11 @@ export default function MasterToDoList() {
       // Load company-wide todos
       try {
         const companyRes = await axios.get(`${API_URL}/todos/company`);
-        setCompanyTodos(companyRes.data.todos || []);
+        const companyItems = companyRes.data.todos || companyRes.data || [];
+        setCompanyTodos(companyItems);
+        console.log(`🏢 Company todos: ${companyItems.length}`);
       } catch (e) {
+        console.log('No company todos');
         setCompanyTodos([]);
       }
       
@@ -95,14 +103,12 @@ export default function MasterToDoList() {
     
     try {
       if (newTodo.type === 'company') {
-        // Add company-wide todo
         await axios.post(`${API_URL}/todos/company`, {
           text: newTodo.text.trim(),
           priority: newTodo.priority,
           completed: false
         });
       } else {
-        // Add project-specific todo
         await axios.post(`${API_URL}/todos`, {
           project_id: newTodo.project_id,
           text: newTodo.text.trim(),
@@ -129,7 +135,7 @@ export default function MasterToDoList() {
     }
   };
 
-  const togglePunchItem = async (itemId, currentStatus, projectId) => {
+  const togglePunchItem = async (itemId, currentStatus) => {
     try {
       const nextStatus = {
         pending: 'in_progress',
@@ -160,16 +166,14 @@ export default function MasterToDoList() {
   };
 
   const getPriorityStyle = (priority) => {
+    const p = (priority || 'medium').toLowerCase();
     const styles = {
-      High: { bg: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)', border: '#EF4444', shadow: '#EF444450' },
-      Medium: { bg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', border: '#F59E0B', shadow: '#F59E0B50' },
-      Low: { bg: 'linear-gradient(135deg, #10B981 0%, #059669 100%)', border: '#10B981', shadow: '#10B98150' },
-      urgent: { bg: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)', border: '#DC2626', shadow: '#DC262650' },
-      high: { bg: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)', border: '#F97316', shadow: '#F9731650' },
-      medium: { bg: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)', border: '#FBBF24', shadow: '#FBBF2450' },
-      low: { bg: 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)', border: '#6B7280', shadow: '#6B728050' }
+      high: { bg: '#EF4444', border: '#EF4444' },
+      urgent: { bg: '#DC2626', border: '#DC2626' },
+      medium: { bg: '#F59E0B', border: '#F59E0B' },
+      low: { bg: '#10B981', border: '#10B981' }
     };
-    return styles[priority] || styles.Medium;
+    return styles[p] || styles.medium;
   };
 
   const getStatusIcon = (status) => {
@@ -199,41 +203,49 @@ export default function MasterToDoList() {
     <div className="min-h-screen" style={{ backgroundColor: '#0F172A' }}>
       <div className="p-6 max-w-6xl mx-auto">
         
+        {/* Back Button */}
+        <button
+          onClick={() => navigate('/')}
+          className="mb-4 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-white flex items-center gap-2"
+        >
+          ← Back to Dashboard
+        </button>
+        
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-[#D4A574] mb-2">📋 Master To-Do List</h1>
-          <p className="text-gray-400">All tasks across company and projects in one place</p>
+          <p className="text-gray-400">All tasks across company and jobs in one place</p>
         </div>
 
         {/* Stats Bar */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           <div 
-            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'all' ? 'border-[#D4A574] bg-[#D4A574]/10' : 'border-[#B49B7E]/30'}`}
+            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'all' ? 'border-[#D4A574] bg-[#D4A574]/10' : 'border-[#B49B7E]/30 hover:border-[#D4A574]/50'}`}
             onClick={() => setActiveSection('all')}
           >
             <div className="text-3xl font-bold text-white">{totalAll}</div>
             <div className="text-sm text-gray-400">All Tasks</div>
           </div>
           <div 
-            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'company' ? 'border-purple-500 bg-purple-500/10' : 'border-[#B49B7E]/30'}`}
+            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'company' ? 'border-purple-500 bg-purple-500/10' : 'border-[#B49B7E]/30 hover:border-purple-500/50'}`}
             onClick={() => setActiveSection('company')}
           >
             <div className="text-3xl font-bold text-purple-400">{totalCompanyTodos}</div>
             <div className="text-sm text-gray-400">Company Tasks</div>
           </div>
           <div 
-            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'projects' ? 'border-blue-500 bg-blue-500/10' : 'border-[#B49B7E]/30'}`}
-            onClick={() => setActiveSection('projects')}
+            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'todos' ? 'border-blue-500 bg-blue-500/10' : 'border-[#B49B7E]/30 hover:border-blue-500/50'}`}
+            onClick={() => setActiveSection('todos')}
           >
             <div className="text-3xl font-bold text-blue-400">{totalProjectTodos}</div>
-            <div className="text-sm text-gray-400">Project To-Dos</div>
+            <div className="text-sm text-gray-400">Job To-Dos</div>
           </div>
           <div 
-            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'punch' ? 'border-orange-500 bg-orange-500/10' : 'border-[#B49B7E]/30'}`}
+            className={`p-4 rounded-xl border cursor-pointer transition-all ${activeSection === 'punch' ? 'border-orange-500 bg-orange-500/10' : 'border-[#B49B7E]/30 hover:border-orange-500/50'}`}
             onClick={() => setActiveSection('punch')}
           >
             <div className="text-3xl font-bold text-orange-400">{totalPunchItems}</div>
-            <div className="text-sm text-gray-400">Punch List Items</div>
+            <div className="text-sm text-gray-400">Punch List</div>
           </div>
         </div>
 
@@ -261,7 +273,7 @@ export default function MasterToDoList() {
                 className="px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white"
               >
                 <option value="company">🏢 Established Design Co (Company)</option>
-                <option value="project">👤 Project-Specific</option>
+                <option value="project">👤 Job-Specific</option>
               </select>
               
               {newTodo.type === 'project' && (
@@ -270,7 +282,7 @@ export default function MasterToDoList() {
                   onChange={(e) => setNewTodo(prev => ({ ...prev, project_id: e.target.value }))}
                   className="px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white"
                 >
-                  <option value="">Select Project...</option>
+                  <option value="">Select Job...</option>
                   {projects.map(p => (
                     <option key={p.id} value={p.id}>{p.name} - {p.client_info?.name || 'No Client'}</option>
                   ))}
@@ -326,7 +338,7 @@ export default function MasterToDoList() {
             
             <div className="border border-purple-500/30 border-t-0 rounded-b-xl overflow-hidden">
               {companyTodos.length === 0 ? (
-                <div className="p-6 text-center text-gray-500">No company tasks yet</div>
+                <div className="p-6 text-center text-gray-500">No company tasks yet - add one above!</div>
               ) : (
                 companyTodos.map(todo => (
                   <div key={todo.id} className="p-4 border-b border-purple-500/10 last:border-b-0 hover:bg-purple-500/5 flex items-center gap-4">
@@ -353,41 +365,41 @@ export default function MasterToDoList() {
           </div>
         )}
 
-        {/* PROJECT TO-DOS & PUNCH LISTS */}
-        {(activeSection === 'all' || activeSection === 'projects' || activeSection === 'punch') && projects.map(project => {
+        {/* PROJECT/JOB SECTIONS - Organized by JOB */}
+        {(activeSection === 'all' || activeSection === 'todos' || activeSection === 'punch') && projects.map(project => {
           const todos = projectTodos[project.id] || [];
           const punchItems = projectPunchItems[project.id] || [];
-          const showTodos = activeSection === 'all' || activeSection === 'projects';
+          const showTodos = activeSection === 'all' || activeSection === 'todos';
           const showPunch = activeSection === 'all' || activeSection === 'punch';
           
-          if (!showTodos && !showPunch) return null;
-          if (showTodos && todos.length === 0 && showPunch && punchItems.length === 0) return null;
-          if (!showTodos && punchItems.length === 0) return null;
-          if (!showPunch && todos.length === 0) return null;
+          // Skip if nothing to show
+          const hasTodos = showTodos && todos.length > 0;
+          const hasPunch = showPunch && punchItems.length > 0;
+          if (!hasTodos && !hasPunch) return null;
           
           return (
             <div key={project.id} className="mb-6">
-              {/* Project Header */}
+              {/* JOB Header */}
               <div 
                 className="flex items-center gap-3 px-4 py-3 rounded-t-xl cursor-pointer"
                 style={{ background: 'linear-gradient(135deg, #1E40AF 0%, #1E3A8A 100%)' }}
                 onClick={() => toggleProjectExpanded(project.id)}
               >
                 <span className="text-xl">{expandedProjects[project.id] ? '▼' : '▶'}</span>
-                <span className="text-2xl">👤</span>
+                <span className="text-2xl">🏠</span>
                 <div className="flex-1">
-                  <h2 className="text-lg font-bold text-white">{project.name}</h2>
-                  <p className="text-sm text-blue-200">{project.client_info?.name || 'No Client'}</p>
+                  <h2 className="text-lg font-bold text-white">JOB: {project.name}</h2>
+                  <p className="text-sm text-blue-200">{project.client_info?.name || project.client_info?.full_name || 'No Client'}</p>
                 </div>
                 <div className="flex gap-2">
-                  {showTodos && todos.length > 0 && (
-                    <span className="bg-blue-400/20 px-3 py-1 rounded-full text-sm text-blue-200">
-                      {todos.length} to-dos
+                  {hasTodos && (
+                    <span className="bg-blue-400/30 px-3 py-1 rounded-full text-sm text-blue-100 font-bold">
+                      📋 {todos.length} TO-DO
                     </span>
                   )}
-                  {showPunch && punchItems.length > 0 && (
-                    <span className="bg-orange-400/20 px-3 py-1 rounded-full text-sm text-orange-200">
-                      {punchItems.length} punch
+                  {hasPunch && (
+                    <span className="bg-orange-400/30 px-3 py-1 rounded-full text-sm text-orange-100 font-bold">
+                      🔨 {punchItems.length} PUNCH
                     </span>
                   )}
                 </div>
@@ -395,14 +407,18 @@ export default function MasterToDoList() {
               
               {expandedProjects[project.id] && (
                 <div className="border border-blue-500/30 border-t-0 rounded-b-xl overflow-hidden">
-                  {/* Project To-Dos */}
-                  {showTodos && todos.length > 0 && (
-                    <div className="border-b border-blue-500/20">
-                      <div className="px-4 py-2 bg-blue-900/30 text-blue-300 text-sm font-semibold">
-                        📋 To-Do Items
+                  {/* TO-DO Items for this JOB */}
+                  {hasTodos && (
+                    <div className={hasPunch ? "border-b-2 border-blue-500/30" : ""}>
+                      <div className="px-4 py-2 bg-blue-900/50 text-blue-200 text-sm font-bold flex items-center gap-2">
+                        📋 TO-DO LIST
                       </div>
-                      {todos.map(todo => (
-                        <div key={todo.id} className="p-4 border-b border-blue-500/10 last:border-b-0 hover:bg-blue-500/5 flex items-center gap-4">
+                      {todos.map((todo, idx) => (
+                        <div 
+                          key={todo.id} 
+                          className="p-4 border-b border-blue-500/10 last:border-b-0 flex items-center gap-4"
+                          style={{ backgroundColor: idx % 2 === 0 ? 'rgba(59, 130, 246, 0.05)' : 'transparent' }}
+                        >
                           <input
                             type="checkbox"
                             checked={todo.completed}
@@ -418,26 +434,35 @@ export default function MasterToDoList() {
                           <span className={`flex-1 ${todo.completed ? 'line-through text-gray-500' : 'text-white'}`}>
                             {todo.text}
                           </span>
+                          {todo.linked_ffe_item && (
+                            <span className="text-xs text-[#D4A574] bg-[#D4A574]/10 px-2 py-1 rounded">
+                              🔗 {todo.linked_ffe_item.name}
+                            </span>
+                          )}
                           <button onClick={() => deleteTodo(todo.id, false)} className="text-red-400 hover:text-red-300">🗑️</button>
                         </div>
                       ))}
                     </div>
                   )}
                   
-                  {/* Punch List Items */}
-                  {showPunch && punchItems.length > 0 && (
+                  {/* PUNCH LIST Items for this JOB */}
+                  {hasPunch && (
                     <div>
-                      <div className="px-4 py-2 bg-orange-900/30 text-orange-300 text-sm font-semibold">
-                        🔨 Punch List Items
+                      <div className="px-4 py-2 bg-orange-900/50 text-orange-200 text-sm font-bold flex items-center gap-2">
+                        🔨 PUNCH LIST
                       </div>
-                      {punchItems.map(item => (
-                        <div key={item.id} className="p-4 border-b border-orange-500/10 last:border-b-0 hover:bg-orange-500/5 flex items-center gap-4">
+                      {punchItems.map((item, idx) => (
+                        <div 
+                          key={item.id} 
+                          className="p-4 border-b border-orange-500/10 last:border-b-0 flex items-center gap-4"
+                          style={{ backgroundColor: idx % 2 === 0 ? 'rgba(249, 115, 22, 0.05)' : 'transparent' }}
+                        >
                           <button
-                            onClick={() => togglePunchItem(item.id, item.status, project.id)}
-                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
+                            onClick={() => togglePunchItem(item.id, item.status)}
+                            className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm ${
                               item.status === 'completed' || item.status === 'verified'
                                 ? 'border-green-500 bg-green-500/20 text-green-400'
-                                : 'border-orange-500 hover:border-orange-400'
+                                : 'border-orange-500 hover:border-orange-400 text-orange-400'
                             }`}
                           >
                             {getStatusIcon(item.status)}
@@ -453,23 +478,33 @@ export default function MasterToDoList() {
                               {item.title}
                             </span>
                             {item.description && (
-                              <p className="text-gray-500 text-sm">{item.description}</p>
+                              <p className="text-gray-500 text-sm mt-1">{item.description}</p>
                             )}
                           </div>
-                          <span className="text-xs text-gray-500">{item.status.replace('_', ' ')}</span>
+                          {item.linked_ffe_item && (
+                            <span className="text-xs text-[#D4A574] bg-[#D4A574]/10 px-2 py-1 rounded">
+                              🔗 {item.linked_ffe_item.name}
+                            </span>
+                          )}
+                          <span className="text-xs text-gray-500 uppercase">{(item.status || 'pending').replace('_', ' ')}</span>
                         </div>
                       ))}
                     </div>
-                  )}
-                  
-                  {todos.length === 0 && punchItems.length === 0 && (
-                    <div className="p-6 text-center text-gray-500">No tasks for this project</div>
                   )}
                 </div>
               )}
             </div>
           );
         })}
+
+        {/* Empty state when no items */}
+        {totalAll === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📋</div>
+            <div className="text-xl text-gray-400">No tasks yet</div>
+            <div className="text-gray-500 mt-2">Add company tasks above, or add To-Dos and Punch List items from within each job</div>
+          </div>
+        )}
 
       </div>
     </div>
