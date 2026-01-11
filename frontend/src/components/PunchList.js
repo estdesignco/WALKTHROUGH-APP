@@ -25,6 +25,7 @@ export default function PunchList({ projectId, roomId = null }) {
     description: '',
     priority: 'medium',
     assigned_to: '',
+    due_date: '',
     linked_ffe_item_id: null
   });
 
