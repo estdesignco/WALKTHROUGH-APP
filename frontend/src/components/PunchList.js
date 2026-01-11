@@ -437,7 +437,7 @@ export default function PunchList({ projectId, roomId = null }) {
               )}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
               <select
                 value={newItem.priority}
                 onChange={(e) => setNewItem(prev => ({ ...prev, priority: e.target.value }))}
@@ -454,6 +454,14 @@ export default function PunchList({ projectId, roomId = null }) {
                 onChange={(e) => setNewItem(prev => ({ ...prev, assigned_to: e.target.value }))}
                 placeholder="Assign to (optional)"
                 className="flex-1 px-4 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
+              />
+              <input
+                type="date"
+                value={newItem.due_date}
+                onChange={(e) => setNewItem(prev => ({ ...prev, due_date: e.target.value }))}
+                data-testid="punch-deadline-input"
+                className="px-4 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white focus:border-[#D4A574] focus:outline-none"
+                title="Deadline"
               />
             </div>
             <div className="flex gap-2">
