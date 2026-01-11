@@ -10859,8 +10859,13 @@ async def create_todo(todo: dict):
             "id": str(uuid.uuid4()),
             "project_id": todo.get("project_id"),
             "text": todo.get("text"),
+            "description": todo.get("description", ""),
             "priority": todo.get("priority", "Medium"),
+            "deadline": todo.get("deadline"),
+            "assigned_to": todo.get("assigned_to", ""),
+            "status": todo.get("status", "pending"),
             "completed": False,
+            "linked_ffe_item": todo.get("linked_ffe_item"),
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
@@ -10938,8 +10943,13 @@ async def create_company_todo(todo: dict):
         new_todo = {
             "id": str(uuid.uuid4()),
             "text": todo.get("text"),
+            "description": todo.get("description", ""),
             "priority": todo.get("priority", "Medium"),
+            "deadline": todo.get("deadline"),
+            "assigned_to": todo.get("assigned_to", ""),
+            "status": todo.get("status", "pending"),
             "completed": False,
+            "linked_ffe_item": todo.get("linked_ffe_item"),
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
