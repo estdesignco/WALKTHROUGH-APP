@@ -21,11 +21,11 @@ export default function ToDoList({ projectId }) {
     loadFfeItems();
   }, [projectId]);
 
-  // Load ALL items from ALL sheet types for linking
+  // Load ONLY Checklist AND FFE items for linking (NOT walkthrough)
   const loadFfeItems = async () => {
     try {
       const allItems = [];
-      const sheetTypes = ['walkthrough', 'checklist', 'ffe'];
+      const sheetTypes = ['checklist', 'ffe'];
       
       for (const sheetType of sheetTypes) {
         try {
@@ -54,7 +54,7 @@ export default function ToDoList({ projectId }) {
         }
       }
       
-      console.log(`📦 ToDoList: Loaded ${allItems.length} items for linking`);
+      console.log(`📦 ToDoList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
       setFfeItems(allItems);
     } catch (error) {
       console.error('Failed to load items:', error);
