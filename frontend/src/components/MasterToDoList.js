@@ -4,13 +4,14 @@ import axios from 'axios';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
+// TONED DOWN project colors - much more subtle
 const JOB_COLORS = [
-  { bg: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)', border: '#CD853F', accent: '#DEB887' },
-  { bg: 'linear-gradient(135deg, #2F4F4F 0%, #3D5C5C 100%)', border: '#5F9EA0', accent: '#87CEEB' },
-  { bg: 'linear-gradient(135deg, #4A0E4E 0%, #6B1D6B 100%)', border: '#9932CC', accent: '#DA70D6' },
-  { bg: 'linear-gradient(135deg, #1C3D1C 0%, #2D5A2D 100%)', border: '#228B22', accent: '#90EE90' },
-  { bg: 'linear-gradient(135deg, #4A2C2A 0%, #6B3D3B 100%)', border: '#A0522D', accent: '#F4A460' },
-  { bg: 'linear-gradient(135deg, #1A3A5C 0%, #2A5080 100%)', border: '#4682B4', accent: '#87CEEB' },
+  { bg: 'linear-gradient(135deg, rgba(139, 69, 19, 0.15) 0%, rgba(160, 82, 45, 0.12) 100%)', border: 'rgba(205, 133, 63, 0.4)', accent: '#DEB887' },
+  { bg: 'linear-gradient(135deg, rgba(47, 79, 79, 0.15) 0%, rgba(61, 92, 92, 0.12) 100%)', border: 'rgba(95, 158, 160, 0.4)', accent: '#87CEEB' },
+  { bg: 'linear-gradient(135deg, rgba(74, 14, 78, 0.15) 0%, rgba(107, 29, 107, 0.12) 100%)', border: 'rgba(153, 50, 204, 0.4)', accent: '#DA70D6' },
+  { bg: 'linear-gradient(135deg, rgba(28, 61, 28, 0.15) 0%, rgba(45, 90, 45, 0.12) 100%)', border: 'rgba(34, 139, 34, 0.4)', accent: '#90EE90' },
+  { bg: 'linear-gradient(135deg, rgba(74, 44, 42, 0.15) 0%, rgba(107, 61, 59, 0.12) 100%)', border: 'rgba(160, 82, 45, 0.4)', accent: '#F4A460' },
+  { bg: 'linear-gradient(135deg, rgba(26, 58, 92, 0.15) 0%, rgba(42, 80, 128, 0.12) 100%)', border: 'rgba(70, 130, 180, 0.4)', accent: '#87CEEB' },
 ];
 
 /**
