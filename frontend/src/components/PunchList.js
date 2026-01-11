@@ -569,12 +569,15 @@ export default function PunchList({ projectId, roomId = null }) {
                   {item.linked_ffe_item ? (
                     <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/30">
                       <span className="text-[#D4A574]">🔗</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${item.linked_ffe_item.sourceType === 'CHECKLIST' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
+                        {item.linked_ffe_item.sourceType || 'FFE'}
+                      </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-[#D4A574] text-sm font-medium truncate">
-                          {item.linked_ffe_item.name}
+                          {item.linked_ffe_item.name || 'Unknown Item'}
                         </div>
                         <div className="text-gray-500 text-xs">
-                          {item.linked_ffe_item.roomName} • {item.linked_ffe_item.vendor} • SKU: {item.linked_ffe_item.sku}
+                          {item.linked_ffe_item.roomName || 'No Room'} • {item.linked_ffe_item.vendor || 'No Vendor'} • SKU: {item.linked_ffe_item.sku || 'N/A'}
                         </div>
                       </div>
                       <button
