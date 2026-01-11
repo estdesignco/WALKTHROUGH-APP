@@ -39,40 +39,36 @@ export default function PunchList({ projectId, roomId = null }) {
 
   const loadAllItems = async () => {
     try {
-      const allItems = [];
+      const itemsMap = new Map(); // Dedupe by ID, FFE takes priority
       
-      // Load ONLY Checklist and FFE items (NOT walkthrough)
-      const sheetTypes = ['checklist', 'ffe'];
-      
-      for (const sheetType of sheetTypes) {
+      // Load FFE FIRST so FFE items appear first and take priority
+      for (const sheetType of ['ffe', 'checklist']) {
         try {
           const res = await fetch(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
           if (res.ok) {
             const data = await res.json();
-            if (data.rooms) {
-              data.rooms.forEach(room => {
-                room.categories?.forEach(cat => {
-                  cat.subcategories?.forEach(subCat => {
-                    subCat.items?.forEach(item => {
-                      allItems.push({
+            (data.rooms || []).forEach(room => {
+              (room.categories || []).forEach(cat => {
+                (cat.subcategories || []).forEach(subCat => {
+                  (subCat.items || []).forEach(item => {
+                    if (!itemsMap.has(item.id)) {
+                      itemsMap.set(item.id, {
                         ...item,
                         roomName: room.name,
                         categoryName: cat.name,
                         sourceType: sheetType.toUpperCase()
                       });
-                    });
+                    }
                   });
                 });
               });
-            }
+            });
           }
-        } catch (e) {
-          console.log(`No ${sheetType} items`);
-        }
+        } catch (e) {}
       }
       
-      console.log(`📦 PunchList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
-      setFfeItems(allItems);
+      console.log(`📦 PunchList: Loaded ${itemsMap.size} unique items (FFE priority)`);
+      setFfeItems(Array.from(itemsMap.values()));
     } catch (error) {
       console.error('Failed to load items:', error);
     }
