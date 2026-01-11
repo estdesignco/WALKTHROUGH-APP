@@ -2464,13 +2464,8 @@ const ExactChecklistSpreadsheet = ({
                                         </td>
                                       </tr>
                                     );
-                                            value={item.name || ''}
-                                            onChange={(e) => handleUpdateItemField(item.id, 'name', e.target.value)}
-                                            className="w-full bg-transparent border-none outline-none text-sm"
-                                            style={inputStyle}
-                                            placeholder="Item name..."
-                                          />
-                                        </td>
+                                    });
+                                })()}
                                   
                                   {/* VENDOR/SKU - EDITABLE */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
