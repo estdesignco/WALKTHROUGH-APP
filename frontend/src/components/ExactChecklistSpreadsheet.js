@@ -2423,13 +2423,14 @@ const ExactChecklistSpreadsheet = ({
                                               handleBatchUpdateItem(item.id, updates);
                                             }}
                                             placeholder="Type to search products..."
-                                            className={`${textClass} text-sm`}
+                                            className="text-sm"
                                             style={{ color: textColor }}
                                           />
+                                          </div>
                                         </td>
                                   
                                   {/* VENDOR/SKU - EDITABLE WITH DROPDOWN */}
-                                  <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
                                     <div className="flex flex-col gap-1">
                                       <VendorDropdown
                                         value={item.vendor || ''}
@@ -2438,7 +2439,7 @@ const ExactChecklistSpreadsheet = ({
                                             handleUpdateItemField(item.id, 'vendor', newVendor);
                                           }
                                         }}
-                                        className={`${textClass} text-sm`}
+                                        className="text-sm"
                                         style={{ color: textColor }}
                                       />
                                       <input
@@ -2446,17 +2447,19 @@ const ExactChecklistSpreadsheet = ({
                                         value={item.sku || ''}
                                         onChange={(e) => handleUpdateItemField(item.id, 'sku', e.target.value)}
                                         placeholder="SKU..."
-                                        className="w-full bg-transparent text-[#B49B7E] text-xs outline-none border-t border-gray-600 pt-1"
+                                        className="w-full bg-transparent text-xs outline-none border-t border-gray-600 pt-1"
+                                        style={{ color: textColor }}
                                       />
                                     </div>
                                   </td>
                                   
                                   {/* QTY - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm text-center" style={cellStyle}>
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#B49B7E] text-sm text-center outline-none"
+                                      className="w-full bg-transparent text-sm text-center outline-none"
+                                      style={{ color: textColor }}
                                       onBlur={(e) => {
                                         const newValue = parseInt(e.target.textContent) || 0;
                                         if (newValue !== item.quantity) {
@@ -2469,11 +2472,12 @@ const ExactChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* SIZE - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
                                     <div 
                                       contentEditable={true}
                                       suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                      className="w-full bg-transparent text-sm outline-none"
+                                      style={{ color: textColor }}
                                       onBlur={(e) => {
                                         const newValue = e.target.textContent;
                                         if (newValue !== item.size) {
