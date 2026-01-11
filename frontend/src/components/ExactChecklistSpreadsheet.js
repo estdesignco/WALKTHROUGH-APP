@@ -486,12 +486,12 @@ const ExactChecklistSpreadsheet = ({
 
   // Load items that are linked to To-Do or Punch List
   const loadLinkedItems = async () => {
-    if (!projectId) return;
+    if (!project?.id) return;
     const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
     
     try {
       // Load To-Do items
-      const todoRes = await fetch(`${backendUrl}/api/todos/${projectId}`);
+      const todoRes = await fetch(`${backendUrl}/api/todos/${project.id}`);
       if (todoRes.ok) {
         const todoData = await todoRes.json();
         const todos = todoData.todos || [];
@@ -510,7 +510,7 @@ const ExactChecklistSpreadsheet = ({
     
     try {
       // Load Punch List items
-      const punchRes = await fetch(`${backendUrl}/api/punch-list/project/${projectId}`);
+      const punchRes = await fetch(`${backendUrl}/api/punch-list/project/${project.id}`);
       if (punchRes.ok) {
         const punchData = await punchRes.json();
         const punchItems = punchData.punch_items || punchData || [];
