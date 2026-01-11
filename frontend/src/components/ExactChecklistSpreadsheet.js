@@ -2145,19 +2145,53 @@ const ExactChecklistSpreadsheet = ({
                                 </div>
                               </td>
                             </tr>
-                                {/* ITEMS UNDER THIS SUBCATEGORY */}
-                                {subcategory.items?.map((item, itemIndex) => (
-                                      <tr key={item.id} style={{ 
+                                {/* ITEMS UNDER THIS SUBCATEGORY - Checked items first with alternating highlighter colors */}
+                                {(() => {
+                                  // Sort items: checked/PICKED first, then unchecked
+                                  const sortedItems = [...(subcategory.items || [])].sort((a, b) => {
+                                    const aChecked = checkedItems.has(a.id) || a.status === 'PICKED';
+                                    const bChecked = checkedItems.has(b.id) || b.status === 'PICKED';
+                                    if (aChecked && !bChecked) return -1;
+                                    if (!aChecked && bChecked) return 1;
+                                    return 0;
+                                  });
+                                  
+                                  // Count checked items for alternating colors
+                                  let checkedIndex = 0;
+                                  
+                                  return sortedItems.map((item, itemIndex) => {
+                                    const isChecked = checkedItems.has(item.id) || item.status === 'PICKED';
+                                    
+                                    // Alternating highlighter colors for checked items
+                                    const highlighterColors = [
+                                      'rgba(255, 255, 0, 0.25)',    // Yellow
+                                      'rgba(0, 255, 127, 0.25)',    // Spring Green
+                                      'rgba(255, 182, 193, 0.25)',  // Light Pink
+                                      'rgba(135, 206, 250, 0.25)',  // Light Sky Blue
+                                      'rgba(255, 165, 0, 0.25)',    // Orange
+                                      'rgba(221, 160, 221, 0.25)',  // Plum
+                                    ];
+                                    
+                                    let rowStyle;
+                                    if (isChecked) {
+                                      rowStyle = { background: highlighterColors[checkedIndex % highlighterColors.length] };
+                                      checkedIndex++;
+                                    } else {
+                                      rowStyle = { 
                                         background: itemIndex % 2 === 0 
                                           ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
                                           : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)'
-                                      }}>
+                                      };
+                                    }
+                                    
+                                    return (
+                                      <tr key={item.id} style={rowStyle}>
                                         {/* CHECKBOX - AUTO SET TO PICKED */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
                                             type="checkbox" 
                                             className="w-4 h-4 cursor-pointer" 
-                                            checked={checkedItems.has(item.id) || item.status === 'PICKED'}
+                                            checked={isChecked}
                                             onChange={async (e) => {
                                               const newCheckedItems = new Set(checkedItems);
                                               const newStatus = e.target.checked ? 'PICKED' : '';
