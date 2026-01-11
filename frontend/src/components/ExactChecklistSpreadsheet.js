@@ -485,17 +485,6 @@ const ExactChecklistSpreadsheet = ({
     }
   }, [project]);
 
-  // Auto-refresh linked items every 5 seconds to pick up changes from To-Do/Punch list
-  useEffect(() => {
-    if (!project?.id) return;
-    
-    const interval = setInterval(() => {
-      loadLinkedItems();
-    }, 5000); // Refresh every 5 seconds
-    
-    return () => clearInterval(interval);
-  }, [project?.id]);
-
   // Load items that are linked to To-Do or Punch List
   const loadLinkedItems = async () => {
     if (!project?.id) return;
@@ -2309,7 +2298,7 @@ const ExactChecklistSpreadsheet = ({
                                     // Only highlight if on list AND the linked item is NOT complete
                                     const shouldHighlight = (isOnTodo && !todoComplete) || (isOnPunch && !punchComplete);
                                     
-                                    // BRIGHT alternating highlighter colors
+                                    // BRIGHT alternating highlighter colors - ONLY for items on To-Do or Punch List
                                     const highlighterColors = [
                                       '#FFFF00',  // Bright Yellow
                                       '#00FF7F',  // Bright Spring Green
@@ -2320,11 +2309,12 @@ const ExactChecklistSpreadsheet = ({
                                     ];
                                     
                                     let rowStyle;
-                                    // ALL TEXT BLACK when highlighted
+                                    // Text color: BLACK for highlighted rows, normal for others
                                     const textColor = shouldHighlight ? '#000000' : '#B49B7E';
+                                    const textClass = shouldHighlight ? 'text-black font-semibold' : 'text-[#B49B7E]';
                                     
                                     if (shouldHighlight) {
-                                      rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length], color: '#000000' };
+                                      rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length] };
                                       highlightIndex++;
                                     } else {
                                       rowStyle = { 
@@ -2336,7 +2326,19 @@ const ExactChecklistSpreadsheet = ({
                                     
                                     return (
                                       <tr key={item.id} style={rowStyle}>
-                                        {/* CHECKBOX */}
+                                        {/* Highlight indicator for To-Do/Punch */}
+                                        {shouldHighlight && (
+                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16" style={{ background: 'inherit' }}>
+                                            <span className="text-xs font-bold text-black">
+                                              {isOnTodo && '📋'}
+                                              {isOnPunch && '🔨'}
+                                            </span>
+                                          </td>
+                                        )}
+                                        {!shouldHighlight && (
+                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16"></td>
+                                        )}
+                                        {/* CHECKBOX - AUTO SET TO PICKED */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
                                             type="checkbox" 
@@ -2345,13 +2347,18 @@ const ExactChecklistSpreadsheet = ({
                                             onChange={async (e) => {
                                               const newCheckedItems = new Set(checkedItems);
                                               const newStatus = e.target.checked ? 'PICKED' : '';
+                                              
                                               if (e.target.checked) {
                                                 newCheckedItems.add(item.id);
                                               } else {
                                                 newCheckedItems.delete(item.id);
                                               }
                                               setCheckedItems(newCheckedItems);
+                                              
+                                              // Update item status immediately in local data
                                               item.status = newStatus;
+                                              
+                                              // Update backend
                                               try {
                                                 const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                                 await fetch(`${backendUrl}/api/items/${item.id}`, {
@@ -2359,166 +2366,131 @@ const ExactChecklistSpreadsheet = ({
                                                   headers: { 'Content-Type': 'application/json' },
                                                   body: JSON.stringify({ status: newStatus })
                                                 });
+                                                console.log(`✅ Status updated: ${newStatus}`);
                                               } catch (error) {
                                                 console.error('❌ Failed to update status:', error);
+                                                // Revert local change on error
+                                                item.status = item.status;
                                               }
                                             }}
                                           />
                                         </td>
-                                        {/* ITEM NAME - WITH INLINE TO-DO/PUNCH BADGE (like FFE) */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
-                                          <div className="flex items-center gap-2">
-                                            {isOnTodo && !todoComplete && (
-                                              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-blue-600 text-white flex-shrink-0">TO-DO</span>
-                                            )}
-                                            {isOnPunch && !punchComplete && (
-                                              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-red-600 text-white flex-shrink-0">PUNCH</span>
-                                            )}
-                                            {(isOnTodo && todoComplete) && (
-                                              <span className="text-xs px-1.5 py-0.5 rounded bg-green-600 text-white flex-shrink-0">✓</span>
-                                            )}
-                                            {(isOnPunch && punchComplete) && (
-                                              <span className="text-xs px-1.5 py-0.5 rounded bg-green-600 text-white flex-shrink-0">✓</span>
-                                            )}
-                                            <span style={{ color: textColor, fontWeight: shouldHighlight ? '600' : 'normal' }}>{item.name || ''}</span>
-                                          </div>
-                                        </td>
-                                        {/* VENDOR/SKU */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
-                                          <div style={{ color: textColor }}>{item.vendor || ''}</div>
-                                          <div className="text-xs border-t border-gray-600 pt-1" style={{ color: textColor }}>{item.sku || ''}</div>
-                                        </td>
-                                        {/* QTY */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm text-center" style={{ color: textColor }}>
-                                          <span style={{ color: textColor }}>{item.quantity || ''}</span>
-                                        </td>
-                                        {/* SIZE */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
-                                          <span style={{ color: textColor }}>{item.size || ''}</span>
-                                        </td>
-                                        {/* FINISH/COLOR */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
-                                          <div className="flex items-center gap-2">
-                                            {item.finish_image && (
-                                              <img src={item.finish_image} alt="" className="w-8 h-8 rounded border object-cover flex-shrink-0" onError={(e) => { e.target.style.display = 'none'; }} />
-                                            )}
-                                            <span style={{ color: textColor }}>{item.finish_color || ''}</span>
-                                          </div>
-                                        </td>
-                                        {/* COST */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm cursor-pointer" style={{ color: textColor }} onClick={() => openCalculator(item, category.name)}>
-                                          <span style={{ color: textColor }}>${item.cost || 0}</span>
-                                        </td>
-                                        {/* IMAGE */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-center">
-                                          {item.image_url ? (
-                                            <img src={item.image_url} alt="" className="w-12 h-12 object-cover rounded mx-auto" />
-                                          ) : (
-                                            <span style={{ color: textColor }} className="text-xs">No Image</span>
-                                          )}
-                                        </td>
-                                        {/* LINK */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-center">
-                                          {item.product_link && (
-                                            <a href={item.product_link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">🔗</a>
-                                          )}
-                                        </td>
-                                        {/* REMARKS */}
-                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
-                                          <span style={{ color: textColor }}>{item.remarks || ''}</span>
-                                        </td>
-                                        {/* STATUS */}
-                                        <td className="border border-[#B49B7E] px-2 py-1">
-                                          <select
-                                            value={item.status || ''}
-                                            onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                                            className="w-full px-2 py-1 rounded text-sm border-none outline-none"
-                                            style={{ 
-                                              background: shouldHighlight ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.5)',
-                                              color: textColor
+                                        {/* ITEM - EDITABLE WITH AUTOCOMPLETE */}
+                                        <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
+                                          <InlineProductAutocomplete
+                                            value={item.name}
+                                            onChange={(newName) => {
+                                              if (newName !== item.name) {
+                                                handleUpdateItemField(item.id, 'name', newName);
+                                              }
                                             }}
-                                          >
-                                            <option value="">Select...</option>
-                                            <option value="PICKED">PICKED</option>
-                                            <option value="ORDERED">ORDERED</option>
-                                            <option value="SHIPPED">SHIPPED</option>
-                                            <option value="DELIVERED">DELIVERED</option>
-                                            <option value="INSTALLED">INSTALLED</option>
-                                            <option value="COMPLETE">COMPLETE</option>
-                                            <option value="CHANGE OUT">CHANGE OUT</option>
-                                            <option value="GET QUOTE">GET QUOTE</option>
-                                            <option value="ORDER SAMPLES">ORDER SAMPLES</option>
-                                            <option value="ON HOLD">ON HOLD</option>
-                                            <option value="CANCELLED">CANCELLED</option>
-                                          </select>
-                                        </td>
-                                        {/* DELETE */}
-                                        <td className="border border-[#B49B7E] px-1 py-1 text-center">
-                                          <button 
-                                            onClick={() => handleDeleteItem(item.id)}
-                                            className="text-red-500 hover:text-red-400 text-lg"
-                                            title="Delete item"
-                                          >
-                                            🗑️
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    );
-                                            value={item.name || ''}
-                                            onChange={(e) => handleUpdateItemField(item.id, 'name', e.target.value)}
-                                            className="w-full bg-transparent border-none outline-none text-sm"
-                                            style={inputStyle}
-                                            placeholder="Item name..."
+                                            onProductSelect={async (product) => {
+                                              // Auto-fill all fields when product is selected
+                                              console.log('🎯 Product selected from autocomplete:', product);
+                                              
+                                              // Check if this product has variants (other finishes/colors)
+                                              try {
+                                                const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+                                                const response = await fetch(`${backendUrl}/api/product-variants/${encodeURIComponent(product.sku)}`);
+                                                const variantData = await response.json();
+                                                
+                                                if (variantData.success && variantData.variant_count > 1) {
+                                                  // Has multiple variants - show picker
+                                                  console.log('📦 Product has variants:', variantData.variant_count);
+                                                  setVariantPickerSku(product.sku);
+                                                  setPendingVariantItem(item);
+                                                  setPendingVariantProduct(product);
+                                                  setShowVariantPicker(true);
+                                                  return;
+                                                }
+                                              } catch (error) {
+                                                console.log('No variants or error checking:', error);
+                                              }
+                                              
+                                              // No variants - apply directly using batch update
+                                              const updates = {
+                                                name: product.name,
+                                                vendor: product.vendor,
+                                                sku: product.sku,
+                                                cost: product.cost || product.price || 0
+                                              };
+                                              if (product.image_url) {
+                                                updates.image_url = product.image_url;
+                                              }
+                                              // Also save dimensions (size) and product link if available
+                                              if (product.dimensions) {
+                                                updates.size = product.dimensions;
+                                              }
+                                              if (product.product_link) {
+                                                updates.product_link = product.product_link;
+                                              }
+                                              handleBatchUpdateItem(item.id, updates);
+                                            }}
+                                            placeholder="Type to search products..."
+                                            className={`${textClass} text-sm`}
+                                            style={{ color: textColor }}
                                           />
                                         </td>
                                   
-                                  {/* VENDOR/SKU - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                  {/* VENDOR/SKU - EDITABLE WITH DROPDOWN */}
+                                  <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
                                     <div className="flex flex-col gap-1">
-                                      <input
-                                        type="text"
+                                      <VendorDropdown
                                         value={item.vendor || ''}
-                                        onChange={(e) => handleUpdateItemField(item.id, 'vendor', e.target.value)}
-                                        placeholder="Vendor..."
-                                        className="w-full bg-transparent border-none outline-none text-sm"
-                                        style={inputStyle}
+                                        onChange={(newVendor) => {
+                                          if (newVendor !== item.vendor) {
+                                            handleUpdateItemField(item.id, 'vendor', newVendor);
+                                          }
+                                        }}
+                                        className={`${textClass} text-sm`}
+                                        style={{ color: textColor }}
                                       />
                                       <input
                                         type="text"
                                         value={item.sku || ''}
                                         onChange={(e) => handleUpdateItemField(item.id, 'sku', e.target.value)}
                                         placeholder="SKU..."
-                                        className="w-full bg-transparent text-xs outline-none border-t border-gray-600 pt-1"
-                                        style={inputStyle}
+                                        className="w-full bg-transparent text-[#B49B7E] text-xs outline-none border-t border-gray-600 pt-1"
                                       />
                                     </div>
                                   </td>
                                   
                                   {/* QTY - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm text-center" style={{ color: textColor }}>
-                                    <input
-                                      type="number"
-                                      value={item.quantity || ''}
-                                      onChange={(e) => handleUpdateItemField(item.id, 'quantity', parseInt(e.target.value) || 0)}
-                                      className="w-full bg-transparent text-sm text-center outline-none border-none"
-                                      style={inputStyle}
-                                    />
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-[#B49B7E] text-sm text-center outline-none"
+                                      onBlur={(e) => {
+                                        const newValue = parseInt(e.target.textContent) || 0;
+                                        if (newValue !== item.quantity) {
+                                          handleUpdateItemField(item.id, 'quantity', newValue);
+                                        }
+                                      }}
+                                    >
+                                      {item.quantity || ''}
+                                    </div>
                                   </td>
                                   
                                   {/* SIZE - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
-                                    <input
-                                      type="text"
-                                      value={item.size || ''}
-                                      onChange={(e) => handleUpdateItemField(item.id, 'size', e.target.value)}
-                                      placeholder="Size..."
-                                      className="w-full bg-transparent text-sm outline-none border-none"
-                                      style={inputStyle}
-                                    />
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
+                                      onBlur={(e) => {
+                                        const newValue = e.target.textContent;
+                                        if (newValue !== item.size) {
+                                          handleUpdateItemField(item.id, 'size', newValue);
+                                        }
+                                      }}
+                                    >
+                                      {item.size || ''}
+                                    </div>
                                   </td>
                                   
                                   {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
                                     <div className="flex items-center gap-2">
                                       {/* Swatch Image */}
                                       {item.finish_image && (
@@ -2530,27 +2502,31 @@ const ExactChecklistSpreadsheet = ({
                                         />
                                       )}
                                       {/* Color Name - Editable */}
-                                      <input
-                                        type="text"
-                                        value={item.finish_color || ''}
-                                        onChange={(e) => handleUpdateItemField(item.id, 'finish_color', e.target.value)}
-                                        placeholder="Finish/Color..."
-                                        className="flex-1 bg-transparent text-sm outline-none border-none"
-                                        style={inputStyle}
-                                      />
+                                      <div 
+                                        contentEditable={true}
+                                        suppressContentEditableWarning={true}
+                                        className="flex-1 bg-transparent text-[#D4C5A9] text-sm outline-none"
+                                        onBlur={(e) => {
+                                          const newValue = e.target.textContent;
+                                          if (newValue !== item.finish_color) {
+                                            handleUpdateItemField(item.id, 'finish_color', newValue);
+                                          }
+                                        }}
+                                      >
+                                        {item.finish_color || ''}
+                                      </div>
                                     </div>
                                   </td>
                                   
                                   {/* COST - CLICK TO OPEN CALCULATOR */}
                                   <td 
-                                    className="border border-[#B49B7E] px-2 py-1 text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
-                                    style={{ color: textColor }}
+                                    className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
                                     onClick={() => openCalculator(item, category.name)}
                                     title="Click to open calculator"
                                   >
                                     <div className="flex items-center justify-between">
-                                      <span style={{ color: textColor }}>${item.cost || 0}</span>
-                                      <span className="opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
+                                      <span>${item.cost || 0}</span>
+                                      <span className="text-[#8B7355] opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
                                     </div>
                                   </td>
                                   
@@ -2689,15 +2665,20 @@ const ExactChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* REMARKS - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
-                                    <input
-                                      type="text"
-                                      value={item.remarks || ''}
-                                      onChange={(e) => handleUpdateItemField(item.id, 'remarks', e.target.value)}
-                                      placeholder="Remarks..."
-                                      className="w-full bg-transparent text-sm outline-none border-none"
-                                      style={inputStyle}
-                                    />
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
+                                    <div 
+                                      contentEditable={true}
+                                      suppressContentEditableWarning={true}
+                                      className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
+                                      onBlur={(e) => {
+                                        const newValue = e.target.textContent?.trim();
+                                        if (newValue !== item.remarks) {
+                                          handleUpdateItemField(item.id, 'remarks', newValue);
+                                        }
+                                      }}
+                                    >
+                                      {item.remarks || ''}
+                                    </div>
                                   </td>
                                   
                                   {/* ACTION BUTTONS: Add, Alternatives, Delete */}
