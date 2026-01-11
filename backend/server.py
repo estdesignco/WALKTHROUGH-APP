@@ -135,6 +135,23 @@ app.add_middleware(
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# ====================================
+# SCRAPER DOWNLOAD ENDPOINT
+# ====================================
+@api_router.get("/download-scraper")
+async def download_scraper():
+    """Download the Chrome extension scraper ZIP file"""
+    import os
+    zip_path = "/app/chrome-extension-scraper.zip"
+    if os.path.exists(zip_path):
+        return FileResponse(
+            path=zip_path,
+            filename="chrome-extension-scraper.zip",
+            media_type="application/zip"
+        )
+    else:
+        raise HTTPException(status_code=404, detail="Scraper ZIP not found")
+
 # Helper function to serialize MongoDB documents
 def serialize_doc(doc: Any) -> Any:
     """Convert MongoDB document to JSON-safe format."""
