@@ -15267,6 +15267,50 @@ async def save_clipped_product_to_app(data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Chrome Extension Scraper Save Endpoint
+@api_router.post("/scraper/save")
+async def save_scraped_product(data: dict):
+    """
+    Save scraped product data from the Chrome Extension.
+    This endpoint is called by the scraper extension to save products directly.
+    """
+    try:
+        project_id = data.get('project_id') or data.get('projectId')
+        if not project_id:
+            return {"success": False, "error": "No project_id provided"}
+        
+        # Find the project
+        project = await db.projects.find_one({"id": project_id})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        # Extract product data from scraper
+        product_data = {
+            "name": data.get('name', 'Scraped Product'),
+            "sku": data.get('sku', ''),
+            "price": data.get('price', 0),
+            "cost": data.get('cost', 0),
+            "vendor": data.get('vendor', ''),
+            "size": data.get('size', ''),
+            "finish_color": data.get('finish_color') or data.get('finish', ''),
+            "finish_image": data.get('finish_image', ''),
+            "image_url": data.get('image_url') or data.get('image', ''),
+            "link": data.get('link') or data.get('url', ''),
+            "description": data.get('description', ''),
+            "source": 'chrome_extension_scraper'
+        }
+        
+        logging.info(f"📦 Scraper save: {product_data['name']} for project {project_id}")
+        
+        return {
+            "success": True, 
+            "message": "Product saved from scraper",
+            "product": product_data
+        }
+    except Exception as e:
+        logging.error(f"Scraper save error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # =============================================================================
 # DELIVERY SCHEDULER ENDPOINTS
