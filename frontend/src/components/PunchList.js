@@ -253,7 +253,7 @@ export default function PunchList({ projectId, roomId = null }) {
   const getPriorityColor = (priority) => {
     const colors = {
       low: 'bg-gray-600',
-      medium: 'bg-yellow-600',
+      medium: 'bg-cyan-600',  // CHANGED from yellow to cyan - too similar to "Modern Kitchen" color
       high: 'bg-orange-600',
       urgent: 'bg-red-600'
     };
