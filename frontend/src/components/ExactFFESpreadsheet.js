@@ -138,6 +138,35 @@ const ExactFFESpreadsheet = ({
     const interval = setInterval(loadLinkedPunchItems, 30000);
     return () => clearInterval(interval);
   }, [project?.id]);
+
+  // 🔗 Load to-do linked items for highlighting
+  useEffect(() => {
+    const loadTodoLinkedItems = async () => {
+      if (!project?.id) return;
+      
+      try {
+        const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+        const response = await fetch(`${backendUrl}/api/todos/${project.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          const linkedIds = new Set();
+          (data.todos || []).forEach(todo => {
+            if (todo.linked_ffe_item?.id) {
+              linkedIds.add(todo.linked_ffe_item.id);
+            }
+          });
+          setTodoLinkedItems(linkedIds);
+          console.log('📋 FFE: Found', linkedIds.size, 'items linked to To-Do');
+        }
+      } catch (error) {
+        console.error('Failed to load to-do links:', error);
+      }
+    };
+    
+    loadTodoLinkedItems();
+    const interval = setInterval(loadTodoLinkedItems, 30000);
+    return () => clearInterval(interval);
+  }, [project?.id]);
   
   // Load photos for all rooms from walkthrough
   useEffect(() => {
