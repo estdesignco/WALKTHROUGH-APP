@@ -32,44 +32,75 @@ export default function PunchList({ projectId, roomId = null }) {
     loadPunchList();
   }, [projectId, filter]);
 
-  // Load FFE items for linking
+  // Load BOTH Checklist AND FFE items for linking
   useEffect(() => {
-    loadFfeItems();
+    loadAllItems();
   }, [projectId]);
 
-  const loadFfeItems = async () => {
+  const loadAllItems = async () => {
     try {
-      // Fetch ALL rooms (no sheet_type filter) to get FFE items
-      const response = await fetch(`${API_URL}/projects/${projectId}`);
-      if (response.ok) {
-        const data = await response.json();
-        // Flatten all items from all rooms - use CORRECT property name 'subcategories'
-        const allItems = [];
-        if (data.rooms) {
-          data.rooms.forEach(room => {
-            room.categories?.forEach(cat => {
-              // FIXED: Use 'subcategories' not 'sub_categories'
-              cat.subcategories?.forEach(subCat => {
-                subCat.items?.forEach(item => {
-                  allItems.push({
-                    ...item,
-                    roomName: room.name,
-                    categoryName: cat.name
+      const allItems = [];
+      
+      // Load CHECKLIST items
+      try {
+        const checklistRes = await fetch(`${API_URL}/projects/${projectId}?sheet_type=checklist`);
+        if (checklistRes.ok) {
+          const checklistData = await checklistRes.json();
+          if (checklistData.rooms) {
+            checklistData.rooms.forEach(room => {
+              room.categories?.forEach(cat => {
+                cat.subcategories?.forEach(subCat => {
+                  subCat.items?.forEach(item => {
+                    allItems.push({
+                      ...item,
+                      roomName: room.name,
+                      categoryName: cat.name,
+                      sourceType: 'CHECKLIST'
+                    });
                   });
                 });
               });
             });
-          });
+          }
         }
-        console.log(`📦 PunchList: Loaded ${allItems.length} FFE items for linking`);
-        setFfeItems(allItems);
+      } catch (e) {
+        console.log('No checklist items');
       }
+      
+      // Load FFE items
+      try {
+        const ffeRes = await fetch(`${API_URL}/projects/${projectId}?sheet_type=ffe`);
+        if (ffeRes.ok) {
+          const ffeData = await ffeRes.json();
+          if (ffeData.rooms) {
+            ffeData.rooms.forEach(room => {
+              room.categories?.forEach(cat => {
+                cat.subcategories?.forEach(subCat => {
+                  subCat.items?.forEach(item => {
+                    allItems.push({
+                      ...item,
+                      roomName: room.name,
+                      categoryName: cat.name,
+                      sourceType: 'FFE'
+                    });
+                  });
+                });
+              });
+            });
+          }
+        }
+      } catch (e) {
+        console.log('No FFE items');
+      }
+      
+      console.log(`📦 PunchList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
+      setFfeItems(allItems);
     } catch (error) {
-      console.error('Failed to load FFE items:', error);
+      console.error('Failed to load items:', error);
     }
   };
 
-  // Filter FFE items by search query
+  // Filter items by search query
   const filteredFfeItems = ffeItems.filter(item => {
     if (!ffeSearchQuery) return true;
     const query = ffeSearchQuery.toLowerCase();
@@ -77,7 +108,8 @@ export default function PunchList({ projectId, roomId = null }) {
       item.name?.toLowerCase().includes(query) ||
       item.sku?.toLowerCase().includes(query) ||
       item.roomName?.toLowerCase().includes(query) ||
-      item.vendor?.toLowerCase().includes(query)
+      item.vendor?.toLowerCase().includes(query) ||
+      item.sourceType?.toLowerCase().includes(query)
     );
   }).slice(0, 10); // Limit to 10 results
 
