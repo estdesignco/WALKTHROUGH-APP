@@ -2404,100 +2404,55 @@ const ExactChecklistSpreadsheet = ({
                                             style={inputStyle}
                                             placeholder="Item name..."
                                           />
-                                                  setVariantPickerSku(product.sku);
-                                                  setPendingVariantItem(item);
-                                                  setPendingVariantProduct(product);
-                                                  setShowVariantPicker(true);
-                                                  return;
-                                                }
-                                              } catch (error) {
-                                                console.log('No variants or error checking:', error);
-                                              }
-                                              
-                                              // No variants - apply directly using batch update
-                                              const updates = {
-                                                name: product.name,
-                                                vendor: product.vendor,
-                                                sku: product.sku,
-                                                cost: product.cost || product.price || 0
-                                              };
-                                              if (product.image_url) {
-                                                updates.image_url = product.image_url;
-                                              }
-                                              // Also save dimensions (size) and product link if available
-                                              if (product.dimensions) {
-                                                updates.size = product.dimensions;
-                                              }
-                                              if (product.product_link) {
-                                                updates.product_link = product.product_link;
-                                              }
-                                              handleBatchUpdateItem(item.id, updates);
-                                            }}
-                                            placeholder="Type to search products..."
-                                            className={`${textClass} text-sm`}
-                                            style={{ color: textColor }}
-                                          />
                                         </td>
                                   
-                                  {/* VENDOR/SKU - EDITABLE WITH DROPDOWN */}
-                                  <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
+                                  {/* VENDOR/SKU - EDITABLE */}
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
                                     <div className="flex flex-col gap-1">
-                                      <VendorDropdown
+                                      <input
+                                        type="text"
                                         value={item.vendor || ''}
-                                        onChange={(newVendor) => {
-                                          if (newVendor !== item.vendor) {
-                                            handleUpdateItemField(item.id, 'vendor', newVendor);
-                                          }
-                                        }}
-                                        className={`${textClass} text-sm`}
-                                        style={{ color: textColor }}
+                                        onChange={(e) => handleUpdateItemField(item.id, 'vendor', e.target.value)}
+                                        placeholder="Vendor..."
+                                        className="w-full bg-transparent border-none outline-none text-sm"
+                                        style={inputStyle}
                                       />
                                       <input
                                         type="text"
                                         value={item.sku || ''}
                                         onChange={(e) => handleUpdateItemField(item.id, 'sku', e.target.value)}
                                         placeholder="SKU..."
-                                        className="w-full bg-transparent text-[#B49B7E] text-xs outline-none border-t border-gray-600 pt-1"
+                                        className="w-full bg-transparent text-xs outline-none border-t border-gray-600 pt-1"
+                                        style={inputStyle}
                                       />
                                     </div>
                                   </td>
                                   
                                   {/* QTY - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm text-center">
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#B49B7E] text-sm text-center outline-none"
-                                      onBlur={(e) => {
-                                        const newValue = parseInt(e.target.textContent) || 0;
-                                        if (newValue !== item.quantity) {
-                                          handleUpdateItemField(item.id, 'quantity', newValue);
-                                        }
-                                      }}
-                                    >
-                                      {item.quantity || ''}
-                                    </div>
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm text-center" style={{ color: textColor }}>
+                                    <input
+                                      type="number"
+                                      value={item.quantity || ''}
+                                      onChange={(e) => handleUpdateItemField(item.id, 'quantity', parseInt(e.target.value) || 0)}
+                                      className="w-full bg-transparent text-sm text-center outline-none border-none"
+                                      style={inputStyle}
+                                    />
                                   </td>
                                   
                                   {/* SIZE - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#B49B7E] text-sm">
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#B49B7E] text-sm outline-none"
-                                      onBlur={(e) => {
-                                        const newValue = e.target.textContent;
-                                        if (newValue !== item.size) {
-                                          handleUpdateItemField(item.id, 'size', newValue);
-                                        }
-                                      }}
-                                    >
-                                      {item.size || ''}
-                                    </div>
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                    <input
+                                      type="text"
+                                      value={item.size || ''}
+                                      onChange={(e) => handleUpdateItemField(item.id, 'size', e.target.value)}
+                                      placeholder="Size..."
+                                      className="w-full bg-transparent text-sm outline-none border-none"
+                                      style={inputStyle}
+                                    />
                                   </td>
                                   
                                   {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
                                     <div className="flex items-center gap-2">
                                       {/* Swatch Image */}
                                       {item.finish_image && (
