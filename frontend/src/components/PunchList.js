@@ -77,12 +77,6 @@ export default function PunchList({ projectId, roomId = null }) {
       console.error('Failed to load items:', error);
     }
   };
-      console.log(`📦 PunchList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
-      setFfeItems(allItems);
-    } catch (error) {
-      console.error('Failed to load items:', error);
-    }
-  };
 
   // Filter items by search query
   const filteredFfeItems = ffeItems.filter(item => {
