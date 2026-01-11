@@ -2464,19 +2464,14 @@ const ExactChecklistSpreadsheet = ({
                                         />
                                       )}
                                       {/* Color Name - Editable */}
-                                      <div 
-                                        contentEditable={true}
-                                        suppressContentEditableWarning={true}
-                                        className="flex-1 bg-transparent text-[#D4C5A9] text-sm outline-none"
-                                        onBlur={(e) => {
-                                          const newValue = e.target.textContent;
-                                          if (newValue !== item.finish_color) {
-                                            handleUpdateItemField(item.id, 'finish_color', newValue);
-                                          }
-                                        }}
-                                      >
-                                        {item.finish_color || ''}
-                                      </div>
+                                      <input
+                                        type="text"
+                                        value={item.finish_color || ''}
+                                        onChange={(e) => handleUpdateItemField(item.id, 'finish_color', e.target.value)}
+                                        placeholder="Finish/Color..."
+                                        className="flex-1 bg-transparent text-sm outline-none border-none"
+                                        style={inputStyle}
+                                      />
                                     </div>
                                   </td>
                                   
