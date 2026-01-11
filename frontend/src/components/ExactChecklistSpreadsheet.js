@@ -2309,9 +2309,10 @@ const ExactChecklistSpreadsheet = ({
                                     ];
                                     
                                     let rowStyle;
-                                    // Text color: BLACK for highlighted rows, normal for others
+                                    // Text color: BLACK for highlighted rows - use inline style to override CSS
                                     const textColor = shouldHighlight ? '#000000' : '#B49B7E';
-                                    const textClass = shouldHighlight ? 'text-black font-semibold' : 'text-[#B49B7E]';
+                                    const cellStyle = { color: textColor };
+                                    const inputStyle = { color: textColor, background: 'transparent', border: 'none', outline: 'none', width: '100%' };
                                     
                                     if (shouldHighlight) {
                                       rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length] };
@@ -2326,18 +2327,6 @@ const ExactChecklistSpreadsheet = ({
                                     
                                     return (
                                       <tr key={item.id} style={rowStyle}>
-                                        {/* Highlight indicator for To-Do/Punch */}
-                                        {shouldHighlight && (
-                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16" style={{ background: 'inherit' }}>
-                                            <span className="text-xs font-bold text-black">
-                                              {isOnTodo && '📋'}
-                                              {isOnPunch && '🔨'}
-                                            </span>
-                                          </td>
-                                        )}
-                                        {!shouldHighlight && (
-                                          <td className="border border-[#B49B7E] px-1 py-1 text-center w-16"></td>
-                                        )}
                                         {/* CHECKBOX - AUTO SET TO PICKED */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
@@ -2375,16 +2364,23 @@ const ExactChecklistSpreadsheet = ({
                                             }}
                                           />
                                         </td>
-                                        {/* ITEM - EDITABLE WITH AUTOCOMPLETE */}
-                                        <td className={`border border-[#B49B7E] px-2 py-1 ${textClass} text-sm`}>
-                                          <InlineProductAutocomplete
-                                            value={item.name}
-                                            onChange={(newName) => {
-                                              if (newName !== item.name) {
-                                                handleUpdateItemField(item.id, 'name', newName);
-                                              }
-                                            }}
-                                            onProductSelect={async (product) => {
+                                        {/* ITEM - EDITABLE WITH AUTOCOMPLETE + INLINE TO-DO/PUNCH BADGE */}
+                                        <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
+                                          <div className="flex items-center gap-2">
+                                            {isOnTodo && !todoComplete && (
+                                              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-blue-600 text-white flex-shrink-0">TO-DO</span>
+                                            )}
+                                            {isOnPunch && !punchComplete && (
+                                              <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-red-600 text-white flex-shrink-0">PUNCH</span>
+                                            )}
+                                            <InlineProductAutocomplete
+                                              value={item.name}
+                                              onChange={(newName) => {
+                                                if (newName !== item.name) {
+                                                  handleUpdateItemField(item.id, 'name', newName);
+                                                }
+                                              }}
+                                              onProductSelect={async (product) => {
                                               // Auto-fill all fields when product is selected
                                               console.log('🎯 Product selected from autocomplete:', product);
                                               
