@@ -41,8 +41,8 @@ export default function PunchList({ projectId, roomId = null }) {
     try {
       const allItems = [];
       
-      // Load ALL items from ALL sheet types (walkthrough, checklist, ffe)
-      const sheetTypes = ['walkthrough', 'checklist', 'ffe'];
+      // Load ONLY Checklist and FFE items (NOT walkthrough)
+      const sheetTypes = ['checklist', 'ffe'];
       
       for (const sheetType of sheetTypes) {
         try {
@@ -71,7 +71,7 @@ export default function PunchList({ projectId, roomId = null }) {
         }
       }
       
-      console.log(`📦 PunchList: Loaded ${allItems.length} items for linking`);
+      console.log(`📦 PunchList: Loaded ${allItems.length} items (Checklist + FFE) for linking`);
       setFfeItems(allItems);
     } catch (error) {
       console.error('Failed to load items:', error);
