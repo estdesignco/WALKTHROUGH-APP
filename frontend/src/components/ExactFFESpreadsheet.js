@@ -51,9 +51,11 @@ const ExactFFESpreadsheet = ({
   const [showScraperNotification, setShowScraperNotification] = useState(false);
   
   // 🔗 PUNCH LIST LINKED ITEMS - For highlighting items on punch list
+  // Map format: { itemId: { completed: boolean, status: string, punch_title: string } }
   const [linkedPunchItems, setLinkedPunchItems] = useState({});
   // 🔗 TO-DO LINKED ITEMS - For highlighting items on to-do list
-  const [todoLinkedItems, setTodoLinkedItems] = useState(new Set());
+  // Map format: { itemId: { completed: boolean, status: string } }
+  const [todoLinkedItems, setTodoLinkedItems] = useState(new Map());
   
   // Check for URL parameters from extension (action=add-item&source=extension)
   useEffect(() => {
