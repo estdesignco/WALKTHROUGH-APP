@@ -266,4 +266,4 @@ if __name__ == "__main__":
     asyncio.run(import_fourhands_catalog(num_products=10, start_from=0))
     
     print(f"\n🎉 DONE! Refresh the frontend to see real Four Hands products!")
-    print(f"🔗 https://stability-project-1.preview.emergentagent.com/furniture-search")
+    print(f"🔗 https://highlight-text-fix.preview.emergentagent.com/furniture-search")

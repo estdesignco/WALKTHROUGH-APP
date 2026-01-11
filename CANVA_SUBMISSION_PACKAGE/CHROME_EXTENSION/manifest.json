@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://stability-project-1.preview.emergentagent.com/*"
+    "https://highlight-text-fix.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

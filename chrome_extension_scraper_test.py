@@ -20,7 +20,7 @@ import tempfile
 from urllib.parse import urlparse
 
 # Backend URL from environment
-BACKEND_URL = "https://stability-project-1.preview.emergentagent.com"
+BACKEND_URL = "https://highlight-text-fix.preview.emergentagent.com"
 
 def log_test(message, status="INFO"):
     """Log test messages with timestamp"""

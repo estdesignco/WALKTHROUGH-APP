@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://stability-project-1.preview.emergentagent.com/chrome-extension-v19.zip
+https://highlight-text-fix.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://stability-project-1.preview.emergentagent.com/api/download/chrome-extension
+https://highlight-text-fix.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

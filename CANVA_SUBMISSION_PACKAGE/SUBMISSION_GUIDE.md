@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://stability-project-1.preview.emergentagent.com";
+const BACKEND_URL = "https://highlight-text-fix.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

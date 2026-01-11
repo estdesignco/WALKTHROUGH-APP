@@ -3,7 +3,7 @@
 ## Download the iOS Project
 
 Download the iOS Xcode project from:
-**https://stability-project-1.preview.emergentagent.com/api/download/ios-app**
+**https://highlight-text-fix.preview.emergentagent.com/api/download/ios-app**
 
 This is a 17MB ZIP file containing the complete Xcode project.
 
@@ -64,7 +64,7 @@ open App.xcworkspace
 The app is pre-configured with:
 - **App ID**: `com.establisheddesign.ffe`
 - **App Name**: `ESTABLISHED`
-- **Web URL**: `https://stability-project-1.preview.emergentagent.com/mobile-app`
+- **Web URL**: `https://highlight-text-fix.preview.emergentagent.com/mobile-app`
 - **Background Color**: `#0F172A` (Dark blue)
 - **Accent Color**: `#D4A574` (Gold)
 

@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://stability-project-1.preview.emergentagent.com/*",
+    "https://highlight-text-fix.preview.emergentagent.com/*",
     "https://*/*",
     "http://*/*"
   ],
