@@ -1,202 +1,179 @@
 <analysis>**original_problem_statement:**
-The user initially reported a series of critical bugs and feature requests. Key issues included broken Copy buttons in the web scraper, non-functional dashboard tabs (Deliveries, Critical Path), failing Teams notifications, and the Transfer to FFE feature not working. Feature requests involved adding an AI background removal, a REMARKS field, new statuses, a main dashboard calendar, and a complete aesthetic and functional overhaul of the mobile app to match the desktop version and work as a standalone native app.
+The user initially reported multiple critical bugs across the application, including broken UI elements and failing integrations. The focus has since shifted to data integrity, feature enhancements, and fixing a cascade of severe, interconnected bugs.
 
-Most recently, the user's focus has shifted to refining the mobile app and ensuring data integrity. The latest requests are:
-1.  **Mobile App UI/UX:**
-    *   Place all feature tabs inside the header for a single-page, Excel-like navigation experience, instead of separate pages.
-    *   Redesign the mobile landing page to match the desktop dashboard, including the master calendar.
-    *   Ensure the FFE spreadsheet can be viewed in both portrait and landscape mode.
-    *   Add a feature to add multiple rooms at once.
-2.  **Functionality & Data Sync:**
-    *   Fix the data sync between the mobile app (iPad) and the desktop to be live, where checking/unchecking an item on one device immediately reflects on the other.
-    *   Ensure data flows correctly to all tabs like Critical Path and Reports on mobile.
-3.  **New Features:**
-    *   Allow calendar entries to be made independently on the master calendar.
-    *   Make the Punch List a standalone function that can reference items from the FFE spreadsheet.
+In the last session, the user reported a critical breakdown of core functionality:
+1.  **Data Corruption/Coupling**: The Checklist and FFE spreadsheets were not independent. Actions in one (adding/deleting rooms) were incorrectly affecting the other.
+2.  **Broken Data Transfer**: The Transfer to FFE feature was transferring all 73 items from the Checklist, not just the ones the user had checked.
+3.  **Inconsistent UI**: Two different versions of the Checklist interface were appearing, with the one launched from the Chrome Scraper being broken.
+4.  **Loss of Functionality**: All spreadsheet fields had become non-editable.
+5.  **Broken Linking**: The Punch List could not find any FFE items to link to, and the To-Do list was missing this feature entirely.
+6.  **Recurring Data Loss**: The user's entire list of Contacts and Vendor Contacts was deleted from the database for the third time.
+7.  **New Feature Request**: A Master To-Do List to aggregate tasks from all projects and include a separate company-wide task list.
+8.  **Recurring Bug**: The Chrome Scraper extension was broken again.
+9.  **UI/UX Issues**: The user requested specific highlighting behavior (bright, alternating colors for linked items, moved to the top of their section) and complained about the styling of new components.
 
 **User's preferred language**: English
 
 **what currently exists?**
-- A full-stack application (React/FastAPI/MongoDB) with a redesigned mobile interface that now features a desktop-like landing page, a master calendar, and numerous new feature tiles (Whole Home Finishes, Calculators, etc.).
-- The critical data sync issue between mobile and desktop has been addressed. The system now uses a hybrid model: immediate, event-driven sync from mobile to the backend, and 10-second polling on the desktop to fetch updates.
-- The desktop walkthrough was fixed to correctly display the checked status of items based on the database, resolving a major visual discrepancy.
-- The backend sync logic now correctly removes items from the checklist when they are unchecked on the mobile/walkthrough app.
-- Backend tests are passing at 100% after fixing discrepancies between API responses and test expectations.
-- A downloadable iOS project () is available via an API endpoint, with instructions for the user to build it in Xcode.
-- Project page tabs on the desktop have been reorganized into logical groups as per user specifications.
-- The master calendar now supports adding independent events via a new UI and a dedicated backend endpoint.
-- The mobile app's home screen calendar is now collapsible.
+- A full-stack application (React/FastAPI/MongoDB).
+- **Data Independence Fix**: The backend API has been modified to use a  parameter, ensuring that when the frontend requests data for the FFE sheet, it only receives FFE data, and the same for the Checklist.
+- **Field Editability Fix**: The  event handlers in  and  have been fixed to correctly call the  function, making fields editable again.
+- **To-Do/Punch List Linking Fix**: Both  and  were updated to fetch items from 'checklist' and 'ffe' sheets only. A bug causing FFE items not to appear in the dropdown was fixed by implementing a de-duplication logic that prioritizes FFE items when a conflict exists.
+- **Master To-Do List Implemented**: A new  page has been created with backend support. It aggregates to-dos and punch list items from all projects, includes a section for company-wide tasks, has a Back button, and its theme has been updated to match the rest of the application.
+- **Vendor Data Restored**: The agent found a backup script () and executed it to restore the user's 134 vendor contacts to the  collection. The Master Contacts page is now displaying this data correctly.
+- **Checklist Highlighting & Sorting**: The  component was updated to fetch a list of items linked to To-Dos or Punch Lists. It now exclusively highlights these specific items with bright, alternating colors and sorts them to the top of their respective sections.
+- **Scraper Download Fixed**: A new version of the scraper () was packaged. A missing  endpoint was created on the backend to provide a working download link to the user.
 
 **Last working item**:
--   **Last item agent was working**: Implementing the user's request for a major mobile app redesign. The agent created a new  component within  to replace the tile-based navigation with a header-based tab system. The calendar was also made collapsible, and the agent was about to implement the add multiple rooms feature.
+-   **Last item agent was working**: The agent was debugging why FFE items (like Betina Sofa) were not appearing correctly in the To-Do/Punch List dropdown. The root cause was that the item existed in both the Checklist and FFE data, and the UI was incorrectly showing the CHECKLIST version. The agent implemented a fix in  and  using a JavaScript  to de-duplicate the items and ensure the FFE version is prioritized and displayed correctly.
 -   **Status**: IN PROGRESS
 -   **Agent Testing Done**: N
--   **Which testing method agent to use?**: Frontend testing agent to conduct a full review of the new mobile UI/UX, including the tabbed navigation, collapsible calendar, and the upcoming multi-room and punch-list features.
+-   **Which testing method agent to use?**: Frontend testing agent. The agent must verify that for an item existing in both Checklist and FFE, the dropdown in the To-Do and Punch List views correctly displays the item with the green FFE badge.
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: Mobile Walkthrough Add Room doesn't support adding multiple rooms. (P0)
--   Issue 2: Comprehensive data flow verification for all dashboard tabs is pending. (P1)
--   Issue 3: TEAMS NOT WORKING - notifications are not being sent for key status changes. (P1)
--   Issue 4: Reverse selection feature in the Chrome scraper needs user verification. (P2)
+-   Issue 1: Verify the fix for FFE item prioritization in dropdowns. (P0)
+-   Issue 2: Verify the checklist highlighting and sorting functionality. (P0)
+-   Issue 3: Confirm if the new Chrome Scraper (v7.10.0) is working for the user. (P0)
+-   Issue 4: Full user workflow verification for data independence between spreadsheets. (P1)
+-   Issue 5: User verification of the new Master To-Do List feature. (P1)
 
 **Issues Detail:**
--   **Issue 1: Mobile Walkthrough Add Room doesn't support adding multiple rooms.**
-    -   **Attempted fixes**: The agent has identified the relevant component () and the Add Room modal logic. Implementation has not started.
+-   **Issue 1: FFE items are not correctly prioritized or labeled in the To-Do/Punch List dropdown.**
+    -   **Attempted fixes**: The agent identified that items existing in both Checklist and FFE were causing display issues. A fix was implemented in  and  within the  function to use a  to de-duplicate results and prioritize the FFE data source.
     -   **Next debug checklist**:
-        1.  Modify the Add Room modal in  to support multi-selection.
-        2.  Update the  function to handle an array of rooms.
-    -   **Why fix this issue and what will be achieved with the fix?**: To match mobile functionality with the desktop version, improving user workflow efficiency.
-    -   **Status**: NOT STARTED
+        1.  Navigate to the To-Do or Punch List tab on a project with known data conflicts (e.g., project  with item Betina Sofa).
+        2.  Open the item linking dropdown.
+        3.  Search for the item (Betina Sofa).
+        4.  Confirm it appears once with a green FFE badge.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is critical for data integrity and user trust. It ensures users can confidently link tasks to the correct version of an item.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Frontend.
+    -   **Blocked on other issue**: None.
+
+-   **Issue 2: Verify the checklist highlighting and sorting functionality.**
+    -   **Attempted fixes**: Agent modified  to fetch IDs of items linked to To-Do/Punch lists. The component now applies conditional styling ( or ) and sorts linked items to the top of their category group.
+    -   **Next debug checklist**:
+        1.  Create a To-Do/Punch list item and link it to an FFE or Checklist item.
+        2.  Navigate to the corresponding spreadsheet (FFE or Checklist).
+        3.  Verify the linked item is now at the top of its category, highlighted with a bright color.
+        4.  Link a second item in the same category and verify it also moves to the top and has a different highlight color.
+    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills a direct user request for improved UI/UX, making it easier to track items that require action.
+    -   **Status**: TESTING PENDING
     -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Frontend (Mobile App)
-    -   **Blocked on other issue**: None
-
--   **Issue 2: Comprehensive data flow verification for all dashboard tabs is pending.**
-    -   **Attempted fixes**: The agent confirmed a single item appears correctly in the Deliveries tab.
-    -   **Next debug checklist**:
-        1.  Use the  to systematically test data display on DELIVERIES, CRITICAL PATH, SHIPPING, and AI ASSISTANT tabs.
-        2.  Ensure tests cover various item statuses and dates.
-    -   **Why fix this issue and what will be achieved with the fix?**: This was the user's original critical bug. A full, comprehensive test is needed to finally close this recurring issue and regain user trust.
-    -   **Status**: TESTING PENDING
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Both
+    -   **Should Test frontend/backend/both after fix?**: Frontend.
     -   **Blocked on other issue**: None.
 
--   **Issue 3: TEAMS NOT WORKING - notifications are not being sent for key status changes.**
-    -   **Attempted fixes**: The agent previously updated  to include new statuses.
+-   **Issue 3: Confirm if the new Chrome Scraper (v7.10.0) is working for the user.**
+    -   **Attempted fixes**: A new version of the extension was packaged, and a working  endpoint was created. The user received the link but gave a one-word response (DIDNT WORK).
     -   **Next debug checklist**:
-        1.  Manually change an item's status in the UI to a value that should trigger a notification (e.g., ORDER SAMPLES).
-        2.  Check backend logs for the Sending Teams notification... message.
-        3.  Verify the  function in the spreadsheets is triggering the backend call correctly.
-    -   **Why fix this issue and what will be achieved with the fix?**: Enables a key collaborative feature for the user's team.
-    -   **Status**: TESTING PENDING
-    -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Backend
-    -   **Blocked on other issue**: None.
-
--   **Issue 4: Reverse selection feature in the Chrome scraper needs user verification.**
-    -   **Attempted fixes**: The agent changed the event listener in  to .
-    -   **Next debug checklist**: The agent needs to prompt the user to test the latest version of the Chrome extension to confirm the fix.
-    -   **Why fix this issue and what will be achieved with the fix?**: It's a user-requested quality-of-life improvement.
+        1.  Ask the user for specific details of the failure.
+        2.  Request a screenshot of the extension popup window while on a product page.
+        3.  Request a screenshot of the DevTools Console for the extension popup itself (right-click popup -> inspect).
+    -   **Why fix this issue and what will be achieved with the fix?**: The scraper is a critical part of the user's primary workflow.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend (Chrome Extension)
-    -   **Blocked on other issue**: None.
+    -   **Should Test frontend/backend/both after fix?**: Frontend (via user).
+    -   **Blocked on other issue**: Blocked on user feedback.
 
 **In progress Task List**:
--   **Task 1: Redesign mobile project view with a tabbed header** (P0)
-    -   **Where to resume**: The file  was updated with a new  component and the  logic was modified to use it. The UI and switching logic for the tabs needs to be fully implemented.
-    -   **What will be achieved with this?**: This will transform the mobile project view from a multi-page, tile-based navigation to the single-page, Excel-like tabbed interface the user demands.
-    -   **Status**: IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?**: Frontend (Mobile App)
-    -   **Blocked on something**: None.
+None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P0) **Implement Punch List -> FFE Linking:** Create a standalone Punch List feature that allows linking items to the FFE spreadsheet via a searchable dropdown.
-    -   (P1) **Implement FFE Portrait/Landscape View:** Use CSS media queries in  to ensure the spreadsheet is fully functional in both orientations on an iPad.
+    -   (P1) **Implement FFE Portrait/Landscape View:** Adapt the spreadsheet styling in  for better usability on an iPad in both orientations.
 -   **Future Tasks:**
-    -   Build Android version of the mobile app.
-    -   Google Drive Backup feature.
-    -   Client Approval Portal feature.
-    -   Refactor the monolithic  into modular API routers.
-    -   Canva API Integration (On Hold).
+    -   Build an Android version of the mobile app.
+    -   Implement a Google Drive Backup feature.
+    -   Build a Client Approval Portal feature.
+    -   Refactor the monolithic  into a modular structure with API routers.
 
 **Completed work in this session**
--   **Real-Time Sync:** Fixed the critical data sync issue between mobile and desktop by implementing a hybrid sync model and correcting a state management bug in the desktop spreadsheet component.
--   **Mobile App Overhaul:**
-    -   Reverted the mobile UI to the user's preferred Excel-like tabbed interface ().
-    -   Redesigned the mobile home screen to include a collapsible master calendar.
-    -   Added numerous feature screens to the mobile app (Whole Home, Calculators, Calendar, Reports, etc.).
--   **Core Bug Fixes:**
-    -   Resolved the disappearing contacts issue by ensuring the mobile app loads from the master contact list.
-    -   Achieved 100% backend test coverage by fixing failing tests related to API response formats.
-    -   Verified that data flows correctly to the Deliveries tab and that the Transfer to FFE workflow is functional.
--   **New Features:**
-    -   Added the ability to create independent events on the master calendar.
-    -   Reorganized the desktop project tabs into logical groups based on user feedback.
--   **iOS App Build:** Generated a complete, downloadable Xcode project and provided the user with detailed build instructions.
+-   **Data Independence Fix**: Modified the backend  endpoint to correctly filter rooms by , preventing data from different spreadsheets from being mixed.
+-   **Field Editability Fix**: Corrected  handlers in  and  to save data on edit.
+-   **Master To-Do List Feature**: Created a new page, styled it, and added backend support to aggregate all tasks.
+-   **Vendor Data Restoration**: Found and executed  to restore 134 lost vendor contacts.
+-   **Checklist Highlighting Feature**: Implemented logic to highlight and sort items linked to To-Do/Punch lists.
+-   **Scraper Download Fix**: Created a working  endpoint and packaged a new extension version (7.10.0).
+
+**Earlier issues found/mentioned but not fixed**
+-   The root cause of the recurring data loss (contacts, FFE data) has not been identified. While data was restored in this session, the underlying bug that causes deletion remains a significant risk.
+
+**Known issue recurrence from previous fork**
+-   **Issue recurrence in previous fork**: Scraper Broken and data loss (Contacts/Vendors deleted).
+-   **Recurrence count**: 3+
+-   **Status**:
+    -   Scraper: IN PROGRESS
+    -   Data Loss: RESOLVED (for this instance, but the root cause is still unknown and likely to happen again).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Hybrid Real-time Sync:** The application uses a dual strategy for data synchronization. Mobile clients push updates immediately upon user action (event-driven), while desktop clients pull updates via a 10-second polling interval. This ensures data consistency across platforms.
--   **State Management Bug Fix:** A critical sync issue was resolved by refactoring a desktop component () to derive its state from the database () instead of a local UI state (), establishing a single source of truth.
--   **SwiftUI WebView Wrapper:** The provided iOS solution is a minimal SwiftUI app that uses a  to wrap the existing React mobile web application, turning it into a native-feeling app without rewriting the codebase.
--   **Monolithic Component ():** This single, large React component acts as a router, state manager, and view container for the entire mobile experience, using a  statement to render different screens.
+-   **Data Segregation**: The core stability issue was the backend API returning mixed data. The fix was enforcing strict data segregation using a  query parameter in API calls ().
+-   **Frontend State De-duplication**: When an item exists in two data sources (Checklist and FFE), the frontend must de-duplicate it. The fix involved using a JavaScript  to create a unique list of items, prioritizing the FFE version to resolve conflicts.
+-   **Data Restoration from Scripts**: The agent successfully restored lost data by discovering and executing a Python script () in the repository. This highlights the importance of exploring the codebase for backup or seeding utilities.
 
 **key DB schema**
--   **calendar_events**: New collection to store user-created standalone calendar entries. Fields include , Thu Jan  8 05:46:02 UTC 2026, , , and an optional .
--   **items**: The  field is the definitive source of truth for an item's state. The value  corresponds to a checked item in the walkthrough.
-
-**changes in tech stack**
--   None.
+-   **rooms**: Documents now strictly rely on the  field ('walkthrough', 'checklist', or 'ffe') for data segregation.
+-   **company_todos**: New collection for non-project-specific tasks.
+-   **master_contacts**: Collection where vendor data was restored.
 
 **All files of reference**
--   : The central file for implementing all upcoming mobile UI changes.
--   : The file to modify for multi-room add, portrait/landscape view, and punch-list linking.
--    (or a new component): Will need to be implemented for the standalone punch list feature.
--   : May require new endpoints for the punch list feature.
-
-**Areas that need refactoring**
--    is over 1200 lines and manages the entire mobile app's routing and state. It should be broken down into smaller, manageable components with a proper routing solution.
--    is a massive monolithic file that should be split into domain-specific API routers (e.g., , , ).
+-   
+-   
+-   
+-   
+-   
+-   
 
 **key api endpoints**
--   : Creates a new standalone calendar event.
--   : Syncs checked items from the walkthrough to the project checklist, now with logic to remove unchecked items.
--   : A general-purpose endpoint used by both mobile and desktop to update an item's  to 'PICKED' or 'TO BE SELECTED'.
--   : A new endpoint that serves the zipped Xcode project for the user.
+-   : **CRITICAL CHANGE**. Now the standard for fetching segregated project data.
+-   : **NEW**. Serves the updated Chrome extension.
+-   : **NEW**. Endpoints for the company-wide to-do list.
+-   : **NEW**. Used by the Checklist to identify which items to highlight.
 
 **Critical Info for New Agent**
--   **User's Vision is Law:** The user has an extremely specific vision for the UI/UX, especially for the mobile app. Do not deviate from their explicit instructions (e.g., the Excel-like tabs). Re-read user messages carefully if unsure.
--   **Prioritize the User's Latest Task List:** The user has clearly defined the next set of tasks. Address them in this order:
-    1.  Implement the tabbed header for the mobile project view (currently in progress).
-    2.  Implement the Punch List -> FFE linking feature.
-    3.  Make the FFE view work in both portrait and landscape.
-    4.  Add the add multiple rooms feature to mobile.
--   **Verify All Data Flows:** The user remains skeptical about data integrity. After implementing the features, perform a comprehensive end-to-end test of all data-driven tabs on both desktop and mobile to confirm they are working and syncing correctly.
--   **The Xcode Issue is with the User:** The agent has provided correct code and instructions multiple times. If the user continues to have trouble, gently guide them again but do not assume the provided code or  is wrong. The issue is likely user error in Xcode.
+-   **User is extremely frustrated due to recurring bugs and data loss.** Prioritize clear communication and validate fixes thoroughly. Acknowledge the user's reports directly and avoid defensive language.
+-   **Data loss is a recurring, unsolved problem.** Be extremely cautious with any operation that deletes or modifies data. The root cause of why FFE items and contacts disappear is unknown and represents a major stability risk.
+-   **Test the latest fixes first.** The previous agent made many rapid changes. Your first priority is to verify that the FFE item dropdown and checklist highlighting are working as intended before addressing any other issues.
+-   **The scraper issue is blocked on the user.** You cannot proceed with the scraper fix until the user provides specific error details and console logs from their browser. Politely but firmly request this information.
 
 **documents and test reports created in this job**
--   
--   
--   
+-    (version 7.10.0)
 -   
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
--   **User:** Asks for tabs to be re-reorganized in a specific order. (COMPLETED)
--   **User:** Asks for full links to the app, downloads, etc. (COMPLETED)
--   **User:** Struggles with Xcode, sending screenshots of incorrect screens. (RESOLVED, agent provided correct code and instructions)
--   **User:** Runs the app but says it's not syncing with the desktop and requests a long list of new features (multi-room add, mobile tabs, master calendar, punch list, landscape FFE). (IN PROGRESS)
--   **User:** Clarifies the priority of the new feature list. (IN PROGRESS)
--   **User:** ok, now what after some mobile features were added. (RESOLVED)
--   **User:** what do i do with the code regarding Xcode. (RESOLVED)
--   **User:** its still the fucking same! regarding Xcode issues. (RESOLVED, user eventually got it working)
--   **User:** Sends screenshot showing mobile and desktop are not in sync. (RESOLVED, agent found and fixed the core sync bug).
--   **User:** OK! PLEASE PUT ALL OF THE TABS INSIDE THE APP IN THE HEADER... and awesome, please do 1-3... which defines the current set of tasks. (IN PROGRESS)
+1.  **HOW ABOUT FFE?**: User is frustrated that FFE items are not appearing in the dropdown. (IN PROGRESS)
+2.  **I DONT ACTUALLY NEED ANYTHING FROM THE WALKTHROUGH, TAKE THAT OUT...**: User clarifies that dropdowns should only show Checklist/FFE items and reports their transferred FFE data is missing. (RESOLVED - Walkthrough removed, data loss is a separate issue)
+3.  **User uploads screenshot of FFE sheet with items**: Providing evidence that FFE items exist but are not in the dropdown. (IN PROGRESS)
+4.  **NEVER SAID to highlight EVERYTHING!!!!**: Correcting the agent's implementation of highlighting and providing new UI requirements. (RESOLVED - Fix implemented, pending verification)
+5.  **DIDNT WORK**: Vague report that the new scraper failed. (IN PROGRESS - Blocked on user)
+6.  **I NEED THE LINK FOR THE SCRAPER**: User requesting the scraper download URL. (RESOLVED)
+7.  **STILL A FUCKING ERROR ON THE SCRAPER!...**: Reporting multiple issues simultaneously: broken scraper, empty master to-do, and new UI requirements. (PARTIALLY RESOLVED)
+8.  **WELL... YOU NEED TO LOOK BACK IN THE GIT HISTORY AND FUCKING FIND MY MISSING DATA!!!!!**: Demanding restoration of lost contact data. (RESOLVED)
+9.  **STILL fcukin deleting and adding pages... my fuckng contacs and vendor contacts are deleted...**: Reporting critical data independence issues and another data loss event. (PARTIALLY RESOLVED)
+10. **the ffe, and chcklist need to run INDEPENDANTLY!!!!**: The initial, high-priority message of the session outlining the core data corruption issues. (PARTIALLY RESOLVED)
 
 **Project Health Check:**
 -   **Broken**:
-    -   The Add Room functionality on the mobile app does not support adding multiple rooms at once.
+    -   The UI for linking To-Do/Punch list items is not correctly displaying FFE data, creating a critical workflow blocker.
+    -   The Chrome Scraper is still reported as non-functional by the user.
+    -   There is an unidentified, recurring bug that causes catastrophic data loss (Contacts, FFE items).
 -   **Mocked**: None.
 
 **3rd Party Integrations**
--   **rembg 2.0.72**: Python library on the backend for AI background removal.
--   **Capacitor 4.8.1**: Used to create the native iOS project wrapper.
--   **Microsoft Teams**: Integrated via webhooks in . (Status: Needs Testing)
+-   Microsoft Teams
+-   rembg 2.0.72
+-   Capacitor 4.8.1
 
 **Testing status**
--   **Testing agent used after significant changes**: YES (Iterations 15 & 17)
+-   **Testing agent used after significant changes**: NO
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**:  was created and updated.
--   **Known regressions**: None currently, but the agent had to revert a breaking UI change to the mobile app during the session.
-
-**Credentials to test flow:**
-N/A
+-   **Test files created**: None.
+-   **Known regressions**: Chrome Scraper functionality, persistent data loss.
 
 **What agent forgot to execute**
-- The agent has not yet fully implemented the user's latest set of requests: the tabbed header for the mobile project view (in progress), the FFE portrait/landscape mode, the standalone punch list linking, or the multi-room add feature. These are the immediate next steps.</analysis>
+- The agent successfully restored lost data but did not investigate the root cause of why the data is being deleted repeatedly. This is a critical unaddressed issue that guarantees future failures.</analysis>

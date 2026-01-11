@@ -3,7 +3,7 @@
   "appName": "ESTABLISHED",
   "webDir": "build",
   "server": {
-    "url": "https://procuretrack-4.preview.emergentagent.com/mobile-app",
+    "url": "https://stability-project-1.preview.emergentagent.com/mobile-app",
     "cleartext": true
   },
   "ios": {

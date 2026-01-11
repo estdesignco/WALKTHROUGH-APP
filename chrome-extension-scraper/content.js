@@ -2200,7 +2200,7 @@ function scrapePageData() {
 // SEND TO APP + LIBRARIES
 // ============================================================================
 
-const BACKEND_URL = 'https://procuretrack-4.preview.emergentagent.com';
+const BACKEND_URL = 'https://stability-project-1.preview.emergentagent.com';
 
 async function sendToAppAndLibraries() {
   if (!scrapedData) return;

@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = "https://procuretrack-4.preview.emergentagent.com"
+BACKEND_URL = "https://stability-project-1.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 def print_header(title):

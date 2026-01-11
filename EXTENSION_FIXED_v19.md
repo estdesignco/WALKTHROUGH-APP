@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://procuretrack-4.preview.emergentagent.com/chrome-extension-v19.zip
+https://stability-project-1.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://procuretrack-4.preview.emergentagent.com/api/download/chrome-extension
+https://stability-project-1.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

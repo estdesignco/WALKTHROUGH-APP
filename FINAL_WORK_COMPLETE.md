@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://procuretrack-4.preview.emergentagent.com
+https://stability-project-1.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://procuretrack-4.preview.emergentagent.com/mobile-app
+https://stability-project-1.preview.emergentagent.com/mobile-app
 
 ---
 
