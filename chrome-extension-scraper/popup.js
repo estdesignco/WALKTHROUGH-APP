@@ -50,7 +50,9 @@ async function loadProjects() {
       throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
     }
     
-    const projects = await response.json();
+    const data = await response.json();
+    // Handle both array and object responses
+    const projects = Array.isArray(data) ? data : (data.projects || []);
     console.log('[v7.9.0] Projects loaded:', projects.length);
     
     // Clear and populate dropdown
