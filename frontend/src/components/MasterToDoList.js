@@ -459,10 +459,10 @@ export default function MasterToDoList() {
             </div>
             
             {expandedProjects[project.id] && (
-              <div className="px-6 pb-4 space-y-2">
+              <div className="px-6 pb-4 space-y-1">
                 {/* Project To-Dos */}
-                {todos.map(todo => (
-                  <div key={todo.id} className="flex items-center gap-3 p-3 rounded-lg bg-black/20">
+                {todos.map((todo, todoIdx) => (
+                  <div key={todo.id} className={`flex items-center gap-3 p-3 rounded-lg ${todoIdx % 2 === 0 ? 'bg-black/30' : 'bg-black/15'}`}>
                     <input
                       type="checkbox"
                       checked={todo.completed}
@@ -484,8 +484,8 @@ export default function MasterToDoList() {
                 ))}
                 
                 {/* Punch Items */}
-                {punchItems.map(item => (
-                  <div key={item.id} className="flex items-center gap-3 p-3 rounded-lg bg-black/20">
+                {punchItems.map((item, itemIdx) => (
+                  <div key={item.id} className={`flex items-center gap-3 p-3 rounded-lg ${(todos.length + itemIdx) % 2 === 0 ? 'bg-black/30' : 'bg-black/15'}`}>
                     <button
                       onClick={() => togglePunchItem(item.id, item.status)}
                       className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs ${
