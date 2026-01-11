@@ -478,8 +478,58 @@ const ExactChecklistSpreadsheet = ({
         console.log(`📋 Initialized ${initialCheckedItems.size} pre-checked items from PICKED status`);
         setCheckedItems(initialCheckedItems);
       }
+      
+      // Load items that are on To-Do or Punch List
+      loadLinkedItems();
     }
   }, [project]);
+
+  // Load items that are linked to To-Do or Punch List
+  const loadLinkedItems = async () => {
+    if (!projectId) return;
+    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+    
+    try {
+      // Load To-Do items
+      const todoRes = await fetch(`${backendUrl}/api/todos/${projectId}`);
+      if (todoRes.ok) {
+        const todoData = await todoRes.json();
+        const todos = todoData.todos || [];
+        const linkedTodoIds = new Set();
+        todos.forEach(todo => {
+          if (todo.linked_ffe_item?.id) {
+            linkedTodoIds.add(todo.linked_ffe_item.id);
+          }
+        });
+        setTodoLinkedItems(linkedTodoIds);
+        console.log(`📋 Found ${linkedTodoIds.size} items linked to To-Do`);
+      }
+    } catch (e) {
+      console.log('No todos loaded');
+    }
+    
+    try {
+      // Load Punch List items
+      const punchRes = await fetch(`${backendUrl}/api/punch-list/project/${projectId}`);
+      if (punchRes.ok) {
+        const punchData = await punchRes.json();
+        const punchItems = punchData.punch_items || punchData || [];
+        const linkedPunchIds = new Set();
+        punchItems.forEach(item => {
+          if (item.linked_ffe_item_id) {
+            linkedPunchIds.add(item.linked_ffe_item_id);
+          }
+          if (item.linked_ffe_item?.id) {
+            linkedPunchIds.add(item.linked_ffe_item.id);
+          }
+        });
+        setPunchLinkedItems(linkedPunchIds);
+        console.log(`🔨 Found ${linkedPunchIds.size} items linked to Punch List`);
+      }
+    } catch (e) {
+      console.log('No punch list items loaded');
+    }
+  };
 
   // Fetch available categories from backend API
   useEffect(() => {
