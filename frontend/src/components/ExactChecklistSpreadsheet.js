@@ -2628,20 +2628,15 @@ const ExactChecklistSpreadsheet = ({
                                   </td>
                                   
                                   {/* REMARKS - EDITABLE */}
-                                  <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm">
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-[#D4C5A9] text-sm outline-none"
-                                      onBlur={(e) => {
-                                        const newValue = e.target.textContent?.trim();
-                                        if (newValue !== item.remarks) {
-                                          handleUpdateItemField(item.id, 'remarks', newValue);
-                                        }
-                                      }}
-                                    >
-                                      {item.remarks || ''}
-                                    </div>
+                                  <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={{ color: textColor }}>
+                                    <input
+                                      type="text"
+                                      value={item.remarks || ''}
+                                      onChange={(e) => handleUpdateItemField(item.id, 'remarks', e.target.value)}
+                                      placeholder="Remarks..."
+                                      className="w-full bg-transparent text-sm outline-none border-none"
+                                      style={inputStyle}
+                                    />
                                   </td>
                                   
                                   {/* ACTION BUTTONS: Add, Alternatives, Delete */}
