@@ -1617,11 +1617,22 @@ const ExactFFESpreadsheet = ({
                                                           const punchLink = linkedPunchItems[item.id];
                                                           const isOnPunchList = !!punchLink;
                                                           const isOnTodo = todoLinkedItems.has(item.id);
-                                                          const shouldHighlight = isOnPunchList || isOnTodo;
                                                           const punchCompleted = punchLink?.is_completed;
+                                                          
+                                                          // Check if item is COMPLETE - if so, don't highlight!
+                                                          const isComplete = item.status?.toUpperCase() === 'COMPLETE' || 
+                                                                             item.status?.toUpperCase() === 'COMPLETED' ||
+                                                                             item.status?.toUpperCase() === 'INSTALLED' ||
+                                                                             item.status?.toUpperCase() === 'DONE';
+                                                          
+                                                          // Only highlight if on list AND not complete
+                                                          const shouldHighlight = (isOnPunchList || isOnTodo) && !isComplete;
                                                           
                                                           // Determine row style
                                                           let rowStyle;
+                                                          // Text color: BLACK for highlighted rows, normal for others
+                                                          const textColor = shouldHighlight ? '#000' : '#B49B7E';
+                                                          
                                                           if (shouldHighlight) {
                                                             rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length] };
                                                             highlightIndex++;
@@ -1636,7 +1647,7 @@ const ExactFFESpreadsheet = ({
                                                           return (
                                                         <tr key={item.id} style={rowStyle}>
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
-                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm relative" style={{ color: shouldHighlight ? '#000' : '#B49B7E' }}>
+                                                          <td className="border border-[#B49B7E] px-2 py-2 text-sm relative" style={{ color: textColor }}>
                                                             <div className="flex items-center gap-2">
                                                               {shouldHighlight && (
                                                                 <span className="text-xs font-bold text-black">
