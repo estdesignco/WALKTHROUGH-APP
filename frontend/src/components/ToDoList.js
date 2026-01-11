@@ -17,14 +17,13 @@ export default function ToDoList({ projectId }) {
   const [selectedFfeItem, setSelectedFfeItem] = useState(null);
   const [linkingTodoId, setLinkingTodoId] = useState(null);
 
-  useEffect(() => {
-    loadTodos();
-    loadFfeItems();
-  }, [projectId]);
-
-  // Load ONLY Checklist AND FFE items for linking (NOT walkthrough)
+  // Load FFE items function - defined before useEffect
   const loadFfeItems = async () => {
     console.log('🔥 ToDoList: loadFfeItems called with projectId:', projectId);
+    if (!projectId) {
+      console.log('🔥 ToDoList: No projectId, skipping');
+      return;
+    }
     try {
       const allItems = [];
       const sheetTypes = ['checklist', 'ffe'];
@@ -67,6 +66,12 @@ export default function ToDoList({ projectId }) {
       console.error('🔥 ToDoList: Failed to load items:', error);
     }
   };
+
+  useEffect(() => {
+    console.log('🔥 ToDoList useEffect running, projectId:', projectId);
+    loadTodos();
+    loadFfeItems();
+  }, [projectId]);
 
   // Filter items by search query
   const filteredFfeItems = ffeItems.filter(item => {
