@@ -1,4 +1,4 @@
-// Design Ready Product Scraper v7.9.0
+// Design Ready Product Scraper v7.10.0
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
 // Debug logging enabled in console
 
