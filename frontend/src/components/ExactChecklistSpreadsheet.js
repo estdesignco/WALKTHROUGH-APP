@@ -663,7 +663,9 @@ const ExactChecklistSpreadsheet = ({
       'ASK JALA': '#EC4899',                // Pink
       'GET QUOTE': '#06B6D4',               // Cyan
       'WAITING ON QT': '#F97316',           // Orange
-      'READY FOR PRESENTATION': '#84CC16'   // Lime
+      'READY FOR PRESENTATION': '#84CC16', // Lime
+      'ENTER INTO HOUZZ': '#7C3AED',        // Violet
+      'ENTER INTO HOUZZ & ORDER SAMPLE': '#DB2777' // Deep Pink
     };
     return statusColors[status] || '#6B7280';
   };
