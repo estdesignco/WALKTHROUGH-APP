@@ -848,7 +848,7 @@ const ExactChecklistSpreadsheet = ({
         });
         
         // AUTO-CREATE TO-DO for specific statuses
-        const autoTodoStatuses = ['CHANGE OUT', 'GET QUOTE', 'ORDER SAMPLES'];
+        const autoTodoStatuses = ['CHANGE OUT', 'GET QUOTE', 'ORDER SAMPLES', 'ENTER INTO HOUZZ', 'ENTER INTO HOUZZ & ORDER SAMPLE'];
         if (autoTodoStatuses.includes(newStatus.toUpperCase())) {
           // Create the To-Do automatically
           try {
