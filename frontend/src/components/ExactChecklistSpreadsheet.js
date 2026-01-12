@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import CanvaIntegrationModal from './CanvaIntegrationModal';
@@ -9,6 +9,7 @@ import ProductVariantPicker from './ProductVariantPicker';
 import SmartAlternatives from './SmartAlternatives';
 import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
+import { toast } from 'sonner';
 
 const ExactChecklistSpreadsheet = ({ 
   project, 
