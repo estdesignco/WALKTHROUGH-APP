@@ -160,13 +160,15 @@ export default function ToDoList({ projectId, roomId = null }) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          source_type: ffeItem.sourceType?.toLowerCase() || 'checklist',
           linked_ffe_item: {
             id: ffeItem.id,
             name: ffeItem.name,
             sku: ffeItem.sku,
             vendor: ffeItem.vendor,
-            roomName: ffeItem.roomName,
-            sourceType: ffeItem.sourceType
+            room_name: ffeItem.roomName,
+            category_name: ffeItem.categoryName,
+            source_type: ffeItem.sourceType?.toLowerCase() || 'checklist'
           }
         })
       });
