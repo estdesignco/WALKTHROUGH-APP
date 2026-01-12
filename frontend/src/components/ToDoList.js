@@ -129,13 +129,15 @@ export default function ToDoList({ projectId, roomId = null }) {
           assigned_to: newItem.assigned_to,
           deadline: newItem.deadline || null,
           status: 'pending',
+          source_type: selectedFfeItem?.sourceType?.toLowerCase() || 'checklist',
           linked_ffe_item: selectedFfeItem ? {
             id: selectedFfeItem.id,
             name: selectedFfeItem.name,
             sku: selectedFfeItem.sku,
             vendor: selectedFfeItem.vendor,
-            roomName: selectedFfeItem.roomName,
-            sourceType: selectedFfeItem.sourceType
+            room_name: selectedFfeItem.roomName,
+            category_name: selectedFfeItem.categoryName,
+            source_type: selectedFfeItem.sourceType?.toLowerCase() || 'checklist'
           } : null
         })
       });
