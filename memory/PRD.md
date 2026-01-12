@@ -113,12 +113,13 @@ Full-stack interior design project management application with multiple spreadsh
 - Urgent: `bg-red-600`
 
 ## Backlog / Future Tasks
-1. iPad Portrait/Landscape View for spreadsheets
-2. Android mobile app
-3. Google Drive Backup feature
-4. Client Approval Portal
-5. Backend refactoring (modular API routers)
-6. Root cause investigation for recurring data loss
+1. **Punch list identifiers** - Show linked item details (room, vendor, SKU) on punch list items (P1)
+2. iPad Portrait/Landscape View for spreadsheets
+3. Android mobile app
+4. Google Drive Backup feature
+5. Client Approval Portal
+6. Backend refactoring (modular API routers)
+7. Root cause investigation for recurring data loss
 
 ## Known Issues
 - Chrome Scraper - Fixed missing `/api/scraper/save` endpoint that was causing HTTP 404
