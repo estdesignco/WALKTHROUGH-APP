@@ -198,13 +198,18 @@ class TestToDoAutoComplete:
         assert response.status_code == 200
         data = response.json()
         
-        available_statuses = [s['status'] for s in data.get('statuses', [])]
+        # API returns a list directly
+        available_statuses = data if isinstance(data, list) else [s['status'] for s in data.get('statuses', [])]
         
+        found_count = 0
         for status in auto_create_statuses:
             if status in available_statuses:
                 print(f"✅ Auto-create status '{status}' is available")
+                found_count += 1
             else:
                 print(f"⚠️ Auto-create status '{status}' not found in available statuses")
+        
+        assert found_count == len(auto_create_statuses), f"Expected all {len(auto_create_statuses)} auto-create statuses to be available"
 
 
 class TestMobileApp:
