@@ -374,3 +374,5 @@ frontend/node_modules/.cache/default-development/1.pack_
 *.env
 *.env.*
 frontend/node_modules/electron/dist/electron
+frontend/dist-electron/linux-arm64-unpacked/frontend
+frontend/dist-electron/linux-arm64-unpacked/resources/app.asar
