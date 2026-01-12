@@ -175,14 +175,19 @@ class TestToDoAutoComplete:
         assert response.status_code == 200
         data = response.json()
         
-        available_statuses = [s['status'] for s in data.get('statuses', [])]
+        # API returns a list directly
+        available_statuses = data if isinstance(data, list) else [s['status'] for s in data.get('statuses', [])]
         
         # Check that completion statuses are available
+        found_count = 0
         for status in completion_statuses:
-            # Note: Some statuses might have different names
-            print(f"📋 Checking for status: {status}")
+            if status in available_statuses:
+                print(f"✅ Completion status '{status}' is available")
+                found_count += 1
+            else:
+                print(f"⚠️ Completion status '{status}' not found")
         
-        print(f"✅ Found {len(available_statuses)} available statuses")
+        print(f"✅ Found {len(available_statuses)} available statuses, {found_count}/{len(completion_statuses)} completion statuses")
     
     def test_auto_create_todo_statuses_defined(self):
         """Verify auto-create To-Do statuses are defined"""
