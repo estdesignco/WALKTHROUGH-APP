@@ -1,9 +1,8 @@
 arm64:
   firstOrDefaultFilePatterns:
     - '!**/node_modules'
-    - '!assets{,/**/*}'
+    - '!build{,/**/*}'
     - '!dist-electron{,/**/*}'
-    - build/**/*
     - electron/**/*
     - public/icon-512x512.png
     - package.json
@@ -16,6 +15,5 @@ arm64:
     - '!.yarnrc.yml'
   nodeModuleFilePatterns:
     - '**/*'
-    - build/**/*
     - electron/**/*
     - public/icon-512x512.png
