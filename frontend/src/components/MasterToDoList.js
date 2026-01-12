@@ -466,54 +466,176 @@ export default function MasterToDoList() {
             {expandedProjects[project.id] && (
               <div className="px-6 pb-4 space-y-1">
                 {/* Project To-Dos */}
-                {todos.map((todo, todoIdx) => (
-                  <div key={todo.id} className={`flex items-center gap-3 p-3 rounded-lg ${todoIdx % 2 === 0 ? 'bg-black/30' : 'bg-black/15'}`}>
-                    <input
-                      type="checkbox"
-                      checked={todo.completed}
-                      onChange={() => toggleTodo(todo.id, todo.completed)}
-                      className="w-5 h-5 cursor-pointer"
-                    />
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(todo.priority)} text-white`}>
-                      {todo.priority}
-                    </span>
-                    <span className={`flex-1 ${todo.completed ? 'line-through text-gray-500' : 'text-white'}`}>
-                      {todo.text}
-                    </span>
-                    {todo.deadline && (
-                      <span className="text-amber-400 text-xs">📅 {new Date(todo.deadline).toLocaleDateString()}</span>
-                    )}
-                    <span className="text-xs bg-blue-600 px-2 py-0.5 rounded text-white">TO-DO</span>
-                    <button onClick={() => deleteTodo(todo.id)} className="text-red-400 hover:text-red-300">🗑️</button>
-                  </div>
-                ))}
+                {todos.map((todo, todoIdx) => {
+                  const linkedItem = todo.linked_ffe_item || todo.linked_checklist_item || {};
+                  const sourceType = todo.source_type || linkedItem.source_type || 'checklist';
+                  const sheetLabel = sourceType === 'ffe' ? 'FF&E' : sourceType === 'walkthrough' ? 'WALKTHROUGH' : 'CHECKLIST';
+                  const roomName = linkedItem.room_name || linkedItem.room || todo.room_name || '';
+                  const categoryName = linkedItem.category_name || linkedItem.category || '';
+                  const vendorName = linkedItem.vendor || linkedItem.vendor_name || '';
+                  const sku = linkedItem.sku || '';
+                  const itemName = linkedItem.name || linkedItem.item_name || '';
+                  
+                  // Build link URL
+                  const tabParam = sourceType === 'ffe' ? 'FF%26E' : sourceType === 'walkthrough' ? 'Walkthrough' : 'Checklist';
+                  const itemLink = `/project/${project.id}?tab=${tabParam}`;
+                  
+                  return (
+                    <div key={todo.id} className={`p-3 rounded-lg ${todoIdx % 2 === 0 ? 'bg-black/30' : 'bg-black/15'}`}>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={todo.completed}
+                          onChange={() => toggleTodo(todo.id, todo.completed)}
+                          className="w-5 h-5 cursor-pointer flex-shrink-0"
+                        />
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(todo.priority)} text-white flex-shrink-0`}>
+                          {todo.priority}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className={`font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+                            {todo.text}
+                          </div>
+                          {/* Item identifiers - ROOM, CATEGORY, VENDOR, SKU */}
+                          {(roomName || itemName || vendorName) && (
+                            <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                              {roomName && (
+                                <span className="bg-purple-600/30 text-purple-300 px-2 py-0.5 rounded">
+                                  🏠 {roomName}
+                                </span>
+                              )}
+                              {categoryName && (
+                                <span className="bg-teal-600/30 text-teal-300 px-2 py-0.5 rounded">
+                                  📁 {categoryName}
+                                </span>
+                              )}
+                              {itemName && (
+                                <span className="bg-amber-600/30 text-amber-300 px-2 py-0.5 rounded">
+                                  📦 {itemName}
+                                </span>
+                              )}
+                              {vendorName && (
+                                <span className="bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded">
+                                  🏪 {vendorName}
+                                </span>
+                              )}
+                              {sku && (
+                                <span className="bg-gray-600/30 text-gray-300 px-2 py-0.5 rounded">
+                                  # {sku}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        {todo.deadline && (
+                          <span className="text-amber-400 text-xs flex-shrink-0">📅 {new Date(todo.deadline).toLocaleDateString()}</span>
+                        )}
+                        <span className={`text-xs px-2 py-0.5 rounded text-white flex-shrink-0 ${
+                          sourceType === 'ffe' ? 'bg-green-600' : sourceType === 'walkthrough' ? 'bg-purple-600' : 'bg-blue-600'
+                        }`}>
+                          {sheetLabel}
+                        </span>
+                        <a 
+                          href={itemLink}
+                          onClick={(e) => { e.preventDefault(); navigate(itemLink); }}
+                          className="text-[#D4A574] hover:text-white text-sm flex-shrink-0"
+                          title="Go to item"
+                        >
+                          🔗
+                        </a>
+                        <button onClick={() => deleteTodo(todo.id)} className="text-red-400 hover:text-red-300 flex-shrink-0">🗑️</button>
+                      </div>
+                    </div>
+                  );
+                })}
                 
                 {/* Punch Items */}
-                {punchItems.map((item, itemIdx) => (
-                  <div key={item.id} className={`flex items-center gap-3 p-3 rounded-lg ${(todos.length + itemIdx) % 2 === 0 ? 'bg-black/30' : 'bg-black/15'}`}>
-                    <button
-                      onClick={() => togglePunchItem(item.id, item.status)}
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs ${
-                        item.status === 'completed' || item.status === 'verified'
-                          ? 'border-green-500 bg-green-500/20 text-green-400'
-                          : 'border-gray-500 hover:border-[#D4A574]'
-                      }`}
-                    >
-                      {item.status === 'completed' || item.status === 'verified' ? '✓' : ''}
-                    </button>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white`}>
-                      {item.priority}
-                    </span>
-                    <span className={`flex-1 ${item.status === 'completed' ? 'line-through text-gray-500' : 'text-white'}`}>
-                      {item.title}
-                    </span>
-                    {item.due_date && (
-                      <span className="text-amber-400 text-xs">📅 {new Date(item.due_date).toLocaleDateString()}</span>
-                    )}
-                    <span className="text-xs bg-orange-600 px-2 py-0.5 rounded text-white">PUNCH</span>
-                    <button onClick={() => deletePunchItem(item.id)} className="text-red-400 hover:text-red-300">🗑️</button>
-                  </div>
-                ))}
+                {punchItems.map((item, itemIdx) => {
+                  const linkedItem = item.linked_ffe_item || {};
+                  const sourceType = item.source_type || linkedItem.source_type || 'checklist';
+                  const sheetLabel = sourceType === 'ffe' ? 'FF&E' : sourceType === 'walkthrough' ? 'WALKTHROUGH' : 'CHECKLIST';
+                  const roomName = linkedItem.room_name || linkedItem.room || item.room_name || '';
+                  const categoryName = linkedItem.category_name || linkedItem.category || '';
+                  const vendorName = linkedItem.vendor || linkedItem.vendor_name || '';
+                  const sku = linkedItem.sku || '';
+                  const itemName = linkedItem.name || linkedItem.item_name || '';
+                  
+                  // Build link URL
+                  const tabParam = sourceType === 'ffe' ? 'FF%26E' : sourceType === 'walkthrough' ? 'Walkthrough' : 'Checklist';
+                  const itemLink = `/project/${project.id}?tab=${tabParam}`;
+                  
+                  return (
+                    <div key={item.id} className={`p-3 rounded-lg ${(todos.length + itemIdx) % 2 === 0 ? 'bg-black/30' : 'bg-black/15'}`}>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => togglePunchItem(item.id, item.status)}
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs flex-shrink-0 ${
+                            item.status === 'completed' || item.status === 'verified'
+                              ? 'border-green-500 bg-green-500/20 text-green-400'
+                              : 'border-gray-500 hover:border-[#D4A574]'
+                          }`}
+                        >
+                          {item.status === 'completed' || item.status === 'verified' ? '✓' : ''}
+                        </button>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white flex-shrink-0`}>
+                          {item.priority}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className={`font-medium ${item.status === 'completed' ? 'line-through text-gray-500' : 'text-white'}`}>
+                            {item.title}
+                          </div>
+                          {/* Item identifiers - ROOM, CATEGORY, VENDOR, SKU */}
+                          {(roomName || itemName || vendorName) && (
+                            <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
+                              {roomName && (
+                                <span className="bg-purple-600/30 text-purple-300 px-2 py-0.5 rounded">
+                                  🏠 {roomName}
+                                </span>
+                              )}
+                              {categoryName && (
+                                <span className="bg-teal-600/30 text-teal-300 px-2 py-0.5 rounded">
+                                  📁 {categoryName}
+                                </span>
+                              )}
+                              {itemName && (
+                                <span className="bg-amber-600/30 text-amber-300 px-2 py-0.5 rounded">
+                                  📦 {itemName}
+                                </span>
+                              )}
+                              {vendorName && (
+                                <span className="bg-blue-600/30 text-blue-300 px-2 py-0.5 rounded">
+                                  🏪 {vendorName}
+                                </span>
+                              )}
+                              {sku && (
+                                <span className="bg-gray-600/30 text-gray-300 px-2 py-0.5 rounded">
+                                  # {sku}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        {item.due_date && (
+                          <span className="text-amber-400 text-xs flex-shrink-0">📅 {new Date(item.due_date).toLocaleDateString()}</span>
+                        )}
+                        <span className={`text-xs px-2 py-0.5 rounded text-white flex-shrink-0 ${
+                          sourceType === 'ffe' ? 'bg-green-600' : 'bg-orange-600'
+                        }`}>
+                          PUNCH • {sheetLabel}
+                        </span>
+                        <a 
+                          href={itemLink}
+                          onClick={(e) => { e.preventDefault(); navigate(itemLink); }}
+                          className="text-[#D4A574] hover:text-white text-sm flex-shrink-0"
+                          title="Go to item"
+                        >
+                          🔗
+                        </a>
+                        <button onClick={() => deletePunchItem(item.id)} className="text-red-400 hover:text-red-300 flex-shrink-0">🗑️</button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
