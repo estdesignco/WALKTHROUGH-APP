@@ -4,6 +4,7 @@ import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
 import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
+import { toast } from 'sonner';
 
 const ExactFFESpreadsheet = ({ 
   project, 
