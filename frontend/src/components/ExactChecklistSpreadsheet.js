@@ -822,28 +822,32 @@ const ExactChecklistSpreadsheet = ({
       if (response.ok) {
         console.log('✅ Checklist status updated successfully');
         
-        // AUTO-CREATE TO-DO for specific statuses
-        const autoTodoStatuses = ['CHANGE OUT', 'GET QUOTE', 'ORDER SAMPLES'];
-        if (autoTodoStatuses.includes(newStatus.toUpperCase())) {
-          // Find the item details for the To-Do
-          let itemName = '';
-          let roomName = '';
-          let vendorName = '';
-          
-          filteredProject?.rooms?.forEach(room => {
-            room.categories?.forEach(category => {
-              category.subcategories?.forEach(subcategory => {
-                subcategory.items?.forEach(item => {
-                  if (item.id === itemId) {
-                    itemName = item.name || 'Unknown Item';
-                    roomName = room.name || '';
-                    vendorName = item.vendor || '';
-                  }
-                });
+        // Find item details for automation
+        let itemName = '';
+        let roomName = '';
+        let vendorName = '';
+        let categoryName = '';
+        let sku = '';
+        
+        filteredProject?.rooms?.forEach(room => {
+          room.categories?.forEach(category => {
+            category.subcategories?.forEach(subcategory => {
+              subcategory.items?.forEach(item => {
+                if (item.id === itemId) {
+                  itemName = item.name || 'Unknown Item';
+                  roomName = room.name || '';
+                  vendorName = item.vendor || '';
+                  categoryName = category.name || '';
+                  sku = item.sku || '';
+                }
               });
             });
           });
-          
+        });
+        
+        // AUTO-CREATE TO-DO for specific statuses
+        const autoTodoStatuses = ['CHANGE OUT', 'GET QUOTE', 'ORDER SAMPLES'];
+        if (autoTodoStatuses.includes(newStatus.toUpperCase())) {
           // Create the To-Do automatically
           try {
             const todoText = `${newStatus}: ${itemName}${roomName ? ` (${roomName})` : ''}`;
@@ -856,24 +860,66 @@ const ExactChecklistSpreadsheet = ({
                 description: `Auto-created from Checklist status change. Vendor: ${vendorName || 'N/A'}`,
                 priority: newStatus.toUpperCase() === 'CHANGE OUT' ? 'high' : 'medium',
                 status: 'pending',
+                source_type: 'checklist',
                 linked_ffe_item: {
                   id: itemId,
                   name: itemName,
-                  roomName: roomName,
+                  room_name: roomName,
+                  category_name: categoryName,
                   vendor: vendorName,
-                  sourceType: 'CHECKLIST'
+                  sku: sku,
+                  source_type: 'checklist'
                 }
               })
             });
             
             if (todoResponse.ok) {
               console.log('✅ Auto-created To-Do for status:', newStatus, todoText);
+              toast.info(`📋 To-Do Created: ${newStatus} - ${itemName}`, {
+                description: `Added to your Master To-Do List`,
+                duration: 3000,
+              });
             } else {
               console.warn('⚠️ Failed to auto-create To-Do:', await todoResponse.text());
             }
           } catch (todoError) {
             console.error('❌ Error auto-creating To-Do:', todoError);
           }
+        }
+        
+        // AUTO-COMPLETE TO-DO when status changes to completion states
+        const completionStatuses = ['ORDERED', 'RECEIVED', 'INSTALLED', 'COMPLETE', 'DELIVERED'];
+        if (completionStatuses.includes(newStatus.toUpperCase())) {
+          // Find and complete any linked To-Dos for this item
+          try {
+            const todosRes = await fetch(`${backendUrl}/api/todos/${project?.id}`);
+            if (todosRes.ok) {
+              const todosData = await todosRes.json();
+              const todos = todosData.todos || [];
+              
+              // Find todos linked to this item
+              for (const todo of todos) {
+                if (todo.linked_ffe_item?.id === itemId && !todo.completed) {
+                  // Mark this to-do as completed
+                  await fetch(`${backendUrl}/api/todos/${todo.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ completed: true, status: 'completed' })
+                  });
+                  console.log('✅ Auto-completed To-Do:', todo.text);
+                  toast.success(`✅ To-Do Completed: ${todo.text}`, {
+                    description: `Status changed to ${newStatus}`,
+                    duration: 3000,
+                  });
+                }
+              }
+            }
+          } catch (todoError) {
+            console.error('❌ Error auto-completing To-Dos:', todoError);
+          }
+          
+          // Refresh linked items to update highlights
+          loadLinkedItems();
         }
         
         // Update local state to avoid scroll jump - create proper deep copy
