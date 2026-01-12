@@ -225,8 +225,10 @@ const ExactFFESpreadsheet = ({
     const scrollY = window.scrollY || window.pageYOffset;
     console.log('💾 Saving scroll position:', scrollY);
     
+    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+    
     try {
-      const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
+      const response = await fetch(`${backendUrl}/api/items/${itemId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -236,6 +238,38 @@ const ExactFFESpreadsheet = ({
       
       if (response.ok) {
         console.log('✅ Status updated successfully');
+        
+        // AUTO-COMPLETE TO-DO when status changes to completion states
+        const completionStatuses = ['ORDERED', 'RECEIVED', 'INSTALLED', 'COMPLETE', 'DELIVERED', 'SAMPLES ARRIVED', 'PICKED'];
+        if (completionStatuses.includes(newStatus.toUpperCase())) {
+          // Find and complete any linked To-Dos for this item
+          try {
+            const todosRes = await fetch(`${backendUrl}/api/todos/${project?.id}`);
+            if (todosRes.ok) {
+              const todosData = await todosRes.json();
+              const todos = todosData.todos || [];
+              
+              // Find todos linked to this item
+              for (const todo of todos) {
+                if (todo.linked_ffe_item?.id === itemId && !todo.completed) {
+                  // Mark this to-do as completed
+                  await fetch(`${backendUrl}/api/todos/${todo.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ completed: true, status: 'completed' })
+                  });
+                  console.log('✅ Auto-completed To-Do:', todo.text);
+                  toast.success(`✅ To-Do Completed: ${todo.text}`, {
+                    description: `Status changed to ${newStatus}`,
+                    duration: 3000,
+                  });
+                }
+              }
+            }
+          } catch (todoError) {
+            console.error('❌ Error auto-completing To-Dos:', todoError);
+          }
+        }
         
         // Update local state to avoid scroll jump - create proper deep copy
         const updatedProject = JSON.parse(JSON.stringify(filteredProject));
