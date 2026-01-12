@@ -888,7 +888,7 @@ const ExactChecklistSpreadsheet = ({
         }
         
         // AUTO-COMPLETE TO-DO when status changes to completion states
-        const completionStatuses = ['ORDERED', 'RECEIVED', 'INSTALLED', 'COMPLETE', 'DELIVERED'];
+        const completionStatuses = ['ORDERED', 'RECEIVED', 'INSTALLED', 'COMPLETE', 'DELIVERED', 'SAMPLES ARRIVED', 'PICKED'];
         if (completionStatuses.includes(newStatus.toUpperCase())) {
           // Find and complete any linked To-Dos for this item
           try {
