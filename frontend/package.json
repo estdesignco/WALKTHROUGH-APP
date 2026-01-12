@@ -84,15 +84,20 @@
   "main": "electron/main.js",
   "author": "Established Design",
   "description": "Interior Design Project Management System",
+  "homepage": "./",
   "build": {
     "appId": "com.establisheddesign.ffe",
     "productName": "ESTABLISHED",
     "copyright": "Copyright © 2026 Established Design",
+    "extends": null,
     "directories": {
       "output": "dist-electron"
     },
     "files": [
       "electron/**/*",
+      "public/icon-512x512.png"
+    ],
+    "extraResources": [
       "public/icon-512x512.png"
     ],
     "mac": {
@@ -106,7 +111,7 @@
     },
     "linux": {
       "icon": "public/icon-512x512.png",
-      "target": ["AppImage", "deb"],
+      "target": ["AppImage"],
       "category": "Office"
     },
     "nsis": {
