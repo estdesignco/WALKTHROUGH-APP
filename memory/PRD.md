@@ -6,33 +6,46 @@ Full-stack interior design project management application with multiple spreadsh
 ## Latest Session (January 12, 2026)
 
 ### Issues Fixed
-1. **Checklist Text Color Fix** - Fixed unreadable text on highlighted rows in the Checklist spreadsheet:
-   - Added inline `style={{ color: textColor }}` to all text elements in item rows
-   - Highlighted rows now show BLACK text (#000000) instead of default gold (#B49B7E)
-   - Applied to: Item name, Vendor, SKU, Qty, Size, Finish/Color, Cost, Remarks columns
-   - Uses inline styles to override CSS classes
 
-2. **Highlight Auto-Refresh** - Added 10-second polling interval to update highlights when tasks are completed:
-   - `loadLinkedItems()` now runs every 10 seconds via `setInterval`
-   - When a To-Do or Punch List item is marked complete, the Checklist highlight disappears automatically
-   - Proper cleanup on component unmount
+1. **Master To-Do List Item Identifiers** - Added full item context to all To-Do and Punch items:
+   - Spreadsheet type badge (CHECKLIST in blue, FF&E in green)
+   - Room name badge (purple 🏠)
+   - Category name badge (teal 📁)
+   - Item name badge (amber 📦)
+   - Vendor badge (blue 🏪)
+   - SKU badge (gray #)
+   - Direct link icon (🔗) that navigates to the correct project/tab
 
-3. **Verified PASTE Column Intact** - Confirmed the 📋 PASTE button exists in the action column:
-   - Button shows green (animate-pulse) when scraper data is available
-   - Button shows gray/disabled when no data to paste
-   - All 113 test items have the PASTE button visible
+2. **Auto-Complete To-Do on Status Change** - When checklist status changes to:
+   - ORDERED, RECEIVED, INSTALLED, COMPLETE, DELIVERED
+   - The linked To-Do item is automatically marked as completed
+   - Toast notification shows "✅ To-Do Completed: [item name]"
+
+3. **Auto-Create To-Do Enhancements** - Enhanced auto-create logic:
+   - Includes full item details: room_name, category_name, vendor, sku, source_type
+   - Toast notification shows "📋 To-Do Created: [status] - [item name]"
+
+4. **Checklist Text Color Fix** - Fixed unreadable text on highlighted rows:
+   - Highlighted rows show BLACK text (#000000)
+   - Applied to all text elements via inline styles
+
+5. **Highlight Auto-Refresh** - 10-second polling interval:
+   - Automatically refreshes linked item status
+   - Highlights disappear when tasks are completed
+
+6. **Chrome Extension v7.12.0** - Fixed and updated:
+   - URL: https://highlight-text-fix.preview.emergentagent.com
+   - Download: /chrome-extension-scraper.zip
 
 ### Files Modified
-- `/app/frontend/src/components/ExactChecklistSpreadsheet.js`
-  - Lines 2326-2328: Added `textColor`, `cellStyle`, `inputStyle` variables
-  - Lines 549-553: Added 10-second polling interval for linked items
-  - Multiple cells updated with `style={cellStyle}` and `style={{ color: textColor }}`
+- `/app/frontend/src/components/MasterToDoList.js` - Item identifiers with badges and links
+- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Auto-complete, toast notifications
+- `/app/frontend/src/components/ToDoList.js` - Updated linked item fields
+- `/app/frontend/src/App.js` - Added Toaster component for sonner
 
 ---
 
 ## Previous Session (January 11, 2026)
-
-### Issues Fixed
 1. **Company To-Do endpoint route ordering** - `/todos/company` routes were being captured by `/todos/{project_id}` parameter route. Fixed by moving company routes BEFORE parameterized routes in server.py.
 
 2. **Medium priority color** - Changed from yellow (`bg-yellow-600`) to cyan (`bg-cyan-600`) to differentiate from "Modern Kitchen" room color.
