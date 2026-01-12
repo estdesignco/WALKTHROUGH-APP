@@ -65,7 +65,7 @@ export default function ToDoList({ projectId, roomId = null }) {
               });
             });
           }
-        } catch (e) {}
+        } catch (e) { /* ignore sheet load errors */ }
       }
       
       console.log(`📦 ToDoList: Loaded ${itemsMap.size} unique items (FFE priority)`);
