@@ -52,6 +52,10 @@ const ExactChecklistSpreadsheet = ({
   const [todoLinkedItems, setTodoLinkedItems] = useState(new Map());
   const [punchLinkedItems, setPunchLinkedItems] = useState(new Map());
   
+  // Refs to track previous state for notification when highlights are removed
+  const prevTodoLinkedRef = useRef(new Map());
+  const prevPunchLinkedRef = useRef(new Map());
+  
   // Load expanded states from localStorage
   const [expandedRooms, setExpandedRooms] = useState(() => {
     const saved = localStorage.getItem('checklist_expandedRooms');
