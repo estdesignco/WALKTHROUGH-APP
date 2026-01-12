@@ -2,10 +2,6 @@
   "appId": "com.establisheddesign.ffe",
   "appName": "ESTABLISHED",
   "webDir": "build",
-  "server": {
-    "url": "https://highlight-text-fix.preview.emergentagent.com/mobile-app",
-    "cleartext": true
-  },
   "ios": {
     "contentInset": "always",
     "allowsLinkPreview": false,
