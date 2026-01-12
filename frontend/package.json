@@ -81,6 +81,52 @@
       "last 1 safari version"
     ]
   },
+  "main": "electron/main.js",
+  "author": "Established Design",
+  "description": "Interior Design Project Management System",
+  "build": {
+    "appId": "com.establisheddesign.ffe",
+    "productName": "ESTABLISHED",
+    "copyright": "Copyright © 2026 Established Design",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "electron/**/*",
+      "public/icon-512x512.png"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "public/icon-512x512.png",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "icon": "public/icon-512x512.png",
+      "target": ["nsis", "portable"]
+    },
+    "linux": {
+      "icon": "public/icon-512x512.png",
+      "target": ["AppImage", "deb"],
+      "category": "Office"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "electron:build": "electron-builder",
+    "electron:build:win": "electron-builder --win",
+    "electron:build:mac": "electron-builder --mac",
+    "electron:build:linux": "electron-builder --linux"
+  },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@eslint/js": "9.23.0",
