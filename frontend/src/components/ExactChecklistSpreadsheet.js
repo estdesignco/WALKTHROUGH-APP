@@ -1731,6 +1731,8 @@ const ExactChecklistSpreadsheet = ({
               <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
               <option value="APPROVED">APPROVED</option>
               <option value="ON HOLD">ON HOLD</option>
+              <option value="ENTER INTO HOUZZ">ENTER INTO HOUZZ</option>
+              <option value="ENTER INTO HOUZZ & ORDER SAMPLE">ENTER INTO HOUZZ & ORDER SAMPLE</option>
             </select>
           </div>
           
