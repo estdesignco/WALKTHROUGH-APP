@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
+import { toast } from 'sonner';
 
 const WalkthroughFFE = ({ 
   project, 
