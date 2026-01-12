@@ -561,15 +561,22 @@ export default function ToDoList({ projectId, roomId = null }) {
                   {item.linked_ffe_item ? (
                     <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/30">
                       <span className="text-[#D4A574]">🔗</span>
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${item.linked_ffe_item.sourceType === 'CHECKLIST' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
-                        {item.linked_ffe_item.sourceType || 'LINKED'}
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                        (item.linked_ffe_item.source_type || item.linked_ffe_item.sourceType || '').toLowerCase() === 'checklist' 
+                          ? 'bg-blue-600 text-white' 
+                          : 'bg-green-600 text-white'
+                      }`}>
+                        {(item.linked_ffe_item.source_type || item.linked_ffe_item.sourceType || 'LINKED').toUpperCase()}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-[#D4A574] text-sm font-medium truncate">
                           {item.linked_ffe_item.name}
                         </div>
                         <div className="text-gray-500 text-xs">
-                          {item.linked_ffe_item.roomName} • {item.linked_ffe_item.vendor} • SKU: {item.linked_ffe_item.sku}
+                          🏠 {item.linked_ffe_item.room_name || item.linked_ffe_item.roomName || 'N/A'} 
+                          {(item.linked_ffe_item.category_name || item.linked_ffe_item.categoryName) && ` • 📁 ${item.linked_ffe_item.category_name || item.linked_ffe_item.categoryName}`}
+                          {item.linked_ffe_item.vendor && ` • 🏪 ${item.linked_ffe_item.vendor}`}
+                          {item.linked_ffe_item.sku && ` • # ${item.linked_ffe_item.sku}`}
                         </div>
                       </div>
                       <button
