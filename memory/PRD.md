@@ -3,7 +3,34 @@
 ## Original Problem Statement
 Full-stack interior design project management application with multiple spreadsheets (FFE, Checklist, Walkthrough), task management (To-Do, Punch List, Company Tasks), and Microsoft Teams integration.
 
-## Latest Session (January 11, 2026)
+## Latest Session (January 12, 2026)
+
+### Issues Fixed
+1. **Checklist Text Color Fix** - Fixed unreadable text on highlighted rows in the Checklist spreadsheet:
+   - Added inline `style={{ color: textColor }}` to all text elements in item rows
+   - Highlighted rows now show BLACK text (#000000) instead of default gold (#B49B7E)
+   - Applied to: Item name, Vendor, SKU, Qty, Size, Finish/Color, Cost, Remarks columns
+   - Uses inline styles to override CSS classes
+
+2. **Highlight Auto-Refresh** - Added 10-second polling interval to update highlights when tasks are completed:
+   - `loadLinkedItems()` now runs every 10 seconds via `setInterval`
+   - When a To-Do or Punch List item is marked complete, the Checklist highlight disappears automatically
+   - Proper cleanup on component unmount
+
+3. **Verified PASTE Column Intact** - Confirmed the 📋 PASTE button exists in the action column:
+   - Button shows green (animate-pulse) when scraper data is available
+   - Button shows gray/disabled when no data to paste
+   - All 113 test items have the PASTE button visible
+
+### Files Modified
+- `/app/frontend/src/components/ExactChecklistSpreadsheet.js`
+  - Lines 2326-2328: Added `textColor`, `cellStyle`, `inputStyle` variables
+  - Lines 549-553: Added 10-second polling interval for linked items
+  - Multiple cells updated with `style={cellStyle}` and `style={{ color: textColor }}`
+
+---
+
+## Previous Session (January 11, 2026)
 
 ### Issues Fixed
 1. **Company To-Do endpoint route ordering** - `/todos/company` routes were being captured by `/todos/{project_id}` parameter route. Fixed by moving company routes BEFORE parameterized routes in server.py.
