@@ -492,6 +492,9 @@ const ExactChecklistSpreadsheet = ({
     if (!project?.id) return;
     const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
     
+    let completedTodoItems = [];
+    let completedPunchItems = [];
+    
     try {
       // Load To-Do items - track completion status
       const todoRes = await fetch(`${backendUrl}/api/todos/${project.id}`);
@@ -505,10 +508,20 @@ const ExactChecklistSpreadsheet = ({
             const isComplete = todo.completed || todo.status === 'completed';
             linkedTodoMap.set(todo.linked_ffe_item.id, { 
               completed: isComplete,
-              status: todo.status 
+              status: todo.status,
+              itemName: todo.linked_ffe_item.name || todo.text || 'Item'
             });
+            
+            // Check if this item was just completed (wasn't completed before, is now)
+            const prevState = prevTodoLinkedRef.current.get(todo.linked_ffe_item.id);
+            if (prevState && !prevState.completed && isComplete) {
+              completedTodoItems.push(todo.linked_ffe_item.name || todo.text || 'Item');
+            }
           }
         });
+        
+        // Update ref for next comparison
+        prevTodoLinkedRef.current = linkedTodoMap;
         setTodoLinkedItems(linkedTodoMap);
         console.log(`📋 Found ${linkedTodoMap.size} items linked to To-Do`);
       }
@@ -528,17 +541,42 @@ const ExactChecklistSpreadsheet = ({
           if (itemId) {
             // Track if the PUNCH LIST item is completed, not the checklist item
             const isComplete = item.status === 'completed' || item.status === 'verified';
+            const itemName = item.linked_ffe_item?.name || item.description || 'Item';
             linkedPunchMap.set(itemId, {
               completed: isComplete,
-              status: item.status
+              status: item.status,
+              itemName: itemName
             });
+            
+            // Check if this item was just completed
+            const prevState = prevPunchLinkedRef.current.get(itemId);
+            if (prevState && !prevState.completed && isComplete) {
+              completedPunchItems.push(itemName);
+            }
           }
         });
+        
+        // Update ref for next comparison
+        prevPunchLinkedRef.current = linkedPunchMap;
         setPunchLinkedItems(linkedPunchMap);
         console.log(`🔨 Found ${linkedPunchMap.size} items linked to Punch List`);
       }
     } catch (e) {
       console.log('No punch list items loaded');
+    }
+    
+    // Show toast notifications for newly completed items (highlights removed)
+    if (completedTodoItems.length > 0) {
+      toast.success(`✅ To-Do Completed: ${completedTodoItems.join(', ')}`, {
+        description: 'Highlight removed from checklist',
+        duration: 4000,
+      });
+    }
+    if (completedPunchItems.length > 0) {
+      toast.success(`✅ Punch List Completed: ${completedPunchItems.join(', ')}`, {
+        description: 'Highlight removed from checklist',
+        duration: 4000,
+      });
     }
   }, [project?.id]);
 
