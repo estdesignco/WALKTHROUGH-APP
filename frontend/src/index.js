@@ -8,26 +8,28 @@ root.render(
     <App />
 );
 
-// AGGRESSIVELY UNREGISTER service worker and clear all caches
+// REGISTER service worker for OFFLINE capability
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    // Unregister all service workers
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-      registrations.forEach(registration => {
-        registration.unregister();
-        console.log('🗑️ Service Worker unregistered');
-      });
-    });
-    
-    // Clear all caches
-    if ('caches' in window) {
-      caches.keys().then(cacheNames => {
-        cacheNames.forEach(cacheName => {
-          caches.delete(cacheName);
-          console.log('🗑️ Cache deleted:', cacheName);
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('✅ Service Worker registered for offline capability:', registration.scope);
+        
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          console.log('🔄 Service Worker update found');
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('🆕 New Service Worker installed, refresh for updates');
+            }
+          });
         });
+      })
+      .catch((error) => {
+        console.log('❌ Service Worker registration failed:', error);
       });
-    }
   });
 }
 
