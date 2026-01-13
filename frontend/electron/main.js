@@ -4,8 +4,8 @@ const path = require('path');
 // Keep a global reference of the window object
 let mainWindow;
 
-// Your production URL - UPDATE THIS after deployment
-const PRODUCTION_URL = 'https://highlight-text-fix.preview.emergentagent.com';
+// Your production URL
+const PRODUCTION_URL = 'https://app.estdesignco.com';
 
 function createWindow() {
   // Create the browser window
