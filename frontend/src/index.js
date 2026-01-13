@@ -33,41 +33,13 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// Enable app install prompt
+// Enable app install prompt (hidden - users install via browser menu)
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   console.log('📱 App install prompt available');
   e.preventDefault();
   deferredPrompt = e;
-  
-  // Show custom install button
-  const installButton = document.createElement('button');
-  installButton.textContent = '📱 Install App';
-  installButton.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #8b7355;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 1000;
-    font-weight: bold;
-  `;
-  
-  installButton.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`📱 Install prompt result: ${outcome}`);
-      deferredPrompt = null;
-      installButton.remove();
-    }
-  });
-  
-  document.body.appendChild(installButton);
+  // Install button hidden - app can be installed via browser menu if needed
 });
 
 // Track app installation
