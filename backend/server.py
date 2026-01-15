@@ -10989,10 +10989,10 @@ async def google_calendar_callback(code: str = None, error: str = None):
     from fastapi.responses import RedirectResponse
     
     if error:
-        return RedirectResponse(url=f"/master-calendar?error={error}")
+        return RedirectResponse(url=f"/?error={error}")
     
     if not code:
-        return RedirectResponse(url="/master-calendar?error=no_code")
+        return RedirectResponse(url="/?error=no_code")
     
     try:
         # Exchange code for tokens
