@@ -188,7 +188,20 @@ function ProjectTabbedView({ project, onNavigate, initialTab = 'walkthrough' }) 
       case 'contacts':
         return <ContactsScreen project={project} onNavigate={onNavigate} />;
       case 'calendar':
-        return <InstallationCalendar projectId={project?.id} />;
+        return (
+          <div className="h-full flex flex-col overflow-auto">
+            {/* Master Calendar Section */}
+            <div className="p-2">
+              <h3 className="text-lg font-semibold text-stone-200 mb-2 px-2">📅 Master Calendar</h3>
+              <ProjectCalendar compact={true} />
+            </div>
+            {/* Project Installation Calendar */}
+            <div className="p-2 border-t border-stone-700">
+              <h3 className="text-lg font-semibold text-stone-200 mb-2 px-2">🔧 Installation Calendar</h3>
+              <InstallationCalendar projectId={project?.id} />
+            </div>
+          </div>
+        );
       case 'exports':
         return <ExportsDashboard projectId={project?.id} />;
       case 'punch':
