@@ -83,7 +83,7 @@ This helps you avoid entering the same product data twice - Houzz for your Houzz
 - ✅ Product Image
 - ✅ Product URL
 
-## 🔧 Supported Vendors (v7.13.0)
+## 🔧 Supported Vendors (v7.14.0)
 
 | Vendor | Domain | Status |
 |--------|--------|--------|
