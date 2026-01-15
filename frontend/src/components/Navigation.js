@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 
-const Navigation = ({ currentProject, isOffline }) => {
+const Navigation = ({ currentProject, isOffline, onLogout }) => {
   const location = useLocation();
 
   return (
@@ -45,7 +46,17 @@ const Navigation = ({ currentProject, isOffline }) => {
             </div>
           )}
 
-          {/* Actions removed per user request */}
+          {/* Logout Button */}
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-2 px-3 py-2 text-stone-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+              title="Logout"
+            >
+              <LogOut size={18} />
+              <span className="hidden sm:inline text-sm">Logout</span>
+            </button>
+          )}
         </div>
       </div>
     </nav>
