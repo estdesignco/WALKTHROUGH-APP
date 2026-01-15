@@ -558,7 +558,7 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
           </div>
           
           {/* Add Calendar Button */}
-          <div className="relative">
+          <div className="relative" style={{ zIndex: 100 }}>
             <button
               onClick={() => setShowConnectMenu(!showConnectMenu)}
               className="flex items-center gap-2 px-4 py-2 rounded transition-all hover:scale-105"
@@ -574,10 +574,13 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
             
             {/* Connect Calendar Dropdown */}
             {showConnectMenu && (
-              <div className="absolute right-0 top-full mt-2 z-50 rounded-lg shadow-xl p-4 min-w-[300px]"
+              <div className="fixed right-4 top-auto mt-2 rounded-lg shadow-2xl p-4 min-w-[320px]"
                 style={{
-                  background: '#2a2a2a',
-                  border: '1px solid #8b7355',
+                  background: '#1a1a1a',
+                  border: '2px solid #d4af37',
+                  zIndex: 9999,
+                  maxHeight: '80vh',
+                  overflowY: 'auto',
                 }}>
                 <div className="flex justify-between items-center mb-3 pb-2" style={{ borderBottom: '1px solid #8b7355' }}>
                   <span className="font-semibold text-stone-200">Connect Calendar</span>
