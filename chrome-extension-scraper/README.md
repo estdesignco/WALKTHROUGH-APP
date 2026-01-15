@@ -128,6 +128,11 @@ This helps you avoid entering the same product data twice - Houzz for your Houzz
 - Click on the correct element on the page to capture it
 - Some vendor websites have unusual layouts
 
+### Quick Paste not working?
+- Make sure you have a valid URL copied to your clipboard
+- The URL must be a product page (not a search or category page)
+- Some sites may block automated requests
+
 ### Houzz Sync not working?
 - Make sure the Houzz Pro Clipper modal is **open and visible** on the page
 - Both extensions need to be active on the same page
@@ -142,6 +147,7 @@ If you have issues, please report:
 
 ---
 
-**Version**: 7.13.0  
+**Version**: 7.14.0  
 **Last Updated**: January 2025  
+**New in 7.14.0**: Quick Paste URL feature - scrape products from clipboard URLs  
 **New in 7.13.0**: Houzz Pro Clipper integration for reduced double data entry
