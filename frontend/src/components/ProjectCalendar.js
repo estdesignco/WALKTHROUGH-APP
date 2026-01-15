@@ -123,6 +123,55 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
         console.log('No independent events endpoint');
       }
       
+      // Fetch external calendar events (Google & Outlook)
+      try {
+        const externalResponse = await fetch(`${API_URL}/external-calendar-events`);
+        const externalEvents = await externalResponse.json();
+        if (Array.isArray(externalEvents)) {
+          externalEvents.forEach(evt => {
+            calendarEvents.push({
+              id: evt.id,
+              type: evt.type || evt.source, // 'google' or 'outlook'
+              title: evt.title,
+              date: new Date(evt.date),
+              endDate: evt.end_date ? new Date(evt.end_date) : null,
+              project: evt.calendar_name || 'External Calendar',
+              description: evt.description,
+              location: evt.location,
+              isExternal: true,
+              source: evt.source,
+              calendarEmail: evt.calendar_email
+            });
+          });
+        }
+      } catch (e) {
+        console.log('External calendar events fetch error:', e);
+      }
+      
+      // Fetch To-Do items with deadlines
+      try {
+        const todosResponse = await fetch(`${API_URL}/todos`);
+        const todos = await todosResponse.json();
+        if (Array.isArray(todos)) {
+          todos.forEach(todo => {
+            if (todo.deadline && !todo.completed) {
+              calendarEvents.push({
+                id: `todo-${todo.id}`,
+                type: 'todo',
+                title: todo.text,
+                date: new Date(todo.deadline),
+                project: 'To-Do',
+                description: todo.description,
+                priority: todo.priority,
+                isTodo: true
+              });
+            }
+          });
+        }
+      } catch (e) {
+        console.log('Todos fetch error:', e);
+      }
+      
       for (const project of projectsData) {
         // Add project dates
         if (project.start_date) {
