@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
 import uuid
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 # Import vendor portal management (AFTER loading env)
 from vendor_portals import (
