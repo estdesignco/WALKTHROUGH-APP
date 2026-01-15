@@ -355,9 +355,6 @@ function createSidePanel() {
       <button class="dr-btn-primary" id="dr-send-btn">
         🚀 SEND TO APP
       </button>
-      <button class="dr-btn-secondary" id="dr-quick-paste-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border-color: #f59e0b; font-weight: 600;">
-        📋 QUICK PASTE URL
-      </button>
       <button class="dr-btn-secondary" id="dr-houzz-sync-btn" style="background: linear-gradient(135deg, #00c853 0%, #009624 100%); color: white; border-color: #00c853; font-weight: 600;">
         🏠 SYNC FROM HOUZZ CLIPPER
       </button>
