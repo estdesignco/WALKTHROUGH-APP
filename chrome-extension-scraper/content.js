@@ -2484,13 +2484,238 @@ function copyImageWithLink() {
 }
 
 // ============================================================================
+// HOUZZ PRO CLIPPER INTEGRATION
+// Detects and syncs data from Houzz Pro Clipper when it's open
+// ============================================================================
+
+let houzzSyncInterval = null;
+
+function detectHouzzClipper() {
+  // Houzz Pro Clipper injects a modal/iframe into the page
+  // Look for common Houzz clipper elements
+  const houzzSelectors = [
+    'iframe[src*="houzz"]',
+    '[class*="houzz-clipper"]',
+    '[class*="HouzzClipper"]',
+    '[id*="houzz-clipper"]',
+    '[data-houzz]',
+    // Houzz clipper modal container
+    'div[class*="clipper-modal"]',
+    'div[class*="ClipperModal"]',
+    // Shadow DOM container that Houzz might use
+    'houzz-clipper',
+    '#houzz-clipper-root',
+    // Generic modal that might be Houzz
+    'div[style*="z-index: 2147483647"]'
+  ];
+  
+  for (const selector of houzzSelectors) {
+    const el = document.querySelector(selector);
+    if (el) {
+      console.log('[Houzz Sync] Found Houzz clipper element:', selector);
+      return el;
+    }
+  }
+  
+  // Also check for iframes that might contain Houzz
+  const iframes = document.querySelectorAll('iframe');
+  for (const iframe of iframes) {
+    try {
+      if (iframe.src && (iframe.src.includes('houzz') || iframe.src.includes('clipper'))) {
+        console.log('[Houzz Sync] Found Houzz iframe:', iframe.src);
+        return iframe;
+      }
+    } catch (e) {}
+  }
+  
+  return null;
+}
+
+function extractHouzzClipperData() {
+  // Try to extract data from Houzz clipper's UI elements
+  const data = {
+    name: null,
+    price: null,
+    sku: null,
+    size: null,
+    finish_color: null,
+    image_url: null,
+    vendor: null,
+    description: null
+  };
+  
+  // Strategy 1: Look for input fields that Houzz clipper populates
+  // These are typically named inputs or have data attributes
+  const inputSelectors = {
+    name: ['input[name*="name" i]', 'input[name*="title" i]', 'input[placeholder*="name" i]', '[data-field="name"]'],
+    price: ['input[name*="price" i]', 'input[type="number"][name*="cost" i]', '[data-field="price"]'],
+    sku: ['input[name*="sku" i]', 'input[name*="model" i]', 'input[name*="item" i]', '[data-field="sku"]'],
+    size: ['input[name*="dimension" i]', 'input[name*="size" i]', 'textarea[name*="dimension" i]', '[data-field="dimensions"]'],
+    description: ['textarea[name*="description" i]', 'textarea[name*="note" i]', '[data-field="description"]']
+  };
+  
+  for (const [field, selectors] of Object.entries(inputSelectors)) {
+    for (const selector of selectors) {
+      const el = document.querySelector(selector);
+      if (el && el.value && el.value.trim()) {
+        data[field] = el.value.trim();
+        console.log(`[Houzz Sync] Found ${field}:`, data[field]);
+        break;
+      }
+    }
+  }
+  
+  // Strategy 2: Look for visible text in modal that might be product data
+  // Houzz clipper shows extracted data in a modal with labels
+  const labelValuePairs = document.querySelectorAll('label, [class*="label"], [class*="field-label"]');
+  for (const label of labelValuePairs) {
+    const labelText = label.innerText?.toLowerCase().trim();
+    const valueEl = label.nextElementSibling || label.querySelector('input, textarea, span');
+    const value = valueEl?.value || valueEl?.innerText;
+    
+    if (!value || !value.trim()) continue;
+    
+    if (labelText?.includes('name') || labelText?.includes('title')) {
+      data.name = data.name || value.trim();
+    } else if (labelText?.includes('price') || labelText?.includes('cost')) {
+      const priceMatch = value.match(/[\d,]+\.?\d*/);
+      if (priceMatch) data.price = data.price || parseFloat(priceMatch[0].replace(/,/g, ''));
+    } else if (labelText?.includes('sku') || labelText?.includes('model') || labelText?.includes('item')) {
+      data.sku = data.sku || value.trim();
+    } else if (labelText?.includes('dimension') || labelText?.includes('size')) {
+      data.size = data.size || value.trim();
+    } else if (labelText?.includes('vendor') || labelText?.includes('brand') || labelText?.includes('manufacturer')) {
+      data.vendor = data.vendor || value.trim();
+    }
+  }
+  
+  // Strategy 3: Look for product images in clipper modal
+  // Usually a prominent image with specific class or in an image container
+  const imgSelectors = [
+    '[class*="clipper"] img',
+    '[class*="product-image"] img',
+    '[class*="main-image"] img',
+    'img[src*="product"]',
+    '.modal img[src^="http"]'
+  ];
+  
+  for (const selector of imgSelectors) {
+    const img = document.querySelector(selector);
+    if (img && img.src && img.src.startsWith('http') && img.naturalWidth > 100) {
+      data.image_url = img.src;
+      console.log('[Houzz Sync] Found image:', data.image_url);
+      break;
+    }
+  }
+  
+  // Strategy 4: Check if any data was manually highlighted/selected
+  // Users might have text selected that represents product info
+  const selection = window.getSelection().toString().trim();
+  if (selection && selection.length > 2 && selection.length < 500) {
+    // If it looks like a price
+    if (/^\$?[\d,]+\.?\d*$/.test(selection.replace(/\s/g, ''))) {
+      const priceVal = parseFloat(selection.replace(/[$,\s]/g, ''));
+      if (priceVal > 0 && !data.price) data.price = priceVal;
+    }
+    // If it looks like a SKU (alphanumeric with dashes)
+    else if (/^[A-Z0-9-]{3,20}$/i.test(selection)) {
+      if (!data.sku) data.sku = selection;
+    }
+  }
+  
+  // Log what we found
+  const foundFields = Object.entries(data).filter(([k, v]) => v !== null).map(([k]) => k);
+  console.log('[Houzz Sync] Extracted fields:', foundFields);
+  
+  return data;
+}
+
+function syncFromHouzz() {
+  console.log('[Houzz Sync] Starting sync from Houzz Pro Clipper...');
+  
+  const houzzData = extractHouzzClipperData();
+  
+  // Check if we got any useful data
+  const hasData = Object.values(houzzData).some(v => v !== null);
+  
+  if (!hasData) {
+    showToast('⚠️ No Houzz data detected. Open the Houzz Clipper first.');
+    return false;
+  }
+  
+  // Merge with existing scraped data (Houzz data takes priority for empty fields)
+  if (!scrapedData) {
+    scrapedData = {
+      url: window.location.href,
+      vendor: null,
+      name: null,
+      sku: null,
+      price: null,
+      msrp: null,
+      size: null,
+      finish_color: null,
+      finish_image: null,
+      image_url: null,
+      remarks: null
+    };
+  }
+  
+  let syncedCount = 0;
+  for (const [field, value] of Object.entries(houzzData)) {
+    if (value !== null && (scrapedData[field] === null || scrapedData[field] === undefined || scrapedData[field] === '')) {
+      scrapedData[field] = value;
+      updateFieldDisplay(field, value);
+      syncedCount++;
+    }
+  }
+  
+  if (syncedCount > 0) {
+    showToast(`✅ Synced ${syncedCount} field(s) from Houzz!`);
+    return true;
+  } else {
+    showToast('ℹ️ All fields already have data');
+    return false;
+  }
+}
+
+function startHouzzAutoSync() {
+  // Auto-detect Houzz clipper and sync when it appears
+  if (houzzSyncInterval) {
+    clearInterval(houzzSyncInterval);
+  }
+  
+  houzzSyncInterval = setInterval(() => {
+    const houzzClipper = detectHouzzClipper();
+    if (houzzClipper && sidePanel && sidePanel.style.display === 'block') {
+      // Houzz clipper is open and our panel is open - try to sync
+      console.log('[Houzz Sync] Houzz clipper detected, attempting auto-sync...');
+      syncFromHouzz();
+    }
+  }, 2000); // Check every 2 seconds
+}
+
+function stopHouzzAutoSync() {
+  if (houzzSyncInterval) {
+    clearInterval(houzzSyncInterval);
+    houzzSyncInterval = null;
+  }
+}
+
+// ============================================================================
 // MESSAGE HANDLERS
 // ============================================================================
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'openScraper') {
     scrapeAndShow();
+    // Start Houzz auto-sync when our panel opens
+    startHouzzAutoSync();
     sendResponse({ success: true });
+  }
+  
+  if (request.action === 'syncFromHouzz') {
+    const result = syncFromHouzz();
+    sendResponse({ success: result });
   }
   
   if (request.action === 'getLastProject') {
