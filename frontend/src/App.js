@@ -127,6 +127,7 @@ export const utilityAPI = {
 const App = () => {
   const [currentProject, setCurrentProject] = useState(null);
   const [isOffline, setIsOffline] = useState(false);
+  const [authenticated, setAuthenticated] = useState(isAuthenticated());
 
   useEffect(() => {
     // Check online/offline status for jobsite work
