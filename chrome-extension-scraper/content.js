@@ -2950,8 +2950,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.action === 'syncFromHouzz') {
-    const result = syncFromHouzz();
-    sendResponse({ success: result });
+    console.log('[Houzz Sync] Received sync request from popup');
+    const houzzData = extractHouzzClipperData();
+    const hasData = Object.values(houzzData).some(v => v !== null && v !== undefined && v !== '');
+    console.log('[Houzz Sync] Sending data back to popup:', houzzData);
+    sendResponse({ success: hasData, data: houzzData });
+    return true;
   }
   
   if (request.action === 'getLastProject') {
