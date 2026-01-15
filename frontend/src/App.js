@@ -190,49 +190,8 @@ const App = () => {
   return (
     <div className="App min-h-screen bg-gray-900">
       <BrowserRouter>
-        {/* Routes without navigation - full screen experiences */}
+        {/* Public Routes - Customer-facing pages (NO LOGIN REQUIRED) */}
         <Routes>
-          <Route 
-            path="/mobile-app" 
-            element={<MobileAppSimulator />}
-          />
-          <Route 
-            path="/ai-assistant" 
-            element={<AIDesignDashboard />}
-          />
-          <Route 
-            path="/room-studio" 
-            element={<RoomRenderingStudio />}
-          />
-          {/* Design Tools Suite - Full Screen Experiences */}
-          <Route 
-            path="/project/:projectId/design-tools" 
-            element={<DesignToolsHub />}
-          />
-          <Route 
-            path="/project/:projectId/design-tools/layout-planner" 
-            element={<FurnitureLayoutPlanner />}
-          />
-          <Route 
-            path="/project/:projectId/design-tools/color-extractor" 
-            element={<ColorPaletteExtractor />}
-          />
-          <Route 
-            path="/project/:projectId/design-tools/ar-preview" 
-            element={<ARFurniturePreview />}
-          />
-          <Route 
-            path="/project/:projectId/design-tools/lighting-simulator" 
-            element={<LightingSimulator />}
-          />
-          <Route 
-            path="/project/:projectId/design-tools/room-scanner" 
-            element={<RoomScanner3D />}
-          />
-          <Route 
-            path="/project/:projectId/design-tools/pinterest" 
-            element={<PinterestIntegration />}
-          />
           <Route 
             path="/customer/questionnaire" 
             element={<CustomerfacingQuestionnaire />}
@@ -249,14 +208,65 @@ const App = () => {
             path="/customer/project/:projectId" 
             element={<CustomerfacingProjectDetailPage />}
           />
+          
+          {/* Protected Routes - Require Login */}
           <Route 
             path="*" 
             element={
-              <>
-                <Navigation 
-                  currentProject={currentProject} 
-                  isOffline={isOffline}
-                />
+              !authenticated ? (
+                <SimpleLogin onLogin={() => setAuthenticated(true)} />
+              ) : (
+                <Routes>
+                  <Route 
+                    path="/mobile-app" 
+                    element={<MobileAppSimulator />}
+                  />
+                  <Route 
+                    path="/ai-assistant" 
+                    element={<AIDesignDashboard />}
+                  />
+                  <Route 
+                    path="/room-studio" 
+                    element={<RoomRenderingStudio />}
+                  />
+                  {/* Design Tools Suite - Full Screen Experiences */}
+                  <Route 
+                    path="/project/:projectId/design-tools" 
+                    element={<DesignToolsHub />}
+                  />
+                  <Route 
+                    path="/project/:projectId/design-tools/layout-planner" 
+                    element={<FurnitureLayoutPlanner />}
+                  />
+                  <Route 
+                    path="/project/:projectId/design-tools/color-extractor" 
+                    element={<ColorPaletteExtractor />}
+                  />
+                  <Route 
+                    path="/project/:projectId/design-tools/ar-preview" 
+                    element={<ARFurniturePreview />}
+                  />
+                  <Route 
+                    path="/project/:projectId/design-tools/lighting-simulator" 
+                    element={<LightingSimulator />}
+                  />
+                  <Route 
+                    path="/project/:projectId/design-tools/room-scanner" 
+                    element={<RoomScanner3D />}
+                  />
+                  <Route 
+                    path="/project/:projectId/design-tools/pinterest" 
+                    element={<PinterestIntegration />}
+                  />
+                  <Route 
+                    path="*" 
+                    element={
+                      <>
+                        <Navigation 
+                          currentProject={currentProject} 
+                          isOffline={isOffline}
+                          onLogout={logout}
+                        />
                 
                 <main className="container mx-auto px-4 py-6">
                   <Routes>
