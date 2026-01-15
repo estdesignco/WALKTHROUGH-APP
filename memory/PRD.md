@@ -44,27 +44,43 @@ Download: https://designflow-app-9.preview.emergentagent.com/chrome-extension-sc
 
 ### Features Implemented
 
-1. **Chrome Extension v7.14.0 - Quick Paste URL**
-   - Added "📋 QUICK PASTE URL" button to scraper panel
-   - Reads URL from clipboard and auto-scrapes without navigation
-   - New backend endpoint `/api/quick-scrape` for server-side scraping
-   - Perfect for scraping products from emails, bookmarks, documents
+1. **Calendar Integration - Google & Outlook (P0)**
+   - Added OAuth 2.0 authentication for Google Calendar and Microsoft Outlook
+   - Backend endpoints for calendar connection management
+   - Two-way sync support (read/write events)
+   - "Add Calendar" button in Project Calendar with connection UI
+   - Auto token refresh for long-term connections
+   - New event types: Google Calendar, Outlook Calendar, To-Do deadlines
+   - Credentials configured in backend .env
 
-2. **Chrome Extension v7.13.0 - Houzz Pro Clipper Integration**
-   - Added "🏠 SYNC FROM HOUZZ CLIPPER" button to scraper panel
-   - Detects Houzz Pro Clipper modal/iframe on page
-   - Extracts product data from Houzz clipper form fields
-   - Auto-fills empty fields in Design Ready scraper
-   - Background auto-sync when both panels are open
-   - Updated README with Houzz integration instructions
+2. **Data Loss Fix (P0)**
+   - Fixed auto-populate script that was wiping data on restart
+   - Now only creates sample data if NO projects exist
+   - User data is preserved on server restarts
+
+3. **Chrome Extension v7.12.0 Restored**
+   - Reverted to last working version after Houzz integration attempts failed
+   - Houzz clipper sync not possible due to Chrome extension sandboxing
 
 ### Files Modified
-- `/app/backend/server.py` - Added `/api/quick-scrape` endpoint
-- `/app/chrome-extension-scraper/content.js` - Added Quick Paste and Houzz sync functions
-- `/app/chrome-extension-scraper/popup.js` - Updated version comment
-- `/app/chrome-extension-scraper/manifest.json` - Version 7.14.0, added clipboardRead permission
-- `/app/chrome-extension-scraper/README.md` - Added Quick Paste and Houzz integration docs
-- `/app/frontend/public/chrome-extension-scraper.zip` - Updated extension package
+- `/app/backend/.env` - Added Google and Outlook OAuth credentials
+- `/app/backend/server.py` - Added calendar OAuth endpoints, external calendar events API
+- `/app/backend/auto_populate_projects.py` - Fixed data loss bug
+- `/app/frontend/src/components/ProjectCalendar.js` - Added calendar connection UI, new event types
+- `/app/chrome-extension-scraper/` - Restored to v7.12.0
+
+### IMPORTANT: User Action Required
+To complete calendar integration, add these redirect URIs:
+
+**Google Cloud Console:**
+- Go to: https://console.cloud.google.com/apis/credentials
+- Click on your OAuth client
+- Add redirect URI: `https://designflow-app-9.preview.emergentagent.com/api/auth/google/callback`
+
+**Azure Portal:**
+- Go to: https://portal.azure.com
+- App registrations → Your app → Authentication
+- Add redirect URI: `https://designflow-app-9.preview.emergentagent.com/api/auth/outlook/callback`
 
 ---
 
