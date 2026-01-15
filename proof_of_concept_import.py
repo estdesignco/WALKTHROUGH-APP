@@ -132,5 +132,5 @@ for i in range(5):
     time.sleep(3)
 
 print(f"\n🎉 Done! {success}/5 succeeded")
-print(f"Check: https://highlight-text-fix.preview.emergentagent.com/furniture-search\n")
+print(f"Check: https://designflow-app-9.preview.emergentagent.com/furniture-search\n")
 client.close()

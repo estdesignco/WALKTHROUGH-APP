@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://highlight-text-fix.preview.emergentagent.com';
+const BACKEND_URL = 'https://designflow-app-9.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

@@ -23,7 +23,7 @@ Full-stack interior design project management application with multiple spreadsh
 9. ✅ Live Sync - Desktop ↔ Mobile
 
 ### Chrome Extension v7.12.0
-Download: https://highlight-text-fix.preview.emergentagent.com/chrome-extension-scraper.zip
+Download: https://designflow-app-9.preview.emergentagent.com/chrome-extension-scraper.zip
 
 ---
 
@@ -58,7 +58,7 @@ Download: https://highlight-text-fix.preview.emergentagent.com/chrome-extension-
    - Highlights disappear when tasks are completed
 
 6. **Chrome Extension v7.12.0** - Fixed and updated:
-   - URL: https://highlight-text-fix.preview.emergentagent.com
+   - URL: https://designflow-app-9.preview.emergentagent.com
    - Download: /chrome-extension-scraper.zip
 
 ### Files Modified

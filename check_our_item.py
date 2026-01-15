@@ -10,7 +10,7 @@ import json
 async def check_database_state():
     """Check the current database state for our item"""
     
-    base_url = "https://highlight-text-fix.preview.emergentagent.com/api"
+    base_url = "https://designflow-app-9.preview.emergentagent.com/api"
     
     try:
         async with aiohttp.ClientSession() as session:

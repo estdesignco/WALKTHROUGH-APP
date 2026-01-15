@@ -2,8 +2,8 @@
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
 // Debug logging enabled in console
 
-const APP_URL = 'https://highlight-text-fix.preview.emergentagent.com';
-const BACKEND_URL = 'https://highlight-text-fix.preview.emergentagent.com';
+const APP_URL = 'https://designflow-app-9.preview.emergentagent.com';
+const BACKEND_URL = 'https://designflow-app-9.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 let clickToSelectActive = false;

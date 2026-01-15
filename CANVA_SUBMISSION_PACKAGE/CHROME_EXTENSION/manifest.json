@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://highlight-text-fix.preview.emergentagent.com/*"
+    "https://designflow-app-9.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

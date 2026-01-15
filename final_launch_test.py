@@ -10,7 +10,7 @@ import time
 from typing import Dict, Any, List
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://highlight-text-fix.preview.emergentagent.com/api"
+BACKEND_URL = "https://designflow-app-9.preview.emergentagent.com/api"
 
 def test_with_retry(url, method="GET", payload=None, max_retries=3, timeout=30):
     """Test with retry logic"""

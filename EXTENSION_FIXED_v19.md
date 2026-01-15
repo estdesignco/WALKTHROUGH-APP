@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://highlight-text-fix.preview.emergentagent.com/chrome-extension-v19.zip
+https://designflow-app-9.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://highlight-text-fix.preview.emergentagent.com/api/download/chrome-extension
+https://designflow-app-9.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

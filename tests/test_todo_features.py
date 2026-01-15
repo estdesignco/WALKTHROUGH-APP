@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://highlight-text-fix.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://designflow-app-9.preview.emergentagent.com')
 
 class TestMasterToDoList:
     """Test Master To-Do List features"""

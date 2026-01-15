@@ -3,7 +3,7 @@
 ## ✅ What Was Built
 
 ### 1. **Canva Live Checklist** (WORKING!)
-**URL:** `https://highlight-text-fix.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+**URL:** `https://designflow-app-9.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
 
 **Features:**
 - ✅ Clean, simple UI with dark gold theme
@@ -25,7 +25,7 @@
 ---
 
 ### 2. **Chrome Extension** (COMPLETE!)
-**Download:** `https://highlight-text-fix.preview.emergentagent.com/chrome-extension.zip`
+**Download:** `https://designflow-app-9.preview.emergentagent.com/chrome-extension.zip`
 
 **Features:**
 - ✅ Scans entire Canva boards for images with links
@@ -55,7 +55,7 @@
 ---
 
 ### 3. **Comprehensive Documentation**
-**Guide:** `https://highlight-text-fix.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+**Guide:** `https://designflow-app-9.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
 
 Complete visual guide with:
 - Setup instructions
@@ -205,11 +205,11 @@ Complete visual guide with:
 4. **Bulk Import Tool:** `bulk-import.html` (backup option)
 
 ### All URLs:
-- Main App: `https://highlight-text-fix.preview.emergentagent.com`
-- Live Checklist: `https://highlight-text-fix.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
-- Extension: `https://highlight-text-fix.preview.emergentagent.com/chrome-extension.zip`
-- Guide: `https://highlight-text-fix.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
-- Bulk Import: `https://highlight-text-fix.preview.emergentagent.com/bulk-import.html`
+- Main App: `https://designflow-app-9.preview.emergentagent.com`
+- Live Checklist: `https://designflow-app-9.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+- Extension: `https://designflow-app-9.preview.emergentagent.com/chrome-extension.zip`
+- Guide: `https://designflow-app-9.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+- Bulk Import: `https://designflow-app-9.preview.emergentagent.com/bulk-import.html`
 
 ---
 
