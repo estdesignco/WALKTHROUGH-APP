@@ -2497,6 +2497,123 @@ function copyImageWithLink() {
 }
 
 // ============================================================================
+// QUICK PASTE URL - Scrape product from clipboard URL
+// ============================================================================
+
+async function quickPasteUrl() {
+  console.log('[Quick Paste] Starting...');
+  
+  const btn = document.getElementById('dr-quick-paste-btn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Fetching...';
+  btn.disabled = true;
+  
+  try {
+    // Read URL from clipboard
+    let url = '';
+    
+    try {
+      url = await navigator.clipboard.readText();
+      console.log('[Quick Paste] Clipboard content:', url);
+    } catch (clipErr) {
+      console.log('[Quick Paste] Clipboard read failed, prompting user');
+      url = prompt('Paste the product URL:');
+    }
+    
+    if (!url || !url.trim()) {
+      showToast('⚠️ No URL found in clipboard');
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      return;
+    }
+    
+    url = url.trim();
+    
+    // Basic URL validation
+    if (!url.includes('.') || url.length < 10) {
+      showToast('⚠️ Invalid URL');
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      return;
+    }
+    
+    // Add protocol if missing
+    if (!url.startsWith('http')) {
+      url = 'https://' + url;
+    }
+    
+    showToast('🔄 Fetching product data...');
+    
+    // Call backend API to scrape the URL
+    const response = await fetch(`${BACKEND_URL}/api/quick-scrape`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ url: url })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to scrape URL');
+    }
+    
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Scraping failed');
+    }
+    
+    console.log('[Quick Paste] Result:', result);
+    
+    // Initialize scrapedData if needed
+    if (!scrapedData) {
+      scrapedData = {
+        url: url,
+        vendor: null,
+        name: null,
+        sku: null,
+        price: null,
+        msrp: null,
+        size: null,
+        finish_color: null,
+        finish_image: null,
+        image_url: null,
+        remarks: null
+      };
+    }
+    
+    // Update scraped data with results
+    let updatedCount = 0;
+    const fieldsToUpdate = ['name', 'sku', 'price', 'msrp', 'size', 'finish_color', 'finish_image', 'image_url', 'vendor'];
+    
+    for (const field of fieldsToUpdate) {
+      if (result[field] !== null && result[field] !== undefined) {
+        scrapedData[field] = result[field];
+        updateFieldDisplay(field, result[field]);
+        updatedCount++;
+      }
+    }
+    
+    // Always update URL
+    scrapedData.url = result.url || url;
+    
+    if (updatedCount > 0) {
+      showToast(`✅ Scraped ${updatedCount} fields from URL!`);
+    } else {
+      showToast('⚠️ No product data found at URL');
+    }
+    
+  } catch (error) {
+    console.error('[Quick Paste] Error:', error);
+    showToast('❌ ' + error.message);
+  }
+  
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
+
+// ============================================================================
 // HOUZZ PRO CLIPPER INTEGRATION
 // Detects and syncs data from Houzz Pro Clipper when it's open
 // ============================================================================
