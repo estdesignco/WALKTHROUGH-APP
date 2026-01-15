@@ -178,13 +178,14 @@ Download: https://designflow-app-9.preview.emergentagent.com/chrome-extension-sc
 - Urgent: `bg-red-600`
 
 ## Backlog / Future Tasks
-1. **Punch list identifiers** - Show linked item details (room, vendor, SKU) on punch list items (P1)
-2. iPad Portrait/Landscape View for spreadsheets
-3. Android mobile app
-4. Google Drive Backup feature
-5. Client Approval Portal
-6. Backend refactoring (modular API routers)
-7. Root cause investigation for recurring data loss
+1. **Login Protection (P0)** - Implement access control for main app dashboard while keeping /customer public (waiting for user choice: Simple Password vs User Accounts)
+2. **Punch list identifiers** - Show linked item details (room, vendor, SKU) on punch list items (P1)
+3. iPad Portrait/Landscape View for spreadsheets
+4. Android mobile app
+5. Google Drive Backup feature
+6. Client Approval Portal
+7. Backend refactoring (modular API routers)
+8. Root cause investigation for recurring data loss
 
 ## Known Issues
 - Chrome Scraper - Fixed missing `/api/scraper/save` endpoint that was causing HTTP 404
