@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Filter, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, X, Plus, Calendar, Link } from 'lucide-react';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
@@ -11,6 +11,9 @@ const EVENT_TYPES = {
   order: { label: 'Order', color: '#F59E0B', icon: '🛒' },
   restock: { label: 'Restock', color: '#8B5CF6', icon: '📋' },
   project: { label: 'Project', color: '#D4A574', icon: '🏠' },
+  google: { label: 'Google Calendar', color: '#4285F4', icon: '📅' },
+  outlook: { label: 'Outlook Calendar', color: '#0078D4', icon: '📆' },
+  todo: { label: 'To-Do', color: '#10B981', icon: '✓' },
 };
 
 // Shimmer CSS
