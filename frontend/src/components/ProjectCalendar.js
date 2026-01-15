@@ -556,6 +556,119 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
               </div>
             )}
           </div>
+          
+          {/* Add Calendar Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowConnectMenu(!showConnectMenu)}
+              className="flex items-center gap-2 px-4 py-2 rounded transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #4285F4 0%, #0078D4 100%)',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.3)',
+              }}
+            >
+              <Plus size={18} />
+              Add Calendar
+            </button>
+            
+            {/* Connect Calendar Dropdown */}
+            {showConnectMenu && (
+              <div className="absolute right-0 top-full mt-2 z-50 rounded-lg shadow-xl p-4 min-w-[300px]"
+                style={{
+                  background: '#2a2a2a',
+                  border: '1px solid #8b7355',
+                }}>
+                <div className="flex justify-between items-center mb-3 pb-2" style={{ borderBottom: '1px solid #8b7355' }}>
+                  <span className="font-semibold text-stone-200">Connect Calendar</span>
+                  <button onClick={() => setShowConnectMenu(false)} className="text-stone-400 hover:text-white">
+                    <X size={18} />
+                  </button>
+                </div>
+                
+                {/* Connected Calendars */}
+                {calendarConnections.length > 0 && (
+                  <div className="mb-4">
+                    <div className="text-xs text-stone-400 mb-2">Connected Calendars:</div>
+                    {calendarConnections.map(conn => (
+                      <div key={conn.id} className="flex items-center justify-between p-2 rounded mb-1" 
+                        style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <div className="flex items-center gap-2">
+                          <span>{conn.provider === 'google' ? '📅' : '📆'}</span>
+                          <div>
+                            <div className="text-sm text-stone-200">{conn.name}</div>
+                            <div className="text-xs text-stone-400">{conn.email}</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            if (confirm('Disconnect this calendar?')) {
+                              await fetch(`${API_URL}/calendar-connections/${conn.id}`, { method: 'DELETE' });
+                              fetchCalendarConnections();
+                              fetchCalendarData();
+                            }
+                          }}
+                          className="text-red-400 hover:text-red-300 text-xs px-2 py-1"
+                        >
+                          Disconnect
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Add New Calendar */}
+                <div className="text-xs text-stone-400 mb-2">Add New Calendar:</div>
+                <div className="space-y-2">
+                  <button
+                    onClick={async () => {
+                      setConnectingCalendar('google');
+                      const response = await fetch(`${API_URL}/auth/google/login`);
+                      const data = await response.json();
+                      if (data.authorization_url) {
+                        window.location.href = data.authorization_url;
+                      }
+                    }}
+                    disabled={connectingCalendar === 'google'}
+                    className="w-full flex items-center gap-3 p-3 rounded transition-all hover:scale-[1.02]"
+                    style={{
+                      background: 'linear-gradient(135deg, #4285F4 0%, #34A853 100%)',
+                      color: 'white',
+                    }}
+                  >
+                    <span className="text-xl">📅</span>
+                    <div className="text-left">
+                      <div className="font-semibold">Google Calendar</div>
+                      <div className="text-xs opacity-80">Connect your Google Calendar</div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={async () => {
+                      setConnectingCalendar('outlook');
+                      const response = await fetch(`${API_URL}/auth/outlook/login`);
+                      const data = await response.json();
+                      if (data.authorization_url) {
+                        window.location.href = data.authorization_url;
+                      }
+                    }}
+                    disabled={connectingCalendar === 'outlook'}
+                    className="w-full flex items-center gap-3 p-3 rounded transition-all hover:scale-[1.02]"
+                    style={{
+                      background: 'linear-gradient(135deg, #0078D4 0%, #00BCF2 100%)',
+                      color: 'white',
+                    }}
+                  >
+                    <span className="text-xl">📆</span>
+                    <div className="text-left">
+                      <div className="font-semibold">Outlook Calendar</div>
+                      <div className="text-xs opacity-80">Connect your Microsoft Outlook</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
