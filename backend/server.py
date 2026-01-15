@@ -11040,11 +11040,11 @@ async def google_calendar_callback(code: str = None, error: str = None):
             upsert=True
         )
         
-        return RedirectResponse(url="/master-calendar?connected=google")
+        return RedirectResponse(url="/?connected=google")
     
     except Exception as e:
         logging.error(f"Google OAuth callback error: {str(e)}")
-        return RedirectResponse(url=f"/master-calendar?error={str(e)}")
+        return RedirectResponse(url=f"/?error={str(e)}")
 
 # Microsoft Outlook OAuth
 @api_router.get("/auth/outlook/login")
