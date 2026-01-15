@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const APP_PASSWORD = 'DesignReady2026!';
+const APP_PASSWORD = process.env.REACT_APP_PASSWORD || 'DesignReady2026!';
 const AUTH_KEY = 'design_ready_auth';
 
 export const isAuthenticated = () => {
