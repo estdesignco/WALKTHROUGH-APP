@@ -10971,16 +10971,17 @@ AZURE_REDIRECT_URI = os.environ.get('AZURE_REDIRECT_URI', '')
 @api_router.get("/auth/google/login")
 async def google_calendar_login():
     """Initiate Google Calendar OAuth flow"""
-    scope = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email"
-    auth_url = (
-        f"https://accounts.google.com/o/oauth2/auth?"
-        f"client_id={GOOGLE_CLIENT_ID}"
-        f"&redirect_uri={GOOGLE_REDIRECT_URI}"
-        f"&response_type=code"
-        f"&scope={scope}"
-        f"&access_type=offline"
-        f"&prompt=consent"
-    )
+    from urllib.parse import urlencode
+    
+    params = {
+        'client_id': GOOGLE_CLIENT_ID,
+        'redirect_uri': GOOGLE_REDIRECT_URI,
+        'response_type': 'code',
+        'scope': 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email',
+        'access_type': 'offline',
+        'prompt': 'consent'
+    }
+    auth_url = f"https://accounts.google.com/o/oauth2/auth?{urlencode(params)}"
     return {"authorization_url": auth_url}
 
 @api_router.get("/auth/google/callback")
