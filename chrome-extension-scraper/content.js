@@ -2656,7 +2656,8 @@ function detectHouzzClipper() {
 }
 
 function extractHouzzClipperData() {
-  // Try to extract data from Houzz clipper's UI elements
+  // Try to extract data from Houzz Pro Clipper's UI elements
+  // Based on screenshot: "Additional Details" section with Manufacturer, SKU, Dimensions, Finish/Color
   const data = {
     name: null,
     price: null,
@@ -2665,91 +2666,202 @@ function extractHouzzClipperData() {
     finish_color: null,
     image_url: null,
     vendor: null,
-    description: null
+    description: null,
+    url: window.location.href
   };
   
-  // Strategy 1: Look for input fields that Houzz clipper populates
-  // These are typically named inputs or have data attributes
+  console.log('[Houzz Sync] Scanning page for Houzz Clipper data...');
+  
+  // Get all text on page to search through
+  const pageText = document.body.innerText;
+  
+  // Strategy 1: Look for Houzz Clipper specific labels and their values
+  // The Houzz clipper shows: Manufacturer, SKU, Dimensions, Finish/Color
+  
+  // Find all elements that could contain Houzz clipper data
+  const allElements = document.querySelectorAll('*');
+  
+  // Look for label-value pairs in divs/spans
+  for (const el of allElements) {
+    const text = el.innerText?.trim();
+    if (!text || text.length > 200) continue;
+    
+    // Skip if this element has too many children (it's a container)
+    if (el.children.length > 5) continue;
+    
+    const lowerText = text.toLowerCase();
+    
+    // Look for "Manufacturer" followed by value
+    if (lowerText === 'manufacturer' || lowerText.startsWith('manufacturer')) {
+      const nextEl = el.nextElementSibling;
+      const parentEl = el.parentElement;
+      let value = nextEl?.innerText?.trim() || '';
+      
+      // Also check if value is in same parent
+      if (!value && parentEl) {
+        const siblings = parentEl.querySelectorAll('*');
+        for (const sib of siblings) {
+          const sibText = sib.innerText?.trim();
+          if (sibText && sibText !== text && sibText.length < 50 && !sibText.toLowerCase().includes('manufacturer')) {
+            value = sibText;
+            break;
+          }
+        }
+      }
+      
+      if (value && value.length > 1 && value.length < 50) {
+        data.vendor = value;
+        console.log('[Houzz Sync] Found Manufacturer:', value);
+      }
+    }
+    
+    // Look for "SKU" followed by value
+    if (lowerText === 'sku' || (lowerText.startsWith('sku') && lowerText.length < 10)) {
+      const nextEl = el.nextElementSibling;
+      const parentEl = el.parentElement;
+      let value = nextEl?.innerText?.trim() || '';
+      
+      if (!value && parentEl) {
+        const siblings = parentEl.querySelectorAll('*');
+        for (const sib of siblings) {
+          const sibText = sib.innerText?.trim();
+          if (sibText && sibText !== text && /^[A-Z0-9-]+$/i.test(sibText)) {
+            value = sibText;
+            break;
+          }
+        }
+      }
+      
+      if (value && /^[A-Z0-9-]+$/i.test(value)) {
+        data.sku = value;
+        console.log('[Houzz Sync] Found SKU:', value);
+      }
+    }
+    
+    // Look for "Dimensions" followed by value
+    if (lowerText === 'dimensions' || lowerText.startsWith('dimensions')) {
+      const nextEl = el.nextElementSibling;
+      const parentEl = el.parentElement;
+      let value = nextEl?.innerText?.trim() || '';
+      
+      if (!value && parentEl) {
+        const siblings = parentEl.querySelectorAll('*');
+        for (const sib of siblings) {
+          const sibText = sib.innerText?.trim();
+          if (sibText && sibText !== text && /\d/.test(sibText) && sibText.includes('x')) {
+            value = sibText;
+            break;
+          }
+        }
+      }
+      
+      if (value && /\d/.test(value)) {
+        data.size = value;
+        console.log('[Houzz Sync] Found Dimensions:', value);
+      }
+    }
+    
+    // Look for "Finish/Color" or "Finish" or "Color" followed by value
+    if (lowerText === 'finish/color' || lowerText === 'finish' || lowerText === 'color' || 
+        lowerText === 'finishcolor' || lowerText.startsWith('finish/color')) {
+      const nextEl = el.nextElementSibling;
+      const parentEl = el.parentElement;
+      let value = nextEl?.innerText?.trim() || '';
+      
+      if (!value && parentEl) {
+        const siblings = parentEl.querySelectorAll('*');
+        for (const sib of siblings) {
+          const sibText = sib.innerText?.trim();
+          if (sibText && sibText !== text && sibText.length > 1 && sibText.length < 30 &&
+              !sibText.toLowerCase().includes('finish') && !sibText.toLowerCase().includes('color')) {
+            value = sibText;
+            break;
+          }
+        }
+      }
+      
+      if (value && value.length > 1 && value.length < 50) {
+        data.finish_color = value;
+        console.log('[Houzz Sync] Found Finish/Color:', value);
+      }
+    }
+  }
+  
+  // Strategy 2: Look for input fields that might contain data
   const inputSelectors = {
-    name: ['input[name*="name" i]', 'input[name*="title" i]', 'input[placeholder*="name" i]', '[data-field="name"]'],
-    price: ['input[name*="price" i]', 'input[type="number"][name*="cost" i]', '[data-field="price"]'],
-    sku: ['input[name*="sku" i]', 'input[name*="model" i]', 'input[name*="item" i]', '[data-field="sku"]'],
-    size: ['input[name*="dimension" i]', 'input[name*="size" i]', 'textarea[name*="dimension" i]', '[data-field="dimensions"]'],
-    description: ['textarea[name*="description" i]', 'textarea[name*="note" i]', '[data-field="description"]']
+    name: ['input[name*="name" i]', 'input[name*="title" i]', 'input[placeholder*="name" i]'],
+    price: ['input[name*="price" i]', 'input[name*="cost" i]'],
+    sku: ['input[name*="sku" i]', 'input[name*="model" i]'],
+    size: ['input[name*="dimension" i]', 'input[name*="size" i]'],
+    vendor: ['input[name*="manufacturer" i]', 'input[name*="vendor" i]', 'input[name*="brand" i]'],
+    finish_color: ['input[name*="finish" i]', 'input[name*="color" i]']
   };
   
   for (const [field, selectors] of Object.entries(inputSelectors)) {
+    if (data[field]) continue; // Already found
     for (const selector of selectors) {
       const el = document.querySelector(selector);
       if (el && el.value && el.value.trim()) {
         data[field] = el.value.trim();
-        console.log(`[Houzz Sync] Found ${field}:`, data[field]);
+        console.log(`[Houzz Sync] Found ${field} from input:`, data[field]);
         break;
       }
     }
   }
   
-  // Strategy 2: Look for visible text in modal that might be product data
-  // Houzz clipper shows extracted data in a modal with labels
-  const labelValuePairs = document.querySelectorAll('label, [class*="label"], [class*="field-label"]');
-  for (const label of labelValuePairs) {
-    const labelText = label.innerText?.toLowerCase().trim();
-    const valueEl = label.nextElementSibling || label.querySelector('input, textarea, span');
-    const value = valueEl?.value || valueEl?.innerText;
-    
-    if (!value || !value.trim()) continue;
-    
-    if (labelText?.includes('name') || labelText?.includes('title')) {
-      data.name = data.name || value.trim();
-    } else if (labelText?.includes('price') || labelText?.includes('cost')) {
-      const priceMatch = value.match(/[\d,]+\.?\d*/);
-      if (priceMatch) data.price = data.price || parseFloat(priceMatch[0].replace(/,/g, ''));
-    } else if (labelText?.includes('sku') || labelText?.includes('model') || labelText?.includes('item')) {
-      data.sku = data.sku || value.trim();
-    } else if (labelText?.includes('dimension') || labelText?.includes('size')) {
-      data.size = data.size || value.trim();
-    } else if (labelText?.includes('vendor') || labelText?.includes('brand') || labelText?.includes('manufacturer')) {
-      data.vendor = data.vendor || value.trim();
+  // Strategy 3: Regex patterns in page text for specific formats
+  if (!data.sku) {
+    // Look for SKU pattern in text near "SKU" label
+    const skuMatch = pageText.match(/SKU[:\s]*([A-Z0-9-]+)/i);
+    if (skuMatch) {
+      data.sku = skuMatch[1];
+      console.log('[Houzz Sync] Found SKU from regex:', data.sku);
     }
   }
   
-  // Strategy 3: Look for product images in clipper modal
-  // Usually a prominent image with specific class or in an image container
-  const imgSelectors = [
-    '[class*="clipper"] img',
-    '[class*="product-image"] img',
-    '[class*="main-image"] img',
-    'img[src*="product"]',
-    '.modal img[src^="http"]'
-  ];
-  
-  for (const selector of imgSelectors) {
-    const img = document.querySelector(selector);
-    if (img && img.src && img.src.startsWith('http') && img.naturalWidth > 100) {
-      data.image_url = img.src;
-      console.log('[Houzz Sync] Found image:', data.image_url);
-      break;
+  if (!data.size) {
+    // Look for dimensions pattern like "25 x 32 x 26 (in)"
+    const dimMatch = pageText.match(/(\d+\s*x\s*\d+\s*x\s*\d+\s*\(?in\)?)/i);
+    if (dimMatch) {
+      data.size = dimMatch[1];
+      console.log('[Houzz Sync] Found Dimensions from regex:', data.size);
     }
   }
   
-  // Strategy 4: Check if any data was manually highlighted/selected
-  // Users might have text selected that represents product info
-  const selection = window.getSelection().toString().trim();
-  if (selection && selection.length > 2 && selection.length < 500) {
-    // If it looks like a price
-    if (/^\$?[\d,]+\.?\d*$/.test(selection.replace(/\s/g, ''))) {
-      const priceVal = parseFloat(selection.replace(/[$,\s]/g, ''));
-      if (priceVal > 0 && !data.price) data.price = priceVal;
+  if (!data.vendor) {
+    // Look for Manufacturer pattern
+    const mfgMatch = pageText.match(/Manufacturer[:\s]*([A-Za-z][A-Za-z\s]+?)(?:\n|SKU|Dimensions)/i);
+    if (mfgMatch) {
+      data.vendor = mfgMatch[1].trim();
+      console.log('[Houzz Sync] Found Manufacturer from regex:', data.vendor);
     }
-    // If it looks like a SKU (alphanumeric with dashes)
-    else if (/^[A-Z0-9-]{3,20}$/i.test(selection)) {
-      if (!data.sku) data.sku = selection;
+  }
+  
+  // Strategy 4: Look for the main product image on page
+  if (!data.image_url) {
+    const imgSelectors = [
+      'meta[property="og:image"]',
+      'img[src*="product"]',
+      '.product-image img',
+      'img[class*="product"]'
+    ];
+    
+    for (const selector of imgSelectors) {
+      const el = document.querySelector(selector);
+      if (el) {
+        const src = el.content || el.src;
+        if (src && src.startsWith('http')) {
+          data.image_url = src;
+          console.log('[Houzz Sync] Found image:', data.image_url);
+          break;
+        }
+      }
     }
   }
   
   // Log what we found
-  const foundFields = Object.entries(data).filter(([k, v]) => v !== null).map(([k]) => k);
-  console.log('[Houzz Sync] Extracted fields:', foundFields);
+  const foundFields = Object.entries(data).filter(([k, v]) => v !== null && v !== undefined).map(([k]) => k);
+  console.log('[Houzz Sync] Total fields extracted:', foundFields);
   
   return data;
 }
