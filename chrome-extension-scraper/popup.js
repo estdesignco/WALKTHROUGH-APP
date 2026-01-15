@@ -10,6 +10,7 @@ let selectedProjectId = null;
 let clickToSelectActive = false;
 
 const scrapeBtn = document.getElementById('scrapeBtn');
+const houzzSyncBtn = document.getElementById('houzzSyncBtn');
 const sendBtn = document.getElementById('sendBtn');
 const copyBtn = document.getElementById('copyBtn');
 const rescrapeBtn = document.getElementById('rescrapeBtn');
