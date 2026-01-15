@@ -402,6 +402,9 @@ function createSidePanel() {
   document.getElementById('dr-houzz-sync-btn').addEventListener('click', () => {
     syncFromHouzz();
   });
+  document.getElementById('dr-quick-paste-btn').addEventListener('click', () => {
+    quickPasteUrl();
+  });
   
   // Store the selection before click clears it
   let pendingSelection = '';
