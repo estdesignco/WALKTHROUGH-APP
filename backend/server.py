@@ -10949,6 +10949,504 @@ async def delete_calendar_event(event_id: str):
         logging.error(f"Delete calendar event error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ============================================================================
+# EXTERNAL CALENDAR INTEGRATIONS (Google Calendar & Outlook)
+# ============================================================================
+
+import aiohttp
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request as GoogleRequest
+from googleapiclient.discovery import build
+
+# Calendar OAuth credentials from environment
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+GOOGLE_REDIRECT_URI = os.environ.get('GOOGLE_REDIRECT_URI', '')
+AZURE_CLIENT_ID = os.environ.get('AZURE_CLIENT_ID', '')
+AZURE_CLIENT_SECRET = os.environ.get('AZURE_CLIENT_SECRET', '')
+AZURE_TENANT_ID = os.environ.get('AZURE_TENANT_ID', 'common')
+AZURE_REDIRECT_URI = os.environ.get('AZURE_REDIRECT_URI', '')
+
+# Google Calendar OAuth
+@api_router.get("/auth/google/login")
+async def google_calendar_login():
+    """Initiate Google Calendar OAuth flow"""
+    scope = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email"
+    auth_url = (
+        f"https://accounts.google.com/o/oauth2/auth?"
+        f"client_id={GOOGLE_CLIENT_ID}"
+        f"&redirect_uri={GOOGLE_REDIRECT_URI}"
+        f"&response_type=code"
+        f"&scope={scope}"
+        f"&access_type=offline"
+        f"&prompt=consent"
+    )
+    return {"authorization_url": auth_url}
+
+@api_router.get("/auth/google/callback")
+async def google_calendar_callback(code: str = None, error: str = None):
+    """Handle Google OAuth callback"""
+    from fastapi.responses import RedirectResponse
+    
+    if error:
+        return RedirectResponse(url=f"/master-calendar?error={error}")
+    
+    if not code:
+        return RedirectResponse(url="/master-calendar?error=no_code")
+    
+    try:
+        # Exchange code for tokens
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                'https://oauth2.googleapis.com/token',
+                data={
+                    'code': code,
+                    'client_id': GOOGLE_CLIENT_ID,
+                    'client_secret': GOOGLE_CLIENT_SECRET,
+                    'redirect_uri': GOOGLE_REDIRECT_URI,
+                    'grant_type': 'authorization_code'
+                }
+            ) as resp:
+                token_data = await resp.json()
+        
+        if 'error' in token_data:
+            return RedirectResponse(url=f"/master-calendar?error={token_data.get('error_description', 'token_error')}")
+        
+        # Get user info
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                'https://www.googleapis.com/oauth2/v2/userinfo',
+                headers={'Authorization': f'Bearer {token_data["access_token"]}'}
+            ) as resp:
+                user_info = await resp.json()
+        
+        # Store calendar connection
+        calendar_connection = {
+            "id": str(uuid.uuid4()),
+            "provider": "google",
+            "email": user_info.get('email'),
+            "name": f"Google Calendar ({user_info.get('email')})",
+            "access_token": token_data.get('access_token'),
+            "refresh_token": token_data.get('refresh_token'),
+            "token_expires_at": (datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat(),
+            "connected_at": datetime.now(timezone.utc).isoformat(),
+            "is_active": True
+        }
+        
+        # Upsert - update if exists, insert if not
+        await db.calendar_connections.update_one(
+            {"provider": "google", "email": user_info.get('email')},
+            {"$set": calendar_connection},
+            upsert=True
+        )
+        
+        return RedirectResponse(url="/master-calendar?connected=google")
+    
+    except Exception as e:
+        logging.error(f"Google OAuth callback error: {str(e)}")
+        return RedirectResponse(url=f"/master-calendar?error={str(e)}")
+
+# Microsoft Outlook OAuth
+@api_router.get("/auth/outlook/login")
+async def outlook_calendar_login():
+    """Initiate Microsoft Outlook OAuth flow"""
+    scope = "Calendars.Read Calendars.ReadWrite User.Read offline_access"
+    auth_url = (
+        f"https://login.microsoftonline.com/{AZURE_TENANT_ID}/oauth2/v2.0/authorize?"
+        f"client_id={AZURE_CLIENT_ID}"
+        f"&redirect_uri={AZURE_REDIRECT_URI}"
+        f"&response_type=code"
+        f"&scope={scope}"
+        f"&response_mode=query"
+    )
+    return {"authorization_url": auth_url}
+
+@api_router.get("/auth/outlook/callback")
+async def outlook_calendar_callback(code: str = None, error: str = None, error_description: str = None):
+    """Handle Microsoft OAuth callback"""
+    from fastapi.responses import RedirectResponse
+    
+    if error:
+        return RedirectResponse(url=f"/master-calendar?error={error_description or error}")
+    
+    if not code:
+        return RedirectResponse(url="/master-calendar?error=no_code")
+    
+    try:
+        # Exchange code for tokens
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f'https://login.microsoftonline.com/{AZURE_TENANT_ID}/oauth2/v2.0/token',
+                data={
+                    'client_id': AZURE_CLIENT_ID,
+                    'client_secret': AZURE_CLIENT_SECRET,
+                    'code': code,
+                    'redirect_uri': AZURE_REDIRECT_URI,
+                    'grant_type': 'authorization_code',
+                    'scope': 'Calendars.Read Calendars.ReadWrite User.Read offline_access'
+                }
+            ) as resp:
+                token_data = await resp.json()
+        
+        if 'error' in token_data:
+            return RedirectResponse(url=f"/master-calendar?error={token_data.get('error_description', 'token_error')}")
+        
+        # Get user info from Microsoft Graph
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                'https://graph.microsoft.com/v1.0/me',
+                headers={'Authorization': f'Bearer {token_data["access_token"]}'}
+            ) as resp:
+                user_info = await resp.json()
+        
+        user_email = user_info.get('mail') or user_info.get('userPrincipalName')
+        
+        # Store calendar connection
+        calendar_connection = {
+            "id": str(uuid.uuid4()),
+            "provider": "outlook",
+            "email": user_email,
+            "name": f"Outlook Calendar ({user_email})",
+            "access_token": token_data.get('access_token'),
+            "refresh_token": token_data.get('refresh_token'),
+            "token_expires_at": (datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat(),
+            "connected_at": datetime.now(timezone.utc).isoformat(),
+            "is_active": True
+        }
+        
+        # Upsert
+        await db.calendar_connections.update_one(
+            {"provider": "outlook", "email": user_email},
+            {"$set": calendar_connection},
+            upsert=True
+        )
+        
+        return RedirectResponse(url="/master-calendar?connected=outlook")
+    
+    except Exception as e:
+        logging.error(f"Outlook OAuth callback error: {str(e)}")
+        return RedirectResponse(url=f"/master-calendar?error={str(e)}")
+
+# Get connected calendars
+@api_router.get("/calendar-connections")
+async def get_calendar_connections():
+    """Get all connected external calendars"""
+    try:
+        connections = await db.calendar_connections.find(
+            {"is_active": True},
+            {"_id": 0, "access_token": 0, "refresh_token": 0}
+        ).to_list(length=50)
+        return connections
+    except Exception as e:
+        logging.error(f"Get calendar connections error: {str(e)}")
+        return []
+
+# Disconnect a calendar
+@api_router.delete("/calendar-connections/{connection_id}")
+async def disconnect_calendar(connection_id: str):
+    """Disconnect an external calendar"""
+    try:
+        result = await db.calendar_connections.update_one(
+            {"id": connection_id},
+            {"$set": {"is_active": False}}
+        )
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Connection not found")
+        return {"success": True}
+    except Exception as e:
+        logging.error(f"Disconnect calendar error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Helper to refresh Google token
+async def refresh_google_token(connection):
+    """Refresh Google access token"""
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            'https://oauth2.googleapis.com/token',
+            data={
+                'client_id': GOOGLE_CLIENT_ID,
+                'client_secret': GOOGLE_CLIENT_SECRET,
+                'refresh_token': connection['refresh_token'],
+                'grant_type': 'refresh_token'
+            }
+        ) as resp:
+            token_data = await resp.json()
+    
+    if 'access_token' in token_data:
+        await db.calendar_connections.update_one(
+            {"id": connection['id']},
+            {"$set": {
+                "access_token": token_data['access_token'],
+                "token_expires_at": (datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat()
+            }}
+        )
+        return token_data['access_token']
+    return None
+
+# Helper to refresh Outlook token
+async def refresh_outlook_token(connection):
+    """Refresh Outlook access token"""
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            f'https://login.microsoftonline.com/{AZURE_TENANT_ID}/oauth2/v2.0/token',
+            data={
+                'client_id': AZURE_CLIENT_ID,
+                'client_secret': AZURE_CLIENT_SECRET,
+                'refresh_token': connection['refresh_token'],
+                'grant_type': 'refresh_token',
+                'scope': 'Calendars.Read Calendars.ReadWrite User.Read offline_access'
+            }
+        ) as resp:
+            token_data = await resp.json()
+    
+    if 'access_token' in token_data:
+        await db.calendar_connections.update_one(
+            {"id": connection['id']},
+            {"$set": {
+                "access_token": token_data['access_token'],
+                "refresh_token": token_data.get('refresh_token', connection['refresh_token']),
+                "token_expires_at": (datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat()
+            }}
+        )
+        return token_data['access_token']
+    return None
+
+# Get events from external calendars
+@api_router.get("/external-calendar-events")
+async def get_external_calendar_events(start_date: str = None, end_date: str = None):
+    """Fetch events from all connected external calendars"""
+    try:
+        # Set default date range (30 days)
+        if not start_date:
+            start_date = datetime.now(timezone.utc).isoformat()
+        if not end_date:
+            end_date = (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
+        
+        all_events = []
+        
+        # Get all active connections
+        connections = await db.calendar_connections.find({"is_active": True}).to_list(length=50)
+        
+        for conn in connections:
+            try:
+                # Check if token needs refresh
+                token_expires = datetime.fromisoformat(conn['token_expires_at'].replace('Z', '+00:00'))
+                if token_expires <= datetime.now(timezone.utc) + timedelta(minutes=5):
+                    if conn['provider'] == 'google':
+                        access_token = await refresh_google_token(conn)
+                    else:
+                        access_token = await refresh_outlook_token(conn)
+                    if not access_token:
+                        continue
+                else:
+                    access_token = conn['access_token']
+                
+                if conn['provider'] == 'google':
+                    # Fetch Google Calendar events
+                    events = await fetch_google_calendar_events(access_token, start_date, end_date, conn)
+                    all_events.extend(events)
+                    
+                elif conn['provider'] == 'outlook':
+                    # Fetch Outlook Calendar events
+                    events = await fetch_outlook_calendar_events(access_token, start_date, end_date, conn)
+                    all_events.extend(events)
+                    
+            except Exception as e:
+                logging.error(f"Error fetching events from {conn['provider']}: {str(e)}")
+                continue
+        
+        return all_events
+    
+    except Exception as e:
+        logging.error(f"Get external calendar events error: {str(e)}")
+        return []
+
+async def fetch_google_calendar_events(access_token: str, start_date: str, end_date: str, connection: dict):
+    """Fetch events from Google Calendar"""
+    events = []
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+                headers={'Authorization': f'Bearer {access_token}'},
+                params={
+                    'timeMin': start_date,
+                    'timeMax': end_date,
+                    'maxResults': 100,
+                    'singleEvents': 'true',
+                    'orderBy': 'startTime'
+                }
+            ) as resp:
+                data = await resp.json()
+        
+        for item in data.get('items', []):
+            start = item.get('start', {})
+            end = item.get('end', {})
+            
+            events.append({
+                "id": f"google_{item.get('id')}",
+                "external_id": item.get('id'),
+                "title": item.get('summary', 'No Title'),
+                "date": start.get('dateTime', start.get('date', '')),
+                "end_date": end.get('dateTime', end.get('date', '')),
+                "description": item.get('description', ''),
+                "location": item.get('location', ''),
+                "type": "google",
+                "source": "google",
+                "calendar_name": connection.get('name'),
+                "calendar_email": connection.get('email'),
+                "is_all_day": 'date' in start and 'dateTime' not in start
+            })
+    except Exception as e:
+        logging.error(f"Fetch Google events error: {str(e)}")
+    
+    return events
+
+async def fetch_outlook_calendar_events(access_token: str, start_date: str, end_date: str, connection: dict):
+    """Fetch events from Outlook Calendar"""
+    events = []
+    try:
+        # Format dates for Microsoft Graph API
+        start_formatted = start_date.replace('+00:00', 'Z') if '+' in start_date else start_date
+        end_formatted = end_date.replace('+00:00', 'Z') if '+' in end_date else end_date
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                'https://graph.microsoft.com/v1.0/me/calendarView',
+                headers={'Authorization': f'Bearer {access_token}'},
+                params={
+                    'startDateTime': start_formatted,
+                    'endDateTime': end_formatted,
+                    '$orderby': 'start/dateTime',
+                    '$top': 100
+                }
+            ) as resp:
+                data = await resp.json()
+        
+        for item in data.get('value', []):
+            start = item.get('start', {})
+            end = item.get('end', {})
+            
+            events.append({
+                "id": f"outlook_{item.get('id')}",
+                "external_id": item.get('id'),
+                "title": item.get('subject', 'No Title'),
+                "date": start.get('dateTime', ''),
+                "end_date": end.get('dateTime', ''),
+                "description": item.get('bodyPreview', ''),
+                "location": item.get('location', {}).get('displayName', ''),
+                "type": "outlook",
+                "source": "outlook",
+                "calendar_name": connection.get('name'),
+                "calendar_email": connection.get('email'),
+                "is_all_day": item.get('isAllDay', False)
+            })
+    except Exception as e:
+        logging.error(f"Fetch Outlook events error: {str(e)}")
+    
+    return events
+
+# Create event in external calendar
+@api_router.post("/external-calendar-events")
+async def create_external_calendar_event(event_data: dict):
+    """Create an event in an external calendar"""
+    try:
+        connection_id = event_data.get('connection_id')
+        if not connection_id:
+            raise HTTPException(status_code=400, detail="connection_id required")
+        
+        connection = await db.calendar_connections.find_one({"id": connection_id, "is_active": True})
+        if not connection:
+            raise HTTPException(status_code=404, detail="Calendar connection not found")
+        
+        # Refresh token if needed
+        token_expires = datetime.fromisoformat(connection['token_expires_at'].replace('Z', '+00:00'))
+        if token_expires <= datetime.now(timezone.utc) + timedelta(minutes=5):
+            if connection['provider'] == 'google':
+                access_token = await refresh_google_token(connection)
+            else:
+                access_token = await refresh_outlook_token(connection)
+        else:
+            access_token = connection['access_token']
+        
+        if connection['provider'] == 'google':
+            return await create_google_calendar_event(access_token, event_data)
+        else:
+            return await create_outlook_calendar_event(access_token, event_data)
+    
+    except Exception as e:
+        logging.error(f"Create external calendar event error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+async def create_google_calendar_event(access_token: str, event_data: dict):
+    """Create event in Google Calendar"""
+    event_body = {
+        "summary": event_data.get('title'),
+        "description": event_data.get('description', ''),
+        "start": {
+            "dateTime": event_data.get('start_time'),
+            "timeZone": "UTC"
+        },
+        "end": {
+            "dateTime": event_data.get('end_time'),
+            "timeZone": "UTC"
+        }
+    }
+    
+    if event_data.get('location'):
+        event_body['location'] = event_data['location']
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'Content-Type': 'application/json'
+            },
+            json=event_body
+        ) as resp:
+            result = await resp.json()
+    
+    return {"success": True, "event_id": result.get('id')}
+
+async def create_outlook_calendar_event(access_token: str, event_data: dict):
+    """Create event in Outlook Calendar"""
+    event_body = {
+        "subject": event_data.get('title'),
+        "body": {
+            "contentType": "HTML",
+            "content": event_data.get('description', '')
+        },
+        "start": {
+            "dateTime": event_data.get('start_time'),
+            "timeZone": "UTC"
+        },
+        "end": {
+            "dateTime": event_data.get('end_time'),
+            "timeZone": "UTC"
+        }
+    }
+    
+    if event_data.get('location'):
+        event_body['location'] = {"displayName": event_data['location']}
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            'https://graph.microsoft.com/v1.0/me/events',
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'Content-Type': 'application/json'
+            },
+            json=event_body
+        ) as resp:
+            result = await resp.json()
+    
+    return {"success": True, "event_id": result.get('id')}
+
+# ============================================================================
+# END EXTERNAL CALENDAR INTEGRATIONS
+# ============================================================================
+
 @api_router.post("/todos")
 async def create_todo(todo: dict):
     """Create a new to-do item"""
