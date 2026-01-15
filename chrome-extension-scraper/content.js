@@ -786,6 +786,7 @@ function hidePanel() {
     sidePanel.style.display = 'none';
   }
   stopFieldSelection();
+  stopHouzzAutoSync(); // Stop Houzz auto-sync when panel is hidden
   
   // Remove all element highlights
   Object.values(selectedElements).forEach(el => {
