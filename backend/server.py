@@ -11121,11 +11121,11 @@ async def outlook_calendar_callback(code: str = None, error: str = None, error_d
             upsert=True
         )
         
-        return RedirectResponse(url="/master-calendar?connected=outlook")
+        return RedirectResponse(url="/?connected=outlook")
     
     except Exception as e:
         logging.error(f"Outlook OAuth callback error: {str(e)}")
-        return RedirectResponse(url=f"/master-calendar?error={str(e)}")
+        return RedirectResponse(url=f"/?error={str(e)}")
 
 # Get connected calendars
 @api_router.get("/calendar-connections")
