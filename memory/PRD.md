@@ -22,8 +22,14 @@ Full-stack interior design project management application with multiple spreadsh
 8. ✅ Mobile App - All tabs, identifiers, sync working
 9. ✅ Live Sync - Desktop ↔ Mobile
 
-### Chrome Extension v7.13.0 (January 15, 2026)
+### Chrome Extension v7.14.0 (January 15, 2026)
 Download: https://designflow-app-9.preview.emergentagent.com/chrome-extension-scraper.zip
+
+**New in v7.14.0: Quick Paste URL**
+- Added "📋 QUICK PASTE URL" button to the scraper panel
+- Copy any product URL to clipboard, click the button, and it auto-scrapes
+- No need to navigate to each product page
+- Perfect for scraping products from emails, bookmarks, or documents
 
 **New in v7.13.0: Houzz Pro Clipper Integration**
 - Added "🏠 SYNC FROM HOUZZ CLIPPER" button to the scraper panel
