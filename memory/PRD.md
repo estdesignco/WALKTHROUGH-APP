@@ -44,7 +44,13 @@ Download: https://designflow-app-9.preview.emergentagent.com/chrome-extension-sc
 
 ### Features Implemented
 
-1. **Chrome Extension v7.13.0 - Houzz Pro Clipper Integration**
+1. **Chrome Extension v7.14.0 - Quick Paste URL**
+   - Added "📋 QUICK PASTE URL" button to scraper panel
+   - Reads URL from clipboard and auto-scrapes without navigation
+   - New backend endpoint `/api/quick-scrape` for server-side scraping
+   - Perfect for scraping products from emails, bookmarks, documents
+
+2. **Chrome Extension v7.13.0 - Houzz Pro Clipper Integration**
    - Added "🏠 SYNC FROM HOUZZ CLIPPER" button to scraper panel
    - Detects Houzz Pro Clipper modal/iframe on page
    - Extracts product data from Houzz clipper form fields
@@ -53,10 +59,11 @@ Download: https://designflow-app-9.preview.emergentagent.com/chrome-extension-sc
    - Updated README with Houzz integration instructions
 
 ### Files Modified
-- `/app/chrome-extension-scraper/content.js` - Added Houzz detection and sync functions
+- `/app/backend/server.py` - Added `/api/quick-scrape` endpoint
+- `/app/chrome-extension-scraper/content.js` - Added Quick Paste and Houzz sync functions
 - `/app/chrome-extension-scraper/popup.js` - Updated version comment
-- `/app/chrome-extension-scraper/manifest.json` - Version 7.13.0
-- `/app/chrome-extension-scraper/README.md` - Added Houzz integration docs
+- `/app/chrome-extension-scraper/manifest.json` - Version 7.14.0, added clipboardRead permission
+- `/app/chrome-extension-scraper/README.md` - Added Quick Paste and Houzz integration docs
 - `/app/frontend/public/chrome-extension-scraper.zip` - Updated extension package
 
 ---
