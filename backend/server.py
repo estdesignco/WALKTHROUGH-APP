@@ -15936,6 +15936,198 @@ async def remove_background_from_url(request: dict):
         raise HTTPException(status_code=500, detail=f"Background removal failed: {str(e)}")
 
 # ============================================================================
+# QUICK PASTE URL SCRAPER - Fetch and scrape product from URL
+# ============================================================================
+
+class QuickScrapeRequest(BaseModel):
+    url: str
+
+class QuickScrapeResponse(BaseModel):
+    success: bool
+    name: Optional[str] = None
+    sku: Optional[str] = None
+    price: Optional[float] = None
+    msrp: Optional[float] = None
+    size: Optional[str] = None
+    finish_color: Optional[str] = None
+    finish_image: Optional[str] = None
+    image_url: Optional[str] = None
+    vendor: Optional[str] = None
+    url: str
+    error: Optional[str] = None
+
+@api_router.post("/quick-scrape", response_model=QuickScrapeResponse)
+async def quick_scrape_url(request: QuickScrapeRequest):
+    """
+    Fetch a product URL and scrape product data from it.
+    Used by Chrome extension "Quick Paste" feature.
+    """
+    import aiohttp
+    from bs4 import BeautifulSoup
+    import re
+    
+    url = request.url.strip()
+    if not url:
+        return QuickScrapeResponse(success=False, url="", error="URL is required")
+    
+    # Ensure URL has protocol
+    if not url.startswith('http'):
+        url = 'https://' + url
+    
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        domain = parsed.hostname.replace('www.', '').lower() if parsed.hostname else ''
+        
+        print(f"[Quick Scrape] Fetching URL: {url}")
+        
+        # Fetch the page
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=15)) as response:
+                if response.status != 200:
+                    return QuickScrapeResponse(success=False, url=url, error=f"Failed to fetch page: HTTP {response.status}")
+                html = await response.text()
+        
+        soup = BeautifulSoup(html, 'html.parser')
+        page_text = soup.get_text(separator=' ', strip=True)
+        
+        # Initialize response data
+        data = QuickScrapeResponse(success=True, url=url)
+        
+        # Detect vendor from domain
+        vendor_map = {
+            'uttermost': 'Uttermost', 'visualcomfort': 'Visual Comfort', 'fourhands': 'Four Hands',
+            'bernhardt': 'Bernhardt', 'hvlgroup': 'HVL Group', 'gabby': 'Gabby',
+            'loloirugs': 'Loloi', 'loloi': 'Loloi', 'rowefurniture': 'Rowe Furniture',
+            'globalviews': 'Global Views', 'reginaandrew': 'Regina Andrew', 'surya': 'Surya',
+            'safavieh': 'Safavieh', 'eichholtz': 'Eichholtz', 'crestviewcollection': 'Crestview Collection',
+            'bassettmirror': 'Bassett Mirror', 'flowdecor': 'Flow Decor', 'hubbardtonforge': 'Hubbardton Forge',
+            'hinkley': 'Hinkley', 'elegantlighting': 'Elegant Lighting', 'zeelighting': 'ZEE Lighting',
+            'arteriorshome': 'Arteriors', 'curreyandcompany': 'Currey & Company'
+        }
+        
+        for key, name in vendor_map.items():
+            if key in domain:
+                data.vendor = name
+                break
+        if not data.vendor:
+            data.vendor = domain.split('.')[0].title()
+        
+        # Extract product name from H1
+        h1 = soup.find('h1')
+        if h1:
+            data.name = h1.get_text(strip=True).split('\n')[0][:200]
+        
+        # Extract meta OG image
+        og_image = soup.find('meta', property='og:image')
+        if og_image and og_image.get('content'):
+            data.image_url = og_image['content']
+        
+        # Extract main product image
+        if not data.image_url:
+            for selector in ['img[src*="product"]', 'img[class*="product"]', 'img[class*="gallery"]', 'img[src*="1200"]']:
+                img = soup.select_one(selector)
+                if img and img.get('src'):
+                    src = img['src']
+                    if src.startswith('http'):
+                        data.image_url = src
+                        break
+        
+        # Extract SKU - multiple patterns
+        sku_patterns = [
+            r'SKU[:\s#]*([A-Z0-9-]+)',
+            r'Item[:\s#]*([A-Z0-9-]+)',
+            r'Style[:\s#]*([A-Z0-9-]+)',
+            r'Model[:\s#]*([A-Z0-9-]+)',
+            r'/product/([A-Z0-9-]+)',
+            r'/p/([A-Z0-9-]+)',
+        ]
+        for pattern in sku_patterns:
+            match = re.search(pattern, page_text, re.IGNORECASE)
+            if match:
+                data.sku = match.group(1)
+                break
+        
+        # Extract from URL if not found
+        if not data.sku:
+            url_sku = re.search(r'/(?:product|p|item)/([A-Z0-9-]+)', url, re.IGNORECASE)
+            if url_sku:
+                data.sku = url_sku.group(1)
+        
+        # Extract prices - find all dollar amounts
+        prices = re.findall(r'\$?([\d,]+\.?\d*)', page_text)
+        valid_prices = []
+        for p in prices:
+            try:
+                val = float(p.replace(',', ''))
+                if 10 < val < 100000:  # Reasonable furniture price range
+                    valid_prices.append(val)
+            except:
+                pass
+        
+        if valid_prices:
+            # Usually the first reasonable price is the trade/sale price
+            data.price = valid_prices[0]
+            # If there's a higher price, it's probably MSRP
+            if len(valid_prices) > 1:
+                max_price = max(valid_prices[:5])  # Check first 5 prices
+                if max_price > data.price:
+                    data.msrp = max_price
+        
+        # Extract dimensions - common patterns
+        dim_patterns = [
+            r'([\d.]+)"?\s*[Ww]\s*[xX×]\s*([\d.]+)"?\s*[Dd]\s*[xX×]\s*([\d.]+)"?\s*[Hh]',
+            r'([\d.]+)"?\s*[Hh]\s*[xX×]\s*([\d.]+)"?\s*[Ww]\s*[xX×]\s*([\d.]+)"?\s*[Dd]',
+            r'Width[:\s]*([\d.]+).*?Depth[:\s]*([\d.]+).*?Height[:\s]*([\d.]+)',
+            r"(\d+'[\d.\"]+)\s*[xX×]\s*(\d+'[\d.\"]+)",  # Rug format 8'x10'
+        ]
+        for pattern in dim_patterns:
+            match = re.search(pattern, page_text, re.IGNORECASE)
+            if match:
+                groups = match.groups()
+                if len(groups) == 3:
+                    data.size = f'{groups[0]}"W x {groups[1]}"D x {groups[2]}"H'
+                elif len(groups) == 2:
+                    data.size = f'{groups[0]} x {groups[1]}'
+                break
+        
+        # Extract finish/color
+        finish_patterns = [
+            r'(?:Finish|Color|Material)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)',
+            r'(?:Cover|Fabric)[:\s]+([A-Za-z][A-Za-z\s\-]+?)(?:\n|,|$)',
+        ]
+        for pattern in finish_patterns:
+            match = re.search(pattern, page_text)
+            if match and len(match.group(1).strip()) > 2 and len(match.group(1).strip()) < 50:
+                data.finish_color = match.group(1).strip()
+                break
+        
+        # Extract finish image (swatch)
+        for selector in ['img[src*="swatch"]', 'img[class*="swatch"]', 'img[alt*="finish"]']:
+            img = soup.select_one(selector)
+            if img and img.get('src'):
+                src = img['src']
+                if src.startswith('http'):
+                    data.finish_image = src
+                    break
+        
+        print(f"[Quick Scrape] Success! Found: name={data.name is not None}, sku={data.sku}, price={data.price}")
+        return data
+        
+    except aiohttp.ClientError as e:
+        print(f"[Quick Scrape] Network error: {str(e)}")
+        return QuickScrapeResponse(success=False, url=url, error=f"Network error: {str(e)}")
+    except Exception as e:
+        print(f"[Quick Scrape] Error: {str(e)}")
+        return QuickScrapeResponse(success=False, url=url, error=f"Scraping failed: {str(e)}")
+
+# ============================================================================
 # AI-POWERED PRODUCT SCRAPER (Like Thunderbit)
 # ============================================================================
 
