@@ -408,6 +408,10 @@ const App = () => {
               </>
             }
           />
+                </Routes>
+              )
+            }
+          />
         </Routes>
         <Toaster position="bottom-right" richColors />
       </BrowserRouter>
