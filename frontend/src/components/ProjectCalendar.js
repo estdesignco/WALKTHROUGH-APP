@@ -54,10 +54,42 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
     project_id: ''
   });
   const [projects, setProjects] = useState([]);
+  const [calendarConnections, setCalendarConnections] = useState([]);
+  const [showConnectMenu, setShowConnectMenu] = useState(false);
+  const [connectingCalendar, setConnectingCalendar] = useState(null);
+
+  // Check URL for connection status
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const connected = urlParams.get('connected');
+    const error = urlParams.get('error');
+    
+    if (connected) {
+      alert(`✅ ${connected === 'google' ? 'Google Calendar' : 'Outlook Calendar'} connected successfully!`);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      fetchCalendarConnections();
+    }
+    if (error) {
+      alert(`❌ Connection failed: ${error}`);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  // Fetch calendar connections
+  const fetchCalendarConnections = async () => {
+    try {
+      const response = await fetch(`${API_URL}/calendar-connections`);
+      const connections = await response.json();
+      setCalendarConnections(connections);
+    } catch (error) {
+      console.error('Failed to fetch calendar connections:', error);
+    }
+  };
 
   // Fetch all projects and extract dates
   useEffect(() => {
     fetchCalendarData();
+    fetchCalendarConnections();
   }, []);
 
   const fetchCalendarData = async () => {
