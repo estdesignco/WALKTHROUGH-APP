@@ -11067,10 +11067,10 @@ async def outlook_calendar_callback(code: str = None, error: str = None, error_d
     from fastapi.responses import RedirectResponse
     
     if error:
-        return RedirectResponse(url=f"/master-calendar?error={error_description or error}")
+        return RedirectResponse(url=f"/?error={error_description or error}")
     
     if not code:
-        return RedirectResponse(url="/master-calendar?error=no_code")
+        return RedirectResponse(url="/?error=no_code")
     
     try:
         # Exchange code for tokens
