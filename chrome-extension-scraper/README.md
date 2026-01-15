@@ -1,6 +1,6 @@
 # Design Ready Product Scraper - Chrome Extension
 
-## 📦 Version 7.13.0
+## 📦 Version 7.14.0
 
 This Chrome extension scrapes product data from wholesale vendor websites and sends it directly to your Design Ready app. It works with YOUR logged-in browser session, so it can see the wholesale prices that require authentication.
 
@@ -13,8 +13,25 @@ This Chrome extension scrapes product data from wholesale vendor websites and se
 - **Click-to-Select**: Manually override any scraped field by clicking on page elements
 - **Swatch Support**: Captures color swatches from CSS background-image styles
 - **🆕 Houzz Pro Clipper Integration**: Sync data from Houzz Pro Clipper to reduce double entry!
+- **🆕 Quick Paste URL**: Paste any product URL and scrape it without leaving the current page!
 
-## 🏠 NEW: Houzz Pro Clipper Integration (v7.13.0)
+## 📋 NEW: Quick Paste URL (v7.14.0)
+
+Copy a product URL to your clipboard, then click **"📋 QUICK PASTE URL"** to instantly scrape that product without navigating to it!
+
+### How it works:
+1. Copy any product URL to your clipboard (Ctrl+C / Cmd+C)
+2. Open the **Design Ready Scraper** panel on any page
+3. Click the **"📋 QUICK PASTE URL"** button
+4. The extension will fetch and scrape the product automatically!
+5. Review the data and click "Send to App"
+
+This is perfect for:
+- Scraping products from emails or documents
+- Quick-adding items you've bookmarked
+- Batch processing without opening each page
+
+## 🏠 Houzz Pro Clipper Integration (v7.13.0)
 
 If you already use the **Houzz Pro Clipper** to capture product data, you can now sync that data directly into the Design Ready Scraper!
 
