@@ -396,6 +396,9 @@ function createSidePanel() {
   document.getElementById('dr-rescrape-btn').addEventListener('click', () => {
     scrapeAndShow();
   });
+  document.getElementById('dr-houzz-sync-btn').addEventListener('click', () => {
+    syncFromHouzz();
+  });
   
   // Store the selection before click clears it
   let pendingSelection = '';
