@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v7.15.0
+// Design Ready Product Scraper v7.14.0
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
-// NEW: Houzz Pro Clipper sync button on opening screen
+// NEW: Houzz Pro Clipper integration + Quick Paste URL
 // Debug logging enabled in console
 
 const APP_URL = 'https://designflow-app-9.preview.emergentagent.com';
@@ -894,88 +894,10 @@ function updateFieldDisplay(field, value) {
 
 // Event listeners
 scrapeBtn.addEventListener('click', doScrape);
-houzzSyncBtn.addEventListener('click', doHouzzSync);
 sendBtn.addEventListener('click', sendToApp);
 copyBtn.addEventListener('click', copyToClipboard);
 rescrapeBtn.addEventListener('click', doScrape);
 clickSelectBtn?.addEventListener('click', toggleClickToSelect);
-
-// ============================================================================
-// HOUZZ CLIPPER SYNC - Pull data from Houzz Pro Clipper
-// ============================================================================
-
-async function doHouzzSync() {
-  houzzSyncBtn.disabled = true;
-  houzzSyncBtn.innerHTML = '<div class="spinner"></div><span>Syncing from Houzz...</span>';
-  showStatus('Looking for Houzz Clipper data...', 'info');
-  
-  try {
-    const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-    if (!tab?.url || tab.url.startsWith('chrome://')) {
-      throw new Error('Navigate to a product page first');
-    }
-    
-    // Send message to content script to extract Houzz data
-    chrome.tabs.sendMessage(tab.id, { action: 'syncFromHouzz' }, (response) => {
-      if (chrome.runtime.lastError) {
-        // Content script not loaded, inject it first
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['content.js']
-        }, () => {
-          setTimeout(() => {
-            chrome.tabs.sendMessage(tab.id, { action: 'syncFromHouzz' }, handleHouzzResponse);
-          }, 200);
-        });
-      } else {
-        handleHouzzResponse(response);
-      }
-    });
-    
-  } catch(e) {
-    showStatus(e.message, 'error');
-    resetHouzzBtn();
-  }
-}
-
-function handleHouzzResponse(response) {
-  if (response && response.success && response.data) {
-    // We got data from Houzz!
-    const data = response.data;
-    console.log('[Popup] Houzz data received:', data);
-    
-    // Check if we got any useful data
-    const hasData = Object.values(data).some(v => v !== null && v !== undefined && v !== '');
-    
-    if (hasData) {
-      scrapedData = {
-        url: window.location?.href || data.url || '',
-        vendor: data.vendor || null,
-        name: data.name || null,
-        sku: data.sku || null,
-        price: data.price || null,
-        msrp: data.msrp || null,
-        size: data.size || null,
-        finish_color: data.finish_color || null,
-        finish_image: data.finish_image || null,
-        image_url: data.image_url || null
-      };
-      
-      displayResults(scrapedData);
-      showStatus('✅ Synced from Houzz Clipper!', 'success');
-    } else {
-      showStatus('⚠️ No data found in Houzz Clipper', 'warning');
-    }
-  } else {
-    showStatus('⚠️ Houzz Clipper not detected or no data available', 'warning');
-  }
-  resetHouzzBtn();
-}
-
-function resetHouzzBtn() {
-  houzzSyncBtn.disabled = false;
-  houzzSyncBtn.innerHTML = '<span>🏠</span><span>SYNC FROM HOUZZ CLIPPER</span>';
-}
 
 // Auto-detect vendor on popup open
 (async()=>{ 
