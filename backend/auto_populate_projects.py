@@ -109,7 +109,7 @@ async def create_full_room_with_items(db, project_id, room_name, color="#8B7355"
         return None
 
 async def ensure_test_projects_exist():
-    """Create test projects if they don't exist"""
+    """Create test projects if they don't exist - BUT NEVER DELETE EXISTING DATA"""
     
     mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
     db_name = os.environ.get('DB_NAME', 'interior_design_db')
@@ -119,16 +119,17 @@ async def ensure_test_projects_exist():
     
     print("🔍 AUTO-POPULATE: Checking for existing projects...")
     
-    # Check if we have any projects with rooms that have items
+    # Check if we have ANY projects at all - if yes, DO NOT touch them
     project_count = await db.projects.count_documents({})
-    item_count = await db.items.count_documents({})
     
-    if project_count >= 3 and item_count > 100:
-        print(f"✅ Found {project_count} projects with {item_count} items - skipping auto-population")
+    # CRITICAL FIX: If ANY projects exist, leave them alone!
+    # This prevents data loss from auto-population
+    if project_count > 0:
+        print(f"✅ Found {project_count} existing projects - PRESERVING USER DATA, skipping auto-population")
         client.close()
         return
     
-    print(f"⚠️  Only {project_count} projects with {item_count} items - creating test projects...")
+    print(f"⚠️  No projects found - creating initial test projects...")
     
     # Define test projects to create
     test_projects = [
