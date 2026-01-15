@@ -3,6 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 import { Toaster } from 'sonner';
+import SimpleLogin, { isAuthenticated, logout } from './components/SimpleLogin';
 import FFEDashboard from "./components/FFEDashboard";
 import ProjectList from "./components/ProjectList";
 import Navigation from "./components/Navigation";
