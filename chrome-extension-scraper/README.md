@@ -1,6 +1,6 @@
 # Design Ready Product Scraper - Chrome Extension
 
-## 📦 Version 7.14.0
+## 📦 Version 7.0.0
 
 This Chrome extension scrapes product data from wholesale vendor websites and sends it directly to your Design Ready app. It works with YOUR logged-in browser session, so it can see the wholesale prices that require authentication.
 
@@ -12,37 +12,6 @@ This Chrome extension scrapes product data from wholesale vendor websites and se
 - **22+ Vendors Supported**: Full vendor-specific logic for optimal scraping accuracy
 - **Click-to-Select**: Manually override any scraped field by clicking on page elements
 - **Swatch Support**: Captures color swatches from CSS background-image styles
-- **🆕 Houzz Pro Clipper Integration**: Sync data from Houzz Pro Clipper to reduce double entry!
-- **🆕 Quick Paste URL**: Paste any product URL and scrape it without leaving the current page!
-
-## 📋 NEW: Quick Paste URL (v7.14.0)
-
-Copy a product URL to your clipboard, then click **"📋 QUICK PASTE URL"** to instantly scrape that product without navigating to it!
-
-### How it works:
-1. Copy any product URL to your clipboard (Ctrl+C / Cmd+C)
-2. Open the **Design Ready Scraper** panel on any page
-3. Click the **"📋 QUICK PASTE URL"** button
-4. The extension will fetch and scrape the product automatically!
-5. Review the data and click "Send to App"
-
-This is perfect for:
-- Scraping products from emails or documents
-- Quick-adding items you've bookmarked
-- Batch processing without opening each page
-
-## 🏠 Houzz Pro Clipper Integration (v7.13.0)
-
-If you already use the **Houzz Pro Clipper** to capture product data, you can now sync that data directly into the Design Ready Scraper!
-
-### How it works:
-1. Open the **Houzz Pro Clipper** on any product page
-2. Let Houzz fill in the product details
-3. Open the **Design Ready Scraper** panel
-4. Click the **"🏠 SYNC FROM HOUZZ CLIPPER"** button
-5. The scraper will pull any data from Houzz and fill in empty fields!
-
-This helps you avoid entering the same product data twice - Houzz for your Houzz Pro library, and Design Ready for your project checklists.
 
 ## 🚀 Installation
 
@@ -83,7 +52,7 @@ This helps you avoid entering the same product data twice - Houzz for your Houzz
 - ✅ Product Image
 - ✅ Product URL
 
-## 🔧 Supported Vendors (v7.14.0)
+## 🔧 Supported Vendors (v7.0.0)
 
 | Vendor | Domain | Status |
 |--------|--------|--------|
@@ -128,16 +97,6 @@ This helps you avoid entering the same product data twice - Houzz for your Houzz
 - Click on the correct element on the page to capture it
 - Some vendor websites have unusual layouts
 
-### Quick Paste not working?
-- Make sure you have a valid URL copied to your clipboard
-- The URL must be a product page (not a search or category page)
-- Some sites may block automated requests
-
-### Houzz Sync not working?
-- Make sure the Houzz Pro Clipper modal is **open and visible** on the page
-- Both extensions need to be active on the same page
-- Try clicking "Sync from Houzz" again after the Houzz clipper has loaded
-
 ## 📞 Support
 
 If you have issues, please report:
@@ -147,7 +106,5 @@ If you have issues, please report:
 
 ---
 
-**Version**: 7.14.0  
-**Last Updated**: January 2025  
-**New in 7.14.0**: Quick Paste URL feature - scrape products from clipboard URLs  
-**New in 7.13.0**: Houzz Pro Clipper integration for reduced double data entry
+**Version**: 7.0.0  
+**Last Updated**: January 2025

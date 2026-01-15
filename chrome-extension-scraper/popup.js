@@ -1,6 +1,5 @@
-// Design Ready Product Scraper v7.14.0
+// Design Ready Product Scraper v7.12.0
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
-// NEW: Houzz Pro Clipper integration + Quick Paste URL
 // Debug logging enabled in console
 
 const APP_URL = 'https://designflow-app-9.preview.emergentagent.com';
@@ -10,7 +9,6 @@ let selectedProjectId = null;
 let clickToSelectActive = false;
 
 const scrapeBtn = document.getElementById('scrapeBtn');
-const houzzSyncBtn = document.getElementById('houzzSyncBtn');
 const sendBtn = document.getElementById('sendBtn');
 const copyBtn = document.getElementById('copyBtn');
 const rescrapeBtn = document.getElementById('rescrapeBtn');
