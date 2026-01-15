@@ -1,5 +1,6 @@
-// Design Ready Product Scraper v7.12.0
+// Design Ready Product Scraper v7.13.0
 // VENDOR-SPECIFIC SCRAPING for 22 vendors
+// NEW: Houzz Pro Clipper integration
 // Debug logging enabled in console
 
 const APP_URL = 'https://designflow-app-9.preview.emergentagent.com';
