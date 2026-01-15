@@ -11010,7 +11010,7 @@ async def google_calendar_callback(code: str = None, error: str = None):
                 token_data = await resp.json()
         
         if 'error' in token_data:
-            return RedirectResponse(url=f"/master-calendar?error={token_data.get('error_description', 'token_error')}")
+            return RedirectResponse(url=f"/?error={token_data.get('error_description', 'token_error')}")
         
         # Get user info
         async with aiohttp.ClientSession() as session:
@@ -11089,7 +11089,7 @@ async def outlook_calendar_callback(code: str = None, error: str = None, error_d
                 token_data = await resp.json()
         
         if 'error' in token_data:
-            return RedirectResponse(url=f"/master-calendar?error={token_data.get('error_description', 'token_error')}")
+            return RedirectResponse(url=f"/?error={token_data.get('error_description', 'token_error')}")
         
         # Get user info from Microsoft Graph
         async with aiohttp.ClientSession() as session:
