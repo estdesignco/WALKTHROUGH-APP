@@ -3,7 +3,7 @@
 VENDOR SCRAPER COMPREHENSIVE TEST
 Testing ALL vendor scrapers systematically for complete field extraction.
 
-Backend URL: https://designflow-app-9.preview.emergentagent.com
+Backend URL: https://bugbuster-77.preview.emergentagent.com
 Endpoint: POST /api/scrape-product
 
 Testing 6 vendors for ALL 7 required fields:
@@ -22,7 +22,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://designflow-app-9.preview.emergentagent.com"
+BACKEND_URL = "https://bugbuster-77.preview.emergentagent.com"
 SCRAPE_ENDPOINT = f"{BACKEND_URL}/api/scrape-product"
 
 # Test vendors with their URLs

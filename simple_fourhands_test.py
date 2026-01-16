@@ -11,7 +11,7 @@ import traceback
 async def test_simple_scraping():
     """Test the scraping endpoint with better error handling"""
     
-    url = "https://designflow-app-9.preview.emergentagent.com/api/scrape-product"
+    url = "https://bugbuster-77.preview.emergentagent.com/api/scrape-product"
     data = {
         "url": "https://fourhands.com/product/248606-001"
     }

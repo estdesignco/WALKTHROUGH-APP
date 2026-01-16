@@ -21,7 +21,7 @@ from datetime import datetime
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://designflow-app-9.preview.emergentagent.com/api"
+BACKEND_URL = "https://bugbuster-77.preview.emergentagent.com/api"
 
 class ComprehensiveBackendTester:
     def __init__(self):

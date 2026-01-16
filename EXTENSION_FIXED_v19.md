@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://designflow-app-9.preview.emergentagent.com/chrome-extension-v19.zip
+https://bugbuster-77.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://designflow-app-9.preview.emergentagent.com/api/download/chrome-extension
+https://bugbuster-77.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

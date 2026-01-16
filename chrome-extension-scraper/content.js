@@ -2207,7 +2207,7 @@ function scrapePageData() {
 // SEND TO APP + LIBRARIES
 // ============================================================================
 
-const BACKEND_URL = 'https://designflow-app-9.preview.emergentagent.com';
+const BACKEND_URL = 'https://bugbuster-77.preview.emergentagent.com';
 
 async function sendToAppAndLibraries() {
   if (!scrapedData) return;

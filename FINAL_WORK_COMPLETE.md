@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://designflow-app-9.preview.emergentagent.com
+https://bugbuster-77.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://designflow-app-9.preview.emergentagent.com/mobile-app
+https://bugbuster-77.preview.emergentagent.com/mobile-app
 
 ---
 

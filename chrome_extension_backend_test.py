@@ -20,7 +20,7 @@ import os
 from typing import Dict, Any, List
 
 # Get backend URL from environment
-BACKEND_URL = "https://designflow-app-9.preview.emergentagent.com"
+BACKEND_URL = "https://bugbuster-77.preview.emergentagent.com"
 
 class ChromeExtensionScraperTester:
     def __init__(self):
