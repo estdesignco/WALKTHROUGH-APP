@@ -887,7 +887,12 @@ export default function ProjectDetailPage() {
         // ═══════════════════════════════════════════════════════════════
         { name: "Calendar", icon: Calendar, component: project ? (
             <div className="calendar-content">
-                <InstallationCalendar projectId={projectId} />
+                <h2 className="text-2xl font-bold text-[#D4A574] mb-4">📅 Master Calendar</h2>
+                <ProjectCalendar />
+                <div className="mt-8 border-t border-stone-700 pt-6">
+                  <h2 className="text-2xl font-bold text-[#D4A574] mb-4">🔧 Installation Timeline</h2>
+                  <InstallationCalendar projectId={projectId} />
+                </div>
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading calendar...</div> },
         { name: "Automation", icon: Zap, component: project ? (
