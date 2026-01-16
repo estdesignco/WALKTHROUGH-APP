@@ -279,7 +279,8 @@ class TestFlow9_SampleTracking:
         create_resp = requests.post(f"{BASE_URL}/api/samples", json=sample_data)
         assert create_resp.status_code == 200, f"Failed to create sample: {create_resp.text}"
         created_sample = create_resp.json()
-        sample_id = created_sample.get("id")
+        # API returns {success, sample} not just sample
+        sample_id = created_sample.get("sample", {}).get("id") or created_sample.get("id")
         print(f"✅ Sample created: {sample_id}")
         
         # Verify sample appears in list - API returns {success, samples, count}
