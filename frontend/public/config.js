@@ -1,5 +1,5 @@
 // Runtime configuration - injected at deployment
 window.ENV = {
-  REACT_APP_BACKEND_URL: 'https://designflow-app-9.emergent.host'
+  REACT_APP_BACKEND_URL: 'https://bugbuster-77.preview.emergentagent.com'
 };
 console.log('✅ Runtime config loaded:', window.ENV);
