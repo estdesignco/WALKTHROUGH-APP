@@ -12,6 +12,7 @@ import MeasurementsAndFilesPage from './MeasurementsAndFilesPage';
 import ToDoList from './ToDoList';
 import FinanceDashboard from './FinanceDashboard';
 import InstallationCalendar from './InstallationCalendar';
+import ProjectCalendar from './ProjectCalendar';
 import ReportsDashboard from './ReportsDashboard';
 import DesignToolsDashboard from './DesignToolsDashboard';
 import DesignToolsHub from './DesignToolsHub';
