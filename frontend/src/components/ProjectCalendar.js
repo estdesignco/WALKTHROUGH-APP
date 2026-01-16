@@ -123,10 +123,18 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
         console.log('No independent events endpoint');
       }
       
-      // Fetch external calendar events (Google & Outlook)
+      // Fetch external calendar events (Google & Outlook) with timeout
       try {
-        const externalResponse = await fetch(`${API_URL}/external-calendar-events`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const externalResponse = await fetch(`${API_URL}/external-calendar-events`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
         const externalEvents = await externalResponse.json();
+        console.log('External calendar events loaded:', externalEvents?.length || 0);
         if (Array.isArray(externalEvents)) {
           externalEvents.forEach(evt => {
             calendarEvents.push({
@@ -145,7 +153,7 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
           });
         }
       } catch (e) {
-        console.log('External calendar events fetch error:', e);
+        console.log('External calendar events skipped:', e.message || e);
       }
       
       // Fetch To-Do items with deadlines from all projects
