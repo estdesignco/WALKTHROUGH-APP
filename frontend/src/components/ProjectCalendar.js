@@ -148,25 +148,32 @@ const ProjectCalendar = ({ onEventClick, compact = false }) => {
         console.log('External calendar events fetch error:', e);
       }
       
-      // Fetch To-Do items with deadlines
+      // Fetch To-Do items with deadlines from all projects
       try {
-        const todosResponse = await fetch(`${API_URL}/todos`);
-        const todos = await todosResponse.json();
-        if (Array.isArray(todos)) {
-          todos.forEach(todo => {
-            if (todo.deadline && !todo.completed) {
-              calendarEvents.push({
-                id: `todo-${todo.id}`,
-                type: 'todo',
-                title: todo.text,
-                date: new Date(todo.deadline),
-                project: 'To-Do',
-                description: todo.description,
-                priority: todo.priority,
-                isTodo: true
+        // Get todos for each project
+        for (const project of projectsData) {
+          try {
+            const todosResponse = await fetch(`${API_URL}/todos/${project.id}`);
+            const todos = await todosResponse.json();
+            if (Array.isArray(todos)) {
+              todos.forEach(todo => {
+                if (todo.deadline && !todo.completed) {
+                  calendarEvents.push({
+                    id: `todo-${todo.id}`,
+                    type: 'todo',
+                    title: todo.text,
+                    date: new Date(todo.deadline),
+                    project: project.name || 'To-Do',
+                    description: todo.description,
+                    priority: todo.priority,
+                    isTodo: true
+                  });
+                }
               });
             }
-          });
+          } catch (e) {
+            // Skip if project has no todos
+          }
         }
       } catch (e) {
         console.log('Todos fetch error:', e);
