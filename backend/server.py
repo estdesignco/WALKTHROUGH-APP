@@ -14652,6 +14652,8 @@ async def save_questionnaire(project_id: str, data: dict):
                 }
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Builder")
+                # SYNC TO MASTER CONTACTS
+                await sync_to_master_contacts(builder_name, "Builder", builder_phone)
         
         # Renovation Architect (separate name and phone fields)
         if answers.get('renovation_architect'):
@@ -14672,6 +14674,8 @@ async def save_questionnaire(project_id: str, data: dict):
                 }
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Architect")
+                # SYNC TO MASTER CONTACTS
+                await sync_to_master_contacts(architect_name, "Architect", architect_phone)
         
         # Renovation Builder (separate name and phone fields)
         if answers.get('renovation_builder'):
@@ -14692,6 +14696,8 @@ async def save_questionnaire(project_id: str, data: dict):
                 }
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Builder")
+                # SYNC TO MASTER CONTACTS
+                await sync_to_master_contacts(builder_name, "Builder", builder_phone)
         
         # Check for Spouse/Partner
         if answers.get('spouse_partner_name'):
@@ -17507,6 +17513,8 @@ async def export_ffe_to_pdf(data: dict):
                 }
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Builder")
+                # SYNC TO MASTER CONTACTS
+                await sync_to_master_contacts(builder_name, "Builder", builder_phone)
         
         # Renovation Architect (separate name and phone fields)
         if answers.get('renovation_architect'):
@@ -17527,6 +17535,8 @@ async def export_ffe_to_pdf(data: dict):
                 }
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Architect")
+                # SYNC TO MASTER CONTACTS
+                await sync_to_master_contacts(architect_name, "Architect", architect_phone)
         
         # Renovation Builder (separate name and phone fields)
         if answers.get('renovation_builder'):
@@ -17547,6 +17557,8 @@ async def export_ffe_to_pdf(data: dict):
                 }
                 await db.contacts.insert_one(contact_doc)
                 contacts_created.append("Builder")
+                # SYNC TO MASTER CONTACTS
+                await sync_to_master_contacts(builder_name, "Builder", builder_phone)
         
         # Check for Spouse/Partner
         if answers.get('spouse_partner_name'):
