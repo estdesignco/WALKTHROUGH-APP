@@ -318,7 +318,8 @@ class TestFlow10_ContactPersistence:
         create_resp = requests.post(f"{BASE_URL}/api/master/contacts", json=contact_data)
         assert create_resp.status_code == 200, f"Failed to create contact: {create_resp.text}"
         created_contact = create_resp.json()
-        contact_id = created_contact.get("id")
+        # API returns {success, contact} not just contact
+        contact_id = created_contact.get("contact", {}).get("id") or created_contact.get("id")
         assert contact_id is not None, f"Contact ID not returned: {created_contact}"
         print(f"✅ Master contact created: {contact_id}")
         
