@@ -389,3 +389,7 @@ frontend/dist-electron/ESTABLISHED-0.1.0-arm64.AppImage
 # Environment files
 *.env
 *.env.*
+-e 
+# Environment files
+*.env
+*.env.*
