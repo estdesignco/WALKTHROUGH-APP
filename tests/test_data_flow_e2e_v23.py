@@ -58,8 +58,8 @@ class TestFlow1_QuestionnaireToContacts:
         assert quest_resp.status_code == 200, f"Failed to save questionnaire: {quest_resp.text}"
         print(f"✅ Questionnaire saved with builder: {unique_builder_name}")
         
-        # Verify builder appears in project contacts
-        contacts_resp = requests.get(f"{BASE_URL}/api/contacts/{project_id}")
+        # Verify builder appears in project contacts - use query param not path
+        contacts_resp = requests.get(f"{BASE_URL}/api/contacts?project_id={project_id}")
         assert contacts_resp.status_code == 200, f"Failed to get project contacts: {contacts_resp.text}"
         project_contacts = contacts_resp.json()
         
