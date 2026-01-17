@@ -1,0 +1,114 @@
+{
+  "summary": "Comprehensive E2E testing completed for Interior Design Project Management App. CRITICAL BUG FIXED: config.js was pointing to production URL (app.estdesignco.com) instead of preview URL, causing dashboard to be stuck on 'Loading...'. Backend: 31/36 tests passed (86%). Frontend: All major features working after config fix.",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/projects POST",
+        "issue": "Returns 422 validation error - requires more fields than provided in test",
+        "priority": "LOW"
+      },
+      {
+        "endpoint": "/api/punch-list POST",
+        "issue": "Returns 422 validation error - requires more fields than provided in test",
+        "priority": "LOW"
+      },
+      {
+        "endpoint": "/api/vendor-portals",
+        "issue": "Returns {portals: [...]} instead of direct array - response format inconsistency",
+        "priority": "LOW"
+      },
+      {
+        "endpoint": "/api/furniture/vendors",
+        "issue": "Returns {vendors: [...]} instead of direct array - response format inconsistency",
+        "priority": "LOW"
+      },
+      {
+        "endpoint": "/api/vendor-database",
+        "issue": "Returns {data: [...]} instead of direct array - response format inconsistency",
+        "priority": "LOW"
+      }
+    ]
+  },
+  
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "fixed_issues": [
+      {
+        "component": "config.js",
+        "issue": "CRITICAL: config.js was pointing to production URL (https://app.estdesignco.com) instead of preview URL, causing dashboard to be stuck on 'Loading projects...' and 'Loading calendar...'",
+        "fix": "Updated /app/frontend/public/config.js to use https://bugbuster-77.preview.emergentagent.com",
+        "priority": "CRITICAL"
+      }
+    ]
+  },
+  
+  "test_report_links": [
+    "/app/tests/test_launch_critical_v25.py",
+    "/app/test_reports/pytest/pytest_results_v25.xml"
+  ],
+  
+  "action_items": [
+    "IMPORTANT: Before deploying to production, update /app/frontend/public/config.js to point to https://app.estdesignco.com",
+    "Consider standardizing API response formats (some return direct arrays, others return {data: [...]} or {portals: [...]})"
+  ],
+  
+  "critical_code_review_comments": [
+    "FIXED: config.js was pointing to wrong backend URL - this was causing the dashboard loading issue",
+    "Dashboard now loads correctly with projects and calendar visible",
+    "All navigation buttons work (Walkthrough, Checklist, FF&E, Calculators, Master Contacts, Master Materials, Master To-Do, AI Assistant)",
+    "Customer questionnaire (public route /customer) works without login - 172 form fields",
+    "Scraper endpoint works - successfully scraped Four Hands product",
+    "Scraper download endpoint works - returns 58KB ZIP file",
+    "All export endpoints work (Electrician Sheet, Load-In Sheets, Mover's FFE)",
+    "Vendor credentials and portals endpoints work",
+    "Calendar with filters (Shipping, Delivery, Install, Order, Restock, Project, Google Calendar, Outlook Calendar, To-Do) visible"
+  ],
+  
+  "updated_files": [
+    "/app/frontend/public/config.js",
+    "/app/tests/test_launch_critical_v25.py"
+  ],
+  
+  "success_rate": {
+    "backend": "86% (31/36 tests passed)",
+    "frontend": "100% - All major features working after config fix"
+  },
+  
+  "test_credentials": "Password: DesignReady2026!",
+  
+  "seed_data_creation": "Test data created during testing: contacts, todos, punch items, calendar events, samples - all cleaned up after tests",
+  
+  "verified_features": {
+    "dashboard_loading": "WORKING - Projects and calendar display correctly (BUG FIXED)",
+    "calendar_display": "WORKING - Shows full month view with filters",
+    "calendar_filters": "WORKING - Shipping, Delivery, Install, Order, Restock, Project, Google Calendar, Outlook Calendar, To-Do",
+    "master_contacts_crud": "WORKING - Create, Read, Delete all work",
+    "master_materials": "WORKING - Materials list displays correctly",
+    "master_todo": "WORKING - Company tasks endpoint functional",
+    "customer_questionnaire": "WORKING - Public route, no login required, 172 form fields",
+    "scraper_endpoint": "WORKING - Successfully scraped Four Hands product (Fenn Chair $477.30)",
+    "scraper_download": "WORKING - Returns 58KB ZIP file",
+    "exports": "WORKING - Electrician Sheet, Load-In Sheets, Mover's FFE all return HTML",
+    "vendor_portals": "WORKING - 13 vendor portals available",
+    "vendor_credentials": "WORKING - Multiple vendor credentials stored",
+    "ai_assistant": "WORKING - Chat, Visualize, Analyze, Budget tabs with Quick Prompts",
+    "calculators": "WORKING - Wallpaper, Drapery, Hardware, Paint, Tile & Flooring, Lighting, Square Ft, Convert"
+  },
+  
+  "features_not_fully_tested": {
+    "google_calendar_integration": "NOT TESTED - External integration",
+    "outlook_calendar_integration": "NOT TESTED - External integration",
+    "teams_notification": "NOT TESTED - External integration",
+    "photo_upload": "NOT TESTED - Requires file upload",
+    "voice_notes": "NOT TESTED - Requires audio recording"
+  },
+  
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "CRITICAL: The config.js file at /app/frontend/public/config.js controls the backend URL. For preview environment, it should point to https://bugbuster-77.preview.emergentagent.com. For production, it should point to https://app.estdesignco.com. The dashboard was stuck on 'Loading...' because this file was pointing to production. All major features are now working. Backend tests pass at 86% rate with only minor response format issues. Frontend is fully functional with all navigation buttons, calendar, projects, and customer questionnaire working."
+}
