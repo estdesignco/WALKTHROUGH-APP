@@ -9,7 +9,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://bugbuster-77.preview.emergentagent.com/*",
+    "https://app.estdesignco.com/*",
     "https://*/*",
     "http://*/*"
   ],
