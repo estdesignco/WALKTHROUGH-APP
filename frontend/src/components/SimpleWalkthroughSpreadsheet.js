@@ -337,7 +337,7 @@ const SimpleWalkthroughSpreadsheet = ({
         cost: 0.0,
         size: '',
         finish_color: '',
-        quantity: 1,
+        quantity: null,
         subcategory_id: subcategoryId,
         status: '',
         order_index: 0

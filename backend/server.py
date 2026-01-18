@@ -932,7 +932,7 @@ class ProjectType(str, Enum):
 # Enhanced Pydantic Models with Advanced Tracking
 class ItemBase(BaseModel):
     name: str
-    quantity: int = 1
+    quantity: Optional[int] = None
     size: Optional[str] = ""
     remarks: Optional[str] = ""
     vendor: Optional[str] = ""
