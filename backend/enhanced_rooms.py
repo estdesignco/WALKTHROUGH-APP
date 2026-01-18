@@ -1630,3 +1630,202 @@ DEFAULT_ROOM_STRUCTURE = {
     "children's bedroom": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bedroom", {}).get("categories", []),
     "nursery": COMPREHENSIVE_ROOM_STRUCTURE.get("primary bedroom", {}).get("categories", []),
 }
+
+# OUTDOOR FURNITURE - TRUE OUTDOOR CATEGORY
+OUTDOOR_ROOM_STRUCTURE = {
+    "categories": [
+        {
+            "name": "Outdoor Lighting",
+            "color": "#7B68AA",
+            "subcategories": [
+                {
+                    "name": "INSTALLED",
+                    "color": "#9B89B3",
+                    "items": [
+                        {"name": "Ceiling Fan w/ Light", "finish_color": "Outdoor Rated"},
+                        {"name": "Flush Mount Light", "finish_color": "Bronze/Black"},
+                        {"name": "Pendant Light", "finish_color": "Outdoor Rated"},
+                        {"name": "Recessed Lighting", "finish_color": "White/Nickel"},
+                        {"name": "String Lights", "finish_color": "Edison/LED"},
+                        {"name": "Landscape Lighting", "finish_color": "Bronze/Black"},
+                        {"name": "Path Lights", "finish_color": "Bronze/Black/Copper"},
+                        {"name": "Spotlights", "finish_color": "Bronze/Black"},
+                        {"name": "Wall Lanterns", "finish_color": "Bronze/Black/Copper"},
+                        {"name": "Post Lights", "finish_color": "Bronze/Black"}
+                    ]
+                },
+                {
+                    "name": "PORTABLE",
+                    "color": "#9B89B3",
+                    "items": [
+                        {"name": "Table Lanterns", "finish_color": "Various"},
+                        {"name": "Floor Lanterns", "finish_color": "Various"},
+                        {"name": "Solar Lights", "finish_color": "Various"},
+                        {"name": "Tiki Torches", "finish_color": "Bamboo/Metal"}
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Outdoor Furniture",
+            "color": "#8B6914",
+            "subcategories": [
+                {
+                    "name": "SEATING",
+                    "color": "#A0782F",
+                    "items": [
+                        {"name": "Outdoor Sofa", "finish_color": "Wicker/Aluminum/Teak"},
+                        {"name": "Outdoor Sectional", "finish_color": "Wicker/Aluminum"},
+                        {"name": "Outdoor Loveseat", "finish_color": "Wicker/Aluminum/Teak"},
+                        {"name": "Outdoor Lounge Chairs", "finish_color": "Various Materials"},
+                        {"name": "Outdoor Dining Chairs", "finish_color": "Wicker/Aluminum/Teak"},
+                        {"name": "Adirondack Chairs", "finish_color": "Wood/Poly"},
+                        {"name": "Rocking Chairs", "finish_color": "Wood/Wicker"},
+                        {"name": "Hammock", "finish_color": "Rope/Fabric"},
+                        {"name": "Hanging Chair/Swing", "finish_color": "Wicker/Rope"},
+                        {"name": "Outdoor Bench", "finish_color": "Wood/Metal/Stone"},
+                        {"name": "Outdoor Ottoman", "finish_color": "Wicker/Fabric"},
+                        {"name": "Pool Loungers/Chaises", "finish_color": "Aluminum/Wicker"}
+                    ]
+                },
+                {
+                    "name": "TABLES",
+                    "color": "#A0782F",
+                    "items": [
+                        {"name": "Outdoor Dining Table", "finish_color": "Teak/Aluminum/Stone"},
+                        {"name": "Outdoor Coffee Table", "finish_color": "Wicker/Teak/Concrete"},
+                        {"name": "Outdoor Side Table", "finish_color": "Various Materials"},
+                        {"name": "Outdoor Console Table", "finish_color": "Various Materials"},
+                        {"name": "Bar Height Table", "finish_color": "Various Materials"},
+                        {"name": "Bistro Table", "finish_color": "Metal/Wood"},
+                        {"name": "Fire Pit Table", "finish_color": "Stone/Metal/Concrete"}
+                    ]
+                },
+                {
+                    "name": "STORAGE & ACCESSORIES",
+                    "color": "#A0782F",
+                    "items": [
+                        {"name": "Storage Bench", "finish_color": "Wicker/Wood"},
+                        {"name": "Deck Box", "finish_color": "Wicker/Resin"},
+                        {"name": "Outdoor Bar Cart", "finish_color": "Metal/Wood"},
+                        {"name": "Planter Boxes", "finish_color": "Wood/Metal/Concrete"},
+                        {"name": "Outdoor Rug", "finish_color": "Polypropylene"}
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Outdoor Structures",
+            "color": "#8B4513",
+            "subcategories": [
+                {
+                    "name": "SHADE & COVER",
+                    "color": "#A0522D",
+                    "items": [
+                        {"name": "Umbrella", "finish_color": "Canvas/Sunbrella"},
+                        {"name": "Umbrella Stand", "finish_color": "Metal/Concrete"},
+                        {"name": "Pergola", "finish_color": "Wood/Metal/Vinyl"},
+                        {"name": "Awning", "finish_color": "Canvas/Sunbrella"},
+                        {"name": "Shade Sail", "finish_color": "Various Colors"},
+                        {"name": "Gazebo", "finish_color": "Wood/Metal"}
+                    ]
+                },
+                {
+                    "name": "FIRE FEATURES",
+                    "color": "#A0522D",
+                    "items": [
+                        {"name": "Fire Pit", "finish_color": "Stone/Metal/Concrete"},
+                        {"name": "Outdoor Fireplace", "finish_color": "Stone/Brick"},
+                        {"name": "Fire Table", "finish_color": "Various Materials"},
+                        {"name": "Chiminea", "finish_color": "Clay/Cast Iron"}
+                    ]
+                },
+                {
+                    "name": "WATER FEATURES",
+                    "color": "#A0522D",
+                    "items": [
+                        {"name": "Fountain", "finish_color": "Stone/Metal/Concrete"},
+                        {"name": "Bird Bath", "finish_color": "Stone/Metal"},
+                        {"name": "Pond/Water Garden", "finish_color": "Natural"}
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Outdoor Kitchen",
+            "color": "#1E90FF",
+            "subcategories": [
+                {
+                    "name": "APPLIANCES",
+                    "color": "#4169E1",
+                    "items": [
+                        {"name": "Built-in Grill", "finish_color": "Stainless Steel"},
+                        {"name": "Outdoor Refrigerator", "finish_color": "Stainless Steel"},
+                        {"name": "Outdoor Sink", "finish_color": "Stainless Steel"},
+                        {"name": "Ice Maker", "finish_color": "Stainless Steel"},
+                        {"name": "Pizza Oven", "finish_color": "Stainless/Stone"},
+                        {"name": "Smoker", "finish_color": "Black/Stainless"},
+                        {"name": "Side Burner", "finish_color": "Stainless Steel"},
+                        {"name": "Kegerator", "finish_color": "Stainless Steel"}
+                    ]
+                },
+                {
+                    "name": "CABINETRY",
+                    "color": "#4169E1",
+                    "items": [
+                        {"name": "Outdoor Cabinets", "finish_color": "Stainless/HDPE"},
+                        {"name": "Counter Space", "finish_color": "Granite/Concrete"},
+                        {"name": "Bar Counter", "finish_color": "Various Materials"},
+                        {"name": "Storage Drawers", "finish_color": "Stainless Steel"}
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Landscaping & Planters",
+            "color": "#228B22",
+            "subcategories": [
+                {
+                    "name": "PLANTERS",
+                    "color": "#32CD32",
+                    "items": [
+                        {"name": "Large Planters", "finish_color": "Ceramic/Concrete/Metal"},
+                        {"name": "Raised Garden Beds", "finish_color": "Wood/Metal"},
+                        {"name": "Window Boxes", "finish_color": "Various Materials"},
+                        {"name": "Hanging Baskets", "finish_color": "Wire/Wicker"},
+                        {"name": "Plant Stands", "finish_color": "Metal/Wood"}
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Paint, Stain, and Finishes",
+            "color": "#5A7A5A",
+            "subcategories": [
+                {
+                    "name": "FINISHES",
+                    "color": "#6B8B6B",
+                    "items": [
+                        {"name": "Deck Stain/Paint", "finish_color": ""},
+                        {"name": "Fence Stain/Paint", "finish_color": ""},
+                        {"name": "Concrete Stain", "finish_color": ""},
+                        {"name": "Stone Sealer", "finish_color": ""}
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
+# Add outdoor rooms to the lookup
+COMPREHENSIVE_ROOM_STRUCTURE["deck"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["patio"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["outdoor kitchen"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["pool house"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["covered porch"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["front porch"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["back porch"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["screened porch"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["balcony"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["terrace"] = OUTDOOR_ROOM_STRUCTURE
+COMPREHENSIVE_ROOM_STRUCTURE["cabana"] = OUTDOOR_ROOM_STRUCTURE
