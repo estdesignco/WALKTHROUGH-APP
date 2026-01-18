@@ -759,7 +759,9 @@ async function sendToApp() {
     // Go directly to the selected project's checklist
     const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
     
-    window.open(projectUrl, '_blank');
+    // Use the SAME window for all items (named window 'designready_checklist')
+    // This prevents opening a new window every time - reuses existing one
+    window.open(projectUrl, 'designready_checklist');
     showStatus('Sent to project!', 'success');
   } catch(e) { showStatus('Failed', 'error'); }
   finally { sendBtn.disabled = false; sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>'; }
