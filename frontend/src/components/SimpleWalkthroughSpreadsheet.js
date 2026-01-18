@@ -1205,17 +1205,6 @@ const SimpleWalkthroughSpreadsheet = ({
                                           {item.name}
                                         </div>
                                       </td>
-                                      <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm text-center w-16" style={{ color: '#F5F5DC' }}>
-                                        <div 
-                                          contentEditable
-                                          suppressContentEditableWarning={true}
-                                          className="w-full bg-transparent text-sm outline-none text-center"
-                                          style={{ color: '#F5F5DC' }}
-                                          onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
-                                        >
-                                          {item.quantity || 1}
-                                        </div>
-                                      </td>
                                       <td className="border border-[#B49B7E]/20 px-2 py-1 text-sm" style={{ color: '#F5F5DC' }}>
                                         <div 
                                           contentEditable
