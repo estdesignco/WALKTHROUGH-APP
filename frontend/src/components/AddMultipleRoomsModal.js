@@ -6,12 +6,35 @@ const AddMultipleRoomsModal = ({ onClose, onSubmit, roomColors, existingRooms = 
   const [customRoom, setCustomRoom] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // COMPREHENSIVE room list matching questionnaire - organized by category
   const commonRooms = [
-    'Living Room', 'Kitchen', 'Master Bedroom', 'Bedroom 2', 'Bedroom 3',
-    'Bathroom', 'Master Bathroom', 'Powder Room', 'Dining Room', 'Office',
-    'Family Room', 'Basement', 'Laundry Room', 'Mudroom', 'Pantry',
-    'Closet', 'Guest Room', 'Playroom', 'Library', 'Wine Cellar',
-    'Garage', 'Patio', 'Balcony', 'Foyer', 'Hallway'
+    // Living Spaces
+    'Living Room', 'Family Room', 'Great Room', 'Den', 'Sunroom', 'Screened Porch',
+    // Bedrooms
+    'Primary Bedroom', 'Guest Bedroom', 'Bedroom 2', 'Bedroom 3', 'Bedroom 4',
+    'Children\'s Bedroom', 'Nursery', 'Guest Room',
+    // Bathrooms
+    'Primary Bathroom', 'Guest Bathroom', 'Half Bathroom', 'Powder Room',
+    'Jack and Jill Bathroom', 'Pool Bathroom',
+    // Kitchen & Dining
+    'Kitchen', 'Pantry', 'Butler\'s Pantry', 'Scullery', 'Dining Room', 'Breakfast Nook',
+    // Work Spaces
+    'Home Office', 'Study', 'Library', 'Craft Room', 'Art Studio', 'Workshop',
+    // Entertainment
+    'Bar Area', 'Wine Cellar', 'Home Theater', 'Media Room', 'Game Room', 'Music Room',
+    // Utility
+    'Laundry Room', 'Mudroom', 'Utility Room', 'Garage',
+    // Storage
+    'Linen Closet', 'Walk-in Closet', 'Master Closet', 'Storage Room',
+    // Recreation
+    'Basement', 'Home Gym', 'Play Room', 'Bonus Room',
+    // Entry & Hallways
+    'Foyer', 'Entryway', 'Hallway', 'Stairway', 'Landing',
+    // Outdoor
+    'Patio', 'Deck', 'Outdoor Kitchen', 'Pool House', 'Cabana',
+    'Covered Porch', 'Front Porch', 'Back Porch', 'Balcony', 'Terrace',
+    // Other
+    'Guest House', 'Mother-in-Law Suite', 'She Shed', 'Man Cave'
   ];
 
   // Filter out rooms that already exist in the project
