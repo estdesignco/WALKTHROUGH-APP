@@ -110,7 +110,7 @@ export default function TabbedFFESpreadsheet({ projectId }) {
   const handleAddBlankItem = async (subcategoryId) => {
     try {
       await axios.post(`${API_URL}/items`, {
-        name: 'New Item',
+        name: '',
         vendor: '',
         quantity: '1',
         size: '',
