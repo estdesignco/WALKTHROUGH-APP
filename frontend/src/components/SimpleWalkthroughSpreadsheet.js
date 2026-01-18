@@ -1172,7 +1172,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                         <input 
                                           type="checkbox" 
                                           className="w-6 h-6 cursor-pointer" 
-                                          checked={checkedItems.has(item.id) || item.status === 'PICKED'}
+                                          checked={checkedItems.has(item.id)}
                                           onChange={async (e) => {
                                             const newStatus = e.target.checked ? 'PICKED' : '';
                                             const newCheckedItems = new Set(checkedItems);
