@@ -6,35 +6,93 @@ const AddMultipleRoomsModal = ({ onClose, onSubmit, roomColors, existingRooms = 
   const [customRoom, setCustomRoom] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // COMPREHENSIVE room list matching questionnaire - organized by category
+  // Room list ordered by INTERIOR DESIGN PROJECT PRIORITY
+  // First 10: Main living spaces designers typically start with
   const commonRooms = [
-    // Living Spaces
-    'Living Room', 'Family Room', 'Great Room', 'Den', 'Sunroom', 'Screened Porch',
-    // Bedrooms
-    'Primary Bedroom', 'Guest Bedroom', 'Bedroom 2', 'Bedroom 3', 'Bedroom 4',
-    'Children\'s Bedroom', 'Nursery', 'Guest Room',
-    // Bathrooms
-    'Primary Bathroom', 'Guest Bathroom', 'Half Bathroom', 'Powder Room',
-    'Jack and Jill Bathroom', 'Pool Bathroom',
-    // Kitchen & Dining
-    'Kitchen', 'Pantry', 'Butler\'s Pantry', 'Scullery', 'Dining Room', 'Breakfast Nook',
-    // Work Spaces
-    'Home Office', 'Study', 'Library', 'Craft Room', 'Art Studio', 'Workshop',
-    // Entertainment
-    'Bar Area', 'Wine Cellar', 'Home Theater', 'Media Room', 'Game Room', 'Music Room',
-    // Utility
-    'Laundry Room', 'Mudroom', 'Utility Room', 'Garage',
-    // Storage
-    'Linen Closet', 'Walk-in Closet', 'Master Closet', 'Storage Room',
-    // Recreation
-    'Basement', 'Home Gym', 'Play Room', 'Bonus Room',
-    // Entry & Hallways
-    'Foyer', 'Entryway', 'Hallway', 'Stairway', 'Landing',
-    // Outdoor
-    'Patio', 'Deck', 'Outdoor Kitchen', 'Pool House', 'Cabana',
-    'Covered Porch', 'Front Porch', 'Back Porch', 'Balcony', 'Terrace',
-    // Other
-    'Guest House', 'Mother-in-Law Suite', 'She Shed', 'Man Cave'
+    // PRIMARY LIVING SPACES (First priority - these are worked on first)
+    'Living Room',
+    'Kitchen', 
+    'Primary Bedroom',
+    'Primary Bathroom',
+    'Dining Room',
+    'Family Room',
+    'Guest Bedroom',
+    'Guest Bathroom',
+    'Home Office',
+    'Laundry Room',
+    
+    // SECONDARY LIVING SPACES
+    'Great Room',
+    'Breakfast Nook',
+    'Powder Room',
+    'Mudroom',
+    'Foyer',
+    'Pantry',
+    'Butler\'s Pantry',
+    
+    // ADDITIONAL BEDROOMS & BATHROOMS
+    'Bedroom 2',
+    'Bedroom 3', 
+    'Bedroom 4',
+    'Children\'s Bedroom',
+    'Nursery',
+    'Guest Bedroom 2',
+    'Guest Bathroom 2',
+    'Jack and Jill Bathroom',
+    
+    // CLOSETS & STORAGE
+    'Primary Closet',
+    'Walk-in Closet',
+    'Linen Closet',
+    'Storage Room',
+    
+    // SPECIALTY ROOMS
+    'Den',
+    'Study',
+    'Library',
+    'Media Room',
+    'Home Theater',
+    'Game Room',
+    'Music Room',
+    'Craft Room',
+    'Art Studio',
+    'Home Gym',
+    'Wine Cellar',
+    'Bar Area',
+    'Bonus Room',
+    'Play Room',
+    
+    // UTILITY & SERVICE
+    'Scullery',
+    'Utility Room',
+    'Workshop',
+    'Garage',
+    
+    // TRANSITIONAL SPACES
+    'Hallway',
+    'Stairway',
+    'Landing',
+    'Sunroom',
+    'Screened Porch',
+    
+    // OUTDOOR SPACES (Last - typically completed after interior)
+    'Patio',
+    'Deck',
+    'Covered Porch',
+    'Front Porch',
+    'Back Porch',
+    'Balcony',
+    'Terrace',
+    'Outdoor Kitchen',
+    'Pool House',
+    'Cabana',
+    'Pool Bathroom',
+    
+    // SEPARATE STRUCTURES
+    'Guest House',
+    'Mother-in-Law Suite',
+    'She Shed',
+    'Man Cave'
   ];
 
   // Filter out rooms that already exist in the project
