@@ -329,15 +329,15 @@ const SimpleWalkthroughSpreadsheet = ({
 
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       
-      // Create a blank row item - WITH PROPER DATA TYPES
+      // Create a blank row item - ALL CELLS BLANK as requested
       const blankItem = {
-        name: 'New Item',
+        name: '',
         vendor: '',
         sku: '',
-        cost: 0.0,  // Float value instead of empty string
+        cost: 0.0,
         size: '',
-        finish_color: '',  // BLANK AS REQUESTED
-        quantity: 1,  // Integer value instead of string
+        finish_color: '',
+        quantity: 1,
         subcategory_id: subcategoryId,
         status: '',
         order_index: 0
