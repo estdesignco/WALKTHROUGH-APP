@@ -192,7 +192,7 @@ const SimpleSpreadsheet = ({
                           <tr key={item.id} className="bg-neutral-800 hover:bg-neutral-700">
                             <td className="p-3 text-white border border-neutral-600">{item.name || 'Unnamed Item'}</td>
                             <td className="p-3 text-white border border-neutral-600">{item.vendor || 'No Vendor'}</td>
-                            <td className="p-3 text-white border border-neutral-600">{item.quantity || '1'}</td>
+                            <td className="p-3 text-white border border-neutral-600">{item.quantity || ''}</td>
                             <td className="p-3 text-white border border-neutral-600">{item.size || 'N/A'}</td>
                             <td className="p-3 text-white border border-neutral-600">{item.status || 'TBD'}</td>
                             <td className="p-3 text-white border border-neutral-600">{item.finish_color || 'N/A'}</td>

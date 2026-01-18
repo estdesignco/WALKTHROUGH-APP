@@ -893,7 +893,7 @@ const ExactChecklistSpreadsheet = ({
                                                           
                                                           {/* Quantity */}
                                                           <td className="border border-gray-400 px-2 py-2 text-white text-sm text-center">
-                                                            {item.quantity || 1}
+                                                            {item.quantity || ''}
                                                           </td>
                                                           
                                                           {/* Size */}

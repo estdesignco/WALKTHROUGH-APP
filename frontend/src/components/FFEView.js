@@ -975,7 +975,7 @@ const ExactFFESpreadsheet = ({
                                                               className="w-full bg-transparent text-[#D4C5A9] text-sm text-center outline-none"
                                                               onBlur={(e) => handleItemFieldChange(item.id, 'quantity', parseInt(e.target.textContent) || 1)}
                                                             >
-                                                              {item.quantity || 1}
+                                                              {item.quantity || ''}
                                                             </div>
                                                           </td>
                                                           
