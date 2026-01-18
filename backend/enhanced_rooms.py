@@ -1,44 +1,13 @@
 # COMPREHENSIVE ROOM STRUCTURE - PERFECT EDITION
 # Items ordered logically by importance, no duplicates, only items that belong
+# Categories ordered: FURNITURE FIRST, then Window Treatments, Textiles, Lighting, Art, Paint
 
 COMPREHENSIVE_ROOM_STRUCTURE = {
     # ============================================
-    # LIVING ROOM - Sofa first, then seating, tables, storage
+    # LIVING ROOM - Furniture FIRST (Sofa, seating, tables), then rest
     # ============================================
     "living room": {
         "categories": [
-            {
-                "name": "Lighting",
-                "color": "#7B68AA",
-                "subcategories": [
-                    {
-                        "name": "INSTALLED",
-                        "color": "#9B89B3",
-                        "items": [
-                            {"name": "Chandelier", "finish_color": ""},
-                            {"name": "Pendant Lights", "finish_color": ""},
-                            {"name": "Recessed Lighting", "finish_color": ""},
-                            {"name": "Sconces", "finish_color": ""},
-                            {"name": "Ceiling Fan w/ Light", "finish_color": ""},
-                            {"name": "Track Lighting", "finish_color": ""},
-                            {"name": "Cove Lighting", "finish_color": ""},
-                            {"name": "Picture Lights", "finish_color": ""},
-                            {"name": "Art Lights", "finish_color": ""}
-                        ]
-                    },
-                    {
-                        "name": "PORTABLE",
-                        "color": "#9B89B3",
-                        "items": [
-                            {"name": "Floor Lamp", "finish_color": ""},
-                            {"name": "Table Lamp", "finish_color": ""},
-                            {"name": "Accent Lamp", "finish_color": ""},
-                            {"name": "Buffet Lamp", "finish_color": ""},
-                            {"name": "Reading Lamp", "finish_color": ""}
-                        ]
-                    }
-                ]
-            },
             {
                 "name": "Furniture",
                 "color": "#8B6914",
@@ -121,6 +90,38 @@ COMPREHENSIVE_ROOM_STRUCTURE = {
                             {"name": "Throw Pillows", "finish_color": ""},
                             {"name": "Throw Blanket", "finish_color": ""},
                             {"name": "Pillow Inserts", "finish_color": ""}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Lighting",
+                "color": "#7B68AA",
+                "subcategories": [
+                    {
+                        "name": "INSTALLED",
+                        "color": "#9B89B3",
+                        "items": [
+                            {"name": "Chandelier", "finish_color": ""},
+                            {"name": "Pendant Lights", "finish_color": ""},
+                            {"name": "Recessed Lighting", "finish_color": ""},
+                            {"name": "Sconces", "finish_color": ""},
+                            {"name": "Ceiling Fan w/ Light", "finish_color": ""},
+                            {"name": "Track Lighting", "finish_color": ""},
+                            {"name": "Cove Lighting", "finish_color": ""},
+                            {"name": "Picture Lights", "finish_color": ""},
+                            {"name": "Art Lights", "finish_color": ""}
+                        ]
+                    },
+                    {
+                        "name": "PORTABLE",
+                        "color": "#9B89B3",
+                        "items": [
+                            {"name": "Floor Lamp", "finish_color": ""},
+                            {"name": "Table Lamp", "finish_color": ""},
+                            {"name": "Accent Lamp", "finish_color": ""},
+                            {"name": "Buffet Lamp", "finish_color": ""},
+                            {"name": "Reading Lamp", "finish_color": ""}
                         ]
                     }
                 ]
