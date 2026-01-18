@@ -3,48 +3,37 @@
 ## Original Problem Statement
 Full-stack interior design project management application with multiple spreadsheets (FFE, Checklist, Walkthrough), task management (To-Do, Punch List, Company Tasks), and Microsoft Teams integration.
 
-## 🚀 LATEST SESSION - January 16-17, 2026
+## 🚀 LATEST SESSION - January 18, 2026
 
-### CRITICAL BUGS FIXED ✅
+### WALKTHROUGH & ROOM FIXES ✅
 
-1. **Dashboard Loading Bug FIXED**
-   - **Root Cause**: `config.js` had wrong backend URL
-   - **Fix**: Updated `/app/frontend/public/config.js` with correct backend URL
-   - **Result**: Dashboard, calendar, and projects now load correctly
+1. **Checkbox Uncheck Fix** - Walkthrough checkboxes now properly toggle on/off
+   - Removed `|| item.status === 'PICKED'` condition that prevented unchecking
 
-2. **Chrome Extension v7.15.0 - UPDATED FOR PRODUCTION**
-   - **Issue**: Extension was pointing to preview URL instead of production
-   - **Fix**: Updated popup.js, content.js, and manifest.json to use `app.estdesignco.com`
-   - **Download**: `/api/download-scraper` returns updated 58KB ZIP
+2. **Quantity Column Removed** - QTY column removed from Walkthrough spreadsheet as requested
 
-3. **Comprehensive E2E Testing - 2 FULL ITERATIONS**
-   - Backend: 86-95% tests passed
-   - Frontend: 100% working
-   - All 50+ features verified
+3. **New Item Cells Now BLANK** - Adding new items creates blank rows instead of "NEW ITEM"
 
-### Test Results Summary (iteration_24 & iteration_25):
-- ✅ Dashboard loading - Projects and calendar display correctly
-- ✅ Calendar display - All event types with filters (9/9)
-- ✅ Master Contacts, Materials, To-Do - All CRUD operations
-- ✅ Project Walkthrough, Checklist, FF&E - All working
-- ✅ Punch List with AI Suggest - Working
-- ✅ Samples tracking - Working
-- ✅ Exports (PDF, Electrician, Load-In, Mover's) - Working
-- ✅ Scraper endpoint - Successfully scrapes product data
-- ✅ Customer Questionnaire - Public route, no login
-- ✅ Data persistence - All changes persist
+4. **Add Room Modal Updated** - Now includes ALL questionnaire rooms:
+   - Living Spaces: Living Room, Family Room, Great Room, Den, Sunroom, Screened Porch
+   - Bedrooms: Primary, Guest, Children's, Nursery, Bedroom 2/3/4
+   - Bathrooms: Primary, Guest, Half, Powder Room, Jack and Jill, Pool Bathroom
+   - Kitchen: Kitchen, Pantry, Butler's Pantry, Scullery, Breakfast Nook
+   - Work Spaces: Home Office, Study, Library, Craft Room, Art Studio, Workshop
+   - Entertainment: Bar Area, Wine Cellar, Home Theater, Media Room, Game Room
+   - Outdoor: Patio, Deck, Outdoor Kitchen, Pool House, Cabana, Porches, Balcony, Terrace
 
-### IMPORTANT: Production Deployment Notes
-**Before deploying to production:**
-1. `/app/frontend/public/config.js` must point to `https://app.estdesignco.com`
-2. Chrome extension v7.15.0 already points to production URL
+5. **TRUE OUTDOOR FURNITURE Category Created** - New outdoor room template with:
+   - Outdoor Lighting (path lights, string lights, landscape, wall lanterns)
+   - Outdoor Furniture (sectionals, dining sets, loungers, hammocks, fire pit tables)
+   - Outdoor Structures (umbrellas, pergolas, fire pits, water features)
+   - Outdoor Kitchen (grills, refrigerators, sinks, pizza ovens)
+   - Landscaping & Planters
 
-**Your production data (Robert Sherman, etc.) is SAFE on app.estdesignco.com**
-Preview environment has separate test database.
-
-### Known Issues (Lower Priority)
-- Google Calendar OAuth integration needs scope configuration
-- Some API responses use nested format ({data: [...]}) vs direct arrays
+### Previous Fixes (January 16-17):
+- Dashboard Loading Bug FIXED
+- Chrome Extension v7.15.0 updated for production
+- Comprehensive E2E Testing completed
 
 ---
 
