@@ -39,8 +39,11 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
     return colors[carrier] || '#6B7280';
   };
 
+  // READY FOR INSTALL and beyond are considered "completed" - items have arrived and are ready or installed
   const getCompletedItems = () => {
     return (statusBreakdown['INSTALLED'] || 0) + 
+           (statusBreakdown['READY FOR INSTALL'] || 0) +
+           (statusBreakdown['INSTALLING'] || 0) +
            (statusBreakdown['DELIVERED TO JOB SITE'] || 0) + 
            (statusBreakdown['DELIVERED TO RECEIVER'] || 0);
   };
@@ -57,7 +60,9 @@ const StatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemSta
            (statusBreakdown['PENDING APPROVAL'] || 0) + 
            (statusBreakdown['APPROVED'] || 0) + 
            (statusBreakdown['ORDERED'] || 0) + 
-           (statusBreakdown['PICKED'] || 0);
+           (statusBreakdown['PICKED'] || 0) +
+           (statusBreakdown['CONFIRMED'] || 0) +
+           (statusBreakdown['IN PRODUCTION'] || 0);
   };
 
   // Prepare data for Status Overview pie chart
