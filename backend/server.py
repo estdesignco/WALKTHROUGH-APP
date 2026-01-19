@@ -79,11 +79,12 @@ app = FastAPI(title="Interior Design Management System", version="1.0.0")
 @app.on_event("startup")
 async def startup_event():
     """Run on application startup"""
-    try:
-        from auto_populate_projects import ensure_test_projects_exist
-        await ensure_test_projects_exist()
-    except Exception as e:
-        logger.error(f"Error in startup auto-population: {e}")
+    # DISABLED - This was wiping real user data with test data on every startup
+    # try:
+    #     from auto_populate_projects import ensure_test_projects_exist
+    #     await ensure_test_projects_exist()
+    # except Exception as e:
+    #     logger.error(f"Error in startup auto-population: {e}")
     
     # Seed vendor products from JSON files
     try:
