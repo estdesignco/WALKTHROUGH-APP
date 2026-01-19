@@ -1280,7 +1280,7 @@ const ExactChecklistSpreadsheet = ({
             cost: item.cost || '',
             size: '',
             finish_color: item.finish_color || '',
-            quantity: 1,
+            quantity: '',
             status: 'PICKED',
             link: item.link || '',
             image_url: item.image_url || '',
