@@ -2641,16 +2641,40 @@ const ExactChecklistSpreadsheet = ({
                                     </div>
                                   </td>
                                   
-                                  {/* COST - CLICK TO OPEN CALCULATOR */}
+                                  {/* COST - EDITABLE INLINE WITH OPTIONAL CALCULATOR */}
                                   <td 
-                                    className="border border-[#B49B7E] px-2 py-1 text-sm cursor-pointer hover:bg-[#8B7355]/20 transition-colors group"
+                                    className="border border-[#B49B7E] px-2 py-1 text-sm"
                                     style={cellStyle}
-                                    onClick={() => openCalculator(item, category.name)}
-                                    title="Click to open calculator"
                                   >
-                                    <div className="flex items-center justify-between">
-                                      <span style={{ color: textColor }}>${item.cost || 0}</span>
-                                      <span className="text-[#8B7355] opacity-0 group-hover:opacity-100 text-xs ml-1">🧮</span>
+                                    <div className="flex items-center gap-1">
+                                      <span style={{ color: textColor }}>$</span>
+                                      <div 
+                                        contentEditable={true}
+                                        suppressContentEditableWarning={true}
+                                        className="flex-1 bg-transparent text-sm outline-none min-w-[40px]"
+                                        style={{ color: textColor }}
+                                        onBlur={(e) => {
+                                          const newValue = parseFloat(e.target.textContent.replace(/[^0-9.]/g, '')) || 0;
+                                          if (newValue !== item.cost) {
+                                            handleUpdateItemField(item.id, 'cost', newValue);
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            e.target.blur();
+                                          }
+                                        }}
+                                      >
+                                        {item.cost || 0}
+                                      </div>
+                                      <button
+                                        onClick={() => openCalculator(item, category.name)}
+                                        className="text-[#8B7355] hover:text-[#D4A574] text-xs ml-1 opacity-50 hover:opacity-100"
+                                        title="Open calculator"
+                                      >
+                                        🧮
+                                      </button>
                                     </div>
                                   </td>
                                   
