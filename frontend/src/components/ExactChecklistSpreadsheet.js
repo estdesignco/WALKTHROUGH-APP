@@ -1849,7 +1849,35 @@ const ExactChecklistSpreadsheet = ({
                     >
                       {isRoomExpanded ? '▼' : '▶'}
                     </button>
-                    <span>{room.name.toUpperCase()}</span>
+                    <span 
+                      contentEditable={true}
+                      suppressContentEditableWarning={true}
+                      className="outline-none px-1"
+                      onBlur={async (e) => {
+                        const newName = e.target.textContent?.trim();
+                        if (newName && newName.toUpperCase() !== room.name.toUpperCase()) {
+                          try {
+                            const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+                            const response = await fetch(`${backendUrl}/api/rooms/${room.id}`, {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ name: newName.toUpperCase() })
+                            });
+                            if (response.ok && onReload) {
+                              onReload();
+                            }
+                          } catch (error) {
+                            console.error('Failed to update room name:', error);
+                          }
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          e.target.blur();
+                        }
+                      }}
+                    >{room.name.toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {/* ADD ITEM BUTTON - TOP LEVEL */}
