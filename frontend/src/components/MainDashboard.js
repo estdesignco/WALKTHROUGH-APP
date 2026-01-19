@@ -6,6 +6,18 @@ import axios from 'axios';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
+// Project colors for headers - each project gets a unique color
+const PROJECT_COLORS = [
+  { bg: 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)', border: '#CD853F', name: 'Saddle Brown' },
+  { bg: 'linear-gradient(135deg, #2F4F4F 0%, #3D5C5C 100%)', border: '#5F9EA0', name: 'Dark Slate' },
+  { bg: 'linear-gradient(135deg, #4A3728 0%, #5D4037 100%)', border: '#8D6E63', name: 'Coffee' },
+  { bg: 'linear-gradient(135deg, #1C3A4B 0%, #2C5364 100%)', border: '#4682B4', name: 'Steel Blue' },
+  { bg: 'linear-gradient(135deg, #3E2723 0%, #4E342E 100%)', border: '#795548', name: 'Espresso' },
+  { bg: 'linear-gradient(135deg, #1A237E 0%, #283593 100%)', border: '#5C6BC0', name: 'Indigo' },
+  { bg: 'linear-gradient(135deg, #004D40 0%, #00695C 100%)', border: '#26A69A', name: 'Teal' },
+  { bg: 'linear-gradient(135deg, #BF360C 0%, #E64A19 100%)', border: '#FF7043', name: 'Deep Orange' },
+];
+
 const MainDashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -13,14 +25,10 @@ const MainDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
-  const [extensionData, setExtensionData] = useState(null);
   const [companyTodos, setCompanyTodos] = useState([]);
+  const [projectTodos, setProjectTodos] = useState({});
   const [todosLoading, setTodosLoading] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [showTodoList, setShowTodoList] = useState(false);
-  
-  // Expandable section state - null means show all three, otherwise shows expanded section
-  const [expandedSection, setExpandedSection] = useState(null); // 'files', 'todo', 'calendar', or null
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Check for extension data in URL params
   useEffect(() => {
@@ -32,23 +40,14 @@ const MainDashboard = () => {
         sku: searchParams.get('sku'),
         size: searchParams.get('size'),
         finish_color: searchParams.get('finish'),
-        finish_image: searchParams.get('finish_image'), // CRITICAL: Swatch image
+        finish_image: searchParams.get('finish_image'),
         vendor: searchParams.get('vendor'),
         link: searchParams.get('link'),
         image_url: searchParams.get('image'),
         msrp: searchParams.get('msrp')
       };
-      console.log('📦 Extension data received:', data);
-      setExtensionData(data);
-      
-      // Store in localStorage so FFE dashboard can access it
       localStorage.setItem('extensionScrapedData', JSON.stringify(data));
-      
-      // Show notification with finish info if available
-      const finishInfo = data.finish_color ? `\nFinish: ${data.finish_color}` : '';
-      alert(`✅ Product scraped!\n\nName: ${data.name}\nPrice: $${data.price || 'N/A'}${finishInfo}\n\nGo to any project's FF&E tab and click "Add Item" - the data will auto-populate!`);
-      
-      // Clear URL params
+      alert(`✅ Product scraped!\n\nName: ${data.name}\nPrice: $${data.price || 'N/A'}\n\nGo to any project's FF&E tab - the data will auto-populate!`);
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, [searchParams]);
@@ -56,29 +55,26 @@ const MainDashboard = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        console.log('🔄 Fetching projects from API...');
         const response = await projectAPI.getAll();
-        console.log('📡 API Response:', response);
-        
-        // Handle both response.data and direct array response
         const projectsData = response.data || response || [];
-        console.log('📊 Projects data:', projectsData);
-        
-        // Map the API response to the expected format
-        const mappedProjects = projectsData.map(project => ({
+        const mappedProjects = projectsData.map((project, index) => ({
           id: project.id,
           name: project.name,
           clientName: project.client_info?.full_name || 'Unknown Client',
           address: project.client_info?.address || '',
           status: 'Active',
           lastUpdated: new Date(project.updated_at).toLocaleDateString() || 'Unknown',
-          createdDate: new Date(project.created_at).toLocaleDateString() || 'Unknown'
+          createdDate: new Date(project.created_at).toLocaleDateString() || 'Unknown',
+          color: PROJECT_COLORS[index % PROJECT_COLORS.length]
         }));
-        
-        console.log('✅ Mapped projects:', mappedProjects);
         setProjects(mappedProjects);
+        
+        // Load todos for each project
+        for (const project of mappedProjects) {
+          loadProjectTodos(project.id);
+        }
       } catch (error) {
-        console.error('❌ Error fetching projects:', error);
+        console.error('Error fetching projects:', error);
         setProjects([]);
       } finally {
         setLoading(false);
@@ -89,27 +85,44 @@ const MainDashboard = () => {
     loadCompanyTodos();
   }, []);
 
-  // Load company to-dos (PROTECTED - READ ONLY on dashboard)
   const loadCompanyTodos = async () => {
     setTodosLoading(true);
     try {
       const response = await axios.get(`${API_URL}/todos/company`);
       setCompanyTodos(response.data.todos || []);
     } catch (error) {
-      console.error('Failed to load todos:', error);
+      console.error('Failed to load company todos:', error);
       setCompanyTodos([]);
     } finally {
       setTodosLoading(false);
     }
   };
 
-  // Toggle todo completion (SAFE operation)
-  const toggleTodoComplete = async (todoId, currentStatus) => {
+  const loadProjectTodos = async (projectId) => {
     try {
-      await axios.put(`${API_URL}/todos/company/${todoId}`, {
-        completed: !currentStatus
-      });
-      loadCompanyTodos(); // Refresh the list
+      const response = await axios.get(`${API_URL}/todos/${projectId}`);
+      setProjectTodos(prev => ({
+        ...prev,
+        [projectId]: response.data.todos || []
+      }));
+    } catch (error) {
+      console.error(`Failed to load todos for project ${projectId}:`, error);
+    }
+  };
+
+  const toggleTodoComplete = async (todoId, currentStatus, isCompany = true, projectId = null) => {
+    try {
+      const endpoint = isCompany 
+        ? `${API_URL}/todos/company/${todoId}`
+        : `${API_URL}/todos/${projectId}/${todoId}`;
+      
+      await axios.put(endpoint, { completed: !currentStatus });
+      
+      if (isCompany) {
+        loadCompanyTodos();
+      } else {
+        loadProjectTodos(projectId);
+      }
     } catch (error) {
       console.error('Failed to update todo:', error);
     }
@@ -120,128 +133,150 @@ const MainDashboard = () => {
   };
 
   const handleProjectClick = (projectId) => {
-    // Navigate to the project detail page with 4 tabs (Questionnaire, Walkthrough, Checklist, FF&E)
     navigate(`/project/${projectId}`);
   };
 
   const handleDeleteProject = async (projectId, projectName, e) => {
-    e.stopPropagation(); // Prevent project selection when clicking delete
-    
-    if (!window.confirm(`Are you sure you want to delete "${projectName}"?\n\nThis will delete ALL rooms, items, and data. This cannot be undone!`)) {
-      return;
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete "${projectName}"? This cannot be undone.`)) {
+      try {
+        await projectAPI.delete(projectId);
+        alert('✅ Project deleted successfully!');
+        const response = await projectAPI.getAll();
+        const projectsData = response.data || response || [];
+        setProjects(projectsData.map((project, index) => ({
+          id: project.id,
+          name: project.name,
+          clientName: project.client_info?.full_name || 'Unknown Client',
+          address: project.client_info?.address || '',
+          status: 'Active',
+          lastUpdated: new Date(project.updated_at).toLocaleDateString() || 'Unknown',
+          createdDate: new Date(project.created_at).toLocaleDateString() || 'Unknown',
+          color: PROJECT_COLORS[index % PROJECT_COLORS.length]
+        })));
+      } catch (error) {
+        alert('❌ Failed to delete project: ' + error.message);
+      }
     }
-    
-    try {
-      await projectAPI.delete(projectId);
-      alert('✅ Project deleted successfully!');
-      // Refresh the projects list
-      const response = await projectAPI.getAll();
-      const projectsData = response.data || response || [];
-      const mappedProjects = projectsData.map(project => ({
-        id: project.id,
-        name: project.name,
-        clientName: project.client_info?.full_name || 'Unknown Client',
-        address: project.client_info?.address || '',
-        status: 'Active',
-        lastUpdated: new Date(project.updated_at).toLocaleDateString() || 'Unknown',
-        createdDate: new Date(project.created_at).toLocaleDateString() || 'Unknown'
-      }));
-      setProjects(mappedProjects);
-    } catch (error) {
-      alert('❌ Failed to delete project: ' + error.message);
-      console.error('Delete error:', error);
+  };
+
+  // Navigate to checklist with item highlighted
+  const handleTodoClick = (projectId, itemId) => {
+    if (itemId) {
+      navigate(`/project/${projectId}?tab=Checklist&highlightItem=${itemId}`);
+    } else {
+      navigate(`/project/${projectId}?tab=Checklist`);
     }
   };
 
   const handleSendEmail = async () => {
     try {
-      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-      const response = await fetch(`${BACKEND_URL}/api/send-questionnaire`, {
+      const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+      const response = await fetch(`${BACKEND_URL}/api/send-questionnaire-email`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          client_name: emailData.name,
-          client_email: emailData.email,
-          sender_name: 'Established Design Co.'
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailData.email, name: emailData.name })
       });
-
       if (response.ok) {
-        const result = await response.json();
-        alert(`Success! Questionnaire email sent to ${emailData.name} at ${emailData.email}`);
+        alert('✅ Questionnaire email sent successfully!');
         setShowEmailModal(false);
         setEmailData({ email: '', name: '' });
       } else {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to send email');
+        throw new Error('Failed to send email');
       }
     } catch (error) {
-      console.error('Error sending email:', error);
       alert(`Failed to send email: ${error.message}`);
     }
   };
 
+  const sidebarItems = [
+    { icon: '🏠', label: 'Walkthrough', path: projects[0] ? `/project/${projects[0].id}?tab=Walkthrough` : null },
+    { icon: '📋', label: 'Checklist', path: projects[0] ? `/project/${projects[0].id}?tab=Checklist` : null },
+    { icon: '📊', label: 'FF&E', path: projects[0] ? `/project/${projects[0].id}?tab=FF%26E` : null },
+    { icon: '🧮', label: 'Calculators', path: '/calculators' },
+    { icon: '👥', label: 'Contacts', path: '/master-contacts' },
+    { icon: '📦', label: 'Materials', path: '/master-materials' },
+    { icon: '✅', label: 'To-Do', path: '/master-todo' },
+    { icon: '🤖', label: 'AI', path: '/ai-assistant' },
+  ];
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Gold Header with Full-Width Logo */}
-      <div className="w-full h-24" style={{ 
-        background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-        boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
-      }}>
-        <div className="flex items-center justify-center h-full relative px-8">
-          <img 
-            src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
-            alt="ESTABLISHEDDESIGN CO." 
-            className="h-16 object-contain filter drop-shadow-lg"
-            style={{ filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4))' }}
-          />
+    <div className="min-h-screen bg-black flex">
+      {/* SIDEBAR */}
+      <div 
+        className={`${sidebarCollapsed ? 'w-16' : 'w-20'} flex-shrink-0 flex flex-col transition-all duration-300`}
+        style={{
+          background: 'linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%)',
+          borderRight: '1px solid #8b7355',
+        }}
+      >
+        {/* Sidebar Toggle */}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="p-3 text-stone-400 hover:text-white hover:bg-[#8b7355]/20 transition-all"
+        >
+          {sidebarCollapsed ? '→' : '←'}
+        </button>
+        
+        {/* Sidebar Nav Items */}
+        <div className="flex-1 flex flex-col gap-1 p-2">
+          {sidebarItems.map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => item.path ? handleNavigation(item.path) : alert('No projects available')}
+              className="flex flex-col items-center justify-center p-2 rounded-lg text-stone-400 hover:text-white hover:bg-[#8b7355]/30 transition-all"
+              title={item.label}
+            >
+              <span className="text-xl">{item.icon}</span>
+              {!sidebarCollapsed && <span className="text-[10px] mt-1">{item.label}</span>}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="px-4 py-4">
-        {/* Top Action Buttons */}
-        <div className="flex justify-center gap-3 mb-4">
+      {/* MAIN CONTENT */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* HEADER */}
+        <div className="h-20 flex-shrink-0" style={{ 
+          background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)',
+        }}>
+          <div className="flex items-center justify-center h-full px-4">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
+              alt="ESTABLISHEDDESIGN CO." 
+              className="h-12 object-contain"
+              style={{ filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4))' }}
+            />
+          </div>
+        </div>
+
+        {/* ACTION BUTTONS */}
+        <div className="flex justify-center gap-3 py-3 bg-black/50 border-b border-[#8b7355]/30">
           <button 
             onClick={() => handleNavigation('/customer')}
-            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)',
-            }}
+            className="text-white px-5 py-2 rounded-full text-sm font-medium transition-all hover:scale-105 flex items-center gap-2"
+            style={{ background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 100%)' }}
           >
-            <span>+</span>
-            <span>New Client</span>
-          </button>
-          <button 
-            onClick={() => setShowEmailModal(true)}
-            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)',
-            }}
-          >
-            <span>📧</span>
-            <span>Email Client</span>
+            <span>+</span> New Client
           </button>
           <button 
             onClick={() => handleNavigation('/customer/questionnaire')}
-            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)',
-            }}
+            className="text-white px-5 py-2 rounded-full text-sm font-medium transition-all hover:scale-105 flex items-center gap-2"
+            style={{ background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 100%)' }}
           >
-            <span>📋</span>
-            <span>Questionnaire</span>
+            📋 Questionnaire
+          </button>
+          <button 
+            onClick={() => setShowEmailModal(true)}
+            className="text-white px-5 py-2 rounded-full text-sm font-medium transition-all hover:scale-105 flex items-center gap-2"
+            style={{ background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 100%)' }}
+          >
+            📧 Email
           </button>
           <button 
             onClick={async () => {
               try {
-                const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+                const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
                 const response = await fetch(`${BACKEND_URL}/api/backup/full`);
                 if (response.ok) {
                   const blob = await response.blob();
@@ -259,254 +294,227 @@ const MainDashboard = () => {
                 alert('❌ Backup failed: ' + error.message);
               }
             }}
-            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
-            style={{
-              background: `linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%)`,
-              boxShadow: '0 4px 15px rgba(45, 80, 22, 0.3)',
-            }}
+            className="text-white px-5 py-2 rounded-full text-sm font-medium transition-all hover:scale-105 flex items-center gap-2"
+            style={{ background: 'linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%)' }}
           >
-            <span>💾</span>
-            <span>Backup</span>
+            💾 Backup
           </button>
         </div>
 
-        {/* THREE-COLUMN LAYOUT - Customer Files | To-Do | Calendar */}
-        <div className={`mx-auto mb-4 ${expandedSection ? 'max-w-6xl' : 'max-w-7xl'}`}>
-          <div className={`grid gap-4 ${expandedSection ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-3'}`}>
-            
-            {/* CUSTOMER FILES - Left Column */}
-            {(!expandedSection || expandedSection === 'files') && (
-              <div 
-                className={`rounded-lg overflow-hidden ${expandedSection === 'files' ? 'col-span-1' : ''}`}
-                style={{
-                  background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
-                  border: '1px solid #8b7355',
-                  minHeight: expandedSection === 'files' ? '70vh' : '400px'
-                }}
-              >
-                <div className="flex items-center justify-between p-3 border-b border-[#8b7355]/50">
-                  <h3 className="text-lg font-medium text-[#D4C5A9] flex items-center gap-2">
-                    📁 Customer Files
-                    <span className="text-xs bg-[#8b7355]/30 px-2 py-0.5 rounded">{projects.length}</span>
-                  </h3>
-                  <button
-                    onClick={() => setExpandedSection(expandedSection === 'files' ? null : 'files')}
-                    className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
-                    style={{ background: 'rgba(139, 115, 85, 0.2)' }}
-                  >
-                    {expandedSection === 'files' ? '⊟ Collapse' : '⊞ Expand'}
-                  </button>
+        {/* MAIN AREA - Split View */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* LEFT SIDE - Projects + Calendar */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {/* PROJECTS GRID */}
+            <div className="mb-6">
+              <h2 className="text-lg text-stone-400 mb-3 flex items-center gap-2">
+                📁 Projects <span className="text-xs bg-[#8b7355]/30 px-2 py-0.5 rounded">{projects.length}</span>
+              </h2>
+              
+              {loading ? (
+                <div className="text-stone-400 text-center py-8">Loading...</div>
+              ) : projects.length === 0 ? (
+                <div className="text-stone-500 text-center py-8">
+                  No projects yet. <button onClick={() => handleNavigation('/customer')} className="text-[#d4af37] underline">Create one</button>
                 </div>
-                <div className={`p-3 overflow-y-auto ${expandedSection === 'files' ? 'max-h-[65vh]' : 'max-h-[340px]'}`}>
-                  {loading ? (
-                    <div className="text-stone-400 text-center py-4">Loading...</div>
-                  ) : projects.length === 0 ? (
-                    <div className="text-stone-500 text-center py-4">No projects yet</div>
-                  ) : (
-                    <div className="space-y-2">
-                      {projects.map((project) => (
-                        <div 
-                          key={project.id}
-                          onClick={() => handleProjectClick(project.id)}
-                          className="p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
-                          style={{
-                            background: 'linear-gradient(135deg, rgba(139, 115, 85, 0.15) 0%, rgba(139, 115, 85, 0.05) 100%)',
-                            border: '1px solid rgba(139, 115, 85, 0.3)',
-                          }}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <div className="text-stone-200 font-medium">{project.name}</div>
-                              <div className="text-stone-400 text-sm">{project.clientName}</div>
-                              {project.address && (
-                                <div className="text-stone-500 text-xs mt-1">{project.address}</div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                              <button
-                                onClick={(e) => handleDeleteProject(project.id, project.name, e)}
-                                className="text-red-400/50 hover:text-red-400 text-sm"
-                              >
-                                🗑️
-                              </button>
-                            </div>
-                          </div>
-                          {expandedSection === 'files' && (
-                            <div className="flex gap-2 mt-3 pt-2 border-t border-[#8b7355]/30">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=Walkthrough`); }}
-                                className="text-xs px-2 py-1 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
-                              >
-                                Walkthrough
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=Checklist`); }}
-                                className="text-xs px-2 py-1 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
-                              >
-                                Checklist
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=FF%26E`); }}
-                                className="text-xs px-2 py-1 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
-                              >
-                                FF&E
-                              </button>
-                            </div>
-                          )}
+              ) : (
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                  {projects.map((project) => (
+                    <div 
+                      key={project.id}
+                      onClick={() => handleProjectClick(project.id)}
+                      className="rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] hover:shadow-lg"
+                      style={{ border: `1px solid ${project.color.border}` }}
+                    >
+                      {/* Colored Header */}
+                      <div 
+                        className="px-3 py-2"
+                        style={{ background: project.color.bg }}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="text-white font-medium text-sm truncate">{project.name}</div>
+                          <button
+                            onClick={(e) => handleDeleteProject(project.id, project.name, e)}
+                            className="text-white/50 hover:text-white text-xs ml-2"
+                          >
+                            ×
+                          </button>
                         </div>
-                      ))}
+                      </div>
+                      {/* Body */}
+                      <div className="p-3 bg-[#0f0f1a]">
+                        <div className="text-stone-300 text-xs">{project.clientName}</div>
+                        {project.address && (
+                          <div className="text-stone-500 text-xs truncate mt-1">{project.address}</div>
+                        )}
+                        <div className="flex gap-1 mt-2">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=Walkthrough`); }}
+                            className="text-[10px] px-2 py-0.5 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
+                          >
+                            Walk
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=Checklist`); }}
+                            className="text-[10px] px-2 py-0.5 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
+                          >
+                            Check
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=FF%26E`); }}
+                            className="text-[10px] px-2 py-0.5 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
+                          >
+                            FF&E
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* TO-DO LIST - Center Column */}
-            {(!expandedSection || expandedSection === 'todo') && (
-              <div 
-                className={`rounded-lg overflow-hidden ${expandedSection === 'todo' ? 'col-span-1' : ''}`}
-                style={{
-                  background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
-                  border: '1px solid #8b7355',
-                  minHeight: expandedSection === 'todo' ? '70vh' : '400px'
-                }}
-              >
-                <div className="flex items-center justify-between p-3 border-b border-[#8b7355]/50">
-                  <h3 className="text-lg font-medium text-[#D4C5A9] flex items-center gap-2">
-                    ✅ To-Do List
-                    <span className="text-xs bg-[#8b7355]/30 px-2 py-0.5 rounded">
-                      {companyTodos.filter(t => !t.completed).length} active
-                    </span>
-                  </h3>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleNavigation('/master-todo')}
-                      className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
-                      style={{ background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' }}
-                    >
-                      📝 Edit
-                    </button>
-                    <button
-                      onClick={() => setExpandedSection(expandedSection === 'todo' ? null : 'todo')}
-                      className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
-                      style={{ background: 'rgba(139, 115, 85, 0.2)' }}
-                    >
-                      {expandedSection === 'todo' ? '⊟ Collapse' : '⊞ Expand'}
-                    </button>
+                  ))}
+                  
+                  {/* Add New Project Card */}
+                  <div 
+                    onClick={() => handleNavigation('/customer')}
+                    className="rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] border-2 border-dashed border-[#8b7355]/50 hover:border-[#8b7355] flex items-center justify-center min-h-[120px]"
+                    style={{ background: 'rgba(139, 115, 85, 0.1)' }}
+                  >
+                    <div className="text-center">
+                      <div className="text-3xl text-[#8b7355]">+</div>
+                      <div className="text-xs text-stone-500 mt-1">New Project</div>
+                    </div>
                   </div>
                 </div>
-                <div className={`p-3 overflow-y-auto ${expandedSection === 'todo' ? 'max-h-[65vh]' : 'max-h-[340px]'}`}>
-                  {todosLoading ? (
-                    <div className="text-stone-400 text-center py-4">Loading...</div>
-                  ) : companyTodos.length === 0 ? (
-                    <div className="text-stone-500 text-center py-4">No to-do items</div>
+              )}
+            </div>
+
+            {/* CALENDAR */}
+            <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #8b7355' }}>
+              <div className="px-3 py-2" style={{ background: 'linear-gradient(135deg, #5D4037 0%, #795548 100%)' }}>
+                <h3 className="text-white font-medium text-sm">📅 Calendar</h3>
+              </div>
+              <div className="p-2 bg-[#0f0f1a]">
+                <ProjectCalendar 
+                  compact={true}
+                  onEventClick={(event) => {
+                    if (event.projectId) {
+                      handleNavigation(`/project/${event.projectId}?tab=FF&E`);
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT SIDE - To-Do Lists */}
+          <div className="w-80 xl:w-96 flex-shrink-0 overflow-y-auto p-4 border-l border-[#8b7355]/30">
+            {/* COMPANY TO-DO */}
+            <div className="rounded-lg overflow-hidden mb-4" style={{ border: '1px solid #7C3AED' }}>
+              <div 
+                className="px-3 py-2 flex justify-between items-center"
+                style={{ background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' }}
+              >
+                <h3 className="text-white font-medium text-sm">🏢 Company Tasks</h3>
+                <button
+                  onClick={() => handleNavigation('/master-todo')}
+                  className="text-white/70 hover:text-white text-xs"
+                >
+                  Edit →
+                </button>
+              </div>
+              <div className="p-2 bg-[#0f0f1a] max-h-48 overflow-y-auto">
+                {todosLoading ? (
+                  <div className="text-stone-400 text-center py-2 text-sm">Loading...</div>
+                ) : companyTodos.length === 0 ? (
+                  <div className="text-stone-500 text-center py-2 text-sm">No company tasks</div>
+                ) : (
+                  <div className="space-y-1">
+                    {companyTodos.map((todo) => (
+                      <div 
+                        key={todo.id}
+                        className="flex items-start gap-2 p-2 rounded transition-all hover:bg-[#7C3AED]/10"
+                      >
+                        <button
+                          onClick={() => toggleTodoComplete(todo.id, todo.completed, true)}
+                          className={`w-4 h-4 rounded border flex-shrink-0 mt-0.5 flex items-center justify-center text-xs ${
+                            todo.completed 
+                              ? 'bg-green-500 border-green-500 text-white' 
+                              : 'border-stone-500'
+                          }`}
+                        >
+                          {todo.completed && '✓'}
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <span className={`text-xs block ${todo.completed ? 'text-stone-500 line-through' : 'text-stone-300'}`}>
+                            {todo.text}
+                          </span>
+                        </div>
+                        {todo.priority === 'high' && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">urgent</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* PROJECT TO-DOs - One section per project */}
+            {projects.map((project) => (
+              <div 
+                key={project.id}
+                className="rounded-lg overflow-hidden mb-4" 
+                style={{ border: `1px solid ${project.color.border}` }}
+              >
+                <div 
+                  className="px-3 py-2 flex justify-between items-center"
+                  style={{ background: project.color.bg }}
+                >
+                  <h3 className="text-white font-medium text-sm truncate">📋 {project.name}</h3>
+                  <button
+                    onClick={() => navigate(`/project/${project.id}?tab=Checklist`)}
+                    className="text-white/70 hover:text-white text-xs"
+                  >
+                    View →
+                  </button>
+                </div>
+                <div className="p-2 bg-[#0f0f1a] max-h-40 overflow-y-auto">
+                  {!projectTodos[project.id] || projectTodos[project.id].length === 0 ? (
+                    <div className="text-stone-500 text-center py-2 text-xs">No tasks for this project</div>
                   ) : (
-                    <div className="space-y-2">
-                      {companyTodos.map((todo) => (
+                    <div className="space-y-1">
+                      {projectTodos[project.id].map((todo) => (
                         <div 
                           key={todo.id}
-                          className="flex items-start gap-3 p-2 rounded-lg transition-all"
-                          style={{
-                            background: todo.completed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(139, 115, 85, 0.1)',
-                            border: `1px solid ${todo.completed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(139, 115, 85, 0.3)'}`,
-                          }}
+                          onClick={() => handleTodoClick(project.id, todo.item_id)}
+                          className="flex items-start gap-2 p-2 rounded transition-all hover:bg-[#8b7355]/20 cursor-pointer"
+                          title={todo.item_id ? "Click to view in Checklist" : ""}
                         >
                           <button
-                            onClick={() => toggleTodoComplete(todo.id, todo.completed)}
-                            className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTodoComplete(todo.id, todo.completed, false, project.id);
+                            }}
+                            className={`w-4 h-4 rounded border flex-shrink-0 mt-0.5 flex items-center justify-center text-xs ${
                               todo.completed 
                                 ? 'bg-green-500 border-green-500 text-white' 
-                                : 'border-stone-500 hover:border-stone-400'
+                                : 'border-stone-500'
                             }`}
                           >
                             {todo.completed && '✓'}
                           </button>
                           <div className="flex-1 min-w-0">
-                            <span className={`text-sm block ${todo.completed ? 'text-stone-500 line-through' : 'text-stone-300'}`}>
+                            <span className={`text-xs block ${todo.completed ? 'text-stone-500 line-through' : 'text-stone-300'}`}>
                               {todo.text}
                             </span>
-                            {todo.deadline && (
-                              <span className="text-xs text-stone-500">
-                                📅 {new Date(todo.deadline).toLocaleDateString()}
-                              </span>
+                            {todo.item_id && (
+                              <span className="text-[10px] text-[#d4af37]">🔗 Linked to item</span>
                             )}
                           </div>
-                          {todo.priority && (
-                            <span className={`text-xs px-2 py-0.5 rounded flex-shrink-0 ${
-                              todo.priority === 'high' ? 'bg-red-500/20 text-red-400' :
-                              todo.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-stone-500/20 text-stone-400'
-                            }`}>
-                              {todo.priority}
-                            </span>
-                          )}
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
               </div>
-            )}
-
-            {/* CALENDAR - Right Column */}
-            {(!expandedSection || expandedSection === 'calendar') && (
-              <div 
-                className={`rounded-lg overflow-hidden ${expandedSection === 'calendar' ? 'col-span-1' : ''}`}
-                style={{
-                  background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
-                  border: '1px solid #8b7355',
-                  minHeight: expandedSection === 'calendar' ? '70vh' : '400px'
-                }}
-              >
-                <div className="flex items-center justify-between p-3 border-b border-[#8b7355]/50">
-                  <h3 className="text-lg font-medium text-[#D4C5A9] flex items-center gap-2">
-                    📅 Calendar
-                  </h3>
-                  <button
-                    onClick={() => setExpandedSection(expandedSection === 'calendar' ? null : 'calendar')}
-                    className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
-                    style={{ background: 'rgba(139, 115, 85, 0.2)' }}
-                  >
-                    {expandedSection === 'calendar' ? '⊟ Collapse' : '⊞ Expand'}
-                  </button>
-                </div>
-                <div className={`p-2 overflow-hidden ${expandedSection === 'calendar' ? '' : ''}`}>
-                  <ProjectCalendar 
-                    compact={expandedSection !== 'calendar'}
-                    onEventClick={(event) => {
-                      if (event.projectId) {
-                        handleNavigation(`/project/${event.projectId}?tab=FF&E`);
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Bottom Navigation Icons */}
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-center gap-2 flex-wrap">
-            {[
-              { icon: '🏠', label: 'Walk', path: projects[0] ? `/project/${projects[0].id}?tab=Walkthrough` : null },
-              { icon: '📋', label: 'Check', path: projects[0] ? `/project/${projects[0].id}?tab=Checklist` : null },
-              { icon: '📊', label: 'FF&E', path: projects[0] ? `/project/${projects[0].id}?tab=FF%26E` : null },
-              { icon: '🧮', label: 'Calc', path: '/calculators' },
-              { icon: '👥', label: 'Contacts', path: '/master-contacts' },
-              { icon: '📦', label: 'Materials', path: '/master-materials' },
-              { icon: '🤖', label: 'AI', path: '/ai-assistant' },
-            ].map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => item.path ? handleNavigation(item.path) : alert('No projects available')}
-                className="text-stone-400 hover:text-white p-2 rounded-lg transition-all hover:bg-[#8b7355]/20"
-                style={{ border: '1px solid rgba(139, 115, 85, 0.3)' }}
-              >
-                <div className="text-lg">{item.icon}</div>
-                <div className="text-xs">{item.label}</div>
-              </button>
             ))}
           </div>
         </div>
