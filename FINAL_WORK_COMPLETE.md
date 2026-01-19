@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://bugbuster-77.preview.emergentagent.com
+https://devdoctors.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://bugbuster-77.preview.emergentagent.com/mobile-app
+https://devdoctors.preview.emergentagent.com/mobile-app
 
 ---
 

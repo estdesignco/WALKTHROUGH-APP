@@ -57,7 +57,7 @@ Full-stack interior design project management application with multiple spreadsh
 9. ✅ Live Sync - Desktop ↔ Mobile
 
 ### Chrome Extension v7.14.0 (January 15, 2026)
-Download: https://bugbuster-77.preview.emergentagent.com/chrome-extension-scraper.zip
+Download: https://devdoctors.preview.emergentagent.com/chrome-extension-scraper.zip
 
 **New in v7.14.0: Quick Paste URL**
 - Added "📋 QUICK PASTE URL" button to the scraper panel
@@ -109,12 +109,12 @@ To complete calendar integration, add these redirect URIs:
 **Google Cloud Console:**
 - Go to: https://console.cloud.google.com/apis/credentials
 - Click on your OAuth client
-- Add redirect URI: `https://bugbuster-77.preview.emergentagent.com/api/auth/google/callback`
+- Add redirect URI: `https://devdoctors.preview.emergentagent.com/api/auth/google/callback`
 
 **Azure Portal:**
 - Go to: https://portal.azure.com
 - App registrations → Your app → Authentication
-- Add redirect URI: `https://bugbuster-77.preview.emergentagent.com/api/auth/outlook/callback`
+- Add redirect URI: `https://devdoctors.preview.emergentagent.com/api/auth/outlook/callback`
 
 ---
 
@@ -149,7 +149,7 @@ To complete calendar integration, add these redirect URIs:
    - Highlights disappear when tasks are completed
 
 6. **Chrome Extension v7.12.0** - Fixed and updated:
-   - URL: https://bugbuster-77.preview.emergentagent.com
+   - URL: https://devdoctors.preview.emergentagent.com
    - Download: /chrome-extension-scraper.zip
 
 ### Files Modified

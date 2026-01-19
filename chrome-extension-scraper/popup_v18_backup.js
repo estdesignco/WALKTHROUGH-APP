@@ -9,8 +9,8 @@ console.log('██  SCRAPER VERSION 18.0.0 - FINAL COMBINED                   �
 console.log('██  Swatch: v16 logic | Main Image: v10 logic                 ██');
 console.log('████████████████████████████████████████████████████████████████');
 
-const APP_URL = 'https://bugbuster-77.preview.emergentagent.com';
-const BACKEND_URL = 'https://bugbuster-77.preview.emergentagent.com';
+const APP_URL = 'https://devdoctors.preview.emergentagent.com';
+const BACKEND_URL = 'https://devdoctors.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

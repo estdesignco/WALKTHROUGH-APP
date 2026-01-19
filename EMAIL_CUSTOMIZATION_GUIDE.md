@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://bugbuster-77.preview.emergentagent.com/email-template.html
+https://devdoctors.preview.emergentagent.com/email-template.html
 
 ---
 

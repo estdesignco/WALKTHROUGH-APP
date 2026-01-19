@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://bugbuster-77.preview.emergentagent.com/api
+https://devdoctors.preview.emergentagent.com/api
 ```
 
 ---

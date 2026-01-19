@@ -21,7 +21,7 @@ from datetime import datetime
 import uuid
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://bugbuster-77.preview.emergentagent.com/api"
+BACKEND_URL = "https://devdoctors.preview.emergentagent.com/api"
 
 class CorrectedBackendTester:
     def __init__(self):

@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://bugbuster-77.preview.emergentagent.com';
+const BACKEND_URL = 'https://devdoctors.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

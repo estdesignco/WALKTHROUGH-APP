@@ -13969,7 +13969,7 @@ async def generate_electrician_sheet(project_id: str):
             .bulb-summary {{ background: #FEF3C7; border: 3px solid #B45309; padding: 20px; margin: 20px 0; border-radius: 10px; }}
             .bulb-count {{ font-size: 36px; font-weight: bold; color: #B45309; }}
         </style></head><body>
-        <div class="logo"><img src="https://bugbuster-77.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <div class="logo"><img src="https://devdoctors.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         <h1>💡 ELECTRICIAN INSTALLATION SHEET</h1>
         <h2>{project.get('name', 'Project')} - {project.get('client_info', {}).get('full_name', '')}</h2>
         
@@ -14069,7 +14069,7 @@ async def generate_load_in_sheets(project_id: str):
             .item-remarks {{ font-size: 11px; color: #666; margin-top: 8px; padding: 5px; background: #f5f5f5; border-radius: 4px; text-align: left; }}
             .item-install {{ font-size: 11px; color: #059669; margin-top: 5px; padding: 5px; background: #ecfdf5; border-radius: 4px; text-align: left; font-weight: bold; }}
         </style></head><body>
-        <div class="logo"><img src="https://bugbuster-77.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <div class="logo"><img src="https://devdoctors.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         {pages_html}</body></html>"""
         
         return Response(content=html, media_type="text/html")
@@ -14152,7 +14152,7 @@ async def generate_movers_ffe(project_id: str):
             .room-header-row {{ background: black !important; }}
             .room-header-row td {{ color: white; font-weight: bold; font-size: 16px; padding: 12px; text-align: center; }}
         </style></head><body>
-        <div class="logo"><img src="https://bugbuster-77.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
+        <div class="logo"><img src="https://devdoctors.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co."></div>
         <h1>MOVER'S INVENTORY - {project.get('name', 'Project')}</h1>
         <p style="text-align: center;"><strong>Total Items:</strong> {row_num - 1}</p>
         <table><thead><tr><th>IMAGE</th><th>ROOM</th><th>ITEM</th><th>VENDOR</th><th>SIZE/FINISH</th><th>QTY</th><th>REMARKS</th><th>✓</th></tr></thead>
@@ -14443,7 +14443,7 @@ async def generate_customer_sheets(project_id: str, data: dict = None):
 <body>
     <div class="header">
         <div class="logo">
-            <img src="https://bugbuster-77.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co.">
+            <img src="https://devdoctors.preview.emergentagent.com/established-logo.png" alt="ESTABLISHED Design Co.">
         </div>
         <h1>CUSTOMER PRODUCT SHEET</h1>
         <div class="client-name">{client_name} - {project_name}</div>
