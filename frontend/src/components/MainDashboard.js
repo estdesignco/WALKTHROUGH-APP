@@ -410,7 +410,7 @@ const MainDashboard = () => {
         </div>
 
         {/* MAIN CALENDAR SECTION */}
-        <div className="max-w-6xl mx-auto mb-12">
+        <div className="max-w-6xl mx-auto mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-light text-stone-400">Project Calendar</h2>
             <button
@@ -432,6 +432,106 @@ const MainDashboard = () => {
                 }
               }}
             />
+          )}
+        </div>
+
+        {/* MASTER TO-DO LIST SECTION - READ ONLY VIEW (Protected) */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-light text-stone-400">Master To-Do List</h2>
+              <span className="text-xs text-stone-500 bg-stone-800 px-2 py-1 rounded">
+                {companyTodos.filter(t => !t.completed).length} active
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleNavigation('/master-todo')}
+                className="text-stone-400 hover:text-white px-3 py-2 rounded-lg transition-all text-sm"
+                style={{
+                  background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
+                  border: '1px solid #8B5CF6',
+                }}
+              >
+                📝 Edit Full List
+              </button>
+              <button
+                onClick={() => setShowTodoList(!showTodoList)}
+                className="text-stone-400 hover:text-white px-4 py-2 rounded-lg transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
+                  border: '1px solid #8b7355',
+                }}
+              >
+                {showTodoList ? '▼ Hide To-Do' : '▶ Show To-Do'}
+              </button>
+            </div>
+          </div>
+          {showTodoList && (
+            <div 
+              className="rounded-lg p-4"
+              style={{
+                background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
+                border: '1px solid #8b7355',
+              }}
+            >
+              {todosLoading ? (
+                <div className="text-stone-400 text-center py-4">Loading to-dos...</div>
+              ) : companyTodos.length === 0 ? (
+                <div className="text-stone-500 text-center py-4">No to-do items yet. Click "Edit Full List" to add items.</div>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {companyTodos.slice(0, 10).map((todo) => (
+                    <div 
+                      key={todo.id}
+                      className="flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-stone-800/50"
+                      style={{
+                        background: todo.completed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(139, 115, 85, 0.1)',
+                        border: `1px solid ${todo.completed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(139, 115, 85, 0.3)'}`,
+                      }}
+                    >
+                      <button
+                        onClick={() => toggleTodoComplete(todo.id, todo.completed)}
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                          todo.completed 
+                            ? 'bg-green-500 border-green-500 text-white' 
+                            : 'border-stone-500 hover:border-stone-400'
+                        }`}
+                      >
+                        {todo.completed && '✓'}
+                      </button>
+                      <div className="flex-1">
+                        <span className={`text-sm ${todo.completed ? 'text-stone-500 line-through' : 'text-stone-300'}`}>
+                          {todo.text}
+                        </span>
+                        {todo.deadline && (
+                          <span className="ml-2 text-xs text-stone-500">
+                            📅 {new Date(todo.deadline).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                      {todo.priority && (
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          todo.priority === 'high' ? 'bg-red-500/20 text-red-400' :
+                          todo.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-stone-500/20 text-stone-400'
+                        }`}>
+                          {todo.priority}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                  {companyTodos.length > 10 && (
+                    <button
+                      onClick={() => handleNavigation('/master-todo')}
+                      className="w-full text-center text-sm text-stone-400 hover:text-white py-2"
+                    >
+                      View all {companyTodos.length} items →
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </div>
 
