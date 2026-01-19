@@ -759,7 +759,9 @@ async function sendToApp() {
     // Go directly to the selected project's checklist
     const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
     
-    window.open(projectUrl, '_blank');
+    // Reuse existing Design Ready tab if open, otherwise open new one
+    const targetName = 'design_ready_app';
+    window.open(projectUrl, targetName);
     showStatus('Sent to project!', 'success');
   } catch(e) { showStatus('Failed', 'error'); }
   finally { sendBtn.disabled = false; sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>'; }
