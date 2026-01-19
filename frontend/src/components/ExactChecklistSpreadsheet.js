@@ -453,18 +453,32 @@ const ExactChecklistSpreadsheet = ({
     setFilteredProject(filtered);
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
-  // Initialize all rooms and categories as expanded
-  // Also initialize checkedItems with items that have 'PICKED' status
+  // Initialize checkedItems with items that have 'PICKED' status
+  // PRESERVE collapsed state from localStorage - only set defaults for NEW rooms/categories
   useEffect(() => {
     if (project?.rooms) {
-      const roomExpansion = {};
-      const categoryExpansion = {};
       const initialCheckedItems = new Set();
       
+      // Get saved states from localStorage
+      const savedRoomExpansion = localStorage.getItem('checklist_expandedRooms');
+      const savedCategoryExpansion = localStorage.getItem('checklist_expandedCategories');
+      const existingRoomState = savedRoomExpansion ? JSON.parse(savedRoomExpansion) : {};
+      const existingCategoryState = savedCategoryExpansion ? JSON.parse(savedCategoryExpansion) : {};
+      
+      // Only set expansion state for rooms/categories that don't have a saved state
+      const roomExpansion = { ...existingRoomState };
+      const categoryExpansion = { ...existingCategoryState };
+      
       project.rooms.forEach(room => {
-        roomExpansion[room.id] = true;
+        // Only default to expanded if no saved state exists for this room
+        if (roomExpansion[room.id] === undefined) {
+          roomExpansion[room.id] = true;
+        }
         room.categories?.forEach(category => {
-          categoryExpansion[category.id] = true;
+          // Only default to expanded if no saved state exists for this category
+          if (categoryExpansion[category.id] === undefined) {
+            categoryExpansion[category.id] = true;
+          }
           // Initialize checkedItems with PICKED status items
           category.subcategories?.forEach(subcategory => {
             subcategory.items?.forEach(item => {
