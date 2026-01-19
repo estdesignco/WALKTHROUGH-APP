@@ -187,143 +187,30 @@ const MainDashboard = () => {
   return (
     <div className="min-h-screen bg-black">
       {/* Gold Header with Full-Width Logo */}
-      <div className="w-full h-32" style={{ 
+      <div className="w-full h-24" style={{ 
         background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
         boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
       }}>
         <div className="flex items-center justify-center h-full relative px-8">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 animate-pulse"></div>
           <img 
             src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
             alt="ESTABLISHEDDESIGN CO." 
-            className="w-full h-20 object-contain filter drop-shadow-lg"
-            style={{
-              filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.2))',
-              maxWidth: '100%'
-            }}
+            className="h-16 object-contain filter drop-shadow-lg"
+            style={{ filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4))' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-transparent to-yellow-400 opacity-5 animate-pulse"></div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="px-8 py-12">
-        {/* Navigation Links at Top - COMPACT GRID */}
-        <div className="max-w-6xl mx-auto mb-6 grid grid-cols-4 md:grid-cols-8 gap-2">
-          <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Walkthrough`) : alert('No projects available')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">🏠</div>
-            <div className="text-xs">Walkthrough</div>
-          </button>
-          
-          <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Checklist`) : alert('No projects available')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">📋</div>
-            <div className="text-xs">Checklist</div>
-          </button>
-          
-          <button
-            onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=FF&E`) : alert('No projects available')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">📊</div>
-            <div className="text-xs">FF&E</div>
-          </button>
-
-          <button
-            onClick={() => handleNavigation('/calculators')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">🧮</div>
-            <div className="text-xs">Calculators</div>
-          </button>
-
-          <button
-            onClick={() => handleNavigation('/master-contacts')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">👥</div>
-            <div className="text-xs">Contacts</div>
-          </button>
-
-          <button
-            onClick={() => handleNavigation('/master-materials')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">📦</div>
-            <div className="text-xs">Materials</div>
-          </button>
-
-          <button
-            onClick={() => handleNavigation('/master-todo')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">✅</div>
-            <div className="text-xs">To-Do</div>
-          </button>
-
-          <button
-            onClick={() => handleNavigation('/ai-assistant')}
-            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
-            style={{
-              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
-              border: '1px solid #8b7355',
-            }}
-          >
-            <div className="text-lg">🤖</div>
-            <div className="text-xs">AI</div>
-          </button>
-        </div>
-
-        {/* Three Main Action Buttons - FULL SIZE */}
-        <div className="flex justify-center space-x-4 mb-8">
+      <div className="px-4 py-4">
+        {/* Top Action Buttons */}
+        <div className="flex justify-center gap-3 mb-4">
           <button 
             onClick={() => handleNavigation('/customer')}
-            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
+            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-              filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)',
             }}
           >
             <span>+</span>
@@ -331,48 +218,30 @@ const MainDashboard = () => {
           </button>
           <button 
             onClick={() => setShowEmailModal(true)}
-            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
+            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-              filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)',
             }}
           >
             <span>📧</span>
-            <span>Email New Client</span>
+            <span>Email Client</span>
           </button>
           <button 
             onClick={() => handleNavigation('/customer/questionnaire')}
-            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
+            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
             style={{
               background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-              filter: 'drop-shadow(0 0 5px rgba(212, 175, 55, 0.3))'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3)',
             }}
           >
             <span>📋</span>
-            <span>Full Questionnaire</span>
+            <span>Questionnaire</span>
           </button>
           <button 
             onClick={async () => {
               try {
-                const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+                const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
                 const response = await fetch(`${BACKEND_URL}/api/backup/full`);
                 if (response.ok) {
                   const blob = await response.blob();
@@ -384,318 +253,312 @@ const MainDashboard = () => {
                   a.click();
                   window.URL.revokeObjectURL(url);
                   a.remove();
-                  alert('✅ Backup downloaded! Upload this file to Google Drive for safekeeping.');
-                } else {
-                  throw new Error('Backup failed');
+                  alert('✅ Backup downloaded!');
                 }
               } catch (error) {
                 alert('❌ Backup failed: ' + error.message);
               }
             }}
-            className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
+            className="text-white px-6 py-2 rounded-full font-medium transition-all duration-200 flex items-center gap-2 hover:scale-105"
             style={{
-              background: `linear-gradient(135deg, #2d5016 0%, #3d6b1f 50%, #2d5016 100%)`,
-              boxShadow: '0 4px 15px rgba(45, 80, 22, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-              filter: 'drop-shadow(0 0 5px rgba(61, 107, 31, 0.3))'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 6px 20px rgba(45, 80, 22, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 15px rgba(45, 80, 22, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+              background: `linear-gradient(135deg, #2d5016 0%, #3d6b1f 100%)`,
+              boxShadow: '0 4px 15px rgba(45, 80, 22, 0.3)',
             }}
           >
             <span>💾</span>
-            <span>Backup Data</span>
+            <span>Backup</span>
           </button>
         </div>
 
-        {/* MAIN CALENDAR SECTION */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-light text-stone-400">Project Calendar</h2>
-            <button
-              onClick={() => setShowCalendar(!showCalendar)}
-              className="text-stone-400 hover:text-white px-4 py-2 rounded-lg transition-all"
-              style={{
-                background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
-                border: '1px solid #8b7355',
-              }}
-            >
-              {showCalendar ? '▼ Hide Calendar' : '▶ Show Calendar'}
-            </button>
-          </div>
-          {showCalendar && (
-            <ProjectCalendar 
-              onEventClick={(event) => {
-                if (event.projectId) {
-                  handleNavigation(`/project/${event.projectId}?tab=FF&E`);
-                }
-              }}
-            />
-          )}
-        </div>
-
-        {/* MASTER TO-DO LIST SECTION - READ ONLY VIEW (Protected) */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <h2 className="text-2xl font-light text-stone-400">Master To-Do List</h2>
-              <span className="text-xs text-stone-500 bg-stone-800 px-2 py-1 rounded">
-                {companyTodos.filter(t => !t.completed).length} active
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handleNavigation('/master-todo')}
-                className="text-stone-400 hover:text-white px-3 py-2 rounded-lg transition-all text-sm"
+        {/* THREE-COLUMN LAYOUT - Customer Files | To-Do | Calendar */}
+        <div className={`mx-auto mb-4 ${expandedSection ? 'max-w-6xl' : 'max-w-7xl'}`}>
+          <div className={`grid gap-4 ${expandedSection ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-3'}`}>
+            
+            {/* CUSTOMER FILES - Left Column */}
+            {(!expandedSection || expandedSection === 'files') && (
+              <div 
+                className={`rounded-lg overflow-hidden ${expandedSection === 'files' ? 'col-span-1' : ''}`}
                 style={{
-                  background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)',
-                  border: '1px solid #8B5CF6',
-                }}
-              >
-                📝 Edit Full List
-              </button>
-              <button
-                onClick={() => setShowTodoList(!showTodoList)}
-                className="text-stone-400 hover:text-white px-4 py-2 rounded-lg transition-all"
-                style={{
-                  background: 'linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)',
+                  background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
                   border: '1px solid #8b7355',
+                  minHeight: expandedSection === 'files' ? '70vh' : '400px'
                 }}
               >
-                {showTodoList ? '▼ Hide To-Do' : '▶ Show To-Do'}
-              </button>
-            </div>
-          </div>
-          {showTodoList && (
-            <div 
-              className="rounded-lg p-4"
-              style={{
-                background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
-                border: '1px solid #8b7355',
-              }}
-            >
-              {todosLoading ? (
-                <div className="text-stone-400 text-center py-4">Loading to-dos...</div>
-              ) : companyTodos.length === 0 ? (
-                <div className="text-stone-500 text-center py-4">No to-do items yet. Click "Edit Full List" to add items.</div>
-              ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {companyTodos.slice(0, 10).map((todo) => (
-                    <div 
-                      key={todo.id}
-                      className="flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-stone-800/50"
-                      style={{
-                        background: todo.completed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(139, 115, 85, 0.1)',
-                        border: `1px solid ${todo.completed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(139, 115, 85, 0.3)'}`,
-                      }}
-                    >
-                      <button
-                        onClick={() => toggleTodoComplete(todo.id, todo.completed)}
-                        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                          todo.completed 
-                            ? 'bg-green-500 border-green-500 text-white' 
-                            : 'border-stone-500 hover:border-stone-400'
-                        }`}
-                      >
-                        {todo.completed && '✓'}
-                      </button>
-                      <div className="flex-1">
-                        <span className={`text-sm ${todo.completed ? 'text-stone-500 line-through' : 'text-stone-300'}`}>
-                          {todo.text}
-                        </span>
-                        {todo.deadline && (
-                          <span className="ml-2 text-xs text-stone-500">
-                            📅 {new Date(todo.deadline).toLocaleDateString()}
-                          </span>
-                        )}
-                      </div>
-                      {todo.priority && (
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          todo.priority === 'high' ? 'bg-red-500/20 text-red-400' :
-                          todo.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                          'bg-stone-500/20 text-stone-400'
-                        }`}>
-                          {todo.priority}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                  {companyTodos.length > 10 && (
-                    <button
-                      onClick={() => handleNavigation('/master-todo')}
-                      className="w-full text-center text-sm text-stone-400 hover:text-white py-2"
-                    >
-                      View all {companyTodos.length} items →
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Studio Projects Title - Moved Below */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-light text-stone-400 mb-2">Studio Projects</h2>
-          <div className="w-16 h-px bg-stone-600 mx-auto"></div>
-        </div>
-
-        {/* Project Cards */}
-        <div className="max-w-4xl mx-auto space-y-4">
-          {!loading && projects.map((project) => (
-            <div 
-              key={project.id}
-              onClick={() => handleProjectClick(project.id)}
-              className="rounded-lg p-6 cursor-pointer transition-all duration-200"
-              style={{
-                background: `linear-gradient(135deg, #000000 0%, #0a0a1a 30%, #1a1a2e 60%, #0a0a1a 100%)`,
-                border: '1px solid #8b7355',
-                boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.borderColor = '#d4af37';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(139, 115, 85, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05)';
-                e.currentTarget.style.borderColor = '#8b7355';
-              }}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center space-x-3">
-                  <h3 className="text-xl text-stone-300 font-medium">{project.name}</h3>
+                <div className="flex items-center justify-between p-3 border-b border-[#8b7355]/50">
+                  <h3 className="text-lg font-medium text-[#D4C5A9] flex items-center gap-2">
+                    📁 Customer Files
+                    <span className="text-xs bg-[#8b7355]/30 px-2 py-0.5 rounded">{projects.length}</span>
+                  </h3>
                   <button
-                    onClick={(e) => handleDeleteProject(project.id, project.name, e)}
-                    className="text-red-400 hover:text-red-300 transition-colors duration-200 text-sm"
-                    title="Delete Project"
+                    onClick={() => setExpandedSection(expandedSection === 'files' ? null : 'files')}
+                    className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
+                    style={{ background: 'rgba(139, 115, 85, 0.2)' }}
                   >
-                    🗑️
+                    {expandedSection === 'files' ? '⊟ Collapse' : '⊞ Expand'}
                   </button>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-stone-500">Last Updated</span>
-                  <div className="w-4 h-4 bg-stone-600 rounded"></div>
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center mb-4">
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-stone-500">Client:</span>
-                    <span className="text-sm text-stone-300">{project.clientName}</span>
-                  </div>
-                  {project.address && (
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm text-stone-500">Address:</span>
-                      <span className="text-sm text-stone-300">{project.address}</span>
+                <div className={`p-3 overflow-y-auto ${expandedSection === 'files' ? 'max-h-[65vh]' : 'max-h-[340px]'}`}>
+                  {loading ? (
+                    <div className="text-stone-400 text-center py-4">Loading...</div>
+                  ) : projects.length === 0 ? (
+                    <div className="text-stone-500 text-center py-4">No projects yet</div>
+                  ) : (
+                    <div className="space-y-2">
+                      {projects.map((project) => (
+                        <div 
+                          key={project.id}
+                          onClick={() => handleProjectClick(project.id)}
+                          className="p-3 rounded-lg cursor-pointer transition-all hover:scale-[1.02]"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(139, 115, 85, 0.15) 0%, rgba(139, 115, 85, 0.05) 100%)',
+                            border: '1px solid rgba(139, 115, 85, 0.3)',
+                          }}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="text-stone-200 font-medium">{project.name}</div>
+                              <div className="text-stone-400 text-sm">{project.clientName}</div>
+                              {project.address && (
+                                <div className="text-stone-500 text-xs mt-1">{project.address}</div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                              <button
+                                onClick={(e) => handleDeleteProject(project.id, project.name, e)}
+                                className="text-red-400/50 hover:text-red-400 text-sm"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          </div>
+                          {expandedSection === 'files' && (
+                            <div className="flex gap-2 mt-3 pt-2 border-t border-[#8b7355]/30">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=Walkthrough`); }}
+                                className="text-xs px-2 py-1 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
+                              >
+                                Walkthrough
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=Checklist`); }}
+                                className="text-xs px-2 py-1 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
+                              >
+                                Checklist
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); navigate(`/project/${project.id}?tab=FF%26E`); }}
+                                className="text-xs px-2 py-1 rounded bg-[#8b7355]/30 text-stone-300 hover:bg-[#8b7355]/50"
+                              >
+                                FF&E
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
-                
-                <div className="text-right space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-stone-300">{project.status}</span>
+              </div>
+            )}
+
+            {/* TO-DO LIST - Center Column */}
+            {(!expandedSection || expandedSection === 'todo') && (
+              <div 
+                className={`rounded-lg overflow-hidden ${expandedSection === 'todo' ? 'col-span-1' : ''}`}
+                style={{
+                  background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
+                  border: '1px solid #8b7355',
+                  minHeight: expandedSection === 'todo' ? '70vh' : '400px'
+                }}
+              >
+                <div className="flex items-center justify-between p-3 border-b border-[#8b7355]/50">
+                  <h3 className="text-lg font-medium text-[#D4C5A9] flex items-center gap-2">
+                    ✅ To-Do List
+                    <span className="text-xs bg-[#8b7355]/30 px-2 py-0.5 rounded">
+                      {companyTodos.filter(t => !t.completed).length} active
+                    </span>
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleNavigation('/master-todo')}
+                      className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
+                      style={{ background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' }}
+                    >
+                      📝 Edit
+                    </button>
+                    <button
+                      onClick={() => setExpandedSection(expandedSection === 'todo' ? null : 'todo')}
+                      className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
+                      style={{ background: 'rgba(139, 115, 85, 0.2)' }}
+                    >
+                      {expandedSection === 'todo' ? '⊟ Collapse' : '⊞ Expand'}
+                    </button>
                   </div>
-                  <div className="text-sm text-stone-500">Created {project.createdDate}</div>
+                </div>
+                <div className={`p-3 overflow-y-auto ${expandedSection === 'todo' ? 'max-h-[65vh]' : 'max-h-[340px]'}`}>
+                  {todosLoading ? (
+                    <div className="text-stone-400 text-center py-4">Loading...</div>
+                  ) : companyTodos.length === 0 ? (
+                    <div className="text-stone-500 text-center py-4">No to-do items</div>
+                  ) : (
+                    <div className="space-y-2">
+                      {companyTodos.map((todo) => (
+                        <div 
+                          key={todo.id}
+                          className="flex items-start gap-3 p-2 rounded-lg transition-all"
+                          style={{
+                            background: todo.completed ? 'rgba(34, 197, 94, 0.1)' : 'rgba(139, 115, 85, 0.1)',
+                            border: `1px solid ${todo.completed ? 'rgba(34, 197, 94, 0.3)' : 'rgba(139, 115, 85, 0.3)'}`,
+                          }}
+                        >
+                          <button
+                            onClick={() => toggleTodoComplete(todo.id, todo.completed)}
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                              todo.completed 
+                                ? 'bg-green-500 border-green-500 text-white' 
+                                : 'border-stone-500 hover:border-stone-400'
+                            }`}
+                          >
+                            {todo.completed && '✓'}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <span className={`text-sm block ${todo.completed ? 'text-stone-500 line-through' : 'text-stone-300'}`}>
+                              {todo.text}
+                            </span>
+                            {todo.deadline && (
+                              <span className="text-xs text-stone-500">
+                                📅 {new Date(todo.deadline).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          {todo.priority && (
+                            <span className={`text-xs px-2 py-0.5 rounded flex-shrink-0 ${
+                              todo.priority === 'high' ? 'bg-red-500/20 text-red-400' :
+                              todo.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                              'bg-stone-500/20 text-stone-400'
+                            }`}>
+                              {todo.priority}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-              
-              {/* Project Action Buttons */}
-              <div className="flex space-x-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/walkthrough/${project.id}`);
-                  }}
-                  className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs transition-colors duration-200"
-                >
-                  Walkthrough
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/checklist/${project.id}`);
-                  }}
-                  className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs transition-colors duration-200"
-                >
-                  Checklist
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/ffe/${project.id}`);
-                  }}
-                  className="bg-amber-700 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs transition-colors duration-200"
-                >
-                  FF&E
-                </button>
+            )}
+
+            {/* CALENDAR - Right Column */}
+            {(!expandedSection || expandedSection === 'calendar') && (
+              <div 
+                className={`rounded-lg overflow-hidden ${expandedSection === 'calendar' ? 'col-span-1' : ''}`}
+                style={{
+                  background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
+                  border: '1px solid #8b7355',
+                  minHeight: expandedSection === 'calendar' ? '70vh' : '400px'
+                }}
+              >
+                <div className="flex items-center justify-between p-3 border-b border-[#8b7355]/50">
+                  <h3 className="text-lg font-medium text-[#D4C5A9] flex items-center gap-2">
+                    📅 Calendar
+                  </h3>
+                  <button
+                    onClick={() => setExpandedSection(expandedSection === 'calendar' ? null : 'calendar')}
+                    className="text-stone-400 hover:text-white px-2 py-1 rounded transition-all text-sm"
+                    style={{ background: 'rgba(139, 115, 85, 0.2)' }}
+                  >
+                    {expandedSection === 'calendar' ? '⊟ Collapse' : '⊞ Expand'}
+                  </button>
+                </div>
+                <div className={`p-2 overflow-hidden ${expandedSection === 'calendar' ? '' : ''}`}>
+                  <ProjectCalendar 
+                    compact={expandedSection !== 'calendar'}
+                    onEventClick={(event) => {
+                      if (event.projectId) {
+                        handleNavigation(`/project/${event.projectId}?tab=FF&E`);
+                      }
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
-          
-          {loading && (
-            <div className="text-center text-stone-400 py-8">
-              <p className="text-lg">Loading projects...</p>
-            </div>
-          )}
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Navigation Icons */}
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-center gap-2 flex-wrap">
+            {[
+              { icon: '🏠', label: 'Walk', path: projects[0] ? `/project/${projects[0].id}?tab=Walkthrough` : null },
+              { icon: '📋', label: 'Check', path: projects[0] ? `/project/${projects[0].id}?tab=Checklist` : null },
+              { icon: '📊', label: 'FF&E', path: projects[0] ? `/project/${projects[0].id}?tab=FF%26E` : null },
+              { icon: '🧮', label: 'Calc', path: '/calculators' },
+              { icon: '👥', label: 'Contacts', path: '/master-contacts' },
+              { icon: '📦', label: 'Materials', path: '/master-materials' },
+              { icon: '🤖', label: 'AI', path: '/ai-assistant' },
+            ].map((item, idx) => (
+              <button
+                key={idx}
+                onClick={() => item.path ? handleNavigation(item.path) : alert('No projects available')}
+                className="text-stone-400 hover:text-white p-2 rounded-lg transition-all hover:bg-[#8b7355]/20"
+                style={{ border: '1px solid rgba(139, 115, 85, 0.3)' }}
+              >
+                <div className="text-lg">{item.icon}</div>
+                <div className="text-xs">{item.label}</div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Email Modal */}
       {showEmailModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-semibold text-white mb-4">Email Client Questionnaire</h3>
-            
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div 
+            className="rounded-lg p-6 w-full max-w-md"
+            style={{
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)',
+              border: '1px solid #8b7355',
+            }}
+          >
+            <h3 className="text-xl text-[#D4C5A9] mb-4">Send Questionnaire Email</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Client Name
-                </label>
+                <label className="block text-stone-400 text-sm mb-1">Client Name</label>
                 <input
                   type="text"
                   value={emailData.name}
-                  onChange={(e) => setEmailData({ ...emailData, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                  onChange={(e) => setEmailData({...emailData, name: e.target.value})}
+                  className="w-full bg-black/50 border border-[#8b7355] rounded px-3 py-2 text-white"
                   placeholder="Enter client name"
                 />
               </div>
-              
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email Address
-                </label>
+                <label className="block text-stone-400 text-sm mb-1">Client Email</label>
                 <input
                   type="email"
                   value={emailData.email}
-                  onChange={(e) => setEmailData({ ...emailData, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
-                  placeholder="Enter email address"
+                  onChange={(e) => setEmailData({...emailData, email: e.target.value})}
+                  className="w-full bg-black/50 border border-[#8b7355] rounded px-3 py-2 text-white"
+                  placeholder="Enter client email"
                 />
               </div>
-            </div>
-            
-            <div className="flex space-x-3 mt-6">
-              <button
-                onClick={() => setShowEmailModal(false)}
-                className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSendEmail}
-                disabled={!emailData.email || !emailData.name}
-                className="flex-1 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white rounded-md transition-colors"
-              >
-                Send Questionnaire
-              </button>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => setShowEmailModal(false)}
+                  className="px-4 py-2 rounded text-stone-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendEmail}
+                  className="px-4 py-2 rounded text-white"
+                  style={{ background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 100%)' }}
+                >
+                  Send Questionnaire
+                </button>
+              </div>
             </div>
           </div>
         </div>
