@@ -14,10 +14,11 @@ const MainDashboard = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
   const [extensionData, setExtensionData] = useState(null);
-  const [showCalendar, setShowCalendar] = useState(true);
-  const [showTodoList, setShowTodoList] = useState(true);
   const [companyTodos, setCompanyTodos] = useState([]);
   const [todosLoading, setTodosLoading] = useState(false);
+  
+  // Expandable section state - null means show all three, otherwise shows expanded section
+  const [expandedSection, setExpandedSection] = useState(null); // 'files', 'todo', 'calendar', or null
 
   // Check for extension data in URL params
   useEffect(() => {
