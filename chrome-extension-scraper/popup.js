@@ -789,6 +789,70 @@ async function copyToClipboard() {
   } catch(e){}
 }
 
+// Copy Image with Background Removed
+const copyImageNoBgBtn = document.getElementById('copyImageNoBgBtn');
+copyImageNoBgBtn.addEventListener('click', copyImageNoBg);
+
+async function copyImageNoBg() {
+  if (!scrapedData || !scrapedData.image_url) {
+    showStatus('No image to process!', 'warning');
+    return;
+  }
+  
+  copyImageNoBgBtn.disabled = true;
+  copyImageNoBgBtn.innerHTML = '<span>⏳</span><span>Processing...</span>';
+  showStatus('Removing background...', 'info');
+  
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/remove-background`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image_url: scrapedData.image_url })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Background removal failed');
+    }
+    
+    const data = await response.json();
+    if (data.success && data.image_base64) {
+      // Convert base64 to blob and copy to clipboard
+      const byteString = atob(data.image_base64);
+      const arrayBuffer = new ArrayBuffer(byteString.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([uint8Array], { type: 'image/png' });
+      
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        showStatus('Image copied (no background)!', 'success');
+        copyImageNoBgBtn.innerHTML = '<span>✅</span><span>Copied!</span>';
+      } catch (clipErr) {
+        // Fallback: open image in new tab
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        showStatus('Image opened in new tab', 'success');
+        copyImageNoBgBtn.innerHTML = '<span>✅</span><span>Opened!</span>';
+      }
+    } else {
+      throw new Error('No image data received');
+    }
+  } catch (e) {
+    console.error('BG removal error:', e);
+    showStatus('Background removal failed', 'error');
+    copyImageNoBgBtn.innerHTML = '<span>❌</span><span>Failed</span>';
+  }
+  
+  setTimeout(() => {
+    copyImageNoBgBtn.disabled = false;
+    copyImageNoBgBtn.innerHTML = '<span>🖼️</span><span>Copy Image (No BG)</span>';
+  }, 2000);
+}
+
 // ============================================================================
 // CLICK TO SELECT FUNCTIONALITY
 // ============================================================================
