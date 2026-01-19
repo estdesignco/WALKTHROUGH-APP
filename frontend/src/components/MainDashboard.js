@@ -205,116 +205,107 @@ const MainDashboard = () => {
 
       {/* Main Content */}
       <div className="px-8 py-12">
-        {/* Navigation Links at Top with Thin Gold Borders - Reorganized Menu */}
-        <div className="max-w-6xl mx-auto mb-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {/* Navigation Links at Top - COMPACT GRID */}
+        <div className="max-w-6xl mx-auto mb-6 grid grid-cols-4 md:grid-cols-8 gap-2">
           <button
             onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Walkthrough`) : alert('No projects available')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
             }}
           >
-            <div className="text-2xl mb-2">🏠</div>
-            <div className="text-sm">Walkthrough</div>
+            <div className="text-lg">🏠</div>
+            <div className="text-xs">Walkthrough</div>
           </button>
           
           <button
             onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=Checklist`) : alert('No projects available')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
             }}
           >
-            <div className="text-2xl mb-2">📋</div>
-            <div className="text-sm">Checklist</div>
+            <div className="text-lg">📋</div>
+            <div className="text-xs">Checklist</div>
           </button>
           
           <button
             onClick={() => projects.length > 0 ? handleNavigation(`/project/${projects[0].id}?tab=FF&E`) : alert('No projects available')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
             }}
           >
-            <div className="text-2xl mb-2">📊</div>
-            <div className="text-sm">FF&E</div>
+            <div className="text-lg">📊</div>
+            <div className="text-xs">FF&E</div>
           </button>
 
           <button
             onClick={() => handleNavigation('/calculators')}
-            className="text-stone-300 p-4 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
               background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
               border: '1px solid #8b7355',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.2)'
             }}
           >
-            <div className="text-2xl mb-2">🧮</div>
-            <div className="text-sm">Calculators</div>
+            <div className="text-lg">🧮</div>
+            <div className="text-xs">Calculators</div>
           </button>
 
           <button
             onClick={() => handleNavigation('/master-contacts')}
-            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              border: '1px solid #d4af37',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
             }}
           >
-            <div className="text-2xl mb-2">👥</div>
-            <div className="text-sm font-medium">Master Contacts</div>
+            <div className="text-lg">👥</div>
+            <div className="text-xs">Contacts</div>
           </button>
 
           <button
             onClick={() => handleNavigation('/master-materials')}
-            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              border: '1px solid #d4af37',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
             }}
           >
-            <div className="text-2xl mb-2">📦</div>
-            <div className="text-sm font-medium">Master Materials</div>
+            <div className="text-lg">📦</div>
+            <div className="text-xs">Materials</div>
           </button>
 
           <button
             onClick={() => handleNavigation('/master-todo')}
-            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
-              background: `linear-gradient(135deg, #7C3AED 0%, #6D28D9 50%, #7C3AED 100%)`,
-              border: '1px solid #8B5CF6',
-              boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
             }}
           >
-            <div className="text-2xl mb-2">📋</div>
-            <div className="text-sm font-medium">Master To-Do</div>
+            <div className="text-lg">✅</div>
+            <div className="text-xs">To-Do</div>
           </button>
 
-          {/* AI TOOLS - Same styling as other buttons */}
           <button
             onClick={() => handleNavigation('/ai-assistant')}
-            className="text-white p-4 rounded-lg transition-all duration-200 hover:scale-105"
+            className="text-stone-300 p-2 rounded-lg transition-all duration-200 hover:border-[#d4af37]"
             style={{
-              background: `linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)`,
-              border: '1px solid #d4af37',
-              boxShadow: '0 4px 15px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+              background: `linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%)`,
+              border: '1px solid #8b7355',
             }}
           >
-            <div className="text-2xl mb-2">🤖</div>
-            <div className="text-sm font-medium">AI Assistant</div>
+            <div className="text-lg">🤖</div>
+            <div className="text-xs">AI</div>
           </button>
         </div>
 
-        {/* Three Main Action Buttons - NO BORDERS */}
-        <div className="flex justify-center space-x-4 mb-12">
+        {/* Three Main Action Buttons - FULL SIZE */}
+        <div className="flex justify-center space-x-4 mb-8">
           <button 
             onClick={() => handleNavigation('/customer')}
             className="text-white px-8 py-3 rounded-full font-medium transition-all duration-200 flex items-center space-x-2"
