@@ -84,7 +84,7 @@
   "main": "electron/main.js",
   "author": "Established Design",
   "description": "Interior Design Project Management System",
-  "homepage": "./",
+  "homepage": "/",
   "build": {
     "appId": "com.establisheddesign.ffe",
     "productName": "ESTABLISHED",
