@@ -86,6 +86,18 @@ async def startup_event():
     # except Exception as e:
     #     logger.error(f"Error in startup auto-population: {e}")
     
+    # Create database indexes for faster queries
+    try:
+        await db.rooms.create_index([("project_id", 1), ("sheet_type", 1)])
+        await db.rooms.create_index("project_id")
+        await db.categories.create_index("room_id")
+        await db.subcategories.create_index("category_id")
+        await db.items.create_index("subcategory_id")
+        await db.items.create_index([("subcategory_id", 1), ("created_at", -1)])
+        logger.info("✅ Database indexes created for optimized queries")
+    except Exception as e:
+        logger.warning(f"Index creation skipped (may already exist): {e}")
+    
     # Seed vendor products from JSON files
     try:
         from database_seeder import run_seeder
