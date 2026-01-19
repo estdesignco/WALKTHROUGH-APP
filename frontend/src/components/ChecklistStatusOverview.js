@@ -11,6 +11,18 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses, carrierTypes }) => {
   
+  // Define the progression of statuses - items that reach these are considered "picked"
+  const PICKED_AND_BEYOND = ['PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'SAMPLES ORDERED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION'];
+  
+  // Calculate total picked (items that have been picked and progressed)
+  const getTotalPicked = () => {
+    let total = 0;
+    PICKED_AND_BEYOND.forEach(status => {
+      total += statusBreakdown[status] || 0;
+    });
+    return total;
+  };
+  
   // Convert regular status breakdown to checklist format
   const getChecklistStatusBreakdown = () => {
     const checklistStatuses = {
@@ -18,6 +30,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       'PICKED': { count: 0, color: '#3B82F6' },
       'ORDER SAMPLES': { count: 0, color: '#10B981' },
       'SAMPLES ARRIVED': { count: 0, color: '#8B5CF6' },
+      'SAMPLES ORDERED': { count: 0, color: '#14B8A6' },
       'ASK NEIL': { count: 0, color: '#F59E0B' },
       'ASK CHARLENE': { count: 0, color: '#EF4444' },
       'ASK JALA': { count: 0, color: '#EC4899' },
@@ -43,6 +56,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
   };
 
   const checklistBreakdown = getChecklistStatusBreakdown();
+  const totalPicked = getTotalPicked();
 
   // Carrier colors
   const getCarrierColor = (carrier) => {
