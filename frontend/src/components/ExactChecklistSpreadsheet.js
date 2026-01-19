@@ -2325,7 +2325,35 @@ const ExactChecklistSpreadsheet = ({
                                       >
                                         {isCategoryExpanded ? '▼' : '▶'}
                                       </button>
-                                      <span>{category.name.toUpperCase()}</span>
+                                      <span 
+                                        contentEditable={true}
+                                        suppressContentEditableWarning={true}
+                                        className="outline-none px-1"
+                                        onBlur={async (e) => {
+                                          const newName = e.target.textContent?.trim();
+                                          if (newName && newName.toUpperCase() !== category.name.toUpperCase()) {
+                                            try {
+                                              const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+                                              const response = await fetch(`${backendUrl}/api/categories/${category.id}`, {
+                                                method: 'PUT',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ name: newName.toUpperCase() })
+                                              });
+                                              if (response.ok && onReload) {
+                                                onReload();
+                                              }
+                                            } catch (error) {
+                                              console.error('Failed to update category name:', error);
+                                            }
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            e.target.blur();
+                                          }
+                                        }}
+                                      >{category.name.toUpperCase()}</span>
                                     </div>
                         <div className="flex items-center gap-2">
                           {/* ADD CATEGORY DROPDOWN - FIXED */}
