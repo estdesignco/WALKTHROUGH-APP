@@ -108,8 +108,6 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
 
   // Calculate totals for percentage calculations
   const totalItemsFromStatus = Object.values(checklistBreakdown).reduce((sum, status) => sum + status.count, 0);
-  const totalPicked = Object.values(checklistBreakdown).reduce((sum, status) => 
-    sum + (status.count || 0), 0);
 
   // Prepare data for Status Overview pie chart with shimmer
   const statusPieData = {
