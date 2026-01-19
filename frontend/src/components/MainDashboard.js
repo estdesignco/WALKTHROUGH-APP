@@ -16,6 +16,8 @@ const MainDashboard = () => {
   const [extensionData, setExtensionData] = useState(null);
   const [companyTodos, setCompanyTodos] = useState([]);
   const [todosLoading, setTodosLoading] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [showTodoList, setShowTodoList] = useState(false);
   
   // Expandable section state - null means show all three, otherwise shows expanded section
   const [expandedSection, setExpandedSection] = useState(null); // 'files', 'todo', 'calendar', or null
