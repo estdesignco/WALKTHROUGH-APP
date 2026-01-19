@@ -183,7 +183,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
             {totalItems} Total Items
           </div>
           <div className="text-sm text-[#D4A574] mt-1">
-            ({checklistBreakdown['PICKED']?.count || 0} PICKED - {totalItems > 0 ? Math.round(((checklistBreakdown['PICKED']?.count || 0) / totalItems) * 100) : 0}%)
+            ({totalPicked} PICKED - {totalItems > 0 ? Math.round((totalPicked / totalItems) * 100) : 0}%)
           </div>
         </div>
       </div>
