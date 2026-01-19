@@ -756,15 +756,27 @@ async function sendToApp() {
     if(scrapedData.url) params.set('link',scrapedData.url);
     if(scrapedData.image_url) params.set('image',scrapedData.image_url);
     if(scrapedData.msrp) params.set('msrp',scrapedData.msrp);
+    if(scrapedData.description) params.set('remarks',scrapedData.description);
     
     // Go directly to the selected project's checklist
     const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
     
-    // Reuse existing Design Ready tab if open, otherwise open new one
-    const targetName = 'design_ready_app';
-    window.open(projectUrl, targetName);
+    // Try to find and reuse existing Design Ready tab
+    chrome.tabs.query({url: `${APP_URL}/*`}, function(tabs) {
+      if (tabs && tabs.length > 0) {
+        // Reuse existing tab - update URL and focus it
+        chrome.tabs.update(tabs[0].id, {url: projectUrl, active: true});
+      } else {
+        // No existing tab, create new one
+        chrome.tabs.create({url: projectUrl});
+      }
+    });
     showStatus('Sent to project!', 'success');
-  } catch(e) { showStatus('Failed', 'error'); }
+  } catch(e) { 
+    // Fallback to window.open if chrome.tabs fails
+    window.open(projectUrl, 'design_ready_app');
+    showStatus('Sent to project!', 'success');
+  }
   finally { sendBtn.disabled = false; sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>'; }
 }
 
