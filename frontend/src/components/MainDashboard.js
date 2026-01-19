@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAPI } from '../App';
 import ProjectCalendar from './ProjectCalendar';
+import axios from 'axios';
+
+const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 const MainDashboard = () => {
   const navigate = useNavigate();
@@ -12,6 +15,9 @@ const MainDashboard = () => {
   const [emailData, setEmailData] = useState({ email: '', name: '' });
   const [extensionData, setExtensionData] = useState(null);
   const [showCalendar, setShowCalendar] = useState(true);
+  const [showTodoList, setShowTodoList] = useState(true);
+  const [companyTodos, setCompanyTodos] = useState([]);
+  const [todosLoading, setTodosLoading] = useState(false);
 
   // Check for extension data in URL params
   useEffect(() => {
