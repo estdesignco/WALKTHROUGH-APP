@@ -1855,49 +1855,69 @@ async def get_projects():
 
 @api_router.get("/projects/{project_id}")
 async def get_project(project_id: str, sheet_type: str = None):
-    project_data = await db.projects.find_one({"id": project_id})
+    """OPTIMIZED: Batch fetch all data to avoid N+1 queries"""
+    project_data = await db.projects.find_one({"id": project_id}, {"_id": 0})
     if not project_data:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # CRITICAL FIX: Each sheet_type is COMPLETELY INDEPENDENT
-    # Checklist only shows checklist rooms, FFE only shows FFE rooms, Walkthrough only shows walkthrough rooms
-    # They do NOT share data - deleting from one does NOT affect the other
+    # BATCH FETCH: Get all rooms in ONE query
+    room_query = {"project_id": project_id}
     if sheet_type:
-        # Filter by specific sheet_type - FULLY INDEPENDENT
-        rooms = await db.rooms.find({"project_id": project_id, "sheet_type": sheet_type}).sort("order_index", 1).to_list(1000)
-        print(f"📊 Loading {sheet_type.upper()} rooms only: {len(rooms)} rooms found")
-    else:
-        # No filter specified - get all rooms (for backward compatibility)
-        rooms = await db.rooms.find({"project_id": project_id}).sort("order_index", 1).to_list(1000)
-        print(f"📊 Loading ALL rooms (no filter): {len(rooms)} rooms found")
-    project_data["rooms"] = []
+        room_query["sheet_type"] = sheet_type
+        print(f"📊 Loading {sheet_type.upper()} rooms only")
     
-    for room_data in rooms:
-        # Fetch categories
-        categories = await db.categories.find({"room_id": room_data["id"]}).sort("order_index", 1).to_list(1000)
-        room_data["categories"] = []
-        
-        for category_data in categories:
-            # Fetch subcategories
-            subcategories = await db.subcategories.find({"category_id": category_data["id"]}).sort("order_index", 1).to_list(1000)
-            category_data["subcategories"] = []
-            
-            for subcategory_data in subcategories:
-                # Fetch items - sorted by created_at DESCENDING (newest first)
-                items = await db.items.find({"subcategory_id": subcategory_data["id"]}).sort("created_at", -1).to_list(1000)
-                # Fix any items with None names before validation
-                for item in items:
-                    if not item.get("name"):
-                        item["name"] = "Unknown Product"
-                subcategory_data["items"] = [Item(**item) for item in items]
-                
-            category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
-            
-        room_data["categories"] = [Category(**cat) for cat in categories]
-        
-    project_data["rooms"] = [Room(**room) for room in rooms]
+    all_rooms = await db.rooms.find(room_query, {"_id": 0}).sort("order_index", 1).to_list(1000)
+    room_ids = [r["id"] for r in all_rooms]
     
-    # Ensure project_type has a valid value
+    if not room_ids:
+        project_data["rooms"] = []
+        if not project_data.get("project_type"):
+            project_data["project_type"] = "Renovation"
+        return Project(**project_data)
+    
+    # BATCH FETCH: Get all categories in ONE query
+    all_categories = await db.categories.find({"room_id": {"$in": room_ids}}, {"_id": 0}).sort("order_index", 1).to_list(5000)
+    category_ids = [c["id"] for c in all_categories]
+    
+    # BATCH FETCH: Get all subcategories in ONE query
+    all_subcategories = await db.subcategories.find({"category_id": {"$in": category_ids}}, {"_id": 0}).sort("order_index", 1).to_list(5000) if category_ids else []
+    subcategory_ids = [s["id"] for s in all_subcategories]
+    
+    # BATCH FETCH: Get all items in ONE query (sorted by created_at DESC)
+    all_items = await db.items.find({"subcategory_id": {"$in": subcategory_ids}}, {"_id": 0}).sort("created_at", -1).to_list(20000) if subcategory_ids else []
+    
+    # Build lookup dictionaries for O(1) access
+    items_by_subcategory = {}
+    for item in all_items:
+        if not item.get("name"):
+            item["name"] = "Unknown Product"
+        sub_id = item.get("subcategory_id")
+        if sub_id not in items_by_subcategory:
+            items_by_subcategory[sub_id] = []
+        items_by_subcategory[sub_id].append(item)
+    
+    subcategories_by_category = {}
+    for subcat in all_subcategories:
+        subcat["items"] = [Item(**i) for i in items_by_subcategory.get(subcat["id"], [])]
+        cat_id = subcat.get("category_id")
+        if cat_id not in subcategories_by_category:
+            subcategories_by_category[cat_id] = []
+        subcategories_by_category[cat_id].append(subcat)
+    
+    categories_by_room = {}
+    for cat in all_categories:
+        cat["subcategories"] = [SubCategory(**s) for s in subcategories_by_category.get(cat["id"], [])]
+        room_id = cat.get("room_id")
+        if room_id not in categories_by_room:
+            categories_by_room[room_id] = []
+        categories_by_room[room_id].append(cat)
+    
+    # Assemble rooms with their data
+    for room in all_rooms:
+        room["categories"] = [Category(**c) for c in categories_by_room.get(room["id"], [])]
+    
+    project_data["rooms"] = [Room(**r) for r in all_rooms]
+    
     if not project_data.get("project_type"):
         project_data["project_type"] = "Renovation"
     
