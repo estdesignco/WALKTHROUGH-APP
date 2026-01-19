@@ -83,7 +83,34 @@ const MainDashboard = () => {
     };
 
     fetchProjects();
+    loadCompanyTodos();
   }, []);
+
+  // Load company to-dos (PROTECTED - READ ONLY on dashboard)
+  const loadCompanyTodos = async () => {
+    setTodosLoading(true);
+    try {
+      const response = await axios.get(`${API_URL}/todos/company`);
+      setCompanyTodos(response.data.todos || []);
+    } catch (error) {
+      console.error('Failed to load todos:', error);
+      setCompanyTodos([]);
+    } finally {
+      setTodosLoading(false);
+    }
+  };
+
+  // Toggle todo completion (SAFE operation)
+  const toggleTodoComplete = async (todoId, currentStatus) => {
+    try {
+      await axios.put(`${API_URL}/todos/company/${todoId}`, {
+        completed: !currentStatus
+      });
+      loadCompanyTodos(); // Refresh the list
+    } catch (error) {
+      console.error('Failed to update todo:', error);
+    }
+  };
 
   const handleNavigation = (path) => {
     navigate(path);
