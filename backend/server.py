@@ -1772,81 +1772,83 @@ async def create_project(project: ProjectCreate):
 
 @api_router.get("/projects", response_model=List[Project])
 async def get_projects():
-    projects = await db.projects.find().to_list(1000)
+    """OPTIMIZED: Batch fetch all data to avoid N+1 queries"""
+    projects = await db.projects.find({}, {"_id": 0}).to_list(1000)
     print(f"📊 Found {len(projects)} projects in database")
-    result = []
     
+    if not projects:
+        return []
+    
+    # Get all project IDs
+    project_ids = [p["id"] for p in projects]
+    
+    # BATCH FETCH: Get all rooms for all projects in ONE query
+    all_rooms = await db.rooms.find({"project_id": {"$in": project_ids}}, {"_id": 0}).to_list(10000)
+    room_ids = [r["id"] for r in all_rooms]
+    
+    # BATCH FETCH: Get all categories in ONE query
+    all_categories = await db.categories.find({"room_id": {"$in": room_ids}}, {"_id": 0}).to_list(10000) if room_ids else []
+    category_ids = [c["id"] for c in all_categories]
+    
+    # BATCH FETCH: Get all subcategories in ONE query
+    all_subcategories = await db.subcategories.find({"category_id": {"$in": category_ids}}, {"_id": 0}).to_list(10000) if category_ids else []
+    subcategory_ids = [s["id"] for s in all_subcategories]
+    
+    # BATCH FETCH: Get all items in ONE query
+    all_items = await db.items.find({"subcategory_id": {"$in": subcategory_ids}}, {"_id": 0}).to_list(50000) if subcategory_ids else []
+    
+    # Build lookup dictionaries for O(1) access
+    items_by_subcategory = {}
+    for item in all_items:
+        if not item.get("name"):
+            item["name"] = "Unknown Product"
+        sub_id = item.get("subcategory_id")
+        if sub_id not in items_by_subcategory:
+            items_by_subcategory[sub_id] = []
+        items_by_subcategory[sub_id].append(item)
+    
+    subcategories_by_category = {}
+    for subcat in all_subcategories:
+        subcat["items"] = [Item(**i) for i in items_by_subcategory.get(subcat["id"], [])]
+        cat_id = subcat.get("category_id")
+        if cat_id not in subcategories_by_category:
+            subcategories_by_category[cat_id] = []
+        subcategories_by_category[cat_id].append(subcat)
+    
+    categories_by_room = {}
+    for cat in all_categories:
+        cat["subcategories"] = [SubCategory(**s) for s in subcategories_by_category.get(cat["id"], [])]
+        room_id = cat.get("room_id")
+        if room_id not in categories_by_room:
+            categories_by_room[room_id] = []
+        categories_by_room[room_id].append(cat)
+    
+    rooms_by_project = {}
+    for room in all_rooms:
+        room["categories"] = [Category(**c) for c in categories_by_room.get(room["id"], [])]
+        proj_id = room.get("project_id")
+        if proj_id not in rooms_by_project:
+            rooms_by_project[proj_id] = []
+        rooms_by_project[proj_id].append(room)
+    
+    # Assemble final result
+    result = []
     for project_data in projects:
         try:
-            print(f"🔄 Processing project: {project_data.get('name')}")
-            # Remove MongoDB _id field
-            if "_id" in project_data:
-                del project_data["_id"]
+            project_data["rooms"] = [Room(**r) for r in rooms_by_project.get(project_data["id"], [])]
             
-            # Fetch rooms for each project
-            rooms = await db.rooms.find({"project_id": project_data["id"]}).to_list(1000)
-            project_data["rooms"] = []
-            
-            for room_data in rooms:
-                # Remove MongoDB _id field
-                if "_id" in room_data:
-                    del room_data["_id"]
-                
-                # Fetch categories for each room
-                categories = await db.categories.find({"room_id": room_data["id"]}).to_list(1000)
-                room_data["categories"] = []
-                
-                for category_data in categories:
-                    # Remove MongoDB _id field
-                    if "_id" in category_data:
-                        del category_data["_id"]
-                    
-                    # Fetch subcategories for each category
-                    subcategories = await db.subcategories.find({"category_id": category_data["id"]}).to_list(1000)
-                    category_data["subcategories"] = []
-                    
-                    for subcategory_data in subcategories:
-                        # Remove MongoDB _id field
-                        if "_id" in subcategory_data:
-                            del subcategory_data["_id"]
-                        
-                        # Fetch items for each subcategory
-                        items = await db.items.find({"subcategory_id": subcategory_data["id"]}).to_list(1000)
-                        # Fix any items with None names before validation
-                        for item in items:
-                            # Remove MongoDB _id field
-                            if "_id" in item:
-                                del item["_id"]
-                            if not item.get("name"):
-                                item["name"] = "Unknown Product"
-                        subcategory_data["items"] = [Item(**item) for item in items]
-                        
-                    category_data["subcategories"] = [SubCategory(**subcat) for subcat in subcategories]
-                    
-                room_data["categories"] = [Category(**cat) for cat in categories]
-                
-            project_data["rooms"] = [Room(**room) for room in rooms]
-            
-            # Ensure project_type has a valid value
             if not project_data.get("project_type"):
                 project_data["project_type"] = "Renovation"
-                
-            # Ensure client_info fields have valid values
+            
             if project_data.get("client_info"):
-                if not project_data["client_info"].get("address"):
-                    project_data["client_info"]["address"] = ""
-                if not project_data["client_info"].get("full_name"):
-                    project_data["client_info"]["full_name"] = "Unknown Client"
-                if not project_data["client_info"].get("email"):
-                    project_data["client_info"]["email"] = ""
-                if not project_data["client_info"].get("phone"):
-                    project_data["client_info"]["phone"] = ""
-                
+                project_data["client_info"]["address"] = project_data["client_info"].get("address", "")
+                project_data["client_info"]["full_name"] = project_data["client_info"].get("full_name", "Unknown Client")
+                project_data["client_info"]["email"] = project_data["client_info"].get("email", "")
+                project_data["client_info"]["phone"] = project_data["client_info"].get("phone", "")
+            
             result.append(Project(**project_data))
         except Exception as e:
             print(f"❌ Error serializing project {project_data.get('name', 'unknown')}: {str(e)}")
-            import traceback
-            traceback.print_exc()
             continue
     
     return result
