@@ -108,44 +108,6 @@ const MainDashboard = () => {
     } catch (error) {}
   };
 
-  const updateTodoStatus = async (todoId, newStatus, isCompany = true, projectId = null) => {
-    try {
-      const endpoint = isCompany ? `${API_URL}/todos/company/${todoId}` : `${API_URL}/todos/${projectId}/${todoId}`;
-      await axios.put(endpoint, { status: newStatus, completed: newStatus === 'completed' });
-      if (isCompany) loadCompanyTodos(); else loadProjectTodos(projectId);
-    } catch (error) {}
-  };
-
-  const createTodo = async (e) => {
-    e.preventDefault();
-    if (!newTodo.text.trim()) return;
-    try {
-      await axios.post(`${API_URL}/todos/company`, {
-        text: newTodo.text.trim(),
-        description: newTodo.description,
-        priority: newTodo.priority,
-        assigned_to: newTodo.assigned_to,
-        deadline: newTodo.deadline || null,
-        status: 'pending',
-        completed: false
-      });
-      setNewTodo({ text: '', description: '', priority: 'medium', assigned_to: '', deadline: '' });
-      setShowAddForm(false);
-      loadCompanyTodos();
-    } catch (error) {
-      alert('Failed: ' + error.message);
-    }
-  };
-
-  const deleteTodo = async (todoId, isCompany = true, projectId = null) => {
-    if (!window.confirm('Delete this item?')) return;
-    try {
-      const endpoint = isCompany ? `${API_URL}/todos/company/${todoId}` : `${API_URL}/todos/${projectId}/${todoId}`;
-      await axios.delete(endpoint);
-      if (isCompany) loadCompanyTodos(); else loadProjectTodos(projectId);
-    } catch (error) {}
-  };
-
   const handleNavigation = (path) => navigate(path);
   const handleProjectClick = (projectId) => navigate(`/project/${projectId}`);
 
