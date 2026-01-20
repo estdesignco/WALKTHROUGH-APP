@@ -162,7 +162,6 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
 
   // Delete todo
   const deleteTodo = async (todoId, isCompany, projectId) => {
-    if (!window.confirm('Delete this task?')) return;
     try {
       const endpoint = isCompany 
         ? `${API_URL}/todos/company/${todoId}` 
