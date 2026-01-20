@@ -42,6 +42,7 @@ import PowerFeaturesDashboard from './components/PowerFeaturesDashboard';
 import MasterContactsPage from './components/MasterContactsPage';
 import MasterMaterialsPage from './components/MasterMaterialsPage';
 import MasterToDoList from './components/MasterToDoList';
+import GlobalToDoModal from './components/GlobalToDoModal';
 import CalculatorsPage from './components/CalculatorsPage';
 // REMOVED: SourcingCatalog - too many missing images
 import VendorMirror from './components/VendorMirror';
