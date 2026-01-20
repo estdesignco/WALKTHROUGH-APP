@@ -213,6 +213,12 @@ const App = () => {
 
   return (
     <div className="App min-h-screen bg-gray-900">
+      {/* GLOBAL TO-DO MODAL - Available from ANY page */}
+      <GlobalToDoModal 
+        isOpen={showGlobalTodo} 
+        onClose={() => setShowGlobalTodo(false)} 
+      />
+      
       <BrowserRouter>
         {/* Public Routes - Customer-facing pages (NO LOGIN REQUIRED) */}
         <Routes>
