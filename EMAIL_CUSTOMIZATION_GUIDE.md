@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://devdoctors.preview.emergentagent.com/email-template.html
+https://apprescue-deploy.preview.emergentagent.com/email-template.html
 
 ---
 

@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://devdoctors.preview.emergentagent.com/api
+https://apprescue-deploy.preview.emergentagent.com/api
 ```
 
 ---

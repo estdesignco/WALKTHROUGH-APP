@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://devdoctors.preview.emergentagent.com/mobile-app
+Test it now: https://apprescue-deploy.preview.emergentagent.com/mobile-app

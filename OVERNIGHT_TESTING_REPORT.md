@@ -3,7 +3,7 @@
 
 **Testing Date**: December 2, 2024  
 **Testing Duration**: Comprehensive overnight testing session  
-**System URL**: https://devdoctors.preview.emergentagent.com
+**System URL**: https://apprescue-deploy.preview.emergentagent.com
 
 ---
 

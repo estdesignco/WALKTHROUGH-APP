@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://devdoctors.preview.emergentagent.com
+https://apprescue-deploy.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://devdoctors.preview.emergentagent.com/mobile-app
+https://apprescue-deploy.preview.emergentagent.com/mobile-app
 
 ---
 

@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://devdoctors.preview.emergentagent.com';
+const BACKEND_URL = 'https://apprescue-deploy.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

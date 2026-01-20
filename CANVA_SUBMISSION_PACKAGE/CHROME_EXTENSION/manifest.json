@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://devdoctors.preview.emergentagent.com/*"
+    "https://apprescue-deploy.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

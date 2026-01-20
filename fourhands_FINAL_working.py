@@ -207,7 +207,7 @@ async def scrape_fourhands_final(num_products=10):
     
     print("="*80)
     print(f"✅ SUCCESS: {success}/{num_products} products!")
-    print(f"🔗 https://devdoctors.preview.emergentagent.com/furniture-search")
+    print(f"🔗 https://apprescue-deploy.preview.emergentagent.com/furniture-search")
     print("="*80)
     
     client.close()

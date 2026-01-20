@@ -12,7 +12,7 @@ import sys
 from urllib.parse import urljoin
 
 # Backend URL from environment
-BACKEND_URL = "https://devdoctors.preview.emergentagent.com"
+BACKEND_URL = "https://apprescue-deploy.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 class VendorScrapeTest:

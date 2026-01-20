@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://devdoctors.preview.emergentagent.com/chrome-extension-v19.zip
+https://apprescue-deploy.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://devdoctors.preview.emergentagent.com/api/download/chrome-extension
+https://apprescue-deploy.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 
