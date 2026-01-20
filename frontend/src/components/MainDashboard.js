@@ -349,7 +349,7 @@ const MainDashboard = () => {
           <div className="w-72 xl:w-80 flex-shrink-0 overflow-y-auto p-3 border-l border-[#8b7355]/30">
             {/* COMPANY TO-DO */}
             <div className="rounded-lg overflow-hidden mb-3" style={{ border: '1px solid #7C3AED' }}>
-              <div className="px-3 py-2 flex justify-between items-center cursor-pointer" style={{ background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' }} onClick={() => { setShowTodoModal(true); setTodoModalSection('company'); }}>
+              <div className="px-3 py-2 flex justify-between items-center cursor-pointer" style={{ background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' }} onClick={() => window.openGlobalTodo?.()}>
                 <h3 className="text-white font-medium text-xs">🏢 Company Tasks</h3>
                 <span className="text-white/70 text-[10px]">{companyTodos.filter(t => !t.completed).length}</span>
               </div>
@@ -357,7 +357,7 @@ const MainDashboard = () => {
                 {companyTodos.length === 0 ? <div className="text-stone-500 text-center py-3 text-xs">No company tasks</div> : (
                   <div className="p-2 space-y-1">
                     {companyTodos.slice(0, 5).map((todo) => renderTodoItem(todo, true))}
-                    {companyTodos.length > 5 && <button onClick={() => { setShowTodoModal(true); setTodoModalSection('company'); }} className="w-full text-center text-[10px] text-[#D4A574] py-1">View all {companyTodos.length} →</button>}
+                    {companyTodos.length > 5 && <button onClick={() => window.openGlobalTodo?.()} className="w-full text-center text-[10px] text-[#D4A574] py-1">View all {companyTodos.length} →</button>}
                   </div>
                 )}
               </div>
@@ -368,14 +368,14 @@ const MainDashboard = () => {
               if (todos.length === 0) return null;
               return (
                 <div key={project.id} className="rounded-lg overflow-hidden mb-3" style={{ border: `1px solid ${project.color.border}` }}>
-                  <div className="px-3 py-2 flex justify-between items-center cursor-pointer" style={{ background: project.color.bg }} onClick={() => { setShowTodoModal(true); setTodoModalSection('projects'); }}>
+                  <div className="px-3 py-2 flex justify-between items-center cursor-pointer" style={{ background: project.color.bg }} onClick={() => window.openGlobalTodo?.()}>
                     <h3 className="text-white font-medium text-xs truncate">📋 {project.name}</h3>
                     <span className="text-white/70 text-[10px]">{todos.filter(t => !t.completed).length}</span>
                   </div>
                   <div className="bg-[#0f0f1a] max-h-36 overflow-y-auto">
                     <div className="p-2 space-y-1">
                       {todos.slice(0, 3).map((todo) => renderTodoItem(todo, false, project.id))}
-                      {todos.length > 3 && <button onClick={() => handleNavigation(`/project/${project.id}?tab=Checklist`)} className="w-full text-center text-[10px] text-[#D4A574] py-1">View all {todos.length} →</button>}
+                      {todos.length > 3 && <button onClick={() => window.openGlobalTodo?.()} className="w-full text-center text-[10px] text-[#D4A574] py-1">View all {todos.length} →</button>}
                     </div>
                   </div>
                 </div>
