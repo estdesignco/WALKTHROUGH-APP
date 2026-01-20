@@ -29,12 +29,6 @@ const getPriorityColor = (priority) => {
   return colors[priority] || 'bg-gray-600';
 };
 
-const getStatusIcon = (status, completed) => {
-  if (completed) return '✅';
-  const icons = { pending: '⏳', in_progress: '🔄', completed: '✅', verified: '✓✓' };
-  return icons[status] || '⏳';
-};
-
 const MainDashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
