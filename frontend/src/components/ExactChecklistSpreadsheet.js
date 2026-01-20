@@ -923,81 +923,8 @@ const ExactChecklistSpreadsheet = ({
           }
         }
         
-        // AUTO-ADD TO SAMPLES LIBRARY when status changes to sample-related statuses
-        const sampleStatuses = ['ORDER SAMPLES', 'SAMPLES ORDERED', 'ENTER INTO HOUZZ & ORDER SAMPLE'];
-        if (sampleStatuses.includes(newStatus.toUpperCase())) {
-          try {
-            // Get the full item data for creating the sample
-            let fullItem = null;
-            let foundRoom = null;
-            let imageUrl = '';
-            
-            filteredProject?.rooms?.forEach(room => {
-              room.categories?.forEach(category => {
-                category.subcategories?.forEach(subcategory => {
-                  subcategory.items?.forEach(item => {
-                    if (item.id === itemId) {
-                      fullItem = item;
-                      foundRoom = room;
-                      imageUrl = item.image_url || item.photo_url || item.scraped_image || '';
-                    }
-                  });
-                });
-              });
-            });
-            
-            if (fullItem) {
-              // Determine sample type based on category
-              let sampleType = 'other';
-              const categoryLower = (categoryName || '').toLowerCase();
-              if (categoryLower.includes('fabric') || categoryLower.includes('textile')) sampleType = 'fabric';
-              else if (categoryLower.includes('wall') || categoryLower.includes('paint')) sampleType = 'wallcovering';
-              else if (categoryLower.includes('tile')) sampleType = 'tile';
-              else if (categoryLower.includes('stone') || categoryLower.includes('marble')) sampleType = 'stone';
-              else if (categoryLower.includes('wood') || categoryLower.includes('floor')) sampleType = 'wood';
-              else if (categoryLower.includes('carpet') || categoryLower.includes('rug')) sampleType = 'carpet';
-              else if (categoryLower.includes('hardware') || categoryLower.includes('knob')) sampleType = 'hardware';
-              
-              const sampleData = {
-                name: fullItem.name || itemName,
-                vendor: fullItem.vendor || vendorName || '',
-                type: sampleType,
-                sku: fullItem.sku || sku || '',
-                color: fullItem.finish_color || fullItem.color || '',
-                room: foundRoom?.name || roomName || '',
-                status: newStatus.toUpperCase() === 'SAMPLES ORDERED' ? 'shipped' : 'requested',
-                request_date: new Date().toISOString().split('T')[0],
-                expected_date: '',
-                received_date: '',
-                tracking_number: '',
-                notes: `Auto-added from Checklist. Category: ${categoryName || 'N/A'}`,
-                image_url: imageUrl,
-                cost: fullItem.cost || fullItem.price || 0,
-                return_required: false,
-                project_id: project?.id,
-                linked_item_id: itemId
-              };
-              
-              const sampleResponse = await fetch(`${backendUrl}/api/samples`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sampleData)
-              });
-              
-              if (sampleResponse.ok) {
-                console.log('✅ Auto-added to Samples Library:', fullItem.name);
-                toast.success(`📦 Added to Samples Library: ${fullItem.name}`, {
-                  description: `Vendor: ${fullItem.vendor || 'N/A'}`,
-                  duration: 3000,
-                });
-              } else {
-                console.warn('⚠️ Failed to add to Samples Library:', await sampleResponse.text());
-              }
-            }
-          } catch (sampleError) {
-            console.error('❌ Error adding to Samples Library:', sampleError);
-          }
-        }
+        // NOTE: Samples Library sync is now handled by backend based on FINISH_COLOR content
+        // When finish_color field is updated, backend automatically syncs to Samples Library
         
         // AUTO-COMPLETE TO-DO when status changes to completion states
         const completionStatuses = ['ORDERED', 'RECEIVED', 'INSTALLED', 'COMPLETE', 'DELIVERED', 'SAMPLES ARRIVED', 'PICKED'];
