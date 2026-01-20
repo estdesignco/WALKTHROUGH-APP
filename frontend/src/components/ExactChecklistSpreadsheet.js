@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 const PICKED_OR_BEYOND_STATUSES = [
   'PICKED',
   'ORDER SAMPLES',
+  'SAMPLES ORDERED',
   'SAMPLES ARRIVED', 
   'GET QUOTE',
   'WAITING ON QT',
