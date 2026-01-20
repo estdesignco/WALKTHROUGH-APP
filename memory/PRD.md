@@ -3,7 +3,63 @@
 ## Original Problem Statement
 Full-stack interior design project management application with multiple spreadsheets (FFE, Checklist, Walkthrough), task management (To-Do, Punch List, Company Tasks), and Microsoft Teams integration.
 
-## 🚀 LATEST SESSION - January 20, 2026 (Continued)
+## 🚀 LATEST SESSION - January 20, 2026 (Session 2)
+
+### SAMPLES LIBRARY AUTO-SYNC FIX ✅
+**Critical Bug Fixed:** When items have status changed to 'ORDER SAMPLES', 'SAMPLES ORDERED', or 'ENTER INTO HOUZZ & ORDER SAMPLE', they now AUTOMATICALLY sync to the project's Samples Library.
+
+**What was implemented:**
+1. **Frontend (ExactChecklistSpreadsheet.js):** Added auto-sync logic in `handleStatusChange` function (lines 920-990) that:
+   - Detects when status changes to sample-related statuses
+   - Creates a sample record with: name, vendor, SKU, color, room, image_url, cost, linked_item_id
+   - Shows toast notification: "📦 Added to Samples Library: [item name]"
+
+2. **Backend (server.py):** Added auto-sync in `update_item` endpoint (lines 2845-2910) that:
+   - Checks if item status is changing to a sample status
+   - Creates a sample in `db.samples` collection if not already synced
+   - Logs: "📦 Auto-synced item to Samples Library"
+
+3. **Backend Migration Endpoint:** Added `/api/samples/sync-existing` to sync existing items with sample statuses
+
+4. **SampleData Model:** Added `linked_item_id` field to track the connection between samples and checklist items
+
+5. **SampleTracker UI:** Added image display for samples that have image_url
+
+### CONFIG.JS FIX ✅ (by Testing Agent)
+- Fixed `/app/frontend/public/config.js` - was pointing to production URL, now points to preview URL
+
+### FILES MODIFIED:
+- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Samples auto-sync
+- `/app/frontend/src/components/SampleTracker.js` - Image display
+- `/app/backend/server.py` - Auto-sync in update_item, SampleData model, migration endpoint
+- `/app/frontend/public/config.js` - URL fix
+
+### VERIFIED WORKING:
+- ✅ Samples auto-sync when status changes to ORDER SAMPLES
+- ✅ Samples appear in Samples Library tab with name, room, date
+- ✅ Notes show "Auto-synced from Checklist. Category: [category]"
+- ✅ All 20+ project tabs functional
+- ✅ Dashboard loads with projects
+- ✅ 94% backend tests passed (17/18)
+
+---
+
+## 🔴 PENDING ISSUES (From Handoff)
+
+### P0 - Critical:
+1. **Scraper Price Detection** - User reports price not transferring. New v7.20.1 with improved logging needs user testing
+2. **GitHub Push Blocked** - Secret scanning blocking push. User must approve in GitHub settings
+
+### P1 - High:
+3. **Google Calendar Integration** - Broken, needs investigation
+4. **Data Disappearing** - Cache-busting fix applied, needs user verification
+
+### P2 - Medium:
+5. **Scraper Image Quality** - Needs example websites from user
+
+---
+
+## 🚀 Session 1 - January 20, 2026
 
 ### ALL FIXES IMPLEMENTED THIS SESSION:
 
