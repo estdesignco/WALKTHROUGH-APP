@@ -5,40 +5,37 @@ Full-stack interior design project management application with multiple spreadsh
 
 ## 🚀 LATEST SESSION - January 20, 2026
 
-### DASHBOARD UI COMPLETE ✅
+### GLOBAL TO-DO MODAL - COMPLETE ✅
 
-**Houzz-Inspired Dashboard Layout:**
-1. **Left Sidebar** - Icon navigation with labels:
-   - Walk, Check, FF&E, Calc, Contacts, Materials, To-Do, AI
-   - To-Do icon opens the full Master To-Do List modal
+**New GlobalToDoModal Component Features:**
+1. **Large Modal on Same Page** - Opens as full-page overlay, NO navigation away
+2. **Alternating Row Colors** - Similar tones for better readability (purple shades for company, brown shades for projects)
+3. **Direct Inline Editing** - Click on any task text to edit:
+   - Text field
+   - Priority dropdown (Low/Medium/High/Urgent)
+   - Assignee field
+   - Deadline date picker
+   - Save/Cancel buttons
+4. **Quick Add Form** - "+ Add Task" button shows immediate form at top
+5. **Available from ANY Page**:
+   - Via sidebar To-Do icon
+   - Via `window.openGlobalTodo()` function
+   - Via keyboard shortcut: Ctrl/Cmd + T
+   - Via clicking any to-do panel on dashboard
+6. **Tabs**: All / Company / Projects with counts
+7. **Pending counts** on section headers
+8. **Status circle toggle** - Click to cycle through: pending → in_progress → completed
 
-2. **Main Content Area:**
-   - Projects grid with color-coded headers
-   - Calendar section with ProjectCalendar component
-   - Quick navigation buttons (Walk, Check, FF&E) on each project card
+### Files Created/Modified:
+- `/app/frontend/src/components/GlobalToDoModal.js` - NEW: Global to-do modal component
+- `/app/frontend/src/App.js` - Added global modal state and keyboard shortcuts
+- `/app/frontend/src/components/MainDashboard.js` - Simplified, removed local modal, uses global modal
 
-3. **Right Side To-Do Panels:**
-   - Company Tasks (purple header) - shows top 5 tasks
-   - Project-specific tasks with unique colored headers
-
-4. **Master To-Do List Modal:**
-   - Opens on sidebar To-Do click
-   - Full-featured with tabs: All / Company / Projects
-   - Inline task adding with form (text, priority, assign to, deadline)
-   - Status toggling (pending → in_progress → completed)
-   - Priority badges (low/medium/high/urgent)
-   - Room/Category tags
-   - Delete functionality
-   - Links to navigate to source items
-
-### Files Modified:
-- `/app/frontend/src/components/MainDashboard.js` - Complete Houzz-inspired sidebar layout with To-Do modal
-
-### Previous Session Performance & Bug Fixes:
-- Fixed N+1 query performance bottleneck (server timeouts)
-- Added database indexes for faster lookups
-- Fixed scraper "white screen" bug (`homepage: "/"` in package.json)
-- Outlook Calendar integration confirmed working on production
+### Previous Session Work:
+- Dashboard UI with Houzz-inspired sidebar layout
+- Performance optimizations (N+1 query fixes)
+- Scraper "white screen" bug fix
+- Outlook Calendar integration working
 - Scraper extension v7.18.0 with tab reuse and background removal
 
 ---
