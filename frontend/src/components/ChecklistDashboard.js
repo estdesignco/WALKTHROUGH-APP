@@ -387,7 +387,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       <CompletePageLayout 
         projectId={projectId}
         activeTab="checklist"
-        title="CHECKLIST - GREENE"
+        title={`CHECKLIST - ${project?.client_info?.full_name || project?.name || 'PROJECT'}`}
         hideNavigation={hideNavigation}
         onAddRoom={() => setShowAddRoom(true)}
       >
