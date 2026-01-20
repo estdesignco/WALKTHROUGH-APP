@@ -125,14 +125,21 @@ const MainDashboard = () => {
   const handleSendEmail = async () => {
     try {
       const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
-      const response = await fetch(`${BACKEND_URL}/api/send-questionnaire-email`, {
+      const response = await fetch(`${BACKEND_URL}/api/send-questionnaire`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailData.email, name: emailData.name })
+        body: JSON.stringify({ 
+          client_email: emailData.email, 
+          client_name: emailData.name,
+          sender_name: "Established Design Co."
+        })
       });
       if (response.ok) {
         alert('✅ Email sent!');
         setShowEmailModal(false);
         setEmailData({ email: '', name: '' });
+      } else {
+        const error = await response.json();
+        alert('Failed: ' + (error.detail || 'Unknown error'));
       }
     } catch (error) {
       alert('Failed: ' + error.message);
