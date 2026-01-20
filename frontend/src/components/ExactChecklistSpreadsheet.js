@@ -11,6 +11,19 @@ import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 import { toast } from 'sonner';
 
+// CRITICAL: Statuses that mean item is PICKED or beyond - checkbox should STAY CHECKED
+// These items still need to transfer to FFE!
+const PICKED_OR_BEYOND_STATUSES = [
+  'PICKED',
+  'ORDER SAMPLES',
+  'SAMPLES ARRIVED', 
+  'GET QUOTE',
+  'WAITING ON QT',
+  'READY FOR PRESENTATION',
+  'ENTER INTO HOUZZ',
+  'ENTER INTO HOUZZ & ORDER SAMPLE'
+];
+
 const ExactChecklistSpreadsheet = ({ 
   project, 
   roomColors, 
