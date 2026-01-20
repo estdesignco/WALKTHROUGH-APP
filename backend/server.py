@@ -10485,6 +10485,7 @@ class SampleData(BaseModel):
     return_required: bool = False
     return_by: Optional[str] = None
     project_id: Optional[str] = None
+    linked_item_id: Optional[str] = None  # Links sample to checklist item
 
 @api_router.get("/samples")
 async def get_samples(project_id: Optional[str] = None):
