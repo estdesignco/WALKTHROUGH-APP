@@ -582,10 +582,21 @@ export default function SampleTracker({ projectId }) {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    {/* Type icon */}
+                    {/* Sample Image or Type icon */}
+                    {sample.image_url ? (
+                      <img 
+                        src={sample.image_url} 
+                        alt={sample.name}
+                        className="w-16 h-16 rounded-xl object-cover border border-stone-700"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
                     <div 
-                      className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
-                      style={{ backgroundColor: `${typeInfo.color}20` }}
+                      className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl ${sample.image_url ? 'hidden' : ''}`}
+                      style={{ backgroundColor: `${typeInfo.color}20`, display: sample.image_url ? 'none' : 'flex' }}
                     >
                       {typeInfo.icon}
                     </div>
