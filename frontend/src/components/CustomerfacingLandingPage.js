@@ -258,7 +258,7 @@ const NewProjectDialog = ({ isOpen, onOpenChange }) => {
                         sub_category: item.sub_category,
                         name: item.name,
                         status: 'Walkthrough',
-                        quantity: '',
+                        quantity: null,
                     }));
 
                     await Item.bulkCreate(itemsToCreate);

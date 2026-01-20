@@ -108,7 +108,7 @@ const QuickAddProduct = ({ projectId, onSuccess }) => {
           ...productData,
           subcategory_id: subcategoryId,
           status: '',
-          quantity: ''
+          quantity: null
         })
       });
 

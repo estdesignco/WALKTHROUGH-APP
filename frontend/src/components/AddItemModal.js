@@ -6,7 +6,7 @@ import CalculatorPopup from './CalculatorPopup';
 const AddItemModal = ({ onClose, onSubmit, itemStatuses = [], vendorTypes = [], loading, projectId }) => {
   const [formData, setFormData] = useState({
     name: '',
-    quantity: '',
+    quantity: null,
     size: '',
     status: '',
     vendor: '',

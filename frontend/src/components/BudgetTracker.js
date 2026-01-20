@@ -12,7 +12,7 @@ const BudgetTracker = ({ projectId }) => {
     item_name: '',
     estimated_cost: '',
     actual_cost: '',
-    quantity: '',
+    quantity: null,
     notes: '',
     status: 'pending'
   });
@@ -74,7 +74,7 @@ const BudgetTracker = ({ projectId }) => {
       item_name: '',
       estimated_cost: '',
       actual_cost: '',
-      quantity: '',
+      quantity: null,
       notes: '',
       status: 'pending'
     });

@@ -136,7 +136,7 @@ export default function WorkingTabbedWalkthrough({ projectId }) {
       await axios.post(`${API_URL}/items`, {
         name: '',
         vendor: '',
-        quantity: '',
+        quantity: null,
         size: '',
         finish_color: '',
         cost: '',
