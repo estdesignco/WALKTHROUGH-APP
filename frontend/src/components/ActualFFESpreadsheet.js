@@ -305,7 +305,7 @@ const ActualFFESpreadsheet = ({
                             <td className="border border-gray-300 px-3 py-2 text-center text-sm text-gray-800">
                               <input 
                                 type="number" 
-                                value={item.quantity || 1} 
+                                value={item.quantity || ''} 
                                 className="w-16 text-center bg-transparent border-none outline-none"
                               />
                             </td>

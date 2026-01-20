@@ -342,7 +342,7 @@ const ProfessionalFFESpreadsheet = ({
                                         <td className="p-2 border border-neutral-600 text-center">
                                           <input
                                             type="number"
-                                            value={item.quantity || 1}
+                                            value={item.quantity || ''}
                                             className="w-full bg-transparent text-white border-none outline-none text-center"
                                             min="1"
                                           />

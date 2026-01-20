@@ -51,7 +51,7 @@ export default function MobileAddItemModal({
 
       const newItem = {
         name: itemName.trim(),
-        quantity: parseInt(quantity) || 1,
+        quantity: parseInt(quantity) || null,
         size: size || "",
         vendor: vendor || "",
         sku: sku || "",

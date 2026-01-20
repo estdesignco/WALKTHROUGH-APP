@@ -60,7 +60,7 @@ export default function MobileQuickAddTemplates({
       for (const template of selectedTemplates) {
         await axios.post(`${API_URL}/items`, {
           name: template.name,
-          quantity: template.quantity || 1,
+          quantity: template.quantity || '',
           size: template.size || '',
           vendor: template.vendor || '',
           subcategory_id: subcategoryId,

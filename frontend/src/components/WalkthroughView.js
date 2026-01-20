@@ -912,7 +912,7 @@ const ExactWalkthroughSpreadsheet = ({
                                                           
                                                           {/* QTY */}
                                                           <td className="border border-gray-400 px-2 py-2 text-[#D4C5A9] text-sm text-center">
-                                                            {item.quantity || 1}
+                                                            {item.quantity || ''}
                                                           </td>
                                                           
                                                           {/* SIZE */}

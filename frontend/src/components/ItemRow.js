@@ -93,7 +93,7 @@ const ItemRow = ({ item, itemStatuses, onUpdate, onDelete, isEven, isOffline }) 
           <input
             type="number"
             value={editData.quantity}
-            onChange={(e) => setEditData({ ...editData, quantity: parseInt(e.target.value) || 1 })}
+            onChange={(e) => setEditData({ ...editData, quantity: parseInt(e.target.value) || null })}
             className="w-full bg-gray-800 text-white px-2 py-1 rounded border border-gray-600 focus:border-blue-500 focus:outline-none text-sm"
             min="1"
           />

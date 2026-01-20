@@ -712,7 +712,7 @@ const SimpleWalkthroughSpreadsheet = ({
               cost: itemData.item.cost || 0,
               size: itemData.item.size || '',
               finish_color: '', // ALWAYS BLANK as requested
-              quantity: itemData.item.quantity || 1,
+              quantity: itemData.item.quantity || '',
               subcategory_id: subcategoryId,
               status: '', // BLANK STATUS as required for transfer
               order_index: 0
