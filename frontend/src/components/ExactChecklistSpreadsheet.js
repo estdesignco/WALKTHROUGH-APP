@@ -2474,7 +2474,8 @@ const ExactChecklistSpreadsheet = ({
                                   let highlightIndex = 0;
                                   
                                   return sortedItems.map((item, itemIndex) => {
-                                    const isChecked = checkedItems.has(item.id) || item.status === 'PICKED';
+                                    // CRITICAL: Checkbox stays checked for PICKED and ALL post-picked statuses
+                                    const isChecked = checkedItems.has(item.id) || PICKED_OR_BEYOND_STATUSES.includes(item.status);
                                     
                                     // Get linked To-Do and Punch info
                                     const todoInfo = todoLinkedItems.get(item.id);
