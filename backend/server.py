@@ -879,6 +879,7 @@ class ItemStatus(str, Enum):
     
     # Checklist-specific statuses (9 statuses for checklist functionality)
     ORDER_SAMPLES = "ORDER SAMPLES"
+    SAMPLES_ORDERED = "SAMPLES ORDERED"
     SAMPLES_ARRIVED = "SAMPLES ARRIVED"
     ASK_NEIL = "ASK NEIL"
     ASK_CHARLENE = "ASK CHARLENE"
