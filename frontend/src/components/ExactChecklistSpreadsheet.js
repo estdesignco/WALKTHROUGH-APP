@@ -3108,46 +3108,55 @@ const ExactChecklistSpreadsheet = ({
                                     />
                                   </td>
                                   
-                                  {/* ACTION BUTTONS: Add, Alternatives, Delete */}
+                                  {/* ACTION BUTTONS: Select for Delete / Add, Alternatives, Delete */}
                                   <td className="border border-[#B49B7E] px-1 py-1 text-center w-20">
                                     <div className="flex items-center justify-center gap-1">
-                                      <button
-                                        onClick={() => {
-                                          setSelectedSubCategoryId(subcategory.id);
-                                          setShowAddItem(true);
-                                        }}
-                                        className="text-green-400 hover:text-green-300 text-sm font-bold"
-                                        title="Add New Item"
-                                      >
-                                        +
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          setAlternativesItem({...item, category_name: category.name});
-                                          setShowAlternatives(true);
-                                        }}
-                                        className="text-[#D4A574] hover:text-[#E8D4B8] text-sm"
-                                        title="Find Alternatives"
-                                      >
-                                        ✨
-                                      </button>
-                                      {/* PASTE BUTTON - Shows when scraper data is available */}
-                                      <button
-                                        onClick={() => scraperClipboard && handlePasteScrapedData(item.id)}
-                                        disabled={!scraperClipboard}
-                                        className={`text-sm px-2 py-1 rounded font-bold ${
-                                          scraperClipboard 
-                                            ? 'bg-green-600 hover:bg-green-500 text-white animate-pulse cursor-pointer' 
-                                            : 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                                        }`}
-                                        title={scraperClipboard ? `📋 Paste: ${scraperClipboard.name}` : 'No data to paste - scrape a product first'}
-                                      >
-                                        📋 PASTE
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteItem(item.id)}
-                                        className="text-red-400 hover:text-red-300 text-sm"
-                                        title="Delete Item"
+                                      {/* DELETE MODE - Show selection checkbox */}
+                                      {deleteMode && (
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedForDelete.has(item.id)}
+                                          onChange={() => toggleSelectForDelete(item.id)}
+                                          className="w-4 h-4 accent-red-500 cursor-pointer"
+                                          title="Select for deletion"
+                                        />
+                                      )}
+                                      {!deleteMode && (
+                                        <>
+                                          <button
+                                            onClick={() => addBlankItem(subcategory.id)}
+                                            className="text-green-400 hover:text-green-300 text-sm font-bold"
+                                            title="Add New Item"
+                                          >
+                                            +
+                                          </button>
+                                          <button
+                                            onClick={() => {
+                                              setAlternativesItem({...item, category_name: category.name});
+                                              setShowAlternatives(true);
+                                            }}
+                                            className="text-[#D4A574] hover:text-[#E8D4B8] text-sm"
+                                            title="Find Alternatives"
+                                          >
+                                            ✨
+                                          </button>
+                                          {/* PASTE BUTTON - Shows when scraper data is available */}
+                                          <button
+                                            onClick={() => scraperClipboard && handlePasteScrapedData(item.id)}
+                                            disabled={!scraperClipboard}
+                                            className={`text-sm px-2 py-1 rounded font-bold ${
+                                              scraperClipboard 
+                                                ? 'bg-green-600 hover:bg-green-500 text-white animate-pulse cursor-pointer' 
+                                                : 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                                            }`}
+                                            title={scraperClipboard ? `📋 Paste: ${scraperClipboard.name}` : 'No data to paste - scrape a product first'}
+                                          >
+                                            📋 PASTE
+                                          </button>
+                                          <button
+                                            onClick={() => handleDeleteItem(item.id)}
+                                            className="text-red-400 hover:text-red-300 text-sm"
+                                            title="Delete Item"
                                       >
                                         🗑️
                                       </button>
