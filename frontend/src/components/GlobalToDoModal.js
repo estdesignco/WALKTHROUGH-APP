@@ -144,6 +144,9 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
         : `${API_URL}/todos/${projectId}/${todoId}`;
       await axios.put(endpoint, {
         text: editValues.text,
+        notes: editValues.notes || '',
+        status: editValues.status || 'pending',
+        completed: editValues.status === 'completed',
         priority: editValues.priority,
         assigned_to: editValues.assigned_to || null,
         deadline: editValues.deadline || null
