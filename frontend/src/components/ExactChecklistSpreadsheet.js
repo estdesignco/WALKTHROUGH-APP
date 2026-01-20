@@ -1413,7 +1413,7 @@ const ExactChecklistSpreadsheet = ({
     try {
       console.log('🚀 TRANSFER TO FFE: ONLY CHECKED ITEMS');
       
-      // Step 1: Collect checked items - INCLUDE BOTH manual checks AND items with PICKED status
+      // Step 1: Collect checked items - INCLUDE manual checks AND items with PICKED/post-picked status
       const checkedItemIds = Array.from(checkedItems);
       const itemsToTransfer = [];
       
@@ -1422,8 +1422,8 @@ const ExactChecklistSpreadsheet = ({
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
-                // Include if manually checked OR has PICKED status
-                const isChecked = checkedItemIds.includes(item.id) || item.status === 'PICKED';
+                // Include if manually checked OR has PICKED/post-picked status
+                const isChecked = checkedItemIds.includes(item.id) || PICKED_OR_BEYOND_STATUSES.includes(item.status);
                 if (isChecked) {
                   console.log(`✅ CHECKED ITEM: "${item.name}" (ID: ${item.id}, Status: ${item.status})`);
                   itemsToTransfer.push({
