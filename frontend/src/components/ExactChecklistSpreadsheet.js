@@ -2990,22 +2990,29 @@ const ExactChecklistSpreadsheet = ({
                                     )}
                                   </td>
                                   
-                                  {/* REMARKS - EDITABLE */}
+                                  {/* REMARKS - EDITABLE INPUT */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-sm outline-none"
+                                    <input
+                                      type="text"
+                                      defaultValue={item.remarks || ''}
+                                      placeholder="Add remarks..."
+                                      className="w-full bg-transparent text-sm outline-none focus:ring-1 focus:ring-[#D4A574] rounded px-1"
                                       style={{ color: textColor }}
                                       onBlur={(e) => {
-                                        const newValue = e.target.textContent?.trim();
-                                        if (newValue !== item.remarks) {
+                                        const newValue = e.target.value?.trim() || '';
+                                        if (newValue !== (item.remarks || '')) {
+                                          console.log('💾 Saving remarks:', newValue);
                                           handleUpdateItemField(item.id, 'remarks', newValue);
+                                          item.remarks = newValue;
                                         }
                                       }}
-                                    >
-                                      {item.remarks || ''}
-                                    </div>
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          e.target.blur();
+                                        }
+                                      }}
+                                    />
                                   </td>
                                   
                                   {/* ACTION BUTTONS: Add, Alternatives, Delete */}
