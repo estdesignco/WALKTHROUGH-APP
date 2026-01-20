@@ -280,7 +280,7 @@ const MainDashboard = () => {
               <div className="bg-[#0f0f1a] max-h-44 overflow-y-auto">
                 {companyTodos.length === 0 ? <div className="text-stone-500 text-center py-3 text-xs">No company tasks</div> : (
                   <div className="p-2 space-y-1">
-                    {companyTodos.slice(0, 5).map((todo) => renderTodoItem(todo, true))}
+                    {companyTodos.slice(0, 5).map((todo, idx) => renderPreviewItem(todo, idx))}
                     {companyTodos.length > 5 && <button onClick={() => window.openGlobalTodo?.()} className="w-full text-center text-[10px] text-[#D4A574] py-1">View all {companyTodos.length} →</button>}
                   </div>
                 )}
@@ -298,7 +298,7 @@ const MainDashboard = () => {
                   </div>
                   <div className="bg-[#0f0f1a] max-h-36 overflow-y-auto">
                     <div className="p-2 space-y-1">
-                      {todos.slice(0, 3).map((todo) => renderTodoItem(todo, false, project.id))}
+                      {todos.slice(0, 3).map((todo, idx) => renderPreviewItem(todo, idx))}
                       {todos.length > 3 && <button onClick={() => window.openGlobalTodo?.()} className="w-full text-center text-[10px] text-[#D4A574] py-1">View all {todos.length} →</button>}
                     </div>
                   </div>
