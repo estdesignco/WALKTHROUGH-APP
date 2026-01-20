@@ -1750,7 +1750,7 @@ const ExactChecklistSpreadsheet = ({
             cost: itemContext.item.cost || 0,
             size: itemContext.item.size || '',
             finish_color: itemContext.item.finish_color || '',
-            quantity: itemContext.item.quantity || 1,
+            quantity: itemContext.item.quantity || '',
             subcategory_id: subcategoryId,
             status: itemContext.item.status || '', // TRANSFER STATUS FROM CHECKLIST
             order_index: itemContext.item.order_index || 0,

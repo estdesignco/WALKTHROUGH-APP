@@ -124,7 +124,7 @@ const AdvancedFFEFeatures = ({ project, onUpdate }) => {
               item.name,
               item.vendor || '',
               item.sku || '',
-              item.quantity || 1,
+              item.quantity || '',
               item.cost || '',
               item.status || '',
               item.carrier || ''
