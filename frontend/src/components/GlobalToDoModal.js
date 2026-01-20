@@ -303,6 +303,13 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
                 </span>
               </div>
               
+              {/* Notes/Comments - Show if exists */}
+              {(todo.notes || todo.description) && (
+                <div className="mt-1 text-xs text-gray-400 italic bg-black/20 rounded px-2 py-1">
+                  💬 {todo.notes || todo.description}
+                </div>
+              )}
+              
               {/* Room/Category tags */}
               {(roomName || categoryName) && (
                 <div className="flex items-center gap-1 mt-1 flex-wrap">
