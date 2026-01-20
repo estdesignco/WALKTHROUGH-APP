@@ -2468,10 +2468,7 @@ const ExactChecklistSpreadsheet = ({
                                   </span>
                                   <div className="flex items-center gap-2">
                                     <button
-                                      onClick={() => {
-                                        setSelectedSubCategoryId(subcategory.id);
-                                        setShowAddItem(true);
-                                      }}
+                                      onClick={() => addBlankItem(subcategory.id)}
                                       className="text-[#D4A574] hover:text-white text-xs px-2 py-1 rounded bg-[#D4A574]/20 hover:bg-[#D4A574]/40"
                                     >
                                       + Add Item
