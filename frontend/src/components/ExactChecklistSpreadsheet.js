@@ -2681,38 +2681,49 @@ const ExactChecklistSpreadsheet = ({
                                   
                                   {/* QTY - EDITABLE */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-sm text-center" style={cellStyle}>
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-sm text-center outline-none"
+                                    <input
+                                      type="text"
+                                      defaultValue={item.quantity || ''}
+                                      className="w-full bg-transparent text-sm text-center outline-none focus:ring-1 focus:ring-[#D4A574] rounded"
                                       style={{ color: textColor }}
                                       onBlur={(e) => {
-                                        const newValue = parseInt(e.target.textContent) || 0;
+                                        const newValue = parseInt(e.target.value) || 0;
                                         if (newValue !== item.quantity) {
                                           handleUpdateItemField(item.id, 'quantity', newValue);
+                                          item.quantity = newValue;
                                         }
                                       }}
-                                    >
-                                      {item.quantity || ''}
-                                    </div>
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          e.target.blur();
+                                        }
+                                      }}
+                                      onClick={(e) => e.target.select()}
+                                    />
                                   </td>
                                   
                                   {/* SIZE - EDITABLE */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
-                                    <div 
-                                      contentEditable={true}
-                                      suppressContentEditableWarning={true}
-                                      className="w-full bg-transparent text-sm outline-none"
+                                    <input
+                                      type="text"
+                                      defaultValue={item.size || ''}
+                                      className="w-full bg-transparent text-sm outline-none focus:ring-1 focus:ring-[#D4A574] rounded"
                                       style={{ color: textColor }}
                                       onBlur={(e) => {
-                                        const newValue = e.target.textContent;
+                                        const newValue = e.target.value;
                                         if (newValue !== item.size) {
                                           handleUpdateItemField(item.id, 'size', newValue);
+                                          item.size = newValue;
                                         }
                                       }}
-                                    >
-                                      {item.size || ''}
-                                    </div>
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          e.target.blur();
+                                        }
+                                      }}
+                                    />
                                   </td>
                                   
                                   {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE */}
