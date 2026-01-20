@@ -2866,80 +2866,111 @@ const ExactChecklistSpreadsheet = ({
                                     </select>
                                   </td>
                                   
-                                  {/* IMAGE */}
+                                  {/* IMAGE - With upload option */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-[#D4C5A9] text-sm w-20">
-                                    {item.image_url ? (
-                                      <img 
-                                        src={item.image_url} 
-                                        alt={item.name}
-                                        className="w-12 h-12 object-cover cursor-pointer hover:scale-150 transition-transform duration-200 z-10"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          console.log('🖼️ Opening LARGE image popup - 98vw x 95vh');
-                                          // Create full-size overlay with better styling
-                                          const overlay = document.createElement('div');
-                                          overlay.style.cssText = `
-                                            position: fixed;
-                                            top: 0;
-                                            left: 0;
-                                            width: 100%;
-                                            height: 100%;
-                                            background: rgba(0, 0, 0, 0.8);
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            z-index: 9999;
-                                            cursor: pointer;
-                                          `;
-                                          
-                                          const container = document.createElement('div');
-                                          container.style.cssText = `
-                                            width: 100vw;
-                                            height: 100vh;
-                                            padding: 10px;
-                                            text-align: center;
-                                            display: flex;
-                                            flex-direction: column;
-                                            align-items: center;
-                                            justify-content: center;
-                                          `;
-                                          
-                                          const img = document.createElement('img');
-                                          img.src = item.image_url;
-                                          img.alt = item.name;
-                                          img.style.cssText = `
-                                            max-width: 98vw;
-                                            max-height: 95vh;
-                                            width: auto;
-                                            height: auto;
-                                            object-fit: contain;
-                                            border-radius: 8px;
-                                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-                                          `;
-                                          
-                                          const title = document.createElement('p');
-                                          title.textContent = item.name;
-                                          title.style.cssText = `
-                                            color: white;
-                                            margin-top: 15px;
-                                            font-size: 18px;
-                                            font-weight: bold;
-                                          `;
-                                          
-                                          container.appendChild(img);
-                                          container.appendChild(title);
-                                          overlay.appendChild(container);
-                                          
-                                          overlay.addEventListener('click', () => {
-                                            document.body.removeChild(overlay);
-                                          });
-                                          
-                                          document.body.appendChild(overlay);
-                                        }}
-                                      />
-                                    ) : (
-                                      <div className="w-12 h-12 bg-gray-600 flex items-center justify-center text-xs">No Image</div>
-                                    )}
+                                    <div className="relative group">
+                                      {item.image_url ? (
+                                        <img 
+                                          src={item.image_url} 
+                                          alt={item.name}
+                                          className="w-12 h-12 object-cover cursor-pointer hover:scale-150 transition-transform duration-200 z-10"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            console.log('🖼️ Opening LARGE image popup - 98vw x 95vh');
+                                            // Create full-size overlay with better styling
+                                            const overlay = document.createElement('div');
+                                            overlay.style.cssText = `
+                                              position: fixed;
+                                              top: 0;
+                                              left: 0;
+                                              width: 100%;
+                                              height: 100%;
+                                              background: rgba(0, 0, 0, 0.8);
+                                              display: flex;
+                                              align-items: center;
+                                              justify-content: center;
+                                              z-index: 9999;
+                                              cursor: pointer;
+                                            `;
+                                            
+                                            const container = document.createElement('div');
+                                            container.style.cssText = `
+                                              width: 100vw;
+                                              height: 100vh;
+                                              padding: 10px;
+                                              text-align: center;
+                                              display: flex;
+                                              flex-direction: column;
+                                              align-items: center;
+                                              justify-content: center;
+                                            `;
+                                            
+                                            const img = document.createElement('img');
+                                            img.src = item.image_url;
+                                            img.alt = item.name;
+                                            img.style.cssText = `
+                                              max-width: 98vw;
+                                              max-height: 95vh;
+                                              width: auto;
+                                              height: auto;
+                                              object-fit: contain;
+                                              border-radius: 8px;
+                                              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+                                            `;
+                                            
+                                            const title = document.createElement('p');
+                                            title.textContent = item.name;
+                                            title.style.cssText = `
+                                              color: white;
+                                              margin-top: 15px;
+                                              font-size: 18px;
+                                              font-weight: bold;
+                                            `;
+                                            
+                                            container.appendChild(img);
+                                            container.appendChild(title);
+                                            overlay.appendChild(container);
+                                            
+                                            overlay.addEventListener('click', () => {
+                                              document.body.removeChild(overlay);
+                                            });
+                                            
+                                            document.body.appendChild(overlay);
+                                          }}
+                                        />
+                                      ) : (
+                                        <label className="w-12 h-12 bg-gray-700 hover:bg-gray-600 flex flex-col items-center justify-center text-xs cursor-pointer rounded border border-dashed border-gray-500 hover:border-[#D4A574]">
+                                          <span className="text-lg">📷</span>
+                                          <span className="text-[8px] text-gray-400">Upload</span>
+                                          <input 
+                                            type="file" 
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                              if (e.target.files[0]) {
+                                                handleImageUpload(item.id, e.target.files[0]);
+                                              }
+                                            }}
+                                          />
+                                        </label>
+                                      )}
+                                      {/* Replace image button - shows on hover when image exists */}
+                                      {item.image_url && (
+                                        <label className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#D4A574] hover:bg-[#c49564] rounded-full flex items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" title="Replace image">
+                                          <span className="text-[10px]">📷</span>
+                                          <input 
+                                            type="file" 
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                              if (e.target.files[0]) {
+                                                handleImageUpload(item.id, e.target.files[0]);
+                                              }
+                                            }}
+                                          />
+                                        </label>
+                                      )}
+                                    </div>
                                   </td>
                                   
                                   {/* PRODUCT LINK - CLICKABLE */}
