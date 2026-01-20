@@ -25,7 +25,7 @@ const CalculatorPopup = ({
   const [formData, setFormData] = useState({
     // General
     costPerUnit: '',
-    quantity: '1',
+    quantity: '',
     
     // Wallpaper
     wallWidth: '',

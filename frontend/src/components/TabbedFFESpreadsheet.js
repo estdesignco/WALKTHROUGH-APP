@@ -112,7 +112,7 @@ export default function TabbedFFESpreadsheet({ projectId }) {
       await axios.post(`${API_URL}/items`, {
         name: '',
         vendor: '',
-        quantity: '1',
+        quantity: '',
         size: '',
         finish_color: '',
         cost: '',

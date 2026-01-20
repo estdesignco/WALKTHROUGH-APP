@@ -1145,7 +1145,7 @@ const AddToProjectModal = ({ product, onClose, onSuccess, backendUrl }) => {
     try {
       const itemData = {
         name: product.name || 'Unknown Product',
-        quantity: 1,
+        quantity: '',
         vendor: product.vendor || '',
         sku: product.sku || '',
         cost: product.cost || product.price || 0,

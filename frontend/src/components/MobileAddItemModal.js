@@ -13,7 +13,7 @@ export default function MobileAddItemModal({
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [itemName, setItemName] = useState('');
-  const [quantity, setQuantity] = useState('1');
+  const [quantity, setQuantity] = useState('');
   const [size, setSize] = useState('');
   const [vendor, setVendor] = useState('');
   const [sku, setSku] = useState('');
