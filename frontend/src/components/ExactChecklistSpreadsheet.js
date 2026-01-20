@@ -2739,20 +2739,25 @@ const ExactChecklistSpreadsheet = ({
                                         />
                                       )}
                                       {/* Color Name - Editable */}
-                                      <div 
-                                        contentEditable={true}
-                                        suppressContentEditableWarning={true}
-                                        className="flex-1 bg-transparent text-sm outline-none"
+                                      <input
+                                        type="text"
+                                        defaultValue={item.finish_color || ''}
+                                        className="flex-1 bg-transparent text-sm outline-none focus:ring-1 focus:ring-[#D4A574] rounded"
                                         style={{ color: textColor }}
                                         onBlur={(e) => {
-                                          const newValue = e.target.textContent;
+                                          const newValue = e.target.value;
                                           if (newValue !== item.finish_color) {
                                             handleUpdateItemField(item.id, 'finish_color', newValue);
+                                            item.finish_color = newValue;
                                           }
                                         }}
-                                      >
-                                        {item.finish_color || ''}
-                                      </div>
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            e.target.blur();
+                                          }
+                                        }}
+                                      />
                                     </div>
                                   </td>
                                   
