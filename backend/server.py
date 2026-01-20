@@ -3805,6 +3805,99 @@ async def delete_room(room_id: str):
         logger.error(f"Error deleting room {room_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete room: {str(e)}")
 
+@api_router.post("/rooms/{room_id}/copy")
+async def copy_room(room_id: str, new_name: str = None):
+    """Copy/duplicate a room with all its categories, subcategories, and items"""
+    try:
+        # Get the original room
+        original_room = await db.rooms.find_one({"id": room_id})
+        if not original_room:
+            raise HTTPException(status_code=404, detail="Room not found")
+        
+        # Create new room with copied data
+        new_room_id = str(uuid.uuid4())
+        new_room = {
+            "id": new_room_id,
+            "name": new_name or f"{original_room['name']} (Copy)",
+            "project_id": original_room["project_id"],
+            "sheet_type": original_room.get("sheet_type", "checklist"),
+            "description": original_room.get("description", ""),
+            "color": original_room.get("color", "#D4A574"),
+            "order_index": original_room.get("order_index", 0) + 1,
+            "categories": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Insert the new room
+        await db.rooms.insert_one(new_room)
+        
+        # Copy all categories
+        categories = await db.categories.find({"room_id": room_id}).to_list(1000)
+        for category in categories:
+            new_category_id = str(uuid.uuid4())
+            new_category = {
+                "id": new_category_id,
+                "name": category["name"],
+                "room_id": new_room_id,
+                "description": category.get("description", ""),
+                "color": category.get("color", "#D4A574"),
+                "order_index": category.get("order_index", 0),
+                "subcategories": [],
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            await db.categories.insert_one(new_category)
+            
+            # Copy subcategories
+            subcategories = await db.subcategories.find({"category_id": category["id"]}).to_list(1000)
+            for subcategory in subcategories:
+                new_subcategory_id = str(uuid.uuid4())
+                new_subcategory = {
+                    "id": new_subcategory_id,
+                    "name": subcategory["name"],
+                    "category_id": new_category_id,
+                    "description": subcategory.get("description", ""),
+                    "color": subcategory.get("color", "#6BA3E6"),
+                    "order_index": subcategory.get("order_index", 0),
+                    "items": [],
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow()
+                }
+                await db.subcategories.insert_one(new_subcategory)
+                
+                # Copy items
+                items = await db.items.find({"subcategory_id": subcategory["id"]}).to_list(1000)
+                for item in items:
+                    new_item_id = str(uuid.uuid4())
+                    new_item = {
+                        "id": new_item_id,
+                        "name": item.get("name", ""),
+                        "subcategory_id": new_subcategory_id,
+                        "quantity": item.get("quantity", 1),
+                        "size": item.get("size", ""),
+                        "remarks": item.get("remarks", ""),
+                        "vendor": item.get("vendor", ""),
+                        "sku": item.get("sku", ""),
+                        "status": item.get("status", ""),
+                        "cost": item.get("cost", 0),
+                        "link": item.get("link", ""),
+                        "image_url": item.get("image_url", ""),
+                        "finish_color": item.get("finish_color", ""),
+                        "finish_image": item.get("finish_image", ""),
+                        "order_index": item.get("order_index", 0),
+                        "created_at": datetime.utcnow(),
+                        "updated_at": datetime.utcnow()
+                    }
+                    await db.items.insert_one(new_item)
+        
+        logger.info(f"✅ Room copied successfully: {original_room['name']} -> {new_room['name']}")
+        return {"success": True, "new_room_id": new_room_id, "message": f"Room copied as '{new_room['name']}'"}
+        
+    except Exception as e:
+        logger.error(f"Error copying room {room_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to copy room: {str(e)}")
+
 @api_router.delete("/categories/{category_id}")
 async def delete_category(category_id: str):
     """Delete a category and all its associated subcategories and items"""
