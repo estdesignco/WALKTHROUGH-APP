@@ -390,41 +390,67 @@ function scrapePageData() {
     }
   }
   
-  // GENERIC PRICE DETECTION - Improved
+  // GENERIC PRICE DETECTION - AGGRESSIVE VERSION
   if (!data.price) {
     // Try to find price in structured data first (most reliable)
-    const jsonLd = document.querySelector('script[type="application/ld+json"]');
-    if (jsonLd) {
+    const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+    for (const jsonLd of jsonLdScripts) {
+      if (data.price) break;
       try {
         const jsonData = JSON.parse(jsonLd.textContent);
+        // Direct offers
         if (jsonData.offers?.price) {
-          data.price = parseFloat(jsonData.offers.price);
-        } else if (jsonData['@graph']) {
+          data.price = parseFloat(String(jsonData.offers.price).replace(/[^0-9.]/g, ''));
+          console.log('💰 Found price in JSON-LD offers:', data.price);
+        } else if (jsonData.offers?.lowPrice) {
+          data.price = parseFloat(String(jsonData.offers.lowPrice).replace(/[^0-9.]/g, ''));
+          console.log('💰 Found price in JSON-LD lowPrice:', data.price);
+        }
+        // @graph array
+        if (!data.price && jsonData['@graph']) {
           for (const item of jsonData['@graph']) {
             if (item.offers?.price) {
-              data.price = parseFloat(item.offers.price);
+              data.price = parseFloat(String(item.offers.price).replace(/[^0-9.]/g, ''));
+              console.log('💰 Found price in JSON-LD @graph:', data.price);
               break;
             }
           }
         }
-      } catch(e) { console.log('JSON-LD parse failed'); }
+        // Product type
+        if (!data.price && jsonData['@type'] === 'Product' && jsonData.offers) {
+          const offers = Array.isArray(jsonData.offers) ? jsonData.offers[0] : jsonData.offers;
+          if (offers.price) {
+            data.price = parseFloat(String(offers.price).replace(/[^0-9.]/g, ''));
+            console.log('💰 Found price in Product offers:', data.price);
+          }
+        }
+      } catch(e) { console.log('JSON-LD parse failed:', e.message); }
     }
   }
   
   if (!data.price) {
-    // Look for price in common price elements
+    // Look for price in common price elements - EXPANDED SELECTORS
     const priceSelectors = [
-      '.product-price', '.price', '[class*="price"]', '[data-price]',
-      '[itemprop="price"]', '.current-price', '.sale-price', '.regular-price'
+      '[itemprop="price"]', '[data-price]', '[data-product-price]',
+      '.product-price', '.price', '.current-price', '.sale-price', '.regular-price',
+      '.price-value', '.price-amount', '.product-price-value',
+      '[class*="price"]:not([class*="compare"]):not([class*="was"])',
+      '[class*="Price"]:not([class*="Compare"]):not([class*="Was"])',
+      '.cost', '.amount', '[class*="cost"]',
+      'span[class*="price"]', 'div[class*="price"]', 'p[class*="price"]',
+      '[data-testid*="price"]', '[data-qa*="price"]'
     ];
     for (const sel of priceSelectors) {
-      const el = document.querySelector(sel);
-      if (el) {
-        const match = el.textContent.match(/\$([\d,]+\.?\d*)/);
+      if (data.price) break;
+      const els = document.querySelectorAll(sel);
+      for (const el of els) {
+        const text = el.textContent || el.getAttribute('content') || el.getAttribute('data-price') || '';
+        const match = text.match(/\$?\s*([\d,]+\.?\d*)/);
         if (match) {
           const val = parseFloat(match[1].replace(/,/g, ''));
-          if (val > 0 && val < 100000) {
+          if (val > 0 && val < 500000) {
             data.price = val;
+            console.log('💰 Found price via selector', sel, ':', data.price);
             break;
           }
         }
@@ -433,22 +459,38 @@ function scrapePageData() {
   }
   
   if (!data.price) {
-    // Last resort: find price near "ADD TO CART" or "Add to Cart"
-    const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)[\s\S]{0,200}(?:ADD TO CART|Add to Cart|ADD TO BAG)/i);
-    if (addToCartMatch) {
-      data.price = parseFloat(addToCartMatch[1].replace(/,/g, ''));
+    // Look for price in meta tags
+    const priceMeta = document.querySelector('meta[property="product:price:amount"], meta[property="og:price:amount"], meta[name="price"]');
+    if (priceMeta) {
+      const val = parseFloat(priceMeta.content.replace(/[^0-9.]/g, ''));
+      if (val > 0) {
+        data.price = val;
+        console.log('💰 Found price in meta tag:', data.price);
+      }
     }
   }
   
   if (!data.price) {
-    // Final fallback: get first reasonable price on page
-    const allPrices = pageText.match(/\$([\d,]+\.?\d*)/g) || [];
+    // Last resort: find price near "ADD TO CART" or "Add to Cart"
+    const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)[\s\S]{0,200}(?:ADD TO CART|Add to Cart|ADD TO BAG|Buy Now)/i);
+    if (addToCartMatch) {
+      data.price = parseFloat(addToCartMatch[1].replace(/,/g, ''));
+      console.log('💰 Found price near Add to Cart:', data.price);
+    }
+  }
+  
+  if (!data.price) {
+    // Final fallback: get first reasonable price on page (NOT in navigation/header)
+    const mainContent = document.querySelector('main, #main, .main, [role="main"], .product, .pdp') || document.body;
+    const mainText = mainContent.textContent || '';
+    const allPrices = mainText.match(/\$([\d,]+\.?\d*)/g) || [];
     for (const p of allPrices) {
       const val = parseFloat(p.replace(/[$,]/g, ''));
-      if (val > 10 && val < 100000) {
+      if (val > 10 && val < 500000) {
         // Skip if this looks like an MSRP (if we already found one)
         if (data.msrp && val === data.msrp) continue;
         data.price = val;
+        console.log('💰 Found price via text scan:', data.price);
         break;
       }
     }
