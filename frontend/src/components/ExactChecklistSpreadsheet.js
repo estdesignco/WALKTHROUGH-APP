@@ -1329,6 +1329,43 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
+  // ADD BLANK ITEM - Just adds an empty row, no modal
+  const addBlankItem = async (subcategoryId) => {
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      
+      const response = await fetch(`${backendUrl}/api/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: '',
+          vendor: '',
+          sku: '',
+          cost: 0,
+          size: '',
+          finish_color: '',
+          quantity: 1,
+          status: '',
+          link: '',
+          image_url: '',
+          subcategory_id: subcategoryId,
+          order_index: 999
+        })
+      });
+      
+      if (response.ok) {
+        console.log('✅ Blank item added');
+        if (onReload) {
+          onReload();
+        }
+      } else {
+        console.error('❌ Failed to add blank item');
+      }
+    } catch (error) {
+      console.error('❌ Error adding blank item:', error);
+    }
+  };
+
   // Handle upload to Canva - NOW OPENS IMPORT MODAL
   const handleUploadToCanva = () => {
     console.log('🎨 Opening Canva import modal');
