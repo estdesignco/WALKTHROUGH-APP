@@ -129,6 +129,29 @@ const App = () => {
   const [currentProject, setCurrentProject] = useState(null);
   const [isOffline, setIsOffline] = useState(false);
   const [authenticated, setAuthenticated] = useState(isAuthenticated());
+  const [showGlobalTodo, setShowGlobalTodo] = useState(false);
+
+  // Global keyboard shortcut for To-Do (Ctrl/Cmd + T)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+        e.preventDefault();
+        setShowGlobalTodo(prev => !prev);
+      }
+      // Escape to close
+      if (e.key === 'Escape' && showGlobalTodo) {
+        setShowGlobalTodo(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showGlobalTodo]);
+
+  // Expose global function to open To-Do from anywhere
+  useEffect(() => {
+    window.openGlobalTodo = () => setShowGlobalTodo(true);
+    return () => { delete window.openGlobalTodo; };
+  }, []);
 
   useEffect(() => {
     // Check online/offline status for jobsite work
