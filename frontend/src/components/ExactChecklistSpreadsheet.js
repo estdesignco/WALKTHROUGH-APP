@@ -1227,6 +1227,42 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
+  // DELETE MULTIPLE - Delete all selected items
+  const handleDeleteMultiple = async () => {
+    if (selectedForDelete.size === 0) return;
+    
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const itemIds = Array.from(selectedForDelete);
+      
+      console.log(`🗑️ Deleting ${itemIds.length} items...`);
+      
+      // Delete all selected items
+      await Promise.all(itemIds.map(itemId => 
+        fetch(`${backendUrl}/api/items/${itemId}`, { method: 'DELETE' })
+      ));
+      
+      console.log('✅ Multiple items deleted');
+      setSelectedForDelete(new Set());
+      setDeleteMode(false);
+      if (onReload) onReload();
+    } catch (error) {
+      console.error('❌ Error deleting multiple items:', error);
+      alert('Failed to delete some items: ' + error.message);
+    }
+  };
+
+  // Toggle item selection for delete
+  const toggleSelectForDelete = (itemId) => {
+    const newSelected = new Set(selectedForDelete);
+    if (newSelected.has(itemId)) {
+      newSelected.delete(itemId);
+    } else {
+      newSelected.add(itemId);
+    }
+    setSelectedForDelete(newSelected);
+  };
+
   // Handle adding a new category - FIXED TO USE COMPREHENSIVE ENDPOINT
   const handleAddCategory = async (roomId, categoryName) => {
     if (!roomId || !categoryName) {
