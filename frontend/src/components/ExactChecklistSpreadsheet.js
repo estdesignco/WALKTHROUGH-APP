@@ -2718,15 +2718,16 @@ const ExactChecklistSpreadsheet = ({
                                   >
                                     <div className="flex items-center gap-1">
                                       <span style={{ color: textColor }}>$</span>
-                                      <div 
-                                        contentEditable={true}
-                                        suppressContentEditableWarning={true}
-                                        className="flex-1 bg-transparent text-sm outline-none min-w-[40px]"
-                                        style={{ color: textColor }}
+                                      <input
+                                        type="text"
+                                        defaultValue={item.cost || 0}
+                                        className="flex-1 bg-transparent text-sm outline-none min-w-[40px] border-none focus:ring-1 focus:ring-[#D4A574] rounded px-1"
+                                        style={{ color: textColor, background: 'transparent' }}
                                         onBlur={(e) => {
-                                          const newValue = parseFloat(e.target.textContent.replace(/[^0-9.]/g, '')) || 0;
+                                          const newValue = parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0;
                                           if (newValue !== item.cost) {
                                             handleUpdateItemField(item.id, 'cost', newValue);
+                                            item.cost = newValue; // Update local state
                                           }
                                         }}
                                         onKeyDown={(e) => {
@@ -2735,9 +2736,8 @@ const ExactChecklistSpreadsheet = ({
                                             e.target.blur();
                                           }
                                         }}
-                                      >
-                                        {item.cost || 0}
-                                      </div>
+                                        onClick={(e) => e.target.select()}
+                                      />
                                       <button
                                         onClick={() => openCalculator(item, category.name)}
                                         className="text-[#8B7355] hover:text-[#D4A574] text-xs ml-1 opacity-50 hover:opacity-100"
