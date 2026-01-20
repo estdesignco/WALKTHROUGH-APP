@@ -61,6 +61,10 @@ const ExactChecklistSpreadsheet = ({
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [availableCategories, setAvailableCategories] = useState([]);
   
+  // DELETE MULTIPLE - state for selected items
+  const [selectedForDelete, setSelectedForDelete] = useState(new Set());
+  const [deleteMode, setDeleteMode] = useState(false);
+  
   // State to track items on To-Do or Punch List (for highlighting)
   // Map format: { itemId: { completed: boolean, status: string } }
   const [todoLinkedItems, setTodoLinkedItems] = useState(new Map());
