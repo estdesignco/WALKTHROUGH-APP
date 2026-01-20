@@ -10589,6 +10589,97 @@ async def delete_sample(sample_id: str):
         logger.error(f"Delete sample error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to delete sample: {str(e)}")
 
+@api_router.post("/samples/sync-existing")
+async def sync_existing_samples():
+    """One-time migration: Sync all existing items with sample statuses to Samples Library"""
+    try:
+        sample_statuses = ['ORDER SAMPLES', 'SAMPLES ORDERED', 'ENTER INTO HOUZZ & ORDER SAMPLE']
+        synced_count = 0
+        already_synced = 0
+        
+        # Get all items
+        items = await db.items.find({}, {"_id": 0}).to_list(None)
+        
+        for item in items:
+            item_status = (item.get("status") or "").upper()
+            if item_status in sample_statuses:
+                item_id = item.get("id")
+                
+                # Check if already synced
+                existing = await db.samples.find_one({"linked_item_id": item_id})
+                if existing:
+                    already_synced += 1
+                    continue
+                
+                # Get project info
+                subcategory_doc = await db.subcategories.find_one({"id": item.get("subcategory_id")})
+                project_id = None
+                room_name = ""
+                category_name = ""
+                if subcategory_doc:
+                    category_doc = await db.categories.find_one({"id": subcategory_doc.get("category_id")})
+                    if category_doc:
+                        category_name = category_doc.get("name", "")
+                        room_doc = await db.rooms.find_one({"id": category_doc.get("room_id")})
+                        if room_doc:
+                            room_name = room_doc.get("name", "")
+                            project_id = room_doc.get("project_id")
+                
+                # Determine sample type
+                sample_type = 'other'
+                category_lower = category_name.lower()
+                if 'fabric' in category_lower or 'textile' in category_lower:
+                    sample_type = 'fabric'
+                elif 'wall' in category_lower or 'paint' in category_lower:
+                    sample_type = 'wallcovering'
+                elif 'tile' in category_lower:
+                    sample_type = 'tile'
+                elif 'stone' in category_lower or 'marble' in category_lower:
+                    sample_type = 'stone'
+                elif 'wood' in category_lower or 'floor' in category_lower:
+                    sample_type = 'wood'
+                elif 'carpet' in category_lower or 'rug' in category_lower:
+                    sample_type = 'carpet'
+                elif 'hardware' in category_lower or 'knob' in category_lower:
+                    sample_type = 'hardware'
+                
+                sample_doc = {
+                    "id": str(uuid.uuid4()),
+                    "name": item.get("name", "Unknown Item"),
+                    "vendor": item.get("vendor", ""),
+                    "type": sample_type,
+                    "sku": item.get("sku", ""),
+                    "color": item.get("finish_color", "") or item.get("color", ""),
+                    "room": room_name,
+                    "status": "shipped" if item_status == "SAMPLES ORDERED" else "requested",
+                    "request_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                    "expected_date": "",
+                    "received_date": "",
+                    "tracking_number": "",
+                    "notes": f"Migration sync from Checklist. Category: {category_name}. Status: {item_status}",
+                    "image_url": item.get("image_url", "") or item.get("photo_url", "") or item.get("scraped_image", ""),
+                    "cost": item.get("cost", 0) or item.get("price", 0),
+                    "return_required": False,
+                    "project_id": project_id,
+                    "linked_item_id": item_id,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+                await db.samples.insert_one(sample_doc)
+                synced_count += 1
+                logging.info(f"📦 Migration synced: {item.get('name')} ({item_status})")
+        
+        return {
+            "success": True,
+            "message": f"Migration complete. Synced {synced_count} new items. {already_synced} already synced.",
+            "synced_count": synced_count,
+            "already_synced": already_synced
+        }
+        
+    except Exception as e:
+        logger.error(f"Migration sync error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Migration failed: {str(e)}")
+
 # ================================================================================
 # TEAM CHAT ENDPOINTS
 # Real-time team chat functionality with phone number identification
