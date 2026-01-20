@@ -191,16 +191,34 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
         style={{ background: bgColor }}
       >
         {isEditing ? (
-          // INLINE EDIT MODE
+          // INLINE EDIT MODE - With Notes/Comments
           <div className="space-y-2">
             <input
               type="text"
               value={editValues.text}
               onChange={(e) => setEditValues(prev => ({ ...prev, text: e.target.value }))}
               className="w-full px-3 py-2 rounded bg-black/50 border border-[#D4A574] text-white text-sm"
+              placeholder="Task description..."
               autoFocus
             />
+            {/* NOTES/COMMENTS FIELD */}
+            <textarea
+              value={editValues.notes || ''}
+              onChange={(e) => setEditValues(prev => ({ ...prev, notes: e.target.value }))}
+              placeholder="Add notes or comments..."
+              className="w-full px-3 py-2 rounded bg-black/50 border border-[#8b7355] text-white text-sm min-h-[60px] resize-y"
+            />
             <div className="flex gap-2 flex-wrap">
+              {/* STATUS DROPDOWN */}
+              <select
+                value={editValues.status || 'pending'}
+                onChange={(e) => setEditValues(prev => ({ ...prev, status: e.target.value }))}
+                className="px-3 py-1.5 rounded bg-black/50 border border-[#8b7355] text-white text-sm"
+              >
+                <option value="pending">⏳ Pending</option>
+                <option value="in_progress">🔄 In Progress</option>
+                <option value="completed">✅ Completed</option>
+              </select>
               <select
                 value={editValues.priority}
                 onChange={(e) => setEditValues(prev => ({ ...prev, priority: e.target.value }))}
@@ -243,23 +261,27 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
         ) : (
           // DISPLAY MODE - Click anywhere to edit
           <div className="flex items-center gap-3">
-            {/* Status Toggle Button */}
-            <button
-              onClick={(e) => {
+            {/* Status Toggle Button - Better visibility */}
+            <select
+              value={todo.status || 'pending'}
+              onChange={(e) => {
                 e.stopPropagation();
-                toggleStatus(todo.id, todo.status, isCompany, projectId);
+                const newStatus = e.target.value;
+                toggleStatus(todo.id, todo.status, isCompany, projectId, newStatus);
               }}
-              className={`w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+              className={`w-24 px-2 py-1 rounded text-xs font-bold cursor-pointer ${
                 todo.completed || todo.status === 'completed'
-                  ? 'border-green-500 bg-green-500/20 text-green-400'
+                  ? 'bg-green-600 text-white'
                   : todo.status === 'in_progress'
-                  ? 'border-blue-500 bg-blue-500/20 text-blue-400'
-                  : 'border-gray-500 hover:border-[#D4A574]'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-600 text-white'
               }`}
-              title="Click to change status"
+              onClick={(e) => e.stopPropagation()}
             >
-              {getStatusIcon(todo.status, todo.completed)}
-            </button>
+              <option value="pending">⏳ Pending</option>
+              <option value="in_progress">🔄 Working</option>
+              <option value="completed">✅ Done</option>
+            </select>
             
             {/* Main Content - Click to Edit */}
             <div 
