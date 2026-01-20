@@ -3157,9 +3157,11 @@ const ExactChecklistSpreadsheet = ({
                                             onClick={() => handleDeleteItem(item.id)}
                                             className="text-red-400 hover:text-red-300 text-sm"
                                             title="Delete Item"
-                                      >
-                                        🗑️
-                                      </button>
+                                          >
+                                            🗑️
+                                          </button>
+                                        </>
+                                      )}
                                     </div>
                                   </td>
                                 </tr>
