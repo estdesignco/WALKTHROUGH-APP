@@ -1816,6 +1816,7 @@ const ExactChecklistSpreadsheet = ({
               <option value="ORDERED">ORDERED</option>
               <option value="CHANGE OUT">CHANGE OUT</option>
               <option value="ORDER SAMPLES">ORDER SAMPLES</option>
+              <option value="SAMPLES ORDERED">SAMPLES ORDERED</option>
               <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
               <option value="ASK NEIL">ASK NEIL</option>
               <option value="ASK CHARLENE">ASK CHARLENE</option>
