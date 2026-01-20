@@ -2290,6 +2290,30 @@ const ExactChecklistSpreadsheet = ({
                       🎨 Import Page
                     </button>
                     <button
+                      onClick={async () => {
+                        const newName = prompt(`Copy room "${room.name}" as:`, `${room.name} (Copy)`);
+                        if (newName) {
+                          try {
+                            const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin)}/api/rooms/${room.id}/copy?new_name=${encodeURIComponent(newName)}`, {
+                              method: 'POST'
+                            });
+                            if (response.ok) {
+                              alert(`✅ Room copied as "${newName}"`);
+                              if (onReload) onReload();
+                            } else {
+                              alert('Failed to copy room');
+                            }
+                          } catch (error) {
+                            alert('Error: ' + error.message);
+                          }
+                        }
+                      }}
+                      className="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+                      title="Copy Room"
+                    >
+                      📋 Copy
+                    </button>
+                    <button
                       onClick={() => onDeleteRoom && onDeleteRoom(room.id)}
                       className="text-red-300 hover:text-red-100 text-lg"
                       title="Delete Room"
