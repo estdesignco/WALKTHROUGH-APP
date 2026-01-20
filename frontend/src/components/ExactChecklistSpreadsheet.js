@@ -1358,6 +1358,41 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
+  // UPLOAD IMAGE FOR ITEM - Manual image upload when scraper fails
+  const handleImageUpload = async (itemId, file) => {
+    if (!file) return;
+    
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('item_id', itemId);
+      
+      // Upload image to server
+      const uploadResponse = await fetch(`${backendUrl}/api/upload-item-image`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (uploadResponse.ok) {
+        const result = await uploadResponse.json();
+        console.log('✅ Image uploaded:', result);
+        
+        // Update item with new image URL
+        if (result.image_url) {
+          await handleUpdateItemField(itemId, 'image_url', result.image_url);
+          if (onReload) onReload();
+        }
+      } else {
+        console.error('❌ Image upload failed');
+        alert('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('❌ Image upload error:', error);
+      alert('Error uploading image: ' + error.message);
+    }
+  };
+
   // Handle upload to Canva - NOW OPENS IMPORT MODAL
   const handleUploadToCanva = () => {
     console.log('🎨 Opening Canva import modal');
