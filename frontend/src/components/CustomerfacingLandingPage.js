@@ -61,18 +61,20 @@ const Item = {
     }
 };
 
-const SendEmail = async ({ to, subject, body, from_name }) => {
-    const response = await fetch(`${BACKEND_URL}/api/send-questionnaire-email`, {
+const SendEmail = async ({ to, subject, body, from_name, client_name }) => {
+    const response = await fetch(`${BACKEND_URL}/api/send-questionnaire`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            to,
-            subject,
-            body,
-            from_name
+            client_name: client_name || to.split('@')[0],
+            client_email: to,
+            sender_name: from_name || "Established Design Co."
         })
     });
-    if (!response.ok) throw new Error('Failed to send email');
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to send email');
+    }
     return await response.json();
 };
 
