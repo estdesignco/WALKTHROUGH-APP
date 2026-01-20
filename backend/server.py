@@ -2183,7 +2183,7 @@ async def create_room(room_data: RoomCreate):
                         "id": item_id,
                         "subcategory_id": subcategory_id,
                         "name": item_obj["name"],
-                        "quantity": 1,
+                        "quantity": null,
                         "size": "",
                         "finish_color": "",  # ALWAYS BLANK - ignore template data
                         "status": "",  # BLANK status for all sheets
@@ -2395,7 +2395,7 @@ async def create_comprehensive_category(room_id: str = Query(...), category_name
                 item_obj = Item(
                     name=item_name,
                     subcategory_id=subcategory_id,
-                    quantity=1,
+                    quantity=None,
                     finish_color="",  # ALWAYS BLANK as requested
                     status="TO BE SELECTED",
                     order_index=0
@@ -2489,7 +2489,7 @@ async def create_category(category: CategoryCreate):
                         item_obj = Item(
                             name=item_name,
                             subcategory_id=subcategory_id,
-                            quantity=1,
+                            quantity=None,
                             finish_color="",  # FORCE BLANK - ignore any template data
                             status="TO BE SELECTED",
                             order_index=0
@@ -8771,7 +8771,7 @@ async def process_canva_pdf_file(file_path: str, room_name: str, project_id: str
                     "description": f"Auto-imported from Canva PDF - {item_data.get('source', 'extracted')}",
                     "subcategory_id": subcategory['id'],
                     "status": "",  # Start blank as requested
-                    "quantity": 1,
+                    "quantity": null,
                     "vendor": "From Canva PDF",
                     "price": 0,
                     "order_index": len(subcategory.get('items', [])),
@@ -8971,7 +8971,7 @@ async def scrape_canva_pdf(data: dict):
                     "subcategory_id": subcategory['id'],
                     "status": "",  # Start blank as requested
                     "link_url": url,
-                    "quantity": 1,
+                    "quantity": null,
                     "vendor": "From Canva PDF",
                     "price": 0,
                     "order_index": len(subcategory.get('items', [])),
@@ -13010,7 +13010,7 @@ async def import_selected_items(
                 "finish_color": item_data.get("finish_color", ""),
                 "image_url": item_data.get("image_url", ""),
                 "status": "PICKED",
-                "quantity": 1,
+                "quantity": null,
                 "photos": [],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
@@ -13695,7 +13695,7 @@ async def process_pdf_import(
                                 "finish_color": product_data.get("finish_color", ""),
                                 "image_url": product_data.get("image_url", ""),
                                 "status": "PICKED",
-                                "quantity": 1,
+                                "quantity": null,
                                 "photos": [],
                                 "created_at": datetime.utcnow(),
                                 "updated_at": datetime.utcnow()
