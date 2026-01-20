@@ -3,7 +3,81 @@
 ## Original Problem Statement
 Full-stack interior design project management application with multiple spreadsheets (FFE, Checklist, Walkthrough), task management (To-Do, Punch List, Company Tasks), and Microsoft Teams integration.
 
-## 🚀 LATEST SESSION - January 20, 2026
+## 🚀 LATEST SESSION - January 20, 2026 (Continued)
+
+### ALL FIXES IMPLEMENTED THIS SESSION:
+
+#### 1. CHECKBOX STATUS FIX ✅
+- Checkbox now stays checked for PICKED and ALL post-picked statuses
+- Statuses: PICKED, ORDER SAMPLES, SAMPLES ORDERED, SAMPLES ARRIVED, GET QUOTE, WAITING ON QT, READY FOR PRESENTATION, ENTER INTO HOUZZ
+
+#### 2. COST/PRICE FIELD EDITABLE ✅
+- Changed from contentEditable div to proper input field
+- Click to edit, Enter or blur to save
+
+#### 3. ADD ITEM = BLANK ROW ✅
+- "+ Add Item" now adds empty row directly
+- No modal, no form - just blank line ready for input
+
+#### 4. REMOVED "ARE YOU SURE" CONFIRMATIONS ✅
+- Delete now happens immediately (items, categories, subcategories, to-dos, projects)
+
+#### 5. IMAGE UPLOAD FOR ITEMS ✅
+- Manual image upload when scraper fails
+- Click 📷 icon to upload from device
+- Hover existing image to replace
+
+#### 6. REMARKS FIELD FIXED ✅
+- Changed to proper input field
+- Saves on blur or Enter
+
+#### 7. COPY ROOM ✅
+- "📋 Copy" button on room headers
+- Copies room with all categories, subcategories, and items
+
+#### 8. "SAMPLES ORDERED" STATUS ✅
+- Added to status dropdown in checklist
+
+#### 9. CLIENT NAME IN HEADER ✅
+- Changed from "CHECKLIST - GREENE" to actual client name
+
+#### 10. DELETE MULTIPLE ✅
+- "🗑️ Delete Multiple" button in toolbar
+- Select items with checkboxes, then bulk delete
+
+#### 11. TO-DO COMMENTS & STATUS ✅
+- Status dropdown (Pending/Working/Done) visible directly
+- Notes/Comments field when editing
+- Notes displayed in view mode
+
+#### 12. FILES DISAPPEARING FIX ✅
+- Added cache-busting headers to ALL API calls
+- Timestamp added to GET requests
+
+#### 13. EMAIL CLIENT FIX ✅
+- Corrected API endpoint from `/api/send-questionnaire-email` to `/api/send-questionnaire`
+- Fixed request body format
+
+#### 14. SCRAPER v7.21.0 ✅
+- Improved price detection with vendor-specific logic
+- Better data transfer with explicit null checks
+- Debug logging for troubleshooting
+
+### FILES MODIFIED:
+- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Multiple fixes
+- `/app/frontend/src/components/GlobalToDoModal.js` - Comments, status dropdown
+- `/app/frontend/src/components/MainDashboard.js` - Email fix
+- `/app/frontend/src/components/CustomerfacingLandingPage.js` - Email fix
+- `/app/frontend/src/components/ChecklistDashboard.js` - Client name header
+- `/app/frontend/src/components/ChecklistSheet.js` - Client name header
+- `/app/frontend/src/App.js` - Cache-busting headers
+- `/app/backend/server.py` - Copy room endpoint, SAMPLES ORDERED status, image upload
+- `/app/chrome-extension-scraper/popup.js` - v7.21.0 price fixes
+- `/app/chrome-extension-scraper/manifest.json` - Version bump
+
+---
+
+## PREVIOUS SESSION WORK:
 
 ### GLOBAL TO-DO MODAL - COMPLETE ✅
 
