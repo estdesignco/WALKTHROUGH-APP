@@ -107,20 +107,18 @@ const MainDashboard = () => {
 
   const handleDeleteProject = async (projectId, projectName, e) => {
     e.stopPropagation();
-    if (window.confirm(`Delete "${projectName}"?`)) {
-      try {
-        await projectAPI.delete(projectId);
-        const response = await projectAPI.getAll();
-        const projectsData = response.data || response || [];
-        setProjects(projectsData.map((project, index) => ({
-          id: project.id, name: project.name,
-          clientName: project.client_info?.full_name || 'Unknown Client',
-          address: project.client_info?.address || '',
-          color: PROJECT_COLORS[index % PROJECT_COLORS.length]
-        })));
-      } catch (error) {
-        alert('Failed: ' + error.message);
-      }
+    try {
+      await projectAPI.delete(projectId);
+      const response = await projectAPI.getAll();
+      const projectsData = response.data || response || [];
+      setProjects(projectsData.map((project, index) => ({
+        id: project.id, name: project.name,
+        clientName: project.client_info?.full_name || 'Unknown Client',
+        address: project.client_info?.address || '',
+        color: PROJECT_COLORS[index % PROJECT_COLORS.length]
+      })));
+    } catch (error) {
+      alert('Failed: ' + error.message);
     }
   };
 
