@@ -867,17 +867,33 @@ async function sendToApp() {
     const params = new URLSearchParams();
     params.set('action','add-item');
     params.set('source','extension');
-    if(scrapedData.name) params.set('name',scrapedData.name);
-    if(scrapedData.price) params.set('price',scrapedData.price);
-    if(scrapedData.sku) params.set('sku',scrapedData.sku);
-    if(scrapedData.size) params.set('size',scrapedData.size);
-    if(scrapedData.finish_color) params.set('finish',scrapedData.finish_color);
-    if(scrapedData.finish_image) params.set('finish_image',scrapedData.finish_image);
-    if(scrapedData.vendor) params.set('vendor',scrapedData.vendor);
-    if(scrapedData.url) params.set('link',scrapedData.url);
-    if(scrapedData.image_url) params.set('image',scrapedData.image_url);
-    if(scrapedData.msrp) params.set('msrp',scrapedData.msrp);
-    if(scrapedData.description) params.set('remarks',scrapedData.description);
+    
+    // ALWAYS send all available data - don't skip based on truthiness
+    if(scrapedData.name) params.set('name', scrapedData.name);
+    if(scrapedData.price !== undefined && scrapedData.price !== null && scrapedData.price !== '') {
+      params.set('price', String(scrapedData.price));
+    }
+    if(scrapedData.sku) params.set('sku', scrapedData.sku);
+    if(scrapedData.size) params.set('size', scrapedData.size);
+    if(scrapedData.finish_color) params.set('finish', scrapedData.finish_color);
+    if(scrapedData.finish_image) params.set('finish_image', scrapedData.finish_image);
+    if(scrapedData.vendor) params.set('vendor', scrapedData.vendor);
+    if(scrapedData.url) params.set('link', scrapedData.url);
+    if(scrapedData.image_url) params.set('image', scrapedData.image_url);
+    if(scrapedData.msrp !== undefined && scrapedData.msrp !== null && scrapedData.msrp !== '') {
+      params.set('msrp', String(scrapedData.msrp));
+    }
+    if(scrapedData.description) params.set('remarks', scrapedData.description);
+    
+    // DEBUG: Log what we're sending
+    console.log('==================== SENDING TO APP ====================');
+    console.log('Name:', scrapedData.name);
+    console.log('Price:', scrapedData.price, '(type:', typeof scrapedData.price, ')');
+    console.log('SKU:', scrapedData.sku);
+    console.log('Vendor:', scrapedData.vendor);
+    console.log('Image:', scrapedData.image_url ? 'YES' : 'NO');
+    console.log('Full params:', params.toString());
+    console.log('=========================================================');
     
     // Go directly to the selected project's checklist
     const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
