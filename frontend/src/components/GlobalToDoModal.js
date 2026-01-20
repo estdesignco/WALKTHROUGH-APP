@@ -105,10 +105,10 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
     }
   };
 
-  // Toggle status (cycles through pending -> in_progress -> completed -> pending)
-  const toggleStatus = async (todoId, currentStatus, isCompany, projectId) => {
+  // Toggle status - Now accepts direct status value
+  const toggleStatus = async (todoId, currentStatus, isCompany, projectId, newStatusOverride = null) => {
     const nextStatus = { pending: 'in_progress', in_progress: 'completed', completed: 'pending' };
-    const newStatus = nextStatus[currentStatus || 'pending'];
+    const newStatus = newStatusOverride || nextStatus[currentStatus || 'pending'];
     try {
       const endpoint = isCompany 
         ? `${API_URL}/todos/company/${todoId}` 
@@ -123,11 +123,13 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
     }
   };
 
-  // Start inline editing
+  // Start inline editing - Include notes and status
   const startEditing = (todo) => {
     setEditingId(todo.id);
     setEditValues({
       text: todo.text || '',
+      notes: todo.notes || todo.description || '',
+      status: todo.status || 'pending',
       priority: todo.priority || 'medium',
       assigned_to: todo.assigned_to || '',
       deadline: todo.deadline ? todo.deadline.split('T')[0] : ''
