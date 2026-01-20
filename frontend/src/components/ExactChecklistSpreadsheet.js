@@ -160,7 +160,7 @@ const ExactChecklistSpreadsheet = ({
         name: scraperClipboard.name || undefined,
         vendor: scraperClipboard.vendor || undefined,
         sku: scraperClipboard.sku || undefined,
-        cost: scraperClipboard.price ? parseFloat(scraperClipboard.price) : undefined,
+        cost: scraperClipboard.price ? parseFloat(String(scraperClipboard.price).replace(/[^0-9.]/g, '')) : undefined,
         size: scraperClipboard.size || undefined,
         finish_color: scraperClipboard.finish_color || undefined,
         finish_image: scraperClipboard.finish_image || undefined,
@@ -168,6 +168,9 @@ const ExactChecklistSpreadsheet = ({
         link: scraperClipboard.link || scraperClipboard.url || undefined,
         remarks: scraperClipboard.remarks || undefined
       };
+      
+      // Debug: Log the price conversion
+      console.log('💰 Price from clipboard:', scraperClipboard.price, '-> cost:', updateData.cost);
       
       // Remove undefined values
       Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
