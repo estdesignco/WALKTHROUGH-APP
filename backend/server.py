@@ -10714,15 +10714,16 @@ async def sync_existing_samples():
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
-                await db.samples.insert_one(sample_doc)
-                synced_count += 1
-                logging.info(f"📦 Migration synced: {item.get('name')} ({item_status})")
+            await db.samples.insert_one(sample_doc)
+            synced_count += 1
+            logging.info(f"📦 Migration synced: {sample_name} (finish: {finish_color}, vendor: {sample_vendor})")
         
         return {
             "success": True,
-            "message": f"Migration complete. Synced {synced_count} new items. {already_synced} already synced.",
+            "message": f"Migration complete. Synced {synced_count} items with finish_color. {already_synced} already synced. {skipped_no_finish} skipped (no finish_color).",
             "synced_count": synced_count,
-            "already_synced": already_synced
+            "already_synced": already_synced,
+            "skipped_no_finish": skipped_no_finish
         }
         
     except Exception as e:
