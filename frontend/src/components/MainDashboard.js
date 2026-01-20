@@ -124,11 +124,6 @@ const MainDashboard = () => {
     }
   };
 
-  const handleTodoClick = (projectId, itemId, sourceType = 'checklist') => {
-    const tabParam = sourceType === 'ffe' ? 'FF%26E' : sourceType === 'walkthrough' ? 'Walkthrough' : 'Checklist';
-    navigate(`/project/${projectId}?tab=${tabParam}${itemId ? `&highlightItem=${itemId}` : ''}`);
-  };
-
   const handleSendEmail = async () => {
     try {
       const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
