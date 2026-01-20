@@ -385,67 +385,6 @@ const MainDashboard = () => {
         </div>
       </div>
 
-      {/* TO-DO MODAL */}
-      {showTodoModal && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-5xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col" style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%)', border: '1px solid #8b7355' }}>
-            <div className="px-6 py-4 border-b border-[#8b7355]/30 flex items-center justify-between">
-              <div><h2 className="text-2xl font-bold text-[#D4A574]">Master To-Do List</h2><p className="text-gray-400 text-sm">{companyTodos.filter(t => !t.completed).length + Object.values(projectTodos).flat().filter(t => !t.completed).length} pending</p></div>
-              <div className="flex items-center gap-3">
-                <button onClick={() => setShowAddForm(true)} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm">+ Add Task</button>
-                <button onClick={() => setShowTodoModal(false)} className="text-gray-400 hover:text-white text-2xl">×</button>
-              </div>
-            </div>
-            <div className="flex border-b border-[#8b7355]/30">
-              {['all', 'company', 'projects'].map(section => (
-                <button key={section} onClick={() => setTodoModalSection(section)} className={`flex-1 px-4 py-3 text-sm font-medium ${todoModalSection === section ? 'text-[#D4A574] border-b-2 border-[#D4A574] bg-[#D4A574]/10' : 'text-gray-500 hover:text-gray-300'}`}>
-                  {section === 'all' ? '📋 All' : section === 'company' ? '🏢 Company' : '🏠 Projects'}
-                </button>
-              ))}
-            </div>
-            {showAddForm && (
-              <div className="p-4 border-b border-[#8b7355]/30 bg-black/30">
-                <form onSubmit={createTodo} className="space-y-3">
-                  <input type="text" value={newTodo.text} onChange={(e) => setNewTodo(prev => ({ ...prev, text: e.target.value }))} placeholder="What needs to be done?" className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#8b7355]/30 text-white placeholder-gray-500" autoFocus required />
-                  <div className="flex gap-3 flex-wrap">
-                    <select value={newTodo.priority} onChange={(e) => setNewTodo(prev => ({ ...prev, priority: e.target.value }))} className="px-4 py-2 rounded-lg bg-black/50 border border-[#8b7355]/30 text-white">
-                      <option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="urgent">Urgent</option>
-                    </select>
-                    <input type="text" value={newTodo.assigned_to} onChange={(e) => setNewTodo(prev => ({ ...prev, assigned_to: e.target.value }))} placeholder="Assign to" className="flex-1 px-4 py-2 rounded-lg bg-black/50 border border-[#8b7355]/30 text-white placeholder-gray-500" />
-                    <input type="date" value={newTodo.deadline} onChange={(e) => setNewTodo(prev => ({ ...prev, deadline: e.target.value }))} className="px-4 py-2 rounded-lg bg-black/50 border border-[#8b7355]/30 text-white" />
-                  </div>
-                  <div className="flex gap-2">
-                    <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium text-sm">Add Task</button>
-                    <button type="button" onClick={() => setShowAddForm(false)} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm">Cancel</button>
-                  </div>
-                </form>
-              </div>
-            )}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {(todoModalSection === 'all' || todoModalSection === 'company') && (
-                <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #7C3AED' }}>
-                  <div className="px-4 py-3" style={{ background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)' }}><h3 className="text-white font-bold">🏢 Company Tasks</h3></div>
-                  <div className="p-3 space-y-2 bg-[#0f0f1a]/50">
-                    {companyTodos.length === 0 ? <p className="text-gray-500 text-center py-4">No company tasks</p> : companyTodos.map((todo) => renderTodoItem(todo, true))}
-                  </div>
-                </div>
-              )}
-              {(todoModalSection === 'all' || todoModalSection === 'projects') && projects.map((project) => {
-                const todos = projectTodos[project.id] || [];
-                return (
-                  <div key={project.id} className="rounded-xl overflow-hidden" style={{ border: `1px solid ${project.color.border}` }}>
-                    <div className="px-4 py-3" style={{ background: project.color.bg }}><h3 className="text-white font-bold">🏠 {project.name}</h3></div>
-                    <div className="p-3 space-y-2 bg-[#0f0f1a]/50">
-                      {todos.length === 0 ? <p className="text-gray-500 text-center py-4">No tasks</p> : todos.map((todo) => renderTodoItem(todo, false, project.id))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Email Modal */}
       {showEmailModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
