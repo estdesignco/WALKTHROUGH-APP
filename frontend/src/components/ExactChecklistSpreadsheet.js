@@ -1871,8 +1871,34 @@ const ExactChecklistSpreadsheet = ({
             </select>
           </div>
           
-          {/* Action Buttons - ADD ROOM, CANVA LIVE CHECKLIST, SCANNER, AND TRANSFER */}
+          {/* Action Buttons - ADD ROOM, DELETE MULTIPLE, CANVA LIVE CHECKLIST, SCANNER, AND TRANSFER */}
           <div className="flex gap-3 flex-wrap">
+            {/* DELETE MULTIPLE TOGGLE */}
+            {deleteMode ? (
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleDeleteMultiple}
+                  disabled={selectedForDelete.size === 0}
+                  className={`px-4 py-2 rounded-full font-bold text-sm ${selectedForDelete.size > 0 ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-600 text-gray-400 cursor-not-allowed'}`}
+                >
+                  🗑️ Delete {selectedForDelete.size} Items
+                </button>
+                <button 
+                  onClick={() => { setDeleteMode(false); setSelectedForDelete(new Set()); }}
+                  className="px-4 py-2 rounded-full bg-gray-600 hover:bg-gray-700 text-white font-bold text-sm"
+                >
+                  ✖ Cancel
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setDeleteMode(true)}
+                className="px-4 py-2 rounded-full bg-red-600/20 hover:bg-red-600/40 text-red-400 hover:text-red-300 font-bold text-sm border border-red-600/30"
+              >
+                🗑️ Delete Multiple
+              </button>
+            )}
+            
             <button 
               onClick={onAddRoom}
               className="px-6 py-2 rounded-full shadow-xl hover:shadow-[#D4A574]/40 transition-all duration-300 transform hover:scale-105 tracking-wide font-bold text-black border border-[#B49B7E]"
