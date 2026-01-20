@@ -59,18 +59,26 @@ import PinterestIntegration from './components/PinterestIntegration';
 const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
 
-// Create axios instance with default config
+// Create axios instance with default config - NO CACHING
 console.log('🌐 API configured:', { BACKEND_URL, API });
 const api = axios.create({
   baseURL: API,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
   }
 });
 
-// Add request interceptor for debugging
+// Add request interceptor - ADD CACHE BUSTER TO ALL GET REQUESTS
 api.interceptors.request.use(request => {
+  // Add timestamp to prevent caching issues
+  if (request.method === 'get') {
+    request.params = request.params || {};
+    request.params._t = Date.now();
+  }
   console.log('🚀 API Request:', request.method.toUpperCase(), request.url);
   return request;
 });
