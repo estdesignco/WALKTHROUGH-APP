@@ -2475,9 +2475,7 @@ const ExactChecklistSpreadsheet = ({
                                     </button>
                                     <button
                                       onClick={() => {
-                                        if (window.confirm(`Delete "${subcategory.name}" and all its items?`)) {
-                                          handleDeleteSubcategory(subcategory.id);
-                                        }
+                                        handleDeleteSubcategory(subcategory.id);
                                       }}
                                       className="text-red-400 hover:text-red-300 text-xs"
                                     >
