@@ -44,15 +44,6 @@ const MainDashboard = () => {
   const [emailData, setEmailData] = useState({ email: '', name: '' });
   const [companyTodos, setCompanyTodos] = useState([]);
   const [projectTodos, setProjectTodos] = useState({});
-  const [todosLoading, setTodosLoading] = useState(false);
-  
-  // To-Do Modal State
-  const [showTodoModal, setShowTodoModal] = useState(false);
-  const [todoModalSection, setTodoModalSection] = useState('all');
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newTodo, setNewTodo] = useState({
-    text: '', description: '', priority: 'medium', assigned_to: '', deadline: ''
-  });
 
   useEffect(() => {
     const action = searchParams.get('action');
