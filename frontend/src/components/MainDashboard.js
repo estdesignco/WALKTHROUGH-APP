@@ -163,56 +163,27 @@ const MainDashboard = () => {
     { icon: '🤖', label: 'AI', path: '/ai-assistant' },
   ];
 
-  const renderTodoItem = (todo, isCompany, projectId = null) => {
-    const linkedItem = todo.linked_ffe_item || todo.linked_checklist_item || {};
-    const sourceType = todo.source_type || linkedItem.source_type || 'checklist';
-    const sheetLabel = sourceType === 'ffe' ? 'FF&E' : sourceType === 'walkthrough' ? 'WALKTHROUGH' : 'CHECKLIST';
-    const roomName = linkedItem.room_name || linkedItem.room || todo.room_name || '';
-    const categoryName = linkedItem.category_name || linkedItem.category || '';
-    
-    return (
-      <div key={todo.id} className={`p-2 rounded-lg transition-all hover:bg-black/30 ${todo.completed ? 'opacity-60' : ''}`} style={{ background: 'rgba(0,0,0,0.2)' }}>
-        <div className="flex items-start gap-2">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              const nextStatus = { pending: 'in_progress', in_progress: 'completed', completed: 'pending' };
-              updateTodoStatus(todo.id, nextStatus[todo.status || 'pending'], isCompany, projectId);
-            }}
-            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs ${
-              todo.completed || todo.status === 'completed' ? 'border-green-500 bg-green-500/20 text-green-400'
-                : todo.status === 'in_progress' ? 'border-blue-500 bg-blue-500/20 text-blue-400'
-                : 'border-gray-500 hover:border-[#D4A574]'
-            }`}
-          >
-            {getStatusIcon(todo.status, todo.completed)}
-          </button>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1 flex-wrap">
-              <span className={`text-xs font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-white'}`}>{todo.text}</span>
-              <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${getPriorityColor(todo.priority)} text-white`}>{todo.priority}</span>
-            </div>
-            {(roomName || categoryName) && (
-              <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                {roomName && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#8b7355]/30 text-[#D4A574]">{roomName}</span>}
-                {categoryName && <span className="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300">{categoryName}</span>}
-              </div>
-            )}
-            <div className="flex items-center gap-2 mt-1 text-[9px] text-gray-500 flex-wrap">
-              {todo.assigned_to && <span>👤 {todo.assigned_to}</span>}
-              {todo.deadline && <span className="text-amber-400">📅 {new Date(todo.deadline).toLocaleDateString()}</span>}
-              {!isCompany && todo.item_id && (
-                <button onClick={(e) => { e.stopPropagation(); handleTodoClick(projectId, todo.item_id, sourceType); }}
-                  className="px-1.5 py-0.5 rounded bg-blue-600 text-white hover:bg-blue-500">{sheetLabel} →</button>
-              )}
-            </div>
-          </div>
-          <button onClick={(e) => { e.stopPropagation(); deleteTodo(todo.id, isCompany, projectId); }}
-            className="text-red-400/50 hover:text-red-400 text-xs flex-shrink-0">🗑️</button>
-        </div>
+  // Simple preview item for right panel
+  const renderPreviewItem = (todo, index) => (
+    <div 
+      key={todo.id} 
+      className={`p-2 rounded cursor-pointer hover:bg-white/10 ${todo.completed ? 'opacity-50' : ''}`}
+      style={{ background: index % 2 === 0 ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.15)' }}
+      onClick={() => window.openGlobalTodo?.()}
+    >
+      <div className="flex items-center gap-2">
+        <span className={`text-xs ${todo.completed ? 'line-through text-gray-500' : 'text-white'}`}>
+          {todo.text?.length > 30 ? todo.text.substring(0, 30) + '...' : todo.text}
+        </span>
+        <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${getPriorityColor(todo.priority)} text-white`}>
+          {todo.priority}
+        </span>
       </div>
-    );
-  };
+      {todo.deadline && (
+        <div className="text-[9px] text-amber-400 mt-0.5">📅 {new Date(todo.deadline).toLocaleDateString()}</div>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-black flex">
