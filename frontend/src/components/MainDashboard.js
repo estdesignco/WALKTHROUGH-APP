@@ -206,7 +206,7 @@ const MainDashboard = () => {
     { icon: '🧮', label: 'Calc', path: '/calculators' },
     { icon: '👥', label: 'Contacts', path: '/master-contacts' },
     { icon: '📦', label: 'Materials', path: '/master-materials' },
-    { icon: '✅', label: 'To-Do', action: () => setShowTodoModal(true) },
+    { icon: '✅', label: 'To-Do', action: () => window.openGlobalTodo?.() },
     { icon: '🤖', label: 'AI', path: '/ai-assistant' },
   ];
 
