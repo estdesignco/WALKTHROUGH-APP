@@ -10623,80 +10623,97 @@ async def delete_sample(sample_id: str):
 
 @api_router.post("/samples/sync-existing")
 async def sync_existing_samples():
-    """One-time migration: Sync all existing items with sample statuses to Samples Library"""
+    """One-time migration: Sync all existing items with FINISH_COLOR content to Samples Library"""
     try:
-        sample_statuses = ['ORDER SAMPLES', 'SAMPLES ORDERED', 'ENTER INTO HOUZZ & ORDER SAMPLE']
         synced_count = 0
         already_synced = 0
+        skipped_no_finish = 0
         
         # Get all items
         items = await db.items.find({}, {"_id": 0}).to_list(None)
         
         for item in items:
-            item_status = (item.get("status") or "").upper()
-            if item_status in sample_statuses:
-                item_id = item.get("id")
+            finish_color = (item.get("finish_color") or "").strip()
+            item_vendor = item.get("vendor", "")
+            item_image = item.get("image_url", "") or item.get("photo_url", "") or item.get("scraped_image", "")
+            
+            # Only sync items that have finish_color content
+            if not finish_color:
+                skipped_no_finish += 1
+                continue
                 
-                # Check if already synced
-                existing = await db.samples.find_one({"linked_item_id": item_id})
-                if existing:
-                    already_synced += 1
-                    continue
-                
-                # Get project info
-                subcategory_doc = await db.subcategories.find_one({"id": item.get("subcategory_id")})
-                project_id = None
-                room_name = ""
-                category_name = ""
-                if subcategory_doc:
-                    category_doc = await db.categories.find_one({"id": subcategory_doc.get("category_id")})
-                    if category_doc:
-                        category_name = category_doc.get("name", "")
-                        room_doc = await db.rooms.find_one({"id": category_doc.get("room_id")})
-                        if room_doc:
-                            room_name = room_doc.get("name", "")
-                            project_id = room_doc.get("project_id")
-                
-                # Determine sample type
-                sample_type = 'other'
-                category_lower = category_name.lower()
-                if 'fabric' in category_lower or 'textile' in category_lower:
-                    sample_type = 'fabric'
-                elif 'wall' in category_lower or 'paint' in category_lower:
-                    sample_type = 'wallcovering'
-                elif 'tile' in category_lower:
-                    sample_type = 'tile'
-                elif 'stone' in category_lower or 'marble' in category_lower:
-                    sample_type = 'stone'
-                elif 'wood' in category_lower or 'floor' in category_lower:
-                    sample_type = 'wood'
-                elif 'carpet' in category_lower or 'rug' in category_lower:
-                    sample_type = 'carpet'
-                elif 'hardware' in category_lower or 'knob' in category_lower:
-                    sample_type = 'hardware'
-                
-                sample_doc = {
-                    "id": str(uuid.uuid4()),
-                    "name": item.get("name", "Unknown Item"),
-                    "vendor": item.get("vendor", ""),
-                    "type": sample_type,
-                    "sku": item.get("sku", ""),
-                    "color": item.get("finish_color", "") or item.get("color", ""),
-                    "room": room_name,
-                    "status": "shipped" if item_status == "SAMPLES ORDERED" else "requested",
-                    "request_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-                    "expected_date": "",
-                    "received_date": "",
-                    "tracking_number": "",
-                    "notes": f"Migration sync from Checklist. Category: {category_name}. Status: {item_status}",
-                    "image_url": item.get("image_url", "") or item.get("photo_url", "") or item.get("scraped_image", ""),
-                    "cost": item.get("cost", 0) or item.get("price", 0),
-                    "return_required": False,
-                    "project_id": project_id,
-                    "linked_item_id": item_id,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
+            item_id = item.get("id")
+            
+            # Check if already synced
+            existing = await db.samples.find_one({"linked_item_id": item_id})
+            if existing:
+                already_synced += 1
+                continue
+            
+            # Get project info
+            subcategory_doc = await db.subcategories.find_one({"id": item.get("subcategory_id")})
+            project_id = None
+            room_name = ""
+            category_name = ""
+            if subcategory_doc:
+                category_doc = await db.categories.find_one({"id": subcategory_doc.get("category_id")})
+                if category_doc:
+                    category_name = category_doc.get("name", "")
+                    room_doc = await db.rooms.find_one({"id": category_doc.get("room_id")})
+                    if room_doc:
+                        room_name = room_doc.get("name", "")
+                        project_id = room_doc.get("project_id")
+            
+            # Determine sample type
+            sample_type = 'other'
+            category_lower = category_name.lower()
+            if 'fabric' in category_lower or 'textile' in category_lower:
+                sample_type = 'fabric'
+            elif 'wall' in category_lower or 'paint' in category_lower:
+                sample_type = 'wallcovering'
+            elif 'tile' in category_lower:
+                sample_type = 'tile'
+            elif 'stone' in category_lower or 'marble' in category_lower:
+                sample_type = 'stone'
+            elif 'wood' in category_lower or 'floor' in category_lower:
+                sample_type = 'wood'
+            elif 'carpet' in category_lower or 'rug' in category_lower:
+                sample_type = 'carpet'
+            elif 'hardware' in category_lower or 'knob' in category_lower:
+                sample_type = 'hardware'
+            
+            # Parse vendor from finish_color if it contains "/" (e.g., "Kravet/Blue Velvet")
+            sample_vendor = item_vendor
+            sample_name = finish_color
+            if "/" in finish_color:
+                parts = finish_color.split("/", 1)
+                if len(parts) == 2:
+                    sample_vendor = parts[0].strip() or item_vendor
+                    sample_name = parts[1].strip() or finish_color
+            
+            sample_doc = {
+                "id": str(uuid.uuid4()),
+                "name": sample_name,
+                "vendor": sample_vendor,
+                "type": sample_type,
+                "sku": item.get("sku", ""),
+                "color": finish_color,
+                "room": room_name,
+                "status": "requested",
+                "request_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                "expected_date": "",
+                "received_date": "",
+                "tracking_number": "",
+                "notes": f"Migration sync. Item: {item.get('name', '')}. Category: {category_name}",
+                "image_url": item_image,
+                "cost": item.get("cost", 0) or item.get("price", 0),
+                "return_required": False,
+                "project_id": project_id,
+                "linked_item_id": item_id,
+                "item_name": item.get("name", ""),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
                 await db.samples.insert_one(sample_doc)
                 synced_count += 1
                 logging.info(f"📦 Migration synced: {item.get('name')} ({item_status})")
