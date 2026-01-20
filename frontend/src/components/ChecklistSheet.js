@@ -173,7 +173,7 @@ const ChecklistSheet = () => {
 
         {/* Checklist Title and Actions */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - GREENE</h3>
+          <h3 className="text-xl font-semibold" style={{ color: '#8b7355' }}>CHECKLIST - {project?.client_info?.full_name || project?.name || 'PROJECT'}</h3>
           <div className="flex space-x-4">
             <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
               📄 Print Checklist
