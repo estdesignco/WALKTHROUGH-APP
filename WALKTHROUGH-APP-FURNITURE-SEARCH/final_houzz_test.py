@@ -9,7 +9,7 @@ import json
 import time
 from datetime import datetime
 
-BACKEND_URL = "https://apprescue-deploy.preview.emergentagent.com"
+BACKEND_URL = "https://fixmyapp-13.preview.emergentagent.com"
 
 def test_houzz_automation_final():
     """Final test with extended timeout"""

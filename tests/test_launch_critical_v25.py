@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Get BASE_URL from environment
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://apprescue-deploy.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fixmyapp-13.preview.emergentagent.com').rstrip('/')
 API_URL = f"{BASE_URL}/api"
 
 print(f"Testing against: {API_URL}")

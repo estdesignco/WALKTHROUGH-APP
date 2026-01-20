@@ -62,7 +62,7 @@ def test_send_questionnaire():
     print("=" * 80)
     
     print("\n🔍 Looking for questionnaire URL in backend logs...")
-    print("Expected URL: https://apprescue-deploy.preview.emergentagent.com/customer/questionnaire")
+    print("Expected URL: https://fixmyapp-13.preview.emergentagent.com/customer/questionnaire")
     print("NOT expected: http://localhost:3000/customer/questionnaire")
     
     return True
@@ -88,7 +88,7 @@ def check_backend_logs():
             print(logs)
             
             # Check for the correct URL
-            if "https://apprescue-deploy.preview.emergentagent.com/customer/questionnaire" in logs:
+            if "https://fixmyapp-13.preview.emergentagent.com/customer/questionnaire" in logs:
                 print("\n✅ CORRECT PUBLIC URL FOUND IN LOGS!")
                 return True
             elif "localhost:3000" in logs or "http://localhost" in logs:
@@ -126,7 +126,7 @@ if __name__ == "__main__":
         print("\n✅ ALL TESTS PASSED!")
         print("   ✓ Email sent successfully (200 OK)")
         print("   ✓ Correct public URL used in email")
-        print("   ✓ URL: https://apprescue-deploy.preview.emergentagent.com/customer/questionnaire")
+        print("   ✓ URL: https://fixmyapp-13.preview.emergentagent.com/customer/questionnaire")
     elif test_result and log_result is None:
         print("\n⚠️  PARTIAL SUCCESS")
         print("   ✓ Email sent successfully (200 OK)")

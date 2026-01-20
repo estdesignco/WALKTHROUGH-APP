@@ -2,7 +2,7 @@
 """
 COMPREHENSIVE VENDOR SCRAPER TESTING
 Testing ALL 7 required fields for priority vendors as requested in review
-Backend URL: https://apprescue-deploy.preview.emergentagent.com
+Backend URL: https://fixmyapp-13.preview.emergentagent.com
 """
 
 import requests
@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://apprescue-deploy.preview.emergentagent.com"
+BACKEND_URL = "https://fixmyapp-13.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test vendors with specific URLs from review request

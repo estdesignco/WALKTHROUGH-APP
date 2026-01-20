@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://apprescue-deploy.preview.emergentagent.com";
+const BACKEND_URL = "https://fixmyapp-13.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

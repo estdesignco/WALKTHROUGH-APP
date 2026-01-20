@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://apprescue-deploy.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fixmyapp-13.preview.emergentagent.com')
 
 class TestMasterToDoList:
     """Test Master To-Do List features"""
