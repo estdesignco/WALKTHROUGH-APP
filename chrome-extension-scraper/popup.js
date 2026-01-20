@@ -325,45 +325,150 @@ function scrapePageData() {
     }
   }
 
-  // PRICE & MSRP - Search the entire page text
-  // Uttermost format: "$488.00" and "Suggested retail price $1,464.00"
+  // PRICE & MSRP - IMPROVED VENDOR-SPECIFIC DETECTION
   const pageText = document.body.innerText;
   
-  // First get MSRP - it's clearly labeled
-  const msrpMatch = pageText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
-  if (msrpMatch) {
-    data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
-    console.log('Found MSRP:', data.msrp);
+  // ============================================================================
+  // VENDOR-SPECIFIC PRICE DETECTION
+  // ============================================================================
+  
+  if (domain.includes('uttermost')) {
+    // Uttermost: Dealer price is first price, MSRP follows "Suggested retail price"
+    const msrpMatch = pageText.match(/Suggested retail price \$([\d,]+\.?\d*)/i);
+    if (msrpMatch) {
+      data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
+    }
+    // Find price before "Suggested retail" - that's the dealer price
+    const priceBeforeMsrp = pageText.match(/\$([\d,]+\.?\d*)[\s\S]*?Suggested retail/i);
+    if (priceBeforeMsrp) {
+      data.price = parseFloat(priceBeforeMsrp[1].replace(/,/g, ''));
+    }
   }
   
-  // For dealer price, look for pattern: standalone price before "Suggested retail"
-  // Or find price near "ADD TO CART"
-  const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)\s*[\s\S]*?ADD TO CART/i);
-  if (addToCartMatch) {
-    data.price = parseFloat(addToCartMatch[1].replace(/,/g, ''));
-    console.log('Found price near ADD TO CART:', data.price);
+  else if (domain.includes('fourhands')) {
+    // Four Hands: Price in specific element near product title
+    const priceEl = document.querySelector('[class*="price"], [data-testid*="price"]');
+    if (priceEl) {
+      const match = priceEl.textContent.match(/\$([\d,]+\.?\d*)/);
+      if (match) data.price = parseFloat(match[1].replace(/,/g, ''));
+    }
+    // Also try looking for price pattern in page
+    if (!data.price) {
+      const priceMatch = pageText.match(/\$([\d,]+\.?\d*)\s*(?:USD|each|per item)?/i);
+      if (priceMatch) data.price = parseFloat(priceMatch[1].replace(/,/g, ''));
+    }
   }
   
-  // Fallback: find all prices and pick the one that looks like dealer price
+  else if (domain.includes('bernhardt')) {
+    // Bernhardt: Look for price in product details
+    const priceEl = document.querySelector('.product-price, .price, [class*="price"]');
+    if (priceEl) {
+      const match = priceEl.textContent.match(/\$([\d,]+\.?\d*)/);
+      if (match) data.price = parseFloat(match[1].replace(/,/g, ''));
+    }
+  }
+  
+  else if (domain.includes('visualcomfort')) {
+    // Visual Comfort: Price shown prominently
+    const priceEl = document.querySelector('[class*="price"], .product-price');
+    if (priceEl) {
+      const match = priceEl.textContent.match(/\$([\d,]+\.?\d*)/);
+      if (match) data.price = parseFloat(match[1].replace(/,/g, ''));
+    }
+  }
+  
+  else if (domain.includes('hvlgroup')) {
+    // HVL: Look for Trade Price specifically
+    const tradePriceMatch = pageText.match(/Trade Price[:\s]*\$([\d,]+\.?\d*)/i);
+    if (tradePriceMatch) {
+      data.price = parseFloat(tradePriceMatch[1].replace(/,/g, ''));
+    }
+    const msrpMatch = pageText.match(/MSRP[:\s]*\$([\d,]+\.?\d*)/i);
+    if (msrpMatch) {
+      data.msrp = parseFloat(msrpMatch[1].replace(/,/g, ''));
+    }
+  }
+  
+  // GENERIC PRICE DETECTION - Improved
   if (!data.price) {
-    const allPrices = pageText.match(/\$([\d,]+\.?\d*)/g) || [];
-    console.log('All prices found:', allPrices);
-    
-    for (const p of allPrices) {
-      const val = parseFloat(p.replace(/[$,]/g, ''));
-      // Dealer price should be > $50 and if we have MSRP, should be less than MSRP
-      if (val > 50 && val < 50000) {
-        if (data.msrp && val < data.msrp) {
-          data.price = val;
-          console.log('Found dealer price:', data.price);
-          break;
-        } else if (!data.msrp) {
-          data.price = val;
-          break;
+    // Try to find price in structured data first (most reliable)
+    const jsonLd = document.querySelector('script[type="application/ld+json"]');
+    if (jsonLd) {
+      try {
+        const jsonData = JSON.parse(jsonLd.textContent);
+        if (jsonData.offers?.price) {
+          data.price = parseFloat(jsonData.offers.price);
+        } else if (jsonData['@graph']) {
+          for (const item of jsonData['@graph']) {
+            if (item.offers?.price) {
+              data.price = parseFloat(item.offers.price);
+              break;
+            }
+          }
+        }
+      } catch(e) { console.log('JSON-LD parse failed'); }
+    }
+  }
+  
+  if (!data.price) {
+    // Look for price in common price elements
+    const priceSelectors = [
+      '.product-price', '.price', '[class*="price"]', '[data-price]',
+      '[itemprop="price"]', '.current-price', '.sale-price', '.regular-price'
+    ];
+    for (const sel of priceSelectors) {
+      const el = document.querySelector(sel);
+      if (el) {
+        const match = el.textContent.match(/\$([\d,]+\.?\d*)/);
+        if (match) {
+          const val = parseFloat(match[1].replace(/,/g, ''));
+          if (val > 0 && val < 100000) {
+            data.price = val;
+            break;
+          }
         }
       }
     }
   }
+  
+  if (!data.price) {
+    // Last resort: find price near "ADD TO CART" or "Add to Cart"
+    const addToCartMatch = pageText.match(/\$([\d,]+\.?\d*)[\s\S]{0,200}(?:ADD TO CART|Add to Cart|ADD TO BAG)/i);
+    if (addToCartMatch) {
+      data.price = parseFloat(addToCartMatch[1].replace(/,/g, ''));
+    }
+  }
+  
+  if (!data.price) {
+    // Final fallback: get first reasonable price on page
+    const allPrices = pageText.match(/\$([\d,]+\.?\d*)/g) || [];
+    for (const p of allPrices) {
+      const val = parseFloat(p.replace(/[$,]/g, ''));
+      if (val > 10 && val < 100000) {
+        // Skip if this looks like an MSRP (if we already found one)
+        if (data.msrp && val === data.msrp) continue;
+        data.price = val;
+        break;
+      }
+    }
+  }
+  
+  // Get MSRP if not found yet
+  if (!data.msrp) {
+    const msrpPatterns = [
+      /(?:MSRP|Retail|List Price|Suggested Retail)[:\s]*\$([\d,]+\.?\d*)/i,
+      /\$([\d,]+\.?\d*)\s*(?:MSRP|Retail|List)/i
+    ];
+    for (const pattern of msrpPatterns) {
+      const match = pageText.match(pattern);
+      if (match) {
+        data.msrp = parseFloat(match[1].replace(/,/g, ''));
+        break;
+      }
+    }
+  }
+  
+  console.log('💰 Price found:', data.price, 'MSRP:', data.msrp);
 
   // PRODUCT IMAGE - vendor-specific main product photo
   if (domain.includes('fourhands')) {
