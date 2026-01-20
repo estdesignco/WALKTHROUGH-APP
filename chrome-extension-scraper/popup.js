@@ -797,7 +797,22 @@ function scrapePageData() {
     data.finish_color = data.name.split(',').pop().trim();
   }
 
-  console.log('Scraped data:', data);
+  // ============================================================================
+  // FINAL DEBUG OUTPUT - Log ALL scraped data
+  // ============================================================================
+  console.log('==================== SCRAPE RESULTS ====================');
+  console.log('🏪 Vendor:', data.vendor);
+  console.log('📦 Product Name:', data.name);
+  console.log('🏷️ SKU:', data.sku);
+  console.log('💰 PRICE:', data.price);
+  console.log('💵 MSRP:', data.msrp);
+  console.log('📐 Size:', data.size);
+  console.log('🎨 Finish/Color:', data.finish_color);
+  console.log('🖼️ Finish Image:', data.finish_image ? 'YES' : 'NO');
+  console.log('📷 Product Image:', data.image_url ? 'YES' : 'NO');
+  console.log('🔗 URL:', data.url);
+  console.log('=========================================================');
+  
   return data;
 }
 
