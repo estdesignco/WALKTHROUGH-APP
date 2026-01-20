@@ -2632,6 +2632,38 @@ async def bulk_create_items(items: List[ItemCreate]):
         print(f"❌ Bulk create failed: {e}")
         raise HTTPException(status_code=500, detail=f"Bulk item creation failed: {str(e)}")
 
+@api_router.post("/upload-item-image")
+async def upload_item_image(file: UploadFile = File(...), item_id: str = Form(...)):
+    """Upload an image for a checklist item when scraper fails"""
+    try:
+        import base64
+        import os
+        
+        # Read file content
+        content = await file.read()
+        
+        # Create base64 data URL
+        file_ext = file.filename.split('.')[-1].lower() if file.filename else 'png'
+        mime_type = f"image/{file_ext}" if file_ext in ['png', 'jpg', 'jpeg', 'gif', 'webp'] else 'image/png'
+        base64_data = base64.b64encode(content).decode('utf-8')
+        image_url = f"data:{mime_type};base64,{base64_data}"
+        
+        # Update item with image URL
+        result = await db.items.update_one(
+            {"id": item_id},
+            {"$set": {"image_url": image_url, "updated_at": datetime.utcnow()}}
+        )
+        
+        if result.modified_count > 0:
+            print(f"✅ Image uploaded for item {item_id}")
+            return {"success": True, "image_url": image_url}
+        else:
+            return {"success": False, "message": "Item not found or not updated"}
+            
+    except Exception as e:
+        print(f"❌ Image upload error: {e}")
+        raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
+
 @api_router.get("/items/{item_id}", response_model=Item)  
 async def get_item(item_id: str):
     item_data = await db.items.find_one({"id": item_id})
