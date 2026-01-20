@@ -2843,6 +2843,73 @@ async def update_item(item_id: str, item_update: ItemUpdate):
             logging.error(f"Failed to create Teams notification: {str(e)}")
             # Don't fail the update if Teams notification fails
     
+    # AUTO-SYNC: Add to Samples Library when status changes to sample-related statuses
+    sample_statuses = ['ORDER SAMPLES', 'SAMPLES ORDERED', 'ENTER INTO HOUZZ & ORDER SAMPLE']
+    if new_status.upper() in sample_statuses and old_status.upper() not in sample_statuses:
+        try:
+            # Check if sample already exists for this item
+            existing_sample = await db.samples.find_one({"linked_item_id": item_id})
+            if not existing_sample:
+                # Get project info
+                subcategory_doc = await db.subcategories.find_one({"id": current_item_doc["subcategory_id"]})
+                project_id = None
+                room_name = ""
+                category_name = ""
+                if subcategory_doc:
+                    category_doc = await db.categories.find_one({"id": subcategory_doc["category_id"]})
+                    if category_doc:
+                        category_name = category_doc.get("name", "")
+                        room_doc = await db.rooms.find_one({"id": category_doc["room_id"]})
+                        if room_doc:
+                            room_name = room_doc.get("name", "")
+                            project_id = room_doc.get("project_id")
+                
+                # Determine sample type based on category
+                sample_type = 'other'
+                category_lower = category_name.lower()
+                if 'fabric' in category_lower or 'textile' in category_lower:
+                    sample_type = 'fabric'
+                elif 'wall' in category_lower or 'paint' in category_lower:
+                    sample_type = 'wallcovering'
+                elif 'tile' in category_lower:
+                    sample_type = 'tile'
+                elif 'stone' in category_lower or 'marble' in category_lower:
+                    sample_type = 'stone'
+                elif 'wood' in category_lower or 'floor' in category_lower:
+                    sample_type = 'wood'
+                elif 'carpet' in category_lower or 'rug' in category_lower:
+                    sample_type = 'carpet'
+                elif 'hardware' in category_lower or 'knob' in category_lower:
+                    sample_type = 'hardware'
+                
+                sample_doc = {
+                    "id": str(uuid.uuid4()),
+                    "name": current_item_doc.get("name", "Unknown Item"),
+                    "vendor": current_item_doc.get("vendor", ""),
+                    "type": sample_type,
+                    "sku": current_item_doc.get("sku", ""),
+                    "color": current_item_doc.get("finish_color", "") or current_item_doc.get("color", ""),
+                    "room": room_name,
+                    "status": "shipped" if new_status.upper() == "SAMPLES ORDERED" else "requested",
+                    "request_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                    "expected_date": "",
+                    "received_date": "",
+                    "tracking_number": "",
+                    "notes": f"Auto-synced from Checklist. Category: {category_name}",
+                    "image_url": current_item_doc.get("image_url", "") or current_item_doc.get("photo_url", "") or current_item_doc.get("scraped_image", ""),
+                    "cost": current_item_doc.get("cost", 0) or current_item_doc.get("price", 0),
+                    "return_required": False,
+                    "project_id": project_id,
+                    "linked_item_id": item_id,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }
+                await db.samples.insert_one(sample_doc)
+                logging.info(f"📦 Auto-synced item to Samples Library: {current_item_doc.get('name')} (status: {new_status})")
+        except Exception as e:
+            logging.error(f"Failed to auto-sync to Samples Library: {str(e)}")
+            # Don't fail the update if sample sync fails
+    
     return await get_item(item_id)
 
 @api_router.delete("/items/{item_id}")
