@@ -408,7 +408,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
         name: '',
         vendor: '',
         sku: '',
-        quantity: '',
+        quantity: null,
         size: '',
         finish_color: '',
         cost: 0,
