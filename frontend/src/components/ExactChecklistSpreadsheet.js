@@ -1138,10 +1138,6 @@ const ExactChecklistSpreadsheet = ({
 
   // Handle deleting an item - NO PAGE RELOAD
   const handleDeleteItem = async (itemId) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) {
-      return;
-    }
-
     try {
       const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/items/${itemId}`, {
         method: 'DELETE'
@@ -1168,10 +1164,6 @@ const ExactChecklistSpreadsheet = ({
 
   // Handle deleting a category - NO PAGE RELOAD
   const handleDeleteCategory = async (categoryId) => {
-    if (!window.confirm('Are you sure you want to delete this entire category and all its items?')) {
-      return;
-    }
-
     try {
       const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${categoryId}`, {
         method: 'DELETE'
