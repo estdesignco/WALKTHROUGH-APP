@@ -170,7 +170,11 @@ const ExactChecklistSpreadsheet = ({
       };
       
       // Debug: Log the price conversion
-      console.log('💰 Price from clipboard:', scraperClipboard.price, '-> cost:', updateData.cost);
+      console.log('💰 PRICE DEBUG:');
+      console.log('   Raw price from clipboard:', scraperClipboard.price);
+      console.log('   Type:', typeof scraperClipboard.price);
+      console.log('   Parsed cost:', updateData.cost);
+      console.log('   Full clipboard data:', JSON.stringify(scraperClipboard, null, 2));
       
       // Remove undefined values
       Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
