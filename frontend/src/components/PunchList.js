@@ -511,6 +511,14 @@ export default function PunchList({ projectId, roomId = null }) {
                 title="Deadline"
               />
             </div>
+            {/* Notes/Comments for new item */}
+            <textarea
+              value={newItem.notes}
+              onChange={(e) => setNewItem(prev => ({ ...prev, notes: e.target.value }))}
+              placeholder="Add notes or comments (optional)"
+              className="w-full px-4 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none resize-none"
+              rows={2}
+            />
             <div className="flex gap-2">
               <button
                 type="submit"
