@@ -37,7 +37,12 @@ const ExactChecklistSpreadsheet = ({
   onReload,
   onRoomCanvaImport
 }) => {
-  console.log('🎯 SimpleChecklistSpreadsheet rendering with project:', project);
+  // Reduce console spam - only log on first render
+  const hasLoggedRender = useRef(false);
+  if (!hasLoggedRender.current && project) {
+    console.log('🎯 SimpleChecklistSpreadsheet rendering with project:', project);
+    hasLoggedRender.current = true;
+  }
 
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
