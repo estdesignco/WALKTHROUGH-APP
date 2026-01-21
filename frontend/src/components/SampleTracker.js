@@ -662,6 +662,9 @@ export default function SampleTracker({ projectId }) {
                   
                   {/* Dates */}
                   <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
+                        {sample.request_date && (
+                          <span>Requested: {sample.request_date}</span>
+                        )}
                         {sample.expected_date && (
                           <span>Expected: {sample.expected_date}</span>
                         )}
@@ -681,21 +684,14 @@ export default function SampleTracker({ projectId }) {
                           Tracking: {sample.tracking_number}
                         </div>
                       )}
-                      
-                      {/* Notes */}
-                      {sample.notes && (
-                        <p className="mt-2 text-sm text-gray-500 italic">{sample.notes}</p>
-                      )}
-                    </div>
-                  </div>
                   
-                  {/* Right side - Actions */}
-                  <div className="flex flex-col items-end gap-2">
+                  {/* Action Buttons */}
+                  <div className="mt-4 flex items-center gap-2 border-t border-stone-700 pt-3">
                     {/* Quick actions based on status */}
                     {sample.status === 'shipped' && (
                       <button
                         onClick={() => markAsReceived(sample)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 text-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 text-sm"
                       >
                         <CheckCircle size={14} />
                         Mark Received
@@ -704,19 +700,22 @@ export default function SampleTracker({ projectId }) {
                     {(sample.status === 'received' || sample.status === 'in_use') && sample.return_required && (
                       <button
                         onClick={() => markAsReturned(sample)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 text-sm"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 text-sm"
                       >
                         <RotateCcw size={14} />
                         Mark Returned
                       </button>
                     )}
                     
-                    <div className="flex items-center gap-2 mt-2">
-                      <button
-                        onClick={() => setViewingSample(sample)}
-                        className="p-2 rounded-lg bg-gray-500/20 text-gray-400 hover:bg-gray-500/30"
-                      >
-                        <Eye size={16} />
+                    <div className="flex-1" />
+                    
+                    <button
+                      onClick={() => setViewingSample(sample)}
+                      className="p-2 rounded-lg bg-gray-500/20 text-gray-400 hover:bg-gray-500/30"
+                      title="View Details"
+                    >
+                      <Eye size={16} />
+                    </button>
                       </button>
                       <button
                         onClick={() => handleEdit(sample)}
