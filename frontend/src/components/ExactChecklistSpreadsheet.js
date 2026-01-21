@@ -3154,6 +3154,53 @@ const ExactChecklistSpreadsheet = ({
                                           >
                                             +
                                           </button>
+                                          {/* DUPLICATE BUTTON - Copy this entire line */}
+                                          <button
+                                            onClick={async () => {
+                                              try {
+                                                const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+                                                // Duplicate the item with all its data
+                                                const duplicateData = {
+                                                  name: item.name ? `${item.name} (Copy)` : '',
+                                                  vendor: item.vendor || '',
+                                                  sku: item.sku || '',
+                                                  cost: item.cost || 0,
+                                                  size: item.size || '',
+                                                  finish_color: item.finish_color || '',
+                                                  finish_image: item.finish_image || '',
+                                                  quantity: item.quantity || null,
+                                                  status: '', // Start with blank status
+                                                  link: item.link || '',
+                                                  image_url: item.image_url || '',
+                                                  remarks: item.remarks || '',
+                                                  placement: item.placement || '',
+                                                  subcategory_id: subcategory.id,
+                                                  order_index: (item.order_index || 0) + 1
+                                                };
+                                                
+                                                const response = await fetch(`${backendUrl}/api/items`, {
+                                                  method: 'POST',
+                                                  headers: { 'Content-Type': 'application/json' },
+                                                  body: JSON.stringify(duplicateData)
+                                                });
+                                                
+                                                if (response.ok) {
+                                                  console.log('✅ Item duplicated successfully');
+                                                  if (onReload) onReload();
+                                                } else {
+                                                  console.error('❌ Failed to duplicate item');
+                                                  alert('Failed to duplicate item');
+                                                }
+                                              } catch (error) {
+                                                console.error('❌ Error duplicating item:', error);
+                                                alert('Error duplicating item: ' + error.message);
+                                              }
+                                            }}
+                                            className="text-blue-400 hover:text-blue-300 text-sm"
+                                            title="Duplicate Line"
+                                          >
+                                            ⎘
+                                          </button>
                                           <button
                                             onClick={() => {
                                               setAlternativesItem({...item, category_name: category.name});
