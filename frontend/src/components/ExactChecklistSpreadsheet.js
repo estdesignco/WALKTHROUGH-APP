@@ -2579,12 +2579,28 @@ const ExactChecklistSpreadsheet = ({
                     {/* CHECKLIST TABLE - Only show when category expanded */}
                     {isCategoryExpanded && (
                       <>
+                        {/* Check if this category needs the PLACEMENT column (Tile, Countertops, Flooring) */}
+                        {(() => {
+                          const categoryNameLower = category.name.toLowerCase();
+                          const needsPlacement = categoryNameLower.includes('tile') || 
+                                                 categoryNameLower.includes('countertop') || 
+                                                 categoryNameLower.includes('counter top') ||
+                                                 categoryNameLower.includes('flooring') ||
+                                                 categoryNameLower.includes('floor');
+                          const colSpanCount = needsPlacement ? 13 : 12;
+                          
+                          return (
+                        <>
                         {/* SINGLE TABLE FOR ALL SUBCATEGORIES - NO NESTED TABLES */}
-                        <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10">
+                        <table className="w-full border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10" data-category={category.name} data-needs-placement={needsPlacement}>
                           <thead>
                             <tr>
                               <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>✓</th>
                               <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>ITEM</th>
+                              {/* PLACEMENT column - Only for Tile, Countertops, Flooring */}
+                              {needsPlacement && (
+                                <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>PLACEMENT</th>
+                              )}
                               <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>VENDOR/SKU</th>
                               <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>QTY</th>
                               <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>SIZE</th>
@@ -2602,7 +2618,7 @@ const ExactChecklistSpreadsheet = ({
                           <React.Fragment key={subcategory.id || subcategory.name}>
                             {/* SUBCATEGORY HEADER ROW */}
                             <tr style={{ background: 'linear-gradient(135deg, rgba(180, 155, 126, 0.3) 0%, rgba(212, 165, 116, 0.2) 100%)' }}>
-                              <td colSpan="12" className="border border-[#B49B7E] px-3 py-2">
+                              <td colSpan={colSpanCount} className="border border-[#B49B7E] px-3 py-2">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[#D4A574] font-bold text-sm">
                                     {subcategory.name.toUpperCase()}
