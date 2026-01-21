@@ -2897,9 +2897,11 @@ const ExactChecklistSpreadsheet = ({
                                       <span style={{ color: textColor }}>$</span>
                                       <input
                                         type="text"
-                                        defaultValue={item.cost || 0}
+                                        key={`cost-${item.id}-${item.cost}`}
+                                        defaultValue={item.cost || ''}
                                         className="flex-1 bg-transparent text-sm outline-none min-w-[40px] border-none focus:ring-1 focus:ring-[#D4A574] rounded px-1"
                                         style={{ color: textColor, background: 'transparent' }}
+                                        placeholder="0"
                                         onBlur={(e) => {
                                           const newValue = parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0;
                                           if (newValue !== item.cost) {
