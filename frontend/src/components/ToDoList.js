@@ -626,6 +626,20 @@ export default function ToDoList({ projectId, roomId = null }) {
                       <option value="high" className="bg-gray-800">High</option>
                       <option value="urgent" className="bg-gray-800">Urgent</option>
                     </select>
+                    {/* PRIORITY TIMER - Shows how long item has been open */}
+                    {(() => {
+                      const timePriority = getTimePriority(item.created_at);
+                      // Don't show timer for completed items
+                      if (item.completed || item.status === 'completed') return null;
+                      return (
+                        <span 
+                          className={`text-xs px-2 py-0.5 rounded-full text-white ${timePriority.color}`}
+                          title="Priority Timer - Items grow in urgency over time"
+                        >
+                          {timePriority.label}
+                        </span>
+                      );
+                    })()}
                   </div>
                   
                   {item.description && (
