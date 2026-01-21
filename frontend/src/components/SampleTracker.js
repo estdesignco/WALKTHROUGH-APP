@@ -716,20 +716,20 @@ export default function SampleTracker({ projectId }) {
                     >
                       <Eye size={16} />
                     </button>
-                      </button>
-                      <button
-                        onClick={() => handleEdit(sample)}
-                        className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => deleteSample(sample.id)}
-                        className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleEdit(sample)}
+                      className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                      title="Edit"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button
+                      onClick={() => deleteSample(sample.id)}
+                      className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </div>
                 </div>
               </div>
