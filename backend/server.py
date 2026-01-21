@@ -9873,6 +9873,7 @@ class PunchListItem(BaseModel):
     item_id: Optional[str] = None  # Reference to checklist item if applicable
     title: str
     description: Optional[str] = None
+    notes: Optional[str] = None  # Comments/notes field
     priority: str = "medium"  # low, medium, high, urgent
     status: str = "pending"  # pending, in_progress, completed, verified
     assigned_to: Optional[str] = None
@@ -9887,6 +9888,7 @@ class PunchListUpdate(BaseModel):
     """Model for updating punch list items"""
     title: Optional[str] = None
     description: Optional[str] = None
+    notes: Optional[str] = None  # Comments/notes field
     priority: Optional[str] = None
     status: Optional[str] = None
     assigned_to: Optional[str] = None
