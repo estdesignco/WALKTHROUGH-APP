@@ -783,12 +783,13 @@ export default function PunchList({ projectId, roomId = null }) {
                 
                 {/* Actions */}
                 <button
-                  onClick={() => deletePunchItem(item.id)}
+                  onClick={(e) => { e.stopPropagation(); deletePunchItem(item.id); }}
                   className="text-red-400 hover:text-red-300 p-1"
                 >
                   🗑️
                 </button>
               </div>
+              )}
             </div>
           ))
         )}
