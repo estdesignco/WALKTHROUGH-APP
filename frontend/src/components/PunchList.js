@@ -262,6 +262,36 @@ export default function PunchList({ projectId, roomId = null }) {
     setEditValues({});
   };
 
+  // ADD COMMENT to punch item
+  const addPunchComment = async (itemId) => {
+    if (!newComment.trim()) return;
+    try {
+      const response = await fetch(`${API_URL}/punch-list/${itemId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: newComment.trim(), author: '' })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Update local state with new comment
+        setPunchItems(prev => prev.map(item => 
+          item.id === itemId 
+            ? { ...item, comments: [...(item.comments || []), data.comment] }
+            : item
+        ));
+        setNewComment('');
+        setCommentingId(null);
+      }
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
+  };
+
+  // Toggle comment expansion
+  const toggleComments = (itemId) => {
+    setExpandedComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
+
   const deletePunchItem = async (itemId) => {
     if (!window.confirm('Delete this punch list item?')) return;
     
