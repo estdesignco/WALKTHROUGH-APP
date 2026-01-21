@@ -41,6 +41,11 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({});
   
+  // Comment state
+  const [commentingId, setCommentingId] = useState(null);
+  const [newComment, setNewComment] = useState('');
+  const [expandedComments, setExpandedComments] = useState({});
+  
   // Quick add form state
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [quickAddText, setQuickAddText] = useState('');
