@@ -13,6 +13,10 @@ export default function PunchList({ projectId, roomId = null }) {
   const [generating, setGenerating] = useState(false);
   const [filter, setFilter] = useState('all'); // all, pending, in_progress, completed
   
+  // INLINE EDITING state
+  const [editingId, setEditingId] = useState(null);
+  const [editValues, setEditValues] = useState({});
+  
   // FFE Linking states
   const [ffeItems, setFfeItems] = useState([]);
   const [ffeSearchQuery, setFfeSearchQuery] = useState('');
@@ -26,7 +30,8 @@ export default function PunchList({ projectId, roomId = null }) {
     priority: 'medium',
     assigned_to: '',
     due_date: '',
-    linked_ffe_item_id: null
+    linked_ffe_item_id: null,
+    notes: ''  // Added notes field
   });
 
   useEffect(() => {
