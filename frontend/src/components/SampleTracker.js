@@ -575,79 +575,93 @@ export default function SampleTracker({ projectId }) {
             return (
               <div
                 key={sample.id}
-                className={`p-4 rounded-xl bg-black/30 border-l-4 hover:bg-black/40 transition-colors ${
+                className={`rounded-xl bg-black/30 border-l-4 hover:bg-black/40 transition-colors overflow-hidden ${
                   isOverdue ? 'border-red-500' : ''
                 }`}
                 style={{ borderLeftColor: isOverdue ? '#EF4444' : typeInfo.color }}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    {/* Sample Image or Type icon */}
-                    {sample.image_url ? (
-                      <img 
-                        src={sample.image_url} 
-                        alt={sample.name}
-                        className="w-16 h-16 rounded-xl object-cover border border-stone-700"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                    ) : null}
-                    <div 
-                      className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl ${sample.image_url ? 'hidden' : ''}`}
-                      style={{ backgroundColor: `${typeInfo.color}20`, display: sample.image_url ? 'none' : 'flex' }}
+                {/* LARGE SAMPLE IMAGE */}
+                <div className="relative">
+                  {sample.image_url ? (
+                    <img 
+                      src={sample.image_url} 
+                      alt={sample.name}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div 
+                    className={`w-full h-48 flex items-center justify-center text-6xl bg-gradient-to-br from-stone-800 to-stone-900 ${sample.image_url ? 'hidden' : ''}`}
+                    style={{ display: sample.image_url ? 'none' : 'flex' }}
+                  >
+                    {typeInfo.icon}
+                  </div>
+                  
+                  {/* Status badge on image */}
+                  <div className="absolute top-3 right-3">
+                    <span 
+                      className="px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg"
+                      style={{ backgroundColor: statusInfo.color, color: 'white' }}
                     >
-                      {typeInfo.icon}
+                      <StatusIcon size={12} />
+                      {statusInfo.name}
+                    </span>
+                  </div>
+                  
+                  {isOverdue && (
+                    <div className="absolute top-3 left-3">
+                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-500 text-white flex items-center gap-1 shadow-lg">
+                        <AlertCircle size={12} />
+                        OVERDUE
+                      </span>
                     </div>
-                    
-                    {/* Main info */}
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-lg font-bold text-white">{sample.name}</h3>
-                        <span 
-                          className="px-2 py-0.5 rounded text-xs font-medium flex items-center gap-1"
-                          style={{ backgroundColor: `${statusInfo.color}20`, color: statusInfo.color }}
-                        >
-                          <StatusIcon size={12} />
-                          {statusInfo.name}
-                        </span>
-                        {isOverdue && (
-                          <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-500/20 text-red-400 flex items-center gap-1">
-                            <AlertCircle size={12} />
-                            OVERDUE
-                          </span>
-                        )}
-                      </div>
-                      
-                      {/* Details */}
-                      <div className="mt-2 flex items-center gap-4 text-sm text-gray-400">
-                        <span className="flex items-center gap-1">
-                          <Building2 size={14} />
-                          {sample.vendor}
-                        </span>
-                        {sample.sku && (
-                          <span className="flex items-center gap-1">
-                            <Tag size={14} />
-                            {sample.sku}
-                          </span>
-                        )}
-                        {sample.room && (
-                          <span className="flex items-center gap-1">
-                            <MapPin size={14} />
-                            {sample.room}
-                          </span>
-                        )}
-                        {sample.color && (
-                          <span>Color: {sample.color}</span>
-                        )}
-                      </div>
-                      
-                      {/* Dates */}
-                      <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
-                        {sample.request_date && (
-                          <span>Requested: {sample.request_date}</span>
-                        )}
+                  )}
+                </div>
+                
+                {/* SAMPLE NAME - Large */}
+                <div className="p-4">
+                  <h3 className="text-xl font-bold text-white">{sample.name}</h3>
+                  
+                  {/* SWATCH IDENTIFIER / SKU */}
+                  {sample.sku && (
+                    <div className="mt-1 text-sm text-amber-400 font-mono font-bold">
+                      SKU: {sample.sku}
+                    </div>
+                  )}
+                  
+                  {/* Color/Finish */}
+                  {sample.color && sample.color !== sample.name && (
+                    <div className="mt-1 text-sm text-cyan-400">
+                      Color: {sample.color}
+                    </div>
+                  )}
+                  
+                  {/* Vendor & Room */}
+                  <div className="mt-3 flex items-center gap-4 text-sm text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <Building2 size={14} />
+                      {sample.vendor || 'Unknown Vendor'}
+                    </span>
+                    {sample.room && (
+                      <span className="flex items-center gap-1">
+                        <MapPin size={14} />
+                        {sample.room}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* From Item info */}
+                  {sample.item_name && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      From item: {sample.item_name}. Category: {sample.notes?.split('Category:')[1]?.trim() || 'N/A'}
+                    </div>
+                  )}
+                  
+                  {/* Dates */}
+                  <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
                         {sample.expected_date && (
                           <span>Expected: {sample.expected_date}</span>
                         )}
