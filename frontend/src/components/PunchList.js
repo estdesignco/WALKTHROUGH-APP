@@ -735,6 +735,67 @@ export default function PunchList({ projectId, roomId = null }) {
                         💬 {item.notes}
                       </div>
                     )}
+                    
+                    {/* ADDITIONAL COMMENTS THREAD */}
+                    <div className="mt-2">
+                      {/* Show existing comments */}
+                      {item.comments && item.comments.length > 0 && (
+                        <div className="mb-2">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleComments(item.id); }}
+                            className="text-xs text-cyan-400 hover:text-cyan-300"
+                          >
+                            📝 {item.comments.length} comment{item.comments.length > 1 ? 's' : ''} {expandedComments[item.id] ? '▼' : '▶'}
+                          </button>
+                          {expandedComments[item.id] && (
+                            <div className="mt-1 space-y-1 pl-2 border-l-2 border-cyan-600/30">
+                              {item.comments.map((comment, idx) => (
+                                <div key={comment.id || idx} className="text-xs bg-cyan-900/20 rounded px-2 py-1">
+                                  <span className="text-cyan-400">{comment.text}</span>
+                                  <span className="text-gray-500 ml-2">
+                                    {comment.created_at && new Date(comment.created_at).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Add comment button/form */}
+                      {commentingId === item.id ? (
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="text"
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="Add a comment..."
+                            className="flex-1 px-2 py-1 text-xs rounded bg-black/50 border border-cyan-600/50 text-white"
+                            autoFocus
+                            onKeyPress={(e) => e.key === 'Enter' && addPunchComment(item.id)}
+                          />
+                          <button
+                            onClick={() => addPunchComment(item.id)}
+                            className="px-2 py-1 text-xs bg-cyan-600 hover:bg-cyan-700 text-white rounded"
+                          >
+                            Add
+                          </button>
+                          <button
+                            onClick={() => { setCommentingId(null); setNewComment(''); }}
+                            className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setCommentingId(item.id); }}
+                          className="text-xs text-cyan-500 hover:text-cyan-400"
+                        >
+                          + Add comment
+                        </button>
+                      )}
+                    </div>
                   
                   {/* Linked FFE Item Display */}
                   {item.linked_ffe_item ? (
