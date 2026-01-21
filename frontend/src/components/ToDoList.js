@@ -537,6 +537,25 @@ export default function ToDoList({ projectId, roomId = null }) {
                     }`}>
                       {item.text}
                     </h4>
+                    {/* STATUS - EDITABLE DROPDOWN */}
+                    <select
+                      value={item.status || 'pending'}
+                      onChange={(e) => {
+                        const newStatus = e.target.value;
+                        const newCompleted = newStatus === 'completed';
+                        updateTodoItem(item.id, { status: newStatus, completed: newCompleted });
+                      }}
+                      className={`text-xs px-2 py-0.5 rounded-full cursor-pointer border-none outline-none ${
+                        item.status === 'completed' ? 'bg-green-600 text-white' :
+                        item.status === 'in_progress' ? 'bg-blue-600 text-white' :
+                        'bg-gray-600 text-white'
+                      }`}
+                      style={{ background: 'inherit' }}
+                    >
+                      <option value="pending" className="bg-gray-800">⏳ Pending</option>
+                      <option value="in_progress" className="bg-gray-800">🔄 Working</option>
+                      <option value="completed" className="bg-gray-800">✅ Done</option>
+                    </select>
                     {/* PRIORITY - EDITABLE DROPDOWN */}
                     <select
                       value={item.priority || 'medium'}
