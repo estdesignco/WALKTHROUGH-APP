@@ -142,7 +142,7 @@ async function connectLeicaD5() {
 
 ## 🚀 TEST PHOTOS NOW
 
-1. Open: https://fixmyapp-13.preview.emergentagent.com/mobile-app
+1. Open: https://bugfix-central-89.preview.emergentagent.com/mobile-app
 2. Select project
 3. Open Walkthrough or FFE
 4. Click "📸 PHOTO"

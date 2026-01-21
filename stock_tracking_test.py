@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Backend URL from .env
-BACKEND_URL = "https://fixmyapp-13.preview.emergentagent.com/api"
+BACKEND_URL = "https://bugfix-central-89.preview.emergentagent.com/api"
 
 # Test project ID from review request
 PROJECT_ID = "8bb8cbf2-e691-4227-9892-d78c79d5b0a4"

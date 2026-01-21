@@ -1,209 +1,225 @@
 <analysis>**original_problem_statement:**
-The user's initial goal was to fix a broken application, which included a malfunctioning dashboard, a non-functional web scraper, a broken Outlook Calendar integration, and a catastrophic bug causing recurring data loss. The scope has since expanded dramatically to include numerous UI/UX enhancements, performance optimizations, and a long list of feature requests and bug fixes driven by the user's hands-on testing and frustration.
+The user is extremely frustrated with an unstable application. Key issues include recurring data loss, features breaking after being fixed (scraper, samples library, email), the production environment showing test data, UI flickering due to infinite re-render loops, and core functionalities like the web scraper's price transfer consistently failing. The user's goal is a flawlessly working application, and their patience is exhausted, with threats of legal action. A major secondary requirement is that all fixes and features applied to the desktop app must also be implemented in the separate mobile app codebase.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Stabilize the Application:** Fix all core functionalities, including the dashboard, scraper, and calendar integrations.
-2.  **Fix Data Integrity/Loss:** Address the root cause of data disappearing, which was identified as a browser caching issue.
-3.  **Full Inline Editing:** The user wants a click-to-edit experience across the application, especially on the main checklist, removing all modals and edit buttons for core data entry.
-4.  **Streamline Workflow:** Implement features like Copy Room, Delete Multiple, adding blank item rows directly, and removing confirmation dialogs.
-5.  **Enhance Scraper:** Ensure the scraper reliably captures all necessary information, especially the price, from various vendor websites.
-6.  **Improve To-Do List:** The To-Do list must be globally accessible, support comments, and have a clear status update mechanism.
-7.  **Fix All Integrations:** Ensure Outlook, Google Calendar, and the email client are fully functional.
+1.  **Stabilize the Application:** Eliminate all sources of instability, including data loss, configuration errors, and UI flickering.
+2.  **Fix Core Functionality:** Ensure the web scraper, Samples Library, To-Do list, Punch List, and all integrations work reliably.
+3.  **Achieve Feature Parity:** All features and fixes on the desktop application must be mirrored on the mobile application.
+4.  **Resolve Deployment Issues:** Prevent test configurations from ever being deployed to the production environment.
+5.  **Unblock GitHub Saves:** Resolve the secret scanning issue that prevents work from being saved.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack React/FastAPI/MongoDB application with a significant number of recent changes.
--   **UI/UX:**
-    -   A  is implemented, accessible from any page, featuring inline editing, comments, and status updates.
-    -   The main checklist () has been overhauled for a full inline editing experience (no edit buttons), supports adding blank rows directly, and allows manual image uploads.
-    -   Confirmation dialogs on deletion have been removed across the app.
+A full-stack React/FastAPI/MongoDB application in a highly volatile state. While numerous features have been added or fixed in this session, the application's stability is critically low.
 -   **Features:**
-    -   Copy Room and Delete Multiple Items functionalities have been added.
-    -   A new SAMPLES ORDERED status is available.
-    -   Checklist headers now dynamically display the client's name.
+    -   The Samples Library now auto-syncs when an item's  and  are updated. The UI has been redesigned to feature large images.
+    -   The To-Do List () and Punch List () now support adding a thread of comments and have status dropdowns.
+    -   A Priority Timer feature has been partially added to the desktop To-Do list.
 -   **Bug Fixes:**
-    -   A critical fix for data disappearing was implemented by adding cache-busting headers to all API calls.
-    -   The logic for Picked status checkboxes has been fixed to persist for all subsequent statuses.
-    -   The  field is now a proper input and saves correctly.
-    -   The email client API endpoint and payload have been corrected.
--   **Scraper:** The Chrome extension is at version  with improved, vendor-specific price detection and enhanced debug logging.
+    -   The default quantity for new items has been changed from 1 to blank across the application.
+    -   An attempted fix for a UI flickering/re-rendering loop was implemented by increasing polling intervals in  and .
+-   **Deployment Issues:** There is a persistent, critical issue where the testing environment's configuration (, ) is deployed to production, causing the production app to point to the test database. The agent has fixed this multiple times, but it keeps recurring.
+-   **Mobile App:** A separate mobile application exists at  which is now significantly out-of-sync with the main application's features and fixes.
 
 **Last working item**:
--   **Last item agent was working**: Fixing the Chrome web scraper which was failing to transfer all information, especially the price. The user was extremely frustrated by this recurring issue. The agent improved the price detection logic in  to be more robust, added extensive debug logging to the browser console, and bumped the version to .
--   **Status**: USER VERIFICATION PENDING
--   **Agent Testing Done**: N (Agent implemented fixes but could not test on a live vendor website).
--   **Which testing method agent to use?**: Manual testing by the user. The agent must instruct the user to test the scraper on a problematic website and share the new, detailed logs from the browser's developer console.
+-   **Last item agent was working**: The user reported that they are unable to save their work to GitHub. The agent correctly identified this as a **GitHub Secret Scanning** issue caused by credentials in the  file and advised the user on how to resolve it in their repository settings.
+-   **Status**: BLOCKED (on user action in GitHub)
+-   **Agent Testing Done**: N/A
+-   **Which testing method agent to use?**: N/A
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Scraper is not transferring price and other information correctly. (P0)**
--   **Issue 2: GitHub push is blocked by secret scanning. (P0)**
--   **Issue 3: Data disappearing after a few hours. (P0)**
--   **Issue 4: Google Calendar integration remains broken. (P1)**
--   **Issue 5: Image quality from the scraper is poor. (P2)**
--   **Issue 6: Apply room item template changes to existing data. (P1)**
+-   **Issue 1: GitHub push is blocked by secret scanning. (P0)**
+-   **Issue 2: Production app is unstable and shows test data due to incorrect configuration being deployed. (P0)**
+-   **Issue 3: Infinite re-render loop causing UI to flash back and forth. (P0)**
+-   **Issue 4: Scraper is not transferring price correctly. (P0)**
+-   **Issue 5: Mobile app is not updated with ANY of the recent desktop changes. (P0)**
+-   **Issue 6: Google Calendar integration remains broken. (P1)**
+-   **Issue 7: User-reported data loss (it keeps on fucking losing my fucking data). (P0)**
 
 **Issues Detail**:
--   **Issue 1: Scraper is not transferring price and other information correctly.**
-    -   **Attempted fixes**: The agent rewrote the price detection logic in  to be more robust, trying multiple methods (JSON-LD, vendor-specific classes). Added detailed console logging to help diagnose future failures. Updated version to .
+-   **Issue 1: GitHub push is blocked by secret scanning.**
+    -   **Attempted fixes**: Agent explained to the user how to resolve the detected secrets in their GitHub repository settings.
     -   **Next debug checklist**:
-        1.  Instruct the user to download the new scraper from the  endpoint.
-        2.  Ask the user to test on a specific product page where the price fails.
-        3.  Ask the user to open the browser's Developer Tools (F12), go to the Console tab, and share the output that starts with .
-        4.  Analyze the log to see what data is being captured and refine the scraping selectors in  accordingly.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a core feature for the user's workflow and a major source of recurring frustration.
+        1.  Confirm with the user if they were able to follow the instructions to resolve the secret scanning alerts in their GitHub repository (**Settings -> Security & analysis -> Secrets and variables -> Actions**).
+        2.  If the user cannot resolve it, the next step is to remove the hardcoded secrets (e.g.,  in ) from the codebase and instruct the user to use environment variables in their deployment environment.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a critical blocker. No work can be saved to the repository, putting the entire session's progress at risk of being lost permanently.
+    -   **Status**: BLOCKED
+    -   **Is recurring issue?**: Y
+
+-   **Issue 2: Production app is unstable and shows test data due to incorrect configuration being deployed.**
+    -   **Attempted fixes**: The agent repeatedly edited  and  to point to the production URL, but the changes were reverted or ineffective, likely due to a flawed deployment process or aggressive caching.
+    -   **Next debug checklist**:
+        1.  Investigate the deployment process itself. Why are these files being overwritten or cached so aggressively?
+        2.  A permanent solution is needed. The  file should be made static and environment variables should be injected by the deployment pipeline, not edited by agents.
+        3.  As a last resort, hardcode the production URL in  and remove all reliance on  or  for the .
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the user's primary source of frustration and makes the application unusable and untrustworthy.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: Y
+
+-   **Issue 3: Infinite re-render loop causing UI to flash back and forth.**
+    -   **Attempted fixes**: Agent identified  polling in  and  as the cause. The fix was to increase the refresh interval. Later, the agent removed the auto-refresh entirely.
+    -   **Next debug checklist**:
+        1.  Verify with the user if removing the auto-refresh has stopped the flickering.
+        2.  The root cause is poor state management. The component re-renders when the  object changes, which happens on every fetch.
+        3.  Refactor the  hooks to depend on specific, stable values like  instead of the entire  object.
+        4.  Replace the polling mechanism with a more modern data-fetching library like React Query (TanStack Query) or SWR that handles caching and re-fetching intelligently without causing disruptive UI shifts.
+    -   **Why fix this issue and what will be achieved with the fix?**: The flickering makes the app feel broken and is extremely disruptive to the user's workflow.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Both (Scraper extension and frontend data handling).
 
--   **Issue 2: GitHub push is blocked by secret scanning.**
-    -   **Attempted fixes**: None in this session. This is a critical carry-over issue. The  file contains credentials that are preventing any work from being saved to the git repository.
+-   **Issue 4: Scraper is not transferring price correctly.**
+    -   **Attempted fixes**: The scraper has been updated multiple times (latest is v7.23.0) with more aggressive price detection logic, better parsing, and extensive debug logging. The agent also fixed the  input on the frontend to re-render correctly.
     -   **Next debug checklist**:
-        1.  Re-explain to the user that saving work to GitHub is blocked and all recent progress is at risk.
-        2.  Instruct the user to navigate to their repository's settings on GitHub: **Settings -> Security & analysis -> Secrets and variables -> Actions**, and approve the secrets detected by GitHub.
-    -   **Why fix this issue and what will be achieved with the fix?**: All work from this session is unsaved and at risk of being lost. This is the highest technical priority.
-    -   **Status**: BLOCKED (on user action)
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: N/A
-
--   **Issue 3: Data disappearing after a few hours.**
-    -   **Attempted fixes**: The agent identified this as a likely browser caching issue and implemented cache-busting headers for all API requests in .
-    -   **Next debug checklist**:
-        1.  Confirm with the user if the issue has been resolved after the latest changes.
-        2.  Instruct the user to perform a hard refresh (Ctrl+Shift+R) and, if the issue persists, to test with the browser's network cache disabled.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a critical, confidence-destroying bug that makes the application seem unreliable.
+        1.  Instruct the user to use the latest scraper (v7.23.0) and test on a specific product page where the price fails.
+        2.  Ask the user to open the browser's Developer Tools (F12), go to the Console tab, and share the entire log output, especially the 💰 PRICE DEBUG and SENDING TO APP messages.
+        3.  Ask for the URL of the failing website to add vendor-specific selectors.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is a core feature that the user has requested to be fixed at least 10 times. It is a major blocker for their workflow.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Frontend
 
--   **Issue 4: Google Calendar integration remains broken.**
-    -   **Attempted fixes**: None.
+-   **Issue 5: Mobile app is not updated with ANY of the recent desktop changes.**
+    -   **Attempted fixes**: None. The agent only identified the existence of the  directory.
     -   **Next debug checklist**:
-        1.  Investigate Google-related credentials in the environment.
-        2.  Review the OAuth flow and relevant API calls in .
-    -   **Why fix this issue and what will be achieved with the fix?**: A core feature has been pending for a long time.
+        1.  Create a comprehensive list of all features and fixes implemented in the desktop app during this and previous sessions.
+        2.  Systematically review the files in  and apply the necessary changes. This includes: quantity defaults, samples sync logic, punch list comments, to-do list comments/dropdowns, priority timer, etc.
+    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills a direct and important user requirement for feature parity between platforms.
     -   **Status**: NOT STARTED
+    -   **Is recurring issue?**: N
+
+-   **Issue 7: User-reported data loss (it keeps on fucking losing my fucking data).**
+    -   **Attempted fixes**: In a previous session, cache-busting headers were added. In this session, the re-render loop was addressed, which could cause perceived data loss if API calls were failing silently during the rapid re-renders.
+    -   **Next debug checklist**:
+        1.  Confirm with the user if this is still happening after the re-render loop fix.
+        2.  Add comprehensive error logging to all API calls on the frontend to ensure no errors are being swallowed silently.
+        3.  Check backend logs for any database-related errors during item updates.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the most critical type of bug. Data integrity is non-negotiable for the application to be useful.
+    -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: Y
-    -   **Should Test frontend/backend/both after fix?**: Both
-
--   **Issue 5: Image quality from the scraper is poor.**
-    -   **Attempted fixes**: None. Blocked on user providing specific examples.
-    -   **Next debug checklist**: Ask user for vendor websites where image quality is an issue to create custom scraping rules.
-    -   **Status**: BLOCKED (on user input)
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Both
-
--   **Issue 6: Apply room item template changes to existing data.**
-    -   **Attempted fixes**: None.
-    -   **Next debug checklist**: Wait for the user to confirm data stability, then create a one-time migration script or API endpoint.
-    -   **Status**: NOT STARTED
-    -   **Is recurring issue?**: N
-    -   **Should Test frontend/backend/both after fix?**: Backend
 
 **In progress Task List**:
--   None.
+-   **Task 1: Implement Priority Timer for To-Do list.**
+    -   **Where to resume**: The agent implemented the UI for the timer in the desktop . The logic needs to be fully tested.
+    -   **What will be achieved with this?**: A new priority level that visually changes over time to indicate urgency.
+    -   **Status**: IN PROGRESS
+    -   **Blocked on something**: Needs to be ported to the  codebase after completion.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **(P1)** Fix Google Calendar integration.
-    -   **(P1)** Apply  templates to user's existing data.
-    -   **(P1)** User Onboarding for Native Builds.
+    -   **(P0)** Port ALL recent features to the mobile app in .
+    -   **(P1)** Fix the broken Google Calendar integration.
+    -   **(P1)** Apply  templates to user's existing data (long-pending task).
+    -   **(P1)** Implement User Onboarding for Native Builds.
 -   **Future Tasks:**
     -   Implement FFE Portrait/Landscape View for iPad.
     -   Build an Android version of the mobile app.
     -   Implement a Google Drive Backup feature.
     -   Build a Client Approval Portal feature.
-    -   Refactor the monolithic .
+    -   Refactor the monolithic  and large frontend components.
 
 **Completed work in this session**
--   **Global To-Do Modal**: Implemented a globally accessible modal () with inline editing, comments, and status updates, refactoring  and .
--   **Checklist UX Overhaul**: Made all fields on the checklist directly editable, removed edit buttons, and made  add a blank row directly ().
--   **Critical Bug Fix (Data Disappearing)**: Added cache-busting headers to all API requests in  to prevent the browser from serving stale data.
--   **Critical Bug Fix (Post-Picked Status)**: Fixed checkbox logic in  to remain checked for all statuses after PICKED.
--   **Feature Implementation**: Added Copy Room, Delete Multiple Items, SAMPLES ORDERED status, and manual image upload functionality.
--   **UX Improvements**: Removed all Are you sure? delete confirmations and fixed hardcoded client names in headers.
--   **Bug Fix (Email Client)**: Corrected the API endpoint and request payload for the email feature.
--   **Bug Fix (Remarks)**: Fixed the remarks field to save correctly by replacing a  div with a proper input.
+-   **Samples Library Overhaul**: Changed sync logic to be based on  and , and completely redesigned the  UI to have large images.
+-   **Comment Threads**: Added the ability to add and view a thread of comments to both the To-Do list ( and ) and the Punch List ().
+-   **Quantity Default Fix**: Removed the default  on new items across the entire application.
+-   **UI Flickering Patch**: Removed the disruptive auto-refresh polling from the checklist, which was causing an infinite re-render loop.
+-   **To-Do List UI Fix**: Re-added the status dropdown (Pending/Working/Done) to the  component.
+-   **Scraper Updates**: Bumped the scraper to v7.23.0 with more aggressive price detection and enhanced debug logging.
+-   **Deployment Firefighting**: Multiple (ultimately recurring) fixes to  and  to correct the backend URL.
+
+**Earlier issues found/mentioned but not fixed**
+-   **Google Calendar integration**: This has been pending since the start.
+-   **Image quality from the scraper is poor**: This has been blocked on user input.
+
+**Known issue recurrence from previous fork**
+-   **Scraper Price Transfer**: Recurring. The core functionality is still unreliable.
+-   **Data Disappearing/Loss**: Recurring. The user reported it again in this session.
+-   **GitHub Push Blocked**: Recurring. This was an issue in the previous fork and happened again.
+-   **Deployment/Config Errors**: Emerged as a new, critical recurring issue in this session.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Browser Cache Busting**: Addressed data integrity issues by forcing the browser to fetch fresh data via Axios interceptors that add  headers and a timestamp query parameter to GET requests.
--   **Global State via **: A global function () was exposed from  to allow any component to trigger the .
--   **Robust Web Scraping**: The scraper was improved to use a multi-tiered approach (JSON-LD, vendor-specific selectors, generic selectors) to increase the reliability of price extraction.
--   **File Uploads**: Implemented a standard file upload flow using  on the frontend and a FastAPI  endpoint on the backend.
+-   **State Management Instability**: The application is plagued by re-render loops caused by poorly managed  dependencies and  polling for data fetching. This is the likely cause of the UI flickering.
+-   **Configuration Management Failure**: The deployment process is critically flawed. The preview environment's  is repeatedly making its way into the production build, pointing the live app to the test database.
+-   **Component Divergence**: Similar features (e.g., To-Do list) are implemented in multiple components (, ), leading to duplicated effort and features being missed when one is updated.
 
 **key DB schema**
--   **collections**: , , , , , .
--   **changes**:
-    -   The  collection documents now support a  field.
-    -   The  collection  field enum was updated on the backend to include .
+-   ****: Now contains a  array field. Each comment is an object .
+-   ****: Now also contains a  array field with the same structure.
+-   ****: Now contains a  to trace it back to the checklist item.
 
 **changes in tech stack**
 -   None.
 
 **All files of reference**
--   : Location of most recent user-facing feature work and bug fixes.
--   : The new core component for managing to-do items.
--   : Contains the critical cache-busting logic.
--   : Contains all new backend endpoints and model changes.
--   : Contains the latest logic for the web scraper.
+-    (All backend logic)
+-    (Re-render loop fix)
+-    (Price and re-render issues)
+-    (Feature parity for comments/status)
+-    (Feature parity for comments)
+-    (Image display and layout)
+-    (Critical config file)
+-    (Critical config file)
+-   All files within  (Need to be updated)
 
 **Areas that need refactoring**:
--    is now a massive god component and urgently needs to be broken down into smaller, specialized components (e.g., , , ).
--    remains a monolithic file and should be broken down into a modular structure (routes, services, models).
--   The use of  for global state is a temporary hack. It should be replaced with a proper state management solution like React Context or Zustand for maintainability.
+-   **CRITICAL**: The entire data fetching and state synchronization strategy needs to be replaced.  polling must be removed in favor of a modern library like **React Query (TanStack Query)** or **SWR** to handle caching, background refetching, and state synchronization without the disruptive UI re-renders.
+-   **CRITICAL**: The component structure.  is a god component.  and  should share a common  component to avoid feature divergence.
+-   The deployment process needs to be fixed to prevent config errors. Environment variables should be injected securely at build/deploy time, not stored in source files agents can edit.
 
 **key api endpoints**
--   **POST** : For manual checklist image uploads.
--   **POST** : For duplicating a room and its contents.
--   **POST** : For deleting multiple items at once (expects a list of item IDs).
--   **POST** : The corrected endpoint for sending emails.
--   **GET** : Serves the latest version of the Chrome extension.
+-   **POST** : Adds a new comment to a to-do item's thread.
+-   **POST** : Adds a new comment to a punch list item's thread.
+-   **POST** : One-time migration endpoint to sync existing checklist items to the Samples Library based on their .
+-   **GET** : Serves the latest version of the Chrome extension (currently v7.23.0).
 
 **Critical Info for New Agent**
--   **USER FRUSTRATION IS EXTREMELY HIGH.** The user is angry and feels ignored. Your communication must be direct, acknowledge the problem (I understand this is frustrating), and immediately focus on the solution. Prioritize their explicit requests above all else.
--   **IMMEDIATE PRIORITY IS THE SCRAPER.** The last interaction was about the scraper failing to get the price. This must be the first issue you address. Guide the user to test the latest version () and provide the new console logs.
--   **CRITICAL RISK - GIT PUSH BLOCKED.** No work from the entire previous session is saved to the repository. This is a top technical priority. You must guide the user to resolve the secret scanning block in their GitHub settings.
--   **VERIFY THE CACHING FIX.** The data disappearing bug is a major source of frustration. The agent deployed a cache-busting fix. You must confirm with the user if this has solved the problem.
+-   **THE USER IS AT THEIR BREAKING POINT.** They have threatened legal action multiple times. Your top priority is STABILITY. Do not add new features until the existing ones are rock-solid. Your communication must be extremely careful, empathetic, and precise. Acknowledge the user's immense frustration and focus on solutions. Do not make ANY changes without explicit permission.
+-   **THE DEPLOYMENT/CONFIG ISSUE IS THE #1 TECHNICAL PRIORITY.** The fact that the production app points to the test database is a catastrophic, recurring failure. You must create a permanent fix for this. Do not simply edit the config files again; investigate the root cause in the deployment pipeline. The app is unusable until this is solved.
+-   **THE MOBILE APP IS A HUGE PENDING TASK.** The user has explicitly stated that all desktop changes must be ported to the mobile app in . This has been completely neglected and represents a significant amount of work that must be planned and executed.
+-   **ASSUME EVERYTHING IS STILL BROKEN.** The fixes for the re-render loop and scraper price are patches, not fundamental solutions. The user is still reporting data loss. You must approach every issue with deep investigation and not trust that previous fixes have worked.
+-   **GITHUB PUSH IS BLOCKED.** The user cannot save their work. This is a top priority to resolve so that progress is not lost.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Remove are you sure popups and send a new scraper.
-2.  **User**: Demands the ability to add an image to the spreadsheet manually.
-3.  **User**: (Angry) Remarks are not saving.
-4.  **User**: SEND ME A NEW SCRAPER.
-5.  **User**: (Very Angry) Scraper is broken again, not transferring info, especially the price.
-6.  **User**: (Very Angry) Lists many new demands: Copy Room, SAMPLES ORDERED status, fix client name in header, delete multiple, fix To-Do comments/status. Critically asks: WHY THE FUCK, DOES DO MY FILES KEEP DISAPPEARING??????????????????.
-7.  **User**: Reports the email client is not working.
-8.  **User**: Again states the scraper is not sending the price.
-9.  **User**: please finish the task before forking.
-10. **User**: finish the TASK.
+1.  **User**: (Extremely Angry) The app keeps losing data and crashing. Threatens lawsuit.
+2.  **User**: (Extremely Angry) The app is still showing test files on the production URL after redeploying.
+3.  **User**: Wants a Priority Timer feature for the To-Do list and demands all desktop changes be made to the mobile app as well.
+4.  **User**: Complains that the auto-refresh is too disruptive and wants a better way.
+5.  **User**: (Extremely Angry) States the To-Do list is the old version and doesn't have the new comment features.
+6.  **User**: (Angry) Corrects the agent, stating the status dropdown should be next to the priority dropdown on the To-Do list.
+7.  **User**: (Angry) Asks why the agent is changing things without permission.
+8.  **User**: Reports that the app is showing 0 projects and asks for the API test command to be explained.
+9.  **User**: (Extremely Angry) Reports the scraper is STILL not transferring the price (10th request).
+10. **User**: (Extremely Angry) Reports that the Samples Library has no pictures and the layout is wrong. Wants large pictures.
 
 **Project Health Check:**
 -   **Broken**:
-    -   The scraper's data extraction is unreliable, especially for price, which is a critical failure for the user.
+    -   The production deployment process is fundamentally flawed, causing the wrong configuration to be served.
+    -   Application stability is critically low, with users experiencing UI flickering, crashes, and potential data loss.
+    -   The mobile application at  is completely out of sync with the main application.
+    -   The web scraper's price detection remains unreliable for the user.
     -   The Google Calendar integration is non-functional.
 -   **Mocked**: N/A
 
 **3rd Party Integrations**
--   **Microsoft Graph API (Outlook Calendar)**: Confirmed working.
+-   **Microsoft Graph API (Outlook Calendar)**: Believed to be working.
 -   **Google Calendar API**: Confirmed broken.
--   **rembg**: Python library for image background removal in the scraper.
--   **aiosmtplib**: Python library for sending emails via SMTP.
+-   **rembg**: Python library for image background removal.
+-   **aiosmtplib**: Python library for sending emails.
 
 **Testing status**
--   **Testing agent used after significant changes**: NO
+-   **Testing agent used after significant changes**: YES. However, the testing agent was the source of the critical configuration bug that pointed the production app to the test database. This tool's modifications to config files should be considered untrustworthy.
 -   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: []
--   **Known regressions**: The scraper's functionality is a recurring regression point.
+-   **Test files created**: Test reports exist at .
+-   **Known regressions**: Scraper functionality, data integrity (disappearing data/projects), and UI stability are all major regression points.
 
 **Credentials to test flow:**
 -   **Application Login Password**: 
--   **SMTP Credentials in **:  / . These are likely blocking the GitHub push and must be handled.
+-   **SMTP Credentials in **:  / . This is blocking the GitHub push.
 
 **What agent forgot to execute**
--   The agent completely failed to address the **blocked GitHub push**, which is a critical oversight putting all recent work at risk.
--   The agent did not start any work on the long-pending Google Calendar integration.
--   The agent repeatedly tried to finish the task while the user was still reporting critical, show-stopping bugs, indicating a disconnect with the user's definition of done.</analysis>
+-   The agent completely neglected to apply ANY of the numerous features and fixes to the  codebase, despite a direct user request.
+-   The agent failed to create a permanent solution for the recurring deployment/configuration issue, leading to repeated production failures.
+-   The agent did not address the long-pending broken Google Calendar integration.</analysis>

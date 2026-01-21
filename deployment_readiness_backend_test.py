@@ -23,7 +23,7 @@ from datetime import datetime
 import uuid
 
 # Get backend URL from environment
-BACKEND_URL = "https://fixmyapp-13.preview.emergentagent.com/api"
+BACKEND_URL = "https://bugfix-central-89.preview.emergentagent.com/api"
 
 class DeploymentReadinessTest:
     def __init__(self):

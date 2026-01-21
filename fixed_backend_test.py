@@ -6,7 +6,7 @@ CORRECTED BACKEND TEST - Fix the failing endpoints
 import requests
 import json
 
-BASE_URL = "https://fixmyapp-13.preview.emergentagent.com/api"
+BASE_URL = "https://bugfix-central-89.preview.emergentagent.com/api"
 HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 
 def test_corrected_calculators():

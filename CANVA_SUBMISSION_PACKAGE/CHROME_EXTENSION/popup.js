@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://fixmyapp-13.preview.emergentagent.com';
+const BACKEND_URL = 'https://bugfix-central-89.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

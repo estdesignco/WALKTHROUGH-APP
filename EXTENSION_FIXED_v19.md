@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://fixmyapp-13.preview.emergentagent.com/chrome-extension-v19.zip
+https://bugfix-central-89.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://fixmyapp-13.preview.emergentagent.com/api/download/chrome-extension
+https://bugfix-central-89.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

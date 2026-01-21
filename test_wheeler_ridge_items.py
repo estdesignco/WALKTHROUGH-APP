@@ -6,7 +6,7 @@ Final comprehensive test with WHEELER RIDGE project
 import requests
 import json
 
-BACKEND_URL = "https://fixmyapp-13.preview.emergentagent.com/api"
+BACKEND_URL = "https://bugfix-central-89.preview.emergentagent.com/api"
 
 def get_wheeler_ridge_subcategory():
     """Get a real subcategory_id from WHEELER RIDGE project"""

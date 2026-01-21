@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://fixmyapp-13.preview.emergentagent.com/email-template.html
+https://bugfix-central-89.preview.emergentagent.com/email-template.html
 
 ---
 

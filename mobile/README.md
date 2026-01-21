@@ -73,8 +73,8 @@ yarn android
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://fixmyapp-13.preview.emergentagent.com
-API_URL=https://fixmyapp-13.preview.emergentagent.com/api
+BACKEND_URL=https://bugfix-central-89.preview.emergentagent.com
+API_URL=https://bugfix-central-89.preview.emergentagent.com/api
 ```
 
 ### App Configuration

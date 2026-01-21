@@ -31,7 +31,7 @@ import json
 import time
 from datetime import datetime
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fixmyapp-13.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://bugfix-central-89.preview.emergentagent.com').rstrip('/')
 
 # Test project IDs from user's context
 TEST_PROJECT_IDS = {

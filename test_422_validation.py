@@ -6,7 +6,7 @@ Test script to trigger 422 validation errors
 import requests
 import json
 
-BACKEND_URL = "https://fixmyapp-13.preview.emergentagent.com/api"
+BACKEND_URL = "https://bugfix-central-89.preview.emergentagent.com/api"
 
 def test_missing_required_fields():
     """Test with missing required fields"""
