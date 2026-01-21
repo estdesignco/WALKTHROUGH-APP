@@ -190,6 +190,7 @@ const ExactChecklistSpreadsheet = ({
       
       const responseData = await response.json();
       console.log('📋 API Response:', responseData);
+      console.log('📋 Response cost value:', responseData.cost);
       
       if (response.ok) {
         // Clear the clipboard after successful paste
@@ -197,11 +198,21 @@ const ExactChecklistSpreadsheet = ({
         setScraperClipboard(null);
         setShowScraperNotification(false);
         
-        alert(`✅ Pasted: ${scraperClipboard.name || 'Product data'}\n\nVendor: ${updateData.vendor || 'N/A'}\nPrice: $${updateData.cost || 'N/A'}\nFinish: ${updateData.finish_color || 'N/A'}`);
+        // Show success with the ACTUAL cost from API response
+        const savedCost = responseData.cost || updateData.cost || 0;
+        alert(`✅ Pasted: ${scraperClipboard.name || 'Product data'}\n\nVendor: ${updateData.vendor || 'N/A'}\nPrice: $${savedCost}\nFinish: ${updateData.finish_color || 'N/A'}`);
         
-        // Reload to show updated data
-        if (onReload) onReload();
+        // Force reload to show updated data (including cost)
+        if (onReload) {
+          console.log('🔄 Calling onReload to refresh data...');
+          onReload();
+        } else {
+          // Fallback: reload the page
+          console.log('🔄 No onReload, refreshing page...');
+          window.location.reload();
+        }
       } else {
+        console.error('❌ API Error:', responseData);
         throw new Error('Failed to update item');
       }
     } catch (error) {
