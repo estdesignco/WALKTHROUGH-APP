@@ -224,8 +224,6 @@ export default function ToDoList({ projectId, roomId = null }) {
   };
 
   const deleteTodoItem = async (itemId) => {
-    if (!window.confirm('Delete this to-do item?')) return;
-    
     try {
       const response = await fetch(`${API_URL}/todos/${itemId}`, {
         method: 'DELETE'
@@ -237,6 +235,38 @@ export default function ToDoList({ projectId, roomId = null }) {
     } catch (error) {
       console.error('Failed to delete to-do item:', error);
     }
+  };
+
+  // ADD COMMENT to todo item
+  const addTodoComment = async (itemId) => {
+    if (!newComment.trim()) return;
+    try {
+      const response = await fetch(`${API_URL}/todos/${itemId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: newComment.trim(), author: '' })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        // Update local state with new comment
+        setTodoItems(prev => prev.map(item => 
+          item.id === itemId 
+            ? { ...item, comments: [...(item.comments || []), data.comment] }
+            : item
+        ));
+        setNewComment('');
+        setCommentingId(null);
+        // Auto-expand comments after adding
+        setExpandedComments(prev => ({ ...prev, [itemId]: true }));
+      }
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
+  };
+
+  // Toggle comment expansion
+  const toggleComments = (itemId) => {
+    setExpandedComments(prev => ({ ...prev, [itemId]: !prev[itemId] }));
   };
 
   const getPriorityColor = (priority) => {
