@@ -170,6 +170,27 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
     setEditValues({});
   };
 
+  // Add comment to todo
+  const addComment = async (todoId, isCompany) => {
+    if (!newComment.trim()) return;
+    try {
+      await axios.post(`${API_URL}/todos/${todoId}/comments`, {
+        text: newComment.trim(),
+        author: '' // Could add user name here
+      });
+      setNewComment('');
+      setCommentingId(null);
+      loadData(); // Refresh to show new comment
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
+  };
+
+  // Toggle comment expansion
+  const toggleComments = (todoId) => {
+    setExpandedComments(prev => ({ ...prev, [todoId]: !prev[todoId] }));
+  };
+
   // Delete todo
   const deleteTodo = async (todoId, isCompany, projectId) => {
     try {
