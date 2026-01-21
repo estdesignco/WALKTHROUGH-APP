@@ -3334,10 +3334,10 @@ const ExactChecklistSpreadsheet = ({
                           </button>
                         </div>
                       </>
-                          ); // End of needsPlacement IIFE return
-                        })()}
-                      </>
-                    )}
+                        ); // End of needsPlacement IIFE return
+                      })()}
+                    </>
+                  )}
                               </div>
                             )}
                           </Draggable>
