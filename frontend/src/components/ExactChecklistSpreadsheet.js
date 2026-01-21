@@ -632,7 +632,7 @@ const ExactChecklistSpreadsheet = ({
     }
   }, [project?.id]);
 
-  // Poll for linked item status changes every 5 seconds
+  // Poll for linked item status changes every 30 seconds (reduced from 5 to prevent flicker)
   // This allows highlights to disappear when items are completed on Master To-Do List
   useEffect(() => {
     if (!project?.id) return;
@@ -640,13 +640,13 @@ const ExactChecklistSpreadsheet = ({
     // Initial load
     loadLinkedItems();
     
-    // Set up polling interval - refresh every 5 seconds for faster feedback
+    // Set up polling interval - refresh every 30 seconds (reduced frequency)
     const pollInterval = setInterval(() => {
       loadLinkedItems();
-    }, 5000);
+    }, 30000); // Changed from 5000 to 30000
     
     return () => clearInterval(pollInterval);
-  }, [project?.id, loadLinkedItems]);
+  }, [project?.id]); // Removed loadLinkedItems from deps to prevent loop
 
   // Fetch available categories from backend API
   useEffect(() => {
