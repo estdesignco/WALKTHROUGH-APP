@@ -493,8 +493,13 @@ const ExactChecklistSpreadsheet = ({
 
   // Initialize checkedItems with items that have 'PICKED' status
   // PRESERVE collapsed state from localStorage - only set defaults for NEW rooms/categories
+  // Track if we've initialized the expansion state
+  const hasInitializedExpansion = useRef(false);
+  
   useEffect(() => {
-    if (project?.rooms) {
+    if (project?.rooms && !hasInitializedExpansion.current) {
+      hasInitializedExpansion.current = true;
+      
       const initialCheckedItems = new Set();
       
       // Get saved states from localStorage
@@ -537,7 +542,7 @@ const ExactChecklistSpreadsheet = ({
         setCheckedItems(initialCheckedItems);
       }
     }
-  }, [project]);
+  }, [project?.id]); // Only depend on project.id, not the entire project object
 
   // Load items that are linked to To-Do or Punch List
   const loadLinkedItems = useCallback(async () => {
