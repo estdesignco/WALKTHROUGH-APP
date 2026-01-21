@@ -17,6 +17,11 @@ export default function PunchList({ projectId, roomId = null }) {
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState({});
   
+  // COMMENT state
+  const [commentingId, setCommentingId] = useState(null);
+  const [newComment, setNewComment] = useState('');
+  const [expandedComments, setExpandedComments] = useState({});
+  
   // FFE Linking states
   const [ffeItems, setFfeItems] = useState([]);
   const [ffeSearchQuery, setFfeSearchQuery] = useState('');
