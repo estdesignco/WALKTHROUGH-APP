@@ -2810,6 +2810,32 @@ const ExactChecklistSpreadsheet = ({
                                           </div>
                                         </td>
                                   
+                                  {/* PLACEMENT - Only for Tile, Countertops, Flooring categories */}
+                                  {needsPlacement && (
+                                    <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
+                                      <input
+                                        type="text"
+                                        defaultValue={item.placement || ''}
+                                        placeholder="e.g. Kitchen Floor, Master Bath..."
+                                        className="w-full bg-transparent text-sm outline-none focus:ring-1 focus:ring-[#D4A574] rounded"
+                                        style={{ color: textColor }}
+                                        onBlur={(e) => {
+                                          const newValue = e.target.value?.trim() || '';
+                                          if (newValue !== (item.placement || '')) {
+                                            handleUpdateItemField(item.id, 'placement', newValue);
+                                            item.placement = newValue;
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            e.target.blur();
+                                          }
+                                        }}
+                                      />
+                                    </td>
+                                  )}
+                                  
                                   {/* VENDOR/SKU - EDITABLE WITH DROPDOWN */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
                                     <div className="flex flex-col gap-1">
