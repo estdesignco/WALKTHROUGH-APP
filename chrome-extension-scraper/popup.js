@@ -967,6 +967,8 @@ async function sendToApp() {
   }
   
   sendBtn.disabled = true;
+  sendBtn.innerHTML = '<div class="spinner"></div><span>Sending...</span>';
+  
   try {
     const params = new URLSearchParams();
     params.set('action','add-item');
@@ -1002,23 +1004,43 @@ async function sendToApp() {
     // Go directly to the selected project's checklist
     const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
     
-    // Try to find and reuse existing Design Ready tab
-    chrome.tabs.query({url: `${APP_URL}/*`}, function(tabs) {
-      if (tabs && tabs.length > 0) {
-        // Reuse existing tab - update URL and focus it
-        chrome.tabs.update(tabs[0].id, {url: projectUrl, active: true});
+    // IMPROVED TAB REUSE: Find ANY existing app tab and reuse it
+    // This prevents opening new windows every time
+    chrome.tabs.query({}, function(allTabs) {
+      // Look for any tab that has our app URL (any path)
+      const existingTab = allTabs.find(t => 
+        t.url && (
+          t.url.includes('app.estdesignco.com') || 
+          t.url.includes('estdesignco.com') ||
+          t.url.includes('localhost:3000')
+        )
+      );
+      
+      if (existingTab) {
+        // REUSE existing tab - just update the URL and bring to front
+        console.log('♻️ Reusing existing app tab:', existingTab.id);
+        chrome.tabs.update(existingTab.id, {url: projectUrl, active: true});
+        // Also focus the window containing the tab
+        if (existingTab.windowId) {
+          chrome.windows.update(existingTab.windowId, {focused: true});
+        }
       } else {
-        // No existing tab, create new one
+        // No existing tab found - create one
+        console.log('🆕 Creating new app tab');
         chrome.tabs.create({url: projectUrl});
       }
     });
     showStatus('Sent to project!', 'success');
   } catch(e) { 
-    // Fallback to window.open if chrome.tabs fails
+    console.error('Error sending to app:', e);
+    // Fallback: Use window.open with same name to reuse window
     window.open(projectUrl, 'design_ready_app');
     showStatus('Sent to project!', 'success');
   }
-  finally { sendBtn.disabled = false; sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>'; }
+  finally { 
+    sendBtn.disabled = false; 
+    sendBtn.innerHTML = '<span>🚀</span><span>SEND TO APP</span>'; 
+  }
 }
 
 async function copyToClipboard() {
