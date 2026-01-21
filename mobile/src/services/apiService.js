@@ -65,8 +65,59 @@ export const apiService = {
   createItem: (data) => api.post('/items', data),
   updateItem: (itemId, data) => api.put(`/items/${itemId}`, data),
   deleteItem: (itemId) => api.delete(`/items/${itemId}`),
+  duplicateItem: async (itemData) => {
+    // Create a duplicate with (Copy) suffix
+    const duplicateData = {
+      ...itemData,
+      name: itemData.name ? `${itemData.name} (Copy)` : '',
+      status: '', // Reset status for duplicates
+    };
+    return api.post('/items', duplicateData);
+  },
   
-  // Photos
+  // ===============================
+  // TO-DO LIST ENDPOINTS
+  // ===============================
+  getTodos: (projectId) => api.get(`/todos/project/${projectId}`),
+  
+  createTodo: (data) => api.post('/todos', data),
+  
+  updateTodo: (todoId, data) => api.put(`/todos/${todoId}`, data),
+  
+  deleteTodo: (todoId) => api.delete(`/todos/${todoId}`),
+  
+  // To-Do Comments
+  addTodoComment: (todoId, comment) => 
+    api.post(`/todos/${todoId}/comments`, comment),
+  
+  // ===============================
+  // PUNCH LIST ENDPOINTS
+  // ===============================
+  getPunchList: (projectId) => api.get(`/punch-list/project/${projectId}`),
+  
+  createPunchItem: (data) => api.post('/punch-list', data),
+  
+  updatePunchItem: (itemId, data) => api.put(`/punch-list/${itemId}`, data),
+  
+  deletePunchItem: (itemId) => api.delete(`/punch-list/${itemId}`),
+  
+  // Punch List Comments
+  addPunchItemComment: (itemId, comment) => 
+    api.post(`/punch-list/${itemId}/comments`, comment),
+  
+  // ===============================
+  // SAMPLES LIBRARY ENDPOINTS
+  // ===============================
+  getSamples: (projectId) => api.get(`/samples/project/${projectId}`),
+  
+  updateSample: (sampleId, data) => api.put(`/samples/${sampleId}`, data),
+  
+  // Sync samples from checklist items (based on finish_color and vendor)
+  syncSamples: (projectId) => api.post(`/samples/sync/${projectId}`),
+  
+  // ===============================
+  // PHOTOS ENDPOINTS
+  // ===============================
   uploadPhoto: async (projectId, roomId, photoData) => {
     try {
       return await api.post('/photos/upload', {
@@ -87,10 +138,27 @@ export const apiService = {
   
   deletePhoto: (photoId) => api.delete(`/photos/${photoId}`),
   
-  // Measurements (Leica D5)
+  // ===============================
+  // MEASUREMENTS (Leica D5)
+  // ===============================
   saveMeasurement: (data) => api.post('/measurements', data),
   getMeasurements: (projectId, roomId) => 
     api.get(`/measurements/${projectId}/${roomId}`),
+    
+  // ===============================
+  // FFE (Furniture, Fixtures & Equipment)
+  // ===============================
+  getFFEItems: (projectId) => api.get(`/ffe/project/${projectId}`),
+  
+  // ===============================
+  // CALENDAR INTEGRATION
+  // ===============================
+  getCalendarEvents: (projectId) => api.get(`/calendar/events/${projectId}`),
+  
+  // ===============================
+  // EMAIL
+  // ===============================
+  sendQuestionnaireEmail: (data) => api.post('/questionnaire/email', data),
 };
 
 export default apiService;
