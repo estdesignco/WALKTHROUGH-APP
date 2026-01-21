@@ -63,8 +63,11 @@ const MainDashboard = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        console.log('🔄 Fetching projects...');
         const response = await projectAPI.getAll();
+        console.log('📦 Projects API response:', response);
         const projectsData = response.data || response || [];
+        console.log('📦 Projects data:', projectsData, 'Length:', projectsData.length);
         const mappedProjects = projectsData.map((project, index) => ({
           id: project.id,
           name: project.name,
@@ -72,11 +75,14 @@ const MainDashboard = () => {
           address: project.client_info?.address || '',
           color: PROJECT_COLORS[index % PROJECT_COLORS.length]
         }));
+        console.log('✅ Mapped projects:', mappedProjects);
         setProjects(mappedProjects);
         for (const project of mappedProjects) {
           loadProjectTodos(project.id);
         }
       } catch (error) {
+        console.error('❌ PROJECTS FETCH ERROR:', error);
+        console.error('❌ Error details:', error.message, error.response?.data);
         setProjects([]);
       } finally {
         setLoading(false);
