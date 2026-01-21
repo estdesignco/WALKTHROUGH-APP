@@ -217,6 +217,46 @@ export default function PunchList({ projectId, roomId = null }) {
     }
   };
 
+  // START INLINE EDIT - include notes
+  const startEdit = (item) => {
+    setEditingId(item.id);
+    setEditValues({
+      title: item.title || '',
+      description: item.description || '',
+      notes: item.notes || '',
+      priority: item.priority || 'medium',
+      assigned_to: item.assigned_to || '',
+      due_date: item.due_date || '',
+      status: item.status || 'pending'
+    });
+  };
+
+  // SAVE INLINE EDIT
+  const saveEdit = async () => {
+    if (!editingId) return;
+    try {
+      await updatePunchItem(editingId, {
+        title: editValues.title,
+        description: editValues.description,
+        notes: editValues.notes,
+        priority: editValues.priority,
+        assigned_to: editValues.assigned_to,
+        due_date: editValues.due_date,
+        status: editValues.status
+      });
+      setEditingId(null);
+      setEditValues({});
+    } catch (error) {
+      console.error('Failed to save edit:', error);
+    }
+  };
+
+  // CANCEL EDIT
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditValues({});
+  };
+
   const deletePunchItem = async (itemId) => {
     if (!window.confirm('Delete this punch list item?')) return;
     
