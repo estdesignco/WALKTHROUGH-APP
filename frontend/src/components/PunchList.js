@@ -556,58 +556,142 @@ export default function PunchList({ projectId, roomId = null }) {
                 item.status === 'completed' || item.status === 'verified' ? 'opacity-60' : ''
               }`}
             >
-              <div className="flex items-start gap-4">
-                {/* Status Toggle */}
-                <button
-                  onClick={() => {
-                    const nextStatus = {
-                      pending: 'in_progress',
-                      in_progress: 'completed',
-                      completed: 'verified',
-                      verified: 'pending'
-                    };
-                    updatePunchItem(item.id, { status: nextStatus[item.status] });
-                  }}
-                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
-                    item.status === 'completed' || item.status === 'verified'
-                      ? 'border-green-500 bg-green-500/20 text-green-400'
-                      : 'border-gray-500 hover:border-[#D4A574]'
-                  }`}
-                >
-                  {getStatusIcon(item.status)}
-                </button>
-                
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className={`font-medium ${
-                      item.status === 'completed' || item.status === 'verified' 
-                        ? 'line-through text-gray-500' 
-                        : 'text-white'
-                    }`}>
-                      {item.title}
-                    </h4>
-                    {/* PRIORITY - EDITABLE DROPDOWN */}
+              {/* INLINE EDIT MODE */}
+              {editingId === item.id ? (
+                <div className="space-y-3">
+                  {/* Title */}
+                  <input
+                    type="text"
+                    value={editValues.title || ''}
+                    onChange={(e) => setEditValues(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#D4A574] text-white font-medium"
+                    placeholder="Title"
+                    autoFocus
+                  />
+                  {/* Description */}
+                  <input
+                    type="text"
+                    value={editValues.description || ''}
+                    onChange={(e) => setEditValues(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm"
+                    placeholder="Description"
+                  />
+                  {/* Notes/Comments */}
+                  <textarea
+                    value={editValues.notes || ''}
+                    onChange={(e) => setEditValues(prev => ({ ...prev, notes: e.target.value }))}
+                    placeholder="Add notes or comments..."
+                    className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm resize-none"
+                    rows={2}
+                  />
+                  {/* Row: Priority, Assigned, Due Date, Status */}
+                  <div className="flex gap-2 flex-wrap">
                     <select
-                      value={item.priority || 'medium'}
-                      onChange={(e) => updatePunchItem(item.id, { priority: e.target.value })}
-                      className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white cursor-pointer border-none outline-none`}
-                      style={{ background: 'inherit' }}
+                      value={editValues.priority || 'medium'}
+                      onChange={(e) => setEditValues(prev => ({ ...prev, priority: e.target.value }))}
+                      className="px-3 py-1.5 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm"
                     >
-                      <option value="low" className="bg-gray-800">Low</option>
-                      <option value="medium" className="bg-gray-800">Medium</option>
-                      <option value="high" className="bg-gray-800">High</option>
-                      <option value="urgent" className="bg-gray-800">Urgent</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="urgent">Urgent</option>
                     </select>
-                    {item.ai_suggested && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-purple-600/30 text-purple-300">
-                        🤖 AI
-                      </span>
-                    )}
+                    <select
+                      value={editValues.status || 'pending'}
+                      onChange={(e) => setEditValues(prev => ({ ...prev, status: e.target.value }))}
+                      className="px-3 py-1.5 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                      <option value="verified">Verified</option>
+                    </select>
+                    <input
+                      type="text"
+                      value={editValues.assigned_to || ''}
+                      onChange={(e) => setEditValues(prev => ({ ...prev, assigned_to: e.target.value }))}
+                      className="flex-1 px-3 py-1.5 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm min-w-[100px]"
+                      placeholder="Assigned to"
+                    />
+                    <input
+                      type="date"
+                      value={editValues.due_date || ''}
+                      onChange={(e) => setEditValues(prev => ({ ...prev, due_date: e.target.value }))}
+                      className="px-3 py-1.5 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm"
+                    />
                   </div>
+                  {/* Save/Cancel buttons */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={saveEdit}
+                      className="px-4 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium"
+                    >
+                      ✓ Save
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      className="px-4 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* NORMAL VIEW MODE */
+                <div className="flex items-start gap-4">
+                  {/* Status Toggle */}
+                  <button
+                    onClick={() => {
+                      const nextStatus = {
+                        pending: 'in_progress',
+                        in_progress: 'completed',
+                        completed: 'verified',
+                        verified: 'pending'
+                      };
+                      updatePunchItem(item.id, { status: nextStatus[item.status] });
+                    }}
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
+                      item.status === 'completed' || item.status === 'verified'
+                        ? 'border-green-500 bg-green-500/20 text-green-400'
+                        : 'border-gray-500 hover:border-[#D4A574]'
+                    }`}
+                  >
+                    {getStatusIcon(item.status)}
+                  </button>
                   
-                  {item.description && (
-                    <p className="text-gray-400 text-sm mt-1 line-clamp-2">
+                  {/* Content - Click to Edit */}
+                  <div className="flex-1 min-w-0 cursor-pointer" onClick={() => startEdit(item)}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className={`font-medium ${
+                        item.status === 'completed' || item.status === 'verified' 
+                          ? 'line-through text-gray-500' 
+                          : 'text-white'
+                      }`}>
+                        {item.title}
+                      </h4>
+                      {/* PRIORITY Badge */}
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white`}>
+                        {item.priority || 'medium'}
+                      </span>
+                      {item.ai_suggested && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-600/30 text-purple-300">
+                          🤖 AI
+                        </span>
+                      )}
+                    </div>
+                    
+                    {item.description && (
+                      <p className="text-gray-400 text-sm mt-1 line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+                    
+                    {/* Notes/Comments Display */}
+                    {item.notes && (
+                      <div className="mt-2 text-sm text-cyan-400 bg-cyan-900/20 px-3 py-1.5 rounded-lg">
+                        💬 {item.notes}
+                      </div>
+                    )}
                       {item.description}
                     </p>
                   )}
