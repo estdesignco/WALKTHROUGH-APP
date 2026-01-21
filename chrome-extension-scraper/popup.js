@@ -513,33 +513,95 @@ function scrapePageData() {
   
   console.log('💰 Price found:', data.price, 'MSRP:', data.msrp);
 
-  // PRODUCT IMAGE - vendor-specific main product photo
+  // PRODUCT IMAGE - vendor-specific main product photo with HIGH RESOLUTION PRIORITIZED
   if (domain.includes('fourhands')) {
-    // Four Hands: Look for gallery images with PRM (primary) in filename
-    const galleryImgs = document.querySelectorAll('img[src*="_PRM_"], img[src*="_FRT_"]');
-    for (const img of galleryImgs) {
-      // Get the large version (not thumbnail)
-      if (img.src && img.src.includes('1200x1200')) {
-        data.image_url = img.src;
+    // Four Hands: Look for gallery images with PRM (primary) in filename - HIGHEST RES
+    // Try to get 2400x2400 first, then 1800x1800, then 1200x1200
+    const resolutions = ['2400x2400', '1800x1800', '1200x1200', 'S1200x1200'];
+    for (const res of resolutions) {
+      const largeImg = document.querySelector(`img[src*="${res}"], img[src*="_PRM_"][src*="${res}"], img[src*="_FRT_"][src*="${res}"]`);
+      if (largeImg?.src) {
+        data.image_url = largeImg.src;
         break;
       }
     }
-    // Fallback: get any large gallery image
+    // If not found, try to upgrade existing image URL to higher res
     if (!data.image_url) {
-      const largeImg = document.querySelector('img[src*="1200x1200"]');
-      if (largeImg) data.image_url = largeImg.src;
+      const anyImg = document.querySelector('img[src*="_PRM_"], img[src*="_FRT_"], img[src*="cloudfront"]');
+      if (anyImg?.src) {
+        // Try to replace resolution in URL for higher quality
+        let imgUrl = anyImg.src;
+        imgUrl = imgUrl.replace(/S\d+x\d+/g, 'S2400x2400')
+                       .replace(/\/\d+x\d+\//g, '/2400x2400/')
+                       .replace(/w_\d+,h_\d+/g, 'w_2400,h_2400');
+        data.image_url = imgUrl;
+      }
     }
   }
   
-  // Generic fallbacks
+  // Generic HIGH-RES image detection for other vendors
   if (!data.image_url) {
+    // Try og:image first (usually high quality)
     const ogImage = document.querySelector('meta[property="og:image"]');
     if (ogImage?.content) {
-      data.image_url = ogImage.content;
-    } else {
-      const mainImg = document.querySelector('.swiper-slide-active img, [class*="product-image"] img');
-      if (mainImg) data.image_url = mainImg.src;
+      let imgUrl = ogImage.content;
+      // Try to upgrade to higher resolution if URL contains size parameters
+      imgUrl = imgUrl.replace(/w_\d+/g, 'w_2400')
+                     .replace(/h_\d+/g, 'h_2400')
+                     .replace(/\/\d+x\d+\//g, '/2400x2400/')
+                     .replace(/_\d+x\d+\./g, '_2400x2400.');
+      data.image_url = imgUrl;
     }
+  }
+  
+  if (!data.image_url) {
+    // Try to find the largest product image on the page
+    const productImgs = document.querySelectorAll(
+      '.swiper-slide img, [class*="product-image"] img, [class*="gallery"] img, ' +
+      '[class*="main-image"] img, [data-zoom-image], [data-large], [srcset]'
+    );
+    
+    let bestImg = null;
+    let bestSize = 0;
+    
+    for (const img of productImgs) {
+      // Check srcset for highest resolution
+      if (img.srcset) {
+        const srcsetParts = img.srcset.split(',');
+        for (const part of srcsetParts) {
+          const match = part.trim().match(/(\S+)\s+(\d+)w/);
+          if (match && parseInt(match[2]) > bestSize) {
+            bestSize = parseInt(match[2]);
+            bestImg = match[1];
+          }
+        }
+      }
+      // Check data attributes for zoom/large images
+      const zoomSrc = img.getAttribute('data-zoom-image') || 
+                      img.getAttribute('data-large') || 
+                      img.getAttribute('data-full-size') ||
+                      img.getAttribute('data-src');
+      if (zoomSrc && zoomSrc.startsWith('http')) {
+        bestImg = zoomSrc;
+        break;
+      }
+      // Check natural dimensions
+      const naturalSize = (img.naturalWidth || 0) * (img.naturalHeight || 0);
+      if (naturalSize > bestSize && img.src?.startsWith('http')) {
+        bestSize = naturalSize;
+        bestImg = img.src;
+      }
+    }
+    
+    if (bestImg) {
+      data.image_url = bestImg;
+    }
+  }
+  
+  // Final fallback: any main product image
+  if (!data.image_url) {
+    const mainImg = document.querySelector('.swiper-slide-active img, [class*="product-image"] img, #product-image img');
+    if (mainImg?.src) data.image_url = mainImg.src;
   }
 
   // ============================================================================
