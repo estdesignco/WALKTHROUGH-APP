@@ -14,6 +14,10 @@ import ContactsScreen from './src/screens/ContactsScreen';
 import WalkthroughScreen from './src/screens/WalkthroughScreen';
 import PhotoManagerScreen from './src/screens/PhotoManagerScreen';
 import LeicaConnectionScreen from './src/screens/LeicaConnectionScreen';
+// NEW SCREENS - Desktop Feature Parity
+import ToDoListScreen from './src/screens/ToDoListScreen';
+import PunchListScreen from './src/screens/PunchListScreen';
+import SamplesScreen from './src/screens/SamplesScreen';
 
 // Services
 import { syncService } from './src/services/syncService';
@@ -116,6 +120,22 @@ export default function App() {
           name="LeicaConnection" 
           component={LeicaConnectionScreen}
           options={{ title: 'Leica D5 Connection' }}
+        />
+        {/* NEW SCREENS - Desktop Feature Parity */}
+        <Stack.Screen 
+          name="ToDoList" 
+          component={ToDoListScreen}
+          options={{ title: 'To-Do List' }}
+        />
+        <Stack.Screen 
+          name="PunchList" 
+          component={PunchListScreen}
+          options={{ title: 'Punch List' }}
+        />
+        <Stack.Screen 
+          name="Samples" 
+          component={SamplesScreen}
+          options={{ title: 'Samples Library' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
