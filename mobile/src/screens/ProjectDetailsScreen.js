@@ -162,6 +162,37 @@ export default function ProjectDetailsScreen({ route, navigation }) {
           >
             <Text style={styles.buttonText}>📸 Start Walkthrough</Text>
           </TouchableOpacity>
+          
+          {/* NEW BUTTONS - Desktop Feature Parity */}
+          <TouchableOpacity
+            style={[styles.button, styles.todoButton]}
+            onPress={() => navigation.navigate('ToDoList', {
+              projectId,
+              projectName: project.name,
+            })}
+          >
+            <Text style={styles.buttonText}>✅ To-Do List</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.punchButton]}
+            onPress={() => navigation.navigate('PunchList', {
+              projectId,
+              projectName: project.name,
+            })}
+          >
+            <Text style={styles.buttonText}>🔧 Punch List</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.samplesButton]}
+            onPress={() => navigation.navigate('Samples', {
+              projectId,
+              projectName: project.name,
+            })}
+          >
+            <Text style={styles.buttonText}>🎨 Samples Library</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
