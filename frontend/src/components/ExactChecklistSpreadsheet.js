@@ -2579,16 +2579,22 @@ const ExactChecklistSpreadsheet = ({
                     {/* CHECKLIST TABLE - Only show when category expanded */}
                     {isCategoryExpanded && (
                       <>
-                        {/* Check if this category needs the PLACEMENT column (Tile, Countertops, Flooring) */}
+                        {/* Check if this category needs the PLACEMENT column (Tile, Countertops, Flooring, Paint, Wallpaper, Trim) */}
                         {(() => {
                           const categoryNameLower = category.name.toLowerCase();
                           // Use word boundary matching to avoid matching "textiles" when looking for "tile"
-                          // Matches: "tile", "tile & surfaces", "flooring", "countertops", etc.
+                          // Matches: "tile", "tile & surfaces", "flooring", "countertops", "paint", "wallpaper", "trim", etc.
                           // Does NOT match: "textiles" (because there's no word boundary after 'tile')
                           const needsPlacement = /\btile\b|\btiles\b/i.test(category.name) || 
                                                  categoryNameLower.includes('countertop') || 
                                                  categoryNameLower.includes('counter top') ||
-                                                 /\bflooring\b|\bfloor\b/i.test(category.name);
+                                                 /\bflooring\b|\bfloor\b/i.test(category.name) ||
+                                                 /\bpaint\b/i.test(category.name) ||
+                                                 /\bwallpaper\b/i.test(category.name) ||
+                                                 /\btrim\b/i.test(category.name) ||
+                                                 categoryNameLower.includes('specialty trim') ||
+                                                 categoryNameLower.includes('wall covering') ||
+                                                 categoryNameLower.includes('finishes');
                           const colSpanCount = needsPlacement ? 13 : 12;
                           
                           return (
@@ -2599,7 +2605,7 @@ const ExactChecklistSpreadsheet = ({
                             <tr>
                               <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>✓</th>
                               <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>ITEM</th>
-                              {/* PLACEMENT column - Only for Tile, Countertops, Flooring */}
+                              {/* PLACEMENT column - Only for Tile, Countertops, Flooring, Paint, Wallpaper, Trim */}
                               {needsPlacement && (
                                 <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>PLACEMENT</th>
                               )}
