@@ -2582,11 +2582,13 @@ const ExactChecklistSpreadsheet = ({
                         {/* Check if this category needs the PLACEMENT column (Tile, Countertops, Flooring) */}
                         {(() => {
                           const categoryNameLower = category.name.toLowerCase();
-                          const needsPlacement = categoryNameLower.includes('tile') || 
+                          // Use word boundary matching to avoid matching "textiles" when looking for "tile"
+                          // Matches: "tile", "tile & surfaces", "flooring", "countertops", etc.
+                          // Does NOT match: "textiles" (because there's no word boundary after 'tile')
+                          const needsPlacement = /\btile\b|\btiles\b/i.test(category.name) || 
                                                  categoryNameLower.includes('countertop') || 
                                                  categoryNameLower.includes('counter top') ||
-                                                 categoryNameLower.includes('flooring') ||
-                                                 categoryNameLower.includes('floor');
+                                                 /\bflooring\b|\bfloor\b/i.test(category.name);
                           const colSpanCount = needsPlacement ? 13 : 12;
                           
                           return (
