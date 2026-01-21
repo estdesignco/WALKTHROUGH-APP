@@ -20,6 +20,11 @@ export default function ToDoList({ projectId, roomId = null }) {
   const [selectedFfeItem, setSelectedFfeItem] = useState(null);
   const [linkingItemId, setLinkingItemId] = useState(null); // For linking existing items
   
+  // COMMENT states
+  const [commentingId, setCommentingId] = useState(null);
+  const [newComment, setNewComment] = useState('');
+  const [expandedComments, setExpandedComments] = useState({});
+  
   const [newItem, setNewItem] = useState({
     text: '',
     description: '',
