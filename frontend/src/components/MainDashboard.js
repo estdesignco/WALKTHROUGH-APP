@@ -65,11 +65,24 @@ const MainDashboard = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        console.log('🔄 Fetching projects...');
-        const response = await projectAPI.getAll();
-        console.log('📦 Projects API response:', response);
-        const projectsData = response.data || response || [];
-        console.log('📦 Projects data:', projectsData, 'Length:', projectsData.length);
+        console.log('🔄 Fetching projects from:', PRODUCTION_API);
+        
+        // DIRECT FETCH - bypassing all axios interceptors
+        const response = await fetch(`${PRODUCTION_API}/projects`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const projectsData = await response.json();
+        console.log('📦 Projects fetched:', projectsData.length, 'projects');
+        
         const mappedProjects = projectsData.map((project, index) => ({
           id: project.id,
           name: project.name,
@@ -77,14 +90,16 @@ const MainDashboard = () => {
           address: project.client_info?.address || '',
           color: PROJECT_COLORS[index % PROJECT_COLORS.length]
         }));
-        console.log('✅ Mapped projects:', mappedProjects);
+        
+        console.log('✅ Setting projects:', mappedProjects.length);
         setProjects(mappedProjects);
+        
         for (const project of mappedProjects) {
           loadProjectTodos(project.id);
         }
       } catch (error) {
         console.error('❌ PROJECTS FETCH ERROR:', error);
-        console.error('❌ Error details:', error.message, error.response?.data);
+        console.error('❌ Error message:', error.message);
         setProjects([]);
       } finally {
         setLoading(false);
