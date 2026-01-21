@@ -692,9 +692,6 @@ export default function PunchList({ projectId, roomId = null }) {
                         💬 {item.notes}
                       </div>
                     )}
-                      {item.description}
-                    </p>
-                  )}
                   
                   {/* Linked FFE Item Display */}
                   {item.linked_ffe_item ? (
