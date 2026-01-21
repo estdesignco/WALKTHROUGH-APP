@@ -958,6 +958,9 @@ class ItemBase(BaseModel):
     install_date: Optional[datetime] = None
     image_url: Optional[str] = ""
     
+    # PLACEMENT field - For Tile, Countertops, Flooring (e.g., "Kitchen Floor", "Master Bath Walls")
+    placement: Optional[str] = ""
+    
     # NEW ENHANCED TRACKING FIELDS
     sku: Optional[str] = ""
     finish_color: Optional[str] = ""
