@@ -296,6 +296,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
+  todoButton: {
+    backgroundColor: '#10B981',
+  },
+  punchButton: {
+    backgroundColor: '#EF4444',
+  },
+  samplesButton: {
+    backgroundColor: '#8B5CF6',
+  },
   buttonText: {
     color: '#1F2937',
     fontSize: 16,
