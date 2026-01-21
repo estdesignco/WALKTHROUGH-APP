@@ -11889,6 +11889,68 @@ async def delete_todo(todo_id: str):
         logging.error(f"Delete todo error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ADD COMMENT TO TODO
+@api_router.post("/todos/{todo_id}/comments")
+async def add_todo_comment(todo_id: str, comment_data: dict):
+    """Add a comment to an existing to-do item"""
+    try:
+        comment = {
+            "id": str(uuid.uuid4()),
+            "text": comment_data.get("text", ""),
+            "author": comment_data.get("author", ""),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Try project todos first
+        result = await db.todos.update_one(
+            {"id": todo_id},
+            {"$push": {"comments": comment}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        if result.modified_count == 0:
+            # Try company todos
+            result = await db.company_todos.update_one(
+                {"id": todo_id},
+                {"$push": {"comments": comment}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
+            )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="To-do not found")
+        
+        return {"success": True, "comment": comment}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Add todo comment error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ADD COMMENT TO PUNCH LIST ITEM
+@api_router.post("/punch-list/{item_id}/comments")
+async def add_punch_comment(item_id: str, comment_data: dict):
+    """Add a comment to an existing punch list item"""
+    try:
+        comment = {
+            "id": str(uuid.uuid4()),
+            "text": comment_data.get("text", ""),
+            "author": comment_data.get("author", ""),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        result = await db.punch_list.update_one(
+            {"id": item_id},
+            {"$push": {"comments": comment}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Punch list item not found")
+        
+        return {"success": True, "comment": comment}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Add punch comment error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ====================================
 # LEICA D5 MEASUREMENT ENDPOINTS
 # ====================================
