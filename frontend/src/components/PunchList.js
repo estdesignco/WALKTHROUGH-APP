@@ -70,7 +70,7 @@ export default function PunchList({ projectId, roomId = null }) {
               });
             });
           }
-        } catch (e) {}
+        } catch (e) { /* ignore */ }
       }
       
       console.log(`📦 PunchList: Loaded ${itemsMap.size} unique items (FFE priority)`);
