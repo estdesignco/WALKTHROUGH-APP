@@ -709,6 +709,67 @@ export default function ToDoList({ projectId, roomId = null }) {
                       {new Date(item.created_at).toLocaleDateString()}
                     </span>
                   </div>
+                  
+                  {/* ADDITIONAL COMMENTS THREAD */}
+                  <div className="mt-3 border-t border-stone-700 pt-3">
+                    {/* Show existing comments */}
+                    {item.comments && item.comments.length > 0 && (
+                      <div className="mb-2">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleComments(item.id); }}
+                          className="text-xs text-cyan-400 hover:text-cyan-300 font-medium"
+                        >
+                          📝 {item.comments.length} comment{item.comments.length > 1 ? 's' : ''} {expandedComments[item.id] ? '▼' : '▶'}
+                        </button>
+                        {expandedComments[item.id] && (
+                          <div className="mt-2 space-y-2 pl-3 border-l-2 border-cyan-600/30">
+                            {item.comments.map((comment, idx) => (
+                              <div key={comment.id || idx} className="text-sm bg-cyan-900/20 rounded-lg px-3 py-2">
+                                <span className="text-cyan-300">{comment.text}</span>
+                                <span className="text-gray-500 text-xs ml-2">
+                                  {comment.created_at && new Date(comment.created_at).toLocaleDateString()}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Add comment button/form */}
+                    {commentingId === item.id ? (
+                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <input
+                          type="text"
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="Add a comment..."
+                          className="flex-1 px-3 py-2 text-sm rounded-lg bg-black/50 border border-cyan-600/50 text-white focus:outline-none focus:border-cyan-500"
+                          autoFocus
+                          onKeyPress={(e) => e.key === 'Enter' && addTodoComment(item.id)}
+                        />
+                        <button
+                          onClick={() => addTodoComment(item.id)}
+                          className="px-3 py-2 text-sm bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium"
+                        >
+                          Add
+                        </button>
+                        <button
+                          onClick={() => { setCommentingId(null); setNewComment(''); }}
+                          className="px-3 py-2 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setCommentingId(item.id); }}
+                        className="text-sm text-cyan-500 hover:text-cyan-400 font-medium"
+                      >
+                        + Add comment
+                      </button>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Actions */}
