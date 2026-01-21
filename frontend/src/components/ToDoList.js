@@ -302,6 +302,29 @@ export default function ToDoList({ projectId, roomId = null }) {
     return icons[status] || '⏳';
   };
 
+  // PRIORITY TIMER - Items grow in urgency as time passes
+  const getTimePriority = (createdAt) => {
+    if (!createdAt) return { level: 'new', label: '🆕 New', color: 'bg-green-600', days: 0 };
+    
+    const created = new Date(createdAt);
+    const now = new Date();
+    const diffMs = now - created;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    
+    if (diffDays >= 7) {
+      return { level: 'critical', label: `🔥 ${diffDays}d - CRITICAL`, color: 'bg-red-600 animate-pulse', days: diffDays };
+    } else if (diffDays >= 3) {
+      return { level: 'high', label: `⚠️ ${diffDays}d - Aging`, color: 'bg-orange-500', days: diffDays };
+    } else if (diffDays >= 1) {
+      return { level: 'medium', label: `⏰ ${diffDays}d old`, color: 'bg-yellow-600', days: diffDays };
+    } else if (diffHours >= 1) {
+      return { level: 'low', label: `🕐 ${diffHours}h old`, color: 'bg-blue-600', days: 0 };
+    } else {
+      return { level: 'new', label: '🆕 New', color: 'bg-green-600', days: 0 };
+    }
+  };
+
   const counts = {
     all: todoItems.length,
     pending: todoItems.filter(i => !i.completed && i.status !== 'completed' && i.status !== 'in_progress').length,
