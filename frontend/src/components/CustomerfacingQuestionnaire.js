@@ -698,56 +698,109 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     />
                 </div>
 
-                <div className="text-center mb-12">
-                    <h2 className="text-2xl font-light text-[#B49B7E] tracking-wider">
-                        {editProjectId ? 'EDIT QUESTIONNAIRE' : 'COMPREHENSIVE CLIENT QUESTIONNAIRE'}
-                    </h2>
-                    <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-4"></div>
-                </div>
+                {/* SHOW BOOKING SECTION AFTER SUCCESSFUL SUBMISSION */}
+                {showBooking && submissionStatus === 'success' ? (
+                    <div className="space-y-8">
+                        {/* Success Message */}
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+                                <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <h2 className="text-2xl font-light text-[#B49B7E] tracking-wider mb-2">
+                                QUESTIONNAIRE SUBMITTED!
+                            </h2>
+                            <p className="text-gray-400">
+                                Thank you for completing your design questionnaire, {formData.client_name || 'valued client'}!
+                            </p>
+                            <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-4"></div>
+                        </div>
+                        
+                        {/* One More Step Message */}
+                        <div className="text-center mb-6">
+                            <div className="flex items-center justify-center gap-2 text-[#D4A574] mb-2">
+                                <Calendar className="w-5 h-5" />
+                                <span className="text-lg font-medium">One More Step!</span>
+                            </div>
+                            <p className="text-gray-400">
+                                Schedule your design consultation to get started on your project.
+                            </p>
+                        </div>
+                        
+                        {/* Appointment Booking Component */}
+                        <AppointmentBooking 
+                            clientName={formData.client_name || formData.name || 'Client'}
+                            clientEmail={formData.email || ''}
+                            clientPhone={formData.phone || ''}
+                            projectId={createdProjectId}
+                            onBooked={(result) => {
+                                console.log('✅ Appointment booked:', result);
+                            }}
+                        />
+                        
+                        {/* Skip Booking Option */}
+                        <div className="text-center mt-6">
+                            <button
+                                onClick={() => window.location.href = `/project/${createdProjectId}?tab=Questionnaire`}
+                                className="text-gray-500 hover:text-[#B49B7E] text-sm underline transition-colors"
+                            >
+                                Skip for now - I'll schedule later
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="text-center mb-12">
+                            <h2 className="text-2xl font-light text-[#B49B7E] tracking-wider">
+                                {editProjectId ? 'EDIT QUESTIONNAIRE' : 'COMPREHENSIVE CLIENT QUESTIONNAIRE'}
+                            </h2>
+                            <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E] to-transparent mx-auto mt-4"></div>
+                        </div>
 
-                <form onSubmit={handleSubmit} className="space-y-12 mt-8">
-                    {/* Section 1: Client Information */}
-                    <Section title="CLIENT INFORMATION">
-                        <InputField label="Full Name" id="client_name" value={formData.client_name || ''} onChange={(e) => handleFormChange('client_name', e.target.value)} required />
-                        <InputField label="Project Name" id="name" value={formData.name || ''} onChange={(e) => handleFormChange('name', e.target.value)} required />
-                        <InputField label="Email Address" id="email" type="email" value={formData.email || ''} onChange={(e) => handleFormChange('email', e.target.value)} />
-                        <InputField label="Phone Number" id="phone" type="tel" value={formData.phone || ''} onChange={(e) => handleFormChange('phone', e.target.value, e)} />
-                        <InputField label="Spouse / Partner Name" id="spouse_partner_name" value={formData.spouse_partner_name || ''} onChange={(e) => handleFormChange('spouse_partner_name', e.target.value)} />
-                        <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value, e)} />
-                        <FieldWrapper label="Project Address">
-                            <Autocomplete
-                                apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
-                                onPlaceSelected={(place) => {
-                                    console.log('📍 Place selected:', place);
-                                    if (place && place.formatted_address) {
-                                        handleFormChange('address', place.formatted_address);
-                                    }
-                                }}
-                                options={{
-                                    types: ['address'],
-                                }}
-                                className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400"
-                                placeholder="Start typing your address..."
-                                defaultValue={formData.address || ''}
-                                onChange={(e) => {
-                                    // Also save manual input as fallback
-                                    handleFormChange('address', e.target.value);
-                                }}
-                            />
-                            <p className="text-xs text-[#B49B7E]/60 mt-1">Start typing and select from suggestions, or type your full address manually</p>
-                        </FieldWrapper>
-                        <FieldWrapper label="Preferred Method of Communication">
-                            <CheckboxGroup options={contactPrefOptions} value={formData.contact_preferences} onChange={(v) => handleFormChange('contact_preferences', v)} />
-                        </FieldWrapper>
-                        <InputField label="Best Time to Call" id="best_time_to_call" value={formData.best_time_to_call || ''} onChange={(e) => handleFormChange('best_time_to_call', e.target.value)} />
-                        <FieldWrapper label="Have you worked with a designer before? If not, what are your hesitations?">
-                            <textarea id="worked_with_designer_before" className={textareaStyles} value={formData.worked_with_designer_before || ''} onChange={(e) => handleFormChange('worked_with_designer_before', e.target.value)}></textarea>
-                        </FieldWrapper>
-                        <InputField label="Who will be the primary decision maker(s) for this project?" id="primary_decision_maker" value={formData.primary_decision_maker || ''} onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} />
-                        <FieldWrapper label="How involved would you like to be in the design process?">
-                            <select 
-                                value={formData.involvement_level} 
-                                onChange={(e) => handleFormChange('involvement_level', e.target.value)}
+                        <form onSubmit={handleSubmit} className="space-y-12 mt-8">
+                            {/* Section 1: Client Information */}
+                            <Section title="CLIENT INFORMATION">
+                                <InputField label="Full Name" id="client_name" value={formData.client_name || ''} onChange={(e) => handleFormChange('client_name', e.target.value)} required />
+                                <InputField label="Project Name" id="name" value={formData.name || ''} onChange={(e) => handleFormChange('name', e.target.value)} required />
+                                <InputField label="Email Address" id="email" type="email" value={formData.email || ''} onChange={(e) => handleFormChange('email', e.target.value)} />
+                                <InputField label="Phone Number" id="phone" type="tel" value={formData.phone || ''} onChange={(e) => handleFormChange('phone', e.target.value, e)} />
+                                <InputField label="Spouse / Partner Name" id="spouse_partner_name" value={formData.spouse_partner_name || ''} onChange={(e) => handleFormChange('spouse_partner_name', e.target.value)} />
+                                <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value, e)} />
+                                <FieldWrapper label="Project Address">
+                                    <Autocomplete
+                                        apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
+                                        onPlaceSelected={(place) => {
+                                            console.log('📍 Place selected:', place);
+                                            if (place && place.formatted_address) {
+                                                handleFormChange('address', place.formatted_address);
+                                            }
+                                        }}
+                                        options={{
+                                            types: ['address'],
+                                        }}
+                                        className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400"
+                                        placeholder="Start typing your address..."
+                                        defaultValue={formData.address || ''}
+                                        onChange={(e) => {
+                                            // Also save manual input as fallback
+                                            handleFormChange('address', e.target.value);
+                                        }}
+                                    />
+                                    <p className="text-xs text-[#B49B7E]/60 mt-1">Start typing and select from suggestions, or type your full address manually</p>
+                                </FieldWrapper>
+                                <FieldWrapper label="Preferred Method of Communication">
+                                    <CheckboxGroup options={contactPrefOptions} value={formData.contact_preferences} onChange={(v) => handleFormChange('contact_preferences', v)} />
+                                </FieldWrapper>
+                                <InputField label="Best Time to Call" id="best_time_to_call" value={formData.best_time_to_call || ''} onChange={(e) => handleFormChange('best_time_to_call', e.target.value)} />
+                                <FieldWrapper label="Have you worked with a designer before? If not, what are your hesitations?">
+                                    <textarea id="worked_with_designer_before" className={textareaStyles} value={formData.worked_with_designer_before || ''} onChange={(e) => handleFormChange('worked_with_designer_before', e.target.value)}></textarea>
+                                </FieldWrapper>
+                                <InputField label="Who will be the primary decision maker(s) for this project?" id="primary_decision_maker" value={formData.primary_decision_maker || ''} onChange={(e) => handleFormChange('primary_decision_maker', e.target.value)} />
+                                <FieldWrapper label="How involved would you like to be in the design process?">
+                                    <select 
+                                        value={formData.involvement_level} 
+                                        onChange={(e) => handleFormChange('involvement_level', e.target.value)}
                                 className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355]"
                             >
                                 <option value="">Select...</option>
