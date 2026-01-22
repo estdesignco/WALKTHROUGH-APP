@@ -513,8 +513,14 @@ export default function MasterToDoList() {
             
             {expandedProjects[project.id] && (
               <div className="px-6 pb-4 space-y-1">
-                {/* Project To-Dos */}
-                {todos.map((todo, todoIdx) => {
+                {/* Project To-Dos - SORTED: Done items at bottom */}
+                {[...todos].sort((a, b) => {
+                  const aIsDone = a.completed || a.status === 'completed';
+                  const bIsDone = b.completed || b.status === 'completed';
+                  if (aIsDone && !bIsDone) return 1;
+                  if (!aIsDone && bIsDone) return -1;
+                  return 0;
+                }).map((todo, todoIdx) => {
                   const linkedItem = todo.linked_ffe_item || todo.linked_checklist_item || {};
                   const sourceType = todo.source_type || linkedItem.source_type || 'checklist';
                   const sheetLabel = sourceType === 'ffe' ? 'FF&E' : sourceType === 'walkthrough' ? 'WALKTHROUGH' : 'CHECKLIST';
