@@ -390,7 +390,7 @@ export default function MasterToDoList() {
                   key={todo.id} 
                   data-testid={`company-todo-${todo.id}`}
                   className={`p-4 hover:bg-black/20 transition-colors ${
-                    todo.completed || todo.status === 'completed' ? 'opacity-60' : ''
+                    isDone(todo) ? 'opacity-60' : ''
                   }`}
                 >
                   <div className="flex items-start gap-4">
@@ -399,14 +399,15 @@ export default function MasterToDoList() {
                       onClick={() => {
                         const nextStatus = {
                           pending: 'in_progress',
-                          in_progress: 'completed',
+                          in_progress: 'done',
+                          done: 'pending',
                           completed: 'pending',
                           undefined: 'in_progress'
                         };
                         updateCompanyTodoStatus(todo.id, nextStatus[todo.status || 'pending']);
                       }}
                       className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
-                        todo.completed || todo.status === 'completed'
+                        isDone(todo)
                           ? 'border-green-500 bg-green-500/20 text-green-400'
                           : 'border-gray-500 hover:border-[#D4A574]'
                       }`}
@@ -418,7 +419,7 @@ export default function MasterToDoList() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className={`font-medium ${
-                          todo.completed || todo.status === 'completed' 
+                          isDone(todo)
                             ? 'line-through text-gray-500' 
                             : 'text-white'
                         }`}>
