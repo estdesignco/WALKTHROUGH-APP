@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v7.25.0
+// Design Ready Product Scraper v7.26.0
 // VENDOR-SPECIFIC SCRAPING for 26+ vendors
-// MULTI-IMAGE SUPPORT, HIGH-RES IMAGES, IMPROVED TAB REUSE - Jan 2026
+// MULTI-IMAGE SUPPORT FIXED, HIGH-RES IMAGES, IMPROVED TAB REUSE - Jan 2026
 // Debug logging enabled in console
 
 const APP_URL = 'https://app.estdesignco.com';
