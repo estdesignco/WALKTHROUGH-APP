@@ -592,7 +592,14 @@ export default function PunchList({ projectId, roomId = null }) {
             </button>
           </div>
         ) : (
-          punchItems.map(item => (
+          // SORT: Completed/Verified items go to BOTTOM of the list
+          [...punchItems].sort((a, b) => {
+            const aIsDone = a.status === 'completed' || a.status === 'verified';
+            const bIsDone = b.status === 'completed' || b.status === 'verified';
+            if (aIsDone && !bIsDone) return 1;  // a goes after b
+            if (!aIsDone && bIsDone) return -1; // a goes before b
+            return 0; // maintain original order
+          }).map(item => (
             <div 
               key={item.id} 
               className={`p-4 hover:bg-black/20 transition-colors ${

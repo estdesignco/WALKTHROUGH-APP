@@ -364,7 +364,14 @@ export default function MasterToDoList() {
                 </button>
               </div>
             ) : (
-              filteredCompanyTodos.map(todo => (
+              // SORT: Completed items go to BOTTOM of the list
+              [...filteredCompanyTodos].sort((a, b) => {
+                const aIsDone = a.completed || a.status === 'completed';
+                const bIsDone = b.completed || b.status === 'completed';
+                if (aIsDone && !bIsDone) return 1;
+                if (!aIsDone && bIsDone) return -1;
+                return 0;
+              }).map(todo => (
                 <div 
                   key={todo.id} 
                   data-testid={`company-todo-${todo.id}`}

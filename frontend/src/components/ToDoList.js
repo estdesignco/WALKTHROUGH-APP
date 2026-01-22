@@ -551,7 +551,14 @@ export default function ToDoList({ projectId, roomId = null }) {
             </button>
           </div>
         ) : (
-          todoItems.map(item => (
+          // SORT: Completed/Done items go to BOTTOM of the list
+          [...todoItems].sort((a, b) => {
+            const aIsDone = a.completed || a.status === 'completed';
+            const bIsDone = b.completed || b.status === 'completed';
+            if (aIsDone && !bIsDone) return 1;  // a goes after b
+            if (!aIsDone && bIsDone) return -1; // a goes before b
+            return 0; // maintain original order
+          }).map(item => (
             <div 
               key={item.id} 
               data-testid={`todo-item-${item.id}`}
