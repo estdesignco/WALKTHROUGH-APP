@@ -15279,10 +15279,85 @@ async def generate_customer_sheets(project_id: str, data: dict = None):
 # CALENDAR SYNC ENDPOINTS
 @api_router.post("/calendar/google/sync/{project_id}")
 async def sync_google_calendar(project_id: str):
-    """Sync project to Google Calendar"""
+    """Sync project dates to Google Calendar"""
     try:
-        # Placeholder for Google Calendar API integration
-        return {"success": True, "message": "Google Calendar sync ready - requires OAuth setup"}
+        # Get active Google Calendar connection
+        connection = await db.calendar_connections.find_one({"provider": "google", "is_active": True}, {"_id": 0})
+        
+        if not connection:
+            return {"success": False, "message": "Google Calendar not connected. Please connect via Settings.", "requires_auth": True}
+        
+        # Check if token needs refresh
+        token_expires_at = datetime.fromisoformat(connection.get('token_expires_at', '2000-01-01T00:00:00+00:00').replace('Z', '+00:00'))
+        if datetime.now(timezone.utc) >= token_expires_at:
+            # Refresh the token
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    'https://oauth2.googleapis.com/token',
+                    data={
+                        'client_id': GOOGLE_CLIENT_ID,
+                        'client_secret': GOOGLE_CLIENT_SECRET,
+                        'refresh_token': connection.get('refresh_token'),
+                        'grant_type': 'refresh_token'
+                    }
+                ) as resp:
+                    token_data = await resp.json()
+                    
+                    if 'error' in token_data:
+                        return {"success": False, "message": "Token refresh failed. Please reconnect Google Calendar.", "requires_auth": True}
+                    
+                    # Update stored token
+                    await db.calendar_connections.update_one(
+                        {"id": connection['id']},
+                        {"$set": {
+                            "access_token": token_data.get('access_token'),
+                            "token_expires_at": (datetime.now(timezone.utc) + timedelta(seconds=token_data.get('expires_in', 3600))).isoformat()
+                        }}
+                    )
+                    connection['access_token'] = token_data.get('access_token')
+        
+        # Get project details
+        project = await db.projects.find_one({"id": project_id}, {"_id": 0})
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        events_created = []
+        access_token = connection['access_token']
+        
+        async with aiohttp.ClientSession() as session:
+            # Sync key project dates
+            project_dates = [
+                ("delivery_date", "🚚 Delivery"),
+                ("install_date", "🔧 Installation"),
+                ("completion_date", "✅ Project Completion")
+            ]
+            
+            for date_field, event_prefix in project_dates:
+                date_value = project.get(date_field)
+                if date_value:
+                    event_data = {
+                        "summary": f"{event_prefix}: {project.get('name', 'Project')}",
+                        "description": f"Design Ready Project Event\nProject: {project.get('name')}\nClient: {project.get('client_name', 'N/A')}",
+                        "start": {"date": date_value[:10]},  # All-day event
+                        "end": {"date": date_value[:10]},
+                        "reminders": {"useDefault": True}
+                    }
+                    
+                    async with session.post(
+                        'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+                        headers={'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'},
+                        json=event_data
+                    ) as resp:
+                        if resp.status == 200:
+                            result = await resp.json()
+                            events_created.append({"type": date_field, "event_id": result.get('id')})
+        
+        return {
+            "success": True, 
+            "message": f"Synced {len(events_created)} events to Google Calendar",
+            "events_created": events_created
+        }
+        
     except Exception as e:
         logging.error(f"Error syncing Google Calendar: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
