@@ -17203,33 +17203,72 @@ async def remove_background_from_url(request: dict):
     """
     Remove background from an image URL and return PNG with transparent background.
     Used by Chrome extension for "Copy Image (No BG)" feature.
+    
+    Options:
+    - model: 'fast' (u2net_human_seg - quicker) or 'quality' (u2netp - better quality)
+    - alpha_matting: True for better edge handling (slower)
     """
     image_url = request.get("image_url")
+    model_type = request.get("model", "fast")  # 'fast' or 'quality'
+    use_alpha = request.get("alpha_matting", False)
+    
     if not image_url:
         raise HTTPException(status_code=400, detail="image_url is required")
     
     try:
         # Import rembg here to avoid loading model until needed
-        from rembg import remove
+        from rembg import remove, new_session
         from PIL import Image
         import aiohttp
         
-        print(f"[BG Removal] Processing: {image_url[:80]}...")
+        print(f"[BG Removal] Processing (model={model_type}): {image_url[:80]}...")
         
-        # Download the image
+        # Download the image with timeout
         async with aiohttp.ClientSession() as session:
             async with session.get(image_url, timeout=aiohttp.ClientTimeout(total=30)) as response:
                 if response.status != 200:
                     raise HTTPException(status_code=400, detail=f"Failed to download image: HTTP {response.status}")
                 image_data = await response.read()
         
-        # Process with rembg
+        print(f"[BG Removal] Downloaded {len(image_data)} bytes, processing...")
+        
+        # Open image and resize if too large (speeds up processing significantly)
         input_image = Image.open(BytesIO(image_data))
-        output_image = remove(input_image)
+        original_size = input_image.size
+        
+        # Limit max dimension to 1500px for faster processing
+        max_dim = 1500
+        if max(input_image.size) > max_dim:
+            ratio = max_dim / max(input_image.size)
+            new_size = (int(input_image.size[0] * ratio), int(input_image.size[1] * ratio))
+            input_image = input_image.resize(new_size, Image.LANCZOS)
+            print(f"[BG Removal] Resized from {original_size} to {new_size}")
+        
+        # Choose model based on speed preference
+        # 'u2net' is default (good quality, slower)
+        # 'u2netp' is smaller/faster but lower quality
+        # 'silueta' is fast for human silhouettes
+        model_name = "u2netp" if model_type == "fast" else "u2net"
+        
+        # Process with rembg
+        # Setting only_mask=False, post_process_mask=True for cleaner edges
+        output_image = remove(
+            input_image,
+            session=new_session(model_name),
+            alpha_matting=use_alpha,
+            alpha_matting_foreground_threshold=240,
+            alpha_matting_background_threshold=10,
+            alpha_matting_erode_size=10,
+            post_process_mask=True
+        )
+        
+        # Resize back to original if we scaled down
+        if max(original_size) > max_dim:
+            output_image = output_image.resize(original_size, Image.LANCZOS)
         
         # Convert to PNG bytes
         output_buffer = BytesIO()
-        output_image.save(output_buffer, format="PNG")
+        output_image.save(output_buffer, format="PNG", optimize=True)
         output_bytes = output_buffer.getvalue()
         
         # Return as base64 for easy clipboard handling
@@ -17241,14 +17280,18 @@ async def remove_background_from_url(request: dict):
         return {
             "success": True,
             "image_base64": base64_image,
-            "content_type": "image/png"
+            "content_type": "image/png",
+            "original_size": original_size,
+            "model_used": model_name
         }
         
     except ImportError as e:
         print(f"[BG Removal] rembg not installed: {e}")
-        raise HTTPException(status_code=500, detail="Background removal service not available")
+        raise HTTPException(status_code=500, detail="Background removal service not available. Install with: pip install rembg")
     except Exception as e:
         print(f"[BG Removal] Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Background removal failed: {str(e)}")
 
 # ============================================================================
