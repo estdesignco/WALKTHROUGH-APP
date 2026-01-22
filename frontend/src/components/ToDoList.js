@@ -325,11 +325,26 @@ export default function ToDoList({ projectId, roomId = null }) {
     }
   };
 
+  // Helper to check if item is done
+  const isDone = (item) => item.completed || item.status === 'completed' || item.status === 'done';
+
+  // Filter out items completed more than a week ago
+  const isOlderThanWeek = (item) => {
+    if (!isDone(item)) return false;
+    const completedDate = item.completed_at || item.updated_at || item.created_at;
+    if (!completedDate) return false;
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return new Date(completedDate) < weekAgo;
+  };
+
+  const activeTodoItems = todoItems.filter(item => !isOlderThanWeek(item));
+
   const counts = {
-    all: todoItems.length,
-    pending: todoItems.filter(i => !i.completed && i.status !== 'completed' && i.status !== 'in_progress').length,
-    in_progress: todoItems.filter(i => i.status === 'in_progress').length,
-    completed: todoItems.filter(i => i.completed || i.status === 'completed').length
+    all: activeTodoItems.length,
+    pending: activeTodoItems.filter(i => !isDone(i) && i.status !== 'in_progress' && i.status !== 'working').length,
+    in_progress: activeTodoItems.filter(i => i.status === 'in_progress' || i.status === 'working').length,
+    completed: activeTodoItems.filter(i => isDone(i)).length
   };
 
   return (
