@@ -20,7 +20,7 @@ import os
 from typing import Dict, Any, List
 
 # Get backend URL from environment
-BACKEND_URL = "https://bugfix-central-89.preview.emergentagent.com"
+BACKEND_URL = "https://app-stability-fix-4.preview.emergentagent.com"
 
 class ChromeExtensionScraperTester:
     def __init__(self):

@@ -12,7 +12,7 @@ from datetime import datetime
 import uuid
 
 # Configuration
-BACKEND_URL = "https://bugfix-central-89.preview.emergentagent.com/api"
+BACKEND_URL = "https://app-stability-fix-4.preview.emergentagent.com/api"
 PROJECT_ID = "e2f3e36d-1972-4ae4-aa61-22381aaf0bdb"
 
 # Test data

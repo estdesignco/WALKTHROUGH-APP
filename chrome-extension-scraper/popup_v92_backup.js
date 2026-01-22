@@ -3,8 +3,8 @@
 // Main image = Large product photo (NOT a swatch)
 // Swatch image = Small color/finish chip ONLY
 
-const APP_URL = 'https://bugfix-central-89.preview.emergentagent.com';
-const BACKEND_URL = 'https://bugfix-central-89.preview.emergentagent.com';
+const APP_URL = 'https://app-stability-fix-4.preview.emergentagent.com';
+const BACKEND_URL = 'https://app-stability-fix-4.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://bugfix-central-89.preview.emergentagent.com";
+const BACKEND_URL = "https://app-stability-fix-4.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

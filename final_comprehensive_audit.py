@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 import uuid
 
-BASE_URL = "https://bugfix-central-89.preview.emergentagent.com/api"
+BASE_URL = "https://app-stability-fix-4.preview.emergentagent.com/api"
 
 def test_update_delete_operations():
     """Test PUT and DELETE operations"""
