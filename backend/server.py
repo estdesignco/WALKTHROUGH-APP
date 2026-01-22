@@ -11417,6 +11417,23 @@ async def google_calendar_callback(code: str = None, error: str = None):
         logging.error(f"Google OAuth callback error: {str(e)}")
         return RedirectResponse(url=f"/?error={str(e)}")
 
+# Get calendar connection status
+@api_router.get("/auth/google/status")
+async def get_google_calendar_status():
+    """Get Google Calendar connection status"""
+    try:
+        connection = await db.calendar_connections.find_one({"provider": "google", "is_active": True}, {"_id": 0})
+        if connection:
+            return {
+                "connected": True,
+                "email": connection.get('email'),
+                "connected_at": connection.get('connected_at')
+            }
+        return {"connected": False}
+    except Exception as e:
+        logging.error(f"Get Google Calendar status error: {str(e)}")
+        return {"connected": False, "error": str(e)}
+
 # Microsoft Outlook OAuth
 @api_router.get("/auth/outlook/login")
 async def outlook_calendar_login():
