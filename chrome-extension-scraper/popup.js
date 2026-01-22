@@ -1078,6 +1078,7 @@ function scrapePageData() {
   console.log('🎨 Finish/Color:', data.finish_color);
   console.log('🖼️ Finish Image:', data.finish_image ? 'YES' : 'NO');
   console.log('📷 Product Image:', data.image_url ? 'YES' : 'NO');
+  console.log('📸 All Images:', data.all_images?.length || 0);
   console.log('🔗 URL:', data.url);
   console.log('=========================================================');
   
