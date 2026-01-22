@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { apiService } from '../services/apiService';
 
 export default function ToDoListScreen({ route, navigation }) {
@@ -95,6 +96,20 @@ export default function ToDoListScreen({ route, navigation }) {
     }
   };
 
+  const updateTodoPriority = async (todoId, newPriority) => {
+    try {
+      await apiService.updateTodo(todoId, { priority: newPriority });
+      setTodos(prev =>
+        prev.map(todo =>
+          todo.id === todoId ? { ...todo, priority: newPriority } : todo
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update todo priority:', error);
+      Alert.alert('Error', 'Failed to update priority');
+    }
+  };
+
   const deleteTodo = async (todoId) => {
     Alert.alert(
       'Delete To-Do',
@@ -136,7 +151,6 @@ export default function ToDoListScreen({ route, navigation }) {
       });
 
       if (response.data) {
-        // Update the todo in the list with new comments
         setTodos(prev =>
           prev.map(todo =>
             todo.id === selectedTodo.id
@@ -160,8 +174,10 @@ export default function ToDoListScreen({ route, navigation }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'done': return '#10B981';
-      case 'working': return '#3B82F6';
+      case 'done': 
+      case 'completed': return '#10B981';
+      case 'working':
+      case 'in_progress': return '#3B82F6';
       case 'pending': return '#F59E0B';
       default: return '#6B7280';
     }
@@ -169,8 +185,9 @@ export default function ToDoListScreen({ route, navigation }) {
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return '#EF4444';
-      case 'medium': return '#F59E0B';
+      case 'urgent': return '#DC2626';
+      case 'high': return '#F59E0B';
+      case 'medium': return '#3B82F6';
       case 'low': return '#10B981';
       default: return '#6B7280';
     }
@@ -178,14 +195,16 @@ export default function ToDoListScreen({ route, navigation }) {
 
   const filteredTodos = todos.filter(todo => {
     if (activeFilter === 'all') return true;
+    if (activeFilter === 'working') return todo.status === 'working' || todo.status === 'in_progress';
+    if (activeFilter === 'done') return todo.status === 'done' || todo.status === 'completed';
     return todo.status === activeFilter;
   });
 
   const counts = {
     all: todos.length,
     pending: todos.filter(t => t.status === 'pending').length,
-    working: todos.filter(t => t.status === 'working').length,
-    done: todos.filter(t => t.status === 'done').length,
+    working: todos.filter(t => t.status === 'working' || t.status === 'in_progress').length,
+    done: todos.filter(t => t.status === 'done' || t.status === 'completed').length,
   };
 
   if (loading) {
@@ -241,9 +260,6 @@ export default function ToDoListScreen({ route, navigation }) {
         {filteredTodos.map(todo => (
           <View key={todo.id} style={styles.todoCard}>
             <View style={styles.todoHeader}>
-              <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(todo.priority) }]}>
-                <Text style={styles.priorityText}>{todo.priority?.toUpperCase()}</Text>
-              </View>
               <TouchableOpacity onPress={() => deleteTodo(todo.id)}>
                 <Text style={styles.deleteButton}>🗑️</Text>
               </TouchableOpacity>
@@ -254,33 +270,45 @@ export default function ToDoListScreen({ route, navigation }) {
               <Text style={styles.todoDescription}>{todo.description}</Text>
             )}
 
-            {/* Status Selector */}
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Status:</Text>
-              <View style={styles.statusButtons}>
-                {['pending', 'working', 'done'].map(status => (
-                  <TouchableOpacity
-                    key={status}
-                    style={[
-                      styles.statusButton,
-                      todo.status === status && {
-                        backgroundColor: getStatusColor(status),
-                      },
-                    ]}
-                    onPress={() => updateTodoStatus(todo.id, status)}
-                  >
-                    <Text
-                      style={[
-                        styles.statusButtonText,
-                        todo.status === status && styles.statusButtonTextActive,
-                      ]}
-                    >
-                      {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+            {/* STATUS DROPDOWN - Matching Desktop */}
+            <View style={styles.dropdownRow}>
+              <Text style={styles.dropdownLabel}>Status:</Text>
+              <View style={[styles.pickerContainer, { backgroundColor: getStatusColor(todo.status) }]}>
+                <Picker
+                  selectedValue={todo.status || 'pending'}
+                  onValueChange={(value) => updateTodoStatus(todo.id, value)}
+                  style={styles.picker}
+                  dropdownIconColor="#FFF"
+                >
+                  <Picker.Item label="⏳ Pending" value="pending" />
+                  <Picker.Item label="🔄 Working" value="working" />
+                  <Picker.Item label="✅ Done" value="done" />
+                </Picker>
               </View>
             </View>
+
+            {/* PRIORITY DROPDOWN - Matching Desktop */}
+            <View style={styles.dropdownRow}>
+              <Text style={styles.dropdownLabel}>Priority:</Text>
+              <View style={[styles.pickerContainer, { backgroundColor: getPriorityColor(todo.priority) }]}>
+                <Picker
+                  selectedValue={todo.priority || 'medium'}
+                  onValueChange={(value) => updateTodoPriority(todo.id, value)}
+                  style={styles.picker}
+                  dropdownIconColor="#FFF"
+                >
+                  <Picker.Item label="Low" value="low" />
+                  <Picker.Item label="Medium" value="medium" />
+                  <Picker.Item label="High" value="high" />
+                  <Picker.Item label="🔴 Urgent" value="urgent" />
+                </Picker>
+              </View>
+            </View>
+
+            {/* Assigned To */}
+            {todo.assigned_to && (
+              <Text style={styles.assignedTo}>👤 Assigned: {todo.assigned_to}</Text>
+            )}
 
             {/* Comments Section */}
             <TouchableOpacity
@@ -300,10 +328,6 @@ export default function ToDoListScreen({ route, navigation }) {
                   {todo.linked_ffe_item.name} ({todo.linked_ffe_item.vendor})
                 </Text>
               </View>
-            )}
-
-            {todo.assigned_to && (
-              <Text style={styles.assignedTo}>Assigned to: {todo.assigned_to}</Text>
             )}
           </View>
         ))}
@@ -346,7 +370,7 @@ export default function ToDoListScreen({ route, navigation }) {
 
             <Text style={styles.inputLabel}>Priority</Text>
             <View style={styles.prioritySelector}>
-              {['low', 'medium', 'high'].map(priority => (
+              {['low', 'medium', 'high', 'urgent'].map(priority => (
                 <TouchableOpacity
                   key={priority}
                   style={[
@@ -535,19 +559,9 @@ const styles = StyleSheet.create({
   },
   todoHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     marginBottom: 8,
-  },
-  priorityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  priorityText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: 'bold',
   },
   deleteButton: {
     fontSize: 18,
@@ -563,42 +577,36 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     marginBottom: 12,
   },
-  statusRow: {
+  dropdownRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
-  statusLabel: {
+  dropdownLabel: {
     fontSize: 14,
     color: '#9CA3AF',
-    marginRight: 8,
+    width: 70,
   },
-  statusButtons: {
-    flexDirection: 'row',
+  pickerContainer: {
     flex: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  statusButton: {
-    flex: 1,
-    paddingVertical: 6,
-    alignItems: 'center',
-    backgroundColor: '#374151',
-    marginHorizontal: 2,
-    borderRadius: 4,
-  },
-  statusButtonText: {
-    fontSize: 12,
-    color: '#9CA3AF',
-  },
-  statusButtonTextActive: {
+  picker: {
     color: '#FFF',
-    fontWeight: 'bold',
+    height: 40,
+  },
+  assignedTo: {
+    fontSize: 14,
+    color: '#D4A574',
+    marginBottom: 8,
   },
   commentsButton: {
     backgroundColor: '#374151',
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 8,
+    marginTop: 8,
   },
   commentsButtonText: {
     color: '#D4A574',
@@ -618,11 +626,6 @@ const styles = StyleSheet.create({
   linkedItemText: {
     fontSize: 12,
     color: '#D4A574',
-  },
-  assignedTo: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 8,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -686,12 +689,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     backgroundColor: '#374151',
-    marginHorizontal: 4,
+    marginHorizontal: 2,
     borderRadius: 8,
   },
   priorityOptionText: {
     color: '#9CA3AF',
     fontWeight: '500',
+    fontSize: 12,
   },
   priorityOptionTextActive: {
     color: '#FFF',
