@@ -3199,53 +3199,78 @@ const ExactChecklistSpreadsheet = ({
                                           >
                                             +
                                           </button>
-                                          {/* DUPLICATE BUTTON - Copy this entire line */}
+                                          {/* COPY BUTTON - Copy this item to clipboard for pasting anywhere */}
                                           <button
-                                            onClick={async () => {
-                                              try {
-                                                const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-                                                // Duplicate the item with all its data
-                                                const duplicateData = {
-                                                  name: item.name ? `${item.name} (Copy)` : '',
-                                                  vendor: item.vendor || '',
-                                                  sku: item.sku || '',
-                                                  cost: item.cost || 0,
-                                                  size: item.size || '',
-                                                  finish_color: item.finish_color || '',
-                                                  finish_image: item.finish_image || '',
-                                                  quantity: item.quantity || null,
-                                                  status: '', // Start with blank status
-                                                  link: item.link || '',
-                                                  image_url: item.image_url || '',
-                                                  remarks: item.remarks || '',
-                                                  placement: item.placement || '',
-                                                  subcategory_id: subcategory.id,
-                                                  order_index: (item.order_index || 0) + 1
-                                                };
-                                                
-                                                const response = await fetch(`${backendUrl}/api/items`, {
-                                                  method: 'POST',
-                                                  headers: { 'Content-Type': 'application/json' },
-                                                  body: JSON.stringify(duplicateData)
-                                                });
-                                                
-                                                if (response.ok) {
-                                                  console.log('✅ Item duplicated successfully');
-                                                  if (onReload) onReload();
-                                                } else {
-                                                  console.error('❌ Failed to duplicate item');
-                                                  alert('Failed to duplicate item');
-                                                }
-                                              } catch (error) {
-                                                console.error('❌ Error duplicating item:', error);
-                                                alert('Error duplicating item: ' + error.message);
-                                              }
+                                            onClick={() => {
+                                              // Store item data in window clipboard state
+                                              window.checklistClipboard = {
+                                                name: item.name || '',
+                                                vendor: item.vendor || '',
+                                                sku: item.sku || '',
+                                                cost: item.cost || 0,
+                                                size: item.size || '',
+                                                finish_color: item.finish_color || '',
+                                                finish_image: item.finish_image || '',
+                                                quantity: item.quantity || null,
+                                                link: item.link || '',
+                                                image_url: item.image_url || '',
+                                                remarks: item.remarks || '',
+                                                placement: item.placement || ''
+                                              };
+                                              alert('✅ Item copied! Click + on any row to paste.');
                                             }}
                                             className="text-blue-400 hover:text-blue-300 text-sm"
-                                            title="Duplicate Line"
+                                            title="Copy Item (then click + anywhere to paste)"
                                           >
-                                            ⎘
+                                            📋
                                           </button>
+                                          {/* PASTE CLIPBOARD - Paste copied item here */}
+                                          {window.checklistClipboard && (
+                                            <button
+                                              onClick={async () => {
+                                                try {
+                                                  const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+                                                  const clipData = window.checklistClipboard;
+                                                  const pasteData = {
+                                                    name: clipData.name ? `${clipData.name} (Copy)` : '',
+                                                    vendor: clipData.vendor || '',
+                                                    sku: clipData.sku || '',
+                                                    cost: clipData.cost || 0,
+                                                    size: clipData.size || '',
+                                                    finish_color: clipData.finish_color || '',
+                                                    finish_image: clipData.finish_image || '',
+                                                    quantity: clipData.quantity || null,
+                                                    status: '',
+                                                    link: clipData.link || '',
+                                                    image_url: clipData.image_url || '',
+                                                    remarks: clipData.remarks || '',
+                                                    placement: clipData.placement || '',
+                                                    subcategory_id: subcategory.id,
+                                                    order_index: (item.order_index || 0) + 1
+                                                  };
+                                                  
+                                                  const response = await fetch(`${backendUrl}/api/items`, {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify(pasteData)
+                                                  });
+                                                  
+                                                  if (response.ok) {
+                                                    window.checklistClipboard = null; // Clear after paste
+                                                    if (onReload) onReload();
+                                                  } else {
+                                                    alert('Failed to paste item');
+                                                  }
+                                                } catch (error) {
+                                                  alert('Error pasting item: ' + error.message);
+                                                }
+                                              }}
+                                              className="text-green-400 hover:text-green-300 text-sm animate-pulse"
+                                              title="Paste copied item HERE"
+                                            >
+                                              📥
+                                            </button>
+                                          )}
                                           <button
                                             onClick={() => {
                                               setAlternativesItem({...item, category_name: category.name});
