@@ -134,11 +134,43 @@ const ExportsDashboard = ({ projectId }) => {
   const syncToGoogleCalendar = async () => {
     try {
       const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
-      await fetch(`${BACKEND_URL}/api/calendar/google/sync/${projectId}`, {
+      
+      if (!googleCalendarConnected) {
+        // Need to connect first - initiate OAuth flow
+        const response = await fetch(`${BACKEND_URL}/api/auth/google/login`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.authorization_url) {
+            window.location.href = data.authorization_url;
+            return;
+          }
+        }
+        alert('Failed to initiate Google Calendar connection');
+        return;
+      }
+      
+      // Already connected - sync the project
+      const response = await fetch(`${BACKEND_URL}/api/calendar/google/sync/${projectId}`, {
         method: 'POST'
       });
-      alert('✅ Synced to Google Calendar!');
-      setGoogleCalendarConnected(true);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.requires_auth) {
+          // Token expired, need to reconnect
+          const authResponse = await fetch(`${BACKEND_URL}/api/auth/google/login`);
+          if (authResponse.ok) {
+            const authData = await authResponse.json();
+            if (authData.authorization_url) {
+              window.location.href = authData.authorization_url;
+              return;
+            }
+          }
+        }
+        alert(`✅ ${data.message || 'Synced to Google Calendar!'}`);
+      } else {
+        alert('Failed to sync to Google Calendar');
+      }
     } catch (error) {
       console.error('Error syncing to Google Calendar:', error);
       alert('Failed to sync to Google Calendar');
