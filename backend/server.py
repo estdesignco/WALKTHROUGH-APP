@@ -9908,18 +9908,17 @@ async def create_punch_list_item(item: PunchListItem):
         
         logger.info(f"📋 Punch list item created: {punch_id}")
         
-        # Send Teams notification for new punch list item
+        # Send Teams notification for NEW punch list item
         try:
             project = await db.projects.find_one({"id": item.project_id})
             project_name = project.get("name", "Unknown") if project else "Unknown"
-            await notify_status_change(
+            await notify_new_punch_item(
+                description=item.title or item.description or "New punch item",
                 project_name=project_name,
-                item_name=f"Punch List: {item.title}",
-                old_status="",
-                new_status=f"NEW - {item.priority.upper()} priority",
-                room_name="Punch List",
-                vendor="",
-                cost=0.0
+                room_name=item.room_name if hasattr(item, 'room_name') else "",
+                priority=item.priority or "medium",
+                assigned_to=item.assigned_to if hasattr(item, 'assigned_to') else "",
+                location=item.location if hasattr(item, 'location') else ""
             )
         except Exception as notify_error:
             logging.error(f"Teams notification failed: {str(notify_error)}")
