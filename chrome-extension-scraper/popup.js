@@ -129,6 +129,57 @@ function displayResults(data) {
   document.getElementById('dataFinish').textContent = data.finish_color || 'Not found';
   document.getElementById('dataMsrp').textContent = data.msrp ? `$${data.msrp}` : 'Not found';
   document.getElementById('dataUrl').textContent = data.url || 'Not found';
+  
+  // MULTI-IMAGE GALLERY
+  displayMultiImageGallery(data.all_images || []);
+}
+
+function displayMultiImageGallery(images) {
+  allProductImages = images;
+  selectedImages = images.filter(img => img.isPrimary).map(img => img.url);
+  
+  if (images.length <= 1) {
+    multiImageSection.style.display = 'none';
+    return;
+  }
+  
+  multiImageSection.style.display = 'block';
+  imageGallery.innerHTML = '';
+  
+  images.forEach((img, index) => {
+    const div = document.createElement('div');
+    div.className = `gallery-image ${img.isPrimary ? 'selected primary' : ''} ${selectedImages.includes(img.url) ? 'selected' : ''}`;
+    div.innerHTML = `<img src="${img.url}" alt="Product image ${index + 1}" onerror="this.parentElement.style.display='none'">`;
+    div.addEventListener('click', () => toggleImageSelection(img.url, div));
+    imageGallery.appendChild(div);
+  });
+  
+  updateSelectedCount();
+}
+
+function toggleImageSelection(url, element) {
+  const index = selectedImages.indexOf(url);
+  if (index > -1) {
+    selectedImages.splice(index, 1);
+    element.classList.remove('selected');
+  } else {
+    selectedImages.push(url);
+    element.classList.add('selected');
+  }
+  updateSelectedCount();
+  
+  // Update main image if this is the first selected
+  if (selectedImages.length > 0) {
+    scrapedData.image_url = selectedImages[0];
+    document.getElementById('productImage').src = selectedImages[0];
+  }
+  
+  // Store all selected images in scraped data
+  scrapedData.selected_images = selectedImages;
+}
+
+function updateSelectedCount() {
+  selectedCount.textContent = `${selectedImages.length} selected`;
 }
 
 function scrapePageData() {
