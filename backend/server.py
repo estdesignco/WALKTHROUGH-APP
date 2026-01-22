@@ -4420,24 +4420,24 @@ async def configure_teams_webhook(webhook_data: dict):
 
 @api_router.post("/teams/test-notification")
 async def test_teams_notification():
-    """Send a test notification to Teams"""
+    """Send a test notification to Teams - Tests To-Do notification format"""
     try:
-        from teams_integration import notify_status_change
+        from teams_integration import notify_new_todo
         
-        result = await notify_status_change(
+        result = await notify_new_todo(
+            text="Test To-Do Item - Please ignore",
             project_name="Test Project",
-            item_name="Sample Dining Chair",
-            old_status="TO BE SELECTED",
-            new_status="ORDERED",
-            room_name="Dining Room",
-            vendor="Four Hands",
-            cost=1299.00
+            priority="high",
+            assigned_to="Test User",
+            deadline="Tomorrow",
+            description="This is a test notification to verify Teams integration is working.",
+            source_type="checklist"
         )
         
         if result:
             return {"status": "success", "message": "Test notification sent to Teams successfully"}
         else:
-            return {"status": "error", "message": "Failed to send test notification"}
+            return {"status": "error", "message": "Failed to send test notification - check webhook URL"}
             
     except Exception as e:
         logging.error(f"Teams test notification failed: {str(e)}")
