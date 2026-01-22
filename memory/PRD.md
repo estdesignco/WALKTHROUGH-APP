@@ -21,7 +21,7 @@ Build a comprehensive interior design management application for EST Design Co. 
 - **Frontend**: React + Tailwind CSS + Shadcn UI
 - **Backend**: FastAPI (Python)
 - **Database**: MongoDB
-- **Chrome Extension**: Manifest V3 scraper
+- **Chrome Extension**: Manifest V3 scraper (v7.27.0)
 - **Mobile**: React Native + Expo
 
 ## What's Been Implemented
@@ -30,120 +30,125 @@ Build a comprehensive interior design management application for EST Design Co. 
 - Project CRUD with rooms, categories, subcategories, items
 - Checklist spreadsheet with inline editing
 - FFE spreadsheet with comprehensive tracking
-- Chrome extension scraper (v7.24.0) with 26+ vendor support
+- Chrome extension scraper (v7.27.0) with 26+ vendor support + multi-image gallery
 - Samples Library with auto-sync based on finish_color + vendor
-- To-Do list with comments, status dropdowns, FFE linking
+- To-Do list with comments, status dropdowns, FFE linking, Timed Priority badges
 - Punch list with comments and status tracking
 - Materials library and master database
 - Contact management
 - Outlook Calendar integration (working)
+- Google Calendar integration (functional - needs OAuth setup)
 - Background image removal (rembg)
 
-### Session Changes (Jan 21, 2026)
+### Session Changes (Jan 22, 2026)
 
-#### Desktop App Fixes
-1. ✅ **DUPLICATE Line Feature** - Added duplicate button (⎘) to each checklist item row
-2. ✅ **PLACEMENT Column** - Added for Tile/Countertops/Flooring categories (appears next to ITEM column)
-3. ✅ **Scraper v7.24.0** - Higher resolution images (prioritizes 2400x2400), better tab reuse
-4. ✅ **Backend placement field** - Added to ItemBase and ItemUpdate models
+#### P0 Fixes - COMPLETED ✅
+1. ✅ **DONE Items Sort to Bottom** - All To-Do and Punch lists now sort completed items to bottom
+   - `ToDoList.js` - Project To-Do list sorting
+   - `PunchList.js` - Project Punch list sorting
+   - `MasterToDoList.js` - Company todos, project todos, and punch items sorting
+   - `ToDoListScreen.js` (mobile) - Mobile To-Do list sorting
+   - `PunchListScreen.js` (mobile) - Mobile Punch list sorting
 
-#### Mobile App Feature Parity ✅
-5. ✅ **ToDoListScreen.js** - Full To-Do list with comments, status, priority, filtering
-6. ✅ **PunchListScreen.js** - Full Punch list with comments, status, priority, location
-7. ✅ **SamplesScreen.js** - Samples library with large images, quick approve/reject
-8. ✅ **App.js updated** - Added navigation to new screens
-9. ✅ **apiService.js updated** - Added all new API endpoints
-10. ✅ **ProjectDetailsScreen.js updated** - Added navigation buttons to new features
+2. ✅ **Scraper Multi-Image Gallery (v7.27.0)** - Added multi-image selection to content.js
+   - Collects ALL product images from page (srcset, data attributes, gallery selectors)
+   - Displays thumbnail gallery below scraped data
+   - Click to select/deselect images
+   - Shows selected count
+   - Primary image marked with ★
+
+#### P1 Fixes - COMPLETED ✅
+3. ✅ **Timed Priority Feature** - Already implemented and working
+   - Shows age-based urgency badges on To-Do items
+   - 🆕 New (< 1 hour) - Green
+   - 🕐 Xh old (1-24 hours) - Blue
+   - ⏰ Xd old (1-3 days) - Yellow
+   - ⚠️ Xd - Aging (3-7 days) - Orange
+   - 🔥 Xd - CRITICAL (7+ days) - Red with pulse animation
+   - Hidden for completed items
+
+4. ✅ **Google Calendar Integration** - Enhanced and functional
+   - `/api/auth/google/status` - Check connection status
+   - `/api/auth/google/login` - Initiate OAuth flow
+   - `/api/auth/google/callback` - Handle OAuth callback
+   - `/api/calendar/google/sync/{project_id}` - Sync project dates (delivery, installation, completion)
+   - Token refresh logic implemented
+   - Frontend shows connected email in UI
+
+### Previous Session Changes (Jan 21, 2026)
+- DUPLICATE Line Feature for checklist items
+- PLACEMENT Column for Tile/Countertops/Flooring categories
+- Scraper v7.24.0 with higher resolution images
+- Teams notifications refactored (only for new items)
+- Checkbox decoupled from status dropdown
+- Status dropdowns standardized across all lists
+- Mobile app feature parity (To-Do, Punch List, Samples screens)
+- Client appointment booking via Outlook
 
 ## Known Issues / Status
 
 ### Resolved ✅
+- To-Do/Punch list sorting (DONE items at bottom) - WORKING
+- Timed Priority badges visible - WORKING
+- Google Calendar endpoints - WORKING (needs user OAuth setup)
+- Scraper multi-image gallery - IMPLEMENTED (v7.27.0)
 - Checklist DUPLICATE line feature - WORKING
 - PLACEMENT column for Tile/Countertops/Flooring - WORKING
-- Scraper high-res images - WORKING (v7.24.0)
-- Scraper tab reuse - WORKING (finds any existing app tab)
-- Mobile app feature parity - COMPLETE (To-Do, Punch List, Samples)
-- To-Do List comments - WORKING
-- Punch List comments - WORKING
-- Samples Library large images - WORKING
+- Scraper high-res images - WORKING
+- Mobile app feature parity - COMPLETE
 
-### Pending Verification
-- [ ] Email functionality (credentials configured in .env)
-- [ ] Google Calendar integration (broken, needs fix)
-- [ ] Background remover speed (rembg installed but may be slow)
+### Pending User Action
+- [ ] Google Calendar OAuth - User needs to connect via app settings
+- [ ] Azure credentials for Outlook booking - User needs to provide
 
-### User Reported Issues (From Handoff)
-- [ ] GitHub push blocked by secret scanning (user action required)
-- [ ] Production config sometimes shows test data (deployment process)
-- [ ] Potential UI flickering (auto-refresh was removed)
+### Known Limitations
+- [ ] Application performance ("snails pace") - Not yet investigated
+- [ ] GitHub push blocked by secret scanning - User needs to remove SENDER_PASSWORD from .env
 
 ## File Structure
 ```
 /app
 ├── backend/
-│   ├── server.py              # Main API (17000+ lines) - Updated with placement field
-│   ├── .env                   # Credentials (SMTP, MongoDB)
+│   ├── server.py              # Main API - Updated with Google Calendar sync
+│   ├── .env                   # Credentials (SMTP, MongoDB, OAuth)
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
 │   │   ├── App.js
 │   │   └── components/
-│   │       ├── ExactChecklistSpreadsheet.js  # UPDATED: Duplicate button, Placement column
-│   │       ├── ExactFFESpreadsheet.js
-│   │       ├── ToDoList.js
-│   │       ├── PunchList.js
-│   │       └── SampleTracker.js
-│   └── .env
+│   │       ├── ExactChecklistSpreadsheet.js  # Duplicate button, Placement column
+│   │       ├── ToDoList.js                   # UPDATED: Sorting, Timed Priority
+│   │       ├── PunchList.js                  # UPDATED: Sorting
+│   │       ├── MasterToDoList.js             # UPDATED: Sorting
+│   │       └── ExportsDashboard.js           # UPDATED: Google Calendar UI
 ├── chrome-extension-scraper/
-│   ├── manifest.json          # v7.24.0
-│   └── popup.js               # High-res images, improved tab reuse
-└── mobile/                    # UPDATED: Full feature parity
-    ├── App.js                 # Updated navigation
-    └── src/
-        ├── screens/
-        │   ├── ToDoListScreen.js      # NEW
-        │   ├── PunchListScreen.js     # NEW
-        │   └── SamplesScreen.js       # NEW
-        └── services/
-            └── apiService.js          # Updated with new endpoints
+│   ├── manifest.json          # v7.27.0
+│   ├── content.js             # UPDATED: Multi-image gallery
+│   └── popup.js
+└── mobile/
+    └── src/screens/
+        ├── ToDoListScreen.js    # UPDATED: Sorting
+        └── PunchListScreen.js   # UPDATED: Sorting
 ```
 
-## Credentials
-- **App Password**: `DesignReady2026!`
-- **SMTP**: info@estdesignco.com (Outlook)
+## API Endpoints Added/Modified
+- `GET /api/auth/google/status` - Check Google Calendar connection
+- `GET /api/auth/google/login` - Initiate Google OAuth
+- `GET /api/auth/google/callback` - Handle OAuth callback
+- `POST /api/calendar/google/sync/{project_id}` - Sync project to Google Calendar
 
-## API Endpoints Added/Updated
-
-### Items
-- `POST /api/items` - Now supports `placement` field
-- `PUT /api/items/:id` - Now supports `placement` field
-
-### Mobile Endpoints (used by new screens)
-- `GET /api/todos/project/:projectId`
-- `POST /api/todos/:id/comments`
-- `GET /api/punch-list/project/:projectId`
-- `POST /api/punch-list/:id/comments`
-- `GET /api/samples/project/:projectId`
+## Test Reports
+- `/app/test_reports/iteration_30.json` - Latest test results (all passing)
+- `/app/tests/test_calendar_endpoints.py` - Google Calendar endpoint tests
 
 ## Upcoming Tasks
-1. Fix Google Calendar integration
-2. Test email functionality
-3. Apply enhanced_rooms templates to existing data
-4. Priority Timer completion for To-Do list
+1. [ ] Investigate app performance issues
+2. [ ] Guide user to connect Google Calendar OAuth
+3. [ ] Guide user on Azure credentials for Outlook booking
+4. [ ] Test scraper multi-image feature in real Chrome extension
 
-## Future Backlog
-- FFE Portrait/Landscape View for iPad
-- Android mobile app build
-- Google Drive Backup
+## Future/Backlog
+- Refactor server.py (17000+ lines - needs splitting)
+- Build Android version of mobile app
+- Google Drive Backup feature
 - Client Approval Portal
-- Refactor monolithic server.py
-- Multiple image scraping support
-
-## Session Summary
-This session focused on implementing critical user-requested features:
-1. **DUPLICATE line** functionality for checklist items
-2. **PLACEMENT column** for Tile/Countertops/Flooring categories
-3. **Scraper improvements** for higher resolution images and better tab reuse
-4. **Complete mobile app feature parity** with To-Do List, Punch List, and Samples Library screens
-
-All features have been tested and verified working via screenshots.
