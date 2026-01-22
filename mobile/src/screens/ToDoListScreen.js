@@ -193,27 +193,41 @@ export default function ToDoListScreen({ route, navigation }) {
     }
   };
 
-  const filteredTodos = todos.filter(todo => {
+  // Helper to check if item is done
+  const isDone = (todo) => todo.status === 'done' || todo.status === 'completed' || todo.completed;
+
+  // Helper to check if done item is older than a week
+  const isOlderThanWeek = (todo) => {
+    if (!isDone(todo)) return false;
+    const completedDate = todo.completed_at || todo.updated_at || todo.created_at;
+    if (!completedDate) return false;
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return new Date(completedDate) < weekAgo;
+  };
+
+  // Filter out done items older than a week
+  const activeTodos = todos.filter(todo => !isOlderThanWeek(todo));
+
+  const filteredTodos = activeTodos.filter(todo => {
     if (activeFilter === 'all') return true;
     if (activeFilter === 'working') return todo.status === 'working' || todo.status === 'in_progress';
-    if (activeFilter === 'done') return todo.status === 'done' || todo.status === 'completed';
+    if (activeFilter === 'done') return isDone(todo);
     return todo.status === activeFilter;
   });
 
-  // SORT: Completed/Done items go to BOTTOM of the list
+  // SORT: Done items go to BOTTOM of the list
   const sortedFilteredTodos = [...filteredTodos].sort((a, b) => {
-    const aIsDone = a.status === 'done' || a.status === 'completed';
-    const bIsDone = b.status === 'done' || b.status === 'completed';
-    if (aIsDone && !bIsDone) return 1;
-    if (!aIsDone && bIsDone) return -1;
+    if (isDone(a) && !isDone(b)) return 1;
+    if (!isDone(a) && isDone(b)) return -1;
     return 0;
   });
 
   const counts = {
-    all: todos.length,
-    pending: todos.filter(t => t.status === 'pending').length,
-    working: todos.filter(t => t.status === 'working' || t.status === 'in_progress').length,
-    done: todos.filter(t => t.status === 'done' || t.status === 'completed').length,
+    all: activeTodos.length,
+    pending: activeTodos.filter(t => t.status === 'pending').length,
+    working: activeTodos.filter(t => t.status === 'working' || t.status === 'in_progress').length,
+    done: activeTodos.filter(t => isDone(t)).length,
   };
 
   if (loading) {
