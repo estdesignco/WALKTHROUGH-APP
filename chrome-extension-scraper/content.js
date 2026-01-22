@@ -349,6 +349,15 @@ function createSidePanel() {
         </div>
         <div class="dr-field-value" id="dr-field-remarks">Not found</div>
       </div>
+      
+      <!-- MULTI-IMAGE GALLERY -->
+      <div id="dr-multi-image-section" style="display: none; margin-top: 12px; padding: 10px; background: #1a1a2e; border-radius: 8px; border: 1px solid #333;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #4ade80;">🖼️ Product Images (click to select)</span>
+          <span id="dr-selected-count" style="font-size: 11px; color: #888; background: #222; padding: 2px 8px; border-radius: 4px;">0 selected</span>
+        </div>
+        <div id="dr-image-gallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 160px; overflow-y: auto;"></div>
+      </div>
     </div>
     
     <div class="dr-actions">
