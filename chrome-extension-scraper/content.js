@@ -878,7 +878,92 @@ function scrapeAndShow() {
   updateFieldDisplay('image_url', scrapedData.image_url);
   updateFieldDisplay('remarks', scrapedData.remarks);
   
+  // Display multi-image gallery if multiple images found
+  displayMultiImageGallery(scrapedData.all_images || []);
+  
   showToast('✅ Page scraped! Click any field to manually select.');
+}
+
+// MULTI-IMAGE GALLERY - State
+let allProductImages = [];
+let selectedImages = [];
+
+function displayMultiImageGallery(images) {
+  allProductImages = images || [];
+  selectedImages = images.filter(img => img.isPrimary).map(img => img.url);
+  
+  const section = document.getElementById('dr-multi-image-section');
+  const gallery = document.getElementById('dr-image-gallery');
+  const countEl = document.getElementById('dr-selected-count');
+  
+  if (!section || !gallery) return;
+  
+  if (images.length <= 1) {
+    section.style.display = 'none';
+    return;
+  }
+  
+  section.style.display = 'block';
+  gallery.innerHTML = '';
+  
+  images.forEach((img, index) => {
+    const div = document.createElement('div');
+    div.style.cssText = `
+      position: relative;
+      aspect-ratio: 1;
+      cursor: pointer;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid ${img.isPrimary || selectedImages.includes(img.url) ? '#4ade80' : 'transparent'};
+      transition: all 0.2s;
+      box-shadow: ${selectedImages.includes(img.url) ? '0 0 10px rgba(74, 222, 128, 0.4)' : 'none'};
+    `;
+    div.innerHTML = `
+      <img src="${img.url}" alt="Product image ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.style.display='none'">
+      ${img.isPrimary ? '<span style="position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #f59e0b; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">★</span>' : ''}
+      ${selectedImages.includes(img.url) ? '<span style="position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: #4ade80; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</span>' : ''}
+    `;
+    
+    div.addEventListener('click', () => toggleImageSelection(img.url, div));
+    div.addEventListener('mouseenter', () => { div.style.transform = 'scale(1.05)'; div.style.borderColor = '#4ade80'; });
+    div.addEventListener('mouseleave', () => { div.style.transform = 'scale(1)'; div.style.borderColor = selectedImages.includes(img.url) ? '#4ade80' : 'transparent'; });
+    
+    gallery.appendChild(div);
+  });
+  
+  updateSelectedCount();
+}
+
+function toggleImageSelection(url, element) {
+  const index = selectedImages.indexOf(url);
+  if (index > -1) {
+    selectedImages.splice(index, 1);
+  } else {
+    selectedImages.push(url);
+  }
+  
+  // Refresh gallery display
+  displayMultiImageGallery(allProductImages);
+  
+  // Update main image if this is the first selected
+  if (selectedImages.length > 0 && scrapedData) {
+    scrapedData.image_url = selectedImages[0];
+    updateFieldDisplay('image_url', selectedImages[0]);
+  }
+  
+  // Store all selected images in scraped data
+  if (scrapedData) {
+    scrapedData.selected_images = selectedImages;
+  }
+  
+  showToast(`${selectedImages.length} image(s) selected`);
+}
+
+function updateSelectedCount() {
+  const countEl = document.getElementById('dr-selected-count');
+  if (countEl) {
+    countEl.textContent = `${selectedImages.length} selected`;
+  }
 }
 
 function scrapePageData() {
