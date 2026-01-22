@@ -14,6 +14,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { apiService } from '../services/apiService';
 
 export default function PunchListScreen({ route, navigation }) {
@@ -27,7 +28,7 @@ export default function PunchListScreen({ route, navigation }) {
     location: '',
     priority: 'medium',
     assigned_to: '',
-    status: 'open',
+    status: 'pending',
   });
 
   // Comments modal state
@@ -62,16 +63,17 @@ export default function PunchListScreen({ route, navigation }) {
     try {
       const response = await apiService.createPunchItem({
         project_id: projectId,
+        title: newItem.description,
         description: newItem.description,
         location: newItem.location,
         priority: newItem.priority,
         assigned_to: newItem.assigned_to,
-        status: 'open',
+        status: 'pending',
       });
 
       if (response.data) {
         setPunchItems(prev => [response.data, ...prev]);
-        setNewItem({ description: '', location: '', priority: 'medium', assigned_to: '', status: 'open' });
+        setNewItem({ description: '', location: '', priority: 'medium', assigned_to: '', status: 'pending' });
         setShowAddForm(false);
       }
     } catch (error) {
@@ -91,6 +93,20 @@ export default function PunchListScreen({ route, navigation }) {
     } catch (error) {
       console.error('Failed to update punch item status:', error);
       Alert.alert('Error', 'Failed to update status');
+    }
+  };
+
+  const updateItemPriority = async (itemId, newPriority) => {
+    try {
+      await apiService.updatePunchItem(itemId, { priority: newPriority });
+      setPunchItems(prev =>
+        prev.map(item =>
+          item.id === itemId ? { ...item, priority: newPriority } : item
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update punch item priority:', error);
+      Alert.alert('Error', 'Failed to update priority');
     }
   };
 
@@ -159,16 +175,18 @@ export default function PunchListScreen({ route, navigation }) {
   const getStatusColor = (status) => {
     switch (status) {
       case 'completed': return '#10B981';
+      case 'verified': return '#059669';
       case 'in_progress': return '#3B82F6';
-      case 'open': return '#F59E0B';
+      case 'pending': return '#F59E0B';
       default: return '#6B7280';
     }
   };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
-      case 'high': return '#EF4444';
-      case 'medium': return '#F59E0B';
+      case 'urgent': return '#DC2626';
+      case 'high': return '#F59E0B';
+      case 'medium': return '#3B82F6';
       case 'low': return '#10B981';
       default: return '#6B7280';
     }
@@ -177,8 +195,9 @@ export default function PunchListScreen({ route, navigation }) {
   const getStatusLabel = (status) => {
     switch (status) {
       case 'completed': return 'Completed';
+      case 'verified': return 'Verified';
       case 'in_progress': return 'In Progress';
-      case 'open': return 'Open';
+      case 'pending': return 'Pending';
       default: return status;
     }
   };
@@ -190,9 +209,9 @@ export default function PunchListScreen({ route, navigation }) {
 
   const counts = {
     all: punchItems.length,
-    open: punchItems.filter(i => i.status === 'open').length,
+    pending: punchItems.filter(i => i.status === 'pending').length,
     in_progress: punchItems.filter(i => i.status === 'in_progress').length,
-    completed: punchItems.filter(i => i.status === 'completed').length,
+    completed: punchItems.filter(i => i.status === 'completed' || i.status === 'verified').length,
   };
 
   if (loading) {
@@ -214,7 +233,7 @@ export default function PunchListScreen({ route, navigation }) {
 
       {/* Filter Tabs */}
       <View style={styles.filterTabs}>
-        {['all', 'open', 'in_progress', 'completed'].map(filter => (
+        {['all', 'pending', 'in_progress', 'completed'].map(filter => (
           <TouchableOpacity
             key={filter}
             style={[
@@ -248,18 +267,12 @@ export default function PunchListScreen({ route, navigation }) {
         {filteredItems.map(item => (
           <View key={item.id} style={styles.punchCard}>
             <View style={styles.punchHeader}>
-              <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(item.priority) }]}>
-                <Text style={styles.priorityText}>{item.priority?.toUpperCase()}</Text>
-              </View>
-              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
-                <Text style={styles.statusText}>{getStatusLabel(item.status)}</Text>
-              </View>
               <TouchableOpacity onPress={() => deletePunchItem(item.id)}>
                 <Text style={styles.deleteButton}>🗑️</Text>
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.punchDescription}>{item.description}</Text>
+            <Text style={styles.punchDescription}>{item.title || item.description}</Text>
             
             {item.location && (
               <View style={styles.locationRow}>
@@ -277,33 +290,46 @@ export default function PunchListScreen({ route, navigation }) {
               />
             )}
 
-            {/* Status Selector */}
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Status:</Text>
-              <View style={styles.statusButtons}>
-                {['open', 'in_progress', 'completed'].map(status => (
-                  <TouchableOpacity
-                    key={status}
-                    style={[
-                      styles.statusButton,
-                      item.status === status && {
-                        backgroundColor: getStatusColor(status),
-                      },
-                    ]}
-                    onPress={() => updateItemStatus(item.id, status)}
-                  >
-                    <Text
-                      style={[
-                        styles.statusButtonText,
-                        item.status === status && styles.statusButtonTextActive,
-                      ]}
-                    >
-                      {getStatusLabel(status)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+            {/* STATUS DROPDOWN - Matching Desktop */}
+            <View style={styles.dropdownRow}>
+              <Text style={styles.dropdownLabel}>Status:</Text>
+              <View style={[styles.pickerContainer, { backgroundColor: getStatusColor(item.status) }]}>
+                <Picker
+                  selectedValue={item.status || 'pending'}
+                  onValueChange={(value) => updateItemStatus(item.id, value)}
+                  style={styles.picker}
+                  dropdownIconColor="#FFF"
+                >
+                  <Picker.Item label="⏳ Pending" value="pending" />
+                  <Picker.Item label="🔄 In Progress" value="in_progress" />
+                  <Picker.Item label="✅ Completed" value="completed" />
+                  <Picker.Item label="✓✓ Verified" value="verified" />
+                </Picker>
               </View>
             </View>
+
+            {/* PRIORITY DROPDOWN - Matching Desktop */}
+            <View style={styles.dropdownRow}>
+              <Text style={styles.dropdownLabel}>Priority:</Text>
+              <View style={[styles.pickerContainer, { backgroundColor: getPriorityColor(item.priority) }]}>
+                <Picker
+                  selectedValue={item.priority || 'medium'}
+                  onValueChange={(value) => updateItemPriority(item.id, value)}
+                  style={styles.picker}
+                  dropdownIconColor="#FFF"
+                >
+                  <Picker.Item label="Low" value="low" />
+                  <Picker.Item label="Medium" value="medium" />
+                  <Picker.Item label="High" value="high" />
+                  <Picker.Item label="🔴 Urgent" value="urgent" />
+                </Picker>
+              </View>
+            </View>
+
+            {/* Assigned To */}
+            {item.assigned_to && (
+              <Text style={styles.assignedTo}>👤 Assigned: {item.assigned_to}</Text>
+            )}
 
             {/* Comments Section */}
             <TouchableOpacity
@@ -314,10 +340,6 @@ export default function PunchListScreen({ route, navigation }) {
                 💬 Comments ({item.comments?.length || 0})
               </Text>
             </TouchableOpacity>
-
-            {item.assigned_to && (
-              <Text style={styles.assignedTo}>Assigned to: {item.assigned_to}</Text>
-            )}
           </View>
         ))}
 
@@ -359,7 +381,7 @@ export default function PunchListScreen({ route, navigation }) {
 
             <Text style={styles.inputLabel}>Priority</Text>
             <View style={styles.prioritySelector}>
-              {['low', 'medium', 'high'].map(priority => (
+              {['low', 'medium', 'high', 'urgent'].map(priority => (
                 <TouchableOpacity
                   key={priority}
                   style={[
@@ -419,7 +441,7 @@ export default function PunchListScreen({ route, navigation }) {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.commentsItemText}>{selectedItem?.description}</Text>
+            <Text style={styles.commentsItemText}>{selectedItem?.title || selectedItem?.description}</Text>
 
             <ScrollView style={styles.commentsList}>
               {(selectedItem?.comments || []).map((comment, index) => (
@@ -549,30 +571,9 @@ const styles = StyleSheet.create({
   },
   punchHeader: {
     flexDirection: 'row',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    marginBottom: 12,
-    gap: 8,
-  },
-  priorityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  priorityText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    flex: 1,
-  },
-  statusText: {
-    color: '#FFF',
-    fontSize: 10,
-    fontWeight: 'bold',
+    marginBottom: 8,
   },
   deleteButton: {
     fontSize: 18,
@@ -602,49 +603,41 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
   },
-  statusRow: {
-    marginBottom: 12,
+  dropdownRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  statusLabel: {
+  dropdownLabel: {
     fontSize: 14,
     color: '#9CA3AF',
-    marginBottom: 8,
+    width: 70,
   },
-  statusButtons: {
-    flexDirection: 'row',
-  },
-  statusButton: {
+  pickerContainer: {
     flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    backgroundColor: '#374151',
-    marginHorizontal: 2,
-    borderRadius: 4,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  statusButtonText: {
-    fontSize: 11,
-    color: '#9CA3AF',
-  },
-  statusButtonTextActive: {
+  picker: {
     color: '#FFF',
-    fontWeight: 'bold',
+    height: 40,
+  },
+  assignedTo: {
+    fontSize: 14,
+    color: '#D4A574',
+    marginBottom: 8,
   },
   commentsButton: {
     backgroundColor: '#374151',
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 8,
+    marginTop: 8,
   },
   commentsButtonText: {
     color: '#D4A574',
     fontSize: 14,
     fontWeight: '500',
-  },
-  assignedTo: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 8,
   },
   emptyContainer: {
     alignItems: 'center',
@@ -708,12 +701,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     backgroundColor: '#374151',
-    marginHorizontal: 4,
+    marginHorizontal: 2,
     borderRadius: 8,
   },
   priorityOptionText: {
     color: '#9CA3AF',
     fontWeight: '500',
+    fontSize: 12,
   },
   priorityOptionTextActive: {
     color: '#FFF',
