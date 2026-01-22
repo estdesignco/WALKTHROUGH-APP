@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.26.0",
-  "description": "Scrape product data from wholesale vendors. MULTI-IMAGE support, high-res images, tab reuse. Works with your logged-in browser session.",
+  "version": "7.27.0",
+  "description": "Scrape product data from wholesale vendors. MULTI-IMAGE gallery selection, high-res images, tab reuse. Works with your logged-in browser session.",
   "permissions": [
     "activeTab",
     "scripting",
