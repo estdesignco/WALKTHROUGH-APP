@@ -603,8 +603,14 @@ export default function MasterToDoList() {
                   );
                 })}
                 
-                {/* Punch Items */}
-                {punchItems.map((item, itemIdx) => {
+                {/* Punch Items - SORTED: Completed/Verified items at bottom */}
+                {[...punchItems].sort((a, b) => {
+                  const aIsDone = a.status === 'completed' || a.status === 'verified';
+                  const bIsDone = b.status === 'completed' || b.status === 'verified';
+                  if (aIsDone && !bIsDone) return 1;
+                  if (!aIsDone && bIsDone) return -1;
+                  return 0;
+                }).map((item, itemIdx) => {
                   const linkedItem = item.linked_ffe_item || {};
                   const sourceType = item.source_type || linkedItem.source_type || 'checklist';
                   const sheetLabel = sourceType === 'ffe' ? 'FF&E' : sourceType === 'walkthrough' ? 'WALKTHROUGH' : 'CHECKLIST';
