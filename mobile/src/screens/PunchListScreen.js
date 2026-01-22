@@ -207,6 +207,15 @@ export default function PunchListScreen({ route, navigation }) {
     return item.status === activeFilter;
   });
 
+  // SORT: Completed/Verified items go to BOTTOM of the list
+  const sortedFilteredItems = [...filteredItems].sort((a, b) => {
+    const aIsDone = a.status === 'completed' || a.status === 'verified';
+    const bIsDone = b.status === 'completed' || b.status === 'verified';
+    if (aIsDone && !bIsDone) return 1;
+    if (!aIsDone && bIsDone) return -1;
+    return 0;
+  });
+
   const counts = {
     all: punchItems.length,
     pending: punchItems.filter(i => i.status === 'pending').length,
