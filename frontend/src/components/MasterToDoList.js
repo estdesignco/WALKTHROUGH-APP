@@ -180,24 +180,40 @@ export default function MasterToDoList() {
   };
 
   // Filter company todos
-  const filteredCompanyTodos = companyTodos.filter(todo => {
+  // Helper to check if item is done (handles both 'done' and 'completed' status)
+  const isDone = (todo) => todo.completed || todo.status === 'completed' || todo.status === 'done';
+  
+  // Helper to check if item is older than a week and should be hidden
+  const isOlderThanWeek = (todo) => {
+    if (!isDone(todo)) return false;
+    const completedDate = todo.completed_at || todo.updated_at || todo.created_at;
+    if (!completedDate) return false;
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return new Date(completedDate) < weekAgo;
+  };
+
+  // Filter out items completed more than a week ago
+  const activeCompanyTodos = companyTodos.filter(todo => !isOlderThanWeek(todo));
+
+  const filteredCompanyTodos = activeCompanyTodos.filter(todo => {
     if (companyFilter === 'all') return true;
-    if (companyFilter === 'completed') return todo.completed || todo.status === 'completed';
-    if (companyFilter === 'pending') return !todo.completed && todo.status !== 'completed' && todo.status !== 'in_progress';
-    if (companyFilter === 'in_progress') return todo.status === 'in_progress';
+    if (companyFilter === 'completed') return isDone(todo);
+    if (companyFilter === 'pending') return !isDone(todo) && todo.status !== 'in_progress' && todo.status !== 'working';
+    if (companyFilter === 'in_progress') return todo.status === 'in_progress' || todo.status === 'working';
     return true;
   });
 
   const companyCounts = {
-    all: companyTodos.length,
-    pending: companyTodos.filter(t => !t.completed && t.status !== 'completed' && t.status !== 'in_progress').length,
-    in_progress: companyTodos.filter(t => t.status === 'in_progress').length,
-    completed: companyTodos.filter(t => t.completed || t.status === 'completed').length
+    all: activeCompanyTodos.length,
+    pending: activeCompanyTodos.filter(t => !isDone(t) && t.status !== 'in_progress' && t.status !== 'working').length,
+    in_progress: activeCompanyTodos.filter(t => t.status === 'in_progress' || t.status === 'working').length,
+    completed: activeCompanyTodos.filter(t => isDone(t)).length
   };
 
-  const totalPending = Object.values(projectTodos).flat().filter(t => !t.completed).length +
-    Object.values(projectPunchItems).flat().filter(p => p.status !== 'completed' && p.status !== 'verified').length +
-    companyTodos.filter(t => !t.completed).length;
+  const totalPending = Object.values(projectTodos).flat().filter(t => !t.completed && t.status !== 'done').length +
+    Object.values(projectPunchItems).flat().filter(p => p.status !== 'completed' && p.status !== 'done' && p.status !== 'verified').length +
+    activeCompanyTodos.filter(t => !isDone(t)).length;
 
   if (loading) {
     return (
