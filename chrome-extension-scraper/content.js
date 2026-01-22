@@ -1,8 +1,8 @@
 // Design Ready Product Scraper - Content Script
-// Version 4.0 - Full Page-Injected UI with Click to Select
+// Version 7.27.0 - Full Page-Injected UI with Click to Select + MULTI-IMAGE GALLERY
 // UI stays open on page, doesn't close like popup
 
-console.log('🛒 Design Ready Scraper loaded on:', window.location.hostname);
+console.log('🛒 Design Ready Scraper v7.27.0 loaded on:', window.location.hostname);
 
 // State
 let scrapedData = null;
