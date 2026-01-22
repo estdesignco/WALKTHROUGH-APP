@@ -12202,24 +12202,25 @@ async def create_todo(todo: dict):
             "status": todo.get("status", "pending"),
             "completed": False,
             "linked_ffe_item": todo.get("linked_ffe_item"),
+            "source_type": todo.get("source_type", "checklist"),
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
         await db.todos.insert_one(new_todo)
         new_todo.pop('_id', None)
         
-        # Send Teams notification
+        # Send Teams notification for NEW To-Do item
         try:
             project = await db.projects.find_one({"id": todo.get("project_id")})
             project_name = project.get("name", "Unknown") if project else "Unknown"
-            await notify_status_change(
+            await notify_new_todo(
+                text=todo.get('text', ''),
                 project_name=project_name,
-                item_name=f"To-Do Added",
-                old_status="",
-                new_status=todo.get('text')[:50],
-                room_name="To-Do List",
-                vendor="",
-                cost=0.0
+                priority=todo.get("priority", "Medium"),
+                assigned_to=todo.get("assigned_to", ""),
+                deadline=todo.get("deadline", ""),
+                description=todo.get("description", ""),
+                source_type=todo.get("source_type", "checklist")
             )
         except Exception as notify_error:
             logging.error(f"Teams notification failed: {str(notify_error)}")
