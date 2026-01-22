@@ -890,7 +890,6 @@ let selectedImages = [];
 
 function displayMultiImageGallery(images) {
   allProductImages = images || [];
-  selectedImages = images.filter(img => img.isPrimary).map(img => img.url);
   
   const section = document.getElementById('dr-multi-image-section');
   const gallery = document.getElementById('dr-image-gallery');
@@ -903,10 +902,16 @@ function displayMultiImageGallery(images) {
     return;
   }
   
+  // Initialize selected with primary image if not already set
+  if (selectedImages.length === 0) {
+    selectedImages = images.filter(img => img.isPrimary).map(img => img.url);
+  }
+  
   section.style.display = 'block';
   gallery.innerHTML = '';
   
   images.forEach((img, index) => {
+    const isSelected = selectedImages.includes(img.url);
     const div = document.createElement('div');
     div.style.cssText = `
       position: relative;
@@ -914,19 +919,19 @@ function displayMultiImageGallery(images) {
       cursor: pointer;
       border-radius: 6px;
       overflow: hidden;
-      border: 2px solid ${img.isPrimary || selectedImages.includes(img.url) ? '#4ade80' : 'transparent'};
+      border: 3px solid ${isSelected ? '#4ade80' : '#333'};
       transition: all 0.2s;
-      box-shadow: ${selectedImages.includes(img.url) ? '0 0 10px rgba(74, 222, 128, 0.4)' : 'none'};
+      box-shadow: ${isSelected ? '0 0 12px rgba(74, 222, 128, 0.5)' : 'none'};
     `;
     div.innerHTML = `
-      <img src="${img.url}" alt="Product image ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.style.display='none'">
-      ${img.isPrimary ? '<span style="position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #f59e0b; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px;">★</span>' : ''}
-      ${selectedImages.includes(img.url) ? '<span style="position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; background: #4ade80; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">✓</span>' : ''}
+      <img src="${img.url}" alt="Product ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.style.display='none'">
+      ${img.isPrimary ? '<span style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #f59e0b; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">★</span>' : ''}
+      ${isSelected ? '<span style="position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: #4ade80; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">✓</span>' : ''}
     `;
     
-    div.addEventListener('click', () => toggleImageSelection(img.url, div));
-    div.addEventListener('mouseenter', () => { div.style.transform = 'scale(1.05)'; div.style.borderColor = '#4ade80'; });
-    div.addEventListener('mouseleave', () => { div.style.transform = 'scale(1)'; div.style.borderColor = selectedImages.includes(img.url) ? '#4ade80' : 'transparent'; });
+    div.onclick = function() {
+      toggleImageSelection(img.url);
+    };
     
     gallery.appendChild(div);
   });
@@ -934,7 +939,7 @@ function displayMultiImageGallery(images) {
   updateSelectedCount();
 }
 
-function toggleImageSelection(url, element) {
+function toggleImageSelection(url) {
   const index = selectedImages.indexOf(url);
   if (index > -1) {
     selectedImages.splice(index, 1);
@@ -942,19 +947,19 @@ function toggleImageSelection(url, element) {
     selectedImages.push(url);
   }
   
-  // Refresh gallery display
-  displayMultiImageGallery(allProductImages);
-  
-  // Update main image if this is the first selected
+  // Update main image to first selected
   if (selectedImages.length > 0 && scrapedData) {
     scrapedData.image_url = selectedImages[0];
     updateFieldDisplay('image_url', selectedImages[0]);
   }
   
-  // Store all selected images in scraped data
+  // Store all selected images
   if (scrapedData) {
-    scrapedData.selected_images = selectedImages;
+    scrapedData.selected_images = [...selectedImages];
   }
+  
+  // Re-render gallery to show updated selection
+  displayMultiImageGallery(allProductImages);
   
   showToast(`${selectedImages.length} image(s) selected`);
 }
