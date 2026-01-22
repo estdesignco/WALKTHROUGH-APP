@@ -565,39 +565,11 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
             }
 
             setSubmissionStatus('success');
-            // Reset form data after successful submission
-            setFormData({
-                rooms_involved: [],
-                ideal_sofa_price: '',
-                property_type: '',
-                project_type: '',
-                renovation_has_current_plans: '',
-                renovation_has_new_plans: '',
-                client_name: '', name: '', email: '', phone: '', address: '', contact_preferences: [],
-                best_time_to_call: '', worked_with_designer_before: '', primary_decision_maker: '', involvement_level: '',
-                timeline: '', budget_range: '', project_priority: [], other_project_description: '',
-                new_build_address: '', new_build_architect: '', new_build_builder: '', new_build_has_plans: '',
-                new_build_process_stage: '', new_build_need_furniture: '', new_build_scope_notes: '',
-                renovation_address: '', renovation_move_in_date: '', renovation_builder: '', renovation_architect: '',
-                renovation_team_members: [{ name: '', role: '', phone: '' }],
-                renovation_existing_condition: '', renovation_need_furniture: '', renovation_memories: '',
-                renovation_scope_notes: '', furniture_refresh_condition: '', furniture_has_current_plans: '',
-                furniture_move_in_date: '', furniture_scope_notes: '', design_love_home: '', design_space_use: '',
-                design_current_use: '', design_first_impression: '', design_common_color_palette: '',
-                design_preferred_palette: [], design_disliked_colors: '', design_styles_preference: [],
-                design_styles_love: '', design_artwork_preference: [], design_meaningful_item: '',
-                design_existing_furniture: '', finishes_patterns_preference: [], design_materials_to_avoid: '',
-                design_special_requirements: '', design_pinterest_houzz: '', design_additional_comments: '',
-                know_you_household: '', know_you_pets: '', know_you_weekday_routine: '', know_you_weekend_routine: '',
-                know_you_lighting_preference: '', know_you_entertaining_style: '', know_you_relax_space: '',
-                know_you_future_plans: '', know_you_social_media: '', know_you_hobbies: '', know_you_fun: '',
-                know_you_happy: '', know_you_family_birthdays: '', family_birthdays: [{ name: '', date: '' }], know_you_anniversary: '',
-                know_you_family_together: '', know_you_favorite_restaurant: '', know_you_favorite_vacation: '',
-                know_you_favorite_foods: '', know_you_evoke_space: '', know_you_support_social_life: '',
-                know_you_share_more: '', how_heard: '', how_heard_other: '',
-            });
-            // Redirect after successful project creation
-            window.location.href = `/project/${newProject.id}?tab=Questionnaire`;
+            setCreatedProjectId(newProject.id);
+            setShowBooking(true);  // Show booking section instead of redirecting
+            
+            // Scroll to top to show booking section
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             console.error("❌ QUESTIONNAIRE SUBMISSION FAILED:", error);
             console.error("❌ Error details:", {
