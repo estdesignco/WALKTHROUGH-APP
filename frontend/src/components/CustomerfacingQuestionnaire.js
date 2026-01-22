@@ -1427,6 +1427,8 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         )}
                     </div>
                 </form>
+                    </>
+                )}
             </div>
         </div>
     );
