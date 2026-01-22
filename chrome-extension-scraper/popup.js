@@ -610,6 +610,113 @@ function scrapePageData() {
   }
 
   // ============================================================================
+  // MULTI-IMAGE SCRAPING - Find ALL product images on the page
+  // ============================================================================
+  data.all_images = [];
+  const seenUrls = new Set();
+  
+  // Add main image first if we have it
+  if (data.image_url) {
+    data.all_images.push({ url: data.image_url, isPrimary: true });
+    seenUrls.add(data.image_url);
+  }
+  
+  // Common gallery selectors for various vendors
+  const gallerySelectors = [
+    // Swiper galleries (common)
+    '.swiper-slide img',
+    '.swiper-wrapper img',
+    // Product galleries
+    '[class*="gallery"] img',
+    '[class*="Gallery"] img',
+    '[class*="product-image"] img',
+    '[class*="ProductImage"] img',
+    '[class*="thumbnail"] img',
+    '[class*="Thumbnail"] img',
+    // Carousel/slider images
+    '[class*="carousel"] img',
+    '[class*="slider"] img',
+    // Data attributes for zoom/large
+    'img[data-zoom-image]',
+    'img[data-large]',
+    'img[data-full]',
+    'img[data-src]',
+    // Vendor-specific
+    '.product-gallery img',
+    '.product-images img',
+    '.image-gallery img',
+    '#product-images img',
+    '.pdp-gallery img',
+    // Four Hands specific
+    'img[src*="_PRM_"]',
+    'img[src*="_FRT_"]',
+    'img[src*="_ALT_"]',
+    'img[src*="_DET_"]',
+    // Generic srcset images
+    'img[srcset]'
+  ];
+  
+  for (const selector of gallerySelectors) {
+    const images = document.querySelectorAll(selector);
+    for (const img of images) {
+      let imgUrl = null;
+      
+      // Try to get highest quality URL
+      if (img.srcset) {
+        // Parse srcset for largest image
+        const srcsetParts = img.srcset.split(',');
+        let maxWidth = 0;
+        for (const part of srcsetParts) {
+          const match = part.trim().match(/(\S+)\s+(\d+)w/);
+          if (match && parseInt(match[2]) > maxWidth) {
+            maxWidth = parseInt(match[2]);
+            imgUrl = match[1];
+          }
+        }
+      }
+      
+      // Try data attributes for high-res versions
+      imgUrl = imgUrl || 
+               img.getAttribute('data-zoom-image') || 
+               img.getAttribute('data-large') || 
+               img.getAttribute('data-full-size') ||
+               img.getAttribute('data-src') ||
+               img.src;
+      
+      // Validate URL
+      if (imgUrl && imgUrl.startsWith('http') && !seenUrls.has(imgUrl)) {
+        // Filter out tiny icons, logos, etc.
+        const isLikelyProduct = !imgUrl.includes('logo') && 
+                                !imgUrl.includes('icon') && 
+                                !imgUrl.includes('badge') &&
+                                !imgUrl.includes('payment') &&
+                                !imgUrl.includes('social') &&
+                                !imgUrl.includes('1x1') &&
+                                (img.naturalWidth > 100 || !img.naturalWidth);
+        
+        if (isLikelyProduct) {
+          // Try to upgrade to higher resolution
+          let highResUrl = imgUrl
+            .replace(/w_\d+/g, 'w_2400')
+            .replace(/h_\d+/g, 'h_2400')
+            .replace(/\/\d+x\d+\//g, '/2400x2400/')
+            .replace(/S\d+x\d+/g, 'S2400x2400');
+          
+          data.all_images.push({ 
+            url: highResUrl, 
+            isPrimary: false,
+            originalUrl: imgUrl
+          });
+          seenUrls.add(imgUrl);
+          seenUrls.add(highResUrl);
+        }
+      }
+    }
+  }
+  
+  console.log(`📸 Found ${data.all_images.length} product images`);
+
+  // ============================================================================
   // FINISH COLOR & SWATCH IMAGE DETECTION - ALL 26 VENDORS
   // ============================================================================
   
