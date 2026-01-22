@@ -961,6 +961,9 @@ class ItemBase(BaseModel):
     # PLACEMENT field - For Tile, Countertops, Flooring (e.g., "Kitchen Floor", "Master Bath Walls")
     placement: Optional[str] = ""
     
+    # Independent checkbox - NOT tied to status dropdown
+    is_checked: Optional[bool] = False
+    
     # NEW ENHANCED TRACKING FIELDS
     sku: Optional[str] = ""
     finish_color: Optional[str] = ""
