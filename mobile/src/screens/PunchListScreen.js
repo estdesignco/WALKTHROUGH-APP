@@ -202,25 +202,40 @@ export default function PunchListScreen({ route, navigation }) {
     }
   };
 
-  const filteredItems = punchItems.filter(item => {
+  // Helper to check if item is done
+  const isDone = (item) => item.status === 'completed' || item.status === 'done' || item.status === 'verified';
+
+  // Helper to check if done item is older than a week
+  const isOlderThanWeek = (item) => {
+    if (!isDone(item)) return false;
+    const completedDate = item.completed_at || item.updated_at || item.created_at;
+    if (!completedDate) return false;
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return new Date(completedDate) < weekAgo;
+  };
+
+  // Filter out done items older than a week
+  const activeItems = punchItems.filter(item => !isOlderThanWeek(item));
+
+  const filteredItems = activeItems.filter(item => {
     if (activeFilter === 'all') return true;
+    if (activeFilter === 'completed') return isDone(item);
     return item.status === activeFilter;
   });
 
-  // SORT: Completed/Verified items go to BOTTOM of the list
+  // SORT: Done items go to BOTTOM of the list
   const sortedFilteredItems = [...filteredItems].sort((a, b) => {
-    const aIsDone = a.status === 'completed' || a.status === 'verified';
-    const bIsDone = b.status === 'completed' || b.status === 'verified';
-    if (aIsDone && !bIsDone) return 1;
-    if (!aIsDone && bIsDone) return -1;
+    if (isDone(a) && !isDone(b)) return 1;
+    if (!isDone(a) && isDone(b)) return -1;
     return 0;
   });
 
   const counts = {
-    all: punchItems.length,
-    pending: punchItems.filter(i => i.status === 'pending').length,
-    in_progress: punchItems.filter(i => i.status === 'in_progress').length,
-    completed: punchItems.filter(i => i.status === 'completed' || i.status === 'verified').length,
+    all: activeItems.length,
+    pending: activeItems.filter(i => i.status === 'pending').length,
+    in_progress: activeItems.filter(i => i.status === 'in_progress').length,
+    completed: activeItems.filter(i => isDone(i)).length,
   };
 
   if (loading) {
