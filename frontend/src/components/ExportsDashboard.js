@@ -396,21 +396,21 @@ const ExportsDashboard = ({ projectId }) => {
               <div>
                 <h4 className="text-xl font-bold text-[#D4C5A9]">Google Calendar</h4>
                 <p className="text-sm text-[#B49B7E]">
-                  {googleCalendarConnected ? 'Connected ✓' : 'Not connected'}
+                  {googleCalendarConnected ? `Connected ✓ ${googleCalendarEmail ? `(${googleCalendarEmail})` : ''}` : 'Not connected'}
                 </p>
               </div>
             </div>
             <ul className="text-sm text-gray-300 mb-4 space-y-1">
-              <li>• Auto-create install date events</li>
-              <li>• Sync delivery dates</li>
-              <li>• Send calendar invites to clients</li>
+              <li>• Auto-create delivery date events</li>
+              <li>• Sync installation dates</li>
+              <li>• Sync project completion dates</li>
               <li>• Reminder notifications</li>
             </ul>
             <button
               onClick={syncToGoogleCalendar}
               className="w-full bg-[#4285F4] hover:bg-[#3367D6] text-white px-6 py-3 rounded-lg font-bold"
             >
-              {googleCalendarConnected ? 'Re-Sync' : 'Connect'} Google Calendar
+              {googleCalendarConnected ? 'Sync Project Dates' : 'Connect Google Calendar'}
             </button>
           </div>
 
