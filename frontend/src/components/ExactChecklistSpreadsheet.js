@@ -2724,7 +2724,6 @@ const ExactChecklistSpreadsheet = ({
                                             checked={isChecked}
                                             onChange={async (e) => {
                                               const newCheckedItems = new Set(checkedItems);
-                                              const newStatus = e.target.checked ? 'PICKED' : '';
                                               
                                               if (e.target.checked) {
                                                 newCheckedItems.add(item.id);
@@ -2733,22 +2732,17 @@ const ExactChecklistSpreadsheet = ({
                                               }
                                               setCheckedItems(newCheckedItems);
                                               
-                                              // Update item status immediately in local data
-                                              item.status = newStatus;
-                                              
-                                              // Update backend
+                                              // Save checked state to backend as a separate field (not status)
                                               try {
                                                 const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
                                                 await fetch(`${backendUrl}/api/items/${item.id}`, {
                                                   method: 'PUT',
                                                   headers: { 'Content-Type': 'application/json' },
-                                                  body: JSON.stringify({ status: newStatus })
+                                                  body: JSON.stringify({ is_checked: e.target.checked })
                                                 });
-                                                console.log(`✅ Status updated: ${newStatus}`);
+                                                console.log(`✅ Item ${e.target.checked ? 'checked' : 'unchecked'}`);
                                               } catch (error) {
-                                                console.error('❌ Failed to update status:', error);
-                                                // Revert local change on error
-                                                item.status = item.status;
+                                                console.error('❌ Failed to update checked state:', error);
                                               }
                                             }}
                                           />
