@@ -314,6 +314,8 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submissionStatus, setSubmissionStatus] = useState(null);
     const [newRoomName, setNewRoomName] = useState("");
+    const [createdProjectId, setCreatedProjectId] = useState(null);
+    const [showBooking, setShowBooking] = useState(false);
 
     // Load existing data when in edit mode
     useEffect(() => {
