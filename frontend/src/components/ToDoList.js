@@ -100,12 +100,13 @@ export default function ToDoList({ projectId, roomId = null }) {
         const data = await response.json();
         let items = data.todos || [];
         
-        // Apply filter
+        // Apply filter - include 'done' status
         if (filter !== 'all') {
           items = items.filter(item => {
-            if (filter === 'completed') return item.completed || item.status === 'completed';
-            if (filter === 'pending') return !item.completed && item.status !== 'completed' && item.status !== 'in_progress';
-            if (filter === 'in_progress') return item.status === 'in_progress';
+            const itemIsDone = item.completed || item.status === 'completed' || item.status === 'done';
+            if (filter === 'completed') return itemIsDone;
+            if (filter === 'pending') return !itemIsDone && item.status !== 'in_progress' && item.status !== 'working';
+            if (filter === 'in_progress') return item.status === 'in_progress' || item.status === 'working';
             return true;
           });
         }
