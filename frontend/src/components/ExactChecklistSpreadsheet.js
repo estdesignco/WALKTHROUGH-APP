@@ -2717,7 +2717,7 @@ const ExactChecklistSpreadsheet = ({
                                     
                                     return (
                                       <tr key={item.id} style={rowStyle}>
-                                        {/* CHECKBOX - AUTO SET TO PICKED */}
+                                        {/* CHECKBOX - Independent of status dropdown */}
                                         <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
                                           <input 
                                             type="checkbox" 
