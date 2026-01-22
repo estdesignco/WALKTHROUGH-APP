@@ -56,7 +56,7 @@ from master_database_api import router as master_database_router
 import aiosmtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from teams_integration import notify_status_change, notify_company_todo
+from teams_integration import notify_new_todo, notify_new_punch_item, notify_company_todo
 from shipping_tracker import ShippingTracker
 from canva_integration import canva_integration
 
