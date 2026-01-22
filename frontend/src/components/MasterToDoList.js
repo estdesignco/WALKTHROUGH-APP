@@ -123,6 +123,15 @@ export default function MasterToDoList() {
     } catch (error) { console.error('Failed:', error); }
   };
 
+  const updateCompanyTodoPriority = async (todoId, newPriority) => {
+    try {
+      await axios.put(`${API_URL}/todos/company/${todoId}`, { 
+        priority: newPriority
+      });
+      await loadAllData();
+    } catch (error) { console.error('Failed:', error); }
+  };
+
   const togglePunchItem = async (itemId, currentStatus) => {
     try {
       const nextStatus = { pending: 'in_progress', in_progress: 'completed', completed: 'verified', verified: 'pending' };
