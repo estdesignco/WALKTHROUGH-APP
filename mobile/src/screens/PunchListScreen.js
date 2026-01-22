@@ -273,7 +273,7 @@ export default function PunchListScreen({ route, navigation }) {
 
       {/* Punch List */}
       <ScrollView style={styles.content}>
-        {filteredItems.map(item => (
+        {sortedFilteredItems.map(item => (
           <View key={item.id} style={styles.punchCard}>
             <View style={styles.punchHeader}>
               <TouchableOpacity onPress={() => deletePunchItem(item.id)}>
@@ -352,7 +352,7 @@ export default function PunchListScreen({ route, navigation }) {
           </View>
         ))}
 
-        {filteredItems.length === 0 && (
+        {sortedFilteredItems.length === 0 && (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>🔧</Text>
             <Text style={styles.emptyText}>No punch items</Text>
