@@ -380,12 +380,10 @@ export default function MasterToDoList() {
                 </button>
               </div>
             ) : (
-              // SORT: Completed/Done items go to BOTTOM of the list
+              // SORT: Done items go to BOTTOM of the list
               [...filteredCompanyTodos].sort((a, b) => {
-                const aIsDone = a.completed || a.status === 'completed' || a.status === 'done';
-                const bIsDone = b.completed || b.status === 'completed' || b.status === 'done';
-                if (aIsDone && !bIsDone) return 1;
-                if (!aIsDone && bIsDone) return -1;
+                if (isDone(a) && !isDone(b)) return 1;
+                if (!isDone(a) && isDone(b)) return -1;
                 return 0;
               }).map(todo => (
                 <div 
