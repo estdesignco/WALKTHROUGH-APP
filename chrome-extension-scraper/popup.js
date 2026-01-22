@@ -1,6 +1,6 @@
-// Design Ready Product Scraper v7.24.0
+// Design Ready Product Scraper v7.25.0
 // VENDOR-SPECIFIC SCRAPING for 26+ vendors
-// HIGH-RES IMAGES, IMPROVED TAB REUSE - Jan 2026
+// MULTI-IMAGE SUPPORT, HIGH-RES IMAGES, IMPROVED TAB REUSE - Jan 2026
 // Debug logging enabled in console
 
 const APP_URL = 'https://app.estdesignco.com';
@@ -8,6 +8,8 @@ const BACKEND_URL = 'https://app.estdesignco.com';
 let scrapedData = null;
 let selectedProjectId = null;
 let clickToSelectActive = false;
+let allProductImages = [];  // Store all found product images
+let selectedImages = [];    // Store user-selected images
 
 const scrapeBtn = document.getElementById('scrapeBtn');
 const sendBtn = document.getElementById('sendBtn');
@@ -20,6 +22,9 @@ const resultsContainer = document.getElementById('resultsContainer');
 const vendorBadge = document.getElementById('vendorBadge');
 const loginWarning = document.getElementById('loginWarning');
 const projectSelector = document.getElementById('projectSelector');
+const multiImageSection = document.getElementById('multiImageSection');
+const imageGallery = document.getElementById('imageGallery');
+const selectedCount = document.getElementById('selectedCount');
 
 // Load projects from API
 async function loadProjects() {
