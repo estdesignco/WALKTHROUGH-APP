@@ -2832,20 +2832,11 @@ async def update_item(item_id: str, item_update: ItemUpdate):
                     room_doc = await db.rooms.find_one({"id": category_doc["room_id"]})
                     if room_doc:
                         project_doc = await db.projects.find_one({"id": room_doc["project_id"]})
-                        if project_doc:
-                            # Create Teams notification
-                            await notify_status_change(
-                                project_name=project_doc["name"],
-                                item_name=current_item_doc["name"],
-                                old_status=old_status,
-                                new_status=new_status,
-                                room_name=room_doc["name"],
-                                vendor=current_item_doc.get("vendor", ""),
-                                cost=current_item_doc.get("cost", 0.0)
-                            )
+                        # NOTE: Status change notifications DISABLED
+                        # Only To-Do and Punch List items send Teams notifications now
         except Exception as e:
-            logging.error(f"Failed to create Teams notification: {str(e)}")
-            # Don't fail the update if Teams notification fails
+            logging.error(f"Failed to process status change: {str(e)}")
+            # Don't fail the update
     
     # AUTO-SYNC: Add to Samples Library when FINISH_COLOR has content (with vendor)
     # This syncs based on the FINISH column content, NOT status dropdown
