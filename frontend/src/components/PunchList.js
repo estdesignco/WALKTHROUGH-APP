@@ -870,9 +870,63 @@ export default function PunchList({ projectId, roomId = null }) {
                   )}
                   
                   <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 flex-wrap">
-                    <span className={getStatusColor(item.status)}>
-                      {item.status.replace('_', ' ')}
-                    </span>
+                    {/* STATUS - EDITABLE DROPDOWN */}
+                    <select
+                      value={item.status || 'pending'}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={async (e) => {
+                        e.stopPropagation();
+                        const newStatus = e.target.value;
+                        try {
+                          await fetch(`${API_URL}/punch-list/${item.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ status: newStatus })
+                          });
+                          loadPunchList();
+                        } catch (err) {
+                          console.error('Failed to update status:', err);
+                        }
+                      }}
+                      className={`text-xs px-2 py-0.5 rounded-full cursor-pointer border-none outline-none ${
+                        item.status === 'completed' ? 'bg-green-600 text-white' :
+                        item.status === 'verified' ? 'bg-emerald-600 text-white' :
+                        item.status === 'in_progress' ? 'bg-blue-600 text-white' :
+                        'bg-gray-600 text-white'
+                      }`}
+                      style={{ background: 'inherit' }}
+                    >
+                      <option value="pending" className="bg-gray-800">⏳ Pending</option>
+                      <option value="in_progress" className="bg-gray-800">🔄 In Progress</option>
+                      <option value="completed" className="bg-gray-800">✅ Completed</option>
+                      <option value="verified" className="bg-gray-800">✓✓ Verified</option>
+                    </select>
+                    {/* PRIORITY - EDITABLE DROPDOWN */}
+                    <select
+                      value={item.priority || 'medium'}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={async (e) => {
+                        e.stopPropagation();
+                        const newPriority = e.target.value;
+                        try {
+                          await fetch(`${API_URL}/punch-list/${item.id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ priority: newPriority })
+                          });
+                          loadPunchList();
+                        } catch (err) {
+                          console.error('Failed to update priority:', err);
+                        }
+                      }}
+                      className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(item.priority)} text-white cursor-pointer border-none outline-none`}
+                      style={{ background: 'inherit' }}
+                    >
+                      <option value="low" className="bg-gray-800">Low</option>
+                      <option value="medium" className="bg-gray-800">Medium</option>
+                      <option value="high" className="bg-gray-800">High</option>
+                      <option value="urgent" className="bg-gray-800">Urgent</option>
+                    </select>
                     {item.assigned_to && (
                       <span>👤 {item.assigned_to}</span>
                     )}
