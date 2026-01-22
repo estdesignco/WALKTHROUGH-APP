@@ -5,6 +5,7 @@ const ExportsDashboard = ({ projectId }) => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [googleCalendarConnected, setGoogleCalendarConnected] = useState(false);
+  const [googleCalendarEmail, setGoogleCalendarEmail] = useState('');
   const [teamsCalendarConnected, setTeamsCalendarConnected] = useState(false);
   const [showGoogleSheetsImport, setShowGoogleSheetsImport] = useState(false);
   const [googleSheetsUrl, setGoogleSheetsUrl] = useState('');
@@ -30,6 +31,7 @@ const ExportsDashboard = ({ projectId }) => {
 
   useEffect(() => {
     loadProjectData();
+    checkGoogleCalendarStatus();
   }, [projectId]);
 
   useEffect(() => {
@@ -42,6 +44,21 @@ const ExportsDashboard = ({ projectId }) => {
       setCustomerSheetRooms(roomSelections);
     }
   }, [project]);
+
+  // Check Google Calendar connection status
+  const checkGoogleCalendarStatus = async () => {
+    try {
+      const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+      const response = await fetch(`${BACKEND_URL}/api/auth/google/status`);
+      if (response.ok) {
+        const data = await response.json();
+        setGoogleCalendarConnected(data.connected);
+        if (data.email) setGoogleCalendarEmail(data.email);
+      }
+    } catch (error) {
+      console.error('Error checking Google Calendar status:', error);
+    }
+  };
 
   const loadProjectData = async () => {
     try {
