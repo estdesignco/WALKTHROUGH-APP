@@ -266,7 +266,7 @@ export default function ToDoListScreen({ route, navigation }) {
 
       {/* Todo List */}
       <ScrollView style={styles.content}>
-        {filteredTodos.map(todo => (
+        {sortedFilteredTodos.map(todo => (
           <View key={todo.id} style={styles.todoCard}>
             <View style={styles.todoHeader}>
               <TouchableOpacity onPress={() => deleteTodo(todo.id)}>
@@ -341,7 +341,7 @@ export default function ToDoListScreen({ route, navigation }) {
           </View>
         ))}
 
-        {filteredTodos.length === 0 && (
+        {sortedFilteredTodos.length === 0 && (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>📋</Text>
             <Text style={styles.emptyText}>No to-do items</Text>
