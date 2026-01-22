@@ -6,8 +6,9 @@ import Autocomplete from 'react-google-autocomplete';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, PlusCircle, XCircle, Home } from 'lucide-react';
+import { Loader2, PlusCircle, XCircle, Home, Calendar } from 'lucide-react';
 import { autoSyncContact } from './ContactAutocomplete';
+import AppointmentBooking from './AppointmentBooking';
 
 const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin || '';
 console.log('🔗 CustomerfacingQuestionnaire BACKEND_URL:', BACKEND_URL);
