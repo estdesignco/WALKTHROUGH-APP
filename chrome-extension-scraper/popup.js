@@ -194,7 +194,8 @@ function scrapePageData() {
     finish_color: null,
     finish_image: null,
     image_url: null,
-    description: null  // Added for remarks field
+    description: null,  // Added for remarks field
+    all_images: []  // MULTI-IMAGE SUPPORT
   };
 
   const domain = window.location.hostname.replace('www.', '').toLowerCase();
