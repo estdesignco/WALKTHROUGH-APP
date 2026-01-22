@@ -515,8 +515,8 @@ export default function MasterToDoList() {
               <div className="px-6 pb-4 space-y-1">
                 {/* Project To-Dos - SORTED: Done items at bottom */}
                 {[...todos].sort((a, b) => {
-                  const aIsDone = a.completed || a.status === 'completed';
-                  const bIsDone = b.completed || b.status === 'completed';
+                  const aIsDone = a.completed || a.status === 'completed' || a.status === 'done';
+                  const bIsDone = b.completed || b.status === 'completed' || b.status === 'done';
                   if (aIsDone && !bIsDone) return 1;
                   if (!aIsDone && bIsDone) return -1;
                   return 0;
@@ -603,10 +603,10 @@ export default function MasterToDoList() {
                   );
                 })}
                 
-                {/* Punch Items - SORTED: Completed/Verified items at bottom */}
+                {/* Punch Items - SORTED: Completed/Done/Verified items at bottom */}
                 {[...punchItems].sort((a, b) => {
-                  const aIsDone = a.status === 'completed' || a.status === 'verified';
-                  const bIsDone = b.status === 'completed' || b.status === 'verified';
+                  const aIsDone = a.status === 'completed' || a.status === 'done' || a.status === 'verified';
+                  const bIsDone = b.status === 'completed' || b.status === 'done' || b.status === 'verified';
                   if (aIsDone && !bIsDone) return 1;
                   if (!aIsDone && bIsDone) return -1;
                   return 0;
