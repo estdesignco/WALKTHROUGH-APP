@@ -200,6 +200,15 @@ export default function ToDoListScreen({ route, navigation }) {
     return todo.status === activeFilter;
   });
 
+  // SORT: Completed/Done items go to BOTTOM of the list
+  const sortedFilteredTodos = [...filteredTodos].sort((a, b) => {
+    const aIsDone = a.status === 'done' || a.status === 'completed';
+    const bIsDone = b.status === 'done' || b.status === 'completed';
+    if (aIsDone && !bIsDone) return 1;
+    if (!aIsDone && bIsDone) return -1;
+    return 0;
+  });
+
   const counts = {
     all: todos.length,
     pending: todos.filter(t => t.status === 'pending').length,
