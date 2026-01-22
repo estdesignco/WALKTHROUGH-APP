@@ -415,9 +415,41 @@ export default function MasterToDoList() {
                       )}
                       
                       <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 flex-wrap">
-                        <span className={getStatusColor(todo.status, todo.completed)}>
-                          {(todo.status || 'pending').replace('_', ' ')}
-                        </span>
+                        {/* STATUS - EDITABLE DROPDOWN */}
+                        <select
+                          value={todo.status || 'pending'}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            updateCompanyTodoStatus(todo.id, e.target.value);
+                          }}
+                          className={`text-xs px-2 py-0.5 rounded-full cursor-pointer border-none outline-none ${
+                            todo.status === 'completed' ? 'bg-green-600 text-white' :
+                            todo.status === 'in_progress' ? 'bg-blue-600 text-white' :
+                            'bg-gray-600 text-white'
+                          }`}
+                          style={{ background: 'inherit' }}
+                        >
+                          <option value="pending" className="bg-gray-800">⏳ Pending</option>
+                          <option value="in_progress" className="bg-gray-800">🔄 Working</option>
+                          <option value="completed" className="bg-gray-800">✅ Done</option>
+                        </select>
+                        {/* PRIORITY - EDITABLE DROPDOWN */}
+                        <select
+                          value={todo.priority || 'medium'}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            updateCompanyTodoPriority(todo.id, e.target.value);
+                          }}
+                          className={`text-xs px-2 py-0.5 rounded-full ${getPriorityColor(todo.priority)} text-white cursor-pointer border-none outline-none`}
+                          style={{ background: 'inherit' }}
+                        >
+                          <option value="low" className="bg-gray-800">Low</option>
+                          <option value="medium" className="bg-gray-800">Medium</option>
+                          <option value="high" className="bg-gray-800">High</option>
+                          <option value="urgent" className="bg-gray-800">Urgent</option>
+                        </select>
                         {todo.assigned_to && (
                           <span>👤 {todo.assigned_to}</span>
                         )}
