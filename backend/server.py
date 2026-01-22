@@ -11821,7 +11821,380 @@ async def create_outlook_calendar_event(access_token: str, event_data: dict):
     return {"success": True, "event_id": result.get('id')}
 
 # ============================================================================
-# END EXTERNAL CALENDAR INTEGRATIONS
+# CLIENT BOOKING SYSTEM - Outlook Calendar Based
+# ============================================================================
+# Available: Tuesday-Friday, 9am-5pm, 2-hour blocks
+# Checks Outlook calendar for conflicts
+
+@api_router.get("/booking/available-slots")
+async def get_available_booking_slots(weeks_ahead: int = 4):
+    """
+    Get available booking slots for the next X weeks.
+    Slots are 2 hours, Tuesday-Friday, 9am-5pm.
+    Blocked times come from Outlook calendar.
+    """
+    try:
+        from datetime import datetime, timedelta, timezone
+        import pytz
+        
+        # Business hours configuration
+        AVAILABLE_DAYS = [1, 2, 3, 4]  # Tuesday=1, Wednesday=2, Thursday=3, Friday=4 (Monday=0)
+        START_HOUR = 9  # 9 AM
+        END_HOUR = 17   # 5 PM
+        SLOT_DURATION_HOURS = 2
+        
+        # Get timezone (default to Central Time for Texas)
+        tz = pytz.timezone('America/Chicago')
+        
+        # Calculate date range
+        now = datetime.now(tz)
+        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = start_date + timedelta(weeks=weeks_ahead)
+        
+        # Get blocked times from Outlook calendar
+        blocked_times = []
+        try:
+            # Get active Outlook calendar connection
+            connection = await db.calendar_connections.find_one({
+                "provider": "outlook",
+                "is_active": True
+            })
+            
+            if connection:
+                # Refresh token if needed
+                token_expires = datetime.fromisoformat(connection['token_expires_at'].replace('Z', '+00:00'))
+                if token_expires <= datetime.now(timezone.utc) + timedelta(minutes=5):
+                    access_token = await refresh_outlook_token(connection)
+                else:
+                    access_token = connection['access_token']
+                
+                # Fetch calendar events
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(
+                        'https://graph.microsoft.com/v1.0/me/calendarView',
+                        params={
+                            'startDateTime': start_date.isoformat(),
+                            'endDateTime': end_date.isoformat(),
+                            '$select': 'subject,start,end',
+                            '$top': 500
+                        },
+                        headers={'Authorization': f'Bearer {access_token}'}
+                    ) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            for event in data.get('value', []):
+                                event_start = datetime.fromisoformat(event['start']['dateTime'].replace('Z', '+00:00'))
+                                event_end = datetime.fromisoformat(event['end']['dateTime'].replace('Z', '+00:00'))
+                                blocked_times.append({
+                                    'start': event_start,
+                                    'end': event_end,
+                                    'title': event.get('subject', 'Busy')
+                                })
+        except Exception as e:
+            logging.warning(f"Could not fetch Outlook calendar: {e}")
+        
+        # Generate available slots
+        available_slots = []
+        current_date = start_date
+        
+        while current_date < end_date:
+            # Check if it's an available day (Tue-Fri)
+            if current_date.weekday() in AVAILABLE_DAYS:
+                # Generate time slots for this day
+                for hour in range(START_HOUR, END_HOUR, SLOT_DURATION_HOURS):
+                    slot_start = current_date.replace(hour=hour, minute=0, second=0, microsecond=0)
+                    slot_end = slot_start + timedelta(hours=SLOT_DURATION_HOURS)
+                    
+                    # Skip past slots
+                    if slot_start <= now:
+                        continue
+                    
+                    # Check if slot conflicts with any blocked time
+                    is_available = True
+                    for blocked in blocked_times:
+                        # Check for overlap
+                        if slot_start < blocked['end'] and slot_end > blocked['start']:
+                            is_available = False
+                            break
+                    
+                    if is_available:
+                        available_slots.append({
+                            'date': slot_start.strftime('%Y-%m-%d'),
+                            'day_name': slot_start.strftime('%A'),
+                            'start_time': slot_start.strftime('%I:%M %p'),
+                            'end_time': slot_end.strftime('%I:%M %p'),
+                            'start_iso': slot_start.isoformat(),
+                            'end_iso': slot_end.isoformat(),
+                            'display': f"{slot_start.strftime('%A, %B %d')} at {slot_start.strftime('%I:%M %p')}"
+                        })
+            
+            current_date += timedelta(days=1)
+        
+        return {
+            "slots": available_slots,
+            "timezone": "America/Chicago",
+            "slot_duration_hours": SLOT_DURATION_HOURS,
+            "available_days": ["Tuesday", "Wednesday", "Thursday", "Friday"],
+            "business_hours": f"{START_HOUR}:00 AM - {END_HOUR - 12}:00 PM"
+        }
+    
+    except Exception as e:
+        logging.error(f"Get available slots error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/booking/book-appointment")
+async def book_client_appointment(booking: dict):
+    """
+    Book a consultation appointment for a client.
+    Creates event in Outlook calendar and sends confirmation email.
+    """
+    try:
+        client_name = booking.get('client_name')
+        client_email = booking.get('client_email')
+        client_phone = booking.get('client_phone', '')
+        slot_start = booking.get('start_iso')
+        slot_end = booking.get('end_iso')
+        project_id = booking.get('project_id')
+        notes = booking.get('notes', '')
+        
+        if not client_name or not client_email or not slot_start:
+            raise HTTPException(status_code=400, detail="Missing required fields")
+        
+        # Get Outlook connection
+        connection = await db.calendar_connections.find_one({
+            "provider": "outlook",
+            "is_active": True
+        })
+        
+        if not connection:
+            # If no Outlook connected, just save locally
+            logging.warning("No Outlook calendar connected - saving appointment locally only")
+            appointment = {
+                "id": str(uuid.uuid4()),
+                "client_name": client_name,
+                "client_email": client_email,
+                "client_phone": client_phone,
+                "start_time": slot_start,
+                "end_time": slot_end,
+                "project_id": project_id,
+                "notes": notes,
+                "status": "confirmed",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "calendar_synced": False
+            }
+            await db.appointments.insert_one(appointment)
+            
+            return {
+                "success": True,
+                "appointment_id": appointment['id'],
+                "message": "Appointment booked (calendar sync unavailable)",
+                "calendar_synced": False
+            }
+        
+        # Refresh token if needed
+        token_expires = datetime.fromisoformat(connection['token_expires_at'].replace('Z', '+00:00'))
+        if token_expires <= datetime.now(timezone.utc) + timedelta(minutes=5):
+            access_token = await refresh_outlook_token(connection)
+        else:
+            access_token = connection['access_token']
+        
+        # Parse times
+        start_dt = datetime.fromisoformat(slot_start.replace('Z', '+00:00'))
+        end_dt = datetime.fromisoformat(slot_end.replace('Z', '+00:00'))
+        
+        # Create Outlook calendar event
+        event_body = {
+            "subject": f"Design Consultation - {client_name}",
+            "body": {
+                "contentType": "HTML",
+                "content": f"""
+                <h2>Design Consultation Appointment</h2>
+                <p><strong>Client:</strong> {client_name}</p>
+                <p><strong>Email:</strong> {client_email}</p>
+                <p><strong>Phone:</strong> {client_phone or 'Not provided'}</p>
+                {f'<p><strong>Notes:</strong> {notes}</p>' if notes else ''}
+                <hr>
+                <p><em>Booked via Design Ready Questionnaire</em></p>
+                """
+            },
+            "start": {
+                "dateTime": start_dt.strftime('%Y-%m-%dT%H:%M:%S'),
+                "timeZone": "America/Chicago"
+            },
+            "end": {
+                "dateTime": end_dt.strftime('%Y-%m-%dT%H:%M:%S'),
+                "timeZone": "America/Chicago"
+            },
+            "attendees": [
+                {
+                    "emailAddress": {
+                        "address": client_email,
+                        "name": client_name
+                    },
+                    "type": "required"
+                }
+            ],
+            "isReminderOn": True,
+            "reminderMinutesBeforeStart": 60
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                'https://graph.microsoft.com/v1.0/me/events',
+                headers={
+                    'Authorization': f'Bearer {access_token}',
+                    'Content-Type': 'application/json'
+                },
+                json=event_body
+            ) as resp:
+                result = await resp.json()
+                
+                if resp.status not in [200, 201]:
+                    logging.error(f"Outlook event creation failed: {result}")
+                    raise HTTPException(status_code=500, detail="Failed to create calendar event")
+        
+        outlook_event_id = result.get('id')
+        
+        # Save appointment to database
+        appointment = {
+            "id": str(uuid.uuid4()),
+            "client_name": client_name,
+            "client_email": client_email,
+            "client_phone": client_phone,
+            "start_time": slot_start,
+            "end_time": slot_end,
+            "project_id": project_id,
+            "notes": notes,
+            "status": "confirmed",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "calendar_synced": True,
+            "outlook_event_id": outlook_event_id
+        }
+        await db.appointments.insert_one(appointment)
+        
+        # Send confirmation email to client
+        try:
+            await send_appointment_confirmation_email(
+                client_name=client_name,
+                client_email=client_email,
+                appointment_time=start_dt.strftime('%A, %B %d, %Y at %I:%M %p'),
+                duration="2 hours"
+            )
+        except Exception as email_error:
+            logging.warning(f"Failed to send confirmation email: {email_error}")
+        
+        return {
+            "success": True,
+            "appointment_id": appointment['id'],
+            "outlook_event_id": outlook_event_id,
+            "message": "Appointment booked successfully!",
+            "calendar_synced": True
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Book appointment error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def send_appointment_confirmation_email(client_name: str, client_email: str, appointment_time: str, duration: str):
+    """Send appointment confirmation email to client"""
+    smtp_server = os.getenv('SMTP_SERVER', 'smtp-mail.outlook.com')
+    smtp_port = int(os.getenv('SMTP_PORT', '587'))
+    sender_email = os.getenv('SENDER_EMAIL')
+    sender_password = os.getenv('SENDER_PASSWORD')
+    
+    if not sender_email or not sender_password:
+        raise Exception("Email credentials not configured")
+    
+    message = MIMEMultipart('alternative')
+    message['Subject'] = f"Your Design Consultation is Confirmed - {appointment_time}"
+    message['From'] = f"Established Design Co. <{sender_email}>"
+    message['To'] = client_email
+    
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body style="font-family: 'Century Gothic', Arial, sans-serif; background: #0a0a0a; margin: 0; padding: 40px 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(30,30,30,0.9)); border-radius: 20px; border: 2px solid rgba(139, 115, 85, 0.3); overflow: hidden;">
+            
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #8b7355, #a0845c); padding: 30px; text-align: center;">
+                <div style="font-size: 28px; font-weight: 300; letter-spacing: 6px; color: #1a1a1a;">ESTABLISHED</div>
+                <div style="font-size: 12px; letter-spacing: 3px; color: #2a2a2a;">DESIGN CO.</div>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 40px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">✨</div>
+                    <h2 style="color: #D4C5A9; font-size: 24px; margin: 0;">Your Consultation is Confirmed!</h2>
+                </div>
+                
+                <p style="color: #e0e0e0; font-size: 16px; line-height: 1.8;">Dear {client_name},</p>
+                
+                <p style="color: #e0e0e0; font-size: 16px; line-height: 1.8;">We're thrilled to confirm your design consultation with Established Design Co.</p>
+                
+                <!-- Appointment Details Box -->
+                <div style="background: rgba(212, 165, 116, 0.1); border-left: 4px solid #D4A574; padding: 20px; margin: 30px 0; border-radius: 8px;">
+                    <p style="color: #D4A574; font-size: 18px; font-weight: bold; margin: 0 0 10px 0;">📅 Appointment Details</p>
+                    <p style="color: #e0e0e0; font-size: 16px; margin: 5px 0;"><strong>Date & Time:</strong> {appointment_time}</p>
+                    <p style="color: #e0e0e0; font-size: 16px; margin: 5px 0;"><strong>Duration:</strong> {duration}</p>
+                </div>
+                
+                <p style="color: #e0e0e0; font-size: 16px; line-height: 1.8;">We'll be reaching out shortly to discuss next steps and answer any questions you may have.</p>
+                
+                <p style="color: #e0e0e0; font-size: 16px; line-height: 1.8; margin-top: 30px;">With warmth,<br><span style="color: #D4A574; font-weight: 600;">The Established Design Co. Team</span></p>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background: rgba(139, 115, 85, 0.15); padding: 20px; text-align: center; border-top: 1px solid rgba(212, 165, 116, 0.2);">
+                <div style="font-size: 12px; color: #a0a0a0;">© 2026 Established Design Co. | Luxury Interior Design</div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    text_content = f"""
+    Your Design Consultation is Confirmed!
+    
+    Dear {client_name},
+    
+    We're thrilled to confirm your design consultation with Established Design Co.
+    
+    Appointment Details:
+    - Date & Time: {appointment_time}
+    - Duration: {duration}
+    
+    We'll be reaching out shortly to discuss next steps.
+    
+    With warmth,
+    The Established Design Co. Team
+    """
+    
+    message.attach(MIMEText(text_content, 'plain', 'utf-8'))
+    message.attach(MIMEText(html_content, 'html', 'utf-8'))
+    
+    await aiosmtplib.send(
+        message,
+        hostname=smtp_server,
+        port=smtp_port,
+        start_tls=True,
+        username=sender_email,
+        password=sender_password,
+    )
+    
+    logging.info(f"Appointment confirmation email sent to {client_email}")
+
+
+# ============================================================================
+# END CLIENT BOOKING SYSTEM
 # ============================================================================
 
 @api_router.post("/todos")
