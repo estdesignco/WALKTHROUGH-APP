@@ -1033,6 +1033,7 @@ class ItemUpdate(BaseModel):
     product_link: Optional[str] = None
     com_fabric: Optional[bool] = None
     placement: Optional[str] = None  # For Tile, Countertops, Flooring categories
+    is_checked: Optional[bool] = None  # Independent checkbox - NOT tied to status
 
 class Item(ItemBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
