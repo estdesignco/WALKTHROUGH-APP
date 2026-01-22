@@ -555,7 +555,7 @@ export default function ToDoList({ projectId, roomId = null }) {
       <div className="divide-y divide-[#B49B7E]/10">
         {loading ? (
           <p className="p-8 text-center text-gray-500">Loading...</p>
-        ) : todoItems.length === 0 ? (
+        ) : activeTodoItems.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-gray-500 mb-4">No to-do items yet.</p>
             <button
@@ -566,19 +566,17 @@ export default function ToDoList({ projectId, roomId = null }) {
             </button>
           </div>
         ) : (
-          // SORT: Completed/Done items go to BOTTOM of the list
-          [...todoItems].sort((a, b) => {
-            const aIsDone = a.completed || a.status === 'completed' || a.status === 'done';
-            const bIsDone = b.completed || b.status === 'completed' || b.status === 'done';
-            if (aIsDone && !bIsDone) return 1;
-            if (!aIsDone && bIsDone) return -1;
+          // SORT: Done items go to BOTTOM of the list
+          [...activeTodoItems].sort((a, b) => {
+            if (isDone(a) && !isDone(b)) return 1;
+            if (!isDone(a) && isDone(b)) return -1;
             return 0;
           }).map(item => (
             <div 
               key={item.id} 
               data-testid={`todo-item-${item.id}`}
               className={`p-4 hover:bg-black/20 transition-colors ${
-                item.completed || item.status === 'completed' ? 'opacity-60' : ''
+                isDone(item) ? 'opacity-60' : ''
               }`}
             >
               <div className="flex items-start gap-4">
@@ -587,7 +585,9 @@ export default function ToDoList({ projectId, roomId = null }) {
                   onClick={() => {
                     const nextStatus = {
                       pending: 'in_progress',
-                      in_progress: 'completed',
+                      in_progress: 'done',
+                      done: 'pending',
+                      completed: 'pending',
                       completed: 'pending',
                       undefined: 'in_progress'
                     };
