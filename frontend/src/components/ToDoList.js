@@ -599,7 +599,7 @@ export default function ToDoList({ projectId, roomId = null }) {
                   }}
                   data-testid={`toggle-status-${item.id}`}
                   className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${
-                    item.completed || item.status === 'completed'
+                    isDone(item)
                       ? 'border-green-500 bg-green-500/20 text-green-400'
                       : 'border-gray-500 hover:border-[#D4A574]'
                   }`}
@@ -611,7 +611,7 @@ export default function ToDoList({ projectId, roomId = null }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h4 className={`font-medium ${
-                      item.completed || item.status === 'completed' 
+                      isDone(item) 
                         ? 'line-through text-gray-500' 
                         : 'text-white'
                     }`}>
@@ -622,19 +622,19 @@ export default function ToDoList({ projectId, roomId = null }) {
                       value={item.status || 'pending'}
                       onChange={(e) => {
                         const newStatus = e.target.value;
-                        const newCompleted = newStatus === 'completed';
+                        const newCompleted = newStatus === 'done' || newStatus === 'completed';
                         updateTodoItem(item.id, { status: newStatus, completed: newCompleted });
                       }}
                       className={`text-xs px-2 py-0.5 rounded-full cursor-pointer border-none outline-none ${
-                        item.status === 'completed' ? 'bg-green-600 text-white' :
-                        item.status === 'in_progress' ? 'bg-blue-600 text-white' :
+                        isDone(item) ? 'bg-green-600 text-white' :
+                        item.status === 'in_progress' || item.status === 'working' ? 'bg-blue-600 text-white' :
                         'bg-gray-600 text-white'
                       }`}
                       style={{ background: 'inherit' }}
                     >
                       <option value="pending" className="bg-gray-800">⏳ Pending</option>
-                      <option value="in_progress" className="bg-gray-800">🔄 Working</option>
-                      <option value="completed" className="bg-gray-800">✅ Done</option>
+                      <option value="working" className="bg-gray-800">🔄 Working</option>
+                      <option value="done" className="bg-gray-800">✅ Done</option>
                     </select>
                     {/* PRIORITY - EDITABLE DROPDOWN */}
                     <select
@@ -651,8 +651,8 @@ export default function ToDoList({ projectId, roomId = null }) {
                     {/* PRIORITY TIMER - Shows how long item has been open */}
                     {(() => {
                       const timePriority = getTimePriority(item.created_at);
-                      // Don't show timer for completed items
-                      if (item.completed || item.status === 'completed') return null;
+                      // Don't show timer for done items
+                      if (isDone(item)) return null;
                       return (
                         <span 
                           className={`text-xs px-2 py-0.5 rounded-full text-white ${timePriority.color}`}
