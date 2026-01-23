@@ -105,30 +105,6 @@ const PaintCatalogPage = () => {
   const filteredData = getFilteredData();
   const manufacturers = Object.keys(paintData);
 
-  // Color chip component
-  const ColorChip = ({ colorName, manufacturer }) => {
-    const isCopied = copiedColor === colorName;
-    
-    return (
-      <div 
-        onClick={() => copyToClipboard(colorName)}
-        className="group flex items-center gap-2 p-2 rounded-lg bg-stone-800/50 hover:bg-stone-700 cursor-pointer transition-all border border-stone-700 hover:border-[#8b7355]"
-      >
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-400 to-stone-600 flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-stone-200 truncate">{colorName}</p>
-        </div>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-          {isCopied ? (
-            <Check className="w-4 h-4 text-green-400" />
-          ) : (
-            <Copy className="w-4 h-4 text-stone-400" />
-          )}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-black text-stone-300 p-6">
       <BackButton />
