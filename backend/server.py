@@ -2191,7 +2191,7 @@ async def create_room(room_data: RoomCreate):
                         "id": item_id,
                         "subcategory_id": subcategory_id,
                         "name": item_obj["name"],
-                        "quantity": null,
+                        "quantity": None,
                         "size": "",
                         "finish_color": "",  # ALWAYS BLANK - ignore template data
                         "status": "",  # BLANK status for all sheets
