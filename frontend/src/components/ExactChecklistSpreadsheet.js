@@ -2981,7 +2981,7 @@ const ExactChecklistSpreadsheet = ({
                                     />
                                   </td>
                                   
-                                  {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE */}
+                                  {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE + PAINT AUTOCOMPLETE */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
                                     <div className="flex items-center gap-2">
                                       {/* Swatch Image */}
@@ -2993,25 +2993,23 @@ const ExactChecklistSpreadsheet = ({
                                           onError={(e) => { e.target.style.display = 'none'; }}
                                         />
                                       )}
-                                      {/* Color Name - Editable */}
-                                      <input
-                                        type="text"
-                                        defaultValue={item.finish_color || ''}
-                                        className="flex-1 bg-transparent text-sm outline-none focus:ring-1 focus:ring-[#D4A574] rounded"
-                                        style={{ color: textColor }}
-                                        onBlur={(e) => {
-                                          const newValue = e.target.value;
+                                      {/* Color Name - Editable with Paint Autocomplete */}
+                                      <PaintColorAutocomplete
+                                        value={item.finish_color || ''}
+                                        onChange={(newValue) => {
                                           if (newValue !== item.finish_color) {
                                             handleUpdateItemField(item.id, 'finish_color', newValue);
                                             item.finish_color = newValue;
                                           }
                                         }}
-                                        onKeyDown={(e) => {
-                                          if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            e.target.blur();
+                                        onBlur={(newValue) => {
+                                          if (newValue !== item.finish_color) {
+                                            handleUpdateItemField(item.id, 'finish_color', newValue);
+                                            item.finish_color = newValue;
                                           }
                                         }}
+                                        textColor={textColor}
+                                        placeholder="Enter color..."
                                       />
                                     </div>
                                   </td>
