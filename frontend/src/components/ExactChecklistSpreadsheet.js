@@ -2043,6 +2043,7 @@ const ExactChecklistSpreadsheet = ({
               <div className="w-full" ref={provided.innerRef} {...provided.droppableProps}>
                 {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
+                  const roomColor = getColorByIndex(roomIndex); // Use index-based color to ensure no repeats
                   
                   return (
                     <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
@@ -2062,8 +2063,8 @@ const ExactChecklistSpreadsheet = ({
               <div 
                 className="px-4 py-2 text-white font-bold mb-4 border border-[#B49B7E]"
                 style={{ 
-                  background: `linear-gradient(135deg, ${getRoomColor(room.name)}FF 0%, ${getRoomColor(room.name)}AA 20%, ${getRoomColor(room.name)} 40%, ${getRoomColor(room.name)}AA 80%, ${getRoomColor(room.name)}FF 100%)`,
-                  boxShadow: `0 0 35px ${getRoomColor(room.name)}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
+                  background: `linear-gradient(135deg, ${roomColor}FF 0%, ${roomColor}AA 20%, ${roomColor} 40%, ${roomColor}AA 80%, ${roomColor}FF 100%)`,
+                  boxShadow: `0 0 35px ${roomColor}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
                   textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)'
                 }}
               >
