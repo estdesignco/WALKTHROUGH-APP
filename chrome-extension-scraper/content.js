@@ -2516,7 +2516,9 @@ async function sendToAppAndLibraries() {
     if (scrapedData.remarks) params.set('remarks', scrapedData.remarks);
     
     const projectUrl = `${BACKEND_URL}/project/${projectId}?tab=Checklist&${params.toString()}`;
-    window.open(projectUrl, '_blank');
+    
+    // REUSE SAME TAB - use named window target to prevent new tabs
+    window.open(projectUrl, 'design_ready_app');
     
     showToast('✅ Saved to App + Product Library + Materials Library!');
     hidePanel();
@@ -2532,7 +2534,9 @@ async function sendToAppAndLibraries() {
     if (scrapedData.name) params.set('name', scrapedData.name);
     if (scrapedData.price) params.set('price', scrapedData.price);
     const projectUrl = `${BACKEND_URL}/project/${projectId}?tab=Checklist&${params.toString()}`;
-    window.open(projectUrl, '_blank');
+    
+    // REUSE SAME TAB - use named window target to prevent new tabs
+    window.open(projectUrl, 'design_ready_app');
   }
 }
 
