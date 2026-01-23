@@ -527,10 +527,10 @@ const ExactChecklistSpreadsheet = ({
           if (categoryExpansion[category.id] === undefined) {
             categoryExpansion[category.id] = true;
           }
-          // Initialize checkedItems with PICKED or any post-picked status items
+          // Initialize checkedItems ONLY from is_checked field - NOT from status
           category.subcategories?.forEach(subcategory => {
             subcategory.items?.forEach(item => {
-              if (PICKED_OR_BEYOND_STATUSES.includes(item.status)) {
+              if (item.is_checked === true) {
                 initialCheckedItems.add(item.id);
               }
             });
@@ -541,9 +541,9 @@ const ExactChecklistSpreadsheet = ({
       setExpandedRooms(roomExpansion);
       setExpandedCategories(categoryExpansion);
       
-      // CRITICAL: Initialize checkedItems with items that have PICKED or post-picked status
+      // Initialize checkedItems only from is_checked field
       if (initialCheckedItems.size > 0) {
-        console.log(`📋 Initialized ${initialCheckedItems.size} pre-checked items from PICKED/post-picked status`);
+        console.log(`📋 Initialized ${initialCheckedItems.size} pre-checked items from is_checked field`);
         setCheckedItems(initialCheckedItems);
       }
     }
