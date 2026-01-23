@@ -7,6 +7,7 @@ import AutocompleteInput from './AutocompleteInput';
 import { InlineProductAutocomplete, VendorDropdown } from './InlineProductAutocomplete';
 import ProductVariantPicker from './ProductVariantPicker';
 import SmartAlternatives from './SmartAlternatives';
+import PaintColorAutocomplete from './PaintColorAutocomplete';
 import { getRoomColor, getCategoryColor } from '../utils/roomColors';
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 import { toast } from 'sonner';
