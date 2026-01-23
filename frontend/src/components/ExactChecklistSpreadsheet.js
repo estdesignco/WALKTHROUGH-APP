@@ -2985,15 +2985,88 @@ const ExactChecklistSpreadsheet = ({
                                   {/* FINISH/COLOR - EDITABLE WITH SWATCH IMAGE + PAINT AUTOCOMPLETE */}
                                   <td className="border border-[#B49B7E] px-2 py-1 text-sm" style={cellStyle}>
                                     <div className="flex items-center gap-2">
-                                      {/* Swatch Image */}
-                                      {item.finish_image && (
-                                        <img 
-                                          src={item.finish_image} 
-                                          alt={item.finish_color || 'Swatch'} 
-                                          className="w-8 h-8 rounded border border-[#B49B7E] object-cover flex-shrink-0"
-                                          onError={(e) => { e.target.style.display = 'none'; }}
-                                        />
-                                      )}
+                                      {/* Swatch Image - Editable */}
+                                      <div className="relative group flex-shrink-0">
+                                        {item.finish_image ? (
+                                          <>
+                                            <img 
+                                              src={item.finish_image} 
+                                              alt={item.finish_color || 'Swatch'} 
+                                              className="w-8 h-8 rounded border border-[#B49B7E] object-cover cursor-pointer hover:scale-125 transition-transform"
+                                              onError={(e) => { e.target.style.display = 'none'; }}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                // Show large swatch image
+                                                const overlay = document.createElement('div');
+                                                overlay.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:pointer;flex-direction:column;gap:20px;`;
+                                                const img = document.createElement('img');
+                                                img.src = item.finish_image;
+                                                img.style.cssText = `max-width:80vw;max-height:70vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.8);`;
+                                                const title = document.createElement('p');
+                                                title.textContent = item.finish_color || 'Swatch';
+                                                title.style.cssText = `color:white;font-size:18px;font-weight:bold;`;
+                                                overlay.appendChild(img);
+                                                overlay.appendChild(title);
+                                                overlay.addEventListener('click', () => document.body.removeChild(overlay));
+                                                document.body.appendChild(overlay);
+                                              }}
+                                            />
+                                            {/* Edit/Replace swatch button */}
+                                            <div className="absolute -bottom-1 -right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                              <label className="w-4 h-4 bg-[#D4A574] hover:bg-[#c49564] rounded-full flex items-center justify-center cursor-pointer" title="Replace swatch">
+                                                <span className="text-[8px]">📷</span>
+                                                <input 
+                                                  type="file" 
+                                                  accept="image/*"
+                                                  className="hidden"
+                                                  onChange={(e) => {
+                                                    if (e.target.files[0]) {
+                                                      handleFinishImageUpload(item.id, e.target.files[0]);
+                                                    }
+                                                  }}
+                                                />
+                                              </label>
+                                              <button 
+                                                className="w-4 h-4 bg-blue-500 hover:bg-blue-400 rounded-full flex items-center justify-center text-[8px]"
+                                                title="Edit URL"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  const newUrl = prompt('Enter swatch image URL:', item.finish_image);
+                                                  if (newUrl !== null && newUrl !== item.finish_image) {
+                                                    handleUpdateItemField(item.id, 'finish_image', newUrl);
+                                                  }
+                                                }}
+                                              >
+                                                ✏️
+                                              </button>
+                                              <button 
+                                                className="w-4 h-4 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center text-[8px]"
+                                                title="Remove swatch"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  handleUpdateItemField(item.id, 'finish_image', '');
+                                                }}
+                                              >
+                                                ✕
+                                              </button>
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <label className="w-8 h-8 bg-gray-700 hover:bg-gray-600 flex flex-col items-center justify-center text-xs cursor-pointer rounded border border-dashed border-gray-500 hover:border-[#D4A574]" title="Add swatch image">
+                                            <span className="text-sm">🎨</span>
+                                            <input 
+                                              type="file" 
+                                              accept="image/*"
+                                              className="hidden"
+                                              onChange={(e) => {
+                                                if (e.target.files[0]) {
+                                                  handleFinishImageUpload(item.id, e.target.files[0]);
+                                                }
+                                              }}
+                                            />
+                                          </label>
+                                        )}
+                                      </div>
                                       {/* Color Name - Editable with Paint Autocomplete */}
                                       <PaintColorAutocomplete
                                         value={item.finish_color || ''}
