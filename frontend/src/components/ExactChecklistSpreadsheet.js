@@ -312,61 +312,59 @@ const ExactChecklistSpreadsheet = ({
       return;
     }
 
+    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+
     try {
       console.log('🔄 Processing drag for type:', type);
       if (type === 'ROOM') {
-        // Create deep copy of project
-        const updatedProject = {...project};
-        const newRooms = Array.from(updatedProject.rooms);
+        // Get current rooms order
+        const currentRooms = project?.rooms || [];
+        const newRooms = Array.from(currentRooms);
         const [removed] = newRooms.splice(source.index, 1);
         newRooms.splice(destination.index, 0, removed);
-        
-        updatedProject.rooms = newRooms;
         
         console.log('🔄 Moving room from', source.index, 'to', destination.index);
         console.log('📦 New room order:', newRooms.map(r => r.name));
         
-        // Force React to re-render
-        setFilteredProject(updatedProject);
-
-        // Update backend silently
-        Promise.all(newRooms.map((room, i) => 
-          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${room.id}`, {
+        // Update backend FIRST - await all updates
+        await Promise.all(newRooms.map((room, i) => 
+          fetch(`${backendUrl}/api/rooms/${room.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
           })
         ));
 
-        console.log('✅ Rooms reordered! Check if visual updated.');
+        console.log('✅ Rooms reordered in backend!');
+        
+        // Reload to get updated data from server
+        if (onReload) await onReload();
+        
       } else if (type === 'CATEGORY') {
-        // Create deep copy of project
-        const updatedProject = {...project};
         const roomId = source.droppableId.replace('categories-', '');
-        const room = updatedProject.rooms.find(r => r.id === roomId);
+        const room = project?.rooms?.find(r => r.id === roomId);
         if (!room) return;
 
         const newCategories = Array.from(room.categories);
         const [removed] = newCategories.splice(source.index, 1);
         newCategories.splice(destination.index, 0, removed);
         
-        room.categories = newCategories;
-        
         console.log('🔄 Moving category from', source.index, 'to', destination.index);
         
-        // Force React to re-render
-        setFilteredProject(updatedProject);
-
-        // Update backend silently
-        Promise.all(newCategories.map((category, i) => 
-          fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${category.id}`, {
+        // Update backend FIRST - await all updates
+        await Promise.all(newCategories.map((category, i) => 
+          fetch(`${backendUrl}/api/categories/${category.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
           })
         ));
 
-        console.log('✅ Categories reordered!');
+        console.log('✅ Categories reordered in backend!');
+        
+        // Reload to get updated data from server
+        if (onReload) await onReload();
+        
       } else if (type === 'SUBCATEGORY') {
         // Reorder subcategories within a category
         const categoryId = source.droppableId.replace('subcategories-', '');
@@ -382,19 +380,22 @@ const ExactChecklistSpreadsheet = ({
         newSubcategories.splice(destination.index, 0, removed);
 
         // Update order_index for all affected subcategories
-        for (let i = 0; i < newSubcategories.length; i++) {
-          await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/subcategories/${newSubcategories[i].id}`, {
+        await Promise.all(newSubcategories.map((subcat, i) =>
+          fetch(`${backendUrl}/api/subcategories/${subcat.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
-          });
-        }
+          })
+        ));
 
+        console.log('✅ Subcategories reordered in backend!');
+        
+        // Reload to get updated data from server
         if (onReload) await onReload();
       }
     } catch (error) {
       console.error('Drag and drop error:', error);
-      alert('Failed to reorder items');
+      alert('Failed to reorder items. Please try again.');
     }
   };
 
