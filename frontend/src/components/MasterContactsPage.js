@@ -40,6 +40,9 @@ const MasterContactsPage = () => {
       const params = [];
       if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
       if (filterRole) params.push(`role=${encodeURIComponent(filterRole)}`);
+      // Filter by type based on active tab
+      if (activeTab === 'vendors') params.push(`type=vendor`);
+      else if (activeTab === 'contacts') params.push(`type=contact`);
       if (params.length > 0) url += '?' + params.join('&');
       
       const response = await axios.get(url);
@@ -49,7 +52,7 @@ const MasterContactsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, filterRole]);
+  }, [searchTerm, filterRole, activeTab]);
 
   const loadRoles = async () => {
     try {
