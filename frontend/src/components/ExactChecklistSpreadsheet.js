@@ -2671,9 +2671,8 @@ const ExactChecklistSpreadsheet = ({
                                   let highlightIndex = 0;
                                   
                                   return sortedItems.map((item, itemIndex) => {
-                                    // Checkbox is now INDEPENDENT of status dropdown
-                                    // Check if item has is_checked field OR is in checkedItems set OR has PICKED status
-                                    const isChecked = item.is_checked === true || checkedItems.has(item.id) || PICKED_OR_BEYOND_STATUSES.includes(item.status);
+                                    // Checkbox is COMPLETELY INDEPENDENT - only uses is_checked field
+                                    const isChecked = item.is_checked === true || checkedItems.has(item.id);
                                     
                                     // Get linked To-Do and Punch info
                                     const todoInfo = todoLinkedItems.get(item.id);
