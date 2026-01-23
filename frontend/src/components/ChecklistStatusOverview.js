@@ -12,7 +12,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown, itemStatuses, carrierTypes }) => {
   
   // Define the progression of statuses - items that reach these are considered "picked"
-  const PICKED_AND_BEYOND = ['PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'SAMPLES ORDERED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION'];
+  const PICKED_AND_BEYOND = ['PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'SAMPLES ORDERED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'ASK AVERI', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION', 'APPROVED', 'ORDERED', 'RECEIVED', 'INSTALLED', 'CHANGE OUT', 'ON HOLD'];
   
   // Calculate total picked (items that have been picked and progressed)
   const getTotalPicked = () => {
@@ -26,7 +26,7 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
   // Convert regular status breakdown to checklist format
   const getChecklistStatusBreakdown = () => {
     const checklistStatuses = {
-      'TO BE PICKED': { count: 0, color: '#6B7280' },        // Changed from BLANK to TO BE PICKED (gray)
+      'TO BE PICKED': { count: 0, color: '#6B7280' },
       'PICKED': { count: 0, color: '#3B82F6' },
       'ORDER SAMPLES': { count: 0, color: '#10B981' },
       'SAMPLES ARRIVED': { count: 0, color: '#8B5CF6' },
@@ -34,9 +34,14 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       'ASK NEIL': { count: 0, color: '#F59E0B' },
       'ASK CHARLENE': { count: 0, color: '#EF4444' },
       'ASK JALA': { count: 0, color: '#EC4899' },
+      'ASK AVERI': { count: 0, color: '#A855F7' },
       'GET QUOTE': { count: 0, color: '#06B6D4' },
       'WAITING ON QT': { count: 0, color: '#F97316' },
-      'READY FOR PRESENTATION': { count: 0, color: '#84CC16' }
+      'READY FOR PRESENTATION': { count: 0, color: '#84CC16' },
+      'APPROVED': { count: 0, color: '#22C55E' },
+      'ORDERED': { count: 0, color: '#0EA5E9' },
+      'CHANGE OUT': { count: 0, color: '#DC2626' },
+      'ON HOLD': { count: 0, color: '#6B7280' }
     };
     
     // Map existing statuses to checklist statuses
@@ -46,10 +51,8 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
       } else if (status === '' || status === 'TO BE SELECTED' || status === 'TO BE PICKED') {
         // Map blank, "TO BE SELECTED", and "TO BE PICKED" to TO BE PICKED
         checklistStatuses['TO BE PICKED'].count += statusBreakdown[status];
-      } else {
-        // For any other unknown statuses, add them to TO BE PICKED as well
-        checklistStatuses['TO BE PICKED'].count += statusBreakdown[status];
       }
+      // Don't add unknown statuses to TO BE PICKED - they should be tracked separately
     });
     
     return checklistStatuses;
