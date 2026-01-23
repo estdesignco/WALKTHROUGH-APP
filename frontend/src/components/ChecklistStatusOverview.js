@@ -201,8 +201,9 @@ const ChecklistStatusOverview = ({ totalItems, statusBreakdown, carrierBreakdown
         
         <div className="space-y-3 max-h-80 overflow-y-auto">
           {[
-            'TO BE PICKED', 'PICKED', 'ORDER SAMPLES', 'SAMPLES ORDERED', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 
-            'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION'
+            'TO BE PICKED', 'PICKED', 'ORDER SAMPLES', 'SAMPLES ORDERED', 'SAMPLES ARRIVED', 
+            'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'ASK AVERI',
+            'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION', 'APPROVED', 'ORDERED', 'CHANGE OUT', 'ON HOLD'
           ].map(status => {
             const statusData = checklistBreakdown[status] || { count: 0, color: '#6B7280' };
             const count = statusData.count;
