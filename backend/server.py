@@ -2642,8 +2642,10 @@ async def bulk_create_items(items: List[ItemCreate]):
         raise HTTPException(status_code=500, detail=f"Bulk item creation failed: {str(e)}")
 
 @api_router.post("/upload-item-image")
-async def upload_item_image(file: UploadFile = File(...), item_id: str = Form(...)):
-    """Upload an image for a checklist item when scraper fails"""
+async def upload_item_image(file: UploadFile = File(...), item_id: str = Form(...), image_type: str = Form(default="main")):
+    """Upload an image for a checklist item when scraper fails
+    image_type: 'main' for image_url, 'finish' for finish_image
+    """
     try:
         import base64
         import os
@@ -2657,14 +2659,17 @@ async def upload_item_image(file: UploadFile = File(...), item_id: str = Form(..
         base64_data = base64.b64encode(content).decode('utf-8')
         image_url = f"data:{mime_type};base64,{base64_data}"
         
+        # Determine which field to update based on image_type
+        field_name = "finish_image" if image_type == "finish" else "image_url"
+        
         # Update item with image URL
         result = await db.items.update_one(
             {"id": item_id},
-            {"$set": {"image_url": image_url, "updated_at": datetime.utcnow()}}
+            {"$set": {field_name: image_url, "updated_at": datetime.utcnow()}}
         )
         
         if result.modified_count > 0:
-            print(f"✅ Image uploaded for item {item_id}")
+            print(f"✅ {field_name} uploaded for item {item_id}")
             return {"success": True, "image_url": image_url}
         else:
             return {"success": False, "message": "Item not found or not updated"}
