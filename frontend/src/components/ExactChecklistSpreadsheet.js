@@ -3259,43 +3259,65 @@ const ExactChecklistSpreadsheet = ({
                                               onClick={async () => {
                                                 try {
                                                   const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
-                                                  const clipData = window.checklistClipboard;
-                                                  const pasteData = {
-                                                    name: clipData.name ? `${clipData.name} (Copy)` : '',
-                                                    vendor: clipData.vendor || '',
-                                                    sku: clipData.sku || '',
-                                                    cost: clipData.cost || 0,
-                                                    size: clipData.size || '',
-                                                    finish_color: clipData.finish_color || '',
-                                                    finish_image: clipData.finish_image || '',
-                                                    quantity: clipData.quantity || null,
-                                                    status: '',
-                                                    link: clipData.link || '',
-                                                    image_url: clipData.image_url || '',
-                                                    remarks: clipData.remarks || '',
-                                                    placement: clipData.placement || '',
-                                                    subcategory_id: subcategory.id,
-                                                    order_index: (item.order_index || 0) + 1
-                                                  };
+                                                  const isCut = !!window.checklistCutItem;
+                                                  const clipData = isCut ? window.checklistCutItem : window.checklistClipboard;
                                                   
-                                                  const response = await fetch(`${backendUrl}/api/items`, {
-                                                    method: 'POST',
-                                                    headers: { 'Content-Type': 'application/json' },
-                                                    body: JSON.stringify(pasteData)
-                                                  });
-                                                  
-                                                  if (response.ok) {
-                                                    window.checklistClipboard = null; // Clear after paste
-                                                    if (onReload) onReload();
+                                                  if (isCut) {
+                                                    // MOVE: Update existing item's subcategory
+                                                    const response = await fetch(`${backendUrl}/api/items/${clipData.id}`, {
+                                                      method: 'PUT',
+                                                      headers: { 'Content-Type': 'application/json' },
+                                                      body: JSON.stringify({
+                                                        subcategory_id: subcategory.id,
+                                                        order_index: (item.order_index || 0) + 1
+                                                      })
+                                                    });
+                                                    
+                                                    if (response.ok) {
+                                                      window.checklistCutItem = null;
+                                                      if (onReload) onReload();
+                                                    } else {
+                                                      alert('Failed to move item');
+                                                    }
                                                   } else {
-                                                    alert('Failed to paste item');
+                                                    // COPY: Create new item
+                                                    const pasteData = {
+                                                      name: clipData.name ? `${clipData.name} (Copy)` : '',
+                                                      vendor: clipData.vendor || '',
+                                                      sku: clipData.sku || '',
+                                                      cost: clipData.cost || 0,
+                                                      size: clipData.size || '',
+                                                      finish_color: clipData.finish_color || '',
+                                                      finish_image: clipData.finish_image || '',
+                                                      quantity: clipData.quantity || null,
+                                                      status: '',
+                                                      link: clipData.link || '',
+                                                      image_url: clipData.image_url || '',
+                                                      remarks: clipData.remarks || '',
+                                                      placement: clipData.placement || '',
+                                                      subcategory_id: subcategory.id,
+                                                      order_index: (item.order_index || 0) + 1
+                                                    };
+                                                    
+                                                    const response = await fetch(`${backendUrl}/api/items`, {
+                                                      method: 'POST',
+                                                      headers: { 'Content-Type': 'application/json' },
+                                                      body: JSON.stringify(pasteData)
+                                                    });
+                                                    
+                                                    if (response.ok) {
+                                                      window.checklistClipboard = null;
+                                                      if (onReload) onReload();
+                                                    } else {
+                                                      alert('Failed to paste item');
+                                                    }
                                                   }
                                                 } catch (error) {
-                                                  alert('Error pasting item: ' + error.message);
+                                                  alert('Error: ' + error.message);
                                                 }
                                               }}
-                                              className="text-green-400 hover:text-green-300 text-sm animate-pulse"
-                                              title="Paste copied item HERE"
+                                              className={`text-sm animate-pulse ${window.checklistCutItem ? 'text-orange-400 hover:text-orange-300' : 'text-green-400 hover:text-green-300'}`}
+                                              title={window.checklistCutItem ? "MOVE cut item HERE" : "Paste copied item HERE"}
                                             >
                                               📥
                                             </button>
