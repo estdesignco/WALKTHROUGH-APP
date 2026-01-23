@@ -2169,21 +2169,137 @@ const ExactFFESpreadsheet = ({
                                                             </div>
                                                           </td>
                                                           
-                                                          {/* ACTIONS - PASTE & DELETE */}
+                                                          {/* ACTIONS - CUT, COPY, PASTE & DELETE */}
                                                           <td className="border border-[#B49B7E] px-2 py-2 text-center">
-                                                            <div className="flex items-center justify-center gap-2">
-                                                              {/* PASTE BUTTON - Always visible, enabled when scraper data is available */}
+                                                            <div className="flex items-center justify-center gap-1">
+                                                              {/* CUT BUTTON */}
                                                               <button 
-                                                                onClick={() => scraperClipboard && handlePasteScrapedData(item.id)}
-                                                                disabled={!scraperClipboard}
-                                                                className={`text-white text-xs px-3 py-1.5 rounded font-bold ${
-                                                                  scraperClipboard 
-                                                                    ? 'bg-green-600 hover:bg-green-500 animate-pulse cursor-pointer' 
-                                                                    : 'bg-gray-600 opacity-50 cursor-not-allowed'
-                                                                }`}
-                                                                title={scraperClipboard ? `Paste: ${scraperClipboard.name}` : 'No data to paste - scrape a product first'}
+                                                                onClick={() => {
+                                                                  window.ffeClipboardCut = {
+                                                                    id: item.id,
+                                                                    name: item.name || '',
+                                                                    vendor: item.vendor || '',
+                                                                    sku: item.sku || '',
+                                                                    cost: item.cost || 0,
+                                                                    size: item.size || '',
+                                                                    finish_color: item.finish_color || '',
+                                                                    finish_image: item.finish_image || '',
+                                                                    quantity: item.quantity || null,
+                                                                    status: item.status || '',
+                                                                    link: item.link || '',
+                                                                    image_url: item.image_url || '',
+                                                                    remarks: item.remarks || '',
+                                                                    notes: item.notes || ''
+                                                                  };
+                                                                  window.ffeClipboardCopy = null;
+                                                                  alert('✂️ Item CUT! Click 📥 on any row to MOVE it there.');
+                                                                  if (onReload) onReload();
+                                                                }}
+                                                                className="text-orange-400 hover:text-orange-300 text-sm"
+                                                                title="Cut Item (MOVE)"
                                                               >
-                                                                📋 PASTE
+                                                                ✂️
+                                                              </button>
+                                                              {/* COPY BUTTON */}
+                                                              <button 
+                                                                onClick={() => {
+                                                                  window.ffeClipboardCopy = {
+                                                                    name: item.name || '',
+                                                                    vendor: item.vendor || '',
+                                                                    sku: item.sku || '',
+                                                                    cost: item.cost || 0,
+                                                                    size: item.size || '',
+                                                                    finish_color: item.finish_color || '',
+                                                                    finish_image: item.finish_image || '',
+                                                                    quantity: item.quantity || null,
+                                                                    link: item.link || '',
+                                                                    image_url: item.image_url || '',
+                                                                    remarks: item.remarks || '',
+                                                                    notes: item.notes || ''
+                                                                  };
+                                                                  window.ffeClipboardCut = null;
+                                                                  alert('📋 Item COPIED! Click 📥 on any row to paste.');
+                                                                }}
+                                                                className="text-blue-400 hover:text-blue-300 text-sm"
+                                                                title="Copy Item"
+                                                              >
+                                                                📋
+                                                              </button>
+                                                              {/* PASTE BUTTON - Always visible */}
+                                                              <button 
+                                                                onClick={async () => {
+                                                                  const hasData = window.ffeClipboardCut || window.ffeClipboardCopy || scraperClipboard;
+                                                                  if (!hasData) {
+                                                                    alert('Nothing to paste! Use ✂️ CUT or 📋 COPY first, or scrape a product.');
+                                                                    return;
+                                                                  }
+                                                                  
+                                                                  // If scraper clipboard, use that
+                                                                  if (scraperClipboard && !window.ffeClipboardCut && !window.ffeClipboardCopy) {
+                                                                    handlePasteScrapedData(item.id);
+                                                                    return;
+                                                                  }
+                                                                  
+                                                                  try {
+                                                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
+                                                                    const isCut = !!window.ffeClipboardCut;
+                                                                    const clipData = isCut ? window.ffeClipboardCut : window.ffeClipboardCopy;
+                                                                    
+                                                                    if (isCut) {
+                                                                      // MOVE: Update existing item's subcategory
+                                                                      const response = await fetch(`${backendUrl}/api/items/${clipData.id}`, {
+                                                                        method: 'PUT',
+                                                                        headers: { 'Content-Type': 'application/json' },
+                                                                        body: JSON.stringify({
+                                                                          subcategory_id: category.subcategories?.[0]?.id,
+                                                                          order_index: (item.order_index || 0) + 1
+                                                                        })
+                                                                      });
+                                                                      if (response.ok) {
+                                                                        window.ffeClipboardCut = null;
+                                                                        if (onReload) onReload();
+                                                                      } else {
+                                                                        alert('Failed to move item');
+                                                                      }
+                                                                    } else {
+                                                                      // COPY: Create new item
+                                                                      const pasteData = {
+                                                                        name: clipData.name ? `${clipData.name} (Copy)` : '',
+                                                                        vendor: clipData.vendor || '',
+                                                                        sku: clipData.sku || '',
+                                                                        cost: clipData.cost || 0,
+                                                                        size: clipData.size || '',
+                                                                        finish_color: clipData.finish_color || '',
+                                                                        finish_image: clipData.finish_image || '',
+                                                                        quantity: clipData.quantity || null,
+                                                                        status: '',
+                                                                        link: clipData.link || '',
+                                                                        image_url: clipData.image_url || '',
+                                                                        remarks: clipData.remarks || '',
+                                                                        notes: clipData.notes || '',
+                                                                        subcategory_id: category.subcategories?.[0]?.id,
+                                                                        order_index: (item.order_index || 0) + 1
+                                                                      };
+                                                                      const response = await fetch(`${backendUrl}/api/items`, {
+                                                                        method: 'POST',
+                                                                        headers: { 'Content-Type': 'application/json' },
+                                                                        body: JSON.stringify(pasteData)
+                                                                      });
+                                                                      if (response.ok) {
+                                                                        window.ffeClipboardCopy = null;
+                                                                        if (onReload) onReload();
+                                                                      } else {
+                                                                        alert('Failed to paste item');
+                                                                      }
+                                                                    }
+                                                                  } catch (error) {
+                                                                    alert('Error: ' + error.message);
+                                                                  }
+                                                                }}
+                                                                className={`text-sm ${(window.ffeClipboardCut || window.ffeClipboardCopy || scraperClipboard) ? 'text-green-400 hover:text-green-300 animate-pulse' : 'text-gray-500'}`}
+                                                                title={window.ffeClipboardCut ? "MOVE cut item here" : window.ffeClipboardCopy ? "Paste copied item here" : scraperClipboard ? `Paste: ${scraperClipboard.name}` : "Cut/Copy an item first"}
+                                                              >
+                                                                📥
                                                               </button>
                                                               <button 
                                                                 onClick={() => handleDeleteItem(item.id)}
