@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const API = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
 const PaintColorAutocomplete = ({ 
-  value, 
+  value = '', 
   onChange, 
   onBlur,
   placeholder = "Enter color...",
@@ -11,7 +11,8 @@ const PaintColorAutocomplete = ({
   style = {},
   textColor = "#D4C5A9"
 }) => {
-  const [inputValue, setInputValue] = useState(value || '');
+  // For controlled input, track local edits separately
+  const [localValue, setLocalValue] = useState(value);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -19,7 +20,7 @@ const PaintColorAutocomplete = ({
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const debounceTimer = useRef(null);
-  const lastExternalValue = useRef(value);
+  const isInternalChange = useRef(false);
 
   // Load all paint colors on mount
   useEffect(() => {
@@ -28,7 +29,6 @@ const PaintColorAutocomplete = ({
         const response = await fetch(`${API}/paint-colors`);
         if (response.ok) {
           const data = await response.json();
-          // Flatten the nested structure into a searchable array
           const colors = [];
           Object.entries(data.data || {}).forEach(([manufacturer, categories]) => {
             Object.entries(categories).forEach(([category, colorList]) => {
@@ -51,15 +51,23 @@ const PaintColorAutocomplete = ({
     loadPaintColors();
   }, []);
 
-  // Sync input value when external value prop changes
-  useEffect(() => {
-    if (value !== lastExternalValue.current) {
-      setInputValue(value || '');
-      lastExternalValue.current = value;
-    }
-  }, [value]);
+  // Display value is either local edit or prop value
+  const displayValue = localValue;
 
-  // Filter suggestions based on input - memoized
+  // When prop value changes externally, reset local value (but not during our own edits)
+  const prevPropValue = useRef(value);
+  if (value !== prevPropValue.current && !isInternalChange.current) {
+    prevPropValue.current = value;
+    if (localValue !== value) {
+      // Schedule state update for next render cycle
+      Promise.resolve().then(() => {
+        setLocalValue(value);
+      });
+    }
+  }
+  isInternalChange.current = false;
+
+  // Filter suggestions based on input
   const filterSuggestions = useCallback((searchTerm) => {
     if (!searchTerm || searchTerm.length < 1) {
       setSuggestions([]);
@@ -71,23 +79,22 @@ const PaintColorAutocomplete = ({
       color.name.toLowerCase().includes(term) ||
       color.manufacturer.toLowerCase().includes(term) ||
       color.category.toLowerCase().includes(term)
-    ).slice(0, 15); // Limit to 15 suggestions
+    ).slice(0, 15);
 
     setSuggestions(filtered);
   }, [allColors]);
 
-  // Debounced search
+  // Handle input change
   const handleInputChange = (e) => {
     const newValue = e.target.value;
-    setInputValue(newValue);
+    isInternalChange.current = true;
+    setLocalValue(newValue);
     setSelectedIndex(-1);
     
-    // Clear previous timer
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
     }
 
-    // Debounce the filter
     debounceTimer.current = setTimeout(() => {
       filterSuggestions(newValue);
       setShowSuggestions(true);
@@ -96,11 +103,11 @@ const PaintColorAutocomplete = ({
 
   // Handle suggestion selection
   const handleSelectSuggestion = (suggestion) => {
-    setInputValue(suggestion.name);
+    isInternalChange.current = true;
+    setLocalValue(suggestion.name);
     setSuggestions([]);
     setShowSuggestions(false);
     setSelectedIndex(-1);
-    lastExternalValue.current = suggestion.name;
     
     if (onChange) {
       onChange(suggestion.name);
@@ -120,15 +127,11 @@ const PaintColorAutocomplete = ({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(prev => 
-          prev < suggestions.length - 1 ? prev + 1 : 0
-        );
+        setSelectedIndex(prev => prev < suggestions.length - 1 ? prev + 1 : 0);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex(prev => 
-          prev > 0 ? prev - 1 : suggestions.length - 1
-        );
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : suggestions.length - 1);
         break;
       case 'Enter':
         e.preventDefault();
@@ -153,19 +156,18 @@ const PaintColorAutocomplete = ({
 
   // Handle blur
   const handleBlur = () => {
-    // Delay hiding suggestions to allow click on suggestion
     setTimeout(() => {
       setShowSuggestions(false);
-      if (onBlur && inputValue !== value) {
-        onBlur(inputValue);
+      if (onBlur && localValue !== value) {
+        onBlur(localValue);
       }
     }, 200);
   };
 
   // Handle focus
   const handleFocus = () => {
-    if (inputValue && inputValue.length >= 1) {
-      filterSuggestions(inputValue);
+    if (localValue && localValue.length >= 1) {
+      filterSuggestions(localValue);
       setShowSuggestions(true);
     }
   };
@@ -185,7 +187,7 @@ const PaintColorAutocomplete = ({
       <input
         ref={inputRef}
         type="text"
-        value={inputValue}
+        value={displayValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
@@ -196,7 +198,6 @@ const PaintColorAutocomplete = ({
         autoComplete="off"
       />
       
-      {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <div 
           ref={suggestionsRef}
