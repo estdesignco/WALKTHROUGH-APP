@@ -159,6 +159,40 @@ const MasterContactsPage = () => {
           </button>
         </div>
 
+        {/* Tabs for All / Contacts / Vendors */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`px-5 py-2 rounded-lg font-medium transition-all ${
+              activeTab === 'all'
+                ? 'bg-[#8b7355] text-white'
+                : 'bg-stone-800 text-stone-400 hover:bg-stone-700'
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setActiveTab('contacts')}
+            className={`px-5 py-2 rounded-lg font-medium transition-all ${
+              activeTab === 'contacts'
+                ? 'bg-[#8b7355] text-white'
+                : 'bg-stone-800 text-stone-400 hover:bg-stone-700'
+            }`}
+          >
+            Contacts
+          </button>
+          <button
+            onClick={() => setActiveTab('vendors')}
+            className={`px-5 py-2 rounded-lg font-medium transition-all ${
+              activeTab === 'vendors'
+                ? 'bg-[#8b7355] text-white'
+                : 'bg-stone-800 text-stone-400 hover:bg-stone-700'
+            }`}
+          >
+            Vendors
+          </button>
+        </div>
+
         {/* Search and Filter */}
         <div className="flex gap-4 mb-6">
           <div className="flex-1 relative">
