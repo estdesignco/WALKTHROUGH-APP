@@ -52,11 +52,9 @@ const PaintColorAutocomplete = ({
     loadPaintColors();
   }, []);
 
-  // Update input value when prop changes
-  useEffect(() => {
-    setInputValue(value || '');
-  }, [value]);
-
+  // Sync input value when prop changes - using key prop on input instead to avoid setState in effect
+  // This is handled by the parent component through controlled input value
+  
   // Filter suggestions based on input
   const filterSuggestions = useCallback((searchTerm) => {
     if (!searchTerm || searchTerm.length < 1) {
