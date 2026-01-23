@@ -3199,10 +3199,38 @@ const ExactChecklistSpreadsheet = ({
                                           >
                                             +
                                           </button>
+                                          {/* CUT BUTTON - Cut item to move it anywhere */}
+                                          <button
+                                            onClick={() => {
+                                              window.checklistCutItem = {
+                                                id: item.id,
+                                                name: item.name || '',
+                                                vendor: item.vendor || '',
+                                                sku: item.sku || '',
+                                                cost: item.cost || 0,
+                                                size: item.size || '',
+                                                finish_color: item.finish_color || '',
+                                                finish_image: item.finish_image || '',
+                                                quantity: item.quantity || null,
+                                                status: item.status || '',
+                                                link: item.link || '',
+                                                image_url: item.image_url || '',
+                                                remarks: item.remarks || '',
+                                                placement: item.placement || '',
+                                                is_checked: item.is_checked || false
+                                              };
+                                              window.checklistClipboard = null; // Clear copy clipboard
+                                              alert('✂️ Item CUT! Click 📥 on any row to MOVE it there.');
+                                              if (onReload) onReload(); // Refresh to show paste buttons
+                                            }}
+                                            className="text-orange-400 hover:text-orange-300 text-sm"
+                                            title="Cut Item (MOVE to another location)"
+                                          >
+                                            ✂️
+                                          </button>
                                           {/* COPY BUTTON - Copy this item to clipboard for pasting anywhere */}
                                           <button
                                             onClick={() => {
-                                              // Store item data in window clipboard state
                                               window.checklistClipboard = {
                                                 name: item.name || '',
                                                 vendor: item.vendor || '',
@@ -3217,15 +3245,16 @@ const ExactChecklistSpreadsheet = ({
                                                 remarks: item.remarks || '',
                                                 placement: item.placement || ''
                                               };
-                                              alert('✅ Item copied! Click + on any row to paste.');
+                                              window.checklistCutItem = null; // Clear cut clipboard
+                                              alert('📋 Item COPIED! Click 📥 on any row to paste a copy.');
                                             }}
                                             className="text-blue-400 hover:text-blue-300 text-sm"
-                                            title="Copy Item (then click + anywhere to paste)"
+                                            title="Copy Item (duplicate to another location)"
                                           >
                                             📋
                                           </button>
-                                          {/* PASTE CLIPBOARD - Paste copied item here */}
-                                          {window.checklistClipboard && (
+                                          {/* PASTE BUTTON - Shows when there's a cut or copied item */}
+                                          {(window.checklistClipboard || window.checklistCutItem) && (
                                             <button
                                               onClick={async () => {
                                                 try {
