@@ -1518,6 +1518,42 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
+  // Handle finish/swatch image upload
+  const handleFinishImageUpload = async (itemId, file) => {
+    if (!file) return;
+    
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('item_id', itemId);
+      formData.append('image_type', 'finish'); // Tell backend this is a finish/swatch image
+      
+      // Upload image to server
+      const uploadResponse = await fetch(`${backendUrl}/api/upload-item-image`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (uploadResponse.ok) {
+        const result = await uploadResponse.json();
+        console.log('✅ Finish image uploaded:', result);
+        
+        // Update item with new finish_image URL
+        if (result.image_url) {
+          await handleUpdateItemField(itemId, 'finish_image', result.image_url);
+          if (onReload) onReload();
+        }
+      } else {
+        console.error('❌ Finish image upload failed');
+        alert('Failed to upload swatch image');
+      }
+    } catch (error) {
+      console.error('❌ Finish image upload error:', error);
+      alert('Error uploading swatch image: ' + error.message);
+    }
+  };
+
   // Handle upload to Canva - NOW OPENS IMPORT MODAL
   const handleUploadToCanva = () => {
     console.log('🎨 Opening Canva import modal');
