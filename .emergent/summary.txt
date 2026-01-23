@@ -1,225 +1,219 @@
 <analysis>**original_problem_statement:**
-The user is extremely frustrated with an unstable application. Key issues include recurring data loss, features breaking after being fixed (scraper, samples library, email), the production environment showing test data, UI flickering due to infinite re-render loops, and core functionalities like the web scraper's price transfer consistently failing. The user's goal is a flawlessly working application, and their patience is exhausted, with threats of legal action. A major secondary requirement is that all fixes and features applied to the desktop app must also be implemented in the separate mobile app codebase.
+The user is extremely frustrated with an unstable application. Key issues include recurring data loss, features breaking after being fixed (scraper), the production environment showing test data, and UI/UX problems. The user's goal is a flawlessly working application, with a critical requirement that all fixes and features on the desktop app are mirrored on the mobile app.
+
+During the session, the user's requests evolved to include:
+- **To-Do/Punch Lists**: Items with DONE status must be sorted to the bottom and hidden after one week.
+- **Scraper**: Must support multi-image selection from a gallery, correctly identify and separate finish/swatch images from main images, and reuse a single browser tab instead of opening a new one for each scrape.
+- **Checklist/FFE Spreadsheet**:
+    - A duplicate feature that evolved into a full cut/copy/paste system to move or copy rows anywhere.
+    - Checkboxes must be independent of the status dropdown.
+    - Quantity for newly added rooms/items should be blank by default, not '1'.
+    - The CHANGE OUT status must highlight the entire row in red and automatically create a to-do item.
+    - Add an ASK AVERI status, and ensure all ASK statuses create assigned to-dos and send Teams notifications.
+    - Paint colors need to autocomplete in all relevant input fields.
+- **UI/UX & Data**:
+    - Fix room drag-and-drop so that rooms stay in their new position.
+    - Overhaul the room color palette to eliminate repetitive purple colors.
+    - Fix the Picked Percentage chart to include all statuses and not count ASK statuses in the total.
+    - The Paint Catalog, Sample Images, and Vendor Contacts were reported as missing.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Stabilize the Application:** Eliminate all sources of instability, including data loss, configuration errors, and UI flickering.
-2.  **Fix Core Functionality:** Ensure the web scraper, Samples Library, To-Do list, Punch List, and all integrations work reliably.
-3.  **Achieve Feature Parity:** All features and fixes on the desktop application must be mirrored on the mobile application.
-4.  **Resolve Deployment Issues:** Prevent test configurations from ever being deployed to the production environment.
-5.  **Unblock GitHub Saves:** Resolve the secret scanning issue that prevents work from being saved.
+1.  **Stabilize the Application:** Eliminate all sources of instability and recurring bugs, especially with the scraper and data persistence.
+2.  **Fix Core Functionality:** Ensure the web scraper, To-Do/Punch lists, and checklist functionalities work reliably as per the user's detailed requests.
+3.  **Achieve Full Feature Parity:** All features and fixes on the desktop application must be mirrored on the mobile application.
+4.  **Resolve Critical Blockers:** Fix the GitHub push blockage caused by secrets in the repository.
+5.  **Improve UI/UX:** Implement all requested UI enhancements, including sorting, color palettes, highlighting, and a functional cut/paste system.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack React/FastAPI/MongoDB application in a highly volatile state. While numerous features have been added or fixed in this session, the application's stability is critically low.
--   **Features:**
-    -   The Samples Library now auto-syncs when an item's  and  are updated. The UI has been redesigned to feature large images.
-    -   The To-Do List () and Punch List () now support adding a thread of comments and have status dropdowns.
-    -   A Priority Timer feature has been partially added to the desktop To-Do list.
--   **Bug Fixes:**
-    -   The default quantity for new items has been changed from 1 to blank across the application.
-    -   An attempted fix for a UI flickering/re-rendering loop was implemented by increasing polling intervals in  and .
--   **Deployment Issues:** There is a persistent, critical issue where the testing environment's configuration (, ) is deployed to production, causing the production app to point to the test database. The agent has fixed this multiple times, but it keeps recurring.
--   **Mobile App:** A separate mobile application exists at  which is now significantly out-of-sync with the main application's features and fixes.
+A full-stack React/FastAPI/MongoDB application that has undergone numerous, rapid-fire bug fixes and feature enhancements in response to high user frustration.
+
+-   **Sorting & Filtering**: Logic to sort 'DONE'/'completed' items to the bottom and hide them after a week was added to , , , and the corresponding mobile screens.
+-   **Scraper (v7.31.0)**: The  was heavily modified to include a multi-image selection gallery, improved detection for finish/swatch images, and logic to aggressively reuse an existing application tab to prevent new tabs from opening on every scrape.
+-   **Checklist/FFE Spreadsheet**:
+    -   A full cut/copy/paste system was implemented, with a paste button now always visible on every row.
+    -   The item checkbox was fully decoupled from the status dropdown, now relying on a separate  field.
+    -   CHANGE OUT status now highlights the row in red and auto-creates a to-do.
+    -   ASK statuses (including the new ASK AVERI) now correctly trigger assigned to-dos and Teams notifications.
+    -   Default quantity for new rooms/items has been set to  (blank).
+-   **UI/UX**: The room color palette in  was completely overhauled with 60+ distinct colors. The room drag-and-drop handler was updated to  backend calls, aiming to fix the re-ordering issue.
+-   **Dashboard**: The  chart logic was corrected to dynamically display all statuses from the data and exclude ASK statuses from the picked percentage.
+-   **Backend**: The paint catalog data exists at the  endpoint. Vendor contacts were confirmed to exist in the database with the .
 
 **Last working item**:
--   **Last item agent was working**: The user reported that they are unable to save their work to GitHub. The agent correctly identified this as a **GitHub Secret Scanning** issue caused by credentials in the  file and advised the user on how to resolve it in their repository settings.
--   **Status**: BLOCKED (on user action in GitHub)
--   **Agent Testing Done**: N/A
--   **Which testing method agent to use?**: N/A
+-   **Last item agent was working**: The agent was about to implement paint color autocomplete for input fields, as requested by the user in the final messages. This was specified for the whole home section and directly within the spreadsheet cells.
+-   **Status**: NOT STARTED
+-   **Agent Testing Done**: N
+-   **Which testing method agent to use?**: frontend testing agent
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: GitHub push is blocked by secret scanning. (P0)**
--   **Issue 2: Production app is unstable and shows test data due to incorrect configuration being deployed. (P0)**
--   **Issue 3: Infinite re-render loop causing UI to flash back and forth. (P0)**
--   **Issue 4: Scraper is not transferring price correctly. (P0)**
--   **Issue 5: Mobile app is not updated with ANY of the recent desktop changes. (P0)**
--   **Issue 6: Google Calendar integration remains broken. (P1)**
--   **Issue 7: User-reported data loss (it keeps on fucking losing my fucking data). (P0)**
+-   **Issue 1**: Paint colors do not autocomplete in input fields. (P0)
+-   **Issue 2**: User verification required for all recent, major fixes. (P0)
+-   **Issue 3**: Vendor contacts are not separated into a dedicated Vendors tab in the UI. (P1)
+-   **Issue 4**: Disappearing data (Paint Catalog, Samples) needs clarification. (P1)
+-   **Issue 5**: GitHub push is blocked by secret scanning. (P0)
+-   **Issue 6**: Google Calendar integration is incomplete and untested. (P1)
+-   **Issue 7**: Application performance is slow (snails pace). (P1)
+-   **Issue 8**: Outlook Calendar booking is blocked on user credentials. (P1)
 
 **Issues Detail**:
--   **Issue 1: GitHub push is blocked by secret scanning.**
-    -   **Attempted fixes**: Agent explained to the user how to resolve the detected secrets in their GitHub repository settings.
+-   **Issue 1: Paint colors do not autocomplete in input fields.**
+    -   **Attempted fixes**: None. This was the last user request.
     -   **Next debug checklist**:
-        1.  Confirm with the user if they were able to follow the instructions to resolve the secret scanning alerts in their GitHub repository (**Settings -> Security & analysis -> Secrets and variables -> Actions**).
-        2.  If the user cannot resolve it, the next step is to remove the hardcoded secrets (e.g.,  in ) from the codebase and instruct the user to use environment variables in their deployment environment.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a critical blocker. No work can be saved to the repository, putting the entire session's progress at risk of being lost permanently.
-    -   **Status**: BLOCKED
-    -   **Is recurring issue?**: Y
-
--   **Issue 2: Production app is unstable and shows test data due to incorrect configuration being deployed.**
-    -   **Attempted fixes**: The agent repeatedly edited  and  to point to the production URL, but the changes were reverted or ineffective, likely due to a flawed deployment process or aggressive caching.
-    -   **Next debug checklist**:
-        1.  Investigate the deployment process itself. Why are these files being overwritten or cached so aggressively?
-        2.  A permanent solution is needed. The  file should be made static and environment variables should be injected by the deployment pipeline, not edited by agents.
-        3.  As a last resort, hardcode the production URL in  and remove all reliance on  or  for the .
-    -   **Why fix this issue and what will be achieved with the fix?**: This is the user's primary source of frustration and makes the application unusable and untrustworthy.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: Y
-
--   **Issue 3: Infinite re-render loop causing UI to flash back and forth.**
-    -   **Attempted fixes**: Agent identified  polling in  and  as the cause. The fix was to increase the refresh interval. Later, the agent removed the auto-refresh entirely.
-    -   **Next debug checklist**:
-        1.  Verify with the user if removing the auto-refresh has stopped the flickering.
-        2.  The root cause is poor state management. The component re-renders when the  object changes, which happens on every fetch.
-        3.  Refactor the  hooks to depend on specific, stable values like  instead of the entire  object.
-        4.  Replace the polling mechanism with a more modern data-fetching library like React Query (TanStack Query) or SWR that handles caching and re-fetching intelligently without causing disruptive UI shifts.
-    -   **Why fix this issue and what will be achieved with the fix?**: The flickering makes the app feel broken and is extremely disruptive to the user's workflow.
-    -   **Status**: USER VERIFICATION PENDING
-    -   **Is recurring issue?**: Y
-
--   **Issue 4: Scraper is not transferring price correctly.**
-    -   **Attempted fixes**: The scraper has been updated multiple times (latest is v7.23.0) with more aggressive price detection logic, better parsing, and extensive debug logging. The agent also fixed the  input on the frontend to re-render correctly.
-    -   **Next debug checklist**:
-        1.  Instruct the user to use the latest scraper (v7.23.0) and test on a specific product page where the price fails.
-        2.  Ask the user to open the browser's Developer Tools (F12), go to the Console tab, and share the entire log output, especially the 💰 PRICE DEBUG and SENDING TO APP messages.
-        3.  Ask for the URL of the failing website to add vendor-specific selectors.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a core feature that the user has requested to be fixed at least 10 times. It is a major blocker for their workflow.
-    -   **Status**: USER VERIFICATION PENDING
-    -   **Is recurring issue?**: Y
-
--   **Issue 5: Mobile app is not updated with ANY of the recent desktop changes.**
-    -   **Attempted fixes**: None. The agent only identified the existence of the  directory.
-    -   **Next debug checklist**:
-        1.  Create a comprehensive list of all features and fixes implemented in the desktop app during this and previous sessions.
-        2.  Systematically review the files in  and apply the necessary changes. This includes: quantity defaults, samples sync logic, punch list comments, to-do list comments/dropdowns, priority timer, etc.
-    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills a direct and important user requirement for feature parity between platforms.
+        1.  Create or modify an autocomplete component that fetches data from the  endpoint.
+        2.  Integrate this component into the  input field within .
+        3.  Ensure it's also available in any whole home or similar sections.
+    -   **Why fix this issue and what will be achieved with the fix?**: Fulfills a direct user request to improve workflow efficiency.
     -   **Status**: NOT STARTED
     -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: Frontend
 
--   **Issue 7: User-reported data loss (it keeps on fucking losing my fucking data).**
-    -   **Attempted fixes**: In a previous session, cache-busting headers were added. In this session, the re-render loop was addressed, which could cause perceived data loss if API calls were failing silently during the rapid re-renders.
+-   **Issue 2: User verification required for all recent, major fixes.**
+    -   **Attempted fixes**: The agent implemented fixes for To-Do sorting, checkbox independence, cut/paste, scraper tab reuse, and room drag-and-drop. However, the user's last messages indicate they are still experiencing these issues.
     -   **Next debug checklist**:
-        1.  Confirm with the user if this is still happening after the re-render loop fix.
-        2.  Add comprehensive error logging to all API calls on the frontend to ensure no errors are being swallowed silently.
-        3.  Check backend logs for any database-related errors during item updates.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is the most critical type of bug. Data integrity is non-negotiable for the application to be useful.
+        1.  First, clarify with the user if they are testing on the preview URL or their production site.
+        2.  If the issue persists on the preview URL, re-investigate each failed feature (drag-and-drop, sorting).
+        3.  Use the frontend testing agent to create automated tests for these core user flows to prevent regressions.
+    -   **Why fix this issue and what will be achieved with the fix?**: User trust is zero. The application is unusable for them until these core features are confirmed to be working.
     -   **Status**: USER VERIFICATION PENDING
     -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: Both
+
+-   **Issue 5: GitHub push is blocked by secret scanning due to credentials in .**
+    -   **Attempted fixes**: None. This critical issue has been ignored for multiple sessions.
+    -   **Next debug checklist**:
+        1.  Instruct the user to remove the  from .
+        2.  Explain that this must be configured as an environment variable or secret in their deployment platform (e.g., GitHub secrets).
+    -   **Why fix this issue and what will be achieved with the fix?**: This unblocks the user from saving any work to their GitHub repository, preventing loss of all progress.
+    -   **Status**: NOT STARTED
+    -   **Is recurring issue?**: Y
+    -   **Should Test frontend/backend/both after fix?**: N/A
 
 **In progress Task List**:
--   **Task 1: Implement Priority Timer for To-Do list.**
-    -   **Where to resume**: The agent implemented the UI for the timer in the desktop . The logic needs to be fully tested.
-    -   **What will be achieved with this?**: A new priority level that visually changes over time to indicate urgency.
-    -   **Status**: IN PROGRESS
-    -   **Blocked on something**: Needs to be ported to the  codebase after completion.
+-   None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **(P0)** Port ALL recent features to the mobile app in .
-    -   **(P1)** Fix the broken Google Calendar integration.
-    -   **(P1)** Apply  templates to user's existing data (long-pending task).
-    -   **(P1)** Implement User Onboarding for Native Builds.
+    -   (P0) Implement paint color autocomplete.
+    -   (P1) Create a dedicated Paint Catalog page to display data from the existing  endpoint.
+    -   (P1) Add tabs or filters to  to separate Vendors from other contacts.
 -   **Future Tasks:**
-    -   Implement FFE Portrait/Landscape View for iPad.
+    -   Refactor the monolithic  and .
     -   Build an Android version of the mobile app.
     -   Implement a Google Drive Backup feature.
     -   Build a Client Approval Portal feature.
-    -   Refactor the monolithic  and large frontend components.
 
 **Completed work in this session**
--   **Samples Library Overhaul**: Changed sync logic to be based on  and , and completely redesigned the  UI to have large images.
--   **Comment Threads**: Added the ability to add and view a thread of comments to both the To-Do list ( and ) and the Punch List ().
--   **Quantity Default Fix**: Removed the default  on new items across the entire application.
--   **UI Flickering Patch**: Removed the disruptive auto-refresh polling from the checklist, which was causing an infinite re-render loop.
--   **To-Do List UI Fix**: Re-added the status dropdown (Pending/Working/Done) to the  component.
--   **Scraper Updates**: Bumped the scraper to v7.23.0 with more aggressive price detection and enhanced debug logging.
--   **Deployment Firefighting**: Multiple (ultimately recurring) fixes to  and  to correct the backend URL.
+-   **To-Do/Punch List Sorting**: Implemented sorting for DONE items to the bottom and auto-hiding after 7 days on both web and mobile platforms.
+-   **Checklist/FFE Spreadsheet Overhaul**:
+    -   Implemented a full cut/copy/paste system for moving and duplicating rows.
+    -   Fully decoupled the item checkbox state from the status dropdown.
+    -   Added CHANGE OUT status highlighting and automatic to-do creation.
+    -   Ensured ASK statuses create assigned to-dos and trigger Teams notifications.
+    -   Fixed default item quantity to be blank instead of 1.
+-   **Scraper (v7.31.0)**: Fixed multi-image selection, improved finish/swatch image detection, and, most recently, fixed tab reuse to stop opening new tabs.
+-   **UI/UX & Data Integrity**:
+    -   Fixed room drag-and-drop to persist the new order.
+    -   Completely replaced the room color palette to ensure visual distinction.
+    -   Fixed the dashboard chart to accurately reflect status data and exclude ASK statuses from the picked count.
 
 **Earlier issues found/mentioned but not fixed**
--   **Google Calendar integration**: This has been pending since the start.
--   **Image quality from the scraper is poor**: This has been blocked on user input.
+-   **App Performance**: User complained the app is running at a SNAILS PACE. This was not investigated or addressed.
+-   **Google Calendar integration**: This has been pending and remains incomplete.
 
 **Known issue recurrence from previous fork**
--   **Scraper Price Transfer**: Recurring. The core functionality is still unreliable.
--   **Data Disappearing/Loss**: Recurring. The user reported it again in this session.
--   **GitHub Push Blocked**: Recurring. This was an issue in the previous fork and happened again.
--   **Deployment/Config Errors**: Emerged as a new, critical recurring issue in this session.
+-   **Scraper Functionality**: The user has repeatedly reported scraper issues (multi-image, tab reuse). This is a persistent source of frustration.
+-   **GitHub Push Blocked**: This critical blocker was present in the previous fork and remains unresolved.
+-   **Data Discrepancies**: The user's complaints about missing data (paint, vendors) strongly suggest a continued confusion between the agent's preview environment and the user's production data.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **State Management Instability**: The application is plagued by re-render loops caused by poorly managed  dependencies and  polling for data fetching. This is the likely cause of the UI flickering.
--   **Configuration Management Failure**: The deployment process is critically flawed. The preview environment's  is repeatedly making its way into the production build, pointing the live app to the test database.
--   **Component Divergence**: Similar features (e.g., To-Do list) are implemented in multiple components (, ), leading to duplicated effort and features being missed when one is updated.
+-   **React State Management**: The agent repeatedly struggled with correctly managing state and side effects (), particularly with async operations for drag-and-drop and scraper image selection, leading to user-reported failures.
+-   **Chrome Extension **: Significant logic, including the multi-image gallery UI, was moved from  to  to function correctly within the page context.
+-   **JavaScript Sorting & Filtering**: Custom  and  methods were chained to reorder and hide items in lists based on status and timestamps.
 
 **key DB schema**
--   ****: Now contains a  array field. Each comment is an object .
--   ****: Now also contains a  array field with the same structure.
--   ****: Now contains a  to trace it back to the checklist item.
-
-**changes in tech stack**
--   None.
+-   ** collection**:  was added to decouple checkbox state.  was modified to allow  values, fixing the default '1' issue.
 
 **All files of reference**
--    (All backend logic)
--    (Re-render loop fix)
--    (Price and re-render issues)
--    (Feature parity for comments/status)
--    (Feature parity for comments)
--    (Image display and layout)
--    (Critical config file)
--    (Critical config file)
--   All files within  (Need to be updated)
+-    (Core component for most user complaints)
+-    (Scraper functionality)
+-    &  (Sorting issues)
+-    (Color palette)
+-    (Dashboard chart)
+-    (Default quantity logic)
 
 **Areas that need refactoring**:
--   **CRITICAL**: The entire data fetching and state synchronization strategy needs to be replaced.  polling must be removed in favor of a modern library like **React Query (TanStack Query)** or **SWR** to handle caching, background refetching, and state synchronization without the disruptive UI re-renders.
--   **CRITICAL**: The component structure.  is a god component.  and  should share a common  component to avoid feature divergence.
--   The deployment process needs to be fixed to prevent config errors. Environment variables should be injected securely at build/deploy time, not stored in source files agents can edit.
+-   ****: This file is over 3,500 lines and is a critical point of failure. It desperately needs to be broken down into smaller, single-responsibility components (e.g., , , ).
+-   ****: The scraper's content script is also growing overly complex and would benefit from being modularized.
 
 **key api endpoints**
--   **POST** : Adds a new comment to a to-do item's thread.
--   **POST** : Adds a new comment to a punch list item's thread.
--   **POST** : One-time migration endpoint to sync existing checklist items to the Samples Library based on their .
--   **GET** : Serves the latest version of the Chrome extension (currently v7.23.0).
+-   **GET** : Returns the full paint catalog from the backend.
+-   **GET** : Fetches all contacts.
+-   **PATCH** : Endpoint used to persist the new order of rooms after drag-and-drop.
+-   **POST** : Used for creating new items; logic was modified to handle .
+-   **GET** : Serves the latest zipped Chrome extension.
 
 **Critical Info for New Agent**
--   **THE USER IS AT THEIR BREAKING POINT.** They have threatened legal action multiple times. Your top priority is STABILITY. Do not add new features until the existing ones are rock-solid. Your communication must be extremely careful, empathetic, and precise. Acknowledge the user's immense frustration and focus on solutions. Do not make ANY changes without explicit permission.
--   **THE DEPLOYMENT/CONFIG ISSUE IS THE #1 TECHNICAL PRIORITY.** The fact that the production app points to the test database is a catastrophic, recurring failure. You must create a permanent fix for this. Do not simply edit the config files again; investigate the root cause in the deployment pipeline. The app is unusable until this is solved.
--   **THE MOBILE APP IS A HUGE PENDING TASK.** The user has explicitly stated that all desktop changes must be ported to the mobile app in . This has been completely neglected and represents a significant amount of work that must be planned and executed.
--   **ASSUME EVERYTHING IS STILL BROKEN.** The fixes for the re-render loop and scraper price are patches, not fundamental solutions. The user is still reporting data loss. You must approach every issue with deep investigation and not trust that previous fixes have worked.
--   **GITHUB PUSH IS BLOCKED.** The user cannot save their work. This is a top priority to resolve so that progress is not lost.
+-   **USER IS EXTREMELY FRUSTRATED.** Their trust is completely gone. You must be direct, acknowledge their reports without making excuses, and provide verified fixes. Do not tell the user to clear their cache or refresh.
+-   **PRIORITIZE THE USER'S LAST REQUEST**: Start immediately with the paint color autocomplete feature.
+-   **CLARIFY THE ENVIRONMENT**: The user's complaints about missing data (paint catalog, vendors) are almost certainly due to them testing on their production app while you are on a preview environment with a separate, mostly empty database. This is a critical point of confusion that must be resolved.
+-   **FIX THE GITHUB BLOCKER**: The user cannot save their work. This P0 issue has been ignored for too long. You must guide them to remove the hardcoded password from .
+-   **VERIFY, DON'T ASSUME**: After implementing fixes, especially for UI interactions like drag-and-drop or sorting, you MUST use screenshots or the testing agent to verify the fix works before reporting success to the user. Many of the agent's completed fixes were immediately reported as still broken by the user.
+
+**documents and test reports created in this job**
+-   
+-    (Updated)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: (Extremely Angry) The app keeps losing data and crashing. Threatens lawsuit.
-2.  **User**: (Extremely Angry) The app is still showing test files on the production URL after redeploying.
-3.  **User**: Wants a Priority Timer feature for the To-Do list and demands all desktop changes be made to the mobile app as well.
-4.  **User**: Complains that the auto-refresh is too disruptive and wants a better way.
-5.  **User**: (Extremely Angry) States the To-Do list is the old version and doesn't have the new comment features.
-6.  **User**: (Angry) Corrects the agent, stating the status dropdown should be next to the priority dropdown on the To-Do list.
-7.  **User**: (Angry) Asks why the agent is changing things without permission.
-8.  **User**: Reports that the app is showing 0 projects and asks for the API test command to be explained.
-9.  **User**: (Extremely Angry) Reports the scraper is STILL not transferring the price (10th request).
-10. **User**: (Extremely Angry) Reports that the Samples Library has no pictures and the layout is wrong. Wants large pictures.
+1.  **User**: Reports vendor contacts are missing and need to be in a separate tab.
+2.  **User**: Complains the scraper is pulling the wrong image (main instead of finish) and not all images are available.
+3.  **User**: Asks where their paint catalog (Sherwin Williams, etc.) went.
+4.  **User**: Complains the scraper is still opening a new tab for every item.
+5.  **User**: Complains that the paint colors are useless if they don't autocomplete in input fields.
+6.  **User**: **(Pending)** Specifies paint autocomplete needs to work inside the spreadsheet cells.
+7.  **User**: **(Pending)** Provides a screenshot showing multiple UI issues: chart missing statuses, and ASK statuses being incorrectly counted in PICKED percentage. (Agent attempted a fix).
+8.  **User**: **(Pending)** Complains rooms won't stay in place after drag-and-drop and there are too many repetitive purple colors. (Agent attempted fixes).
+9.  **User**: **(Pending)** Complains sample images are missing and the paint database disappeared again. (Likely a prod vs. preview environment issue).
+10. **User**: **(Pending)** Asks for the working scraper again, after reporting the zip was not found.
 
 **Project Health Check:**
 -   **Broken**:
-    -   The production deployment process is fundamentally flawed, causing the wrong configuration to be served.
-    -   Application stability is critically low, with users experiencing UI flickering, crashes, and potential data loss.
-    -   The mobile application at  is completely out of sync with the main application.
-    -   The web scraper's price detection remains unreliable for the user.
-    -   The Google Calendar integration is non-functional.
--   **Mocked**: N/A
+    -   Paint color autocomplete (not started).
+    -   GitHub push (blocked by secrets).
+    -   Google Calendar integration.
+    -   UI for separating Vendor contacts.
+-   **Needs Verification**:
+    -   **Room Drag & Drop**: Agent attempted a fix, user has not confirmed.
+    -   **To-Do Sorting**: Agent implemented a fix, user has not confirmed.
+    -   **Scraper v7.31.0**: Agent fixed tab reuse, but user needs to test the entire flow again.
+    -   **Cut/Copy/Paste**: Agent implemented, user has not confirmed the latest version.
+    -   **Room Colors**: Agent updated the palette, but user reported it didn't change (likely cache or prod vs. preview issue).
+-   **Mocked**:
+    -   Outlook Calendar booking (awaiting user credentials).
 
 **3rd Party Integrations**
--   **Microsoft Graph API (Outlook Calendar)**: Believed to be working.
--   **Google Calendar API**: Confirmed broken.
--   **rembg**: Python library for image background removal.
--   **aiosmtplib**: Python library for sending emails.
+-   **Microsoft Graph API (Outlook Calendar)**: Code exists but uses placeholder credentials. Blocked.
+-   **Google Calendar API**: Partially implemented, but broken and untested.
+-   **Microsoft Teams**: Used for webhook notifications.
+-   **rembg**: Python library for background removal (functionality not verified in this session).
+-   **@hello-pangea/dnd**: Used for drag-and-drop functionality.
 
 **Testing status**
--   **Testing agent used after significant changes**: YES. However, the testing agent was the source of the critical configuration bug that pointed the production app to the test database. This tool's modifications to config files should be considered untrustworthy.
--   **Troubleshoot agent used after agent stuck in loop**: NO
--   **Test files created**: Test reports exist at .
--   **Known regressions**: Scraper functionality, data integrity (disappearing data/projects), and UI stability are all major regression points.
+-   **Testing agent used after significant changes**: YES, but only once early in the session. It was not used after major UI/UX changes that the user later reported as broken.
+-   **Test files created**: 
+-   **Known regressions**: The user has repeatedly reported that implemented fixes are not working, indicating either regressions, incorrect fixes, or a fundamental misunderstanding between the agent's environment and the user's testing environment.
 
 **Credentials to test flow:**
 -   **Application Login Password**: 
--   **SMTP Credentials in **:  / . This is blocking the GitHub push.
+-   **SMTP Credentials in **:  / . **This password is blocking GitHub pushes and must be removed.**
 
 **What agent forgot to execute**
--   The agent completely neglected to apply ANY of the numerous features and fixes to the  codebase, despite a direct user request.
--   The agent failed to create a permanent solution for the recurring deployment/configuration issue, leading to repeated production failures.
--   The agent did not address the long-pending broken Google Calendar integration.</analysis>
+-   The agent consistently failed to address the critical P0 issue of the GitHub push being blocked by a hardcoded secret in .
+-   The agent did not address the user's complaint about overall application slowness.
+-   The agent never clarified the fundamental confusion between the preview and production environments, which is the likely source of the missing data complaints.
+-   The agent did not follow up on creating a UI for the paint catalog after confirming the API existed.</analysis>

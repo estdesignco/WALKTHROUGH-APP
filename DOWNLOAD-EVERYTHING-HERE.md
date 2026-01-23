@@ -12,7 +12,7 @@
 ### ⭐ **LATEST VERSION WITH FIX:**
 
 ```
-https://app-stability-fix-4.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip
+https://fixr-design-app.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip
 ```
 
 **Size:** 505KB
@@ -137,7 +137,7 @@ INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip (505KB)
 
 1. **Open Canva Live Checklist:**
    - Click "CANVA LIVE CHECKLIST ✓ STAYS LOADED" button in main app
-   - Or open directly: `https://app-stability-fix-4.preview.emergentagent.com/canva-STAYS-LOADED.js?projectId=YOUR_ID`
+   - Or open directly: `https://fixr-design-app.preview.emergentagent.com/canva-STAYS-LOADED.js?projectId=YOUR_ID`
 
 2. **Load Your Project:**
    - Enter project ID
@@ -168,22 +168,22 @@ INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip (505KB)
 
 **Chrome Extension:**
 ```
-https://app-stability-fix-4.preview.emergentagent.com/canva-scanner-TRADE-SMART.zip
+https://fixr-design-app.preview.emergentagent.com/canva-scanner-TRADE-SMART.zip
 ```
 
 **Canva App (FIXED):**
 ```
-https://app-stability-fix-4.preview.emergentagent.com/canva-STAYS-LOADED.js
+https://fixr-design-app.preview.emergentagent.com/canva-STAYS-LOADED.js
 ```
 
 **Scanner Guide:**
 ```
-https://app-stability-fix-4.preview.emergentagent.com/canva-scanner-guide.html
+https://fixr-design-app.preview.emergentagent.com/canva-scanner-guide.html
 ```
 
 **Keyboard Shortcuts:**
 ```
-https://app-stability-fix-4.preview.emergentagent.com/keyboard-shortcuts.html
+https://fixr-design-app.preview.emergentagent.com/keyboard-shortcuts.html
 ```
 
 ---
@@ -238,7 +238,7 @@ React.useEffect(() => {
 
 1. **Download the ZIP:**
    ```
-   https://app-stability-fix-4.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip
+   https://fixr-design-app.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip
    ```
 
 2. **Extract it:**
@@ -317,14 +317,14 @@ React.useEffect(() => {
 
 **Master Package (EVERYTHING):**
 ```
-https://app-stability-fix-4.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip
+https://fixr-design-app.preview.emergentagent.com/INTERIOR-DESIGN-HUB-V3-COMPLETE-FIXED.zip
 ```
 
 **Individual Files:**
-- Chrome Extension: `https://app-stability-fix-4.preview.emergentagent.com/canva-scanner-TRADE-SMART.zip`
-- Canva App (Fixed): `https://app-stability-fix-4.preview.emergentagent.com/canva-STAYS-LOADED.js`
-- Scanner Guide: `https://app-stability-fix-4.preview.emergentagent.com/canva-scanner-guide.html`
-- Keyboard Shortcuts: `https://app-stability-fix-4.preview.emergentagent.com/keyboard-shortcuts.html`
+- Chrome Extension: `https://fixr-design-app.preview.emergentagent.com/canva-scanner-TRADE-SMART.zip`
+- Canva App (Fixed): `https://fixr-design-app.preview.emergentagent.com/canva-STAYS-LOADED.js`
+- Scanner Guide: `https://fixr-design-app.preview.emergentagent.com/canva-scanner-guide.html`
+- Keyboard Shortcuts: `https://fixr-design-app.preview.emergentagent.com/keyboard-shortcuts.html`
 
 **Documentation on Server:**
 - `/app/DOWNLOAD-EVERYTHING-HERE.md` (this file)

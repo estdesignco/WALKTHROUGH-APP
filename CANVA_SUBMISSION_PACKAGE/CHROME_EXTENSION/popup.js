@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://app-stability-fix-4.preview.emergentagent.com';
+const BACKEND_URL = 'https://fixr-design-app.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

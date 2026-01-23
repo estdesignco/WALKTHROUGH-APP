@@ -9,7 +9,7 @@ import json
 import sys
 
 # Backend URL from frontend/.env
-BACKEND_URL = "https://app-stability-fix-4.preview.emergentagent.com/api"
+BACKEND_URL = "https://fixr-design-app.preview.emergentagent.com/api"
 
 def test_email_sending():
     """Test the send-questionnaire endpoint with exact data from review request"""

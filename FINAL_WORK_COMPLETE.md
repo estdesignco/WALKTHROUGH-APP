@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://app-stability-fix-4.preview.emergentagent.com
+https://fixr-design-app.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://app-stability-fix-4.preview.emergentagent.com/mobile-app
+https://fixr-design-app.preview.emergentagent.com/mobile-app
 
 ---
 

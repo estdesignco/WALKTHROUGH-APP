@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://app-stability-fix-4.preview.emergentagent.com/api
+https://fixr-design-app.preview.emergentagent.com/api
 ```
 
 ---

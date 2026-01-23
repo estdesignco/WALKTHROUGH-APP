@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://app-stability-fix-4.preview.emergentagent.com/mobile-app
+Test it now: https://fixr-design-app.preview.emergentagent.com/mobile-app

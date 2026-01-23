@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://app-stability-fix-4.preview.emergentagent.com/*"
+    "https://fixr-design-app.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
