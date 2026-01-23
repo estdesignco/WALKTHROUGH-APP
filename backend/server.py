@@ -11176,7 +11176,7 @@ async def get_all_products(search: str = None, vendor: str = None, category: str
 # ===========================================
 
 @api_router.get("/master/contacts")
-async def get_master_contacts(search: str = None, role: str = None):
+async def get_master_contacts(search: str = None, role: str = None, type: str = None):
     """Get all master contacts (global vendor list)"""
     try:
         query = {}
@@ -11189,6 +11189,9 @@ async def get_master_contacts(search: str = None, role: str = None):
             ]
         if role:
             query["role"] = {"$regex": role, "$options": "i"}
+        # Filter by type (vendor or contact)
+        if type:
+            query["type"] = {"$regex": type, "$options": "i"}
         
         contacts = await db.master_contacts.find(query, {"_id": 0}).sort("company", 1).to_list(length=1000)
         return contacts
