@@ -2697,13 +2697,23 @@ const ExactChecklistSpreadsheet = ({
                                       '#DA70D6',  // Orchid/Plum
                                     ];
                                     
+                                    // Check if this is a CHANGE OUT item - needs urgent highlighting
+                                    const isChangeOut = item.status?.toUpperCase() === 'CHANGE OUT';
+                                    
                                     let rowStyle;
                                     // Text color: BLACK for highlighted rows - use inline style to override CSS
-                                    const textColor = shouldHighlight ? '#000000' : '#B49B7E';
+                                    const textColor = (shouldHighlight || isChangeOut) ? '#000000' : '#B49B7E';
                                     const cellStyle = { color: textColor };
                                     const inputStyle = { color: textColor, background: 'transparent', border: 'none', outline: 'none', width: '100%' };
                                     
-                                    if (shouldHighlight) {
+                                    if (isChangeOut) {
+                                      // CHANGE OUT gets RED ALERT highlighting
+                                      rowStyle = { 
+                                        background: 'linear-gradient(135deg, #FF0000 0%, #CC0000 50%, #FF0000 100%)',
+                                        animation: 'pulse 2s infinite',
+                                        boxShadow: '0 0 20px rgba(255, 0, 0, 0.5)'
+                                      };
+                                    } else if (shouldHighlight) {
                                       rowStyle = { background: highlighterColors[highlightIndex % highlighterColors.length] };
                                       highlightIndex++;
                                     } else {
