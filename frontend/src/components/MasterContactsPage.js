@@ -18,6 +18,7 @@ const MasterContactsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
   const [roles, setRoles] = useState([]);
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'contacts', 'vendors'
   
   const [formData, setFormData] = useState({
     name: '',
@@ -28,7 +29,8 @@ const MasterContactsPage = () => {
     address: '',
     website: '',
     notes: '',
-    tags: []
+    tags: [],
+    type: '' // 'contact' or 'vendor'
   });
 
   const loadContacts = useCallback(async () => {
