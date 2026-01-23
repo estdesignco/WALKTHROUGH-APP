@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Palette, Layers, ImageIcon, Upload, Trash2, Plus, Download, Search } from 'lucide-react';
 import { getRoomColor } from '../utils/roomColors';
 import { PAINT_VENDORS, searchPaintColors, getColorsByVendor, getAllPaintColors } from '../utils/paintVendorDatabase';
+import PaintColorAutocomplete from './PaintColorAutocomplete';
 
 const DesignToolsDashboard = ({ projectId }) => {
   const [project, setProject] = useState(null);
