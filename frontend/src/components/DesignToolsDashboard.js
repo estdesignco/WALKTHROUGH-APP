@@ -560,13 +560,16 @@ const DesignToolsDashboard = ({ projectId }) => {
             <h4 className="text-lg font-bold text-[#D4A574] mb-3">🎨 Whole Home Paint</h4>
             <div className="space-y-2">
               <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={wholeHomeData.paint.trim} 
-                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, trim: e.target.value }})}
-                  placeholder="Trim color" 
-                  className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
-                />
+                <div className="flex-1 bg-gray-800 rounded border border-[#D4A574]/50">
+                  <PaintColorAutocomplete
+                    value={wholeHomeData.paint.trim}
+                    onChange={(value) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, trim: value }})}
+                    onBlur={(value) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, trim: value }})}
+                    placeholder="Trim color"
+                    className="px-3 py-2 text-sm"
+                    textColor="#ffffff"
+                  />
+                </div>
                 <input 
                   type="color" 
                   value={wholeHomeData.paint.trimColor} 
@@ -575,13 +578,16 @@ const DesignToolsDashboard = ({ projectId }) => {
                 />
               </div>
               <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={wholeHomeData.paint.ceiling} 
-                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, ceiling: e.target.value }})}
-                  placeholder="Ceiling color" 
-                  className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
-                />
+                <div className="flex-1 bg-gray-800 rounded border border-[#D4A574]/50">
+                  <PaintColorAutocomplete
+                    value={wholeHomeData.paint.ceiling}
+                    onChange={(value) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, ceiling: value }})}
+                    onBlur={(value) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, ceiling: value }})}
+                    placeholder="Ceiling color"
+                    className="px-3 py-2 text-sm"
+                    textColor="#ffffff"
+                  />
+                </div>
                 <input 
                   type="color" 
                   value={wholeHomeData.paint.ceilingColor} 
@@ -590,13 +596,16 @@ const DesignToolsDashboard = ({ projectId }) => {
                 />
               </div>
               <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={wholeHomeData.paint.baseMolding} 
-                  onChange={(e) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, baseMolding: e.target.value }})}
-                  placeholder="Base molding color" 
-                  className="flex-1 bg-gray-800 text-white px-3 py-2 rounded border border-[#D4A574]/50 text-sm" 
-                />
+                <div className="flex-1 bg-gray-800 rounded border border-[#D4A574]/50">
+                  <PaintColorAutocomplete
+                    value={wholeHomeData.paint.baseMolding}
+                    onChange={(value) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, baseMolding: value }})}
+                    onBlur={(value) => setWholeHomeData({ ...wholeHomeData, paint: { ...wholeHomeData.paint, baseMolding: value }})}
+                    placeholder="Base molding color"
+                    className="px-3 py-2 text-sm"
+                    textColor="#ffffff"
+                  />
+                </div>
                 <input 
                   type="color" 
                   value={wholeHomeData.paint.baseColor} 
