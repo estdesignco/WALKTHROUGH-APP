@@ -2282,6 +2282,56 @@ function scrapePageData() {
       break;
     }
   }
+  
+  // Also check for background-image on swatch elements (common pattern)
+  if (!data.finish_image) {
+    const swatchBgSelectors = [
+      '[class*="swatch"].active', '[class*="swatch"].selected', '[class*="swatch"][aria-checked="true"]',
+      '[class*="color"].active', '[class*="color"].selected', '[class*="finish"].active',
+      '.swatch-button.selected', '.color-option.selected', '.finish-option.active',
+      'button[class*="swatch"]', 'label[class*="swatch"] input:checked + span',
+      '[data-color].selected', '[data-finish].selected'
+    ];
+    for (const sel of swatchBgSelectors) {
+      try {
+        const el = document.querySelector(sel);
+        if (el) {
+          const bgImg = window.getComputedStyle(el).backgroundImage;
+          if (bgImg && bgImg !== 'none') {
+            const urlMatch = bgImg.match(/url\(["']?([^"')]+)["']?\)/);
+            if (urlMatch && urlMatch[1]) {
+              let swatchUrl = urlMatch[1];
+              if (swatchUrl.startsWith('/')) swatchUrl = window.location.origin + swatchUrl;
+              if (swatchUrl.startsWith('http')) {
+                data.finish_image = swatchUrl;
+                console.log('🎨 Found swatch background-image:', swatchUrl);
+                break;
+              }
+            }
+          }
+          // Also check for img child
+          const childImg = el.querySelector('img');
+          if (childImg?.src) {
+            data.finish_image = childImg.src;
+            console.log('🎨 Found swatch child img:', childImg.src);
+            break;
+          }
+        }
+      } catch (e) { /* ignore */ }
+    }
+  }
+  
+  // Look specifically for SWATCH or FINISH named images in thumbnails
+  if (!data.finish_image) {
+    const swatchImages = document.querySelectorAll('img[src*="swatch" i], img[src*="SWATCH"], img[src*="finish" i], img[src*="FINISH"], img[src*="color" i]');
+    for (const img of swatchImages) {
+      if (img.src && img.src.startsWith('http') && !img.src.includes('logo')) {
+        data.finish_image = img.src;
+        console.log('🎨 Found image with swatch/finish in URL:', img.src);
+        break;
+      }
+    }
+  }
 
   // ===================== MULTI-IMAGE COLLECTION =====================
   // Collect ALL product images for gallery selection
