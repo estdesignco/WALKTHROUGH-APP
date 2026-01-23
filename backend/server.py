@@ -3972,7 +3972,7 @@ async def copy_room(room_id: str, new_name: str = None):
                         "id": new_item_id,
                         "name": item.get("name", ""),
                         "subcategory_id": new_subcategory_id,
-                        "quantity": item.get("quantity", 1),
+                        "quantity": item.get("quantity") or None,
                         "size": item.get("size", ""),
                         "remarks": item.get("remarks", ""),
                         "vendor": item.get("vendor", ""),
