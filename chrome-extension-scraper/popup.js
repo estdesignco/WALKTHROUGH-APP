@@ -1169,30 +1169,58 @@ async function sendToApp() {
     // Go directly to the selected project's checklist
     const projectUrl = `${APP_URL}/project/${selectedProjectId}?tab=Checklist&${params.toString()}`;
     
-    // IMPROVED TAB REUSE: Find ANY existing app tab and reuse it
-    // This prevents opening new windows every time
+    // AGGRESSIVE TAB REUSE: Find ANY existing app tab and reuse it
+    // This prevents opening new tabs EVER
     chrome.tabs.query({}, function(allTabs) {
       // Look for any tab that has our app URL (any path)
       const existingTab = allTabs.find(t => 
         t.url && (
           t.url.includes('app.estdesignco.com') || 
           t.url.includes('estdesignco.com') ||
-          t.url.includes('localhost:3000')
+          t.url.includes('localhost:3000') ||
+          t.url.includes('preview.emergentagent.com') ||
+          t.url.includes('design-ready') ||
+          t.url.includes('designready')
         )
       );
       
       if (existingTab) {
         // REUSE existing tab - just update the URL and bring to front
-        console.log('♻️ Reusing existing app tab:', existingTab.id);
+        console.log('♻️ Reusing existing app tab:', existingTab.id, existingTab.url);
         chrome.tabs.update(existingTab.id, {url: projectUrl, active: true});
         // Also focus the window containing the tab
         if (existingTab.windowId) {
           chrome.windows.update(existingTab.windowId, {focused: true});
         }
       } else {
-        // No existing tab found - create one
-        console.log('🆕 Creating new app tab');
-        chrome.tabs.create({url: projectUrl});
+        // Check if we have a stored tab ID from previous send
+        chrome.storage.local.get(['lastAppTabId'], function(result) {
+          if (result.lastAppTabId) {
+            // Try to update the stored tab
+            chrome.tabs.get(result.lastAppTabId, function(tab) {
+              if (chrome.runtime.lastError || !tab) {
+                // Tab no longer exists, create new one
+                console.log('🆕 Creating new app tab (stored tab gone)');
+                chrome.tabs.create({url: projectUrl}, function(newTab) {
+                  chrome.storage.local.set({lastAppTabId: newTab.id});
+                });
+              } else {
+                // Tab exists, reuse it
+                console.log('♻️ Reusing stored tab:', tab.id);
+                chrome.tabs.update(tab.id, {url: projectUrl, active: true});
+                if (tab.windowId) {
+                  chrome.windows.update(tab.windowId, {focused: true});
+                }
+              }
+            });
+          } else {
+            // No stored tab, create new one and store its ID
+            console.log('🆕 Creating first app tab');
+            chrome.tabs.create({url: projectUrl}, function(newTab) {
+              chrome.storage.local.set({lastAppTabId: newTab.id});
+            });
+          }
+        });
       }
     });
     showStatus('Sent to project!', 'success');
