@@ -4,6 +4,28 @@ import BackButton from './BackButton';
 
 const API = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
+// Color chip component - defined outside to avoid re-creation on render
+const ColorChip = ({ colorName, isCopied, onCopy }) => {
+  return (
+    <div 
+      onClick={() => onCopy(colorName)}
+      className="group flex items-center gap-2 p-2 rounded-lg bg-stone-800/50 hover:bg-stone-700 cursor-pointer transition-all border border-stone-700 hover:border-[#8b7355]"
+    >
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-stone-400 to-stone-600 flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-stone-200 truncate">{colorName}</p>
+      </div>
+      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+        {isCopied ? (
+          <Check className="w-4 h-4 text-green-400" />
+        ) : (
+          <Copy className="w-4 h-4 text-stone-400" />
+        )}
+      </div>
+    </div>
+  );
+};
+
 const PaintCatalogPage = () => {
   const [paintData, setPaintData] = useState({});
   const [loading, setLoading] = useState(true);
