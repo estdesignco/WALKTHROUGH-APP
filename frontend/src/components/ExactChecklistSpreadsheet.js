@@ -3077,6 +3077,7 @@ const ExactChecklistSpreadsheet = ({
                                       <option value="ASK NEIL">ASK NEIL</option>
                                       <option value="ASK CHARLENE">ASK CHARLENE</option>
                                       <option value="ASK JALA">ASK JALA</option>
+                                      <option value="ASK AVERI">ASK AVERI</option>
                                       <option value="GET QUOTE">GET QUOTE</option>
                                       <option value="WAITING ON QT">WAITING ON QT</option>
                                       <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
