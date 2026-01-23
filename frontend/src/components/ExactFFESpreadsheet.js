@@ -1321,6 +1321,7 @@ const ExactFFESpreadsheet = ({
                 {/* USE FILTERED PROJECT DATA */}
                 {(filteredProject || project).rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
+                  const roomColor = getColorByIndex(roomIndex); // Use index-based color to ensure no repeats
                   console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
                   
                   return (
@@ -1340,8 +1341,8 @@ const ExactFFESpreadsheet = ({
                             <td colSpan="12" 
                                 className="border border-[#B49B7E] px-3 py-2 text-white text-sm font-bold"
                                 style={{ 
-                                  background: `linear-gradient(135deg, ${getRoomColor(room.name)}FF 0%, ${getRoomColor(room.name)}AA 20%, ${getRoomColor(room.name)} 40%, ${getRoomColor(room.name)}AA 80%, ${getRoomColor(room.name)}FF 100%)`,
-                                  boxShadow: `0 0 35px ${getRoomColor(room.name)}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
+                                  background: `linear-gradient(135deg, ${roomColor}FF 0%, ${roomColor}AA 20%, ${roomColor} 40%, ${roomColor}AA 80%, ${roomColor}FF 100%)`,
+                                  boxShadow: `0 0 35px ${roomColor}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
                                   textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)'
                                 }}>
                               <div className="flex justify-between items-center">
