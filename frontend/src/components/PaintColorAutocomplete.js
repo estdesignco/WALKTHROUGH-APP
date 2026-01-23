@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 const API = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
@@ -11,25 +11,17 @@ const PaintColorAutocomplete = ({
   style = {},
   textColor = "#D4C5A9"
 }) => {
-  // Use value prop directly as initial state, re-render through key when parent changes
   const [inputValue, setInputValue] = useState(value || '');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [allColors, setAllColors] = useState([]);
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const debounceTimer = useRef(null);
-  const prevValue = useRef(value);
-
-  // Track if value prop changed externally (not from our own onChange)
-  if (value !== prevValue.current && value !== inputValue) {
-    setInputValue(value || '');
-    prevValue.current = value;
-  }
+  const lastExternalValue = useRef(value);
 
   // Load all paint colors on mount
-  const [allColors, setAllColors] = useState([]);
-  
   useEffect(() => {
     const loadPaintColors = async () => {
       try {
@@ -59,10 +51,15 @@ const PaintColorAutocomplete = ({
     loadPaintColors();
   }, []);
 
-  // Sync input value when prop changes - using key prop on input instead to avoid setState in effect
-  // This is handled by the parent component through controlled input value
-  
-  // Filter suggestions based on input
+  // Sync input value when external value prop changes
+  useEffect(() => {
+    if (value !== lastExternalValue.current) {
+      setInputValue(value || '');
+      lastExternalValue.current = value;
+    }
+  }, [value]);
+
+  // Filter suggestions based on input - memoized
   const filterSuggestions = useCallback((searchTerm) => {
     if (!searchTerm || searchTerm.length < 1) {
       setSuggestions([]);
@@ -103,6 +100,7 @@ const PaintColorAutocomplete = ({
     setSuggestions([]);
     setShowSuggestions(false);
     setSelectedIndex(-1);
+    lastExternalValue.current = suggestion.name;
     
     if (onChange) {
       onChange(suggestion.name);
@@ -154,7 +152,7 @@ const PaintColorAutocomplete = ({
   };
 
   // Handle blur
-  const handleBlur = (e) => {
+  const handleBlur = () => {
     // Delay hiding suggestions to allow click on suggestion
     setTimeout(() => {
       setShowSuggestions(false);
