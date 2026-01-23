@@ -449,6 +449,10 @@ const App = () => {
                       element={<MasterMaterialsPage />}
                     />
                     <Route 
+                      path="/paint-catalog" 
+                      element={<PaintCatalogPage />}
+                    />
+                    <Route 
                       path="/calculators" 
                       element={<CalculatorsPage />}
                     />
