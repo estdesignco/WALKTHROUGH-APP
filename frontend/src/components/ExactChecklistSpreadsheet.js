@@ -900,6 +900,50 @@ const ExactChecklistSpreadsheet = ({
           });
         });
         
+        // ASK STATUSES - Create To-Do and notify Teams with assignment
+        const askStatuses = ['ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'ASK AVERI'];
+        if (askStatuses.includes(newStatus.toUpperCase())) {
+          try {
+            // Extract the person's name from the status
+            const assignee = newStatus.toUpperCase().replace('ASK ', '');
+            const todoText = `${newStatus}: ${itemName}${roomName ? ` (${roomName})` : ''}`;
+            
+            const todoResponse = await fetch(`${backendUrl}/api/todos`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                project_id: project?.id,
+                text: todoText,
+                description: `Assigned to ${assignee}. Auto-created from Checklist. Vendor: ${vendorName || 'N/A'}`,
+                priority: 'high',
+                status: 'pending',
+                assigned_to: assignee,
+                source_type: 'checklist',
+                linked_ffe_item: {
+                  id: itemId,
+                  name: itemName,
+                  room_name: roomName,
+                  category_name: categoryName,
+                  vendor: vendorName,
+                  sku: sku,
+                  source_type: 'checklist'
+                },
+                notify_teams: true
+              })
+            });
+            
+            if (todoResponse.ok) {
+              console.log('✅ Auto-created To-Do for ASK status:', newStatus, 'assigned to:', assignee);
+              toast.info(`📋 To-Do Created & Assigned to ${assignee}`, {
+                description: `${itemName} - Teams notified`,
+                duration: 4000,
+              });
+            }
+          } catch (askError) {
+            console.error('❌ Error creating ASK To-Do:', askError);
+          }
+        }
+        
         // AUTO-CREATE TO-DO for specific statuses
         const autoTodoStatuses = ['CHANGE OUT', 'GET QUOTE', 'ORDER SAMPLES', 'ENTER INTO HOUZZ', 'ENTER INTO HOUZZ & ORDER SAMPLE'];
         if (autoTodoStatuses.includes(newStatus.toUpperCase())) {
@@ -945,9 +989,15 @@ const ExactChecklistSpreadsheet = ({
         // NOTE: Samples Library sync is now handled by backend based on FINISH_COLOR content
         // When finish_color field is updated, backend automatically syncs to Samples Library
         
-        // AUTO-COMPLETE TO-DO when status changes to completion states
-        const completionStatuses = ['ORDERED', 'RECEIVED', 'INSTALLED', 'COMPLETE', 'DELIVERED', 'SAMPLES ARRIVED', 'PICKED'];
-        if (completionStatuses.includes(newStatus.toUpperCase())) {
+        // AUTO-COMPLETE TO-DO when status changes AWAY from trigger statuses or to completion states
+        const triggerStatuses = ['ORDER SAMPLES', 'CHANGE OUT', 'GET QUOTE', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'ASK AVERI'];
+        const completionStatuses = ['ORDERED', 'RECEIVED', 'INSTALLED', 'COMPLETE', 'DELIVERED', 'SAMPLES ARRIVED', 'PICKED', 'APPROVED', 'READY FOR PRESENTATION'];
+        
+        // If new status is NOT a trigger status, complete any linked to-dos
+        const shouldCompleteTodo = completionStatuses.includes(newStatus.toUpperCase()) || 
+                                   (!triggerStatuses.includes(newStatus.toUpperCase()) && newStatus !== '');
+        
+        if (shouldCompleteTodo) {
           // Find and complete any linked To-Dos for this item
           try {
             const todosRes = await fetch(`${backendUrl}/api/todos/${project?.id}`);
