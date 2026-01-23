@@ -11,14 +11,21 @@ const PaintColorAutocomplete = ({
   style = {},
   textColor = "#D4C5A9"
 }) => {
+  // Use value prop directly as initial state, re-render through key when parent changes
   const [inputValue, setInputValue] = useState(value || '');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
   const debounceTimer = useRef(null);
+  const prevValue = useRef(value);
+
+  // Track if value prop changed externally (not from our own onChange)
+  if (value !== prevValue.current && value !== inputValue) {
+    setInputValue(value || '');
+    prevValue.current = value;
+  }
 
   // Load all paint colors on mount
   const [allColors, setAllColors] = useState([]);
