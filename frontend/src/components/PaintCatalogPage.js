@@ -221,7 +221,8 @@ const PaintCatalogPage = () => {
                                 <ColorChip 
                                   key={`${color}-${idx}`} 
                                   colorName={color} 
-                                  manufacturer={manufacturer}
+                                  isCopied={copiedColor === color}
+                                  onCopy={copyToClipboard}
                                 />
                               ))}
                             </div>
