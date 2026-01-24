@@ -151,3 +151,7 @@ frontend/dist-electron/linux-arm64-unpacked/frontend
 frontend/dist-electron/linux-arm64-unpacked/resources/app.asar
 frontend/dist-electron/ESTABLISHED-0.1.0-arm64.AppImage
 frontend/node_modules/electron/dist/electron
+-e 
+# Environment files
+*.env
+*.env.*
