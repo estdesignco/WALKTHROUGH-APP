@@ -67,10 +67,11 @@ logger = logging.getLogger(__name__)
 # Set Playwright browser path
 os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/pw-browsers'
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+# MongoDB connection - with fallback for missing env var
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+db_name = os.environ.get('DB_NAME', 'interior_design_db')
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[db_name]
 
 # Create the main app without a prefix
 app = FastAPI(title="Interior Design Management System", version="1.0.0")
