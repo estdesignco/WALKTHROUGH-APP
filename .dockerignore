@@ -13,27 +13,3 @@
 .git
 .gitignore
 *.log
-
-# Electron builds - NOT needed for web deployment
-frontend/dist-electron
-frontend/ios
-**/dist-electron
-
-# Large cache directories
-**/node_modules/.cache
-frontend/node_modules/.cache
-
-# Test and backup files
-*_backup*
-*_BACKUP*
-tests/
-test_reports/
-
-# Unused directories
-WALKTHROUGH-APP-WORKING-WITH-TRANSFER
-WALKTHROUGH-APP-FURNITURE-SEARCH
-FINAL-DELIVERY-PACKAGE
-CANVA_SUBMISSION_PACKAGE
-simple-test
-COMPLETE_DEPLOYMENT_PACKAGE
-canva-checklist-app
