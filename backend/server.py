@@ -129,12 +129,14 @@ async def startup_event():
         logger.warning(f"Index creation skipped (may already exist): {e}")
     
     # Seed vendor products from JSON files
-    try:
-        from database_seeder import run_seeder
-        product_count = await run_seeder()
-        logger.info(f"Vendor products seeded: {product_count} products available")
-    except Exception as e:
-        logger.error(f"Error seeding vendor products: {e}")
+    # NOTE: Disabled for faster startup - products already exist in production
+    # try:
+    #     from database_seeder import run_seeder
+    #     product_count = await run_seeder()
+    #     logger.info(f"Vendor products seeded: {product_count} products available")
+    # except Exception as e:
+    #     logger.error(f"Error seeding vendor products: {e}")
+    logger.info("Skipping vendor product seeding - using existing data")
     
     # AUTO-RESTORE MASTER DATA IF MISSING
     # This ensures contacts, materials, and credentials are always available
