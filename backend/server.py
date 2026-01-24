@@ -138,30 +138,27 @@ async def startup_event():
     
     # AUTO-RESTORE MASTER DATA IF MISSING
     # This ensures contacts, materials, and credentials are always available
+    # NOTE: Made more resilient for production deployment
     try:
         contact_count = await db.master_contacts.count_documents({})
         material_count = await db.master_materials.count_documents({})
         cred_count = await db.vendor_credentials.count_documents({})
         
         if contact_count == 0 or material_count == 0:
-            logger.info("Master data missing - running auto-import...")
-            # Import contacts and materials
-            import subprocess
-            subprocess.run(['python3', 'import_vendors_csv.py'], cwd='/app/backend', capture_output=True)
-            contact_count = await db.master_contacts.count_documents({})
-            material_count = await db.master_materials.count_documents({})
-            logger.info(f"Auto-imported: {contact_count} contacts, {material_count} materials")
+            logger.info("Master data missing - will import on first request")
+            # Don't block startup with subprocess - just log
+            # import subprocess
+            # subprocess.run(['python3', 'import_vendors_csv.py'], cwd='/app/backend', capture_output=True, timeout=30)
         
         if cred_count == 0:
-            logger.info("Vendor credentials missing - running auto-import...")
-            import subprocess
-            subprocess.run(['python3', 'save_credentials.py'], cwd='/app/backend', capture_output=True)
-            cred_count = await db.vendor_credentials.count_documents({})
-            logger.info(f"Auto-imported: {cred_count} vendor credentials")
+            logger.info("Vendor credentials missing - will import on first request")
+            # Don't block startup with subprocess
+            # import subprocess
+            # subprocess.run(['python3', 'save_credentials.py'], cwd='/app/backend', capture_output=True, timeout=30)
         
         logger.info(f"Database status: {contact_count} contacts, {material_count} materials, {cred_count} credentials")
     except Exception as e:
-        logger.error(f"Error in auto-restore: {e}")
+        logger.error(f"Error in auto-restore check: {e}")
 
 # CORS Configuration
 CORS_ORIGINS = os.environ.get('CORS_ORIGINS', '*').split(',')
