@@ -88,12 +88,42 @@ async def startup_event():
     
     # Create database indexes for faster queries
     try:
+        # Project indexes
+        await db.projects.create_index("id", unique=True, sparse=True)
+        
+        # Room indexes
         await db.rooms.create_index([("project_id", 1), ("sheet_type", 1)])
         await db.rooms.create_index("project_id")
+        await db.rooms.create_index("id", unique=True, sparse=True)
+        
+        # Category/Subcategory indexes
         await db.categories.create_index("room_id")
+        await db.categories.create_index("id", unique=True, sparse=True)
         await db.subcategories.create_index("category_id")
+        await db.subcategories.create_index("id", unique=True, sparse=True)
+        
+        # Item indexes - CRITICAL for performance
         await db.items.create_index("subcategory_id")
         await db.items.create_index([("subcategory_id", 1), ("created_at", -1)])
+        await db.items.create_index("id", unique=True, sparse=True)
+        await db.items.create_index("room_id")
+        await db.items.create_index("project_id")
+        
+        # Todo indexes
+        await db.todos.create_index("project_id")
+        await db.todos.create_index("id", unique=True, sparse=True)
+        await db.todos.create_index([("project_id", 1), ("status", 1)])
+        await db.todos.create_index("completed_at")
+        
+        # Punch item indexes
+        await db.punch_items.create_index("project_id")
+        await db.punch_items.create_index("id", unique=True, sparse=True)
+        
+        # Master data indexes
+        await db.master_contacts.create_index("id", unique=True, sparse=True)
+        await db.master_contacts.create_index("type")
+        await db.master_materials.create_index("id", unique=True, sparse=True)
+        
         logger.info("✅ Database indexes created for optimized queries")
     except Exception as e:
         logger.warning(f"Index creation skipped (may already exist): {e}")
