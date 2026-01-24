@@ -70,8 +70,14 @@ os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/pw-browsers'
 # MongoDB connection - with fallback for missing env var
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 db_name = os.environ.get('DB_NAME', 'interior_design_db')
-client = AsyncIOMotorClient(mongo_url)
-db = client[db_name]
+logger.info(f"🔗 Connecting to MongoDB: {mongo_url[:30]}... DB: {db_name}")
+try:
+    client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=5000)
+    db = client[db_name]
+    logger.info("✅ MongoDB client created")
+except Exception as e:
+    logger.error(f"❌ MongoDB connection error: {e}")
+    raise
 
 # Create the main app without a prefix
 app = FastAPI(title="Interior Design Management System", version="1.0.0")
