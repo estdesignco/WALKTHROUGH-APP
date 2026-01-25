@@ -32,15 +32,18 @@ from vendor_portals import (
     get_vendor_portal_info, 
     get_all_vendor_portals
 )
-from vendor_scraper import get_scraper, VendorPortalScraper
 from enum import Enum
 # Playwright is optional - only used for web scraping features
 try:
     from playwright.async_api import async_playwright
+    from vendor_scraper import get_scraper, VendorPortalScraper
     PLAYWRIGHT_AVAILABLE = True
 except ImportError:
     PLAYWRIGHT_AVAILABLE = False
     async_playwright = None
+    # Mock vendor_scraper if playwright not available
+    get_scraper = None
+    VendorPortalScraper = None
 from enhanced_rooms import COMPREHENSIVE_ROOM_STRUCTURE  # Add comprehensive structure import
 from enhanced_rooms_intelligent import INTELLIGENT_ROOM_STRUCTURE  # Add intelligent structure import
 from complete_furniture_api import router as furniture_router
@@ -5351,6 +5354,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
     - AUTHENTICATED SESSIONS: Logs into wholesale sites using stored credentials
     - VENDOR-SPECIFIC CONFIGURATIONS: Uses optimized selectors for each vendor
     """
+    # Check if Playwright is available
+    if not PLAYWRIGHT_AVAILABLE or async_playwright is None:
+        print("⚠️ Playwright not available - returning None")
+        return None
+    
     # Get credentials for this vendor domain
     from urllib.parse import urlparse
     from vendor_config import get_vendor_config
@@ -16972,6 +16980,8 @@ async def list_vendor_portals():
 async def get_vendor_login_status():
     """Get login status for all vendors"""
     try:
+        if not PLAYWRIGHT_AVAILABLE or get_scraper is None:
+            raise HTTPException(status_code=503, detail="Playwright not available - vendor portal features disabled")
         scraper = await get_scraper()
         logged_in = list(scraper.contexts.keys())
         
@@ -17060,6 +17070,8 @@ async def delete_vendor_credentials(vendor_key: str):
 async def login_to_vendor_portal(vendor_key: str):
     """Log into a vendor portal using saved credentials"""
     try:
+        if not PLAYWRIGHT_AVAILABLE or get_scraper is None:
+            raise HTTPException(status_code=503, detail="Playwright not available - vendor portal features disabled")
         # Get portal config
         portal = get_vendor_portal_info(vendor_key)
         if not portal:
@@ -17094,6 +17106,8 @@ async def login_to_vendor_portal(vendor_key: str):
 async def search_vendor_portal(vendor_key: str, query: str = Query(..., min_length=1)):
     """Search for products on a vendor portal (must be logged in first)"""
     try:
+        if not PLAYWRIGHT_AVAILABLE or get_scraper is None:
+            raise HTTPException(status_code=503, detail="Playwright not available - vendor portal features disabled")
         portal = get_vendor_portal_info(vendor_key)
         if not portal:
             raise HTTPException(status_code=404, detail="Vendor portal not found")
@@ -17127,6 +17141,8 @@ async def search_vendor_portal(vendor_key: str, query: str = Query(..., min_leng
 async def search_all_vendor_portals(query: str = Query(..., min_length=1)):
     """Search across all logged-in vendor portals simultaneously"""
     try:
+        if not PLAYWRIGHT_AVAILABLE or get_scraper is None:
+            raise HTTPException(status_code=503, detail="Playwright not available - vendor portal features disabled")
         scraper = await get_scraper()
         
         # Get list of logged-in vendors
@@ -17170,6 +17186,8 @@ async def search_all_vendor_portals(query: str = Query(..., min_length=1)):
 async def get_product_details_from_portal(vendor_key: str, url: str = Query(...)):
     """Get detailed product information from a vendor portal"""
     try:
+        if not PLAYWRIGHT_AVAILABLE or get_scraper is None:
+            raise HTTPException(status_code=503, detail="Playwright not available - vendor portal features disabled")
         portal = get_vendor_portal_info(vendor_key)
         if not portal:
             raise HTTPException(status_code=404, detail="Vendor portal not found")
@@ -17194,6 +17212,8 @@ async def get_product_details_from_portal(vendor_key: str, url: str = Query(...)
 async def login_to_all_vendor_portals():
     """Log into all vendor portals that have saved credentials"""
     try:
+        if not PLAYWRIGHT_AVAILABLE or get_scraper is None:
+            raise HTTPException(status_code=503, detail="Playwright not available - vendor portal features disabled")
         manager = VendorCredentialManager(db)
         all_creds = await manager.get_all_credentials()
         
