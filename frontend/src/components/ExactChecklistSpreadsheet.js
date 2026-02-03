@@ -2041,7 +2041,7 @@ const ExactChecklistSpreadsheet = ({
                 // Store project ID in localStorage for the Canva app to access
                 localStorage.setItem('canva_project_id', project?.id);
               }}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-6 py-2 rounded-full shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-blue-400/20 text-white flex items-center gap-2"
+              className="hidden" // HIDDEN - Canva buttons removed per user request
               title="Open Live Checklist in Canva - Real-time sync!"
             >
               <span>🎨</span>
@@ -2052,7 +2052,7 @@ const ExactChecklistSpreadsheet = ({
               onClick={() => {
                 window.open('/canva-scanner-guide.html', '_blank');
               }}
-              className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] hover:from-[#E8D4B8] hover:to-[#D4A574] px-6 py-2 rounded-full shadow-xl hover:shadow-[#D4A574]/50 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4A574]/30 text-black flex items-center gap-2"
+              className="hidden" // HIDDEN - Canva buttons removed per user request
               title="Download Chrome Extension to scan Canva boards"
             >
               <span>🔍</span>
