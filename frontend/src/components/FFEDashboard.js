@@ -8,6 +8,7 @@ import AddMultipleRoomsModal from './AddMultipleRoomsModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
 import ShippingTracker from './ShippingTracker';
+import PhotoManagerModal from './PhotoManagerModal';
 
 const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 FFE DASHBOARD IS LOADING!");
@@ -23,6 +24,11 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
   const [showShippingTracker, setShowShippingTracker] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showPhotoManager, setShowPhotoManager] = useState(false);
+  const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
+  const [roomPhotos, setRoomPhotos] = useState({});
+  const [photosCollapsed, setPhotosCollapsed] = useState(false);
   
   const loadSimpleProject = async () => {
     try {
