@@ -2603,14 +2603,21 @@ async def create_subcategory(subcategory: SubCategoryCreate):
 # ITEM ENDPOINTS (updated to use subcategory_id)
 @api_router.post("/items", response_model=Item)
 async def create_item(item: ItemCreate):
-    item_dict = item.dict()
-    item_obj = Item(**item_dict)
-    
-    result = await db.items.insert_one(item_obj.dict())
-    
-    if result.inserted_id:
-        return item_obj
-    raise HTTPException(status_code=400, detail="Failed to create item")
+    try:
+        item_dict = item.dict()
+        # Ensure quantity is int or None, not empty string
+        if 'quantity' in item_dict and item_dict['quantity'] == '':
+            item_dict['quantity'] = None
+        item_obj = Item(**item_dict)
+        
+        result = await db.items.insert_one(item_obj.dict())
+        
+        if result.inserted_id:
+            return item_obj
+        raise HTTPException(status_code=400, detail="Failed to create item")
+    except Exception as e:
+        logger.error(f"Error creating item: {e}")
+        raise HTTPException(status_code=422, detail=f"Item validation error: {str(e)}")
 
 @api_router.post("/items/bulk")
 async def bulk_create_items(items: List[ItemCreate]):
