@@ -1794,9 +1794,9 @@ const ExactChecklistSpreadsheet = ({
             cost: itemContext.item.cost || 0,
             size: itemContext.item.size || '',
             finish_color: itemContext.item.finish_color || '',
-            quantity: itemContext.item.quantity || '',
+            quantity: itemContext.item.quantity ? parseInt(itemContext.item.quantity) : null,
             subcategory_id: subcategoryId,
-            status: itemContext.item.status || '', // TRANSFER STATUS FROM CHECKLIST
+            status: itemContext.item.status || 'BLANK',
             order_index: itemContext.item.order_index || 0,
             link: itemContext.item.link || '',
             image_url: itemContext.item.image_url || ''
