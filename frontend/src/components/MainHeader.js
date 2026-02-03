@@ -18,10 +18,11 @@ const MainHeader = ({
     }
   }, [projectId]);
   
-  const clientLastName = project?.client_info?.full_name?.split(' ').pop() || 'GREENE';
+  // Use project name or client last name - NEVER default to "GREENE"
+  const displayName = project?.name?.toUpperCase() || project?.client_info?.full_name?.split(' ').pop()?.toUpperCase() || 'PROJECT';
   const clientFullInfo = project?.client_info 
     ? `${project.client_info.full_name} - ${project.client_info.address}` 
-    : 'Emileigh Greene - 4567 Crooked Creek Road, Gainesville, Georgia, 30506';
+    : project?.name || 'Loading...';
   
   return (
     <div className="max-w-full mx-auto bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
@@ -36,7 +37,7 @@ const MainHeader = ({
             display: 'inline-block',
             padding: '4px 16px',
             borderRadius: '6px'
-          }}>{clientLastName}</h1>
+          }}>{displayName}</h1>
           <p style={{ color: '#F5F5DC', opacity: '0.8' }}>{clientFullInfo}</p>
         </div>
 
