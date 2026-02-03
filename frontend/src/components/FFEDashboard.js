@@ -198,7 +198,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
     <CompletePageLayout 
       projectId={projectId}
       activeTab="ffe"
-      title="FF&E - GREENE"
+      title={`FF&E - ${project?.name?.toUpperCase() || 'PROJECT'}`}
       hideNavigation={hideNavigation}
       onAddRoom={() => setShowAddRoom(true)}
     >
