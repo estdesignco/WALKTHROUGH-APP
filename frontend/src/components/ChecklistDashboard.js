@@ -8,6 +8,7 @@ import AddMultipleRoomsModal from './AddMultipleRoomsModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
 import RoomSpecificCanvaImporter from './RoomSpecificCanvaImporter';
+import PhotoManagerModal from './PhotoManagerModal';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.log("📋 Checklist Dashboard initializing...");
@@ -23,6 +24,10 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   const [itemStatuses, setItemStatuses] = useState([]);
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
+  const [showPhotoManager, setShowPhotoManager] = useState(false);
+  const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
+  const [roomPhotos, setRoomPhotos] = useState({});
+  const [photosCollapsed, setPhotosCollapsed] = useState(false);
   
   // Sync state - for walkthrough to checklist sync
   const [syncStatus, setSyncStatus] = useState(null);
