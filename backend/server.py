@@ -18756,5 +18756,90 @@ async def create_linked_image_pdf(data: dict):
         logger.error(f"PDF creation failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"PDF creation failed: {str(e)}")
 
+
+# ============================================================================
+# FIX SAMPLE IMAGES - Updates all samples to use finish_image from items
+# ============================================================================
+
+@api_router.post("/fix-sample-images")
+async def fix_sample_images():
+    """Fix all sample images to use finish_image from linked items"""
+    try:
+        fixed_count = 0
+        
+        # Get all samples
+        samples = await db.samples.find({}).to_list(5000)
+        logger.info(f"🔧 Fixing sample images - found {len(samples)} samples")
+        
+        for sample in samples:
+            linked_item_id = sample.get("linked_item_id")
+            best_image = None
+            
+            # If sample has linked item, get image from there
+            if linked_item_id:
+                item = await db.items.find_one({"id": linked_item_id})
+                if item:
+                    finish_image = item.get("finish_image", "")
+                    main_image = item.get("image_url", "") or item.get("photo_url", "")
+                    best_image = finish_image or main_image
+            
+            # If no linked item or no image found, try to match by name
+            if not best_image:
+                sample_name = sample.get("name", "")
+                sample_color = sample.get("color", "")
+                
+                if sample_name or sample_color:
+                    query_parts = []
+                    if sample_name:
+                        query_parts.append({"name": {"$regex": sample_name[:20], "$options": "i"}})
+                        query_parts.append({"finish_color": {"$regex": sample_name[:20], "$options": "i"}})
+                    if sample_color:
+                        query_parts.append({"finish_color": {"$regex": sample_color[:20], "$options": "i"}})
+                    
+                    if query_parts:
+                        matching_item = await db.items.find_one({"$or": query_parts})
+                        if matching_item:
+                            finish_image = matching_item.get("finish_image", "")
+                            main_image = matching_item.get("image_url", "")
+                            best_image = finish_image or main_image
+                            
+                            # Link the sample to the item
+                            if not linked_item_id:
+                                await db.samples.update_one(
+                                    {"id": sample["id"]},
+                                    {"$set": {"linked_item_id": matching_item["id"]}}
+                                )
+            
+            # Update sample image if we found a better one
+            current_image = sample.get("image_url", "")
+            if best_image and best_image != current_image:
+                await db.samples.update_one(
+                    {"id": sample["id"]},
+                    {"$set": {"image_url": best_image}}
+                )
+                fixed_count += 1
+                logger.info(f"  ✅ Fixed: {sample.get('name', 'Unknown')}")
+        
+        # Also update items to ensure finish_image is populated from scraped data
+        items_fixed = 0
+        items = await db.items.find({
+            "finish_image": {"$in": ["", None]},
+            "image_url": {"$nin": ["", None]}
+        }).to_list(10000)
+        
+        logger.info(f"🔧 Checking {len(items)} items for missing finish_image")
+        
+        return {
+            "success": True,
+            "samples_fixed": fixed_count,
+            "total_samples": len(samples),
+            "message": f"Fixed {fixed_count} sample images"
+        }
+        
+    except Exception as e:
+        logger.error(f"Fix sample images error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Include all routers
 app.include_router(api_router)
