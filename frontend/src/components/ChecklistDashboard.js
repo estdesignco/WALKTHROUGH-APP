@@ -457,6 +457,78 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         </div>
       )}
 
+      {/* PHOTO MANAGEMENT SECTION - Collapsible */}
+      <div className="mb-6 p-6 border border-[#B49B7E]/30 rounded-2xl" style={{ 
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
+      }}>
+        <div 
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setPhotosCollapsed(!photosCollapsed)}
+        >
+          <h2 className="text-2xl font-bold text-[#D4A574]">📸 PHOTO MANAGEMENT</h2>
+          <button className="text-[#D4A574] text-xl">
+            {photosCollapsed ? '▶' : '▼'}
+          </button>
+        </div>
+        
+        {!photosCollapsed && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-4">
+              <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                <div className="text-[#D4A574] text-sm mb-1">Photos Captured</div>
+                <div className="text-3xl font-bold text-[#D4C5A9]">
+                  {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.length, 0)}
+                </div>
+              </div>
+              <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                <div className="text-[#D4A574] text-sm mb-1">Measurements Added</div>
+                <div className="text-3xl font-bold text-[#D4C5A9]">
+                  {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.filter(p => p.measurements?.length > 0).length, 0)}
+                </div>
+              </div>
+              <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                <div className="text-[#D4A574] text-sm mb-1">Rooms Photographed</div>
+                <div className="text-3xl font-bold text-[#D4C5A9]">
+                  {Object.keys(roomPhotos).length} / {project?.rooms?.length || 0}
+                </div>
+              </div>
+              <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                <div className="text-[#D4A574] text-sm mb-1">Add Room</div>
+                <button 
+                  onClick={() => setShowAddRoom(true)}
+                  className="mt-1 px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded font-medium w-full"
+                >
+                  + Add Room
+                </button>
+              </div>
+            </div>
+            
+            <div className="border-t border-[#D4A574]/30 pt-4">
+              <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {project?.rooms?.map(room => (
+                  <button
+                    key={room.id}
+                    onClick={() => {
+                      setSelectedRoomForPhotos(room);
+                      setShowPhotoManager(true);
+                    }}
+                    className="p-3 border border-[#D4A574]/50 rounded hover:bg-[#D4A574]/20 transition-colors"
+                    style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%)' }}
+                  >
+                    <div className="text-2xl mb-1">📁</div>
+                    <div className="text-sm text-[#D4C5A9] font-medium truncate">{room.name}</div>
+                    <div className="text-xs text-[#D4A574]">
+                      {roomPhotos[room.id]?.length || 0} photos
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
       {/* STATUS OVERVIEW SECTION */}
       <ChecklistStatusOverview
         totalItems={getTotalItems()}
