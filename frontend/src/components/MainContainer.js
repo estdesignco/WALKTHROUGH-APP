@@ -1,7 +1,7 @@
 import React from 'react';
 
 const MainContainer = ({ 
-  title = "WALKTHROUGH - GREENE", 
+  title = "PROJECT", 
   hideNavigation = false,
   onAddRoom,
   children 
