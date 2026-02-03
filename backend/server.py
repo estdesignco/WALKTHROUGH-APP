@@ -2898,7 +2898,10 @@ async def update_item(item_id: str, item_update: ItemUpdate):
     new_finish_color = item_update.finish_color if item_update.finish_color is not None else current_item_doc.get("finish_color", "")
     old_finish_color = current_item_doc.get("finish_color", "")
     item_vendor = item_update.vendor if item_update.vendor is not None else current_item_doc.get("vendor", "")
-    item_image = current_item_doc.get("image_url", "") or current_item_doc.get("photo_url", "") or current_item_doc.get("scraped_image", "")
+    # PRIORITY: Use finish_image first for samples, then fall back to main image
+    item_finish_image = current_item_doc.get("finish_image", "")
+    item_main_image = current_item_doc.get("image_url", "") or current_item_doc.get("photo_url", "") or current_item_doc.get("scraped_image", "")
+    item_image = item_finish_image or item_main_image  # Prefer finish image for samples
     
     # Sync to samples if finish_color is being set/changed and has content
     if new_finish_color and new_finish_color.strip() and new_finish_color != old_finish_color:
