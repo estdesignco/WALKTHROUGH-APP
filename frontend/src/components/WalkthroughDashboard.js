@@ -238,7 +238,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
     <CompletePageLayout 
       projectId={projectId}
       activeTab="walkthrough"
-      title="WALKTHROUGH - GREENE"
+      title={`WALKTHROUGH - ${project?.name?.toUpperCase() || 'PROJECT'}`}
       onAddRoom={() => setShowAddRoom(true)}
     >
       {/* EXISTING WALKTHROUGH CONTENT - UNCHANGED */}
