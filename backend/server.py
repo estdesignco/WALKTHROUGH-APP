@@ -4194,7 +4194,7 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                 # Check for existing checklist category
                 existing_cl_category = await db.categories.find_one({
                     "room_id": checklist_room_id,
-                    "name": {"$regex": f"^{wt_cat_name}$", "$options": "i"}
+                    "name": {"$regex": f"^{safe_regex(wt_cat_name)}$", "$options": "i"}
                 })
                 
                 checklist_category_id = None
