@@ -16125,8 +16125,8 @@ async def create_project_material(material: dict):
         if project_id and material_name:
             existing = await db.project_materials.find_one({
                 "project_id": project_id,
-                "name": {"$regex": f"^{material_name}$", "$options": "i"},
-                "manufacturer": {"$regex": f"^{manufacturer}$", "$options": "i"} if manufacturer else {"$exists": True}
+                "name": {"$regex": f"^{safe_regex(material_name)}$", "$options": "i"},
+                "manufacturer": {"$regex": f"^{safe_regex(manufacturer)}$", "$options": "i"} if manufacturer else {"$exists": True}
             })
             
             if existing:
