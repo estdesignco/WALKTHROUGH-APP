@@ -2850,8 +2850,8 @@ async def update_item(item_id: str, item_update: ItemUpdate):
                 material_vendor, material_name = parts[0].strip(), parts[1].strip()
                 if material_vendor and material_name:
                     existing_material = await db.master_materials.find_one({
-                        "name": {"$regex": f"^{material_name}$", "$options": "i"},
-                        "manufacturer": {"$regex": f"^{material_vendor}$", "$options": "i"}
+                        "name": {"$regex": f"^{safe_regex(material_name)}$", "$options": "i"},
+                        "manufacturer": {"$regex": f"^{safe_regex(material_vendor)}$", "$options": "i"}
                     })
                     if not existing_material:
                         material_doc = {
