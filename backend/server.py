@@ -16161,8 +16161,8 @@ async def create_project_material(material: dict):
         # AUTO-SYNC: Also add to master materials database (with duplicate check)
         if material_name:
             existing_master = await db.master_materials.find_one({
-                "name": {"$regex": f"^{material_name}$", "$options": "i"},
-                "manufacturer": {"$regex": f"^{manufacturer}$", "$options": "i"} if manufacturer else {"$exists": True}
+                "name": {"$regex": f"^{safe_regex(material_name)}$", "$options": "i"},
+                "manufacturer": {"$regex": f"^{safe_regex(manufacturer)}$", "$options": "i"} if manufacturer else {"$exists": True}
             })
             if existing_master:
                 # Update existing master material to track project usage
