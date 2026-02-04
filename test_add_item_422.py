@@ -7,7 +7,7 @@ import requests
 import json
 
 # Backend URL
-BACKEND_URL = "https://fixr-design-app.preview.emergentagent.com/api"
+BACKEND_URL = "https://bugsquash-hub.preview.emergentagent.com/api"
 
 def test_add_item_with_test_data():
     """Test with the exact data from review request"""

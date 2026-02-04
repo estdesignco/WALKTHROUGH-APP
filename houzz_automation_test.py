@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Configuration
-API_BASE = "https://fixr-design-app.preview.emergentagent.com/api"
+API_BASE = "https://bugsquash-hub.preview.emergentagent.com/api"
 
 def print_header(title):
     """Print formatted test header"""

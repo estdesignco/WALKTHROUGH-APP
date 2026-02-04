@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://fixr-design-app.preview.emergentagent.com/api"
+BASE_URL = "https://bugsquash-hub.preview.emergentagent.com/api"
 
 class FreshSyncTester:
     def __init__(self):

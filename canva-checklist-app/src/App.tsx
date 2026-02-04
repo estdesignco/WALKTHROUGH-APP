@@ -42,7 +42,7 @@ interface ChecklistItem {
   sku?: string;
 }
 
-const BACKEND_URL = 'https://fixr-design-app.preview.emergentagent.com';
+const BACKEND_URL = 'https://bugsquash-hub.preview.emergentagent.com';
 
 export const App = () => {
   const [projectId, setProjectId] = useState<string>('');

@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://fixr-design-app.preview.emergentagent.com/*"
+    "https://bugsquash-hub.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

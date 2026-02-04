@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://fixr-design-app.preview.emergentagent.com/api
+https://bugsquash-hub.preview.emergentagent.com/api
 ```
 
 ---

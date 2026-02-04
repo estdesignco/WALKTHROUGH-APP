@@ -7,7 +7,7 @@ import requests
 import os
 import json
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fixr-design-app.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://bugsquash-hub.preview.emergentagent.com').rstrip('/')
 
 class TestHealthAndBasicEndpoints:
     """Test basic API health and utility endpoints"""

@@ -236,6 +236,6 @@ print(f"🎉 PROOF OF CONCEPT COMPLETE!")
 print(f"{'='*70}")
 print(f"✅ Success: {success}/5")
 print(f"\nIf this works, we can scale to thousands!")
-print(f"View: https://fixr-design-app.preview.emergentagent.com/furniture-search\n")
+print(f"View: https://bugsquash-hub.preview.emergentagent.com/furniture-search\n")
 
 client.close()

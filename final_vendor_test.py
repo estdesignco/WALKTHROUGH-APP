@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://fixr-design-app.preview.emergentagent.com"
+BACKEND_URL = "https://bugsquash-hub.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test URLs for vendor finish/color extraction

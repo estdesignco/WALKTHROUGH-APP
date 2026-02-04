@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://fixr-design-app.preview.emergentagent.com/email-template.html
+https://bugsquash-hub.preview.emergentagent.com/email-template.html
 
 ---
 

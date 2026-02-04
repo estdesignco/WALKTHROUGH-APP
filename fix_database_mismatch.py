@@ -256,7 +256,7 @@ async def test_api_after_fix():
     
     import aiohttp
     
-    base_url = "https://fixr-design-app.preview.emergentagent.com/api"
+    base_url = "https://bugsquash-hub.preview.emergentagent.com/api"
     
     try:
         async with aiohttp.ClientSession() as session:
@@ -293,7 +293,7 @@ async def main():
         
         print(f"\n🎉 SUCCESS! Database fixed and tested")
         print(f"\n🔗 NEXT STEPS:")
-        print(f"1. Refresh: https://fixr-design-app.preview.emergentagent.com/furniture-search")
+        print(f"1. Refresh: https://bugsquash-hub.preview.emergentagent.com/furniture-search")
         print(f"2. Product count should now show {count} instead of 17")
         print(f"3. Try searching for 'chair', 'table', 'Four Hands', 'Uttermost'")
         print(f"4. Test all filters and functionality")

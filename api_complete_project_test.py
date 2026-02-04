@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Backend URL from review request
-BACKEND_URL = "https://fixr-design-app.preview.emergentagent.com"
+BACKEND_URL = "https://bugsquash-hub.preview.emergentagent.com"
 
 def test_create_complete_project():
     """Test creating a complete project with full questionnaire data"""

@@ -20,7 +20,7 @@
       {
         "component": "config.js",
         "issue": "config.js was pointing to production URL (https://app.estdesignco.com) instead of preview URL",
-        "fix": "Updated /app/frontend/public/config.js to use https://fixr-design-app.preview.emergentagent.com",
+        "fix": "Updated /app/frontend/public/config.js to use https://bugsquash-hub.preview.emergentagent.com",
         "priority": "CRITICAL"
       }
     ]
@@ -92,5 +92,5 @@
   "retest_needed": false,
   "should_main_agent_self_test": false,
   
-  "context_for_next_testing_agent": "The Samples Library Auto-Sync feature is WORKING. When an item's status is changed to 'ORDER SAMPLES', 'SAMPLES ORDERED', or 'ENTER INTO HOUZZ & ORDER SAMPLE', the item is automatically added to the Samples collection (db.samples) and appears in the Samples Library tab. The config.js file at /app/frontend/public/config.js controls the backend URL - for preview it should point to https://fixr-design-app.preview.emergentagent.com, for production it should point to https://app.estdesignco.com. Test data was created: TEST_Wheeler Ridge project with items."
+  "context_for_next_testing_agent": "The Samples Library Auto-Sync feature is WORKING. When an item's status is changed to 'ORDER SAMPLES', 'SAMPLES ORDERED', or 'ENTER INTO HOUZZ & ORDER SAMPLE', the item is automatically added to the Samples collection (db.samples) and appears in the Samples Library tab. The config.js file at /app/frontend/public/config.js controls the backend URL - for preview it should point to https://bugsquash-hub.preview.emergentagent.com, for production it should point to https://app.estdesignco.com. Test data was created: TEST_Wheeler Ridge project with items."
 }

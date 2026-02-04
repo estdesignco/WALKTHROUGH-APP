@@ -3,8 +3,8 @@
 // Main image = Large product photo (NOT a swatch)
 // Swatch image = Small color/finish chip ONLY
 
-const APP_URL = 'https://fixr-design-app.preview.emergentagent.com';
-const BACKEND_URL = 'https://fixr-design-app.preview.emergentagent.com';
+const APP_URL = 'https://bugsquash-hub.preview.emergentagent.com';
+const BACKEND_URL = 'https://bugsquash-hub.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 
