@@ -17,6 +17,13 @@ from bs4 import BeautifulSoup
 import asyncio
 import re
 import base64
+
+# Helper function to escape regex special characters for MongoDB queries
+def safe_regex(value: str) -> str:
+    """Escape special regex characters in a string for safe MongoDB $regex queries"""
+    if not value:
+        return ""
+    return re.escape(value)
 import subprocess
 from urllib.parse import urljoin, urlparse
 from pydantic import BaseModel, Field, EmailStr
