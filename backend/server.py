@@ -16322,7 +16322,7 @@ async def save_material_from_scraper(material: ScrapedMaterial):
         # Check if material already exists
         existing = await db.master_materials.find_one({
             "$or": [
-                {"name": {"$regex": f"^{material.name}$", "$options": "i"}, "manufacturer": {"$regex": f"^{material.vendor}$", "$options": "i"}},
+                {"name": {"$regex": f"^{safe_regex(material.name)}$", "$options": "i"}, "manufacturer": {"$regex": f"^{safe_regex(material.vendor)}$", "$options": "i"}},
                 {"sku": material.sku} if material.sku else {"_id": None}
             ]
         })
