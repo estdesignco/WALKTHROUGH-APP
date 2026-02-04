@@ -1,178 +1,63 @@
-# Design Ready - Interior Design Management System
+# EST Design Co - Product Requirements Document
 
 ## Original Problem Statement
-Build a comprehensive interior design management application for EST Design Co. with features including:
-- Project management with checklist and FFE (Furniture, Fixtures & Equipment) tracking
-- Chrome extension scraper for capturing product data from vendor websites
-- Mobile-responsive walkthrough for site visits
-- Email questionnaire system for clients
-- Calendar integration (Outlook/Google)
-- Materials and samples library
-- To-Do and Punch list management
-- Client approval portal
+Interior design project management application with checklist/FFE spreadsheets, sample tracking, web scraping, and client management features. Critical requirement: All fixes on desktop must be mirrored to mobile app.
 
-## User's Priority Concerns
-1. **Application Stability** - No data loss, no crashes, no UI flickering
-2. **Core Features Working** - Scraper price transfer, email, samples library
-3. **Feature Parity** - Desktop and mobile apps must have same features
-4. **Performance** - App must be FAST, not slow
+## User Personas
+- Interior designers managing multiple client projects
+- Design team members tracking materials, finishes, and furnishings
+- Clients reviewing project progress
 
-## Tech Stack
-- **Frontend**: React + Tailwind CSS + Shadcn UI
-- **Backend**: FastAPI (Python)
-- **Database**: MongoDB
-- **Chrome Extension**: Manifest V3 scraper (v7.27.0)
-- **Mobile**: React Native + Expo
+## Core Requirements
+1. **Stabilize Application** - Eliminate recurring bugs in data sync, samples, FFE transfer
+2. **Fix Core Functionality** - Web scraper, To-Do/Punch lists, checklist features, paint color workflow
+3. **Full Feature Parity** - Desktop and mobile must have identical features
+4. **Resolve Blockers** - GitHub push (secrets in .env), deployment issues
+5. **UI/UX Improvements** - Dynamic titles, feature consistency, remove obsolete buttons
 
-## What's Been Implemented
+## Architecture
+- **Frontend:** React (web) + React Native/Expo (mobile)
+- **Backend:** FastAPI (Python)
+- **Database:** MongoDB
+- **Deployment:** Containerized (Docker/Kubernetes)
 
-### Core Features ✅
-- Project CRUD with rooms, categories, subcategories, items
-- Checklist spreadsheet with inline editing
-- FFE spreadsheet with comprehensive tracking
-- Chrome extension scraper (v7.27.0) with 26+ vendor support + multi-image gallery
-- Samples Library with auto-sync based on finish_color + vendor
-- To-Do list with comments, status dropdowns, FFE linking, Timed Priority badges
-- Punch list with comments and status tracking
-- Materials library and master database
-- Contact management
-- Outlook Calendar integration (working)
-- Google Calendar integration (functional - needs OAuth setup)
-- Background image removal (rembg)
+## Current Session Progress (Feb 4, 2026)
 
-### Session Changes (Jan 22, 2026)
+### Completed ✅
+- [x] Fixed regex error in `/api/fix-sample-images` and `/api/sync-samples-to-master` endpoints
+  - Root cause: Paint colors with parentheses like "Pure White (SW 7005)" broke MongoDB regex
+  - Fix: Added `re.escape()` to escape special characters in sample names/colors
+- [x] Created `/api/sync-samples-to-master` endpoint alias
 
-#### P0 Fixes - COMPLETED ✅
-1. ✅ **DONE Items Sort to Bottom** - All To-Do and Punch lists now sort completed items to bottom
-   - `ToDoList.js` - Project To-Do list sorting
-   - `PunchList.js` - Project Punch list sorting
-   - `MasterToDoList.js` - Company todos, project todos, and punch items sorting
-   - `ToDoListScreen.js` (mobile) - Mobile To-Do list sorting
-   - `PunchListScreen.js` (mobile) - Mobile Punch list sorting
+### In Progress 🔄
+- [ ] Paint color selection workflow (doesn't create sample or populate vendor info)
+- [ ] Paint samples missing visual swatch/color chip images
+- [ ] GitHub push blocked by `SENDER_PASSWORD` in backend/.env
 
-2. ✅ **Scraper Multi-Image Gallery (v7.27.0)** - Added multi-image selection to content.js
-   - Collects ALL product images from page (srcset, data attributes, gallery selectors)
-   - Displays thumbnail gallery below scraped data
-   - Click to select/deselect images
-   - Shows selected count
-   - Primary image marked with ★
+### P1 Features (Upcoming)
+- [ ] Complete Photo Management for Checklist & FFE Dashboards
+- [ ] Add "Add Room" and Search functionality to FFE sheet
+- [ ] Mirror all UI changes to mobile app
 
-#### P1 Fixes - COMPLETED ✅
-3. ✅ **Timed Priority Feature** - Already implemented and working
-   - Shows age-based urgency badges on To-Do items
-   - 🆕 New (< 1 hour) - Green
-   - 🕐 Xh old (1-24 hours) - Blue
-   - ⏰ Xd old (1-3 days) - Yellow
-   - ⚠️ Xd - Aging (3-7 days) - Orange
-   - 🔥 Xd - CRITICAL (7+ days) - Red with pulse animation
-   - Hidden for completed items
+### P2 Verification (Pending)
+- [ ] Verify Outlook Calendar after secret updates
+- [ ] Confirm performance improvements resolved slow loading
 
-4. ✅ **Google Calendar Integration** - Enhanced and functional
-   - `/api/auth/google/status` - Check connection status
-   - `/api/auth/google/login` - Initiate OAuth flow
-   - `/api/auth/google/callback` - Handle OAuth callback
-   - `/api/calendar/google/sync/{project_id}` - Sync project dates (delivery, installation, completion)
-   - Token refresh logic implemented
-   - Frontend shows connected email in UI
+### Backlog
+- [ ] Complete Google Calendar integration
+- [ ] Refactor `ExactChecklistSpreadsheet.js` into smaller components
+- [ ] Android app build
+- [ ] Google Drive backup feature
+- [ ] Client Approval Portal
 
-### Previous Session Changes (Jan 21, 2026)
-- DUPLICATE Line Feature for checklist items
-- PLACEMENT Column for Tile/Countertops/Flooring categories
-- Scraper v7.24.0 with higher resolution images
-- Teams notifications refactored (only for new items)
-- Checkbox decoupled from status dropdown
-- Status dropdowns standardized across all lists
-- Mobile app feature parity (To-Do, Punch List, Samples screens)
-- Client appointment booking via Outlook
+## Key Files
+- `/app/backend/server.py` - Main backend logic, API endpoints
+- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Main checklist component
+- `/app/frontend/src/components/SampleTracker.js` - Sample library display
+- `/app/frontend/src/components/PaintColorAutocomplete.js` - Paint color selection
+- `/app/mobile/` - Mobile app (React Native/Expo)
 
-## Known Issues / Status
-
-### Resolved ✅
-- To-Do/Punch list sorting (DONE items at bottom) - WORKING
-- Timed Priority badges visible - WORKING
-- Google Calendar endpoints - WORKING (needs user OAuth setup)
-- Scraper multi-image gallery - IMPLEMENTED (v7.27.0)
-- Checklist DUPLICATE line feature - WORKING
-- PLACEMENT column for Tile/Countertops/Flooring - WORKING
-- Scraper high-res images - WORKING
-- Mobile app feature parity - COMPLETE
-
-### Pending User Action
-- [ ] Google Calendar OAuth - User needs to connect via app settings
-- [ ] Azure credentials for Outlook booking - User needs to provide
-
-### Known Limitations
-- [ ] Application performance ("snails pace") - Not yet investigated
-- [ ] GitHub push blocked by secret scanning - User needs to remove SENDER_PASSWORD from .env
-
-## File Structure
-```
-/app
-├── backend/
-│   ├── server.py              # Main API - Updated with Google Calendar sync
-│   ├── .env                   # Credentials (SMTP, MongoDB, OAuth)
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── App.js
-│   │   └── components/
-│   │       ├── ExactChecklistSpreadsheet.js  # Duplicate button, Placement column
-│   │       ├── ToDoList.js                   # UPDATED: Sorting, Timed Priority
-│   │       ├── PunchList.js                  # UPDATED: Sorting
-│   │       ├── MasterToDoList.js             # UPDATED: Sorting
-│   │       └── ExportsDashboard.js           # UPDATED: Google Calendar UI
-├── chrome-extension-scraper/
-│   ├── manifest.json          # v7.27.0
-│   ├── content.js             # UPDATED: Multi-image gallery
-│   └── popup.js
-└── mobile/
-    └── src/screens/
-        ├── ToDoListScreen.js    # UPDATED: Sorting
-        └── PunchListScreen.js   # UPDATED: Sorting
-```
-
-## API Endpoints Added/Modified
-- `GET /api/auth/google/status` - Check Google Calendar connection
-- `GET /api/auth/google/login` - Initiate Google OAuth
-- `GET /api/auth/google/callback` - Handle OAuth callback
-- `POST /api/calendar/google/sync/{project_id}` - Sync project to Google Calendar
-
-## Test Reports
-- `/app/test_reports/iteration_31.json` - Latest test results (all 16 tests passing)
-- `/app/test_reports/iteration_30.json` - Previous test results
-- `/app/tests/test_paint_and_contacts.py` - Paint Catalog and Contacts API tests
-- `/app/tests/test_calendar_endpoints.py` - Google Calendar endpoint tests
-
-### Session Changes (Jan 23, 2026)
-
-#### Completed ✅
-1. ✅ **Paint Color Autocomplete** - `PaintColorAutocomplete.js` component created
-   - Integrated into `ExactChecklistSpreadsheet.js` for finish_color field (Line ~2985)
-   - Integrated into `DesignToolsDashboard.js` for whole home paint fields (Line ~560)
-   - Fetches paint colors from `/api/paint-colors` endpoint
-   - Provides suggestions from Sherwin Williams, Benjamin Moore, and Farrow & Ball
-
-2. ✅ **Paint Catalog Page** - New `/paint-catalog` route
-   - `PaintCatalogPage.js` - Browse 130+ paint colors
-   - Search by color name, manufacturer, or category
-   - Filter by manufacturer dropdown
-   - Click-to-copy color names
-   - Collapsible manufacturer/category sections
-
-3. ✅ **Vendor Contacts Tab** - `MasterContactsPage.js` updated
-   - Added All/Contacts/Vendors tabs
-   - Backend `/api/master/contacts` now supports `?type=vendor` and `?type=contact` filters
-   - 134 vendor contacts available
-
-## Upcoming Tasks
-1. [ ] Investigate app performance issues (user reported "snails pace")
-2. [ ] Guide user to remove SENDER_PASSWORD from `.env` to unblock GitHub push
-3. [ ] Guide user to connect Google Calendar OAuth
-4. [ ] Guide user on Azure credentials for Outlook booking
-5. [ ] Test scraper multi-image feature in real Chrome extension
-
-## Future/Backlog
-- Refactor server.py (17000+ lines - needs splitting)
-- Build Android version of mobile app
-- Google Drive Backup feature
-- Client Approval Portal
+## Critical Notes
+- Backend code is shared between desktop and mobile via the same API
+- `SENDER_PASSWORD` in backend/.env must be removed to unblock GitHub pushes
+- Data synchronization between items and samples is a frequent bug source
