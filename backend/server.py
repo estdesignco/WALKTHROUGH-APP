@@ -4156,7 +4156,7 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
             # Check if a checklist room with same name exists
             existing_checklist_room = await db.rooms.find_one({
                 "project_id": project_id,
-                "name": {"$regex": f"^{wt_room_name}$", "$options": "i"},
+                "name": {"$regex": f"^{safe_regex(wt_room_name)}$", "$options": "i"},
                 "sheet_type": "checklist"
             })
             
