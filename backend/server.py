@@ -18768,7 +18768,7 @@ async def create_linked_image_pdf(data: dict):
 # FIX SAMPLE IMAGES - Updates all samples to use finish_image from items
 # ============================================================================
 
-@api_router.post("/fix-sample-images")
+@api_router.get("/fix-sample-images")
 async def fix_sample_images():
     """Fix all sample images to use finish_image from linked items"""
     try:
@@ -18851,7 +18851,7 @@ async def fix_sample_images():
 
 
 # Alias for sync-samples-to-master (user-friendly endpoint name)
-@api_router.post("/sync-samples-to-master")
+@api_router.get("/sync-samples-to-master")
 async def sync_samples_to_master():
     """Alias for fix-sample-images - syncs sample images from linked items"""
     return await fix_sample_images()
