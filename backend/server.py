@@ -9613,7 +9613,7 @@ async def get_photos_by_room_name(project_id: str, room_name: str):
         # Also check by metadata room_name
         metadata_photos = await db.photos.find({
             "project_id": project_id,
-            "metadata.room_name": {"$regex": f"^{room_name}$", "$options": "i"}
+            "metadata.room_name": {"$regex": f"^{safe_regex(room_name)}$", "$options": "i"}
         }).sort("uploaded_at", -1).to_list(length=None)
         
         # Combine and dedupe by photo id
