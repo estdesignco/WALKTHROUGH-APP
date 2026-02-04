@@ -18798,11 +18798,11 @@ async def fix_sample_images():
                 if sample_name or sample_color:
                     query_parts = []
                     if sample_name:
-                        escaped_name = re.escape(sample_name[:20])
+                        escaped_name = safe_regex(sample_name[:20])
                         query_parts.append({"name": {"$regex": escaped_name, "$options": "i"}})
                         query_parts.append({"finish_color": {"$regex": escaped_name, "$options": "i"}})
                     if sample_color:
-                        escaped_color = re.escape(sample_color[:20])
+                        escaped_color = safe_regex(sample_color[:20])
                         query_parts.append({"finish_color": {"$regex": escaped_color, "$options": "i"}})
                     
                     if query_parts:
