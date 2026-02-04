@@ -16477,7 +16477,7 @@ async def save_product_to_library(product: ScrapedProduct):
         # Check if product already exists (by SKU + vendor or URL)
         existing_query = {"$or": []}
         if product.sku:
-            existing_query["$or"].append({"sku": product.sku, "vendor": {"$regex": f"^{product.vendor}$", "$options": "i"}})
+            existing_query["$or"].append({"sku": product.sku, "vendor": {"$regex": f"^{safe_regex(product.vendor)}$", "$options": "i"}})
         if product.product_url:
             existing_query["$or"].append({"product_url": product.product_url})
         
