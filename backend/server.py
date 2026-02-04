@@ -18843,5 +18843,12 @@ async def fix_sample_images():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Alias for sync-samples-to-master (user-friendly endpoint name)
+@api_router.post("/sync-samples-to-master")
+async def sync_samples_to_master():
+    """Alias for fix-sample-images - syncs sample images from linked items"""
+    return await fix_sample_images()
+
+
 # Include all routers
 app.include_router(api_router)
