@@ -15505,7 +15505,7 @@ async def save_questionnaire(project_id: str, data: dict):
                 return
             try:
                 existing = await db.master_contacts.find_one({
-                    "name": {"$regex": f"^{name.strip()}$", "$options": "i"}
+                    "name": {"$regex": f"^{safe_regex(name.strip())}$", "$options": "i"}
                 })
                 if not existing:
                     master_contact = {
@@ -18421,7 +18421,7 @@ async def export_ffe_to_pdf(data: dict):
                 return
             try:
                 existing = await db.master_contacts.find_one({
-                    "name": {"$regex": f"^{name.strip()}$", "$options": "i"}
+                    "name": {"$regex": f"^{safe_regex(name.strip())}$", "$options": "i"}
                 })
                 if not existing:
                     master_contact = {
