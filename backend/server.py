@@ -9583,7 +9583,7 @@ async def get_photos_by_room_name(project_id: str, room_name: str):
         # Find all rooms with this name in the project (regardless of sheet_type)
         rooms = await db.rooms.find({
             "project_id": project_id,
-            "name": {"$regex": f"^{room_name}$", "$options": "i"}  # Case-insensitive match
+            "name": {"$regex": f"^{safe_regex(room_name)}$", "$options": "i"}  # Case-insensitive match
         }).to_list(length=100)
         
         room_ids = [room["id"] for room in rooms]
@@ -9592,7 +9592,7 @@ async def get_photos_by_room_name(project_id: str, room_name: str):
             # Try partial match if exact match fails
             rooms = await db.rooms.find({
                 "project_id": project_id,
-                "name": {"$regex": room_name, "$options": "i"}
+                "name": {"$regex": safe_regex(room_name), "$options": "i"}
             }).to_list(length=100)
             room_ids = [room["id"] for room in rooms]
         
