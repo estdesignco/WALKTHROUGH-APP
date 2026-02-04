@@ -2805,7 +2805,7 @@ async def update_item(item_id: str, item_update: ItemUpdate):
         try:
             # Check if vendor exists in master_materials
             existing_vendor = await db.master_materials.find_one({
-                "name": {"$regex": f"^{vendor_name}$", "$options": "i"},
+                "name": {"$regex": f"^{safe_regex(vendor_name)}$", "$options": "i"},
                 "is_vendor": True
             })
             if not existing_vendor:
