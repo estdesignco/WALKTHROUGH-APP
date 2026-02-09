@@ -2562,10 +2562,56 @@ const ExactChecklistSpreadsheet = ({
                             )}
                           </div>
                         ))}
+                        {/* Add Photo Button */}
+                        <label 
+                          className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-dashed border-[#D4A574]/50 hover:border-[#D4A574] transition-all flex items-center justify-center bg-black/30"
+                          style={{ aspectRatio: '1/1', minHeight: '80px' }}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={async (e) => {
+                              const files = Array.from(e.target.files);
+                              if (files.length === 0) return;
+                              
+                              const backendUrl = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+                              
+                              for (const file of files) {
+                                try {
+                                  const reader = new FileReader();
+                                  reader.onload = async (event) => {
+                                    const photoData = event.target.result;
+                                    await fetch(`${backendUrl}/api/photos`, {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({
+                                        project_id: project.id,
+                                        room_id: room.id,
+                                        photo_data: photoData,
+                                        file_name: file.name,
+                                        metadata: { room_name: room.name }
+                                      })
+                                    });
+                                    if (onReload) onReload();
+                                  };
+                                  reader.readAsDataURL(file);
+                                } catch (error) {
+                                  console.error('Failed to upload photo:', error);
+                                }
+                              }
+                            }}
+                          />
+                          <div className="text-center">
+                            <span className="text-3xl text-[#D4A574]">+</span>
+                            <p className="text-[#D4A574] text-xs mt-1">Add Photo</p>
+                          </div>
+                        </label>
                       </div>
                       {roomPhotos[room.id]?.length === 0 && (
-                        <p className="text-gray-500 text-sm text-center py-4">
-                          No walkthrough photos for this room yet.
+                        <p className="text-gray-400 text-sm text-center py-2">
+                          No photos yet. Click + to add photos to this room.
                         </p>
                       )}
                     </div>
