@@ -48,7 +48,8 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         url: params.get('link') || '',
         link: params.get('link') || '',
         image_url: params.get('image') || '',
-        msrp: params.get('msrp') || ''
+        msrp: params.get('msrp') || '',
+        remarks: params.get('remarks') || ''
       };
       
       // Store if we have actual data
