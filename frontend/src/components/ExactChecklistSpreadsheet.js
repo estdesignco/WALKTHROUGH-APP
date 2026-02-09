@@ -3328,7 +3328,7 @@ const ExactChecklistSpreadsheet = ({
                                           }}
                                         />
                                       ) : (
-                                        <label className="w-12 h-12 bg-gray-700 hover:bg-gray-600 flex flex-col items-center justify-center text-xs cursor-pointer rounded border border-dashed border-gray-500 hover:border-[#D4A574]">
+                                        <label className="w-16 h-16 bg-gray-700 hover:bg-gray-600 flex flex-col items-center justify-center text-xs cursor-pointer rounded border border-dashed border-gray-500 hover:border-[#D4A574]">
                                           <span className="text-lg">📷</span>
                                           <span className="text-[8px] text-gray-400">Upload</span>
                                           <input 
