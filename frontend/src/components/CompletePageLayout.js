@@ -1,6 +1,7 @@
 import React from 'react';
 import MainHeader from './MainHeader';
 import MainContainer from './MainContainer';
+import ProjectNavigation from './ProjectNavigation';
 
 const CompletePageLayout = ({ 
   projectId, 
@@ -15,8 +16,13 @@ const CompletePageLayout = ({
       <MainHeader 
         projectId={projectId}
         activeTab={activeTab}
-        hideNavigation={hideNavigation}
+        hideNavigation={true}
       />
+      
+      {/* Project Navigation with Dropdowns */}
+      {!hideNavigation && projectId && (
+        <ProjectNavigation projectId={projectId} activeTab={activeTab} />
+      )}
       
       <div style={{ marginTop: '-50px' }}> {/* OVERLAP THE CONTAINER OVER HEADER */}
         <MainContainer
