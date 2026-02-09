@@ -2511,15 +2511,15 @@ const ExactChecklistSpreadsheet = ({
                 </div>
               </div>
 
-              {/* ROOM PHOTOS FOLDER - Walkthrough Photos */}
-              {isRoomExpanded && roomPhotos[room.id]?.length > 0 && (
+              {/* ROOM PHOTOS FOLDER - Walkthrough Photos - ALWAYS visible when room expanded */}
+              {isRoomExpanded && (
                 <div className="mb-4 rounded-lg border border-[#D4A574]/30 overflow-hidden" 
                      style={{ background: 'linear-gradient(135deg, rgba(20,20,30,0.95) 0%, rgba(30,30,40,0.9) 100%)' }}>
                   {/* Photo Folder Header */}
                   <div 
                     className="px-4 py-2 cursor-pointer flex items-center justify-between"
                     style={{ 
-                      background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.2) 0%, rgba(180, 155, 126, 0.15) 100%)',
+                      background: `linear-gradient(135deg, ${roomColor}40 0%, ${roomColor}20 100%)`,
                       borderBottom: expandedPhotoRooms[room.id] ? '1px solid rgba(212, 165, 116, 0.3)' : 'none'
                     }}
                     onClick={() => togglePhotoFolder(room.id)}
@@ -2527,7 +2527,7 @@ const ExactChecklistSpreadsheet = ({
                     <div className="flex items-center gap-3">
                       <span className="text-xl">📁</span>
                       <span className="text-[#D4A574] font-semibold text-sm">
-                        WALKTHROUGH PHOTOS ({roomPhotos[room.id]?.length || 0})
+                        ROOM PHOTOS ({roomPhotos[room.id]?.length || 0})
                       </span>
                     </div>
                     <span className="text-[#B49B7E]">
