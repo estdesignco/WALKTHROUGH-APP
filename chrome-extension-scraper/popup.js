@@ -112,11 +112,21 @@ function displayResults(data) {
   emptyState.style.display = 'none';
   resultsContainer.style.display = 'block';
   if (data.vendor) { vendorBadge.textContent = data.vendor; vendorBadge.style.display = 'block'; }
-  document.getElementById('productName').textContent = data.name || 'Unknown';
-  document.getElementById('productSku').textContent = data.sku ? `SKU: ${data.sku}` : '';
+  
+  // Use .value for input elements
+  document.getElementById('productName').value = data.name || '';
+  document.getElementById('productSku').value = data.sku || '';
   const priceEl = document.getElementById('productPrice');
-  if (data.price) { priceEl.textContent = `$${parseFloat(data.price).toLocaleString('en-US',{minimumFractionDigits:2})}`; priceEl.className='product-price'; loginWarning.style.display='none'; }
-  else { priceEl.textContent = 'Price not found'; priceEl.className='product-price missing'; loginWarning.style.display='flex'; }
+  if (data.price) { 
+    priceEl.value = `$${parseFloat(data.price).toLocaleString('en-US',{minimumFractionDigits:2})}`; 
+    priceEl.style.color = '#4ade80';
+    loginWarning.style.display='none'; 
+  } else { 
+    priceEl.value = ''; 
+    priceEl.placeholder = 'No price found';
+    loginWarning.style.display='flex'; 
+  }
+  
   const imgEl = document.getElementById('productImage');
   if (data.image_url) { imgEl.src = data.image_url; imgEl.style.display = 'block'; } else { imgEl.style.display = 'none'; }
   const finishImgEl = document.getElementById('finishImage');
@@ -124,14 +134,39 @@ function displayResults(data) {
   const finishNameEl = document.getElementById('finishName');
   if (data.finish_image) { finishImgEl.src = data.finish_image; finishImgContainer.style.display = 'flex'; finishNameEl.textContent = data.finish_color || 'Swatch'; }
   else { finishImgContainer.style.display = 'none'; }
-  document.getElementById('dataVendor').textContent = data.vendor || 'Not found';
-  document.getElementById('dataSize').textContent = data.size || 'Not found';
-  document.getElementById('dataFinish').textContent = data.finish_color || 'Not found';
-  document.getElementById('dataMsrp').textContent = data.msrp ? `$${data.msrp}` : 'Not found';
-  document.getElementById('dataUrl').textContent = data.url || 'Not found';
+  
+  // Use .value for input elements
+  document.getElementById('dataVendor').value = data.vendor || '';
+  document.getElementById('dataSize').value = data.size || '';
+  document.getElementById('dataFinish').value = data.finish_color || '';
+  document.getElementById('dataMsrp').value = data.msrp ? `$${data.msrp}` : '';
+  document.getElementById('dataUrl').value = data.url || '';
+  document.getElementById('dataRemarks').value = data.remarks || data.description || '';
   
   // MULTI-IMAGE GALLERY
   displayMultiImageGallery(data.all_images || []);
+  
+  // Add event listeners for editable fields to update scrapedData
+  setupEditableFieldListeners();
+}
+
+// Setup listeners to sync editable fields back to scrapedData
+function setupEditableFieldListeners() {
+  document.getElementById('productName').oninput = (e) => { scrapedData.name = e.target.value; };
+  document.getElementById('productSku').oninput = (e) => { scrapedData.sku = e.target.value; };
+  document.getElementById('productPrice').oninput = (e) => { 
+    const val = e.target.value.replace(/[^0-9.]/g, '');
+    scrapedData.price = val || null;
+  };
+  document.getElementById('dataVendor').oninput = (e) => { scrapedData.vendor = e.target.value; };
+  document.getElementById('dataSize').oninput = (e) => { scrapedData.size = e.target.value; };
+  document.getElementById('dataFinish').oninput = (e) => { scrapedData.finish_color = e.target.value; };
+  document.getElementById('dataMsrp').oninput = (e) => { 
+    const val = e.target.value.replace(/[^0-9.]/g, '');
+    scrapedData.msrp = val || null;
+  };
+  document.getElementById('dataUrl').oninput = (e) => { scrapedData.url = e.target.value; };
+  document.getElementById('dataRemarks').oninput = (e) => { scrapedData.remarks = e.target.value; scrapedData.description = e.target.value; };
 }
 
 function displayMultiImageGallery(images) {
