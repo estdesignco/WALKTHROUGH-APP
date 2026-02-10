@@ -231,12 +231,22 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   };
 
   const handleDeleteRoom = async (roomId) => {
-    if (!window.confirm('Are you sure you want to delete this room? This will delete all categories and items within it.')) {
-      return;
-    }
-    
     try {
       await roomAPI.delete(roomId);
+      await loadSimpleProject();
+    } catch (err) {
+      setError('Failed to delete room');
+      console.error('Error deleting room:', err);
+    }
+  };
+
+  const handleBulkDeleteRooms = async (roomIds) => {
+    if (roomIds.length === 0) return;
+    if (!window.confirm(`Delete ${roomIds.length} room${roomIds.length > 1 ? 's' : ''}? This will delete all categories and items within them.`)) return;
+    try {
+      for (const roomId of roomIds) {
+        await roomAPI.delete(roomId);
+      }
       await loadSimpleProject();
     } catch (err) {
       setError('Failed to delete room');
