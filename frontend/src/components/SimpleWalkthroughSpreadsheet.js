@@ -10,12 +10,14 @@ const SimpleWalkthroughSpreadsheet = ({
   vendorTypes = [],
   carrierTypes = [],
   onDeleteRoom, 
+  onBulkDeleteRooms,
   onAddRoom,
   onReload 
 }) => {
   
   // State to track checked items for transfer - Initialize from PICKED status
   const [checkedItems, setCheckedItems] = useState(new Set());
+  const [selectedRoomsForDelete, setSelectedRoomsForDelete] = useState(new Set());
   console.log('🎯 SimpleWalkthroughSpreadsheet rendering with project:', project);
 
   // Initialize checkedItems from items with PICKED status
