@@ -711,11 +711,10 @@ const SimpleWalkthroughSpreadsheet = ({
               sku: itemData.item.sku || '',
               cost: itemData.item.cost || 0,
               size: itemData.item.size || '',
-              finish_color: '', // ALWAYS BLANK as requested
-              quantity: itemData.item.quantity || '',
+              finish_color: '',
+              quantity: itemData.item.quantity ? parseInt(itemData.item.quantity) : null,
               subcategory_id: subcategoryId,
-              status: '', // BLANK STATUS as required for transfer
-              order_index: 0
+              status: ''
             })
           });
           
