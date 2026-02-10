@@ -9,6 +9,7 @@ import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
 import ShippingTracker from './ShippingTracker';
 import PhotoManagerModal from './PhotoManagerModal';
+import { getColorByIndex } from '../utils/roomColors';
 
 const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.error("🚨 FFE DASHBOARD IS LOADING!");
