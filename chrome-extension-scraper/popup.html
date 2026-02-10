@@ -229,6 +229,66 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    /* Editable input fields */
+    .data-input {
+      width: 100%;
+      font-size: 13px;
+      color: #fff;
+      background: #1a1a2e;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 6px 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .data-input:focus {
+      border-color: #4ade80;
+    }
+    .data-input::placeholder {
+      color: #666;
+    }
+    .data-input.link {
+      color: #93c5fd;
+      font-size: 11px;
+    }
+    /* Editable product header inputs */
+    .product-name-input {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 4px 8px;
+      margin: -4px -8px;
+      width: calc(100% + 16px);
+      outline: none;
+    }
+    .product-name-input:hover, .product-name-input:focus {
+      border-color: #333;
+      background: #1a1a2e;
+    }
+    .product-sku-input, .product-price-input {
+      font-size: 12px;
+      color: #888;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      outline: none;
+    }
+    .product-price-input {
+      font-size: 20px;
+      font-weight: 700;
+      color: #4ade80;
+      width: 120px;
+    }
+    .product-sku-input:hover, .product-sku-input:focus,
+    .product-price-input:hover, .product-price-input:focus {
+      border-color: #333;
+      background: #1a1a2e;
+    }
     
     /* Actions */
     .actions {
