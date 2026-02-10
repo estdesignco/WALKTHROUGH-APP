@@ -1,74 +1,55 @@
 # ESTABLISHED Design Co. - Interior Design Project Management
 
 ## Original Problem Statement
-Full-stack React/FastAPI/MongoDB application for interior design project management. Manages walkthrough items, checklists, FF&E (Furniture, Fixtures & Equipment) tracking, photos, and project workflows.
+Full-stack React/FastAPI/MongoDB application for interior design project management. 
 
 ## Core Architecture
-- **Frontend**: React (Create React App) at port 3000
+- **Frontend**: React (CRA) at port 3000
 - **Backend**: FastAPI at port 8001
 - **Database**: MongoDB
-- **Config**: `process.env.REACT_APP_BACKEND_URL` (set in `.env`, used via `window.ENV` pattern)
+- **Config**: Runtime `config.js` injects `window.ENV.REACT_APP_BACKEND_URL` (environment-specific). Fallback: `process.env.REACT_APP_BACKEND_URL` (build-time).
 
-## What's Been Implemented
+## What's Been Implemented (Feb 10, 2026)
 
-### Phase 1 - Critical Fixes (Feb 10, 2026)
-- **"Project Not Found" Fix**: `MainDashboard.js` had hardcoded production URL `https://app.estdesignco.com/api`. Dashboard fetched production projects but detail pages used environment backend. Fixed to use `process.env.REACT_APP_BACKEND_URL`.
-- **Environment Config Fix**: Removed hardcoded `config.js` injection from `index.html`, moved to `process.env.REACT_APP_BACKEND_URL` in App.js. `window.ENV` set from build-time env vars.
-- **Transfer Walkthrough→Checklist**: Fixed 422 errors caused by sending `quantity: ''` (empty string) instead of `null`.
-- **Transfer Checklist→FFE**: Fixed `status: 'BLANK'` (invalid enum) → `''`, removed invalid `order_index` field.
-- **Removed Misplaced UI**: Removed non-functional search bar, Export FF&E, and Spec Sheet buttons from `MainContainer.js`.
-- **Photo Management**: Verified working - collapsible section, room folder click opens PhotoManagerModal.
-- **GitHub Push Fix**: Removed hardcoded `SENDER_PASSWORD` value from `backend/.env`.
+### Critical Fixes
+- **"Project Not Found" Fix**: 
+  1. `MainDashboard.js` had hardcoded `https://app.estdesignco.com/api` — replaced with `window.ENV?.REACT_APP_BACKEND_URL`
+  2. `index.js` was overwriting `window.ENV` (set by runtime config.js) with build-time preview URL — fixed with `if (!window.ENV)` guard
+  3. Restored `<script src="/config.js">` in `index.html` — needed for runtime URL injection per environment
+  4. Updated `config.js` in both `/public/` and `/build/` to point to production backend
+- **Transfer Walkthrough→Checklist**: Fixed 422 error (quantity sent as empty string instead of null)
+- **Transfer Checklist→FFE**: Fixed status field ('BLANK' → ''), removed invalid order_index
+- **Removed Misplaced UI**: Non-functional search bar/buttons from MainContainer.js
+- **Photo Management**: Verified working
+- **GitHub Push**: Removed hardcoded SENDER_PASSWORD from backend/.env
 
-### Previously Implemented (Prior Sessions)
-- Backend regex safety (`safe_regex()` helper)
-- Dropdown navigation in `ProjectDetailPage.js`
-- 4-wall wallpaper calculator
-- Collapsible photo sections with consistent colors
-- Editable scraper UI fields
-- WholeHomeFinishes page with PASTE button
-- Mobile app color and photo updates
+## Key Config Notes
+- `config.js` is the RUNTIME config — different per environment (preview vs production)
+- `process.env.REACT_APP_BACKEND_URL` is BAKED IN at build time — always the preview URL
+- Priority: `window.ENV` (runtime) > `process.env` (build-time) > `window.location.origin` (fallback)
+- NEVER overwrite `window.ENV` if already set by config.js
 
 ## Prioritized Backlog
 
-### P0 (Critical) - DONE
-- [x] Fix "Project Not Found" (hardcoded production URL in MainDashboard)
-- [x] Fix preview environment config
-- [x] Fix Walkthrough→Checklist transfer
-- [x] Fix Checklist→FFE transfer
-- [x] Fix photo adding to rooms
-- [x] Remove misplaced search bar
-
 ### P1 (High)
 - [ ] Wallpaper calculator 4-wall verification
-- [ ] Room colors matching between Photos section and spreadsheet
-- [ ] Photo section consistency across all dashboards
-- [ ] Scraper UI editable fields verification
-- [ ] WholeHomeFinishes page verification
-- [ ] Mobile app parity for all changes
+- [ ] Mobile app parity
 - [ ] Add "Add Rooms" and Search Bar to FFE sheet
 
-### P2 (Medium)
-- [ ] Google Calendar integration completion
-- [ ] Outlook Calendar verification
-- [ ] Performance optimization verification
-- [ ] Paint color selection workflow fix
-- [ ] Paint samples visual swatch
+### P2 (Medium)  
+- [ ] Google Calendar integration
+- [ ] Room color consistency
+- [ ] Paint workflow fixes
 
 ### P3 (Backlog)
-- [ ] Refactor ProjectDetailPage.js (1100+ lines)
-- [ ] Android app
-- [ ] Google Drive Backup
-- [ ] Client Approval Portal
+- [ ] Refactor ProjectDetailPage.js
+- [ ] Android app, Google Drive Backup, Client Approval Portal
 
 ## Key Files
-- `/app/frontend/src/components/MainDashboard.js` - Dashboard (was hardcoded to production URL)
-- `/app/frontend/src/App.js` - Backend URL config
-- `/app/frontend/src/components/SimpleWalkthroughSpreadsheet.js` - Walkthrough with transfer
-- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Checklist with FFE transfer
-- `/app/frontend/src/components/ProjectDetailPage.js` - Project detail with dropdown nav
-- `/app/frontend/src/components/MainContainer.js` - Page layout container (cleaned up)
-- `/app/backend/server.py` - All API endpoints
+- `/app/frontend/public/config.js` — Runtime backend URL config
+- `/app/frontend/src/index.js` — Guards against overwriting window.ENV
+- `/app/frontend/src/App.js` — BACKEND_URL resolution
+- `/app/frontend/src/components/MainDashboard.js` — Dashboard project list
+- `/app/frontend/src/components/ProjectDetailPage.js` — Project detail page
 
-## Login Credentials
-- Password: `DesignReady2026!`
+## Login: `DesignReady2026!`
