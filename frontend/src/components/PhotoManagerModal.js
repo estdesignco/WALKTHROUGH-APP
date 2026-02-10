@@ -249,20 +249,38 @@ const PhotoManagerModal = ({
             // Photo Grid View
             <div>
               <div className="mb-4 flex gap-3">
+                {/* Hidden file inputs */}
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
                   multiple
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+                <input
+                  id="cameraInput"
+                  type="file"
+                  accept="image/*"
                   capture="environment"
                   onChange={handlePhotoUpload}
                   className="hidden"
                 />
+                
+                {/* TAKE PHOTO button - opens camera */}
+                <button
+                  onClick={() => document.getElementById('cameraInput')?.click()}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium flex items-center gap-2"
+                >
+                  📷 Take Photo
+                </button>
+                
+                {/* UPLOAD PHOTO button - opens file picker */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded font-medium"
+                  className="px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded font-medium flex items-center gap-2"
                 >
-                  📷 Take/Upload Photos
+                  📁 Upload Photos
                 </button>
               </div>
 
