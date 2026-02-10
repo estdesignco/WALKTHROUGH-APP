@@ -26,6 +26,7 @@ const ExactFFESpreadsheet = ({
   const [showAddItem, setShowAddItem] = useState(false);
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
+  const [selectedRoomsForDelete, setSelectedRoomsForDelete] = useState(new Set());
   
   // Load expanded states from localStorage
   const [expandedRooms, setExpandedRooms] = useState(() => {
