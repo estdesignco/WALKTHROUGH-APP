@@ -466,39 +466,23 @@ const SimpleWalkthroughSpreadsheet = ({
 
   // Handle deleting a room
   const handleDeleteRoom = async (roomId) => {
-    if (!window.confirm('Are you sure you want to delete this entire room? This will delete all categories and items in this room.')) {
-      return;
-    }
-
     try {
       console.log('🗑️ DELETING ROOM:', roomId);
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-      console.log('🌐 Using backend URL:', backendUrl);
       
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       });
 
-      console.log('📡 Delete room response:', response.status, response.statusText);
-
       if (response.ok) {
-        console.log('✅ Walkthrough room deleted successfully');
-        
-        if (onReload) {
-          console.log('🔄 Calling onReload after successful delete');
-          await onReload();
-        }
+        if (onReload) await onReload();
       } else {
         const errorText = await response.text();
         console.error('❌ Delete room failed:', response.status, errorText);
-        alert(`Failed to delete room: ${response.status} - ${errorText}`);
       }
     } catch (error) {
       console.error('❌ Error deleting walkthrough room:', error);
-      alert('Failed to delete room: ' + error.message);
     }
   };
 
