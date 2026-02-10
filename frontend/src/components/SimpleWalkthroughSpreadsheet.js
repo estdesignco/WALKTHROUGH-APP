@@ -606,7 +606,7 @@ const SimpleWalkthroughSpreadsheet = ({
 
       // STEP 2: Google Apps Script Transfer Logic - Create structure then add ONLY checked items
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-      const projectId = filteredProject.id;
+      const projectId = project.id; // USE ORIGINAL PROJECT ID, NOT FILTERED!
       
       let successCount = 0;
       const createdStructures = new Map();
