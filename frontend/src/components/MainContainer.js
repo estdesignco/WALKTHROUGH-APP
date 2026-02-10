@@ -22,43 +22,7 @@ const MainContainer = ({
         <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-[#B49B7E]/20 to-transparent mx-auto"></div>
       </div>
 
-      {!hideNavigation && (
-        <>
-          {/* Action Buttons - ZERO SPACING */}
-          <div className="flex justify-center gap-4 mb-1">
-            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border border-[#D4C5A9]/20"
-                    style={{ color: '#F5F5DC' }}> {/* DIMMED BORDER TO 20% */}
-              <span>📥</span>
-              <span>Export FF&E</span>
-            </button>
-            <button className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-8 py-4 text-xl font-medium rounded-full shadow-2xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide flex items-center space-x-2 border border-[#D4C5A9]/20"
-                    style={{ color: '#F5F5DC' }}> {/* DIMMED BORDER TO 20% */}
-              <span>📋</span>
-              <span>Spec Sheet</span>
-            </button>
-          </div>
-
-          {/* Search and Controls - ZERO SPACING */}
-          <div className="flex items-center justify-between mt-1 p-4 rounded-2xl shadow-xl backdrop-blur-sm border border-[#B49B7E]/20" style={{
-            background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
-          }}>
-            <div className="flex items-center space-x-4 flex-1">
-              <input
-                type="text"
-                placeholder="Search Items..."
-                className="flex-1 bg-gray-900/50 border border-[#D4A574]/50 text-[#D4A574] px-4 py-3 rounded-lg focus:outline-none focus:border-[#D4A574] transition-all duration-300 placeholder:text-[#D4A574]/70"
-              />
-              <select className="bg-gray-900/50 border border-[#D4A574]/50 text-[#D4A574] px-4 py-3 rounded-lg focus:outline-none focus:border-[#D4A574] transition-all duration-300">
-                <option>All Rooms</option>
-              </select>
-              <select className="bg-gray-900/50 border border-[#D4A574]/50 text-[#D4A574] px-4 py-3 rounded-lg focus:outline-none focus:border-[#D4A574] transition-all duration-300">
-                <option>All Statuses</option>
-              </select>
-            </div>
-            {/* Add Room button removed per user request */}
-          </div>
-        </>
-      )}
+      {/* Non-functional controls removed - actual controls are in each spreadsheet component */}
 
       {/* Content Area - ZERO SPACING */}
       <div className="mt-1">
