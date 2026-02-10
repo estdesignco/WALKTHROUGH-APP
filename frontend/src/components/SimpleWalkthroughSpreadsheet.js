@@ -971,7 +971,20 @@ const SimpleWalkthroughSpreadsheet = ({
           </div>
           
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
+            {selectedRoomsForDelete.size > 0 && (
+              <button 
+                onClick={() => {
+                  if (onBulkDeleteRooms) {
+                    onBulkDeleteRooms(Array.from(selectedRoomsForDelete));
+                    setSelectedRoomsForDelete(new Set());
+                  }
+                }}
+                className="px-4 py-2 rounded-full bg-red-700 hover:bg-red-800 text-white font-bold text-sm animate-pulse"
+              >
+                🗑️ Delete {selectedRoomsForDelete.size} Room{selectedRoomsForDelete.size > 1 ? 's' : ''}
+              </button>
+            )}
             <button 
               onClick={onAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-black"
