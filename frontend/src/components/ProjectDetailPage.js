@@ -46,6 +46,139 @@ const Project = {
     }
 };
 
+// Dropdown Navigation Component with grouped tabs
+const DropdownNavigation = ({ tabs, activeTab, onTabChange }) => {
+    const [openDropdown, setOpenDropdown] = useState(null);
+    const dropdownRef = useRef(null);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setOpenDropdown(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Group tabs by user's requested structure
+    const navStructure = [
+        { type: 'single', name: 'Questionnaire' },
+        { type: 'single', name: 'Walkthrough' },
+        { type: 'single', name: 'Checklist' },
+        { type: 'single', name: 'FF&E' },
+        { type: 'single', name: 'Whole Home Finishes' },
+        { type: 'dropdown', label: 'Tasks', items: ['To Do', 'Punch List'] },
+        { type: 'single', name: 'Calendar' },
+        { type: 'single', name: 'Design' },
+        { type: 'dropdown', label: 'Design Tools', items: ['Design Tools', 'Calculators'] },
+        { type: 'dropdown', label: 'Logistics', items: ['Shipping', 'Deliveries', 'Critical Path'] },
+        { type: 'dropdown', label: 'Financial', items: ['Budget', 'Finance', 'Trade Discounts'] },
+        { type: 'single', name: 'Automation' },
+        { type: 'dropdown', label: 'Reports', items: ['Reports', 'Exports', 'AI Assistant'] },
+        { type: 'dropdown', label: 'People', items: ['Contacts', 'Vendors'] },
+        { type: 'single', name: 'Samples' },
+        { type: 'single', name: 'Measurements' },
+    ];
+
+    const getTab = (name) => tabs.find(t => t.name === name);
+
+    const renderButton = (tab, isActive) => {
+        if (!tab) return null;
+        const Icon = tab.icon;
+        return (
+            <button
+                onClick={() => {
+                    onTabChange(tab.name);
+                    setOpenDropdown(null);
+                }}
+                className={`whitespace-nowrap py-2 px-3 border-b-2 font-bold text-xs flex items-center space-x-1 rounded-t-lg transition-all ${
+                    isActive
+                        ? 'text-[#D4A574] border-[#D4A574]'
+                        : 'border-transparent text-[#D4C5A9] hover:text-[#D4A574] hover:border-[#B49B7E]'
+                }`}
+                style={isActive ? {
+                    background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                    boxShadow: '0 0 20px rgba(212, 165, 116, 0.4), inset 0 0 35px rgba(212, 165, 116, 0.08)',
+                } : {
+                    background: 'linear-gradient(135deg, rgba(15,15,25,0.8) 0%, rgba(35,35,45,0.7) 50%, rgba(15,15,25,0.8) 100%)'
+                }}
+            >
+                <Icon className="w-3 h-3" />
+                <span>{tab.name}</span>
+            </button>
+        );
+    };
+
+    return (
+        <nav className="-mb-px flex flex-wrap items-center gap-1" aria-label="Tabs" ref={dropdownRef}>
+            {navStructure.map((item, index) => {
+                if (item.type === 'single') {
+                    const tab = getTab(item.name);
+                    return <div key={index}>{renderButton(tab, activeTab === item.name)}</div>;
+                }
+
+                // Dropdown
+                const isOpen = openDropdown === index;
+                const hasActiveChild = item.items.some(name => activeTab === name);
+                const firstTab = getTab(item.items[0]);
+                const Icon = firstTab?.icon || ListTodo;
+
+                return (
+                    <div key={index} className="relative">
+                        <button
+                            onClick={() => setOpenDropdown(isOpen ? null : index)}
+                            className={`whitespace-nowrap py-2 px-3 border-b-2 font-bold text-xs flex items-center space-x-1 rounded-t-lg transition-all ${
+                                hasActiveChild
+                                    ? 'text-[#D4A574] border-[#D4A574]'
+                                    : 'border-transparent text-[#D4C5A9] hover:text-[#D4A574] hover:border-[#B49B7E]'
+                            }`}
+                            style={hasActiveChild ? {
+                                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 100%)',
+                                boxShadow: '0 0 20px rgba(212, 165, 116, 0.4)',
+                            } : {
+                                background: 'linear-gradient(135deg, rgba(15,15,25,0.8) 0%, rgba(35,35,45,0.7) 100%)'
+                            }}
+                        >
+                            <Icon className="w-3 h-3" />
+                            <span>{item.label}</span>
+                            <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {isOpen && (
+                            <div className="absolute top-full left-0 mt-1 bg-gray-900 border border-[#D4A574]/30 rounded-lg shadow-xl z-50 min-w-[150px]">
+                                {item.items.map((tabName) => {
+                                    const tab = getTab(tabName);
+                                    if (!tab) return null;
+                                    const TabIcon = tab.icon;
+                                    return (
+                                        <button
+                                            key={tabName}
+                                            onClick={() => {
+                                                onTabChange(tabName);
+                                                setOpenDropdown(null);
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-xs flex items-center gap-2 transition-all ${
+                                                activeTab === tabName
+                                                    ? 'bg-[#D4A574]/20 text-[#D4A574]'
+                                                    : 'text-[#D4C5A9] hover:bg-[#D4A574]/10'
+                                            }`}
+                                        >
+                                            <TabIcon className="w-3 h-3" />
+                                            <span>{tabName}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </nav>
+    );
+};
+
 export default function ProjectDetailPage() {
     const { projectId } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
