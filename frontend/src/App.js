@@ -57,10 +57,10 @@ import RoomScanner3D from './components/RoomScanner3D';
 import PinterestIntegration from './components/PinterestIntegration';
 import PaintCatalogPage from './components/PaintCatalogPage';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
 
-// Also ensure window.ENV is set for other components
+// Ensure window.ENV is set for all components
 if (!window.ENV) {
   window.ENV = { REACT_APP_BACKEND_URL: BACKEND_URL };
 }
