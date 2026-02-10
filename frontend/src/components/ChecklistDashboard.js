@@ -566,6 +566,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         vendorTypes={vendorTypes}
         carrierTypes={carrierTypes}
         onDeleteRoom={(roomId) => handleDeleteRoom(roomId)}
+        onBulkDeleteRooms={handleBulkDeleteRooms}
         onAddRoom={() => setShowAddRoom(true)}
         onReload={loadSimpleProject}
         onRoomCanvaImport={openRoomCanvaImport}
