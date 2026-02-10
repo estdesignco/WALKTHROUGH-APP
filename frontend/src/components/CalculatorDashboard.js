@@ -8,12 +8,17 @@ const CalculatorDashboard = ({ projectId }) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // WALLPAPER CALCULATOR STATE - BY ROOM SIZE
+  // WALLPAPER CALCULATOR STATE - BY 4 INDIVIDUAL WALLS
   const [wallpaperData, setWallpaperData] = useState({
     wallpaper_type: 'double_roll',
-    room_length: '',      // Room length in feet
-    room_width: '',       // Room width in feet
-    wall_height: '',      // Wall height in feet
+    wall_1_width: '',     // Wall 1 width in feet
+    wall_1_height: '',    // Wall 1 height in feet
+    wall_2_width: '',     // Wall 2 width in feet
+    wall_2_height: '',    // Wall 2 height in feet
+    wall_3_width: '',     // Wall 3 width in feet
+    wall_3_height: '',    // Wall 3 height in feet
+    wall_4_width: '',     // Wall 4 width in feet
+    wall_4_height: '',    // Wall 4 height in feet
     num_doors: 0,         // Number of standard doors to deduct
     num_windows: 0,       // Number of standard windows to deduct
     pattern_repeat: 0,    // Pattern repeat in inches
