@@ -569,6 +569,26 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         />
       )}
 
+      {/* Photo Manager Modal - For adding photos to rooms */}
+      {showPhotoManager && selectedRoomForPhotos && (
+        <PhotoManagerModal
+          isOpen={showPhotoManager}
+          onClose={() => {
+            setShowPhotoManager(false);
+            setSelectedRoomForPhotos(null);
+          }}
+          projectId={projectId}
+          roomId={selectedRoomForPhotos.id}
+          roomName={selectedRoomForPhotos.name}
+          onPhotosUpdate={(photos) => {
+            setRoomPhotos(prev => ({
+              ...prev,
+              [selectedRoomForPhotos.id]: photos
+            }));
+          }}
+        />
+      )}
+
       {/* Room-Specific Canva Import Modals */}
       {project?.rooms?.map(room => (
         <RoomSpecificCanvaImporter
