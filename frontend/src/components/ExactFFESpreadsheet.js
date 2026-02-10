@@ -1255,6 +1255,21 @@ const ExactFFESpreadsheet = ({
             </button>
           </div>
           
+          {/* Bulk Delete Rooms Button */}
+          {selectedRoomsForDelete.size > 0 && (
+            <button 
+              onClick={() => {
+                if (onBulkDeleteRooms) {
+                  onBulkDeleteRooms(Array.from(selectedRoomsForDelete));
+                  setSelectedRoomsForDelete(new Set());
+                }
+              }}
+              className="px-4 py-2 rounded bg-red-700 hover:bg-red-800 text-white font-bold text-sm animate-pulse"
+            >
+              🗑️ Delete {selectedRoomsForDelete.size} Room{selectedRoomsForDelete.size > 1 ? 's' : ''}
+            </button>
+          )}
+          
           {/* Add Room Button - GOLD/AMBER COLOR */}
           <button 
             onClick={handleAddRoom}
