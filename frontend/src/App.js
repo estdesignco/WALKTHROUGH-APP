@@ -57,23 +57,16 @@ import RoomScanner3D from './components/RoomScanner3D';
 import PinterestIntegration from './components/PinterestIntegration';
 import PaintCatalogPage from './components/PaintCatalogPage';
 
-const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
 const API = `${BACKEND_URL}/api`;
 
-// VERIFY CONFIG - Log immediately on load
-console.log('===========================================');
-console.log('🌐 APP INITIALIZATION');
-console.log('🌐 window.ENV:', window.ENV);
-console.log('🌐 BACKEND_URL:', BACKEND_URL);
-console.log('🌐 API:', API);
-console.log('🌐 BUILD_VERSION:', window.ENV?.BUILD_VERSION || 'UNKNOWN');
-console.log('===========================================');
-
-// Sanity check - alert if pointing to wrong backend
-if (BACKEND_URL.includes('preview.emergentagent')) {
-  console.error('❌ ERROR: Still pointing to preview backend!');
-  alert('Configuration Error: App is pointing to preview instead of production. Please clear browser cache completely.');
+// Also ensure window.ENV is set for other components
+if (!window.ENV) {
+  window.ENV = { REACT_APP_BACKEND_URL: BACKEND_URL };
 }
+
+// VERIFY CONFIG
+console.log('🌐 APP INITIALIZATION - BACKEND_URL:', BACKEND_URL);
 
 // Create axios instance with default config - NO CACHING
 console.log('🌐 API configured:', { BACKEND_URL, API });
