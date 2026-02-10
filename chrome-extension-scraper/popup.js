@@ -1419,27 +1419,25 @@ function formatFieldName(field) {
 function updateFieldDisplay(field, value) {
   switch(field) {
     case 'name':
-      document.getElementById('productName').textContent = value;
+      document.getElementById('productName').value = value;
       break;
     case 'price':
       const priceVal = parseFloat(value);
       if (!isNaN(priceVal)) {
         scrapedData.price = priceVal;
-        document.getElementById('productPrice').textContent = `$${priceVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-        document.getElementById('productPrice').className = 'product-price';
+        document.getElementById('productPrice').value = `$${priceVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('productPrice').style.color = '#4ade80';
         loginWarning.style.display = 'none';
       }
       break;
     case 'sku':
-      document.getElementById('productSku').textContent = `SKU: ${value}`;
+      document.getElementById('productSku').value = value;
       break;
     case 'size':
-      document.getElementById('dataSize').textContent = value;
-      document.getElementById('dataSize').className = 'data-value';
+      document.getElementById('dataSize').value = value;
       break;
     case 'finish_color':
-      document.getElementById('dataFinish').textContent = value;
-      document.getElementById('dataFinish').className = 'data-value';
+      document.getElementById('dataFinish').value = value;
       document.getElementById('finishName').textContent = value;
       break;
     case 'finish_image':
@@ -1454,7 +1452,7 @@ function updateFieldDisplay(field, value) {
       const msrpVal = parseFloat(value);
       if (!isNaN(msrpVal)) {
         scrapedData.msrp = msrpVal;
-        document.getElementById('dataMsrp').textContent = `$${msrpVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+        document.getElementById('dataMsrp').value = `$${msrpVal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
       }
       break;
   }
