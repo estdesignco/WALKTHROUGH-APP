@@ -1997,7 +1997,7 @@ const ExactChecklistSpreadsheet = ({
           
           {/* Action Buttons - ADD ROOM, DELETE MULTIPLE, CANVA LIVE CHECKLIST, SCANNER, AND TRANSFER */}
           <div className="flex gap-3 flex-wrap">
-            {/* DELETE MULTIPLE TOGGLE */}
+            {/* DELETE MULTIPLE ITEMS TOGGLE */}
             {deleteMode ? (
               <div className="flex items-center gap-2">
                 <button 
@@ -2020,6 +2020,21 @@ const ExactChecklistSpreadsheet = ({
                 className="px-4 py-2 rounded-full bg-red-600/20 hover:bg-red-600/40 text-red-400 hover:text-red-300 font-bold text-sm border border-red-600/30"
               >
                 🗑️ Delete Multiple
+              </button>
+            )}
+
+            {/* BULK DELETE ROOMS */}
+            {selectedRoomsForDelete.size > 0 && (
+              <button 
+                onClick={() => {
+                  if (onBulkDeleteRooms) {
+                    onBulkDeleteRooms(Array.from(selectedRoomsForDelete));
+                    setSelectedRoomsForDelete(new Set());
+                  }
+                }}
+                className="px-4 py-2 rounded-full bg-red-700 hover:bg-red-800 text-white font-bold text-sm animate-pulse"
+              >
+                🗑️ Delete {selectedRoomsForDelete.size} Room{selectedRoomsForDelete.size > 1 ? 's' : ''}
               </button>
             )}
             
