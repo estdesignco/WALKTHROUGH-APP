@@ -589,12 +589,12 @@ export default function ToDoList({ projectId, roomId = null }) {
                       in_progress: 'done',
                       done: 'pending',
                       completed: 'pending',
-                      completed: 'pending',
                       undefined: 'in_progress'
                     };
-                    const newCompleted = nextStatus[item.status] === 'completed';
+                    const newStatus = nextStatus[item.status || 'pending'];
+                    const newCompleted = newStatus === 'done' || newStatus === 'completed';
                     updateTodoItem(item.id, { 
-                      status: nextStatus[item.status || 'pending'],
+                      status: newStatus,
                       completed: newCompleted
                     });
                   }}
