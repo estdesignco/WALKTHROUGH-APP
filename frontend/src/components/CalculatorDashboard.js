@@ -374,43 +374,114 @@ const CalculatorDashboard = ({ projectId }) => {
 
       {/* Calculator Forms */}
       <div style={styles.calculatorContent}>
-        {/* WALLPAPER CALCULATOR - BY ROOM SIZE */}
+        {/* WALLPAPER CALCULATOR - BY 4 INDIVIDUAL WALLS */}
         {activeCalculator === 'wallpaper' && (
           <div style={styles.form}>
             <h3 style={styles.formTitle}>📐 Wallpaper Calculator</h3>
-            <p style={styles.formSubtitle}>Calculate by ROOM SIZE - Double Rolls & Yards needed</p>
+            <p style={styles.formSubtitle}>Enter dimensions for each wall - Double Rolls & Yards needed</p>
             
-            {/* ROOM DIMENSIONS */}
+            {/* WALL 1 */}
             <div style={{...styles.formGroup, marginBottom: '8px'}}>
-              <label style={{...styles.label, fontWeight: 'bold', color: '#d4af37'}}>📏 Room Dimensions</label>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#E67E22'}}>🧱 Wall 1</label>
             </div>
             <div style={styles.formRow}>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Room Length (feet)</label>
+                <label style={styles.label}>Width (feet)</label>
                 <input
                   type="number"
-                  value={wallpaperData.room_length}
-                  onChange={(e) => setWallpaperData({...wallpaperData, room_length: e.target.value})}
-                  style={styles.input}
-                  placeholder="15"
-                />
-              </div>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Room Width (feet)</label>
-                <input
-                  type="number"
-                  value={wallpaperData.room_width}
-                  onChange={(e) => setWallpaperData({...wallpaperData, room_width: e.target.value})}
+                  value={wallpaperData.wall_1_width}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_1_width: e.target.value})}
                   style={styles.input}
                   placeholder="12"
                 />
               </div>
               <div style={styles.formGroup}>
-                <label style={styles.label}>Wall Height (feet)</label>
+                <label style={styles.label}>Height (feet)</label>
                 <input
                   type="number"
-                  value={wallpaperData.wall_height}
-                  onChange={(e) => setWallpaperData({...wallpaperData, wall_height: e.target.value})}
+                  value={wallpaperData.wall_1_height}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_1_height: e.target.value})}
+                  style={styles.input}
+                  placeholder="9"
+                />
+              </div>
+            </div>
+            
+            {/* WALL 2 */}
+            <div style={{...styles.formGroup, marginTop: '12px', marginBottom: '8px'}}>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#3498DB'}}>🧱 Wall 2</label>
+            </div>
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Width (feet)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.wall_2_width}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_2_width: e.target.value})}
+                  style={styles.input}
+                  placeholder="15"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Height (feet)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.wall_2_height}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_2_height: e.target.value})}
+                  style={styles.input}
+                  placeholder="9"
+                />
+              </div>
+            </div>
+            
+            {/* WALL 3 */}
+            <div style={{...styles.formGroup, marginTop: '12px', marginBottom: '8px'}}>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#27AE60'}}>🧱 Wall 3</label>
+            </div>
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Width (feet)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.wall_3_width}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_3_width: e.target.value})}
+                  style={styles.input}
+                  placeholder="12"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Height (feet)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.wall_3_height}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_3_height: e.target.value})}
+                  style={styles.input}
+                  placeholder="9"
+                />
+              </div>
+            </div>
+            
+            {/* WALL 4 */}
+            <div style={{...styles.formGroup, marginTop: '12px', marginBottom: '8px'}}>
+              <label style={{...styles.label, fontWeight: 'bold', color: '#9B59B6'}}>🧱 Wall 4</label>
+            </div>
+            <div style={styles.formRow}>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Width (feet)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.wall_4_width}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_4_width: e.target.value})}
+                  style={styles.input}
+                  placeholder="15"
+                />
+              </div>
+              <div style={styles.formGroup}>
+                <label style={styles.label}>Height (feet)</label>
+                <input
+                  type="number"
+                  value={wallpaperData.wall_4_height}
+                  onChange={(e) => setWallpaperData({...wallpaperData, wall_4_height: e.target.value})}
                   style={styles.input}
                   placeholder="9"
                 />
