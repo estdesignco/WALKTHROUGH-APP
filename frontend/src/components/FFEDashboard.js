@@ -29,7 +29,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
   const [showPhotoManager, setShowPhotoManager] = useState(false);
   const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
   const [roomPhotos, setRoomPhotos] = useState({});
-  const [photosCollapsed, setPhotosCollapsed] = useState(false);
+  const [photosCollapsed, setPhotosCollapsed] = useState(true); // COLLAPSED by default
   
   const loadSimpleProject = async () => {
     try {
