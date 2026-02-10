@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://bugsquash-hub.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://preview-debug-14.preview.emergentagent.com').rstrip('/')
 
 class TestPaintColorsAPI:
     """Test /api/paint-colors endpoint"""

@@ -10,7 +10,7 @@ All files are prepared and ready. Follow this guide step-by-step.
 
 ### 1. **Canva Live Checklist App** (`/CANVA_APP/`)
 - ✅ Production build complete (`dist/app.js` - 836KB)
-- ✅ Backend URL configured: `https://bugsquash-hub.preview.emergentagent.com`
+- ✅ Backend URL configured: `https://preview-debug-14.preview.emergentagent.com`
 - ✅ All features working:
   - Real-time sync (5-second intervals)
   - Project and room selection

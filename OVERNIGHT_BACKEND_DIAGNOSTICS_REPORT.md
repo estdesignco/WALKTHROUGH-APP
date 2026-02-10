@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://bugsquash-hub.preview.emergentagent.com/api
+## Backend URL: https://preview-debug-14.preview.emergentagent.com/api
 
 ---
 

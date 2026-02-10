@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://bugsquash-hub.preview.emergentagent.com
+https://preview-debug-14.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://bugsquash-hub.preview.emergentagent.com/mobile-app
+https://preview-debug-14.preview.emergentagent.com/mobile-app
 
 ---
 

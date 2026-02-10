@@ -27,7 +27,7 @@ cd /app
 tar -czf mobile-app.tar.gz mobile/
 ```
 
-You can download: `https://bugsquash-hub.preview.emergentagent.com/mobile-app.tar.gz`
+You can download: `https://preview-debug-14.preview.emergentagent.com/mobile-app.tar.gz`
 
 Then extract it on your computer:
 ```bash

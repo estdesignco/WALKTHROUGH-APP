@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://bugsquash-hub.preview.emergentagent.com/mobile-app
+Test it now: https://preview-debug-14.preview.emergentagent.com/mobile-app

@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 import uuid
 
-BASE_URL = "https://bugsquash-hub.preview.emergentagent.com/api"
+BASE_URL = "https://preview-debug-14.preview.emergentagent.com/api"
 
 def test_post_endpoints():
     """Test POST endpoints with detailed response analysis"""

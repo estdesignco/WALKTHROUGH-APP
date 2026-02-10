@@ -3,7 +3,7 @@
 COMPREHENSIVE BACKEND AUDIT - Launch Readiness Test
 Find ALL bugs and disconnects before launch
 
-Backend URL: https://bugsquash-hub.preview.emergentagent.com
+Backend URL: https://preview-debug-14.preview.emergentagent.com
 Test ALL systems exhaustively
 """
 
@@ -15,7 +15,7 @@ import uuid
 import sys
 
 # Configuration
-BASE_URL = "https://bugsquash-hub.preview.emergentagent.com/api"
+BASE_URL = "https://preview-debug-14.preview.emergentagent.com/api"
 HEADERS = {
     'Content-Type': 'application/json',
     'Accept': 'application/json'

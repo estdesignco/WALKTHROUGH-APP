@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://bugsquash-hub.preview.emergentagent.com';
+const BACKEND_URL = 'https://preview-debug-14.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

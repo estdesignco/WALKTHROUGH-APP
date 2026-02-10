@@ -13,7 +13,7 @@ import pymongo
 from pymongo import MongoClient
 
 # Configuration
-BACKEND_URL = "https://bugsquash-hub.preview.emergentagent.com/api"
+BACKEND_URL = "https://preview-debug-14.preview.emergentagent.com/api"
 MONGO_URL = "mongodb://localhost:27017"
 DB_NAME = "interiorsync"
 

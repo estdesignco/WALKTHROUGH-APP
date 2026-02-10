@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://bugsquash-hub.preview.emergentagent.com/api
+https://preview-debug-14.preview.emergentagent.com/api
 ```
 
 ---

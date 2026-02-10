@@ -10,7 +10,7 @@ import json
 async def check_database_state():
     """Check the current database state for our item"""
     
-    base_url = "https://bugsquash-hub.preview.emergentagent.com/api"
+    base_url = "https://preview-debug-14.preview.emergentagent.com/api"
     
     try:
         async with aiohttp.ClientSession() as session:
