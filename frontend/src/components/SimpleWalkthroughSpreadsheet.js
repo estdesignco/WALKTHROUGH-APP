@@ -1035,13 +1035,28 @@ const SimpleWalkthroughSpreadsheet = ({
                     </button>
                     <span>{room.name.toUpperCase()}</span>
                   </div>
-                  <button
-                    onClick={() => handleDeleteRoom(room.id)}
-                    className="text-red-300 hover:text-red-100 text-lg"
-                    title="Delete Room"
-                  >
-                    🗑️
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedRoomsForDelete.has(room.id)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        const newSet = new Set(selectedRoomsForDelete);
+                        if (e.target.checked) newSet.add(room.id);
+                        else newSet.delete(room.id);
+                        setSelectedRoomsForDelete(newSet);
+                      }}
+                      className="w-5 h-5 cursor-pointer accent-red-500"
+                      title="Select room for bulk delete"
+                    />
+                    <button
+                      onClick={() => handleDeleteRoom(room.id)}
+                      className="text-red-300 hover:text-red-100 text-lg"
+                      title="Delete Room"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
               </div>
               
