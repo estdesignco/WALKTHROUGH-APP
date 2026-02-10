@@ -1,63 +1,80 @@
-# EST Design Co - Product Requirements Document
+# ESTABLISHED Design Co. - Interior Design Project Management
 
 ## Original Problem Statement
-Interior design project management application with checklist/FFE spreadsheets, sample tracking, web scraping, and client management features. Critical requirement: All fixes on desktop must be mirrored to mobile app.
+Full-stack React/FastAPI/MongoDB application for interior design project management. Manages walkthrough items, checklists, FF&E (Furniture, Fixtures & Equipment) tracking, photos, and project workflows.
 
-## User Personas
-- Interior designers managing multiple client projects
-- Design team members tracking materials, finishes, and furnishings
-- Clients reviewing project progress
+## Core Architecture
+- **Frontend**: React (Create React App) at port 3000
+- **Backend**: FastAPI at port 8001
+- **Database**: MongoDB
+- **Config**: `process.env.REACT_APP_BACKEND_URL` (set in `.env`, used via `window.ENV` pattern)
 
-## Core Requirements
-1. **Stabilize Application** - Eliminate recurring bugs in data sync, samples, FFE transfer
-2. **Fix Core Functionality** - Web scraper, To-Do/Punch lists, checklist features, paint color workflow
-3. **Full Feature Parity** - Desktop and mobile must have identical features
-4. **Resolve Blockers** - GitHub push (secrets in .env), deployment issues
-5. **UI/UX Improvements** - Dynamic titles, feature consistency, remove obsolete buttons
+## What's Been Implemented
 
-## Architecture
-- **Frontend:** React (web) + React Native/Expo (mobile)
-- **Backend:** FastAPI (Python)
-- **Database:** MongoDB
-- **Deployment:** Containerized (Docker/Kubernetes)
+### Phase 1 - Core Fixes (Feb 2026)
+- **Environment Config Fix**: Removed hardcoded `config.js` injection, moved to `process.env.REACT_APP_BACKEND_URL` in App.js. `window.ENV` now set from build-time env vars.
+- **Transfer Walkthrough→Checklist**: Fixed 422 errors caused by sending empty string for `quantity` field (now sends `null`). Transfer creates room/category/subcategory/item structure in checklist.
+- **Transfer Checklist→FFE**: Fixed `status` field (was sending `'BLANK'` string instead of `""`), removed invalid `order_index` field.
+- **Removed Misplaced UI**: Removed non-functional search bar, Export FF&E, and Spec Sheet buttons from `MainContainer.js` that were duplicating actual controls.
+- **Photo Management**: Verified working - collapsible section, room folder click opens PhotoManagerModal with Take/Upload Photo buttons.
+- **GitHub Push Fix**: Removed hardcoded `SENDER_PASSWORD` value from `backend/.env`.
 
-## Current Session Progress (Feb 4, 2026)
+### Previously Implemented (Prior Sessions)
+- Backend regex safety (`safe_regex()` helper)
+- Dropdown navigation in `ProjectDetailPage.js`
+- 4-wall wallpaper calculator
+- Collapsible photo sections with consistent colors
+- Editable scraper UI fields
+- WholeHomeFinishes page with PASTE button
+- Mobile app color and photo updates
 
-### Completed ✅
-- [x] Fixed regex error in `/api/fix-sample-images` and `/api/sync-samples-to-master` endpoints
-  - Root cause: Paint colors with parentheses like "Pure White (SW 7005)" broke MongoDB regex
-  - Fix: Added `re.escape()` to escape special characters in sample names/colors
-- [x] Created `/api/sync-samples-to-master` endpoint alias
+## Prioritized Backlog
 
-### In Progress 🔄
-- [ ] Paint color selection workflow (doesn't create sample or populate vendor info)
-- [ ] Paint samples missing visual swatch/color chip images
-- [ ] GitHub push blocked by `SENDER_PASSWORD` in backend/.env
+### P0 (Critical) - DONE
+- [x] Fix preview environment config
+- [x] Fix Walkthrough→Checklist transfer
+- [x] Fix Checklist→FFE transfer
+- [x] Fix photo adding to rooms
+- [x] Remove misplaced search bar
 
-### P1 Features (Upcoming)
-- [ ] Complete Photo Management for Checklist & FFE Dashboards
-- [ ] Add "Add Room" and Search functionality to FFE sheet
-- [ ] Mirror all UI changes to mobile app
+### P1 (High)
+- [ ] Wallpaper calculator 4-wall verification
+- [ ] Room colors matching between Photos section and spreadsheet
+- [ ] Photo section consistency across all dashboards
+- [ ] Scraper UI editable fields verification
+- [ ] WholeHomeFinishes page verification
+- [ ] Mobile app parity for all changes
+- [ ] Add "Add Rooms" and Search Bar to FFE sheet
 
-### P2 Verification (Pending)
-- [ ] Verify Outlook Calendar after secret updates
-- [ ] Confirm performance improvements resolved slow loading
+### P2 (Medium)
+- [ ] Google Calendar integration completion
+- [ ] Outlook Calendar verification
+- [ ] Performance optimization verification
+- [ ] Paint color selection workflow fix
+- [ ] Paint samples visual swatch
 
-### Backlog
-- [ ] Complete Google Calendar integration
-- [ ] Refactor `ExactChecklistSpreadsheet.js` into smaller components
-- [ ] Android app build
-- [ ] Google Drive backup feature
+### P3 (Backlog)
+- [ ] Refactor ProjectDetailPage.js (1100+ lines)
+- [ ] Android app
+- [ ] Google Drive Backup
 - [ ] Client Approval Portal
 
 ## Key Files
-- `/app/backend/server.py` - Main backend logic, API endpoints
-- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Main checklist component
-- `/app/frontend/src/components/SampleTracker.js` - Sample library display
-- `/app/frontend/src/components/PaintColorAutocomplete.js` - Paint color selection
-- `/app/mobile/` - Mobile app (React Native/Expo)
+- `/app/frontend/src/App.js` - Backend URL config
+- `/app/frontend/src/components/SimpleWalkthroughSpreadsheet.js` - Walkthrough with transfer
+- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Checklist with FFE transfer
+- `/app/frontend/src/components/WalkthroughDashboard.js` - Walkthrough page
+- `/app/frontend/src/components/ChecklistDashboard.js` - Checklist page
+- `/app/frontend/src/components/PhotoManagerModal.js` - Photo upload modal
+- `/app/frontend/src/components/MainContainer.js` - Page layout container
+- `/app/backend/server.py` - All API endpoints
 
-## Critical Notes
-- Backend code is shared between desktop and mobile via the same API
-- `SENDER_PASSWORD` in backend/.env must be removed to unblock GitHub pushes
-- Data synchronization between items and samples is a frequent bug source
+## 3rd Party Integrations
+- Microsoft Graph API (Outlook Calendar)
+- Google Calendar API (partial)
+- Microsoft Teams (webhooks)
+- rembg (Python)
+- @hello-pangea/dnd (drag and drop)
+
+## Login Credentials
+- Password: `DesignReady2026!`
