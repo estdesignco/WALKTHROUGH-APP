@@ -11,12 +11,13 @@ Full-stack React/FastAPI/MongoDB application for interior design project managem
 
 ## What's Been Implemented
 
-### Phase 1 - Core Fixes (Feb 2026)
-- **Environment Config Fix**: Removed hardcoded `config.js` injection, moved to `process.env.REACT_APP_BACKEND_URL` in App.js. `window.ENV` now set from build-time env vars.
-- **Transfer Walkthrough→Checklist**: Fixed 422 errors caused by sending empty string for `quantity` field (now sends `null`). Transfer creates room/category/subcategory/item structure in checklist.
-- **Transfer Checklist→FFE**: Fixed `status` field (was sending `'BLANK'` string instead of `""`), removed invalid `order_index` field.
-- **Removed Misplaced UI**: Removed non-functional search bar, Export FF&E, and Spec Sheet buttons from `MainContainer.js` that were duplicating actual controls.
-- **Photo Management**: Verified working - collapsible section, room folder click opens PhotoManagerModal with Take/Upload Photo buttons.
+### Phase 1 - Critical Fixes (Feb 10, 2026)
+- **"Project Not Found" Fix**: `MainDashboard.js` had hardcoded production URL `https://app.estdesignco.com/api`. Dashboard fetched production projects but detail pages used environment backend. Fixed to use `process.env.REACT_APP_BACKEND_URL`.
+- **Environment Config Fix**: Removed hardcoded `config.js` injection from `index.html`, moved to `process.env.REACT_APP_BACKEND_URL` in App.js. `window.ENV` set from build-time env vars.
+- **Transfer Walkthrough→Checklist**: Fixed 422 errors caused by sending `quantity: ''` (empty string) instead of `null`.
+- **Transfer Checklist→FFE**: Fixed `status: 'BLANK'` (invalid enum) → `''`, removed invalid `order_index` field.
+- **Removed Misplaced UI**: Removed non-functional search bar, Export FF&E, and Spec Sheet buttons from `MainContainer.js`.
+- **Photo Management**: Verified working - collapsible section, room folder click opens PhotoManagerModal.
 - **GitHub Push Fix**: Removed hardcoded `SENDER_PASSWORD` value from `backend/.env`.
 
 ### Previously Implemented (Prior Sessions)
@@ -31,6 +32,7 @@ Full-stack React/FastAPI/MongoDB application for interior design project managem
 ## Prioritized Backlog
 
 ### P0 (Critical) - DONE
+- [x] Fix "Project Not Found" (hardcoded production URL in MainDashboard)
 - [x] Fix preview environment config
 - [x] Fix Walkthrough→Checklist transfer
 - [x] Fix Checklist→FFE transfer
@@ -60,21 +62,13 @@ Full-stack React/FastAPI/MongoDB application for interior design project managem
 - [ ] Client Approval Portal
 
 ## Key Files
+- `/app/frontend/src/components/MainDashboard.js` - Dashboard (was hardcoded to production URL)
 - `/app/frontend/src/App.js` - Backend URL config
 - `/app/frontend/src/components/SimpleWalkthroughSpreadsheet.js` - Walkthrough with transfer
 - `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Checklist with FFE transfer
-- `/app/frontend/src/components/WalkthroughDashboard.js` - Walkthrough page
-- `/app/frontend/src/components/ChecklistDashboard.js` - Checklist page
-- `/app/frontend/src/components/PhotoManagerModal.js` - Photo upload modal
-- `/app/frontend/src/components/MainContainer.js` - Page layout container
+- `/app/frontend/src/components/ProjectDetailPage.js` - Project detail with dropdown nav
+- `/app/frontend/src/components/MainContainer.js` - Page layout container (cleaned up)
 - `/app/backend/server.py` - All API endpoints
-
-## 3rd Party Integrations
-- Microsoft Graph API (Outlook Calendar)
-- Google Calendar API (partial)
-- Microsoft Teams (webhooks)
-- rembg (Python)
-- @hello-pangea/dnd (drag and drop)
 
 ## Login Credentials
 - Password: `DesignReady2026!`
