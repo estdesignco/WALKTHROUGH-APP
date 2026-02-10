@@ -9,6 +9,7 @@ import PhotoManagerModal from './PhotoManagerModal';
 import AddMultipleRoomsModal from './AddMultipleRoomsModal';
 import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
+import { getColorByIndex } from '../utils/roomColors';
 
 const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
   console.log("🚀 WALKTHROUGH DASHBOARD IS LOADING");
