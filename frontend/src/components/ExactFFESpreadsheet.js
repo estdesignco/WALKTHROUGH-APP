@@ -764,10 +764,6 @@ const ExactFFESpreadsheet = ({
       return;
     }
 
-    if (!window.confirm('Are you sure you want to delete this room? This will delete all categories and items in this room.')) {
-      return;
-    }
-
     try {
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
       const response = await fetch(`${backendUrl}/api/rooms/${roomId}`, {
@@ -775,11 +771,7 @@ const ExactFFESpreadsheet = ({
       });
 
       if (response.ok) {
-        console.log('✅ Room deleted successfully');
-        // Force reload to show updated data
-        if (onReload) {
-          onReload();
-        }
+        if (onReload) onReload();
       } else {
         throw new Error(`HTTP ${response.status}`);
       }
