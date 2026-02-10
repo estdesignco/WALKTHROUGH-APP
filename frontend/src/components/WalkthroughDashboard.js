@@ -30,6 +30,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
   const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
   const [roomPhotos, setRoomPhotos] = useState({});  // {roomId: [{photo, measurements}]}
   const [leicaConnected, setLeicaConnected] = useState(false);
+  const [photosCollapsed, setPhotosCollapsed] = useState(true); // COLLAPSED by default
   
   useEffect(() => {
     if (projectId) {
