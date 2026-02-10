@@ -4,8 +4,8 @@ import { projectAPI } from '../App';
 import ProjectCalendar from './ProjectCalendar';
 import axios from 'axios';
 
-// DIRECT API URL - HARDCODED TO PRODUCTION
-const PRODUCTION_API = (process.env.REACT_APP_BACKEND_URL || window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
+// API URL - uses runtime config (config.js) first, then build-time env, then origin
+const PRODUCTION_API = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 const API_URL = PRODUCTION_API;
 
 // Project colors for headers - each project gets a unique color
