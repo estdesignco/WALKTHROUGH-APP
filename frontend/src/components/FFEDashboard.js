@@ -348,6 +348,7 @@ const FFEDashboard = ({ isOffline, hideNavigation = false, projectId: propProjec
         vendorTypes={vendorTypes}
         carrierTypes={carrierTypes}
         onDeleteRoom={handleDeleteRoom}
+        onBulkDeleteRooms={handleBulkDeleteRooms}
         onAddRoom={() => setShowAddRoom(true)}
         onReload={loadSimpleProject}
         searchTerm={searchTerm}
