@@ -14,6 +14,7 @@ const ExactFFESpreadsheet = ({
   vendorTypes = [],
   carrierTypes = [],
   onDeleteRoom, 
+  onBulkDeleteRooms,
   onAddRoom,
   onReload 
 }) => {
