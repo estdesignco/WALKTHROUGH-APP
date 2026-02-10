@@ -17301,9 +17301,10 @@ async def login_to_all_vendor_portals():
 
 @api_router.get("/download/chrome-extension")
 async def download_chrome_extension():
-    """Download Chrome Extension v7.7.4 - Fixed Copy Image and Copy Link buttons"""
+    """Download Chrome Extension - Latest version with editable fields"""
     import os
     import glob
+    import re
     
     # Find the latest versioned zip file in static folder
     static_dir = "/app/backend/static"
@@ -17311,8 +17312,14 @@ async def download_chrome_extension():
     zip_files = glob.glob(pattern)
     
     if zip_files:
-        # Sort by version number (newest first)
-        zip_files.sort(reverse=True)
+        # Sort by version number properly (handle v7.33.0 > v7.8.2)
+        def version_key(f):
+            match = re.search(r'v(\d+)\.(\d+)\.(\d+)', f)
+            if match:
+                return (int(match.group(1)), int(match.group(2)), int(match.group(3)))
+            return (0, 0, 0)
+        
+        zip_files.sort(key=version_key, reverse=True)
         zip_path = zip_files[0]
         filename = os.path.basename(zip_path)
     else:
