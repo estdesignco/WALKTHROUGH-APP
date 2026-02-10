@@ -572,18 +572,16 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       {/* Photo Manager Modal - For adding photos to rooms */}
       {showPhotoManager && selectedRoomForPhotos && (
         <PhotoManagerModal
-          isOpen={showPhotoManager}
+          room={selectedRoomForPhotos}
+          photos={roomPhotos[selectedRoomForPhotos.id] || []}
           onClose={() => {
             setShowPhotoManager(false);
             setSelectedRoomForPhotos(null);
           }}
-          projectId={projectId}
-          roomId={selectedRoomForPhotos.id}
-          roomName={selectedRoomForPhotos.name}
-          onPhotosUpdate={(photos) => {
+          onSavePhotos={(roomId, photos) => {
             setRoomPhotos(prev => ({
               ...prev,
-              [selectedRoomForPhotos.id]: photos
+              [roomId]: photos
             }));
           }}
         />
