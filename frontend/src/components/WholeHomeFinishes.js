@@ -303,6 +303,52 @@ const WholeHomeFinishes = ({ projectId }) => {
     const fileInputRef = useRef(null);
     const isEditing = editingField === `${section}-${field}`;
 
+    // Paste scraper data into this field
+    const pasteScraperData = async () => {
+      // Check for scraper data first
+      const scraperData = localStorage.getItem('wholeHomeScraperData');
+      if (scraperData) {
+        try {
+          const data = JSON.parse(scraperData);
+          updateField(section, field, {
+            value: data.name || data.finish || '',
+            image: data.image || data.finish_image || '',
+            link: data.link || '',
+            vendor: data.vendor || '',
+            sku: data.sku || ''
+          });
+          localStorage.removeItem('wholeHomeScraperData');
+          return;
+        } catch (err) {
+          console.error('Error parsing scraper data:', err);
+        }
+      }
+      
+      // Try clipboard
+      try {
+        const clipText = await navigator.clipboard.readText();
+        try {
+          const clipData = JSON.parse(clipText);
+          if (clipData.name || clipData.image_url) {
+            updateField(section, field, {
+              value: clipData.name || clipData.finish_color || '',
+              image: clipData.image_url || clipData.finish_image || '',
+              link: clipData.link || clipData.url || '',
+              vendor: clipData.vendor || '',
+              sku: clipData.sku || ''
+            });
+            return;
+          }
+        } catch {
+          // Not JSON, use as plain text
+          const currentData = getField(section, field);
+          updateField(section, field, { ...currentData, value: clipText });
+        }
+      } catch (err) {
+        alert('Please allow clipboard access or use the scraper extension');
+      }
+    };
+
     return (
       <div className="group relative">
         <label className="text-xs text-stone-400 mb-1 block">{label}</label>
@@ -328,17 +374,27 @@ const WholeHomeFinishes = ({ projectId }) => {
           
           {/* Editable text input */}
           <div className="flex-1">
-            <input 
-              ref={inputRef}
-              type="text" 
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded border border-[#8b7355]/50 text-sm focus:border-[#d4af37] focus:outline-none"
-              placeholder={`Enter ${label.toLowerCase()}...`}
-              value={data.value || ''}
-              onChange={(e) => updateField(section, field, { ...data, value: e.target.value })}
-              onPaste={(e) => handlePaste(e, section, field)}
-              onFocus={() => setEditingField(`${section}-${field}`)}
-              onBlur={() => setTimeout(() => setEditingField(null), 200)}
-            />
+            <div className="flex gap-1">
+              <input 
+                ref={inputRef}
+                type="text" 
+                className="flex-1 bg-gray-900 text-white px-3 py-2 rounded-l border border-[#8b7355]/50 text-sm focus:border-[#d4af37] focus:outline-none"
+                placeholder={`Enter ${label.toLowerCase()}...`}
+                value={data.value || ''}
+                onChange={(e) => updateField(section, field, { ...data, value: e.target.value })}
+                onPaste={(e) => handlePaste(e, section, field)}
+                onFocus={() => setEditingField(`${section}-${field}`)}
+                onBlur={() => setTimeout(() => setEditingField(null), 200)}
+              />
+              {/* PASTE BUTTON */}
+              <button
+                onClick={pasteScraperData}
+                className="px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold rounded-r border border-green-600 transition-colors"
+                title="Paste from scraper or clipboard"
+              >
+                📋 PASTE
+              </button>
+            </div>
             
             {/* Extra fields shown when editing */}
             {isEditing && (
