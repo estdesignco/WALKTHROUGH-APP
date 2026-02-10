@@ -369,6 +369,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
             vendorTypes={vendorTypes}
             carrierTypes={carrierTypes}
             onDeleteRoom={handleDeleteRoom}
+            onBulkDeleteRooms={handleBulkDeleteRooms}
             onAddRoom={() => setShowAddRoom(true)}
             onReload={loadSimpleProject}
           />
