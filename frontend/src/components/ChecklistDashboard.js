@@ -28,7 +28,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   const [showPhotoManager, setShowPhotoManager] = useState(false);
   const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
   const [roomPhotos, setRoomPhotos] = useState({});
-  const [photosCollapsed, setPhotosCollapsed] = useState(false);
+  const [photosCollapsed, setPhotosCollapsed] = useState(true); // COLLAPSED by default
   
   // Sync state - for walkthrough to checklist sync
   const [syncStatus, setSyncStatus] = useState(null);
