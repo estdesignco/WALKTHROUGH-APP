@@ -1642,8 +1642,9 @@ const ExactChecklistSpreadsheet = ({
       const checkedItemIds = Array.from(checkedItems);
       const itemsToTransfer = [];
       
-      if (filteredProject?.rooms) {
-        filteredProject.rooms.forEach(room => {
+      // USE ORIGINAL PROJECT, NOT FILTERED!
+      if (project?.rooms) {
+        project.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
@@ -1682,7 +1683,7 @@ const ExactChecklistSpreadsheet = ({
 
       // Step 3: Transfer checked items to FFE
       const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
-      const projectId = filteredProject.id;
+      const projectId = project.id; // USE ORIGINAL PROJECT ID!
       
       let successCount = 0;
       const createdStructures = new Map();
