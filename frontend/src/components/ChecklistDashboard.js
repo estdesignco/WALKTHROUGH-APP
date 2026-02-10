@@ -509,7 +509,8 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
               <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {project?.rooms?.map((room, index) => {
-                  const roomColor = roomColors[room.id] || `hsl(${(index * 47) % 360}, 50%, 40%)`;
+                  // Use the SAME color system as the spreadsheet - getColorByIndex
+                  const roomColor = roomColors[room.id] || getColorByIndex(index);
                   return (
                     <button
                       key={room.id}
