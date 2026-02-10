@@ -2519,6 +2519,18 @@ const ExactChecklistSpreadsheet = ({
                     >
                       📋 Copy
                     </button>
+                    <input
+                      type="checkbox"
+                      checked={selectedRoomsForDelete.has(room.id)}
+                      onChange={(e) => {
+                        const newSet = new Set(selectedRoomsForDelete);
+                        if (e.target.checked) newSet.add(room.id);
+                        else newSet.delete(room.id);
+                        setSelectedRoomsForDelete(newSet);
+                      }}
+                      className="w-5 h-5 cursor-pointer accent-red-500"
+                      title="Select room for bulk delete"
+                    />
                     <button
                       onClick={() => onDeleteRoom && onDeleteRoom(room.id)}
                       className="text-red-300 hover:text-red-100 text-lg"
