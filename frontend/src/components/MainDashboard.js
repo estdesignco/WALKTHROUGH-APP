@@ -5,7 +5,7 @@ import ProjectCalendar from './ProjectCalendar';
 import axios from 'axios';
 
 // DIRECT API URL - HARDCODED TO PRODUCTION
-const PRODUCTION_API = 'https://app.estdesignco.com/api';
+const PRODUCTION_API = (process.env.REACT_APP_BACKEND_URL || window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 const API_URL = PRODUCTION_API;
 
 // Project colors for headers - each project gets a unique color
