@@ -260,84 +260,89 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
              style={{
                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
              }}>
-          <h2 className="text-2xl font-bold text-[#D4A574] mb-6">📸 PHOTO MANAGEMENT</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            {/* Photos Captured */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Photos Captured</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">
-                {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.length, 0)}
-              </div>
-            </div>
-            
-            {/* Measurements Added */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Measurements Added</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">
-                {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.filter(p => p.measurements?.length > 0).length, 0)}
-              </div>
-            </div>
-            
-            {/* Rooms Photographed */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Rooms Photographed</div>
-              <div className="text-3xl font-bold text-[#D4C5A9]">
-                {Object.keys(roomPhotos).length} / {project?.rooms?.length || 0}
-              </div>
-            </div>
-            
-            {/* Leica D5 Status */}
-            <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
-              <div className="text-[#D4A574] text-sm mb-1">Leica D5 Status</div>
-              <div className={`text-xl font-bold ${leicaConnected ? 'text-green-400' : 'text-red-400'}`}>
-                {leicaConnected ? '✓ Connected' : '✗ Not Connected'}
-              </div>
-              <button 
-                onClick={() => {
-                  setLeicaConnected(!leicaConnected);
-                  if (!leicaConnected) {
-                    alert('Leica D5 Connected! (Simulated - real Bluetooth integration coming soon)');
-                  }
-                }}
-                className="mt-2 px-3 py-1 bg-[#D4A574] hover:bg-[#C49564] text-black rounded text-sm font-medium"
-              >
-                {leicaConnected ? 'Disconnect' : 'Connect Leica D5'}
-              </button>
-            </div>
+          {/* Collapsible Header */}
+          <div 
+            className="flex justify-between items-center cursor-pointer"
+            onClick={() => setPhotosCollapsed(!photosCollapsed)}
+          >
+            <h2 className="text-2xl font-bold text-[#D4A574]">📸 PHOTO MANAGEMENT</h2>
+            <button className="text-[#D4A574] text-xl">
+              {photosCollapsed ? '▶' : '▼'}
+            </button>
           </div>
           
-          {/* Room Photo Folders */}
-          <div className="border-t border-[#D4A574]/30 pt-4">
-            <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-              {project?.rooms?.map((room, index) => {
-                // Use the SAME color system as the spreadsheet - getColorByIndex
-                const roomColor = roomColors[room.id] || getColorByIndex(index);
-                return (
-                  <button
-                    key={room.id}
-                    onClick={() => {
-                      setSelectedRoomForPhotos(room);
-                      setShowPhotoManager(true);
-                    }}
-                    className="p-3 border-2 rounded-lg hover:scale-105 transition-all cursor-pointer"
-                    style={{ 
-                      background: `linear-gradient(135deg, ${roomColor}40 0%, ${roomColor}20 50%, ${roomColor}40 100%)`,
-                      borderColor: roomColor,
-                      boxShadow: `0 4px 15px ${roomColor}30`
-                    }}
+          {!photosCollapsed && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 mt-4">
+                {/* Photos Captured */}
+                <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                  <div className="text-[#D4A574] text-sm mb-1">Photos Captured</div>
+                  <div className="text-3xl font-bold text-[#D4C5A9]">
+                    {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.length, 0)}
+                  </div>
+                </div>
+                
+                {/* Measurements Added */}
+                <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                  <div className="text-[#D4A574] text-sm mb-1">Measurements Added</div>
+                  <div className="text-3xl font-bold text-[#D4C5A9]">
+                    {Object.values(roomPhotos).reduce((sum, photos) => sum + photos.filter(p => p.measurements?.length > 0).length, 0)}
+                  </div>
+                </div>
+                
+                {/* Rooms Photographed */}
+                <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                  <div className="text-[#D4A574] text-sm mb-1">Rooms Photographed</div>
+                  <div className="text-3xl font-bold text-[#D4C5A9]">
+                    {Object.keys(roomPhotos).length} / {project?.rooms?.length || 0}
+                  </div>
+                </div>
+                
+                {/* Add Room */}
+                <div className="p-4 border border-[#D4A574]/50 rounded" style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 30%, rgba(5, 5, 5, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)' }}>
+                  <div className="text-[#D4A574] text-sm mb-1">Add Room</div>
+                  <button 
+                    onClick={() => setShowAddRoom(true)}
+                    className="mt-1 px-4 py-2 bg-[#D4A574] hover:bg-[#C49564] text-black rounded font-medium w-full"
                   >
-                    <div className="text-2xl mb-1">📁</div>
-                    <div className="text-sm text-white font-medium truncate">{room.name}</div>
-                    <div className="text-xs" style={{ color: roomColor }}>
-                      {roomPhotos[room.id]?.length || 0} photos
-                    </div>
+                    + Add Room
                   </button>
-                );
-              })}
-            </div>
-          </div>
+                </div>
+              </div>
+              
+              {/* Room Photo Folders */}
+              <div className="border-t border-[#D4A574]/30 pt-4">
+                <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {project?.rooms?.map((room, index) => {
+                    // Use the SAME color system as the spreadsheet - getColorByIndex
+                    const roomColor = roomColors[room.id] || getColorByIndex(index);
+                    return (
+                      <button
+                        key={room.id}
+                        onClick={() => {
+                          setSelectedRoomForPhotos(room);
+                          setShowPhotoManager(true);
+                        }}
+                        className="p-3 border-2 rounded-lg hover:scale-105 transition-all cursor-pointer"
+                        style={{ 
+                          background: `linear-gradient(135deg, ${roomColor}40 0%, ${roomColor}20 50%, ${roomColor}40 100%)`,
+                          borderColor: roomColor,
+                          boxShadow: `0 4px 15px ${roomColor}30`
+                        }}
+                      >
+                        <div className="text-2xl mb-1">📁</div>
+                        <div className="text-sm text-white font-medium truncate">{room.name}</div>
+                        <div className="text-xs" style={{ color: roomColor }}>
+                          {roomPhotos[room.id]?.length || 0} photos
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* DIVIDER LINE */}
