@@ -507,23 +507,30 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
             <div className="border-t border-[#D4A574]/30 pt-4">
               <h3 className="text-lg font-bold text-[#D4A574] mb-3">📁 Photos by Room</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                {project?.rooms?.map(room => (
-                  <button
-                    key={room.id}
-                    onClick={() => {
-                      setSelectedRoomForPhotos(room);
-                      setShowPhotoManager(true);
-                    }}
-                    className="p-3 border border-[#D4A574]/50 rounded hover:bg-[#D4A574]/20 transition-colors"
-                    style={{ background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 10, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%)' }}
-                  >
-                    <div className="text-2xl mb-1">📁</div>
-                    <div className="text-sm text-[#D4C5A9] font-medium truncate">{room.name}</div>
-                    <div className="text-xs text-[#D4A574]">
-                      {roomPhotos[room.id]?.length || 0} photos
-                    </div>
-                  </button>
-                ))}
+                {project?.rooms?.map((room, index) => {
+                  const roomColor = roomColors[room.id] || `hsl(${(index * 47) % 360}, 50%, 40%)`;
+                  return (
+                    <button
+                      key={room.id}
+                      onClick={() => {
+                        setSelectedRoomForPhotos(room);
+                        setShowPhotoManager(true);
+                      }}
+                      className="p-3 border-2 rounded-lg hover:scale-105 transition-all cursor-pointer"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${roomColor}40 0%, ${roomColor}20 50%, ${roomColor}40 100%)`,
+                        borderColor: roomColor,
+                        boxShadow: `0 4px 15px ${roomColor}30`
+                      }}
+                    >
+                      <div className="text-2xl mb-1">📁</div>
+                      <div className="text-sm text-white font-medium truncate">{room.name}</div>
+                      <div className="text-xs" style={{ color: roomColor }}>
+                        {roomPhotos[room.id]?.length || 0} photos
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </>
