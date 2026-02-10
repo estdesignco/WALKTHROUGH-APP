@@ -1015,32 +1015,11 @@ export default function ProjectDetailPage() {
             </div>
 
             <div className="border-b border-stone-700">
-                <nav className="-mb-px flex flex-wrap space-x-4" aria-label="Tabs">
-                    {tabs.map((tab) => {
-                        const Icon = tab.icon;
-                        return (
-                            <button
-                                key={tab.name}
-                                onClick={() => handleTabChange(tab.name)}
-                                className={`whitespace-nowrap py-3 px-4 border-b-4 font-bold text-sm flex items-center space-x-2 rounded-t-lg transition-all ${
-                                    activeTab === tab.name
-                                        ? 'text-[#D4A574] border-[#D4A574]'
-                                        : 'border-transparent text-[#D4C5A9] hover:text-[#D4A574] hover:border-[#B49B7E]'
-                                }`}
-                                style={activeTab === tab.name ? {
-                                  background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
-                                  boxShadow: '0 0 20px rgba(212, 165, 116, 0.4), inset 0 0 35px rgba(212, 165, 116, 0.08)',
-                                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 165, 116, 0.5)'
-                                } : {
-                                  background: 'linear-gradient(135deg, rgba(15,15,25,0.8) 0%, rgba(35,35,45,0.7) 50%, rgba(15,15,25,0.8) 100%)'
-                                }}
-                            >
-                                <Icon className="w-4 h-4" />
-                                <span>{tab.name}</span>
-                            </button>
-                        );
-                    })}
-                </nav>
+                <DropdownNavigation 
+                    tabs={tabs} 
+                    activeTab={activeTab} 
+                    onTabChange={handleTabChange}
+                />
             </div>
 
             <div className="py-4">
