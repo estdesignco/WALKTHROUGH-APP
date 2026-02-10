@@ -568,9 +568,9 @@ const SimpleWalkthroughSpreadsheet = ({
       const checkedItemIds = Array.from(checkedItems);
       console.log('🔍 Checked Item IDs:', checkedItemIds);
       
-      // Find actual item objects for the checked IDs
-      if (filteredProject?.rooms) {
-        filteredProject.rooms.forEach(room => {
+      // Find actual item objects for the checked IDs - USE ORIGINAL PROJECT, NOT FILTERED!
+      if (project?.rooms) {
+        project.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
