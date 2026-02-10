@@ -129,11 +129,30 @@ export default function ProjectDetailsScreen({ route, navigation }) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>ROOMS IN PROJECT</Text>
             <View style={styles.roomsList}>
-              {project.rooms.map((room, index) => (
-                <View key={room.id || index} style={styles.roomChip}>
-                  <Text style={styles.roomChipText}>{room.name}</Text>
-                </View>
-              ))}
+              {project.rooms.map((room, index) => {
+                const roomColor = getColorByIndex(index);
+                return (
+                  <TouchableOpacity 
+                    key={room.id || index} 
+                    style={[styles.roomChip, { 
+                      backgroundColor: `${roomColor}30`,
+                      borderColor: roomColor,
+                      borderWidth: 2
+                    }]}
+                    onPress={() => navigation.navigate('PhotoManager', {
+                      projectId,
+                      projectName: project.name,
+                      roomId: room.id,
+                      roomName: room.name,
+                    })}
+                  >
+                    <Text style={[styles.roomChipText, { color: roomColor }]}>📁 {room.name}</Text>
+                    <Text style={[styles.roomPhotoCount, { color: roomColor }]}>
+                      {room.photo_count || 0} photos
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         )}
