@@ -917,23 +917,8 @@ const SimpleWalkthroughSpreadsheet = ({
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
         <div className="flex flex-col gap-4">
-          {/* Search Bar */}
-          <div className="w-full">
-            <input
-              type="text"
-              placeholder="Search Items, Vendors, SKUs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-[#B49B7E] text-white focus:outline-none placeholder-[#D4C5A9]/70"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
-                boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
-              }}
-            />
-          </div>
-          
           {/* Filter Dropdowns */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
