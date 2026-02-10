@@ -44,10 +44,14 @@ const ExactChecklistSpreadsheet = ({
   vendorTypes = [],
   carrierTypes = [],
   onDeleteRoom, 
+  onBulkDeleteRooms,
   onAddRoom,
   onReload,
   onRoomCanvaImport
 }) => {
+  // Room multi-select state for bulk delete
+  const [selectedRoomsForDelete, setSelectedRoomsForDelete] = useState(new Set());
+  
   // Reduce console spam - only log on first render
   const hasLoggedRender = useRef(false);
   if (!hasLoggedRender.current && project) {
