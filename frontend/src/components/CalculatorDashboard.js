@@ -77,29 +77,26 @@ const CalculatorDashboard = ({ projectId }) => {
   });
 
   const calculateWallpaper = async () => {
-    // Validate required fields
-    if (!wallpaperData.room_length || !wallpaperData.room_width || !wallpaperData.wall_height) {
-      alert('Please enter Room Length, Room Width, and Wall Height');
+    // Validate - at least one wall must have dimensions
+    const wall1Area = (parseFloat(wallpaperData.wall_1_width) || 0) * (parseFloat(wallpaperData.wall_1_height) || 0);
+    const wall2Area = (parseFloat(wallpaperData.wall_2_width) || 0) * (parseFloat(wallpaperData.wall_2_height) || 0);
+    const wall3Area = (parseFloat(wallpaperData.wall_3_width) || 0) * (parseFloat(wallpaperData.wall_3_height) || 0);
+    const wall4Area = (parseFloat(wallpaperData.wall_4_width) || 0) * (parseFloat(wallpaperData.wall_4_height) || 0);
+    
+    const totalWallArea = wall1Area + wall2Area + wall3Area + wall4Area;
+    
+    if (totalWallArea === 0) {
+      alert('Please enter dimensions for at least one wall');
       return;
     }
     
     setLoading(true);
     try {
-      // Calculate locally for instant results
-      const roomLength = parseFloat(wallpaperData.room_length);
-      const roomWidth = parseFloat(wallpaperData.room_width);
-      const wallHeight = parseFloat(wallpaperData.wall_height);
       const rollWidth = parseFloat(wallpaperData.roll_width) || 27; // inches
       const rollLength = parseFloat(wallpaperData.roll_length) || 33; // feet (double roll)
       const patternRepeat = parseFloat(wallpaperData.pattern_repeat) || 0;
       const numDoors = parseInt(wallpaperData.num_doors) || 0;
       const numWindows = parseInt(wallpaperData.num_windows) || 0;
-      
-      // Calculate total wall perimeter (all 4 walls)
-      const perimeter = 2 * (roomLength + roomWidth);
-      
-      // Total wall area in sq ft
-      const totalWallArea = perimeter * wallHeight;
       
       // Deduct for doors (standard door ~21 sq ft = 3ft x 7ft)
       const doorDeduction = numDoors * 21;
@@ -142,9 +139,16 @@ const CalculatorDashboard = ({ projectId }) => {
         totalCostYards = (parseFloat(wallpaperData.cost_per_yard) * totalYardsNeeded).toFixed(2);
       }
       
+      // Build wall details string
+      const wallDetails = [];
+      if (wall1Area > 0) wallDetails.push(`Wall 1: ${wallpaperData.wall_1_width}'W x ${wallpaperData.wall_1_height}'H = ${wall1Area.toFixed(1)} sq ft`);
+      if (wall2Area > 0) wallDetails.push(`Wall 2: ${wallpaperData.wall_2_width}'W x ${wallpaperData.wall_2_height}'H = ${wall2Area.toFixed(1)} sq ft`);
+      if (wall3Area > 0) wallDetails.push(`Wall 3: ${wallpaperData.wall_3_width}'W x ${wallpaperData.wall_3_height}'H = ${wall3Area.toFixed(1)} sq ft`);
+      if (wall4Area > 0) wallDetails.push(`Wall 4: ${wallpaperData.wall_4_width}'W x ${wallpaperData.wall_4_height}'H = ${wall4Area.toFixed(1)} sq ft`);
+      
       const res = {
         data: {
-          room_dimensions: `${roomLength}' x ${roomWidth}' x ${wallHeight}'h`,
+          wall_details: wallDetails.join(' | '),
           total_wall_area: totalWallArea.toFixed(1),
           deductions: `${numDoors} doors, ${numWindows} windows (${(doorDeduction + windowDeduction).toFixed(0)} sq ft)`,
           net_wall_area: netWallArea.toFixed(1),
