@@ -295,15 +295,21 @@ const styles = StyleSheet.create({
   roomChip: {
     backgroundColor: '#374151',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 2,
     borderColor: '#D4A574',
+    minWidth: 100,
+    alignItems: 'center',
   },
   roomChipText: {
     color: '#D4A574',
     fontSize: 14,
     fontWeight: '500',
+  },
+  roomPhotoCount: {
+    fontSize: 10,
+    marginTop: 4,
   },
   buttonContainer: {
     padding: 16,
