@@ -242,6 +242,7 @@ const WalkthroughDashboard = ({ isOffline, hideNavigation = false, projectId: pr
       activeTab="walkthrough"
       title={`WALKTHROUGH - ${project?.name?.toUpperCase() || 'PROJECT'}`}
       onAddRoom={() => setShowAddRoom(true)}
+      hideNavigation={hideNavigation}
     >
       {/* EXISTING WALKTHROUGH CONTENT - UNCHANGED */}
       <div>
