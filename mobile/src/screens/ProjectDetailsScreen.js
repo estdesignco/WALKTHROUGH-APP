@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { apiService } from '../services/apiService';
+import { getColorByIndex } from '../utils/roomColors';
 
 export default function ProjectDetailsScreen({ route, navigation }) {
   const { projectId } = route.params;
