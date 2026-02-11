@@ -144,7 +144,6 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
     } catch (error) {
       console.error('Failed:', error);
       loadData();
-    } // Revert on error
     }
   };
 
