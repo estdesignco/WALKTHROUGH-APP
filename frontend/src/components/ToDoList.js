@@ -209,6 +209,11 @@ export default function ToDoList({ projectId, roomId = null }) {
   };
 
   const updateTodoItem = async (itemId, updates) => {
+    // Optimistic local update - immediately reflect the change in UI
+    setTodoItems(prev => prev.map(item => 
+      item.id === itemId ? { ...item, ...updates } : item
+    ));
+    
     try {
       const response = await fetch(`${API_URL}/todos/${itemId}`, {
         method: 'PUT',
@@ -216,11 +221,13 @@ export default function ToDoList({ projectId, roomId = null }) {
         body: JSON.stringify(updates)
       });
       
-      if (response.ok) {
+      if (!response.ok) {
+        // Revert on failure
         loadTodoList();
       }
     } catch (error) {
       console.error('Failed to update to-do item:', error);
+      loadTodoList(); // Revert on error
     }
   };
 
