@@ -112,19 +112,26 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
 
   // Toggle status - Now accepts direct status value
   const toggleStatus = async (todoId, currentStatus, isCompany, projectId, newStatusOverride = null) => {
-    const nextStatus = { pending: 'in_progress', in_progress: 'completed', completed: 'pending' };
+    const nextStatus = { pending: 'in_progress', in_progress: 'completed', completed: 'pending', done: 'pending' };
     const newStatus = newStatusOverride || nextStatus[currentStatus || 'pending'];
+    const newCompleted = newStatus === 'completed' || newStatus === 'done';
+    
+    // Optimistic update
+    setAllTodos(prev => prev.map(t => 
+      t.id === todoId ? { ...t, status: newStatus, completed: newCompleted } : t
+    ));
+    
     try {
       const endpoint = isCompany 
         ? `${API_URL}/todos/company/${todoId}` 
-        : `${API_URL}/todos/${projectId}/${todoId}`;
+        : `${API_URL}/todos/${todoId}`;
       await axios.put(endpoint, { 
         status: newStatus, 
-        completed: newStatus === 'completed' 
+        completed: newCompleted 
       });
-      loadData();
     } catch (error) {
       console.error('Failed:', error);
+      loadData(); // Revert on error
     }
   };
 
