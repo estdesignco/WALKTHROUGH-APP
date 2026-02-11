@@ -117,9 +117,21 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
     const newCompleted = newStatus === 'completed' || newStatus === 'done';
     
     // Optimistic update
-    setAllTodos(prev => prev.map(t => 
-      t.id === todoId ? { ...t, status: newStatus, completed: newCompleted } : t
-    ));
+    if (isCompany) {
+      setCompanyTodos(prev => prev.map(t => 
+        t.id === todoId ? { ...t, status: newStatus, completed: newCompleted } : t
+      ));
+    } else {
+      setProjectTodos(prev => {
+        const updated = { ...prev };
+        if (updated[projectId]) {
+          updated[projectId] = updated[projectId].map(t => 
+            t.id === todoId ? { ...t, status: newStatus, completed: newCompleted } : t
+          );
+        }
+        return updated;
+      });
+    }
     
     try {
       const endpoint = isCompany 
@@ -131,7 +143,8 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
       });
     } catch (error) {
       console.error('Failed:', error);
-      loadData(); // Revert on error
+      loadData();
+    } // Revert on error
     }
   };
 
