@@ -153,7 +153,7 @@ export default function GlobalToDoModal({ isOpen, onClose }) {
     try {
       const endpoint = isCompany 
         ? `${API_URL}/todos/company/${todoId}` 
-        : `${API_URL}/todos/${projectId}/${todoId}`;
+        : `${API_URL}/todos/${todoId}`;
       await axios.put(endpoint, {
         text: editValues.text,
         notes: editValues.notes || '',
