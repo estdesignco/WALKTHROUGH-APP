@@ -641,6 +641,7 @@ export default function ToDoList({ projectId, roomId = null }) {
                       style={{ background: 'inherit' }}
                     >
                       <option value="pending" className="bg-gray-800">⏳ Pending</option>
+                      <option value="in_progress" className="bg-gray-800">🔄 In Progress</option>
                       <option value="working" className="bg-gray-800">🔄 Working</option>
                       <option value="done" className="bg-gray-800">✅ Done</option>
                     </select>
