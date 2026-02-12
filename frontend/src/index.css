@@ -16,6 +16,21 @@ code {
         monospace;
 }
 
+/* FIT TO TEXT: Force ALL table cells to wrap text, never truncate */
+table td,
+table th {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+table td div[contenteditable],
+table td input,
+table td .inline-autocomplete input {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
 
 
 @layer base {
