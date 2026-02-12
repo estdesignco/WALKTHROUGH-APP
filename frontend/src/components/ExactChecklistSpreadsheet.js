@@ -2776,7 +2776,7 @@ const ExactChecklistSpreadsheet = ({
                           return (
                         <>
                         {/* SINGLE TABLE FOR ALL SUBCATEGORIES - NO NESTED TABLES */}
-                        <table className="border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10" style={{ minWidth: '3400px', width: '100%', tableLayout: 'fixed' }} data-category={category.name} data-needs-placement={needsPlacement}>
+                        <table className="border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10" style={{ minWidth: '3400px', width: '100%' }} data-category={category.name} data-needs-placement={needsPlacement}>
                           <thead>
                             <tr>
                               <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', width: '40px' }}>✓</th>
