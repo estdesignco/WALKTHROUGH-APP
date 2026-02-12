@@ -224,7 +224,7 @@ const VendorDropdown = ({ value, onChange, className = "" }) => {
   );
 
   return (
-    <div ref={dropdownRef} className="relative w-full">
+    <div ref={dropdownRef} className="relative" style={{ width: 'max-content', minWidth: '40px' }}>
       <input
         type="text"
         value={inputValue}
@@ -241,7 +241,9 @@ const VendorDropdown = ({ value, onChange, className = "" }) => {
           }, 200);
         }}
         placeholder="Select vendor..."
-        className={`w-full bg-transparent outline-none ${className}`}
+        size={Math.max((inputValue || 'Select vendor...').length + 2, 8)}
+        className={`bg-transparent outline-none ${className}`}
+        style={{ width: 'auto', minWidth: '40px' }}
       />
       
       {isOpen && filteredVendors.length > 0 && (
