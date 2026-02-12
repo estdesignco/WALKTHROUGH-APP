@@ -16,19 +16,17 @@ code {
         monospace;
 }
 
-/* FIT TO TEXT: Force ALL table cells to wrap text, never truncate */
+/* FIT TO TEXT: Columns auto-widen to fit content, like Excel */
 table td,
 table th {
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
+    white-space: nowrap !important;
 }
-table td div[contenteditable],
-table td input,
-table td .inline-autocomplete input {
-    white-space: normal !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
+table td input[type="text"],
+table td textarea {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    min-width: 0 !important;
+    width: auto !important;
 }
 
 
