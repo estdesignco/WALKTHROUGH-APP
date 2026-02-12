@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://preview-debug-14.preview.emergentagent.com/chrome-extension-v19.zip
+https://fix-verification-1.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://preview-debug-14.preview.emergentagent.com/api/download/chrome-extension
+https://fix-verification-1.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

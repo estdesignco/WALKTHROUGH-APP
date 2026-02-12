@@ -199,7 +199,7 @@ async def pull_products_from_houzz_ideaboard():
         
         print(f"\n{'='*80}")
         print(f"✅ Imported {imported} products from Houzz Pro!")
-        print(f"🔗 View: https://preview-debug-14.preview.emergentagent.com/furniture-search")
+        print(f"🔗 View: https://fix-verification-1.preview.emergentagent.com/furniture-search")
         print(f"{'='*80}\n")
     
     client.close()
