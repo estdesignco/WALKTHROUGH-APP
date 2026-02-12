@@ -163,7 +163,7 @@ const PaintColorAutocomplete = ({
   }, [selectedIndex]);
 
   return (
-    <div className="relative flex-1">
+    <div className="relative" style={{ width: 'max-content', minWidth: '40px' }}>
       <input
         type="text"
         value={inputValue}
@@ -172,8 +172,9 @@ const PaintColorAutocomplete = ({
         onBlur={handleBlur}
         onFocus={handleFocus}
         placeholder={placeholder}
-        className={`w-full bg-transparent text-sm outline-none focus:ring-1 focus:ring-[#D4A574] rounded ${className}`}
-        style={{ color: textColor, ...style }}
+        size={Math.max((inputValue || placeholder || '').length + 2, 8)}
+        className={`bg-transparent text-sm outline-none focus:ring-1 focus:ring-[#D4A574] rounded ${className}`}
+        style={{ color: textColor, width: 'auto', minWidth: '40px', ...style }}
         autoComplete="off"
       />
       
