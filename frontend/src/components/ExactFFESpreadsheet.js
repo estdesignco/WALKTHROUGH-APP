@@ -1316,7 +1316,7 @@ const ExactFFESpreadsheet = ({
         <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', minWidth: '1200px' }}>
           
           <div className="w-full" style={{ touchAction: 'pan-x pan-y' }}>
-            <table className="w-full border-collapse border border-[#B49B7E]">
+            <table className="border-collapse border border-[#B49B7E]" style={{ minWidth: '1400px', width: '100%' }}>
                   
                   <thead>
                     {/* EMPTY HEADER FOR STRUCTURE */}
