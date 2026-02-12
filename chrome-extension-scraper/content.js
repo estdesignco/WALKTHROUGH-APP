@@ -887,10 +887,45 @@ function scrapeAndShow() {
   updateFieldDisplay('image_url', scrapedData.image_url);
   updateFieldDisplay('remarks', scrapedData.remarks);
   
+  // Wire up input handlers so typing syncs back to scrapedData
+  setupInputSyncHandlers();
+  
   // Display multi-image gallery if multiple images found
   displayMultiImageGallery(scrapedData.all_images || []);
   
-  showToast('✅ Page scraped! Click any field to manually select.');
+  showToast('✅ Page scraped! Edit any field, then Send to App.');
+}
+
+function setupInputSyncHandlers() {
+  const fieldMap = {
+    'dr-field-name': 'name',
+    'dr-field-sku': 'sku',
+    'dr-field-size': 'size',
+    'dr-field-finish_color': 'finish_color',
+    'dr-field-finish_image': 'finish_image',
+    'dr-field-image_url': 'image_url',
+    'dr-field-remarks': 'remarks'
+  };
+  
+  for (const [elId, dataKey] of Object.entries(fieldMap)) {
+    const el = document.getElementById(elId);
+    if (el) {
+      el.oninput = function() {
+        if (scrapedData) scrapedData[dataKey] = el.value;
+      };
+    }
+  }
+  
+  // Price needs special handling - strip $ and commas
+  const priceEl = document.getElementById('dr-field-price');
+  if (priceEl) {
+    priceEl.oninput = function() {
+      if (scrapedData) {
+        const val = priceEl.value.replace(/[^0-9.]/g, '');
+        scrapedData.price = val ? parseFloat(val) : null;
+      }
+    };
+  }
 }
 
 // MULTI-IMAGE GALLERY - State
