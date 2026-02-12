@@ -2780,20 +2780,20 @@ const ExactChecklistSpreadsheet = ({
                           <thead>
                             <tr>
                               <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>✓</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>ITEM</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '200px' }}>ITEM</th>
                               {/* PLACEMENT column - Only for Tile, Countertops, Flooring, Paint, Wallpaper, Trim */}
                               {needsPlacement && (
-                                <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>PLACEMENT</th>
+                                <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '120px' }}>PLACEMENT</th>
                               )}
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>VENDOR/SKU</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-12" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>QTY</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>SIZE</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>FINISH</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-20" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>COST</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>STATUS</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-20" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>IMAGE</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>LINK</th>
-                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>REMARKS</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '140px' }}>VENDOR/SKU</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '50px' }}>QTY</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '140px' }}>SIZE</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '130px' }}>FINISH</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '80px' }}>COST</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '180px' }}>STATUS</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '70px' }}>IMAGE</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '60px' }}>LINK</th>
+                              <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', minWidth: '150px' }}>REMARKS</th>
                               <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16" style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}>+</th>
                             </tr>
                           </thead>
