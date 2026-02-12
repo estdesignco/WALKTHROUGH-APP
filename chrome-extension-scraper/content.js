@@ -357,7 +357,7 @@ function createSidePanel() {
           <span>📷 Main Image</span>
           <span class="dr-click-hint">Click to select</span>
         </div>
-        <div class="dr-field-value" id="dr-field-image_url">Not found</div>
+        <input class="dr-field-input" id="dr-field-image_url" type="text" placeholder="Not found" />
       </div>
       
       <div class="dr-field" data-field="remarks">
