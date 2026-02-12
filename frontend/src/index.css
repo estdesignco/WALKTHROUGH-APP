@@ -22,11 +22,11 @@ table th {
     white-space: nowrap !important;
 }
 table td input[type="text"],
-table td textarea {
+table td textarea,
+table td select {
+    field-sizing: content !important;
+    min-width: 40px !important;
     white-space: nowrap !important;
-    overflow: visible !important;
-    min-width: 0 !important;
-    width: auto !important;
 }
 
 
