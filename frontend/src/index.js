@@ -10,6 +10,23 @@ if (!window.ENV) {
   };
 }
 
+// FIT TO TEXT: Auto-size table inputs to their content (like Excel)
+function autoSizeTableInputs() {
+  document.querySelectorAll('table td input[type="text"]').forEach(input => {
+    const text = input.value || input.placeholder || '';
+    input.size = Math.max(text.length + 2, 8);
+  });
+}
+// Run on DOM changes (new data loaded, edits, etc.)
+const fitObserver = new MutationObserver(() => requestAnimationFrame(autoSizeTableInputs));
+fitObserver.observe(document.body, { subtree: true, childList: true, characterData: true });
+// Also run on any input event
+document.addEventListener('input', (e) => {
+  if (e.target.matches('table td input[type="text"]')) {
+    e.target.size = Math.max((e.target.value || '').length + 2, 8);
+  }
+}, true);
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
     <App />
