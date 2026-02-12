@@ -22,18 +22,18 @@ table th {
     white-space: nowrap !important;
 }
 table td input[type="text"],
-table td textarea,
-table td select {
-    field-sizing: content !important;
-    min-width: 40px !important;
+table td textarea {
     width: auto !important;
+    min-width: 40px !important;
     white-space: nowrap !important;
+    max-width: none !important;
 }
 table td > div,
 table td > div > div,
 table td .relative {
     width: max-content !important;
     white-space: nowrap !important;
+    max-width: none !important;
 }
 
 
