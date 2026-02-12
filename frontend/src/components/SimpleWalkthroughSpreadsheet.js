@@ -1130,34 +1130,39 @@ const SimpleWalkthroughSpreadsheet = ({
                             {category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id || subcategory.name}>
                                 {/* TABLE WITH SUBCATEGORY NAME IN HEADER - MATCHING CHECKLIST */}
-                                <table className="border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10" style={{ minWidth: '1200px', width: '100%' }}>
+                                <table className="border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10" style={{ minWidth: '2400px', width: '100%', tableLayout: 'fixed' }}>
                                   <thead>
                                     <tr>
-                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-6 shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355' }}>✓</th>
+                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355', width: '40px' }}>✓</th>
                                       <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)',
+                                    width: '600px'
                                   }}>{subcategory.name.toUpperCase()}</th>
-                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)',
+                                    width: '80px'
                                   }}>QTY</th>
                                       <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)',
+                                    width: '350px'
                                   }}>SIZE</th>
                                       <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)',
+                                    width: '350px'
                                   }}>FINISH/COLOR</th>
-                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-12 shadow-inner shadow-[#B49B7E]/20" style={{ 
+                                      <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)',
+                                    width: '80px'
                                   }}>DELETE</th>
                                     </tr>
                                   </thead>
