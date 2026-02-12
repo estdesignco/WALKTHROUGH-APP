@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.33.0",
+  "version": "7.34.0",
   "description": "Scrape product data from wholesale vendors. NEW: All fields are now EDITABLE - type directly to modify! Tab reuse, multi-image gallery.",
   "permissions": [
     "activeTab",
