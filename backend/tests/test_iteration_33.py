@@ -7,8 +7,9 @@ import requests
 import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fix-verification-1.preview.emergentagent.com')
+# Use the correct project ID from the API
 TEST_PROJECT_ID = "82c5fb51-fd53-4338-807b-7bb58f4d3386"
-VENTURE_PROJECT_ID = "dc98a3f3-5b00-4db7-8d93-6c77f81ce701"  # VENTURE DR. actual ID
+VENTURE_PROJECT_ID = "82c5fb51-fd53-4338-807b-7bb58f4d3386"  # VENTURE DR. - Test Project
 
 
 class TestHealthAndBasicAPIs:
