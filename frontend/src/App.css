@@ -569,15 +569,24 @@ nav {
 }
 
 /* Fit-to-text: All spreadsheet cells auto-size to content */
+table {
+  table-layout: auto !important;
+  width: 100% !important;
+}
 table td, table th {
   white-space: normal !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
+  height: auto !important;
+  min-height: unset !important;
 }
 table td div[contenteditable],
-table td input,
-table td .inline-edit {
+table td input[type="text"],
+table td .inline-edit,
+table td textarea {
   white-space: normal !important;
   word-wrap: break-word !important;
+  width: 100% !important;
+  min-width: 0 !important;
 }
 
