@@ -54,7 +54,8 @@ const MainDashboard = () => {
         vendor: searchParams.get('vendor'),
         link: searchParams.get('link'),
         image_url: searchParams.get('image'),
-        msrp: searchParams.get('msrp')
+        msrp: searchParams.get('msrp'),
+        remarks: searchParams.get('remarks')
       };
       localStorage.setItem('extensionScrapedData', JSON.stringify(data));
       alert(`✅ Product scraped!\n\nName: ${data.name}\nPrice: $${data.price || 'N/A'}`);
