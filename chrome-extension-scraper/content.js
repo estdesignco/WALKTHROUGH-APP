@@ -341,7 +341,7 @@ function createSidePanel() {
           <span>🎨 Finish / Color</span>
           <span class="dr-click-hint">Click to select</span>
         </div>
-        <div class="dr-field-value" id="dr-field-finish_color">Not found</div>
+        <input class="dr-field-input" id="dr-field-finish_color" type="text" placeholder="Not found" />
       </div>
       
       <div class="dr-field" data-field="finish_image">
