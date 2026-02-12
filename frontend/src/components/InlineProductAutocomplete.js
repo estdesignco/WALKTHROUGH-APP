@@ -100,7 +100,7 @@ const InlineProductAutocomplete = ({
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative" style={{ width: 'max-content', minWidth: '40px' }}>
       <input
         ref={inputRef}
         type="text"
@@ -110,7 +110,9 @@ const InlineProductAutocomplete = ({
         onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className={`w-full bg-transparent outline-none ${className}`}
+        size={Math.max((inputValue || placeholder || '').length + 2, 8)}
+        className={`bg-transparent outline-none ${className}`}
+        style={{ width: 'auto', minWidth: '40px' }}
       />
       
       {isSearching && (
