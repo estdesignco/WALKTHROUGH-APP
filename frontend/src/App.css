@@ -567,3 +567,17 @@ nav {
   background-color: #1A1A1A !important;
   border-color: #555 !important;
 }
+
+/* Fit-to-text: All spreadsheet cells auto-size to content */
+table td, table th {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+table td div[contenteditable],
+table td input,
+table td .inline-edit {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+}
+
