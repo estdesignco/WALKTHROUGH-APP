@@ -14,7 +14,10 @@ if (!window.ENV) {
 function autoSizeTableInputs() {
   document.querySelectorAll('table td input[type="text"]').forEach(input => {
     const text = input.value || input.placeholder || '';
-    input.size = Math.max(text.length + 2, 8);
+    const len = Math.max(text.length, 5);
+    // Set width directly based on character count (avg ~8.5px per char at 13-14px font)
+    input.style.setProperty('width', (len * 8.5 + 16) + 'px', 'important');
+    input.style.setProperty('min-width', (len * 8.5 + 16) + 'px', 'important');
   });
 }
 // Run on DOM changes (new data loaded, edits, etc.)
@@ -23,7 +26,9 @@ fitObserver.observe(document.body, { subtree: true, childList: true, characterDa
 // Also run on any input event
 document.addEventListener('input', (e) => {
   if (e.target.matches('table td input[type="text"]')) {
-    e.target.size = Math.max((e.target.value || '').length + 2, 8);
+    const len = Math.max((e.target.value || '').length, 5);
+    e.target.style.setProperty('width', (len * 8.5 + 16) + 'px', 'important');
+    e.target.style.setProperty('min-width', (len * 8.5 + 16) + 'px', 'important');
   }
 }, true);
 
