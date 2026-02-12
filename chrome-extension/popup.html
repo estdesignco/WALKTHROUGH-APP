@@ -9,24 +9,23 @@
       box-sizing: border-box;
     }
     body {
-      width: 420px;
+      width: 460px;
       min-height: 550px;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      /* EXACT MATCH: Dark to blue gradient with gold text */
       background: linear-gradient(135deg, #000000 0%, #0a1628 20%, #0f2847 40%, #1e3a5f 60%, #0f2847 80%, #000000 100%);
       color: #D4A574;
       padding: 0;
-      overflow: hidden;
+      overflow-y: auto;
     }
     .header {
       background: linear-gradient(135deg, rgba(212, 165, 116, 0.15), rgba(212, 165, 116, 0.05));
-      padding: 20px;
+      padding: 16px;
       text-align: center;
       border-bottom: 2px solid rgba(212, 165, 116, 0.3);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     }
     h1 {
-      font-size: 22px;
+      font-size: 20px;
       margin: 0;
       color: #D4A574;
       text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9);
@@ -36,19 +35,19 @@
     .subtitle {
       font-size: 11px;
       color: #B8956A;
-      margin-top: 6px;
+      margin-top: 4px;
       opacity: 0.9;
     }
     .container {
-      padding: 20px;
-      max-height: 450px;
+      padding: 14px;
+      max-height: 520px;
       overflow-y: auto;
     }
     .section {
       background: linear-gradient(135deg, rgba(15, 40, 71, 0.8), rgba(10, 22, 40, 0.9));
-      padding: 18px;
-      border-radius: 12px;
-      margin-bottom: 16px;
+      padding: 14px;
+      border-radius: 10px;
+      margin-bottom: 12px;
       border: 2px solid rgba(212, 165, 116, 0.4);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
@@ -56,44 +55,48 @@
       display: block;
       color: #D4A574;
       font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 13px;
+      margin-bottom: 5px;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    input, select {
+    input[type="text"], select, textarea {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       background: rgba(5, 10, 20, 0.9);
       border: 2px solid rgba(212, 165, 116, 0.5);
       border-radius: 8px;
       color: #D4A574;
       font-size: 13px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
       font-family: inherit;
       transition: all 0.3s ease;
     }
-    input:focus, select:focus {
+    textarea {
+      resize: vertical;
+      min-height: 50px;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
       outline: none;
       border-color: #D4A574;
       box-shadow: 0 0 12px rgba(212, 165, 116, 0.3);
     }
-    input::placeholder {
+    input::placeholder, textarea::placeholder {
       color: rgba(212, 165, 116, 0.4);
     }
     button {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       background: linear-gradient(135deg, #D4A574, #C9A875, #B8956A);
       color: #000;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3);
     }
@@ -104,7 +107,6 @@
     }
     button:active {
       transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
     }
     button:disabled {
       opacity: 0.4;
@@ -113,8 +115,8 @@
     }
     button.scan {
       background: linear-gradient(135deg, #D4A574, #E8D4B8, #D4A574);
-      font-size: 15px;
-      padding: 16px;
+      font-size: 14px;
+      padding: 14px;
       animation: pulse 2s infinite;
     }
     button.scan:hover:not(:disabled) {
@@ -124,17 +126,31 @@
       0%, 100% { box-shadow: 0 4px 12px rgba(212, 165, 116, 0.3); }
       50% { box-shadow: 0 4px 20px rgba(212, 165, 116, 0.6); }
     }
-    #status {
-      margin-top: 16px;
+    button.send-btn {
+      background: linear-gradient(135deg, #22C55E, #16A34A, #15803D);
+      color: white;
+      font-size: 14px;
       padding: 14px;
+    }
+    button.send-btn:hover {
+      background: linear-gradient(135deg, #16A34A, #15803D, #166534);
+    }
+    button.clear-btn {
+      background: linear-gradient(135deg, #6B7280, #4B5563);
+      color: white;
+      font-size: 12px;
+      padding: 10px;
+    }
+    #status {
+      margin-top: 10px;
+      padding: 10px;
       background: linear-gradient(135deg, rgba(5, 10, 20, 0.95), rgba(10, 22, 40, 0.9));
       border-radius: 8px;
       border: 2px solid rgba(212, 165, 116, 0.3);
       font-size: 11px;
-      max-height: 180px;
+      max-height: 120px;
       overflow-y: auto;
       font-family: 'Courier New', monospace;
-      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.7);
     }
     .status-line {
       margin: 3px 0;
@@ -142,27 +158,25 @@
       border-radius: 4px;
       background: rgba(0, 0, 0, 0.3);
     }
-    .success { 
-      color: #9ACD32;
-      font-weight: 600;
-    }
-    .error { 
-      color: #ff6b6b;
-      font-weight: 600;
-    }
-    .info { 
-      color: #D4A574;
-    }
-    .warning {
-      color: #FFA500;
-    }
+    .success { color: #9ACD32; font-weight: 600; }
+    .error { color: #ff6b6b; font-weight: 600; }
+    .info { color: #D4A574; }
+    .warning { color: #FFA500; }
     .hidden { display: none; }
+    .edit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .edit-grid .full-width {
+      grid-column: 1 / -1;
+    }
     .scan-info {
       font-size: 10px;
       color: #B8956A;
       text-align: center;
-      margin-top: 10px;
-      padding: 8px;
+      margin-top: 8px;
+      padding: 6px;
       background: rgba(0, 0, 0, 0.4);
       border-radius: 6px;
       line-height: 1.4;
@@ -177,48 +191,51 @@
       margin: 2px;
       border: 1px solid rgba(212, 165, 116, 0.3);
     }
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
+    .product-card {
       background: rgba(0, 0, 0, 0.4);
-      border-radius: 4px;
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
     }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(212, 165, 116, 0.5);
-      border-radius: 4px;
+    .product-card h3 {
+      font-size: 13px;
+      color: #D4A574;
+      margin-bottom: 8px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(212, 165, 116, 0.7);
-    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.4); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(212, 165, 116, 0.5); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(212, 165, 116, 0.7); }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🎨 Canva Board Scanner</h1>
+    <h1>Canva Board Scanner</h1>
     <div class="subtitle">Trade Vendor Product Importer</div>
   </div>
   
   <div class="container">
-    <div class="section">
-      <label>📋 Project ID:</label>
-      <input type="text" id="projectId" placeholder="Enter your project ID">
+    <!-- STEP 1: Project & Room Selection -->
+    <div class="section" id="step1">
+      <label>Project ID:</label>
+      <input type="text" id="projectId" placeholder="Enter your project ID" data-testid="project-id-input">
       
-      <label>🏠 Select Room:</label>
-      <select id="roomSelect">
+      <label>Select Room:</label>
+      <select id="roomSelect" data-testid="room-select">
         <option value="">-- Load project first --</option>
       </select>
       
-      <button id="loadBtn">Load Project</button>
+      <button id="loadBtn" data-testid="load-project-btn">Load Project</button>
     </div>
 
+    <!-- STEP 2: Scan OR Manual Entry -->
     <div class="section">
-      <button id="scanBtn" class="scan" disabled>
-        🔍 Scan Canva Board for Products
+      <button id="scanBtn" class="scan" disabled data-testid="scan-btn">
+        Scan Canva Board for Products
       </button>
       <div class="scan-info">
-        <strong>Smart Detection:</strong> Finds product links from your trade vendors<br>
+        <strong>Smart Detection:</strong> Finds product links from trade vendors<br>
         <div style="margin-top: 6px;">
           <span class="vendor-badge">Bernhardt</span>
           <span class="vendor-badge">Gabby</span>
@@ -226,6 +243,66 @@
           <span class="vendor-badge">+ more</span>
         </div>
       </div>
+    </div>
+
+    <!-- STEP 3: Editable Product Fields (shown after scan or for manual entry) -->
+    <div class="section hidden" id="editSection">
+      <label style="font-size: 13px; color: #9ACD32; margin-bottom: 10px;">EDIT PRODUCT DATA BEFORE SENDING:</label>
+      
+      <div class="full-width">
+        <label>Item Name:</label>
+        <input type="text" id="editName" placeholder="Enter item name" data-testid="edit-name-input">
+      </div>
+      
+      <div class="edit-grid">
+        <div>
+          <label>Vendor:</label>
+          <input type="text" id="editVendor" placeholder="Vendor name" data-testid="edit-vendor-input">
+        </div>
+        <div>
+          <label>SKU:</label>
+          <input type="text" id="editSku" placeholder="SKU number" data-testid="edit-sku-input">
+        </div>
+      </div>
+
+      <div class="edit-grid">
+        <div>
+          <label>Price:</label>
+          <input type="text" id="editPrice" placeholder="$0.00" data-testid="edit-price-input">
+        </div>
+        <div>
+          <label>MSRP:</label>
+          <input type="text" id="editMsrp" placeholder="$0.00" data-testid="edit-msrp-input">
+        </div>
+      </div>
+
+      <div class="edit-grid">
+        <div>
+          <label>Size:</label>
+          <input type="text" id="editSize" placeholder="e.g. 24x36" data-testid="edit-size-input">
+        </div>
+        <div>
+          <label>Finish/Color:</label>
+          <input type="text" id="editFinish" placeholder="e.g. Brass" data-testid="edit-finish-input">
+        </div>
+      </div>
+
+      <div class="full-width">
+        <label>Product Link:</label>
+        <input type="text" id="editLink" placeholder="https://..." data-testid="edit-link-input">
+      </div>
+
+      <div class="full-width">
+        <label>Remarks:</label>
+        <textarea id="editRemarks" placeholder="Add notes, comments, etc." data-testid="edit-remarks-input"></textarea>
+      </div>
+
+      <button id="sendBtn" class="send-btn" data-testid="send-to-app-btn">
+        SEND TO APP
+      </button>
+      <button id="clearFieldsBtn" class="clear-btn" data-testid="clear-fields-btn">
+        CLEAR ALL FIELDS
+      </button>
     </div>
 
     <div id="status" class="hidden"></div>
