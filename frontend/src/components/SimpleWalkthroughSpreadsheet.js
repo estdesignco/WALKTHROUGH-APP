@@ -1130,7 +1130,7 @@ const SimpleWalkthroughSpreadsheet = ({
                             {category.subcategories?.map((subcategory) => (
                               <React.Fragment key={subcategory.id || subcategory.name}>
                                 {/* TABLE WITH SUBCATEGORY NAME IN HEADER - MATCHING CHECKLIST */}
-                                <table className="border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10" style={{ minWidth: '2400px', width: '100%' }}>
+                                <table className="border-collapse border border-[#B49B7E] mb-4 shadow-lg shadow-[#B49B7E]/10" style={{ minWidth: '2800px', width: '100%' }}>
                                   <thead>
                                     <tr>
                                       <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ backgroundColor: '#8b7355', width: '40px' }}>✓</th>
