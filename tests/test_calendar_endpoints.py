@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fix-verification-1.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://edit-scraped-data.preview.emergentagent.com')
 
 class TestGoogleCalendarEndpoints:
     """Test Google Calendar integration endpoints"""

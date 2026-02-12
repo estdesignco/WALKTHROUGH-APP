@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Backend URL from review request
-BACKEND_URL = "https://fix-verification-1.preview.emergentagent.com"
+BACKEND_URL = "https://edit-scraped-data.preview.emergentagent.com"
 
 def test_create_complete_project():
     """Test creating a complete project with full questionnaire data"""

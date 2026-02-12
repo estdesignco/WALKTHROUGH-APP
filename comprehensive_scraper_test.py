@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Backend URL from environment
-BACKEND_URL = "https://fix-verification-1.preview.emergentagent.com"
+BACKEND_URL = "https://edit-scraped-data.preview.emergentagent.com"
 
 def test_comprehensive_scrape_product():
     """Test the /api/scrape-product endpoint for finish_color extraction on all vendor URLs"""

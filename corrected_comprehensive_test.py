@@ -11,7 +11,7 @@ from typing import Dict, Any, List
 from datetime import datetime
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://fix-verification-1.preview.emergentagent.com/api"
+BACKEND_URL = "https://edit-scraped-data.preview.emergentagent.com/api"
 
 class CorrectedBackendTester:
     def __init__(self):

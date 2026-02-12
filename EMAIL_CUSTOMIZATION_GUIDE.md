@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://fix-verification-1.preview.emergentagent.com/email-template.html
+https://edit-scraped-data.preview.emergentagent.com/email-template.html
 
 ---
 

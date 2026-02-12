@@ -12,8 +12,8 @@ console.log('██  Swatch Logic: v16 | Main Image Logic: v10                 �
 console.log('██  BOTH SHOULD WORK NOW - USER VERIFIED COMBINATION          ██');
 console.log('████████████████████████████████████████████████████████████████');
 
-const APP_URL = 'https://fix-verification-1.preview.emergentagent.com';
-const BACKEND_URL = 'https://fix-verification-1.preview.emergentagent.com';
+const APP_URL = 'https://edit-scraped-data.preview.emergentagent.com';
+const BACKEND_URL = 'https://edit-scraped-data.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

@@ -11,7 +11,7 @@ import traceback
 async def test_full_add_item_workflow():
     """Test the complete add item workflow"""
     
-    base_url = "https://fix-verification-1.preview.emergentagent.com/api"
+    base_url = "https://edit-scraped-data.preview.emergentagent.com/api"
     
     try:
         timeout = aiohttp.ClientTimeout(total=180)  # 3 minutes for full workflow

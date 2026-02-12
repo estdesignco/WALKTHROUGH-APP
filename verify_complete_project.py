@@ -7,7 +7,7 @@ Verifies that all data was saved correctly
 import requests
 import json
 
-BACKEND_URL = "https://fix-verification-1.preview.emergentagent.com"
+BACKEND_URL = "https://edit-scraped-data.preview.emergentagent.com"
 PROJECT_ID = "de2af37b-9a03-48d4-a17e-93148f98bfda"
 
 def verify_project_data():

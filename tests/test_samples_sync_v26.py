@@ -13,7 +13,7 @@ import time
 import uuid
 
 # Get backend URL from environment
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://fix-verification-1.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://edit-scraped-data.preview.emergentagent.com')
 API_URL = f"{BASE_URL}/api"
 
 print(f"🔗 Testing against: {API_URL}")

@@ -3,7 +3,7 @@
 ## ✅ What Was Built
 
 ### 1. **Canva Live Checklist** (WORKING!)
-**URL:** `https://fix-verification-1.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+**URL:** `https://edit-scraped-data.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
 
 **Features:**
 - ✅ Clean, simple UI with dark gold theme
@@ -25,7 +25,7 @@
 ---
 
 ### 2. **Chrome Extension** (COMPLETE!)
-**Download:** `https://fix-verification-1.preview.emergentagent.com/chrome-extension.zip`
+**Download:** `https://edit-scraped-data.preview.emergentagent.com/chrome-extension.zip`
 
 **Features:**
 - ✅ Scans entire Canva boards for images with links
@@ -55,7 +55,7 @@
 ---
 
 ### 3. **Comprehensive Documentation**
-**Guide:** `https://fix-verification-1.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+**Guide:** `https://edit-scraped-data.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
 
 Complete visual guide with:
 - Setup instructions
@@ -205,11 +205,11 @@ Complete visual guide with:
 4. **Bulk Import Tool:** `bulk-import.html` (backup option)
 
 ### All URLs:
-- Main App: `https://fix-verification-1.preview.emergentagent.com`
-- Live Checklist: `https://fix-verification-1.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
-- Extension: `https://fix-verification-1.preview.emergentagent.com/chrome-extension.zip`
-- Guide: `https://fix-verification-1.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
-- Bulk Import: `https://fix-verification-1.preview.emergentagent.com/bulk-import.html`
+- Main App: `https://edit-scraped-data.preview.emergentagent.com`
+- Live Checklist: `https://edit-scraped-data.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+- Extension: `https://edit-scraped-data.preview.emergentagent.com/chrome-extension.zip`
+- Guide: `https://edit-scraped-data.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+- Bulk Import: `https://edit-scraped-data.preview.emergentagent.com/bulk-import.html`
 
 ---
 
