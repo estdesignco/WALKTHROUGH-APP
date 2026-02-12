@@ -309,7 +309,7 @@ function createSidePanel() {
           <span>📝 Product Title</span>
           <span class="dr-click-hint">Click to select</span>
         </div>
-        <div class="dr-field-value" id="dr-field-name">Not found</div>
+        <input class="dr-field-input" id="dr-field-name" type="text" placeholder="Not found" />
       </div>
       
       <div class="dr-field" data-field="price">
