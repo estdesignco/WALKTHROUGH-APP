@@ -132,6 +132,24 @@ function createSidePanel() {
         color: #fff;
         word-break: break-word;
       }
+      #dr-scraper-panel input.dr-field-input {
+        width: 100%;
+        font-size: 13px;
+        color: #fff;
+        background: #1a1a2e;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 6px 8px;
+        outline: none;
+        font-family: inherit;
+      }
+      #dr-scraper-panel input.dr-field-input:focus {
+        border-color: #4ade80;
+      }
+      #dr-scraper-panel input.dr-field-input::placeholder {
+        color: #666;
+        font-style: italic;
+      }
       #dr-scraper-panel .dr-field-value.missing {
         color: #666;
         font-style: italic;
