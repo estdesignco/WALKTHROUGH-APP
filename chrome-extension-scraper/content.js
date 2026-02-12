@@ -762,26 +762,17 @@ function updateFieldDisplay(fieldId, value) {
   const el = document.getElementById(`dr-field-${fieldId}`);
   if (!el) return;
   
-  if (fieldId === 'finish_image' || fieldId === 'image_url') {
-    if (value && value.startsWith('http')) {
-      el.innerHTML = `<img src="${value}" alt="${fieldId}"> <span>${value.split('/').pop().substring(0, 30)}...</span>`;
-      el.classList.add('has-image');
-    } else {
-      el.textContent = value || 'Not found';
-      el.classList.remove('has-image');
-    }
-  } else if (fieldId === 'price') {
+  // All fields are now <input> elements - use .value
+  if (fieldId === 'price') {
     const num = parseFloat(value);
     if (!isNaN(num)) {
-      el.textContent = '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2});
+      el.value = '$' + num.toLocaleString('en-US', {minimumFractionDigits: 2});
     } else {
-      el.textContent = value || 'Not found';
+      el.value = value || '';
     }
   } else {
-    el.textContent = value || 'Not found';
+    el.value = value || '';
   }
-  
-  el.classList.toggle('missing', !value);
 }
 
 function formatFieldName(fieldId) {
