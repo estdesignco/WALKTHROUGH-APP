@@ -1189,7 +1189,7 @@ async function sendToApp() {
     if(scrapedData.msrp !== undefined && scrapedData.msrp !== null && scrapedData.msrp !== '') {
       params.set('msrp', String(scrapedData.msrp));
     }
-    if(scrapedData.description) params.set('remarks', scrapedData.description);
+    if(scrapedData.description || scrapedData.remarks) params.set('remarks', scrapedData.description || scrapedData.remarks);
     
     // DEBUG: Log what we're sending
     console.log('==================== SENDING TO APP ====================');
