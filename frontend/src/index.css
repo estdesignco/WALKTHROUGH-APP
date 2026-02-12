@@ -26,6 +26,7 @@ table td textarea,
 table td select {
     field-sizing: content !important;
     min-width: 40px !important;
+    width: auto !important;
     white-space: nowrap !important;
 }
 
