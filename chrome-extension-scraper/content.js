@@ -328,6 +328,22 @@ function createSidePanel() {
         <input class="dr-field-input" id="dr-field-sku" type="text" placeholder="Not found" />
       </div>
       
+      <div class="dr-field" data-field="vendor">
+        <div class="dr-field-label">
+          <span>🏢 Vendor</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <input class="dr-field-input" id="dr-field-vendor" type="text" placeholder="Not found" />
+      </div>
+      
+      <div class="dr-field" data-field="msrp">
+        <div class="dr-field-label">
+          <span>💲 MSRP</span>
+          <span class="dr-click-hint">Click to select</span>
+        </div>
+        <input class="dr-field-input" id="dr-field-msrp" type="text" placeholder="Not found" />
+      </div>
+      
       <div class="dr-field" data-field="size">
         <div class="dr-field-label">
           <span>📏 Dimensions</span>
