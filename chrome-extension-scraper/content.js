@@ -2597,62 +2597,84 @@ async function copyImage() {
   }
   
   const imageUrl = scrapedData.image_url;
-  console.log('[Scraper] Attempting to copy image:', imageUrl);
+  console.log('[Scraper] Copying ACTUAL IMAGE to clipboard:', imageUrl);
+  showToast('⏳ Downloading image...');
   
-  // Method 1: Try to find the actual image on the page and copy it directly
+  try {
+    // Fetch the actual image data (extension has cross-origin permissions)
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error('Failed to fetch image');
+    
+    const blob = await response.blob();
+    console.log('[Scraper] Image fetched, type:', blob.type, 'size:', blob.size);
+    
+    // Convert to PNG if needed (Canva and clipboard prefer PNG)
+    let pngBlob = blob;
+    if (!blob.type.includes('png')) {
+      // Convert via canvas
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      const blobUrl = URL.createObjectURL(blob);
+      
+      pngBlob = await new Promise((resolve, reject) => {
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+          canvas.toBlob((b) => {
+            URL.revokeObjectURL(blobUrl);
+            resolve(b);
+          }, 'image/png');
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(blobUrl);
+          // If canvas conversion fails, use original blob
+          resolve(blob);
+        };
+        img.src = blobUrl;
+      });
+    }
+    
+    // Copy actual image to clipboard
+    if (pngBlob && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': pngBlob })
+      ]);
+      showToast('✅ Image copied! Paste into Canva with Ctrl+V');
+      return;
+    }
+  } catch (fetchErr) {
+    console.error('[Scraper] Image fetch/copy failed:', fetchErr.message);
+  }
+  
+  // Method 2: Try from page DOM (same-origin images)
   try {
     const imgElements = document.querySelectorAll('img');
-    let targetImg = null;
-    
     for (const img of imgElements) {
       if (img.src === imageUrl || img.src.includes(imageUrl.split('?')[0].split('/').pop())) {
-        targetImg = img;
+        if (img.complete && img.naturalWidth > 0) {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
+          const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          if (pngBlob && navigator.clipboard && navigator.clipboard.write) {
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+            showToast('✅ Image copied! Paste into Canva with Ctrl+V');
+            return;
+          }
+        }
         break;
       }
     }
-    
-    if (targetImg && targetImg.complete && targetImg.naturalWidth > 0) {
-      const canvas = document.createElement('canvas');
-      canvas.width = targetImg.naturalWidth;
-      canvas.height = targetImg.naturalHeight;
-      const ctx = canvas.getContext('2d');
-      
-      try {
-        ctx.drawImage(targetImg, 0, 0);
-        const pngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-        
-        if (pngBlob && navigator.clipboard && navigator.clipboard.write) {
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
-          showToast('✅ Image copied!');
-          return;
-        }
-      } catch (canvasErr) {
-        console.log('[Scraper] Canvas method failed:', canvasErr.message);
-      }
-    }
-  } catch (method1Err) {
-    console.log('[Scraper] Method 1 failed:', method1Err.message);
+  } catch (domErr) {
+    console.log('[Scraper] DOM method failed:', domErr.message);
   }
   
-  // Fallback: Copy the image URL using execCommand
-  const fallbackCopyUrl = (url) => {
-    const textArea = document.createElement('textarea');
-    textArea.value = url;
-    textArea.style.position = 'fixed';
-    textArea.style.left = '-9999px';
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    const success = document.execCommand('copy');
-    document.body.removeChild(textArea);
-    return success;
-  };
-  
-  if (fallbackCopyUrl(imageUrl)) {
-    showToast('📋 Image URL copied!');
-  } else {
-    showToast('❌ Copy failed - URL: ' + imageUrl.substring(0, 40) + '...');
-  }
+  showToast('❌ Could not copy image. Try right-click > Copy Image on the product photo.');
 }
 
 async function copyLink() {
