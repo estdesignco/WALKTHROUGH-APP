@@ -374,7 +374,7 @@ function createSidePanel() {
           <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #4ade80;">🖼️ Product Images (click to select)</span>
           <span id="dr-selected-count" style="font-size: 11px; color: #888; background: #222; padding: 2px 8px; border-radius: 4px;">0 selected</span>
         </div>
-        <div id="dr-image-gallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 160px; overflow-y: auto;"></div>
+        <div id="dr-image-gallery" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-height: 320px; overflow-y: auto;"></div>
       </div>
     </div>
     
