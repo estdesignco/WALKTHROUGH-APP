@@ -918,6 +918,8 @@ function setupInputSyncHandlers() {
   const fieldMap = {
     'dr-field-name': 'name',
     'dr-field-sku': 'sku',
+    'dr-field-vendor': 'vendor',
+    'dr-field-msrp': 'msrp',
     'dr-field-size': 'size',
     'dr-field-finish_color': 'finish_color',
     'dr-field-finish_image': 'finish_image',
