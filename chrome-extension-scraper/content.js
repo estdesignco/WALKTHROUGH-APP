@@ -897,6 +897,8 @@ function scrapeAndShow() {
   updateFieldDisplay('name', scrapedData.name);
   updateFieldDisplay('price', scrapedData.price);
   updateFieldDisplay('sku', scrapedData.sku);
+  updateFieldDisplay('vendor', scrapedData.vendor);
+  updateFieldDisplay('msrp', scrapedData.msrp);
   updateFieldDisplay('size', scrapedData.size);
   updateFieldDisplay('finish_color', scrapedData.finish_color);
   updateFieldDisplay('finish_image', scrapedData.finish_image);
