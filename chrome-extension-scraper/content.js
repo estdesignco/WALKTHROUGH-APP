@@ -89,7 +89,7 @@ function createSidePanel() {
       }
       #dr-scraper-panel .dr-content {
         padding: 12px;
-        max-height: 45vh;
+        max-height: 75vh;
         overflow-y: auto;
       }
       #dr-scraper-panel .dr-field {
