@@ -979,18 +979,20 @@ function displayMultiImageGallery(images) {
     const div = document.createElement('div');
     div.style.cssText = `
       position: relative;
-      aspect-ratio: 1;
+      width: 100%;
+      padding-bottom: 100%;
       cursor: pointer;
       border-radius: 6px;
       overflow: hidden;
       border: 3px solid ${isSelected ? '#4ade80' : '#333'};
       transition: all 0.2s;
       box-shadow: ${isSelected ? '0 0 12px rgba(74, 222, 128, 0.5)' : 'none'};
+      background: #1a1a2e;
     `;
     div.innerHTML = `
-      <img src="${img.url}" alt="Product ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.style.display='none'">
-      ${img.isPrimary ? '<span style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #f59e0b; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">★</span>' : ''}
-      ${isSelected ? '<span style="position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: #4ade80; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">✓</span>' : ''}
+      <img src="${img.url}" alt="Product ${index + 1}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.style.display='none'">
+      ${img.isPrimary ? '<span style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #f59e0b; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; z-index: 2;">★</span>' : ''}
+      ${isSelected ? '<span style="position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: #4ade80; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; z-index: 2;">✓</span>' : ''}
     `;
     
     div.onclick = function() {
