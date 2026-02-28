@@ -27,6 +27,19 @@
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         <meta name="description" content="ESTABLISHED Design Co. - Interior Design Project Management" />
         <script src="/config.js"></script>
+        <script>
+            // iPad/iPhone/Android auto-redirect to mobile app - runs BEFORE React
+            (function() {
+                var path = window.location.pathname;
+                if (path.indexOf('/mobile-app') === 0 || path.indexOf('/customer') === 0) return;
+                var isMobile = /iPad|iPhone|iPod|Android|webOS|BlackBerry/i.test(navigator.userAgent);
+                var isIPad = navigator.userAgent.indexOf('Macintosh') > -1 && navigator.maxTouchPoints > 1;
+                var isTouch = ('ontouchend' in document);
+                if (isMobile || isIPad || (isTouch && navigator.maxTouchPoints > 1)) {
+                    window.location.replace('/mobile-app');
+                }
+            })();
+        </script>
         <title>ESTABLISHED Design Co.</title>
         
         <!-- Additional PWA styles for iOS -->
