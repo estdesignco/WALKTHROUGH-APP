@@ -768,23 +768,17 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                 <InputField label="Spouse / Partner Name" id="spouse_partner_name" value={formData.spouse_partner_name || ''} onChange={(e) => handleFormChange('spouse_partner_name', e.target.value)} />
                                 <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value, e)} />
                                 <FieldWrapper label="Project Address">
-                                    <Autocomplete
+                                    <GoogleAddressInput
+                                        value={formData.address || ''}
                                         onPlaceSelected={(place) => {
                                             console.log('📍 Place selected:', place);
                                             if (place && place.formatted_address) {
                                                 handleFormChange('address', place.formatted_address);
                                             }
                                         }}
-                                        options={{
-                                            types: ['address'],
-                                        }}
+                                        onChange={(val) => handleFormChange('address', val)}
                                         className="flex h-12 w-full rounded-md border border-gray-600 bg-gray-700 px-4 py-2 text-[#F5F5DC] focus:outline-none focus:ring-2 focus:ring-[#8B7355] placeholder:text-stone-400"
                                         placeholder="Start typing your address..."
-                                        defaultValue={formData.address || ''}
-                                        onChange={(e) => {
-                                            // Also save manual input as fallback
-                                            handleFormChange('address', e.target.value);
-                                        }}
                                     />
                                     <p className="text-xs text-[#B49B7E]/60 mt-1">Start typing and select from suggestions, or type your full address manually</p>
                                 </FieldWrapper>
