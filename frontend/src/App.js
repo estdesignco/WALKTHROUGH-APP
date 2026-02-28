@@ -151,7 +151,8 @@ const App = () => {
   // Auto-redirect mobile/tablet to mobile app
   useEffect(() => {
     const isMobile = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent) || 
-      (navigator.userAgent.includes('Macintosh') && 'ontouchend' in document);
+      (navigator.userAgent.includes('Macintosh') && 'ontouchend' in document) ||
+      (navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
     const isOnMobilePage = window.location.pathname.startsWith('/mobile-app');
     const isCustomerPage = window.location.pathname.startsWith('/customer');
     if (isMobile && !isOnMobilePage && !isCustomerPage) {
