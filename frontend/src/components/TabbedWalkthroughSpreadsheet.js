@@ -565,12 +565,124 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
         <div className="text-center">
           <h2 className="text-3xl font-bold text-[#D4A574] mb-4">No Rooms Available</h2>
           <button 
+            data-testid="add-first-room-btn"
             onClick={() => setShowAddRoom(true)}
             className="px-8 py-4 bg-[#D4A574] hover:bg-[#C49564] text-black rounded-xl font-bold text-xl"
           >
             + ADD FIRST ROOM
           </button>
         </div>
+
+        {/* ADD ROOM MODAL - must be rendered here too for the zero-rooms case */}
+        {showAddRoom && (
+          <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
+            <div className="rounded-2xl p-8 max-w-4xl w-full border-2 border-[#D4A574] max-h-[90vh] overflow-y-auto" style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.98) 0%, rgba(30,30,30,0.95) 20%, rgba(15,15,25,0.98) 40%, rgba(30,30,30,0.95) 60%, rgba(15,15,25,0.98) 80%, rgba(0,0,0,0.98) 100%)',
+              boxShadow: '0 0 60px rgba(212, 165, 116, 0.3), inset 0 0 80px rgba(212, 165, 116, 0.05)'
+            }}>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-3xl font-bold text-[#D4A574]">Add New Room(s)</h3>
+                <button
+                  onClick={() => setShowAddRoom(false)}
+                  className="text-[#D4A574] text-3xl hover:text-red-400 font-bold"
+                  data-testid="close-add-room-modal"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="mb-8">
+                <label className="text-[#D4C5A9] text-lg font-bold mb-3 block">Custom Room Name</label>
+                <input
+                  type="text"
+                  data-testid="custom-room-name-input"
+                  value={newRoomName}
+                  onChange={(e) => setNewRoomName(e.target.value)}
+                  placeholder="Enter custom room name..."
+                  className="w-full bg-gray-900 text-[#D4C5A9] px-6 py-4 rounded-xl text-xl border-2 border-[#B49B7E] focus:border-[#D4A574] focus:outline-none"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
+                  }}
+                  onKeyPress={(e) => e.key === 'Enter' && newRoomName.trim() && handleAddRoom()}
+                />
+              </div>
+
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-[#D4C5A9] text-lg font-bold">Quick Select Rooms (Multi-Select)</h4>
+                  <span className="text-[#D4A574] text-sm">
+                    {selectedRoomsToAdd?.length || 0} room(s) selected
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  {[
+                    'Living Room', 'Kitchen', 'Master Bedroom',
+                    'Bedroom 2', 'Bedroom 3', 'Bathroom', 
+                    'Master Bathroom', 'Powder Room', 'Dining Room',
+                    'Office', 'Family Room', 'Basement',
+                    'Laundry Room', 'Mudroom', 'Pantry',
+                    'Closet', 'Guest Room', 'Playroom',
+                    'Library', 'Wine Cellar', 'Garage',
+                    'Patio', 'Balcony', 'Foyer'
+                  ].map((roomName) => {
+                    const roomColor = getRoomColor(roomName);
+                    const isSelected = selectedRoomsToAdd?.includes(roomName);
+                    return (
+                      <button
+                        key={roomName}
+                        data-testid={`room-select-${roomName.toLowerCase().replace(/\s+/g, '-')}`}
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedRoomsToAdd(prev => prev.filter(r => r !== roomName));
+                          } else {
+                            setSelectedRoomsToAdd(prev => [...(prev || []), roomName]);
+                          }
+                        }}
+                        className={`p-4 rounded-xl border-2 font-bold text-lg transition-all transform hover:scale-105 overflow-hidden ${
+                          isSelected ? 'border-green-500 text-green-400' : 'border-[#B49B7E] hover:border-[#D4A574] text-[#D4C5A9]'
+                        }`}
+                        style={{ 
+                          background: isSelected 
+                            ? 'linear-gradient(135deg, rgba(34,197,94,0.2) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(34,197,94,0.2) 100%)'
+                            : 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)',
+                          borderTop: `4px solid ${isSelected ? '#22c55e' : roomColor}`,
+                          boxShadow: isSelected 
+                            ? `0 0 25px rgba(34,197,94,0.5), 0 -3px 15px rgba(34,197,94,0.3), inset 0 0 30px rgba(34,197,94,0.1)` 
+                            : `0 -2px 8px ${roomColor}40, inset 0 0 20px ${roomColor}05`
+                        }}
+                      >
+                        {isSelected && <span className="mr-2">✓</span>}
+                        {roomName}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex gap-6">
+                <button 
+                  onClick={() => {
+                    setShowAddRoom(false);
+                    setSelectedRoomsToAdd([]);
+                    setNewRoomName('');
+                  }}
+                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-8 py-4 rounded-xl font-bold text-xl"
+                  data-testid="cancel-add-room-btn"
+                >
+                  Cancel
+                </button>
+                <button 
+                  data-testid="submit-add-rooms-btn"
+                  onClick={handleAddRooms}
+                  disabled={!newRoomName.trim() && (!selectedRoomsToAdd || selectedRoomsToAdd.length === 0)}
+                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-500 disabled:to-gray-600 text-white px-8 py-4 rounded-xl font-bold text-xl"
+                >
+                  Add {(selectedRoomsToAdd?.length || 0) + (newRoomName.trim() ? 1 : 0)} Room(s)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
