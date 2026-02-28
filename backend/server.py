@@ -1824,6 +1824,69 @@ async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "timestamp": datetime.utcnow(), "version": "1.0.1-wheeler-active"}
 
+# GOOGLE PLACES PROXY - Server-side autocomplete to avoid client-side API key issues
+@api_router.get("/places/autocomplete")
+async def places_autocomplete(input: str):
+    """Proxy Google Places Autocomplete API server-side."""
+    import aiohttp
+    google_key = os.getenv('GOOGLE_MAPS_KEY', '')
+    if not google_key:
+        return {"predictions": [], "error": "Google Maps key not configured"}
+    
+    url = "https://maps.googleapis.com/maps/api/place/autocomplete/json"
+    params = {
+        "input": input,
+        "types": "address",
+        "components": "country:us",
+        "key": google_key
+    }
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params) as resp:
+                data = await resp.json()
+                return {
+                    "predictions": [
+                        {"description": p["description"], "place_id": p["place_id"]}
+                        for p in data.get("predictions", [])
+                    ]
+                }
+    except Exception as e:
+        logging.error(f"Places autocomplete error: {e}")
+        return {"predictions": [], "error": str(e)}
+
+@api_router.get("/places/details")
+async def places_details(place_id: str):
+    """Get place details (full address, lat/lng) from place_id."""
+    import aiohttp
+    google_key = os.getenv('GOOGLE_MAPS_KEY', '')
+    if not google_key:
+        return {"error": "Google Maps key not configured"}
+    
+    url = "https://maps.googleapis.com/maps/api/place/details/json"
+    params = {
+        "place_id": place_id,
+        "fields": "formatted_address,geometry,address_components",
+        "key": google_key
+    }
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params) as resp:
+                data = await resp.json()
+                result = data.get("result", {})
+                return {
+                    "formatted_address": result.get("formatted_address", ""),
+                    "lat": result.get("geometry", {}).get("location", {}).get("lat"),
+                    "lng": result.get("geometry", {}).get("location", {}).get("lng"),
+                    "address_components": result.get("address_components", [])
+                }
+    except Exception as e:
+        logging.error(f"Places details error: {e}")
+        return {"error": str(e)}
+
+
+
 # PROJECT ENDPOINTS
 @api_router.post("/projects", response_model=Project)
 async def create_project(project: ProjectCreate):
