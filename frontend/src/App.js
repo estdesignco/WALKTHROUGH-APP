@@ -148,6 +148,17 @@ const App = () => {
   const [authenticated, setAuthenticated] = useState(isAuthenticated());
   const [showGlobalTodo, setShowGlobalTodo] = useState(false);
 
+  // Auto-redirect mobile/tablet to mobile app
+  useEffect(() => {
+    const isMobile = /iPad|iPhone|iPod|Android/i.test(navigator.userAgent) || 
+      (navigator.userAgent.includes('Macintosh') && 'ontouchend' in document);
+    const isOnMobilePage = window.location.pathname.startsWith('/mobile-app');
+    const isCustomerPage = window.location.pathname.startsWith('/customer');
+    if (isMobile && !isOnMobilePage && !isCustomerPage) {
+      window.location.href = '/mobile-app';
+    }
+  }, []);
+
   // Global keyboard shortcut for To-Do (Ctrl/Cmd + T)
   useEffect(() => {
     const handleKeyDown = (e) => {
