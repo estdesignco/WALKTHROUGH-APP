@@ -929,7 +929,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <Section title="NEW BUILD" description="If you are not currently building a new home, please feel free to skip these questions!">
                             <FieldWrapper label="Please list NEW BUILD address">
                                 <Autocomplete
-                                    apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
                                     onPlaceSelected={(place) => {
                                         if (place && place.formatted_address) {
                                             handleFormChange('new_build_address', place.formatted_address);
