@@ -12025,7 +12025,15 @@ async def get_available_booking_slots(weeks_ahead: int = 4):
     
     except Exception as e:
         logging.error(f"Get available slots error: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return empty slots instead of crashing - the booking page should still render
+        return {
+            "slots": [],
+            "timezone": "America/Chicago",
+            "slot_duration_hours": 2,
+            "available_days": ["Tuesday", "Wednesday", "Thursday", "Friday"],
+            "business_hours": "9:00 AM - 5:00 PM",
+            "error": str(e)
+        }
 
 
 @api_router.post("/booking/book-appointment")
