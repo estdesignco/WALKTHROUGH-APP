@@ -1180,7 +1180,11 @@ export default function MobileAppSimulator() {
   }, []);
   
   // Update URL when screen changes
-  const handleNavigate = (screenName) => {
+  const handleNavigate = (screenName, project) => {
+    if (project) {
+      handleSelectProject(project);
+      return;
+    }
     setScreen(screenName);
     setSearchParams({ screen: screenName });
   };
