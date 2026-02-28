@@ -11935,105 +11935,85 @@ async def get_available_booking_slots(weeks_ahead: int = 4):
     now = datetime.now(tz)
     start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
     end_date = start_date + timedelta(weeks=weeks_ahead)
-        
-        # Get blocked times from Outlook calendar
-        blocked_times = []
-        try:
-            # Get active Outlook calendar connection
-            connection = await db.calendar_connections.find_one({
-                "provider": "outlook",
-                "is_active": True
-            })
-            
-            if connection:
-                # Refresh token if needed
-                token_expires = datetime.fromisoformat(connection['token_expires_at'].replace('Z', '+00:00'))
-                if token_expires <= datetime.now(timezone.utc) + timedelta(minutes=5):
-                    access_token = await refresh_outlook_token(connection)
-                else:
-                    access_token = connection['access_token']
-                
-                # Fetch calendar events
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(
-                        'https://graph.microsoft.com/v1.0/me/calendarView',
-                        params={
-                            'startDateTime': start_date.isoformat(),
-                            'endDateTime': end_date.isoformat(),
-                            '$select': 'subject,start,end',
-                            '$top': 500
-                        },
-                        headers={'Authorization': f'Bearer {access_token}'}
-                    ) as resp:
-                        if resp.status == 200:
-                            data = await resp.json()
-                            for event in data.get('value', []):
-                                event_start = datetime.fromisoformat(event['start']['dateTime'].replace('Z', '+00:00'))
-                                event_end = datetime.fromisoformat(event['end']['dateTime'].replace('Z', '+00:00'))
-                                blocked_times.append({
-                                    'start': event_start,
-                                    'end': event_end,
-                                    'title': event.get('subject', 'Busy')
-                                })
-        except Exception as e:
-            logging.warning(f"Could not fetch Outlook calendar: {e}")
-        
-        # Generate available slots
-        available_slots = []
-        current_date = start_date
-        
-        while current_date < end_date:
-            # Check if it's an available day (Tue-Fri)
-            if current_date.weekday() in AVAILABLE_DAYS:
-                # Generate time slots for this day
-                for hour in range(START_HOUR, END_HOUR, SLOT_DURATION_HOURS):
-                    slot_start = current_date.replace(hour=hour, minute=0, second=0, microsecond=0)
-                    slot_end = slot_start + timedelta(hours=SLOT_DURATION_HOURS)
-                    
-                    # Skip past slots
-                    if slot_start <= now:
-                        continue
-                    
-                    # Check if slot conflicts with any blocked time
-                    is_available = True
-                    for blocked in blocked_times:
-                        # Check for overlap
-                        if slot_start < blocked['end'] and slot_end > blocked['start']:
-                            is_available = False
-                            break
-                    
-                    if is_available:
-                        available_slots.append({
-                            'date': slot_start.strftime('%Y-%m-%d'),
-                            'day_name': slot_start.strftime('%A'),
-                            'start_time': slot_start.strftime('%I:%M %p'),
-                            'end_time': slot_end.strftime('%I:%M %p'),
-                            'start_iso': slot_start.isoformat(),
-                            'end_iso': slot_end.isoformat(),
-                            'display': f"{slot_start.strftime('%A, %B %d')} at {slot_start.strftime('%I:%M %p')}"
-                        })
-            
-            current_date += timedelta(days=1)
-        
-        return {
-            "slots": available_slots,
-            "timezone": "America/Chicago",
-            "slot_duration_hours": SLOT_DURATION_HOURS,
-            "available_days": ["Tuesday", "Wednesday", "Thursday", "Friday"],
-            "business_hours": f"{START_HOUR}:00 AM - {END_HOUR - 12}:00 PM"
-        }
     
+    # Get blocked times from Outlook calendar
+    blocked_times = []
+    try:
+        connection = await db.calendar_connections.find_one({
+            "provider": "outlook",
+            "is_active": True
+        })
+        
+        if connection:
+            token_expires = datetime.fromisoformat(connection['token_expires_at'].replace('Z', '+00:00'))
+            if token_expires <= datetime.now(timezone.utc) + timedelta(minutes=5):
+                access_token = await refresh_outlook_token(connection)
+            else:
+                access_token = connection['access_token']
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    'https://graph.microsoft.com/v1.0/me/calendarView',
+                    params={
+                        'startDateTime': start_date.isoformat(),
+                        'endDateTime': end_date.isoformat(),
+                        '$select': 'subject,start,end',
+                        '$top': 500
+                    },
+                    headers={'Authorization': f'Bearer {access_token}'}
+                ) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        for event in data.get('value', []):
+                            event_start = datetime.fromisoformat(event['start']['dateTime'].replace('Z', '+00:00'))
+                            event_end = datetime.fromisoformat(event['end']['dateTime'].replace('Z', '+00:00'))
+                            blocked_times.append({
+                                'start': event_start,
+                                'end': event_end,
+                                'title': event.get('subject', 'Busy')
+                            })
     except Exception as e:
-        logging.error(f"Get available slots error: {str(e)}")
-        # Return empty slots instead of crashing - the booking page should still render
-        return {
-            "slots": [],
-            "timezone": "America/Chicago",
-            "slot_duration_hours": 2,
-            "available_days": ["Tuesday", "Wednesday", "Thursday", "Friday"],
-            "business_hours": "9:00 AM - 5:00 PM",
-            "error": str(e)
-        }
+        logging.warning(f"Could not fetch Outlook calendar: {e}")
+    
+    # Generate available slots
+    available_slots = []
+    current_date = start_date
+    
+    while current_date < end_date:
+        if current_date.weekday() in AVAILABLE_DAYS:
+            for hour in range(START_HOUR, END_HOUR, SLOT_DURATION_HOURS):
+                slot_start = current_date.replace(hour=hour, minute=0, second=0, microsecond=0)
+                slot_end = slot_start + timedelta(hours=SLOT_DURATION_HOURS)
+                
+                if slot_start <= now:
+                    continue
+                
+                is_available = True
+                for blocked in blocked_times:
+                    if slot_start < blocked['end'] and slot_end > blocked['start']:
+                        is_available = False
+                        break
+                
+                if is_available:
+                    available_slots.append({
+                        'date': slot_start.strftime('%Y-%m-%d'),
+                        'day_name': slot_start.strftime('%A'),
+                        'start_time': slot_start.strftime('%I:%M %p'),
+                        'end_time': slot_end.strftime('%I:%M %p'),
+                        'start_iso': slot_start.isoformat(),
+                        'end_iso': slot_end.isoformat(),
+                        'display': f"{slot_start.strftime('%A, %B %d')} at {slot_start.strftime('%I:%M %p')}"
+                    })
+        
+        current_date += timedelta(days=1)
+    
+    return {
+        "slots": available_slots,
+        "timezone": "America/Chicago",
+        "slot_duration_hours": SLOT_DURATION_HOURS,
+        "available_days": ["Tuesday", "Wednesday", "Thursday", "Friday"],
+        "business_hours": f"{START_HOUR}:00 AM - {END_HOUR - 12}:00 PM"
+    }
 
 
 @api_router.post("/booking/book-appointment")
