@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://edit-scraped-data.preview.emergentagent.com/api
+https://add-room-debug.preview.emergentagent.com/api
 ```
 
 ---

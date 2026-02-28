@@ -4,7 +4,7 @@
 console.log('🏠 Loading Houzz Pro Clipper Interceptor...');
 
 // Your unified furniture search webhook URL
-const WEBHOOK_URL = 'https://edit-scraped-data.preview.emergentagent.com/api/furniture/houzz-webhook';
+const WEBHOOK_URL = 'https://add-room-debug.preview.emergentagent.com/api/furniture/houzz-webhook';
 
 // Function to intercept Houzz Pro clipper form submissions
 function interceptHouzzClipperSubmissions() {

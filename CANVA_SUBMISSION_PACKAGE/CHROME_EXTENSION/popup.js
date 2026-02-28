@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://edit-scraped-data.preview.emergentagent.com';
+const BACKEND_URL = 'https://add-room-debug.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

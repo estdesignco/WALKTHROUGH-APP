@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://edit-scraped-data.preview.emergentagent.com
+https://add-room-debug.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://edit-scraped-data.preview.emergentagent.com/mobile-app
+https://add-room-debug.preview.emergentagent.com/mobile-app
 
 ---
 

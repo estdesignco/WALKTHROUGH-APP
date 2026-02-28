@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://edit-scraped-data.preview.emergentagent.com";
+const BACKEND_URL = "https://add-room-debug.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

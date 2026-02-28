@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://edit-scraped-data.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://add-room-debug.preview.emergentagent.com')
 # Use the correct project ID from the API
 TEST_PROJECT_ID = "82c5fb51-fd53-4338-807b-7bb58f4d3386"
 VENTURE_PROJECT_ID = "82c5fb51-fd53-4338-807b-7bb58f4d3386"  # VENTURE DR. - Test Project

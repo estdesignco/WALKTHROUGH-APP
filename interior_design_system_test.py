@@ -16,7 +16,7 @@ from datetime import datetime
 import time
 
 class InteriorDesignSystemTester:
-    def __init__(self, base_url="https://edit-scraped-data.preview.emergentagent.com"):
+    def __init__(self, base_url="https://add-room-debug.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_base = f"{base_url}/api"
         self.tests_run = 0
