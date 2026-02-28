@@ -1037,15 +1037,14 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                     {formData.project_type === 'Renovation' && (
                         <Section title="RENOVATION" description="If you are not looking to renovate, please feel free to skip these questions!">
                             <FieldWrapper label="Please list Renovation Address (If different!)">
-                                <Autocomplete
+                                <GoogleAddressInput
+                                    value={formData.renovation_address || ''}
                                     onPlaceSelected={(place) => {
                                         if (place && place.formatted_address) {
                                             handleFormChange('renovation_address', place.formatted_address);
                                         }
                                     }}
-                                    options={{
-                                        types: ['address'],
-                                    }}
+                                    onChange={(val) => handleFormChange('renovation_address', val)}
                                     className={inputStyles}
                                     placeholder="Start typing address..."
                                     style={{ minHeight: '60px' }}
