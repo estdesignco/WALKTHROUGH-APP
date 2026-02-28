@@ -7,30 +7,35 @@ Interior design project management application (ESTABLISHED Design Co.) with spr
 - Frontend: React + Tailwind CSS (port 3000)
 - Backend: FastAPI + MongoDB (port 8001)
 - Chrome Extension: Manifest V3 (`/app/chrome-extension-scraper/`)
-- Mobile: Expo React Native (`/app/mobile/`)
+- Mobile: PWA approach via `/mobile-app` route (MobileAppSimulator.js)
 - Email: Microsoft 365 SMTP (info@estdesignco.com)
-- Address: Google Places Autocomplete (key restricted to app.estdesignco.com)
+- Address: OpenStreetMap Nominatim API (replaced Google Maps)
 
 ## What's Been Implemented
 
-### Feb 25, 2026
-- **FIXED**: Booking "Unable to load available times" — `config.js` was pointing to production backend which returned 500. Fixed to use preview URL.
-- **FIXED**: Scraper v7.36.0 — Copy Image downloads actual PNG (not URLs), added Vendor/MSRP fields, expanded panel height
-- **FIXED**: Email — SENDER_PASSWORD configured, emails confirmed working
-- **Mobile**: Expo app running, tunnel at `exp://edit-scraped-data.ngrok.io`
+### Feb 28, 2026
+- **FIXED P0 BUG**: "Add Room" on mobile app for projects with ZERO rooms. Root cause: Add Room modal JSX was only rendered in the main return path of `TabbedWalkthroughSpreadsheet.js`, not in the early-return for zero-rooms case. Fix: duplicated modal into the early-return block (lines 562-685). Verified with testing agent (8/8 backend tests pass, all frontend flows working).
 
 ### Previous
-- Fit-to-text auto-sizing inputs in spreadsheets (`src/utils/autoSizeInputs.js`)
-- Chrome extension redesign with editable fields
+- **Address Autocomplete**: Replaced Google Maps with OpenStreetMap Nominatim API (`GoogleAddressInput.js`)
+- **Mobile App Redirect**: Touch device detection redirects to `/mobile-app`
+- **Mobile Dashboard**: Redesigned home screen listing all projects
+- **Dynamic API Config**: `config.js` uses `window.location.origin` (DO NOT CHANGE)
+- **Booking Endpoint**: Hardened `/api/booking/available-slots`
+- **Chrome Extension v7.37.0**: Fixed image copying, thumbnails, added Vendor/MSRP fields
+- **Email**: SMTP configured and working
+- Fit-to-text auto-sizing inputs in spreadsheets
 
 ## Critical Config
-- `frontend/public/config.js` — Sets `window.ENV.REACT_APP_BACKEND_URL`. Must match deployment target.
-- `backend/.env` — SMTP creds, MongoDB, Azure OAuth
-- Google Maps API key: `AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0` (referrer-restricted to `app.estdesignco.com`)
+- `frontend/src/App.js` line 60 — Sets BACKEND_URL via window.ENV or window.location.origin. DO NOT hardcode URLs.
+- `backend/.env` — SMTP creds, MongoDB, Azure OAuth, Google Maps key
+- DO NOT TOUCH `config.js` or hardcode preview URLs
 
-## Pending
-- User test of scraper image copy to Canva
+## Pending / Backlog
+- P1: User verification of OpenStreetMap address autocomplete
+- P2: User verification of Chrome Extension fixes (v7.37.0)
+- Rename `GoogleAddressInput.js` to `AddressAutocompleteInput.js`
+- Clean up unused `/app/mobile/` Expo directory
 - Deploy to production
-- Fit-to-text verification in spreadsheets
 - EAS Build for standalone iPad app
 - Outlook calendar sync for real booking availability
