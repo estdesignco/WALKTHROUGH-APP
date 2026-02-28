@@ -1045,7 +1045,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                         <Section title="RENOVATION" description="If you are not looking to renovate, please feel free to skip these questions!">
                             <FieldWrapper label="Please list Renovation Address (If different!)">
                                 <Autocomplete
-                                    apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
                                     onPlaceSelected={(place) => {
                                         if (place && place.formatted_address) {
                                             handleFormChange('renovation_address', place.formatted_address);
