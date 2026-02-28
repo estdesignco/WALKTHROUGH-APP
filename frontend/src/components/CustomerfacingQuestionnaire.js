@@ -769,7 +769,6 @@ export default function CustomerfacingQuestionnaire({ isEditMode = false }) {
                                 <InputField label="Spouse / Partner Phone" id="spouse_partner_phone" type="tel" value={formData.spouse_partner_phone || ''} onChange={(e) => handleFormChange('spouse_partner_phone', e.target.value, e)} />
                                 <FieldWrapper label="Project Address">
                                     <Autocomplete
-                                        apiKey="AIzaSyCZ4VtXompFHngyxRATD0FZMruCmfDiiC0"
                                         onPlaceSelected={(place) => {
                                             console.log('📍 Place selected:', place);
                                             if (place && place.formatted_address) {
