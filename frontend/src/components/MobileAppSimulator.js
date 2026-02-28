@@ -1392,6 +1392,37 @@ export default function MobileAppSimulator() {
             </div>
           </div>
         );
+      case 'sync':
+        return (
+          <div className="h-full flex flex-col bg-black p-4">
+            <button onClick={() => handleNavigate('home')} className="bg-gray-700 text-white px-4 py-2 mb-4 rounded font-semibold flex-shrink-0">
+              ← Back
+            </button>
+            <h2 className="text-xl font-bold text-white mb-4">Offline Sync</h2>
+            <div className="space-y-4">
+              <div className={`p-4 rounded-lg ${offlineStatus === 'online' ? 'bg-green-900/30 border border-green-600' : 'bg-red-900/30 border border-red-600'}`}>
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${offlineStatus === 'online' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <span className="text-white font-medium">{offlineStatus === 'online' ? 'Connected' : 'Offline'}</span>
+                </div>
+              </div>
+              {pendingSyncCount > 0 && (
+                <div className="p-4 rounded-lg bg-yellow-900/30 border border-yellow-600">
+                  <span className="text-yellow-400">{pendingSyncCount} changes waiting to sync</span>
+                </div>
+              )}
+              <button 
+                onClick={prefetchForOffline}
+                disabled={syncing || offlineStatus !== 'online'}
+                className="w-full py-4 rounded-lg text-white font-bold text-lg disabled:opacity-50"
+                style={{ background: syncing ? '#555' : 'linear-gradient(135deg, #8b7355 0%, #a0845c 50%, #8b7355 100%)' }}
+              >
+                {syncing ? 'Syncing...' : 'Download All Data for Offline'}
+              </button>
+              <p className="text-stone-500 text-sm text-center">Tap to cache all projects, rooms, and items so you can work without internet</p>
+            </div>
+          </div>
+        );
       default:
         return <MobileHomeScreen onNavigate={handleNavigate} />;
     }
@@ -1399,11 +1430,19 @@ export default function MobileAppSimulator() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-[#0F0F0F] to-[#1a1a2e]">
-      {/* Full width on iPad, phone simulator on desktop */}
       <div className="w-full h-screen md:w-full md:h-screen bg-black overflow-hidden">
-        {/* Remove status bar on larger screens, keep for mobile feel */}
-        <div className="hidden sm:block h-0"></div>
-        <div className="h-full overflow-hidden">
+        {/* Offline banner */}
+        {offlineStatus !== 'online' && (
+          <div className="bg-red-600 text-white text-center py-1 text-xs font-bold">
+            OFFLINE MODE — Changes will sync when connected
+          </div>
+        )}
+        {syncing && (
+          <div className="bg-yellow-600 text-black text-center py-1 text-xs font-bold">
+            Syncing data...
+          </div>
+        )}
+        <div className={`${offlineStatus !== 'online' || syncing ? 'h-[calc(100%-24px)]' : 'h-full'} overflow-hidden`}>
           {renderScreen()}
         </div>
       </div>
