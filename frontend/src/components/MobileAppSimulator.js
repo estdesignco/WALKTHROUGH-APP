@@ -1053,6 +1053,71 @@ export default function MobileAppSimulator() {
     return saved ? JSON.parse(saved) : null;
   });
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [offlineStatus, setOfflineStatus] = useState(navigator.onLine ? 'online' : 'offline');
+  const [pendingSyncCount, setPendingSyncCount] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+  
+  // Track online/offline status
+  useEffect(() => {
+    const goOnline = async () => {
+      setOfflineStatus('online');
+      // Auto-sync when back online
+      const pending = await getPendingSyncItems();
+      if (pending.length > 0) {
+        setSyncing(true);
+        await syncToServer(API_URL);
+        setPendingSyncCount(0);
+        setSyncing(false);
+      }
+    };
+    const goOffline = () => setOfflineStatus('offline');
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+
+  // Check pending sync count
+  useEffect(() => {
+    const checkPending = async () => {
+      try {
+        const items = await getPendingSyncItems();
+        setPendingSyncCount(items.length);
+      } catch (e) {}
+    };
+    checkPending();
+    const interval = setInterval(checkPending, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Pre-cache all project data for offline use
+  const prefetchForOffline = async () => {
+    if (!navigator.onLine) return;
+    setSyncing(true);
+    try {
+      // Fetch all projects
+      const projResp = await axios.get(`${API_URL}/projects`);
+      const projects = projResp.data;
+      for (const proj of projects) {
+        await saveProjectOffline(proj);
+      }
+      // Cache each project's walkthrough/FFE data  
+      for (const proj of projects) {
+        try {
+          await axios.get(`${API_URL}/projects/${proj.id}?sheet_type=walkthrough`);
+          await axios.get(`${API_URL}/projects/${proj.id}?sheet_type=ffe`);
+          await axios.get(`${API_URL}/projects/${proj.id}/rooms`);
+        } catch (e) {}
+      }
+      // The service worker will cache all these API responses automatically
+      alert('Data cached for offline use!');
+    } catch (e) {
+      alert('Failed to cache data: ' + e.message);
+    }
+    setSyncing(false);
+  };
   
   // Restore screen from URL on load
   useEffect(() => {
