@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 
-const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
-
 /**
- * Address autocomplete that calls the backend proxy (no Google Maps script needed on frontend).
+ * Address autocomplete using OpenStreetMap Nominatim (free, no API key, no billing).
+ * Returns full address with lat/lng for geotagging.
  */
 export default function GoogleAddressInput({ value, onChange, onPlaceSelected, placeholder, className, style }) {
   const [query, setQuery] = useState(value || '');
@@ -13,7 +12,6 @@ export default function GoogleAddressInput({ value, onChange, onPlaceSelected, p
   const wrapperRef = useRef(null);
   const debounceRef = useRef(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
@@ -31,9 +29,18 @@ export default function GoogleAddressInput({ value, onChange, onPlaceSelected, p
     }
     setLoading(true);
     try {
-      const resp = await fetch(`${BACKEND_URL}/api/places/autocomplete?input=${encodeURIComponent(input)}`);
+      const resp = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&countrycodes=us&addressdetails=1&limit=5`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
       const data = await resp.json();
-      setSuggestions(data.predictions || []);
+      setSuggestions(data.map(item => ({
+        display_name: item.display_name,
+        lat: parseFloat(item.lat),
+        lng: parseFloat(item.lon),
+        place_id: item.place_id,
+        address: item.address || {}
+      })));
       setShowDropdown(true);
     } catch (e) {
       console.warn('Address autocomplete error:', e);
@@ -46,40 +53,34 @@ export default function GoogleAddressInput({ value, onChange, onPlaceSelected, p
     const val = e.target.value;
     setQuery(val);
     if (onChange) onChange(val);
-
-    // Debounce API calls
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchSuggestions(val), 300);
+    debounceRef.current = setTimeout(() => fetchSuggestions(val), 400);
   };
 
-  const handleSelect = async (suggestion) => {
-    setQuery(suggestion.description);
+  const handleSelect = (suggestion) => {
+    const addr = suggestion.display_name;
+    setQuery(addr);
     setShowDropdown(false);
     setSuggestions([]);
-    if (onChange) onChange(suggestion.description);
-
-    // Get full place details (lat/lng, address components)
-    try {
-      const resp = await fetch(`${BACKEND_URL}/api/places/details?place_id=${encodeURIComponent(suggestion.place_id)}`);
-      const details = await resp.json();
-      if (onPlaceSelected) {
-        onPlaceSelected({
-          formatted_address: details.formatted_address || suggestion.description,
-          geometry: { location: { lat: () => details.lat, lng: () => details.lng } },
-          address_components: details.address_components || [],
-          place_id: suggestion.place_id
-        });
-      }
-    } catch (e) {
-      // Even if details fail, still pass the address
-      if (onPlaceSelected) {
-        onPlaceSelected({ formatted_address: suggestion.description });
-      }
+    if (onChange) onChange(addr);
+    if (onPlaceSelected) {
+      onPlaceSelected({
+        formatted_address: addr,
+        geometry: {
+          location: {
+            lat: () => suggestion.lat,
+            lng: () => suggestion.lng
+          }
+        },
+        address_components: buildAddressComponents(suggestion.address),
+        lat: suggestion.lat,
+        lng: suggestion.lng
+      });
     }
   };
 
   return (
-    <div ref={wrapperRef} style={{ position: 'relative', ...style }}>
+    <div ref={wrapperRef} style={{ position: 'relative' }}>
       <input
         type="text"
         value={query}
@@ -87,6 +88,7 @@ export default function GoogleAddressInput({ value, onChange, onPlaceSelected, p
         onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
         placeholder={placeholder || "Start typing your address..."}
         className={className}
+        style={style}
         autoComplete="off"
       />
       {showDropdown && suggestions.length > 0 && (
@@ -119,7 +121,7 @@ export default function GoogleAddressInput({ value, onChange, onPlaceSelected, p
               onMouseLeave={(e) => e.target.style.background = 'transparent'}
             >
               <span style={{ color: '#d4af37', marginRight: '8px' }}>📍</span>
-              {s.description}
+              {s.display_name}
             </div>
           ))}
         </div>
@@ -138,4 +140,16 @@ export default function GoogleAddressInput({ value, onChange, onPlaceSelected, p
       )}
     </div>
   );
+}
+
+function buildAddressComponents(address) {
+  const components = [];
+  if (address.house_number) components.push({ long_name: address.house_number, types: ['street_number'] });
+  if (address.road) components.push({ long_name: address.road, types: ['route'] });
+  if (address.city || address.town || address.village) components.push({ long_name: address.city || address.town || address.village, types: ['locality'] });
+  if (address.county) components.push({ long_name: address.county, types: ['administrative_area_level_2'] });
+  if (address.state) components.push({ long_name: address.state, types: ['administrative_area_level_1'] });
+  if (address.postcode) components.push({ long_name: address.postcode, types: ['postal_code'] });
+  if (address.country) components.push({ long_name: address.country, types: ['country'] });
+  return components;
 }
