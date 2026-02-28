@@ -56,98 +56,150 @@ const shimmerStyle = `
 
 // ===== HOME SCREEN - MATCHES DESKTOP EXACTLY =====
 function MobileHomeScreen({ onNavigate }) {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [calendarExpanded, setCalendarExpanded] = useState(false);
-  
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [projRes, todoRes] = await Promise.all([
+        axios.get(`${API_URL}/projects`).catch(() => ({ data: [] })),
+        axios.get(`${API_URL}/company-todos`).catch(() => ({ data: [] }))
+      ]);
+      setProjects(projRes.data || []);
+      setTodos((todoRes.data || []).filter(t => !t.completed).slice(0, 5));
+    } catch (e) {
+      console.error('Load error:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="h-full overflow-auto bg-black">
       <style>{shimmerStyle}</style>
       
-      {/* Gold Header - EXACT MATCH to MainDashboard.js */}
-      <div className="w-full h-24 shimmer-gold" style={{ 
+      {/* Gold Header */}
+      <div className="w-full h-20 shimmer-gold" style={{ 
         background: STYLES.goldGradient,
         boxShadow: '0 4px 20px rgba(139, 115, 85, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
       }}>
         <div className="flex items-center justify-center h-full relative px-8">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10"></div>
           <img 
             src="https://customer-assets.emergentagent.com/job_sleek-showcase-46/artifacts/c5c84fh5_Established%20logo.png" 
             alt="ESTABLISHED DESIGN CO." 
-            className="w-full h-16 object-contain"
-            style={{
-              filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.2))',
-              maxWidth: '100%'
-            }}
+            className="w-full h-14 object-contain"
+            style={{ filter: 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.4))', maxWidth: '100%' }}
           />
         </div>
       </div>
 
-      {/* Main Content - Desktop-like layout */}
-      <div className="px-4 py-4">
-        {/* Quick Navigation Grid - Like Desktop */}
-        <div className="grid grid-cols-4 gap-2 mb-4">
-          <button
-            onClick={() => onNavigate('projects')}
-            className="text-stone-300 p-3 rounded-lg transition-all hover:scale-105 active:scale-95"
-            style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}
-          >
-            <div className="text-xl mb-1">📋</div>
-            <div className="text-xs">Projects</div>
-          </button>
-          
-          <button
-            onClick={() => onNavigate('master-contacts')}
-            className="text-white p-3 rounded-lg transition-all hover:scale-105 active:scale-95"
-            style={{ background: STYLES.goldGradient, border: STYLES.goldHighlight }}
-          >
-            <div className="text-xl mb-1">👥</div>
-            <div className="text-xs font-medium">Contacts</div>
-          </button>
-          
-          <button
-            onClick={() => onNavigate('calculators')}
-            className="text-stone-300 p-3 rounded-lg transition-all hover:scale-105 active:scale-95"
-            style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}
-          >
-            <div className="text-xl mb-1">🧮</div>
-            <div className="text-xs">Calculators</div>
-          </button>
-          
-          <button
-            onClick={() => onNavigate('sync')}
-            className="text-white p-3 rounded-lg transition-all hover:scale-105 active:scale-95 shimmer-gold"
-            style={{ background: STYLES.goldGradient, border: STYLES.goldHighlight }}
-          >
-            <div className="text-xl mb-1">🔄</div>
-            <div className="text-xs font-medium">Sync</div>
+      <div className="px-4 py-3">
+        {/* Connection + Sync Row */}
+        <div className="flex items-center justify-between mb-3">
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs ${isOnline() ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}
+            style={{ border: isOnline() ? '1px solid #22c55e' : '1px solid #ef4444' }}>
+            <div className={`w-2 h-2 rounded-full ${isOnline() ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            {isOnline() ? 'Online' : 'Offline'}
+          </div>
+          <button onClick={() => onNavigate('sync')} className="text-xs px-3 py-1 rounded-full text-[#d4af37] border border-[#d4af37]/40">
+            Sync for Offline
           </button>
         </div>
 
-        {/* Master Calendar Section - COLLAPSIBLE */}
+        {/* Projects Section */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-lg font-bold text-[#d4af37]">Projects ({projects.length})</h2>
+            <button onClick={() => onNavigate('projects')} className="text-xs text-stone-400">View All →</button>
+          </div>
+          {loading ? (
+            <div className="text-stone-400 text-sm py-4 text-center">Loading...</div>
+          ) : projects.length === 0 ? (
+            <div className="text-stone-500 text-sm py-4 text-center rounded-lg" style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}>
+              No projects yet
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {projects.slice(0, 6).map((project) => (
+                <button
+                  key={project.id}
+                  onClick={() => { onNavigate('project-menu', project); }}
+                  className="w-full text-left p-3 rounded-lg transition-all active:scale-[0.98] flex items-center gap-3"
+                  style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}
+                >
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ background: STYLES.goldGradient }}>
+                    {project.name?.charAt(0)?.toUpperCase() || 'P'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-stone-200 font-semibold truncate">{project.name}</div>
+                    <div className="text-stone-500 text-xs truncate">{project.client_name || 'No client'} {project.address ? `• ${project.address}` : ''}</div>
+                  </div>
+                  <span className="text-stone-600">▶</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Quick Actions Grid */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          <button onClick={() => onNavigate('projects')} className="text-stone-300 p-3 rounded-lg transition-all active:scale-95" style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}>
+            <div className="text-xl mb-1">📋</div>
+            <div className="text-[10px]">Projects</div>
+          </button>
+          <button onClick={() => onNavigate('master-contacts')} className="text-white p-3 rounded-lg transition-all active:scale-95" style={{ background: STYLES.goldGradient }}>
+            <div className="text-xl mb-1">👥</div>
+            <div className="text-[10px] font-medium">Contacts</div>
+          </button>
+          <button onClick={() => onNavigate('calculators')} className="text-stone-300 p-3 rounded-lg transition-all active:scale-95" style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}>
+            <div className="text-xl mb-1">🧮</div>
+            <div className="text-[10px]">Calculators</div>
+          </button>
+          <button onClick={() => onNavigate('sync')} className="text-white p-3 rounded-lg transition-all active:scale-95 shimmer-gold" style={{ background: STYLES.goldGradient }}>
+            <div className="text-xl mb-1">🔄</div>
+            <div className="text-[10px] font-medium">Sync</div>
+          </button>
+        </div>
+
+        {/* Tasks Section */}
+        {todos.length > 0 && (
+          <div className="mb-4">
+            <h2 className="text-sm font-bold text-[#d4af37] mb-2">Company Tasks</h2>
+            <div className="space-y-1">
+              {todos.map((todo, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm" style={{ background: STYLES.darkGradient, border: STYLES.goldBorder }}>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                    todo.priority === 'high' ? 'bg-red-900/50 text-red-400' : 
+                    todo.priority === 'medium' ? 'bg-yellow-900/50 text-yellow-400' : 'bg-green-900/50 text-green-400'
+                  }`}>{todo.priority}</span>
+                  <span className="text-stone-300 truncate flex-1">{todo.text || todo.title}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Calendar */}
         <div className="mb-4 rounded-lg overflow-hidden" style={{ border: STYLES.goldBorder }}>
           <button 
             onClick={() => setCalendarExpanded(!calendarExpanded)}
             className="w-full px-4 py-2 flex items-center justify-between" 
             style={{ background: STYLES.goldGradient }}
           >
-            <h2 className="text-white font-bold flex items-center gap-2">
-              <span>📅</span> Master Calendar
-            </h2>
-            <span className="text-white text-xl">{calendarExpanded ? '▼' : '▶'}</span>
+            <h2 className="text-white font-bold flex items-center gap-2 text-sm">📅 Master Calendar</h2>
+            <span className="text-white">{calendarExpanded ? '▼' : '▶'}</span>
           </button>
           {calendarExpanded && (
             <div className="bg-gray-900 p-2">
               <ProjectCalendar compact={true} />
             </div>
           )}
-        </div>
-        
-        {/* Connection Status */}
-        <div className="text-center">
-          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs ${isOnline() ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}
-            style={{ border: isOnline() ? '1px solid #22c55e' : '1px solid #ef4444' }}>
-            <div className={`w-2 h-2 rounded-full ${isOnline() ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            {isOnline() ? 'Connected' : 'Offline Mode'}
-          </div>
         </div>
       </div>
     </div>
