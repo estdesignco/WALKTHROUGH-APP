@@ -1,120 +1,126 @@
 /* eslint-disable no-restricted-globals */
 
-// Service Worker for Offline Capability
-const CACHE_NAME = 'established-design-v1';
-const API_CACHE_NAME = 'established-api-v1';
+// Service Worker for ESTABLISHED Design Co. - Full Offline Support
+const CACHE_NAME = 'established-design-v3';
+const API_CACHE_NAME = 'established-api-v3';
 
-// Files to cache for offline use
-const urlsToCache = [
-  '/',
-  '/mobile-app',
-  '/index.html',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.json'
-];
-
-// Install event - cache static assets
+// Install - cache the app shell on first load
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Caching static assets');
-        return cache.addAll(urlsToCache);
-      })
-      .then(() => self.skipWaiting())
-  );
+  console.log('[SW] Installing...');
+  self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate - clean old caches, take control immediately
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
+  console.log('[SW] Activating...');
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((names) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
+        names.filter(n => n !== CACHE_NAME && n !== API_CACHE_NAME)
+          .map(n => caches.delete(n))
       );
     }).then(() => self.clients.claim())
   );
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch handler
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Handle API requests - Network first, cache fallback
+  // Skip non-GET requests (POST, PUT, DELETE go straight to network)
+  if (request.method !== 'GET') return;
+
+  // Skip chrome-extension and other non-http requests
+  if (!url.protocol.startsWith('http')) return;
+
+  // API requests: Network first, fall back to cache
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Clone the response before caching
-          const responseClone = response.clone();
-          caches.open(API_CACHE_NAME).then((cache) => {
-            // Only cache GET requests
-            if (request.method === 'GET') {
-              cache.put(request, responseClone);
-            }
+      fetch(request).then((response) => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(API_CACHE_NAME).then(cache => cache.put(request, clone));
+        }
+        return response;
+      }).catch(() => {
+        console.log('[SW] Offline - serving API from cache:', url.pathname);
+        return caches.match(request).then(cached => {
+          return cached || new Response(JSON.stringify({ error: 'offline', message: 'You are offline. Data shown may not be current.' }), {
+            headers: { 'Content-Type': 'application/json' }
           });
-          return response;
-        })
-        .catch(() => {
-          // Network failed, try cache
-          console.log('[SW] Network failed, serving from cache:', request.url);
-          return caches.match(request);
-        })
+        });
+      })
     );
     return;
   }
 
-  // Handle static assets - Cache first, network fallback
-  event.respondWith(
-    caches.match(request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          // Return cached version
-          return cachedResponse;
-        }
-        // Not in cache, fetch from network
-        return fetch(request).then((response) => {
-          // Cache the new response
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
+  // Static assets (JS, CSS, images, fonts): Cache first, network fallback
+  if (url.pathname.match(/\.(js|css|png|jpg|jpeg|svg|ico|woff|woff2|ttf|eot)$/) || 
+      url.pathname.startsWith('/static/')) {
+    event.respondWith(
+      caches.match(request).then(cached => {
+        if (cached) return cached;
+        return fetch(request).then(response => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
           }
           return response;
         });
       })
-      .catch(() => {
-        // Offline and not in cache - return offline page for navigation
-        if (request.mode === 'navigate') {
-          return caches.match('/index.html');
+    );
+    return;
+  }
+
+  // HTML navigation: Network first, cache fallback (for SPA routing)
+  if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(request).then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
         }
+        return response;
+      }).catch(() => {
+        return caches.match('/index.html') || caches.match('/');
       })
+    );
+    return;
+  }
+
+  // Everything else: network with cache fallback
+  event.respondWith(
+    fetch(request).then(response => {
+      if (response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+      }
+      return response;
+    }).catch(() => caches.match(request))
   );
 });
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync triggered:', event.tag);
-  if (event.tag === 'sync-todos') {
+  if (event.tag === 'sync-offline-data') {
     event.waitUntil(syncOfflineData());
   }
 });
 
-// Sync offline data when back online
 async function syncOfflineData() {
-  console.log('[SW] Syncing offline data...');
-  // Get pending actions from IndexedDB and sync them
-  // This would be implemented based on your offline queue
+  console.log('[SW] Background sync triggered');
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({ type: 'SYNC_REQUESTED' });
+  });
 }
 
-console.log('[SW] Service Worker loaded');
+// Listen for messages from the app
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+console.log('[SW] Service Worker loaded - offline ready');
