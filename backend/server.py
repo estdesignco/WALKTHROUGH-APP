@@ -11911,25 +11911,30 @@ async def get_available_booking_slots(weeks_ahead: int = 4):
     """
     Get available booking slots for the next X weeks.
     Slots are 2 hours, Tuesday-Friday, 9am-5pm.
-    Blocked times come from Outlook calendar.
     """
+    from datetime import datetime, timedelta, timezone
+    
+    # Business hours configuration
+    AVAILABLE_DAYS = [1, 2, 3, 4]  # Tuesday=1, Wednesday=2, Thursday=3, Friday=4 (Monday=0)
+    START_HOUR = 9  # 9 AM
+    END_HOUR = 17   # 5 PM
+    SLOT_DURATION_HOURS = 2
+    
+    # Get timezone - try multiple approaches
+    tz = None
     try:
-        from datetime import datetime, timedelta, timezone
-        import pytz
-        
-        # Business hours configuration
-        AVAILABLE_DAYS = [1, 2, 3, 4]  # Tuesday=1, Wednesday=2, Thursday=3, Friday=4 (Monday=0)
-        START_HOUR = 9  # 9 AM
-        END_HOUR = 17   # 5 PM
-        SLOT_DURATION_HOURS = 2
-        
-        # Get timezone (default to Central Time for Texas)
-        tz = pytz.timezone('America/Chicago')
-        
-        # Calculate date range
-        now = datetime.now(tz)
-        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = start_date + timedelta(weeks=weeks_ahead)
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo('America/Chicago')
+    except ImportError:
+        try:
+            import pytz
+            tz = pytz.timezone('America/Chicago')
+        except ImportError:
+            tz = timezone(timedelta(hours=-6))  # CST fallback
+    
+    now = datetime.now(tz)
+    start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_date = start_date + timedelta(weeks=weeks_ahead)
         
         # Get blocked times from Outlook calendar
         blocked_times = []
