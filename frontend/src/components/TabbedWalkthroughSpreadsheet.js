@@ -239,20 +239,20 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     }
   }, [project?.rooms, hasExpandedInitially.current]); // Don't re-run after initial expansion
 
-  const loadProject = async () => {
+  const loadProject = async (isBackgroundRefresh = false) => {
     try {
-      setLoading(true);
+      if (!isBackgroundRefresh) setLoading(true);
       const response = await axios.get(`${API_URL}/projects/${projectId}?sheet_type=${sheetType}`);
       setProject(response.data);
       
-      // Set first room as active tab
-      if (response.data.rooms && response.data.rooms.length > 0) {
+      // Only set first room as active tab on initial load, not background refresh
+      if (!isBackgroundRefresh && response.data.rooms && response.data.rooms.length > 0) {
         setActiveRoomTab(0);
       }
     } catch (error) {
       console.error('Failed to load project:', error);
     } finally {
-      setLoading(false);
+      if (!isBackgroundRefresh) setLoading(false);
     }
   };
 
