@@ -216,7 +216,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
     if (online) {
       const interval = setInterval(() => {
         console.log(`🔄 ${sheetType.toUpperCase()} Real-time sync...`);
-        loadProject();
+        loadProject(true); // background refresh - no loading flash
       }, 10000); // Every 10 seconds for live sync
       
       return () => clearInterval(interval);
