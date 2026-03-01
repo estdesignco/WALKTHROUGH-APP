@@ -32,10 +32,12 @@
             (function() {
                 var path = window.location.pathname;
                 if (path.indexOf('/mobile-app') === 0 || path.indexOf('/customer') === 0) return;
-                var isMobile = /iPad|iPhone|iPod|Android|webOS|BlackBerry/i.test(navigator.userAgent);
-                var isIPad = navigator.userAgent.indexOf('Macintosh') > -1 && navigator.maxTouchPoints > 1;
+                var ua = navigator.userAgent;
+                var isMobile = /iPad|iPhone|iPod|Android|webOS|BlackBerry/i.test(ua);
+                var isIPad = ua.indexOf('Macintosh') > -1 && navigator.maxTouchPoints > 1;
                 var isTouch = ('ontouchend' in document);
-                if (isMobile || isIPad || (isTouch && navigator.maxTouchPoints > 1)) {
+                var isCoarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+                if (isMobile || isIPad || (isTouch && navigator.maxTouchPoints > 1) || isCoarsePointer) {
                     window.location.replace('/mobile-app');
                 }
             })();
