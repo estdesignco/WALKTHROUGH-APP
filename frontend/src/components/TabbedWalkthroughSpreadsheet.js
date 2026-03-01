@@ -739,7 +739,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   };
 
   return (
-    <div className="w-full h-full ffe-container" style={{ backgroundColor: '#0F172A', overflow: 'auto' }}>
+    <div className="w-full ffe-container" style={{ backgroundColor: '#0F172A' }}>
       {/* Responsive CSS for Portrait/Landscape orientation on iPad */}
       <style>{`
         /* Base styles for mobile portrait */
