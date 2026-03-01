@@ -301,7 +301,7 @@ function ProjectTabbedView({ project, onNavigate, initialTab = 'walkthrough' }) 
       </div>
       
       {/* Tab Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
         {renderTabContent()}
       </div>
     </div>
