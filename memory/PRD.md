@@ -15,9 +15,9 @@ Interior design project management application (ESTABLISHED Design Co.) with spr
 
 ### Mar 1, 2026
 - **FIXED P0 BUG #1**: "Add Room" modal not appearing for projects with ZERO rooms. Root cause: modal JSX was only in the main return path, not the early-return for zero-rooms. Fix: duplicated modal into early-return block (TabbedWalkthroughSpreadsheet.js lines 562-685).
-- **FIXED P0 BUG #2**: iPad users who logged in at root URL `/` saw desktop dashboard instead of mobile app. Root cause: `useEffect` in App.js had `[]` dependency — only fired on mount, not after login state change. Fix: changed to `[authenticated]` dependency so redirect fires after login.
-- **IMPROVED iPad detection**: Added `pointer: coarse` media query check to both `index.html` pre-React redirect and App.js useEffect redirect for more robust iPad/tablet detection.
-- All verified: 8/8 backend tests pass, full end-to-end mobile UI flow tested.
+- **FIXED P0 BUG #2**: iPad users who logged in at root URL `/` saw desktop dashboard instead of mobile app. Root cause: `useEffect` in App.js had `[]` dependency — only fired on mount, not after login state change. Fix: changed to `[authenticated]`.
+- **FIXED P0 BUG #3**: Mobile app content not scrollable on touch devices. Root cause: `TabbedWalkthroughSpreadsheet` wrapper had `h-full` + inline `overflow: auto`, creating a nested scroll container that broke iOS touch scrolling. Fix: removed `h-full` and `overflow: auto` from ffe-container, added `-webkit-overflow-scrolling: touch` to parent `flex-1 overflow-auto` container.
+- **IMPROVED iPad detection**: Added `pointer: coarse` media query check to both `index.html` and App.js.
 
 ### Previous (from handoff)
 - Address Autocomplete: Replaced Google Maps with OpenStreetMap Nominatim API
@@ -26,11 +26,10 @@ Interior design project management application (ESTABLISHED Design Co.) with spr
 - Dynamic API Config: `config.js` uses `window.location.origin` (DO NOT CHANGE)
 - Booking Endpoint: Hardened `/api/booking/available-slots`
 - Chrome Extension v7.37.0: Fixed image copying, thumbnails, added Vendor/MSRP fields
-- Email: SMTP configured and working
 
 ## Critical Config (DO NOT CHANGE)
 - `frontend/public/config.js` — Uses `window.location.origin`. DO NOT hardcode URLs.
-- `backend/.env` — SMTP creds, MongoDB, Azure OAuth, Google Maps key
+- `backend/.env` — SMTP creds, MongoDB, Azure OAuth
 
 ## Pending / Backlog
 - P1: User verification of OpenStreetMap address autocomplete
