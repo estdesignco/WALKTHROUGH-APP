@@ -4371,6 +4371,21 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                             new_cl_item.pop("_id", None)  # Remove MongoDB _id if present
                             await db.items.insert_one(new_cl_item)
                             synced_items += 1
+                        else:
+                            # Update existing checklist item with latest walkthrough data
+                            # Preserve checklist-specific fields (status, id, subcategory_id)
+                            update_fields = {}
+                            for field in ["vendor", "cost", "link", "sku", "size", "finish_color", "image_url", "quantity", "description", "notes", "placement"]:
+                                if field in wt_item:
+                                    update_fields[field] = wt_item[field]
+                            update_fields["updated_at"] = datetime.now(timezone.utc).isoformat()
+                            
+                            if update_fields:
+                                await db.items.update_one(
+                                    {"id": existing_cl_item["id"]},
+                                    {"$set": update_fields}
+                                )
+                                synced_items += 1
                     
                     # CLEANUP: Remove items from checklist that are no longer PICKED in walkthrough
                     if not sync_options.sync_all:
