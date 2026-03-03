@@ -4254,6 +4254,33 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
             for wt_category in wt_categories:
                 wt_cat_name = wt_category.get("name", "")
                 
+                # Get walkthrough subcategories
+                wt_subcategories = await db.subcategories.find({
+                    "category_id": wt_category["id"]
+                }).to_list(1000)
+                
+                # FIRST: Check if this category has ANY picked items before creating it
+                category_has_picked_items = False
+                if not sync_options.sync_all:
+                    for wt_sub in wt_subcategories:
+                        picked_count = await db.items.count_documents({
+                            "subcategory_id": wt_sub["id"],
+                            "status": "PICKED"
+                        })
+                        if picked_count > 0:
+                            category_has_picked_items = True
+                            break
+                else:
+                    for wt_sub in wt_subcategories:
+                        any_count = await db.items.count_documents({"subcategory_id": wt_sub["id"]})
+                        if any_count > 0:
+                            category_has_picked_items = True
+                            break
+                
+                # Skip this entire category if no items to transfer
+                if not category_has_picked_items:
+                    continue
+                
                 # Check for existing checklist category
                 existing_cl_category = await db.categories.find_one({
                     "room_id": checklist_room_id,
@@ -4279,13 +4306,19 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                     }
                     await db.categories.insert_one(new_cl_category)
                 
-                # Get walkthrough subcategories
-                wt_subcategories = await db.subcategories.find({
-                    "category_id": wt_category["id"]
-                }).to_list(1000)
-                
                 for wt_subcategory in wt_subcategories:
                     wt_subcat_name = wt_subcategory.get("name", "")
+                    
+                    # Get walkthrough items for this subcategory
+                    item_query = {"subcategory_id": wt_subcategory["id"]}
+                    if not sync_options.sync_all:
+                        item_query["status"] = "PICKED"
+                    
+                    wt_items = await db.items.find(item_query).to_list(1000)
+                    
+                    # Skip subcategory if no items to transfer
+                    if len(wt_items) == 0:
+                        continue
                     
                     # Check for existing checklist subcategory
                     existing_cl_subcategory = await db.subcategories.find_one({
@@ -4311,14 +4344,6 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                             "updated_at": datetime.now(timezone.utc).isoformat()
                         }
                         await db.subcategories.insert_one(new_cl_subcategory)
-                    
-                    # Get walkthrough items
-                    item_query = {"subcategory_id": wt_subcategory["id"]}
-                    if not sync_options.sync_all:
-                        # Only sync items with PICKED status
-                        item_query["status"] = "PICKED"
-                    
-                    wt_items = await db.items.find(item_query).to_list(1000)
                     
                     # Get list of PICKED item names for cleanup
                     picked_item_names = [item.get("name", "") for item in wt_items]
