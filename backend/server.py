@@ -4337,6 +4337,7 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                                 **wt_item,
                                 "id": new_item_id,
                                 "subcategory_id": checklist_subcategory_id,
+                                "status": "",  # Clear status on transfer - user must re-pick in checklist
                                 "synced_from_walkthrough": True,
                                 "original_walkthrough_item_id": wt_item.get("id"),
                                 "created_at": datetime.now(timezone.utc).isoformat(),
@@ -13622,7 +13623,7 @@ async def import_selected_items(
         if not selected_items:
             raise HTTPException(status_code=400, detail="No items selected")
         
-        # Import each selected item with PICKED status (as requested by user)
+        # Import each selected item - no status by default, user picks manually
         imported_count = 0
         for item_data in selected_items:
             # Use the subcategory_id that was determined during preview
@@ -13637,7 +13638,7 @@ async def import_selected_items(
                 "size": item_data.get("size", ""),
                 "finish_color": item_data.get("finish_color", ""),
                 "image_url": item_data.get("image_url", ""),
-                "status": "PICKED",
+                "status": "",
                 "quantity": null,
                 "photos": [],
                 "created_at": datetime.utcnow(),
@@ -14310,7 +14311,7 @@ async def process_pdf_import(
                             else:
                                 logging.info(f"📂 Categorized '{product_name}' -> {best_category['name'] if best_category else 'default'}")
                             
-                            # Add to checklist with PICKED status (as requested by user)
+                            # Add to checklist - no status by default, user picks manually
                             await db.items.insert_one({
                                 "id": str(uuid.uuid4()),
                                 "subcategory_id": target_subcategory_id,
@@ -14322,7 +14323,7 @@ async def process_pdf_import(
                                 "size": product_data.get("size", ""),
                                 "finish_color": product_data.get("finish_color", ""),
                                 "image_url": product_data.get("image_url", ""),
-                                "status": "PICKED",
+                                "status": "",
                                 "quantity": null,
                                 "photos": [],
                                 "created_at": datetime.utcnow(),
