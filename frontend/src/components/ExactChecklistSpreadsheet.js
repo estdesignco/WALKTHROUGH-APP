@@ -2847,8 +2847,8 @@ const ExactChecklistSpreadsheet = ({
                                   let highlightIndex = 0;
                                   
                                   return sortedItems.map((item, itemIndex) => {
-                                    // Checkbox is COMPLETELY INDEPENDENT - only uses is_checked field
-                                    const isChecked = item.is_checked === true || checkedItems.has(item.id);
+                                    // Checkbox uses checkedItems Set as sole source of truth (initialized from is_checked on load)
+                                    const isChecked = checkedItems.has(item.id);
                                     
                                     // Get linked To-Do and Punch info
                                     const todoInfo = todoLinkedItems.get(item.id);
