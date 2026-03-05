@@ -512,6 +512,34 @@ const ExactChecklistSpreadsheet = ({
     setFilteredProject(filtered);
   }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
+  // FLAT SEARCH RESULTS - compute a simple flat array when searching
+  const flatSearchResults = useMemo(() => {
+    if (!searchTerm || !project) return [];
+    const searchLower = searchTerm.toLowerCase();
+    const results = [];
+    for (const room of (project.rooms || [])) {
+      if (selectedRoom && room.id !== selectedRoom) continue;
+      for (const category of (room.categories || [])) {
+        if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) continue;
+        for (const subcategory of (category.subcategories || [])) {
+          for (const item of (subcategory.items || [])) {
+            const itemMatch =
+              item.name?.toLowerCase().includes(searchLower) ||
+              (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
+              (item.sku && item.sku.toLowerCase().includes(searchLower)) ||
+              (item.remarks && item.remarks.toLowerCase().includes(searchLower));
+            if (!itemMatch) continue;
+            if (selectedVendor && item.vendor !== selectedVendor) continue;
+            if (selectedStatus && item.status !== selectedStatus) continue;
+            results.push({ ...item, _roomName: room.name, _categoryName: category.name });
+          }
+        }
+      }
+    }
+    return results;
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
+
+
   // Initialize checkedItems with items that have 'PICKED' status
   // PRESERVE collapsed state from localStorage - only set defaults for NEW rooms/categories
   // Track if we've initialized the expansion state
@@ -2073,12 +2101,55 @@ const ExactChecklistSpreadsheet = ({
            style={{
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
+
+        {/* FLAT SEARCH RESULTS VIEW */}
+        {searchTerm ? (
+          <div className="w-full overflow-x-auto" data-testid="flat-search-results">
+            {flatSearchResults.length === 0 ? (
+              <div className="text-center py-12 text-[#D4C5A9]/60 text-lg">No items match "{searchTerm}"</div>
+            ) : (
+              <>
+                <div className="text-[#D4C5A9]/70 text-sm mb-3">{flatSearchResults.length} result{flatSearchResults.length !== 1 ? 's' : ''} for "{searchTerm}"</div>
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="text-left text-[#D4C5A9]/80 text-xs uppercase tracking-wider border-b border-[#B49B7E]/30">
+                      <th className="px-3 py-2">Item</th>
+                      <th className="px-3 py-2">Room</th>
+                      <th className="px-3 py-2">Category</th>
+                      <th className="px-3 py-2">Vendor</th>
+                      <th className="px-3 py-2">SKU</th>
+                      <th className="px-3 py-2">Cost</th>
+                      <th className="px-3 py-2">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {flatSearchResults.map((item, idx) => (
+                      <tr key={item.id || idx} className="border-b border-[#B49B7E]/10 hover:bg-white/5 transition-colors">
+                        <td className="px-3 py-2 text-white font-medium">{item.name || '-'}</td>
+                        <td className="px-3 py-2 text-[#D4C5A9]/70 text-sm">{item._roomName}</td>
+                        <td className="px-3 py-2 text-[#D4C5A9]/70 text-sm">{item._categoryName}</td>
+                        <td className="px-3 py-2 text-[#D4C5A9]/70 text-sm">{item.vendor || '-'}</td>
+                        <td className="px-3 py-2 text-[#D4C5A9]/70 text-sm">{item.sku || '-'}</td>
+                        <td className="px-3 py-2 text-[#D4C5A9]/70 text-sm">{item.cost ? `$${item.cost}` : '-'}</td>
+                        <td className="px-3 py-2">
+                          {item.status ? (
+                            <span className="px-2 py-1 rounded text-xs font-bold text-white" style={{ backgroundColor: getStatusColor(item.status) }}>
+                              {item.status}
+                            </span>
+                          ) : '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+        ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="rooms" type="ROOM">
             {(provided) => (
-              <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps} style={{display: searchTerm ? 'none' : undefined}}>
-
-                {/* NORMAL HIERARCHY VIEW - Rooms > Categories > Subcategories > Items */}
+              <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
                 {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   const roomColor = getColorByIndex(roomIndex); // Use index-based color to ensure no repeats
@@ -3664,7 +3735,8 @@ const ExactChecklistSpreadsheet = ({
                     </div>
                   )}
                 </Droppable>
-              </div>
+              )}
+                        </div>
                       )}
                     </Draggable>
                   );
@@ -3674,6 +3746,7 @@ const ExactChecklistSpreadsheet = ({
             )}
           </Droppable>
         </DragDropContext>
+        )}
       </div> {/* END DARK NAVY SPREADSHEET CONTAINER */}
 
       {/* Add Item Modal - FIXED */}
