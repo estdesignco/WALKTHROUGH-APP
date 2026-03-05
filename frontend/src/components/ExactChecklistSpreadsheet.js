@@ -513,10 +513,11 @@ const ExactChecklistSpreadsheet = ({
     setFilteredProject(filtered);
   }, [project, committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
-  // FLAT SEARCH RESULTS - compute a simple flat array when searching
+  // FLAT SEARCH RESULTS - compute a simple flat array when searching or filtering
+  const isFilterActive = committedSearchTerm || selectedStatus || selectedVendor;
   const flatSearchResults = useMemo(() => {
-    if (!committedSearchTerm || !project) return [];
-    const searchLower = committedSearchTerm.toLowerCase();
+    if (!isFilterActive || !project) return [];
+    const searchLower = committedSearchTerm ? committedSearchTerm.toLowerCase() : '';
     const results = [];
     for (const room of (project.rooms || [])) {
       if (selectedRoom && room.id !== selectedRoom) continue;
@@ -524,12 +525,14 @@ const ExactChecklistSpreadsheet = ({
         if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) continue;
         for (const subcategory of (category.subcategories || [])) {
           for (const item of (subcategory.items || [])) {
-            const itemMatch =
-              item.name?.toLowerCase().includes(searchLower) ||
-              (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
-              (item.sku && item.sku.toLowerCase().includes(searchLower)) ||
-              (item.remarks && item.remarks.toLowerCase().includes(searchLower));
-            if (!itemMatch) continue;
+            if (committedSearchTerm) {
+              const itemMatch =
+                item.name?.toLowerCase().includes(searchLower) ||
+                (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
+                (item.sku && item.sku.toLowerCase().includes(searchLower)) ||
+                (item.remarks && item.remarks.toLowerCase().includes(searchLower));
+              if (!itemMatch) continue;
+            }
             if (selectedVendor && item.vendor !== selectedVendor) continue;
             if (selectedStatus && item.status !== selectedStatus) continue;
             results.push({ ...item, _roomName: room.name, _categoryName: category.name });
@@ -538,7 +541,7 @@ const ExactChecklistSpreadsheet = ({
       }
     }
     return results;
-  }, [project, committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
+  }, [project, committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, isFilterActive]);
 
 
   // Initialize checkedItems with items that have 'PICKED' status
@@ -1941,13 +1944,13 @@ const ExactChecklistSpreadsheet = ({
             >
               SEARCH
             </button>
-            {committedSearchTerm && (
+            {(committedSearchTerm || selectedStatus || selectedVendor) && (
               <button
                 data-testid="checklist-search-clear"
-                onClick={() => { setSearchTerm(''); setCommittedSearchTerm(''); }}
+                onClick={() => { setSearchTerm(''); setCommittedSearchTerm(''); setSelectedStatus(''); setSelectedVendor(''); setSelectedRoom(''); setSelectedCategory(''); }}
                 className="px-4 py-3 rounded-lg font-bold text-sm text-white bg-red-600 hover:bg-red-500 transition-all"
               >
-                CLEAR
+                CLEAR ALL
               </button>
             )}
           </div>
@@ -2125,14 +2128,14 @@ const ExactChecklistSpreadsheet = ({
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
 
-        {/* FLAT SEARCH RESULTS VIEW */}
-        {committedSearchTerm ? (
+        {/* FLAT SEARCH/FILTER RESULTS VIEW */}
+        {isFilterActive ? (
           <div className="w-full overflow-x-auto" data-testid="flat-search-results">
             {flatSearchResults.length === 0 ? (
-              <div className="text-center py-12 text-[#D4C5A9]/60 text-lg">No items match "{committedSearchTerm}"</div>
+              <div className="text-center py-12 text-[#D4C5A9]/60 text-lg">No items match your filters</div>
             ) : (
               <>
-                <div className="text-[#D4C5A9]/70 text-sm mb-3">{flatSearchResults.length} result{flatSearchResults.length !== 1 ? 's' : ''} for "{committedSearchTerm}"</div>
+                <div className="text-[#D4C5A9]/70 text-sm mb-3">{flatSearchResults.length} result{flatSearchResults.length !== 1 ? 's' : ''}{committedSearchTerm ? ` for "${committedSearchTerm}"` : ''}</div>
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="text-left text-[#D4C5A9]/80 text-xs uppercase tracking-wider border-b border-[#B49B7E]/30">
