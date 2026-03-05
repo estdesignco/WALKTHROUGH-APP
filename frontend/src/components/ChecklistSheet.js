@@ -251,7 +251,11 @@ const ChecklistSheet = () => {
           roomColors={{}}
           categoryColors={{}}
           itemStatuses={['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO JOB SITE', 'INSTALLED']}
-          vendorTypes={['Four Hands', 'Uttermost', 'Visual Comfort']}
+          vendorTypes={(() => {
+            const v = new Set();
+            (project?.rooms || []).forEach(r => (r.categories || []).forEach(c => (c.subcategories || []).forEach(s => (s.items || []).forEach(i => { if (i.vendor) v.add(i.vendor); }))));
+            return [...v].sort();
+          })()}
           carrierTypes={['FedEx', 'UPS', 'USPS']}
           onDeleteRoom={(roomId) => {
             if (window.confirm('Delete this room?')) {

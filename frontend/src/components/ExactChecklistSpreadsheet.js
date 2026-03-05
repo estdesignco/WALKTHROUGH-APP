@@ -516,6 +516,14 @@ const ExactChecklistSpreadsheet = ({
   const isFilterActive = searchTerm || selectedStatus || selectedVendor || selectedRoom || selectedCategory;
   const resultsRef = useRef(null);
   
+  // Dynamically compute ALL vendors from project data
+  const dynamicVendors = useMemo(() => {
+    if (!project) return [];
+    const v = new Set();
+    (project.rooms || []).forEach(r => (r.categories || []).forEach(c => (c.subcategories || []).forEach(s => (s.items || []).forEach(i => { if (i.vendor) v.add(i.vendor); }))));
+    return [...v].sort();
+  }, [project]);
+  
   // Auto-scroll to results when filter is activated
   useEffect(() => {
     if (isFilterActive && resultsRef.current) {
@@ -2005,7 +2013,7 @@ const ExactChecklistSpreadsheet = ({
               }}
             >
               <option value="">All Vendors</option>
-              {(vendorTypes || []).map(vendor => (
+              {(dynamicVendors || []).map(vendor => (
                 <option key={vendor} value={vendor}>{vendor}</option>
               ))}
             </select>

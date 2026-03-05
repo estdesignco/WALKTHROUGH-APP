@@ -145,7 +145,18 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         setItemStatuses(['PICKED', 'ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA', 'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION']);
       }
       
-      setVendorTypes(['Four Hands', 'Uttermost', 'Visual Comfort']);
+      // Dynamically extract all unique vendors from project items
+      const vendors = new Set();
+      (projectData.rooms || []).forEach(room => {
+        (room.categories || []).forEach(cat => {
+          (cat.subcategories || []).forEach(sub => {
+            (sub.items || []).forEach(item => {
+              if (item.vendor) vendors.add(item.vendor);
+            });
+          });
+        });
+      });
+      setVendorTypes([...vendors].sort());
       setCarrierTypes(['FedEx', 'UPS', 'USPS', 'DHL']);
     }
   };
