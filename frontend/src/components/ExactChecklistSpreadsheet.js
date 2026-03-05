@@ -3304,12 +3304,12 @@ const ExactChecklistSpreadsheet = ({
                                     }}
                                   >
                                     <select 
-                                      className="w-full text-[#D4C5A9] text-xs"
+                                      className="w-full text-xs"
                                       value={item.status || ''}
+                                      data-testid={`status-dropdown-${item.id}`}
                                       style={{ 
                                         backgroundColor: getStatusColor(item.status || ''),
-                                        background: getStatusColor(item.status || ''),
-                                        color: 'white !important',
+                                        color: 'white',
                                         border: '2px solid ' + getStatusColor(item.status || ''),
                                         borderRadius: '4px',
                                         padding: '2px',
@@ -3318,21 +3318,21 @@ const ExactChecklistSpreadsheet = ({
                                       }}
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
-                                      <option value=""></option>
-                                      <option value="ORDERED">ORDERED</option>
-                                      <option value="CHANGE OUT">CHANGE OUT</option>
-                                      <option value="REPLACEMENT">REPLACEMENT</option>
-                                      <option value="ORDER SAMPLES">ORDER SAMPLES</option>
-                                      <option value="SAMPLES ORDERED">SAMPLES ORDERED</option>
-                                      <option value="ASK NEIL">ASK NEIL</option>
-                                      <option value="ASK CHARLENE">ASK CHARLENE</option>
-                                      <option value="ASK JALA">ASK JALA</option>
-                                      <option value="ASK AVERI">ASK AVERI</option>
-                                      <option value="GET QUOTE">GET QUOTE</option>
-                                      <option value="WAITING ON QT">WAITING ON QT</option>
-                                      <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
-                                      <option value="APPROVED">APPROVED</option>
-                                      <option value="ON HOLD">ON HOLD</option>
+                                      <option value="" style={{backgroundColor: getStatusColor(''), color: 'white'}}></option>
+                                      <option value="ORDERED" style={{backgroundColor: getStatusColor('ORDERED'), color: 'white'}}>ORDERED</option>
+                                      <option value="CHANGE OUT" style={{backgroundColor: getStatusColor('CHANGE OUT'), color: 'white'}}>CHANGE OUT</option>
+                                      <option value="REPLACEMENT" style={{backgroundColor: getStatusColor('REPLACEMENT'), color: 'white'}}>REPLACEMENT</option>
+                                      <option value="ORDER SAMPLES" style={{backgroundColor: getStatusColor('ORDER SAMPLES'), color: 'white'}}>ORDER SAMPLES</option>
+                                      <option value="SAMPLES ORDERED" style={{backgroundColor: getStatusColor('SAMPLES ORDERED'), color: 'white'}}>SAMPLES ORDERED</option>
+                                      <option value="ASK NEIL" style={{backgroundColor: getStatusColor('ASK NEIL'), color: 'white'}}>ASK NEIL</option>
+                                      <option value="ASK CHARLENE" style={{backgroundColor: getStatusColor('ASK CHARLENE'), color: 'white'}}>ASK CHARLENE</option>
+                                      <option value="ASK JALA" style={{backgroundColor: getStatusColor('ASK JALA'), color: 'white'}}>ASK JALA</option>
+                                      <option value="ASK AVERI" style={{backgroundColor: getStatusColor('ASK AVERI'), color: 'white'}}>ASK AVERI</option>
+                                      <option value="GET QUOTE" style={{backgroundColor: getStatusColor('GET QUOTE'), color: 'white'}}>GET QUOTE</option>
+                                      <option value="WAITING ON QT" style={{backgroundColor: getStatusColor('WAITING ON QT'), color: 'white'}}>WAITING ON QT</option>
+                                      <option value="READY FOR PRESENTATION" style={{backgroundColor: getStatusColor('READY FOR PRESENTATION'), color: 'white'}}>READY FOR PRESENTATION</option>
+                                      <option value="APPROVED" style={{backgroundColor: getStatusColor('APPROVED'), color: 'white'}}>APPROVED</option>
+                                      <option value="ON HOLD" style={{backgroundColor: getStatusColor('ON HOLD'), color: 'white'}}>ON HOLD</option>
                                     </select>
                                   </td>
                                   

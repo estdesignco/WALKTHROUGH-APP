@@ -1982,29 +1982,29 @@ const ExactFFESpreadsheet = ({
                                                                     handleStatusChange(item.id, newStatus);
                                                                   }}
                                                                 >
-                                                                  <option value="" style={{ background: 'linear-gradient(135deg, #6B7280FF 0%, #6B7280AA 50%, #6B7280FF 100%)', color: 'white' }}>—</option>
-                                                                  <option value="TO BE SELECTED" style={{ background: 'linear-gradient(135deg, #94A3B8FF 0%, #94A3B8AA 50%, #94A3B8FF 100%)', color: 'white' }}>TO BE SELECTED</option>
-                                                                  <option value="RESEARCHING" style={{ background: 'linear-gradient(135deg, #3B82F6FF 0%, #3B82F6AA 50%, #3B82F6FF 100%)', color: 'white' }}>RESEARCHING</option>
-                                                                  <option value="PENDING APPROVAL" style={{ background: 'linear-gradient(135deg, #F59E0BFF 0%, #F59E0BAA 50%, #F59E0BFF 100%)', color: 'white' }}>PENDING APPROVAL</option>
-                                                                  <option value="APPROVED" style={{ background: 'linear-gradient(135deg, #10B981FF 0%, #10B981AA 50%, #10B981FF 100%)', color: 'white' }}>APPROVED</option>
-                                                                  <option value="ORDERED" style={{ background: 'linear-gradient(135deg, #06B6D4FF 0%, #06B6D4AA 50%, #06B6D4FF 100%)', color: 'white' }}>ORDERED</option>
-                                                                  <option value="REPLACEMENT" style={{ background: 'linear-gradient(135deg, #FF4500FF 0%, #FF4500AA 50%, #FF4500FF 100%)', color: 'white' }}>REPLACEMENT</option>
-                                                                  <option value="CONFIRMED" style={{ background: 'linear-gradient(135deg, #84CC16FF 0%, #84CC16AA 50%, #84CC16FF 100%)', color: 'white' }}>CONFIRMED</option>
-                                                                  <option value="IN PRODUCTION" style={{ background: 'linear-gradient(135deg, #F97316FF 0%, #F97316AA 50%, #F97316FF 100%)', color: 'white' }}>IN PRODUCTION</option>
-                                                                  <option value="SHIPPED" style={{ background: 'linear-gradient(135deg, #0EA5E9FF 0%, #0EA5E9AA 50%, #0EA5E9FF 100%)', color: 'white' }}>SHIPPED</option>
-                                                                  <option value="IN TRANSIT" style={{ background: 'linear-gradient(135deg, #8B5CF6FF 0%, #8B5CF6AA 50%, #8B5CF6FF 100%)', color: 'white' }}>IN TRANSIT</option>
-                                                                  <option value="OUT FOR DELIVERY" style={{ background: 'linear-gradient(135deg, #6366F1FF 0%, #6366F1AA 50%, #6366F1FF 100%)', color: 'white' }}>OUT FOR DELIVERY</option>
-                                                                  <option value="DELIVERED TO RECEIVER" style={{ background: 'linear-gradient(135deg, #A855F7FF 0%, #A855F7AA 50%, #A855F7FF 100%)', color: 'white' }}>DELIVERED TO RECEIVER</option>
-                                                                  <option value="DELIVERED TO JOB SITE" style={{ background: 'linear-gradient(135deg, #EC4899FF 0%, #EC4899AA 50%, #EC4899FF 100%)', color: 'white' }}>DELIVERED TO JOB SITE</option>
-                                                                  <option value="RECEIVED" style={{ background: 'linear-gradient(135deg, #D946EFFF 0%, #D946EFAA 50%, #D946EFFF 100%)', color: 'white' }}>RECEIVED</option>
-                                                                  <option value="READY FOR INSTALL" style={{ background: 'linear-gradient(135deg, #14B8A6FF 0%, #14B8A6AA 50%, #14B8A6FF 100%)', color: 'white' }}>READY FOR INSTALL</option>
-                                                                  <option value="INSTALLING" style={{ background: 'linear-gradient(135deg, #22C55EFF 0%, #22C55EAA 50%, #22C55EFF 100%)', color: 'white' }}>INSTALLING</option>
-                                                                  <option value="INSTALLED" style={{ background: 'linear-gradient(135deg, #65A30DFF 0%, #65A30DAA 50%, #65A30DFF 100%)', color: 'white' }}>INSTALLED</option>
-                                                                  <option value="ON HOLD" style={{ background: 'linear-gradient(135deg, #EF4444FF 0%, #EF4444AA 50%, #EF4444FF 100%)', color: 'white' }}>ON HOLD</option>
-                                                                  <option value="BACKORDERED" style={{ background: 'linear-gradient(135deg, #DC2626FF 0%, #DC2626AA 50%, #DC2626FF 100%)', color: 'white' }}>BACKORDERED</option>
-                                                                  <option value="DAMAGED" style={{ background: 'linear-gradient(135deg, #991B1BFF 0%, #991B1BAA 50%, #991B1BFF 100%)', color: 'white' }}>DAMAGED</option>
-                                                                  <option value="RETURNED" style={{ background: 'linear-gradient(135deg, #FB923CFF 0%, #FB923CAA 50%, #FB923CFF 100%)', color: 'white' }}>RETURNED</option>
-                                                                  <option value="CANCELLED" style={{ background: 'linear-gradient(135deg, #7C2D12FF 0%, #7C2D12AA 50%, #7C2D12FF 100%)', color: 'white' }}>CANCELLED</option>
+                                                                  <option value="" style={{ backgroundColor: getStatusColor(''), color: 'white' }}>—</option>
+                                                                  <option value="TO BE SELECTED" style={{ backgroundColor: getStatusColor('TO BE SELECTED'), color: 'white' }}>TO BE SELECTED</option>
+                                                                  <option value="RESEARCHING" style={{ backgroundColor: getStatusColor('RESEARCHING'), color: 'white' }}>RESEARCHING</option>
+                                                                  <option value="PENDING APPROVAL" style={{ backgroundColor: getStatusColor('PENDING APPROVAL'), color: 'white' }}>PENDING APPROVAL</option>
+                                                                  <option value="APPROVED" style={{ backgroundColor: getStatusColor('APPROVED'), color: 'white' }}>APPROVED</option>
+                                                                  <option value="ORDERED" style={{ backgroundColor: getStatusColor('ORDERED'), color: 'white' }}>ORDERED</option>
+                                                                  <option value="REPLACEMENT" style={{ backgroundColor: getStatusColor('REPLACEMENT'), color: 'white' }}>REPLACEMENT</option>
+                                                                  <option value="CONFIRMED" style={{ backgroundColor: getStatusColor('CONFIRMED'), color: 'white' }}>CONFIRMED</option>
+                                                                  <option value="IN PRODUCTION" style={{ backgroundColor: getStatusColor('IN PRODUCTION'), color: 'white' }}>IN PRODUCTION</option>
+                                                                  <option value="SHIPPED" style={{ backgroundColor: getStatusColor('SHIPPED'), color: 'white' }}>SHIPPED</option>
+                                                                  <option value="IN TRANSIT" style={{ backgroundColor: getStatusColor('IN TRANSIT'), color: 'white' }}>IN TRANSIT</option>
+                                                                  <option value="OUT FOR DELIVERY" style={{ backgroundColor: getStatusColor('OUT FOR DELIVERY'), color: 'white' }}>OUT FOR DELIVERY</option>
+                                                                  <option value="DELIVERED TO RECEIVER" style={{ backgroundColor: getStatusColor('DELIVERED TO RECEIVER'), color: 'white' }}>DELIVERED TO RECEIVER</option>
+                                                                  <option value="DELIVERED TO JOB SITE" style={{ backgroundColor: getStatusColor('DELIVERED TO JOB SITE'), color: 'white' }}>DELIVERED TO JOB SITE</option>
+                                                                  <option value="RECEIVED" style={{ backgroundColor: getStatusColor('RECEIVED'), color: 'white' }}>RECEIVED</option>
+                                                                  <option value="READY FOR INSTALL" style={{ backgroundColor: getStatusColor('READY FOR INSTALL'), color: 'white' }}>READY FOR INSTALL</option>
+                                                                  <option value="INSTALLING" style={{ backgroundColor: getStatusColor('INSTALLING'), color: 'white' }}>INSTALLING</option>
+                                                                  <option value="INSTALLED" style={{ backgroundColor: getStatusColor('INSTALLED'), color: 'white' }}>INSTALLED</option>
+                                                                  <option value="ON HOLD" style={{ backgroundColor: getStatusColor('ON HOLD'), color: 'white' }}>ON HOLD</option>
+                                                                  <option value="BACKORDERED" style={{ backgroundColor: getStatusColor('BACKORDERED'), color: 'white' }}>BACKORDERED</option>
+                                                                  <option value="DAMAGED" style={{ backgroundColor: getStatusColor('DAMAGED'), color: 'white' }}>DAMAGED</option>
+                                                                  <option value="RETURNED" style={{ backgroundColor: getStatusColor('RETURNED'), color: 'white' }}>RETURNED</option>
+                                                                  <option value="CANCELLED" style={{ backgroundColor: getStatusColor('CANCELLED'), color: 'white' }}>CANCELLED</option>
                                                                 </select>
                                                               </div>
                                                               <div className="h-6">
