@@ -726,15 +726,13 @@ const ExactChecklistSpreadsheet = ({
       '': '#6B7280',                        // Gray
       'PICKED': '#3B82F6',                  // Blue
       'ORDER SAMPLES': '#10B981',           // Green
-      'SAMPLES ARRIVED': '#8B5CF6',         // Purple
+      'REPLACEMENT': '#DC2626',             // Red
       'ASK NEIL': '#F59E0B',                // Amber
       'ASK CHARLENE': '#EF4444',            // Red
       'ASK JALA': '#EC4899',                // Pink
       'GET QUOTE': '#06B6D4',               // Cyan
       'WAITING ON QT': '#F97316',           // Orange
       'READY FOR PRESENTATION': '#84CC16', // Lime
-      'ENTER INTO HOUZZ': '#7C3AED',        // Violet
-      'ENTER INTO HOUZZ & ORDER SAMPLE': '#DB2777' // Deep Pink
     };
     return statusColors[status] || '#6B7280';
   };
@@ -1976,12 +1974,11 @@ const ExactChecklistSpreadsheet = ({
               }}
             >
               <option value="">All Status</option>
-              <option value="PICKED">PICKED</option>
               <option value="ORDERED">ORDERED</option>
               <option value="CHANGE OUT">CHANGE OUT</option>
+              <option value="REPLACEMENT">REPLACEMENT</option>
               <option value="ORDER SAMPLES">ORDER SAMPLES</option>
               <option value="SAMPLES ORDERED">SAMPLES ORDERED</option>
-              <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
               <option value="ASK NEIL">ASK NEIL</option>
               <option value="ASK CHARLENE">ASK CHARLENE</option>
               <option value="ASK JALA">ASK JALA</option>
@@ -1990,8 +1987,6 @@ const ExactChecklistSpreadsheet = ({
               <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
               <option value="APPROVED">APPROVED</option>
               <option value="ON HOLD">ON HOLD</option>
-              <option value="ENTER INTO HOUZZ">ENTER INTO HOUZZ</option>
-              <option value="ENTER INTO HOUZZ & ORDER SAMPLE">ENTER INTO HOUZZ & ORDER SAMPLE</option>
             </select>
           </div>
           
@@ -3265,12 +3260,11 @@ const ExactChecklistSpreadsheet = ({
                                       onChange={(e) => handleStatusChange(item.id, e.target.value)}
                                     >
                                       <option value=""></option>
-                                      <option value="PICKED">PICKED</option>
                                       <option value="ORDERED">ORDERED</option>
                                       <option value="CHANGE OUT">CHANGE OUT</option>
+                                      <option value="REPLACEMENT">REPLACEMENT</option>
                                       <option value="ORDER SAMPLES">ORDER SAMPLES</option>
                                       <option value="SAMPLES ORDERED">SAMPLES ORDERED</option>
-                                      <option value="SAMPLES ARRIVED">SAMPLES ARRIVED</option>
                                       <option value="ASK NEIL">ASK NEIL</option>
                                       <option value="ASK CHARLENE">ASK CHARLENE</option>
                                       <option value="ASK JALA">ASK JALA</option>
@@ -3280,8 +3274,6 @@ const ExactChecklistSpreadsheet = ({
                                       <option value="READY FOR PRESENTATION">READY FOR PRESENTATION</option>
                                       <option value="APPROVED">APPROVED</option>
                                       <option value="ON HOLD">ON HOLD</option>
-                                      <option value="ENTER INTO HOUZZ">ENTER INTO HOUZZ</option>
-                                      <option value="ENTER INTO HOUZZ & ORDER SAMPLE">ENTER INTO HOUZZ & ORDER SAMPLE</option>
                                     </select>
                                   </td>
                                   
