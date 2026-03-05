@@ -105,7 +105,6 @@ const ExactChecklistSpreadsheet = ({
   });
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [committedSearchTerm, setCommittedSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedVendor, setSelectedVendor] = useState('');
@@ -458,7 +457,7 @@ const ExactChecklistSpreadsheet = ({
 
   // APPLY FILTERS - ENHANCED COMBINATION FILTER LOGIC
   useEffect(() => {
-    console.log('🔍 Enhanced Checklist Filter triggered:', { committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
+    console.log('🔍 Enhanced Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
     
     if (!project) {
       setFilteredProject(null);
@@ -467,7 +466,7 @@ const ExactChecklistSpreadsheet = ({
 
     let filtered = { ...project };
 
-    if (committedSearchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
+    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
       console.log('🔍 Applying COMBINATION checklist filters...');
       
       filtered.rooms = project.rooms.map(room => {
@@ -484,8 +483,8 @@ const ExactChecklistSpreadsheet = ({
           
           const filteredSubcategories = category.subcategories.map(subcategory => {
             const filteredItems = subcategory.items.filter(item => {
-              if (committedSearchTerm) {
-                const searchLower = committedSearchTerm.toLowerCase();
+              if (searchTerm) {
+                const searchLower = searchTerm.toLowerCase();
                 const itemMatch = 
                   item.name.toLowerCase().includes(searchLower) ||
                   (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
@@ -511,13 +510,21 @@ const ExactChecklistSpreadsheet = ({
     }
 
     setFilteredProject(filtered);
-  }, [project, committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
   // FLAT SEARCH RESULTS - compute a simple flat array when searching or filtering
-  const isFilterActive = committedSearchTerm || selectedStatus || selectedVendor;
+  const isFilterActive = searchTerm || selectedStatus || selectedVendor || selectedRoom || selectedCategory;
+  const resultsRef = useRef(null);
+  
+  // Auto-scroll to results when filter is activated
+  useEffect(() => {
+    if (isFilterActive && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isFilterActive, searchTerm, selectedStatus, selectedVendor, selectedRoom, selectedCategory]);
   const flatSearchResults = useMemo(() => {
     if (!isFilterActive || !project) return [];
-    const searchLower = committedSearchTerm ? committedSearchTerm.toLowerCase() : '';
+    const searchLower = searchTerm ? searchTerm.toLowerCase() : '';
     const results = [];
     for (const room of (project.rooms || [])) {
       if (selectedRoom && room.id !== selectedRoom) continue;
@@ -525,7 +532,7 @@ const ExactChecklistSpreadsheet = ({
         if (selectedCategory && category.name.toLowerCase() !== selectedCategory.toLowerCase()) continue;
         for (const subcategory of (category.subcategories || [])) {
           for (const item of (subcategory.items || [])) {
-            if (committedSearchTerm) {
+            if (searchTerm) {
               const itemMatch =
                 item.name?.toLowerCase().includes(searchLower) ||
                 (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
@@ -541,7 +548,7 @@ const ExactChecklistSpreadsheet = ({
       }
     }
     return results;
-  }, [project, committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, isFilterActive]);
+  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus, isFilterActive]);
 
 
   // Initialize checkedItems with items that have 'PICKED' status
@@ -1926,7 +1933,6 @@ const ExactChecklistSpreadsheet = ({
               data-testid="checklist-search-input"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') setCommittedSearchTerm(searchTerm.trim()); }}
               className="flex-1 px-4 py-3 rounded-lg border-2 border-[#B49B7E] text-white text-lg focus:outline-none focus:border-[#D4A574] placeholder-[#D4C5A9]/70"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
@@ -1935,7 +1941,7 @@ const ExactChecklistSpreadsheet = ({
             />
             <button
               data-testid="checklist-search-button"
-              onClick={() => setCommittedSearchTerm(searchTerm.trim())}
+              onClick={() => {/* search is now live */}}
               className="px-8 py-3 rounded-lg font-bold text-lg text-white tracking-wide transition-all duration-200 hover:scale-105"
               style={{
                 background: 'linear-gradient(135deg, #D4A574 0%, #B49B7E 50%, #8B7355 100%)',
@@ -1944,10 +1950,10 @@ const ExactChecklistSpreadsheet = ({
             >
               SEARCH
             </button>
-            {(committedSearchTerm || selectedStatus || selectedVendor) && (
+            {(searchTerm || selectedStatus || selectedVendor) && (
               <button
                 data-testid="checklist-search-clear"
-                onClick={() => { setSearchTerm(''); setCommittedSearchTerm(''); setSelectedStatus(''); setSelectedVendor(''); setSelectedRoom(''); setSelectedCategory(''); }}
+                onClick={() => { setSearchTerm(''); setSelectedStatus(''); setSelectedVendor(''); setSelectedRoom(''); setSelectedCategory(''); }}
                 className="px-4 py-3 rounded-lg font-bold text-sm text-white bg-red-600 hover:bg-red-500 transition-all"
               >
                 CLEAR ALL
@@ -2123,7 +2129,7 @@ const ExactChecklistSpreadsheet = ({
       </div>
 
       {/* ENHANCED CHECKLIST TABLE WITH MINIMIZE/EXPAND AND FILTERING - EXACT SAME TREATMENT AS GRAPHS */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
+      <div ref={resultsRef} className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#B49B7E]/20 mb-6" 
            style={{
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
@@ -2135,7 +2141,7 @@ const ExactChecklistSpreadsheet = ({
               <div className="text-center py-12 text-[#D4C5A9]/60 text-lg">No items match your filters</div>
             ) : (
               <>
-                <div className="text-[#D4C5A9]/70 text-sm mb-3">{flatSearchResults.length} result{flatSearchResults.length !== 1 ? 's' : ''}{committedSearchTerm ? ` for "${committedSearchTerm}"` : ''}</div>
+                <div className="text-[#D4C5A9]/70 text-sm mb-3">{flatSearchResults.length} result{flatSearchResults.length !== 1 ? 's' : ''}{searchTerm ? ` for "${searchTerm}"` : ''}</div>
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="text-left text-[#D4C5A9]/80 text-xs uppercase tracking-wider border-b border-[#B49B7E]/30">
