@@ -7,28 +7,35 @@ export const STATUS_COLORS = {
   'RESEARCHING': '#3B82F6',             // Bright blue
   'PENDING APPROVAL': '#F59E0B',        // Amber/Yellow
   'APPROVED': '#10B981',                // Emerald green
-  'ORDERED': '#06B6D4',                 // Cyan (NOT green)
-  'ORDER SAMPLES': '#818CF8',           // Violet - NEW
-  'CHANGE OUT': '#F472B6',              // Pink - NEW
-  'ASK NEIL': '#FBBF24',                // Amber/Yellow - NEW
-  'ASK JALA': '#EC4899',                // Pink - NEW
-  'PICKED': '#FFD700',                  // Gold
-  'CONFIRMED': '#84CC16',               // Lime (yellow-green)
-  'IN PRODUCTION': '#F97316',           // Orange
-  'SHIPPED': '#0EA5E9',                 // Sky blue
-  'IN TRANSIT': '#8B5CF6',              // Purple
-  'OUT FOR DELIVERY': '#6366F1',        // Indigo
-  'DELIVERED TO RECEIVER': '#A855F7',   // Light purple
-  'DELIVERED TO JOB SITE': '#EC4899',   // Pink
-  'RECEIVED': '#D946EF',                // Magenta
-  'READY FOR INSTALL': '#14B8A6',       // Teal
-  'INSTALLING': '#22C55E',              // Green (different from approved)
-  'INSTALLED': '#65A30D',               // Yellow-green
-  'ON HOLD': '#EF4444',                 // Bright red
-  'BACKORDERED': '#DC2626',             // Dark red
-  'DAMAGED': '#991B1B',                 // Maroon
-  'RETURNED': '#FB923C',                // Light orange
-  'CANCELLED': '#7C2D12'                // Brown-red
+  'ORDERED': '#06B6D4',                 // Cyan
+  'ORDER SAMPLES': '#818CF8',           // Violet
+  'SAMPLES ORDERED': '#A78BFA',         // Lighter violet
+  'CHANGE OUT': '#F472B6',              // Pink
+  'REPLACEMENT': '#FF4500',             // Orange-Red (distinct!)
+  'ASK NEIL': '#FBBF24',               // Amber/Gold
+  'ASK CHARLENE': '#FB7185',            // Rose
+  'ASK JALA': '#EC4899',               // Hot pink
+  'ASK AVERI': '#C084FC',              // Light purple
+  'GET QUOTE': '#22D3EE',              // Light cyan
+  'WAITING ON QT': '#F97316',          // Orange
+  'READY FOR PRESENTATION': '#84CC16', // Lime
+  'ON HOLD': '#EF4444',                // Bright red
+  'PICKED': '#FFD700',                 // Gold
+  'CONFIRMED': '#84CC16',              // Lime
+  'IN PRODUCTION': '#F97316',          // Orange
+  'SHIPPED': '#0EA5E9',                // Sky blue
+  'IN TRANSIT': '#8B5CF6',             // Purple
+  'OUT FOR DELIVERY': '#6366F1',       // Indigo
+  'DELIVERED TO RECEIVER': '#A855F7',  // Light purple
+  'DELIVERED TO JOB SITE': '#EC4899',  // Pink
+  'RECEIVED': '#D946EF',               // Magenta
+  'READY FOR INSTALL': '#14B8A6',      // Teal
+  'INSTALLING': '#22C55E',             // Green
+  'INSTALLED': '#65A30D',              // Yellow-green
+  'BACKORDERED': '#DC2626',            // Dark red
+  'DAMAGED': '#991B1B',                // Maroon
+  'RETURNED': '#FB923C',               // Light orange
+  'CANCELLED': '#7C2D12'               // Brown-red
 };
 
 export const getStatusColor = (status) => {

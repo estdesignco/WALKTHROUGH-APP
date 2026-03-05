@@ -720,22 +720,8 @@ const ExactChecklistSpreadsheet = ({
 
   const getCategoryColor = () => '#065F46';  // Dark green for categories
 
-  // Checklist status colors - DIFFERENT from FFE
-  const getStatusColor = (status) => {
-    const statusColors = {
-      '': '#6B7280',                        // Gray
-      'PICKED': '#3B82F6',                  // Blue
-      'ORDER SAMPLES': '#10B981',           // Green
-      'REPLACEMENT': '#DC2626',             // Red
-      'ASK NEIL': '#F59E0B',                // Amber
-      'ASK CHARLENE': '#EF4444',            // Red
-      'ASK JALA': '#EC4899',                // Pink
-      'GET QUOTE': '#06B6D4',               // Cyan
-      'WAITING ON QT': '#F97316',           // Orange
-      'READY FOR PRESENTATION': '#84CC16', // Lime
-    };
-    return statusColors[status] || '#6B7280';
-  };
+  // Uses imported getStatusColor from ../utils/statusColors (master palette)
+  // All colors are consistent with pie chart in StatusOverview
 
   // Handle updating any item field (vendor, quantity, size, finish_color, cost)
   const handleUpdateItemField = async (itemId, field, value) => {
