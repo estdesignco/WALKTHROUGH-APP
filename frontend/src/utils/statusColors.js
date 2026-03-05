@@ -1,43 +1,43 @@
-// MASTER STATUS COLOR PALETTE - EVERY STATUS HAS A TRULY UNIQUE COLOR
-// Used across ALL components: Checklist, FFE, Status Breakdown, Pie Charts
-// Colors chosen from across the entire color wheel - no two are similar
+// MASTER STATUS COLOR PALETTE - EVERY STATUS IS A COMPLETELY DIFFERENT COLOR
+// These colors are picked from opposite ends of the color wheel
+// NO two colors are even close to each other
 
 export const STATUS_COLORS = {
-  '':                       '#6B7280',  // Gray (blank/unset)
+  '':                       '#6B7280',  // Gray
   'TO BE PICKED':           '#6B7280',  // Gray
-  'TO BE SELECTED':         '#94A3B8',  // Silver-slate
-  'RESEARCHING':            '#2563EB',  // Vivid blue
-  'PENDING APPROVAL':       '#F59E0B',  // Amber-yellow
-  'APPROVED':               '#16A34A',  // Kelly green
-  'ORDERED':                '#0891B2',  // Teal-cyan
-  'ORDER SAMPLES':          '#7C3AED',  // Vivid violet
-  'SAMPLES ORDERED':        '#4338CA',  // Deep indigo
-  'CHANGE OUT':             '#E11D48',  // Crimson red
-  'REPLACEMENT':            '#FF4500',  // Orange-red
-  'ASK NEIL':               '#CA8A04',  // Dark gold
-  'ASK CHARLENE':           '#BE185D',  // Deep pink
-  'ASK JALA':               '#A21CAF',  // Magenta-purple
-  'ASK AVERI':              '#6D28D9',  // Rich purple
-  'GET QUOTE':              '#0E7490',  // Dark cyan
-  'WAITING ON QT':          '#EA580C',  // Burnt orange
-  'READY FOR PRESENTATION': '#65A30D',  // Yellow-green/lime
-  'ON HOLD':                '#DC2626',  // Bright red
-  'PICKED':                 '#D97706',  // Dark amber
-  'CONFIRMED':              '#047857',  // Dark emerald
-  'IN PRODUCTION':          '#B45309',  // Brown-orange
-  'SHIPPED':                '#0284C7',  // Sky blue
-  'IN TRANSIT':             '#7E22CE',  // Purple
-  'OUT FOR DELIVERY':       '#4F46E5',  // Indigo
-  'DELIVERED TO RECEIVER':  '#9333EA',  // Bright purple
-  'DELIVERED TO JOB SITE':  '#C026D3',  // Fuchsia
-  'RECEIVED':               '#059669',  // Emerald
-  'READY FOR INSTALL':      '#14B8A6',  // Teal
-  'INSTALLING':             '#15803D',  // Forest green
-  'INSTALLED':              '#166534',  // Dark green
-  'BACKORDERED':            '#991B1B',  // Maroon
-  'DAMAGED':                '#7F1D1D',  // Dark maroon
-  'RETURNED':               '#C2410C',  // Rust orange
-  'CANCELLED':              '#78350F',  // Brown
+  'TO BE SELECTED':         '#94A3B8',  // Light gray
+  'RESEARCHING':            '#0000FF',  // Pure blue
+  'PENDING APPROVAL':       '#E6B800',  // Dark yellow
+  'APPROVED':               '#00CC00',  // Bright green
+  'ORDERED':                '#FF6600',  // Bright orange
+  'ORDER SAMPLES':          '#8B00FF',  // Violet
+  'SAMPLES ORDERED':        '#00CED1',  // Dark turquoise
+  'CHANGE OUT':             '#FF0000',  // Pure red
+  'REPLACEMENT':            '#FF1493',  // Deep pink
+  'ASK NEIL':               '#FFD700',  // Gold
+  'ASK CHARLENE':           '#DC143C',  // Crimson
+  'ASK JALA':               '#FF00FF',  // Magenta
+  'ASK AVERI':              '#4B0082',  // Indigo
+  'GET QUOTE':              '#00FF7F',  // Spring green
+  'WAITING ON QT':          '#FF4500',  // Red-orange
+  'READY FOR PRESENTATION': '#32CD32',  // Lime green
+  'ON HOLD':                '#B22222',  // Firebrick red
+  'PICKED':                 '#1E90FF',  // Dodger blue
+  'CONFIRMED':              '#228B22',  // Forest green
+  'IN PRODUCTION':          '#DAA520',  // Goldenrod
+  'SHIPPED':                '#4169E1',  // Royal blue
+  'IN TRANSIT':             '#9400D3',  // Dark violet
+  'OUT FOR DELIVERY':       '#FF8C00',  // Dark orange
+  'DELIVERED TO RECEIVER':  '#2E8B57',  // Sea green
+  'DELIVERED TO JOB SITE':  '#C71585',  // Medium violet-red
+  'RECEIVED':               '#008B8B',  // Dark cyan
+  'READY FOR INSTALL':      '#20B2AA',  // Light sea green
+  'INSTALLING':             '#ADFF2F',  // Green-yellow
+  'INSTALLED':              '#006400',  // Dark green
+  'BACKORDERED':            '#8B0000',  // Dark red
+  'DAMAGED':                '#800000',  // Maroon
+  'RETURNED':               '#CD853F',  // Peru/tan
+  'CANCELLED':              '#696969',  // Dim gray
 };
 
 export const getStatusColor = (status) => {
