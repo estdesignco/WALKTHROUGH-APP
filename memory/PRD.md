@@ -1,39 +1,42 @@
-# Interior Design App - PRD
+# Design Ready - Interior Design Management App
 
-## Original Problem Statement
-Interior design project management application (ESTABLISHED Design Co.) with spreadsheets, Chrome extension scraper, email questionnaire, mobile app, appointment booking.
+## Problem Statement
+Full-stack project management tool for an interior design company (EST Design Co). Manages projects with rooms, categories, subcategories, and items through walkthrough, checklist, and FF&E workflows.
+
+## Tech Stack
+- **Frontend**: React, Tailwind CSS, @hello-pangea/dnd (drag-and-drop)
+- **Backend**: FastAPI (Python), MongoDB
+- **3rd Party**: OpenStreetMap Nominatim, Microsoft Graph API, Leica D5
+
+## Core Features
+- Password-based auth (DesignReady2026!)
+- Project management with rooms/categories/subcategories/items
+- Walkthrough spreadsheet (data entry)
+- Checklist spreadsheet (with drag-and-drop, status tracking)
+- FF&E spreadsheet
+- Walkthrough-to-checklist data sync
+- Status overview with pie charts
+- Mobile-responsive views
+- Chrome extension scraper integration
+- Flat-list search in checklist (Feb 2026)
 
 ## Architecture
-- Frontend: React + Tailwind CSS (port 3000)
-- Backend: FastAPI + MongoDB (port 8001)
-- Chrome Extension: Manifest V3 (`/app/chrome-extension-scraper/`)
-- Mobile: PWA approach via `/mobile-app` route (MobileAppSimulator.js)
-- Email: Microsoft 365 SMTP (info@estdesignco.com)
-- Address: OpenStreetMap Nominatim API (replaced Google Maps)
+- `/app/backend/main.py` - All FastAPI endpoints
+- `/app/frontend/src/components/ExactChecklistSpreadsheet.js` - Checklist (4000+ lines, needs refactoring)
+- `/app/frontend/src/components/FFE_Exact_Spreadsheet.js` - FF&E
+- `/app/frontend/src/constants/statusColors.js` - Master status color map
+- `/app/frontend/src/App.js` - Routing, mobile redirect
 
-## What's Been Implemented
+## What's Implemented (as of Feb 2026)
+- All mobile app fixes (add room, scrolling, redirect, flashing UI)
+- Data sync fixes (no more "PICKED" regression, skip empty categories, field updates propagate)
+- Checklist/FFE UI fixes (uncheck items, standardized status dropdowns, REPLACEMENT status)
+- Status color consistency across Checklist, FFE, and pie chart
+- Backend Pydantic enum updated for new statuses
+- **Flat-list search in checklist** - when searching, shows a simple table without room/category headers (TESTED, PASSING)
 
-### Mar 1, 2026
-- **FIXED P0 BUG #1**: "Add Room" modal not appearing for projects with ZERO rooms. Root cause: modal JSX was only in the main return path, not the early-return for zero-rooms. Fix: duplicated modal into early-return block (TabbedWalkthroughSpreadsheet.js lines 562-685).
-- **FIXED P0 BUG #2**: iPad users who logged in at root URL `/` saw desktop dashboard instead of mobile app. Root cause: `useEffect` in App.js had `[]` dependency — only fired on mount, not after login state change. Fix: changed to `[authenticated]`.
-- **FIXED P0 BUG #3**: Mobile app content not scrollable on touch devices. Root cause: `TabbedWalkthroughSpreadsheet` wrapper had `h-full` + inline `overflow: auto`, creating a nested scroll container that broke iOS touch scrolling. Fix: removed `h-full` and `overflow: auto` from ffe-container, added `-webkit-overflow-scrolling: touch` to parent `flex-1 overflow-auto` container.
-- **IMPROVED iPad detection**: Added `pointer: coarse` media query check to both `index.html` and App.js.
-
-### Previous (from handoff)
-- Address Autocomplete: Replaced Google Maps with OpenStreetMap Nominatim API
-- Mobile App Redirect: Touch device detection redirects to `/mobile-app`
-- Mobile Dashboard: Redesigned home screen listing all projects
-- Dynamic API Config: `config.js` uses `window.location.origin` (DO NOT CHANGE)
-- Booking Endpoint: Hardened `/api/booking/available-slots`
-- Chrome Extension v7.37.0: Fixed image copying, thumbnails, added Vendor/MSRP fields
-
-## Critical Config (DO NOT CHANGE)
-- `frontend/public/config.js` — Uses `window.location.origin`. DO NOT hardcode URLs.
-- `backend/.env` — SMTP creds, MongoDB, Azure OAuth
-
-## Pending / Backlog
-- P1: User verification of OpenStreetMap address autocomplete
-- P2: User verification of Chrome Extension fixes (v7.37.0)
-- Rename `GoogleAddressInput.js` to `AddressAutocompleteInput.js`
-- Clean up unused `/app/mobile/` Expo directory
-- Outlook calendar sync for real booking availability
+## Backlog
+- **P1**: Refactor ExactChecklistSpreadsheet.js (4000+ line god component)
+- **P2**: Rename GoogleAddressInput.js to AddressAutocompleteInput.js
+- **P2**: Archive/remove unused /app/mobile/ directory
+- **P1**: Full user verification of all session fixes
