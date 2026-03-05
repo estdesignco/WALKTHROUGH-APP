@@ -105,6 +105,7 @@ const ExactChecklistSpreadsheet = ({
   });
   
   const [searchTerm, setSearchTerm] = useState('');
+  const [committedSearchTerm, setCommittedSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedVendor, setSelectedVendor] = useState('');
@@ -457,7 +458,7 @@ const ExactChecklistSpreadsheet = ({
 
   // APPLY FILTERS - ENHANCED COMBINATION FILTER LOGIC
   useEffect(() => {
-    console.log('🔍 Enhanced Checklist Filter triggered:', { searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
+    console.log('🔍 Enhanced Checklist Filter triggered:', { committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus });
     
     if (!project) {
       setFilteredProject(null);
@@ -466,7 +467,7 @@ const ExactChecklistSpreadsheet = ({
 
     let filtered = { ...project };
 
-    if (searchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
+    if (committedSearchTerm || selectedRoom || selectedCategory || selectedVendor || selectedStatus) {
       console.log('🔍 Applying COMBINATION checklist filters...');
       
       filtered.rooms = project.rooms.map(room => {
@@ -483,8 +484,8 @@ const ExactChecklistSpreadsheet = ({
           
           const filteredSubcategories = category.subcategories.map(subcategory => {
             const filteredItems = subcategory.items.filter(item => {
-              if (searchTerm) {
-                const searchLower = searchTerm.toLowerCase();
+              if (committedSearchTerm) {
+                const searchLower = committedSearchTerm.toLowerCase();
                 const itemMatch = 
                   item.name.toLowerCase().includes(searchLower) ||
                   (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
@@ -510,12 +511,12 @@ const ExactChecklistSpreadsheet = ({
     }
 
     setFilteredProject(filtered);
-  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
+  }, [project, committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
   // FLAT SEARCH RESULTS - compute a simple flat array when searching
   const flatSearchResults = useMemo(() => {
-    if (!searchTerm || !project) return [];
-    const searchLower = searchTerm.toLowerCase();
+    if (!committedSearchTerm || !project) return [];
+    const searchLower = committedSearchTerm.toLowerCase();
     const results = [];
     for (const room of (project.rooms || [])) {
       if (selectedRoom && room.id !== selectedRoom) continue;
@@ -537,7 +538,7 @@ const ExactChecklistSpreadsheet = ({
       }
     }
     return results;
-  }, [project, searchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
+  }, [project, committedSearchTerm, selectedRoom, selectedCategory, selectedVendor, selectedStatus]);
 
 
   // Initialize checkedItems with items that have 'PICKED' status
@@ -1913,24 +1914,46 @@ const ExactChecklistSpreadsheet = ({
       
       {/* ENHANCED FILTER SECTION - MATCHING FFE FUNCTIONALITY */}
       <div className="mb-6 p-4" style={{ backgroundColor: '#1E293B' }}>
-        <div className="flex flex-col lg:flex-row gap-4 items-center">
-          {/* Search Input */}
-          <div className="flex-1">
+        <div className="flex flex-col gap-4">
+          {/* SEARCH BAR WITH GO BUTTON */}
+          <div className="flex gap-2 items-center">
             <input
               type="text"
               placeholder="Search Items, Vendors, SKUs..."
+              data-testid="checklist-search-input"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg border border-[#B49B7E] text-white focus:outline-none placeholder-[#D4C5A9]/70"
+              onKeyDown={(e) => { if (e.key === 'Enter') setCommittedSearchTerm(searchTerm.trim()); }}
+              className="flex-1 px-4 py-3 rounded-lg border-2 border-[#B49B7E] text-white text-lg focus:outline-none focus:border-[#D4A574] placeholder-[#D4C5A9]/70"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(20,20,30,0.9) 50%, rgba(0,0,0,0.95) 100%)',
                 boxShadow: '0 0 20px rgba(212, 165, 116, 0.3), inset 0 0 30px rgba(212, 165, 116, 0.08)'
               }}
             />
+            <button
+              data-testid="checklist-search-button"
+              onClick={() => setCommittedSearchTerm(searchTerm.trim())}
+              className="px-8 py-3 rounded-lg font-bold text-lg text-white tracking-wide transition-all duration-200 hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #D4A574 0%, #B49B7E 50%, #8B7355 100%)',
+                boxShadow: '0 4px 15px rgba(212, 165, 116, 0.4)'
+              }}
+            >
+              SEARCH
+            </button>
+            {committedSearchTerm && (
+              <button
+                data-testid="checklist-search-clear"
+                onClick={() => { setSearchTerm(''); setCommittedSearchTerm(''); }}
+                className="px-4 py-3 rounded-lg font-bold text-sm text-white bg-red-600 hover:bg-red-500 transition-all"
+              >
+                CLEAR
+              </button>
+            )}
           </div>
           
-          {/* Filter Dropdowns */}
-          <div className="flex gap-3 flex-wrap">
+          {/* Filter Dropdowns Row */}
+          <div className="flex gap-3 flex-wrap items-center">
             <select 
               value={selectedRoom}
               onChange={(e) => setSelectedRoom(e.target.value)}
@@ -2103,13 +2126,13 @@ const ExactChecklistSpreadsheet = ({
            }}>
 
         {/* FLAT SEARCH RESULTS VIEW */}
-        {searchTerm ? (
+        {committedSearchTerm ? (
           <div className="w-full overflow-x-auto" data-testid="flat-search-results">
             {flatSearchResults.length === 0 ? (
-              <div className="text-center py-12 text-[#D4C5A9]/60 text-lg">No items match "{searchTerm}"</div>
+              <div className="text-center py-12 text-[#D4C5A9]/60 text-lg">No items match "{committedSearchTerm}"</div>
             ) : (
               <>
-                <div className="text-[#D4C5A9]/70 text-sm mb-3">{flatSearchResults.length} result{flatSearchResults.length !== 1 ? 's' : ''} for "{searchTerm}"</div>
+                <div className="text-[#D4C5A9]/70 text-sm mb-3">{flatSearchResults.length} result{flatSearchResults.length !== 1 ? 's' : ''} for "{committedSearchTerm}"</div>
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="text-left text-[#D4C5A9]/80 text-xs uppercase tracking-wider border-b border-[#B49B7E]/30">
