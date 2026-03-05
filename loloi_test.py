@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://add-room-debug.preview.emergentagent.com"
+BACKEND_URL = "https://bugfix-sprint-9.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 def test_loloi_extended():

@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://add-room-debug.preview.emergentagent.com/mobile-app
+Test it now: https://bugfix-sprint-9.preview.emergentagent.com/mobile-app

@@ -126,7 +126,7 @@ Disconnect Leica when not in use to save battery on both devices.
 
 ## 🧪 TEST IT NOW
 
-1. Open: https://add-room-debug.preview.emergentagent.com/mobile-app
+1. Open: https://bugfix-sprint-9.preview.emergentagent.com/mobile-app
 2. Go to Walkthrough or FFE
 3. Click "📸 PHOTO"
 4. Click "📏 Connect Leica D5"

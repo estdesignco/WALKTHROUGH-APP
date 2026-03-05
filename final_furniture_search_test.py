@@ -9,7 +9,7 @@ import aiohttp
 async def test_furniture_search_complete():
     """Test all aspects of the furniture search system"""
     
-    base_url = "https://add-room-debug.preview.emergentagent.com/api/furniture"
+    base_url = "https://bugfix-sprint-9.preview.emergentagent.com/api/furniture"
     
     print("🧪 COMPREHENSIVE FURNITURE SEARCH TEST")
     print("=" * 60)
@@ -91,7 +91,7 @@ async def main():
     if success:
         print("🎉 FURNITURE SEARCH SYSTEM: FULLY FUNCTIONAL!")
         print("\n🔗 USER TESTING CHECKLIST:")
-        print("1. Go to: https://add-room-debug.preview.emergentagent.com/furniture-search")
+        print("1. Go to: https://bugfix-sprint-9.preview.emergentagent.com/furniture-search")
         print("2. Verify 29 total products are showing")
         print("3. Test search: try 'chair', 'table', 'lamp'")
         print("4. Test filters: Four Hands, Uttermost, Seating, Lighting")

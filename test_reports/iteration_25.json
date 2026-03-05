@@ -40,7 +40,7 @@
       {
         "component": "config.js",
         "issue": "CRITICAL: config.js was pointing to production URL (https://app.estdesignco.com) instead of preview URL, causing dashboard to be stuck on 'Loading projects...' and 'Loading calendar...'",
-        "fix": "Updated /app/frontend/public/config.js to use https://add-room-debug.preview.emergentagent.com",
+        "fix": "Updated /app/frontend/public/config.js to use https://bugfix-sprint-9.preview.emergentagent.com",
         "priority": "CRITICAL"
       }
     ]
@@ -110,5 +110,5 @@
   "retest_needed": false,
   "should_main_agent_self_test": false,
   
-  "context_for_next_testing_agent": "CRITICAL: The config.js file at /app/frontend/public/config.js controls the backend URL. For preview environment, it should point to https://add-room-debug.preview.emergentagent.com. For production, it should point to https://app.estdesignco.com. The dashboard was stuck on 'Loading...' because this file was pointing to production. All major features are now working. Backend tests pass at 86% rate with only minor response format issues. Frontend is fully functional with all navigation buttons, calendar, projects, and customer questionnaire working."
+  "context_for_next_testing_agent": "CRITICAL: The config.js file at /app/frontend/public/config.js controls the backend URL. For preview environment, it should point to https://bugfix-sprint-9.preview.emergentagent.com. For production, it should point to https://app.estdesignco.com. The dashboard was stuck on 'Loading...' because this file was pointing to production. All major features are now working. Backend tests pass at 86% rate with only minor response format issues. Frontend is fully functional with all navigation buttons, calendar, projects, and customer questionnaire working."
 }

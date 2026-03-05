@@ -1,6 +1,6 @@
 # COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS - FINAL REPORT
 ## Test Date: 2025-10-28
-## Backend URL: https://add-room-debug.preview.emergentagent.com/api
+## Backend URL: https://bugfix-sprint-9.preview.emergentagent.com/api
 
 ---
 

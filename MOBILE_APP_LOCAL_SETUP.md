@@ -27,7 +27,7 @@ cd /app
 tar -czf mobile-app.tar.gz mobile/
 ```
 
-You can download: `https://add-room-debug.preview.emergentagent.com/mobile-app.tar.gz`
+You can download: `https://bugfix-sprint-9.preview.emergentagent.com/mobile-app.tar.gz`
 
 Then extract it on your computer:
 ```bash

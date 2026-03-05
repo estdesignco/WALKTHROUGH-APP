@@ -2076,7 +2076,9 @@ const ExactChecklistSpreadsheet = ({
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="rooms" type="ROOM">
             {(provided) => (
-              <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps} style={{display: searchTerm ? 'none' : undefined}}>
+
+                {/* NORMAL HIERARCHY VIEW - Rooms > Categories > Subcategories > Items */}
                 {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
                   const roomColor = getColorByIndex(roomIndex); // Use index-based color to ensure no repeats
@@ -3662,8 +3664,7 @@ const ExactChecklistSpreadsheet = ({
                     </div>
                   )}
                 </Droppable>
-              )}
-                        </div>
+              </div>
                       )}
                     </Draggable>
                   );

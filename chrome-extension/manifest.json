@@ -10,7 +10,7 @@
   ],
   "host_permissions": [
     "https://www.canva.com/*",
-    "https://add-room-debug.preview.emergentagent.com/*"
+    "https://bugfix-sprint-9.preview.emergentagent.com/*"
   ],
   "action": {
     "default_popup": "popup.html",

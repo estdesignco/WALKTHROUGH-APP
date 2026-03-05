@@ -42,7 +42,7 @@ interface ChecklistItem {
   sku?: string;
 }
 
-const BACKEND_URL = 'https://add-room-debug.preview.emergentagent.com';
+const BACKEND_URL = 'https://bugfix-sprint-9.preview.emergentagent.com';
 
 export const App = () => {
   const [projectId, setProjectId] = useState<string>('');

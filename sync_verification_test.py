@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://add-room-debug.preview.emergentagent.com/api"
+BASE_URL = "https://bugfix-sprint-9.preview.emergentagent.com/api"
 PROJECT_ID = "086ccb0a-2a0a-436a-8525-753f0114dbc5"  # Modern Kitchen Design
 
 class SyncTester:

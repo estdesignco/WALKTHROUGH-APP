@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://add-room-debug.preview.emergentagent.com
+https://bugfix-sprint-9.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://add-room-debug.preview.emergentagent.com/mobile-app
+https://bugfix-sprint-9.preview.emergentagent.com/mobile-app
 
 ---
 
