@@ -1212,8 +1212,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                   {/* SUBCATEGORIES - EXACT DESKTOP TABLE STRUCTURE */}
                   {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
                     <React.Fragment key={subcategory.id}>
-                      {sheetType === 'ffe' ? (
-                        // FFE TABLE - 15 COLUMNS WITH SECTION HEADERS
+                      {(sheetType === 'ffe' || sheetType === 'checklist') ? (
+                        // FFE/CHECKLIST TABLE - FULL COLUMNS WITH SECTION HEADERS
                       <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
                         <thead>
                           {/* SECTION HEADERS */}
