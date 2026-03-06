@@ -976,7 +976,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
       )}
 
       {/* SEARCH/FILTER BAR - MOBILE */}
-      {sheetType === 'checklist' && (
+      {(sheetType === 'checklist' || sheetType === 'ffe') && (
         <div className="p-3" style={{ backgroundColor: '#1E293B' }}>
           <div className="flex flex-col gap-2">
             <input
@@ -1028,7 +1028,7 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
       )}
 
       {/* FLAT SEARCH RESULTS - MOBILE (replaces room tabs when filtering) */}
-      {sheetType === 'checklist' && mobileIsFilterActive ? (
+      {(sheetType === 'checklist' || sheetType === 'ffe') && mobileIsFilterActive ? (
         <div className="p-3" data-testid="mobile-flat-results">
           {mobileFlatResults.length === 0 ? (
             <div className="text-center py-8 text-[#D4C5A9]/60 text-lg">No items match your filters</div>
@@ -1212,8 +1212,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                   {/* SUBCATEGORIES - EXACT DESKTOP TABLE STRUCTURE */}
                   {expandedCategories[category.id] && category.subcategories?.map((subcategory) => (
                     <React.Fragment key={subcategory.id}>
-                      {(sheetType === 'ffe' || sheetType === 'checklist') ? (
-                        // FFE/CHECKLIST TABLE - FULL COLUMNS WITH SECTION HEADERS
+                      {sheetType === 'ffe' ? (
+                        // FFE TABLE - FULL COLUMNS WITH SECTION HEADERS
                       <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
                         <thead>
                           {/* SECTION HEADERS */}
@@ -1493,6 +1493,108 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                               </td>
                               <td className="border border-[#B49B7E] px-1 py-1 text-center">
                                 <button onClick={() => handleDeleteItem(item.id)} className="text-red-400 hover:text-red-300 text-sm font-bold">🗑️</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      ) : sheetType === 'checklist' ? (
+                        // CHECKLIST TABLE - MATCHES DESKTOP: ✓, ITEM, VENDOR/SKU, QTY, SIZE, FINISH, COST, STATUS, IMAGE, LINK, REMARKS
+                      <table className="w-full border-collapse border border-[#B49B7E] mb-4 mt-2 shadow-lg shadow-[#B49B7E]/10">
+                        <thead>
+                          <tr>
+                            <th className="border border-[#B49B7E] px-1 py-2 text-xs font-bold text-white w-8" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>✓</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>
+                              {subcategory.name.toUpperCase()}
+                              <button onClick={() => handleAddBlankItem(subcategory.id)} className="ml-2 bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold">+ ADD ITEM</button>
+                            </th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-28" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>VENDOR/SKU</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-14" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>QTY</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-28" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>SIZE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-28" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>FINISH</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-20" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>COST</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-36" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>STATUS</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>IMAGE</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-16" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>LINK</th>
+                            <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white w-32" style={{ background: 'linear-gradient(135deg, #8B4444 0%, #8B4444AA 50%, #8B4444 100%)' }}>REMARKS</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {subcategory.items?.map((item, itemIndex) => (
+                            <tr key={item.id} style={{ 
+                              background: itemIndex % 2 === 0 
+                                ? 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 50%, rgba(0,0,0,0.95) 100%)'
+                                : 'linear-gradient(135deg, rgba(15,15,25,0.95) 0%, rgba(45,45,55,0.9) 50%, rgba(15,15,25,0.95) 100%)'
+                            }}>
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
+                                <input 
+                                  type="checkbox" 
+                                  className="w-4 h-4 cursor-pointer" 
+                                  checked={item.is_checked || false}
+                                  onChange={async (e) => {
+                                    const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin;
+                                    try {
+                                      await fetch(`${BACKEND_URL}/api/items/${item.id}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ is_checked: e.target.checked })
+                                      });
+                                      refreshProject();
+                                    } catch (err) { console.error('Checkbox save error:', err); }
+                                  }}
+                                />
+                              </td>
+                              <td className="border border-[#B49B7E] px-2 py-1">
+                                <input type="text" value={item.name || ''} onChange={(e) => handleUpdateItem(item.id, 'name', e.target.value)} className="w-full bg-transparent text-white text-xs px-1 border-none focus:outline-none" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <input type="text" value={item.vendor || ''} onChange={(e) => handleUpdateItem(item.id, 'vendor', e.target.value)} className="w-full bg-transparent text-white text-xs px-1 border-none focus:outline-none" placeholder="Vendor" />
+                                <input type="text" value={item.sku || ''} onChange={(e) => handleUpdateItem(item.id, 'sku', e.target.value)} className="w-full bg-transparent text-[#D4C5A9]/60 text-xs px-1 border-none focus:outline-none mt-1" placeholder="SKU" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center">
+                                <input type="number" value={item.quantity || ''} onChange={(e) => handleUpdateItem(item.id, 'quantity', e.target.value)} className="w-full bg-transparent text-white text-xs text-center border-none focus:outline-none" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <input type="text" value={item.size || ''} onChange={(e) => handleUpdateItem(item.id, 'size', e.target.value)} className="w-full bg-transparent text-white text-xs px-1 border-none focus:outline-none" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <input type="text" value={item.finish_color || ''} onChange={(e) => handleUpdateItem(item.id, 'finish_color', e.target.value)} className="w-full bg-transparent text-white text-xs px-1 border-none focus:outline-none" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <input type="text" value={item.cost || ''} onChange={(e) => handleUpdateItem(item.id, 'cost', e.target.value)} className="w-full bg-transparent text-white text-xs px-1 border-none focus:outline-none" placeholder="$" />
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <select
+                                  value={item.status || ''}
+                                  onChange={(e) => handleUpdateItem(item.id, 'status', e.target.value)}
+                                  className="w-full text-xs font-bold rounded"
+                                  style={{ backgroundColor: getStatusColor(item.status || ''), color: 'white', border: 'none', padding: '4px' }}
+                                >
+                                  <option value="" style={{backgroundColor: getStatusColor('')}}>--</option>
+                                  <option value="ORDERED" style={{backgroundColor: getStatusColor('ORDERED'), color:'white'}}>ORDERED</option>
+                                  <option value="CHANGE OUT" style={{backgroundColor: getStatusColor('CHANGE OUT'), color:'white'}}>CHANGE OUT</option>
+                                  <option value="REPLACEMENT" style={{backgroundColor: getStatusColor('REPLACEMENT'), color:'white'}}>REPLACEMENT</option>
+                                  <option value="ORDER SAMPLES" style={{backgroundColor: getStatusColor('ORDER SAMPLES'), color:'white'}}>ORDER SAMPLES</option>
+                                  <option value="SAMPLES ORDERED" style={{backgroundColor: getStatusColor('SAMPLES ORDERED'), color:'white'}}>SAMPLES ORDERED</option>
+                                  <option value="ASK NEIL" style={{backgroundColor: getStatusColor('ASK NEIL'), color:'white'}}>ASK NEIL</option>
+                                  <option value="ASK CHARLENE" style={{backgroundColor: getStatusColor('ASK CHARLENE'), color:'white'}}>ASK CHARLENE</option>
+                                  <option value="ASK JALA" style={{backgroundColor: getStatusColor('ASK JALA'), color:'white'}}>ASK JALA</option>
+                                  <option value="ASK AVERI" style={{backgroundColor: getStatusColor('ASK AVERI'), color:'white'}}>ASK AVERI</option>
+                                  <option value="GET QUOTE" style={{backgroundColor: getStatusColor('GET QUOTE'), color:'white'}}>GET QUOTE</option>
+                                  <option value="WAITING ON QT" style={{backgroundColor: getStatusColor('WAITING ON QT'), color:'white'}}>WAITING ON QT</option>
+                                  <option value="READY FOR PRESENTATION" style={{backgroundColor: getStatusColor('READY FOR PRESENTATION'), color:'white'}}>READY FOR PRESENTATION</option>
+                                  <option value="APPROVED" style={{backgroundColor: getStatusColor('APPROVED'), color:'white'}}>APPROVED</option>
+                                  <option value="ON HOLD" style={{backgroundColor: getStatusColor('ON HOLD'), color:'white'}}>ON HOLD</option>
+                                </select>
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center">
+                                {item.image ? <img src={item.image} alt="" className="w-10 h-10 object-cover rounded" /> : <span className="text-[#B49B7E]/30 text-xs">-</span>}
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1 text-center">
+                                {item.link ? <a href={item.link} target="_blank" rel="noreferrer" className="text-blue-400 text-xs underline">VIEW</a> : <span className="text-[#B49B7E]/30 text-xs">-</span>}
+                              </td>
+                              <td className="border border-[#B49B7E] px-1 py-1">
+                                <input type="text" value={item.remarks || ''} onChange={(e) => handleUpdateItem(item.id, 'remarks', e.target.value)} className="w-full bg-transparent text-white text-xs px-1 border-none focus:outline-none" placeholder="Add remarks..." />
                               </td>
                             </tr>
                           ))}
