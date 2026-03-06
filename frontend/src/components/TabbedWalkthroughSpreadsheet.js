@@ -87,6 +87,55 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
   
   const displayProject = project;
   
+  // SEARCH/FILTER STATE - same as desktop
+  const [mobileSearchTerm, setMobileSearchTerm] = useState('');
+  const [mobileSelectedStatus, setMobileSelectedStatus] = useState('');
+  const [mobileSelectedVendor, setMobileSelectedVendor] = useState('');
+  
+  const mobileIsFilterActive = mobileSearchTerm || mobileSelectedStatus || mobileSelectedVendor;
+  
+  // Compute dynamic vendors from project data
+  const mobileVendors = React.useMemo(() => {
+    if (!project) return [];
+    const v = new Set();
+    (project.rooms || []).forEach(r => (r.categories || []).forEach(c => (c.subcategories || []).forEach(s => (s.items || []).forEach(i => { if (i.vendor) v.add(i.vendor); }))));
+    return [...v].sort();
+  }, [project]);
+  
+  // Compute dynamic statuses from project data
+  const mobileStatuses = React.useMemo(() => {
+    if (!project) return [];
+    const s = new Set();
+    (project.rooms || []).forEach(r => (r.categories || []).forEach(c => (c.subcategories || []).forEach(sub => (sub.items || []).forEach(i => { if (i.status) s.add(i.status); }))));
+    return [...s].sort();
+  }, [project]);
+  
+  // FLAT SEARCH RESULTS
+  const mobileFlatResults = React.useMemo(() => {
+    if (!mobileIsFilterActive || !project) return [];
+    const searchLower = mobileSearchTerm ? mobileSearchTerm.toLowerCase() : '';
+    const results = [];
+    for (const room of (project.rooms || [])) {
+      for (const category of (room.categories || [])) {
+        for (const subcategory of (category.subcategories || [])) {
+          for (const item of (subcategory.items || [])) {
+            if (mobileSearchTerm) {
+              const match = item.name?.toLowerCase().includes(searchLower) ||
+                (item.vendor && item.vendor.toLowerCase().includes(searchLower)) ||
+                (item.sku && item.sku.toLowerCase().includes(searchLower)) ||
+                (item.remarks && item.remarks.toLowerCase().includes(searchLower));
+              if (!match) continue;
+            }
+            if (mobileSelectedVendor && item.vendor !== mobileSelectedVendor) continue;
+            if (mobileSelectedStatus && item.status !== mobileSelectedStatus) continue;
+            results.push({ ...item, _roomName: room.name, _categoryName: category.name });
+          }
+        }
+      }
+    }
+    return results;
+  }, [project, mobileSearchTerm, mobileSelectedVendor, mobileSelectedStatus, mobileIsFilterActive]);
+  
   // Helper function to add measurement state to history
   const addToHistory = (newMeasurements) => {
     const newHistory = measurementHistory.slice(0, historyIndex + 1);
@@ -926,6 +975,94 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
         </div>
       )}
 
+      {/* SEARCH/FILTER BAR - MOBILE */}
+      {sheetType === 'checklist' && (
+        <div className="p-3" style={{ backgroundColor: '#1E293B' }}>
+          <div className="flex flex-col gap-2">
+            <input
+              type="text"
+              placeholder="Search items, vendors, SKUs..."
+              data-testid="mobile-search-input"
+              value={mobileSearchTerm}
+              onChange={(e) => setMobileSearchTerm(e.target.value)}
+              className="w-full px-3 py-3 rounded-lg border-2 border-[#B49B7E] text-white text-base focus:outline-none focus:border-[#D4A574] placeholder-[#D4C5A9]/50"
+              style={{ background: 'rgba(0,0,0,0.8)' }}
+            />
+            <div className="flex gap-2">
+              <select
+                data-testid="mobile-status-filter"
+                value={mobileSelectedStatus}
+                onChange={(e) => setMobileSelectedStatus(e.target.value)}
+                className="flex-1 px-2 py-2 rounded-lg border border-[#B49B7E] text-white text-sm"
+                style={{ background: mobileSelectedStatus ? getStatusColor(mobileSelectedStatus) : 'rgba(0,0,0,0.8)' }}
+              >
+                <option value="" style={{backgroundColor: '#1E293B'}}>All Status</option>
+                {mobileStatuses.map(s => (
+                  <option key={s} value={s} style={{backgroundColor: getStatusColor(s), color: 'white'}}>{s}</option>
+                ))}
+              </select>
+              <select
+                data-testid="mobile-vendor-filter"
+                value={mobileSelectedVendor}
+                onChange={(e) => setMobileSelectedVendor(e.target.value)}
+                className="flex-1 px-2 py-2 rounded-lg border border-[#B49B7E] text-white text-sm"
+                style={{ background: 'rgba(0,0,0,0.8)' }}
+              >
+                <option value="">All Vendors</option>
+                {mobileVendors.map(v => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </div>
+            {mobileIsFilterActive && (
+              <button
+                data-testid="mobile-clear-filters"
+                onClick={() => { setMobileSearchTerm(''); setMobileSelectedStatus(''); setMobileSelectedVendor(''); }}
+                className="w-full py-2 rounded-lg font-bold text-sm text-white bg-red-600 hover:bg-red-500"
+              >
+                CLEAR ALL FILTERS
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* FLAT SEARCH RESULTS - MOBILE (replaces room tabs when filtering) */}
+      {sheetType === 'checklist' && mobileIsFilterActive ? (
+        <div className="p-3" data-testid="mobile-flat-results">
+          {mobileFlatResults.length === 0 ? (
+            <div className="text-center py-8 text-[#D4C5A9]/60 text-lg">No items match your filters</div>
+          ) : (
+            <>
+              <div className="text-[#D4C5A9]/70 text-sm mb-2">{mobileFlatResults.length} result{mobileFlatResults.length !== 1 ? 's' : ''}</div>
+              <div className="space-y-2">
+                {mobileFlatResults.map((item, idx) => (
+                  <div key={item.id || idx} className="rounded-lg border border-[#B49B7E]/30 p-3" style={{ background: 'rgba(0,0,0,0.8)' }}>
+                    <div className="flex justify-between items-start mb-1">
+                      <div className="text-white font-bold text-sm flex-1">{item.name || '-'}</div>
+                      {item.status && (
+                        <span className="px-2 py-1 rounded text-xs font-bold text-white ml-2" style={{ backgroundColor: getStatusColor(item.status) }}>
+                          {item.status}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[#D4C5A9]/60 text-xs">
+                      {item._roomName} &bull; {item._categoryName}
+                    </div>
+                    <div className="flex gap-4 mt-1 text-xs text-[#B49B7E]">
+                      {item.vendor && <span>Vendor: {item.vendor}</span>}
+                      {item.cost && <span>Cost: ${item.cost}</span>}
+                      {item.sku && <span>SKU: {item.sku}</span>}
+                      {item.quantity && <span>Qty: {item.quantity}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      ) : (
+      <>
       {/* ROOM TABS - WITH ENHANCED SHIMMER */}
       <div className="bg-[#1E293B] border-b-2 border-[#D4A574] overflow-x-auto" style={{
         boxShadow: 'inset 0 0 40px rgba(212, 165, 116, 0.08)'
@@ -2594,6 +2731,8 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
           </div>
         </div>
       )}\n\n      {/* ADD ROOM MODAL */}
+      </>
+      )}
       {showAddRoom && (
         <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-4">
           <div className="rounded-2xl p-8 max-w-4xl w-full border-2 border-[#D4A574] max-h-[90vh] overflow-y-auto" style={{

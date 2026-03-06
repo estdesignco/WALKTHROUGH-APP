@@ -1101,8 +1101,10 @@ export default function MobileAppSimulator() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [screen, setScreen] = useState(searchParams.get('screen') || 'home');
   const [selectedProject, setSelectedProject] = useState(() => {
-    const saved = localStorage.getItem('mobileAppProject');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const savedId = localStorage.getItem('mobileAppProjectId');
+      return savedId ? { id: savedId } : null;
+    } catch { return null; }
   });
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [offlineStatus, setOfflineStatus] = useState(navigator.onLine ? 'online' : 'offline');
@@ -1190,8 +1192,8 @@ export default function MobileAppSimulator() {
   };
 
   const handleSelectProject = async (project) => {
-    // Save project to localStorage
-    localStorage.setItem('mobileAppProject', JSON.stringify(project));
+    // Save only project ID to localStorage (full data is too large)
+    try { localStorage.setItem('mobileAppProjectId', project.id); } catch {}
     
     // Load full project with walkthrough data
     try {
@@ -1205,11 +1207,9 @@ export default function MobileAppSimulator() {
       };
       
       setSelectedProject(fullProject);
-      localStorage.setItem('mobileAppProject', JSON.stringify(fullProject));
     } catch (error) {
       console.error('Failed to load project details:', error);
       setSelectedProject(project);
-      localStorage.setItem('mobileAppProject', JSON.stringify(project));
     }
     handleNavigate('project-menu');
   };
