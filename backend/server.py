@@ -64,6 +64,7 @@ from moodboard_api import router as moodboard_router
 from master_database_api import router as master_database_router
 
 import aiosmtplib
+import email.utils
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from teams_integration import notify_new_todo, notify_new_punch_item, notify_company_todo
@@ -1236,6 +1237,10 @@ async def send_questionnaire_email(client_name: str, client_email: str, question
         message['Subject'] = f"Your Interior Design Questionnaire - {client_name}"
         message['From'] = f"{sender_name} <{sender_email}>"
         message['To'] = client_email
+        message['Reply-To'] = sender_email
+        message['X-Mailer'] = 'Established Design Co.'
+        message['Date'] = email.utils.formatdate(localtime=True)
+        message['Message-ID'] = email.utils.make_msgid(domain='estdesignco.com')
         
         # Create HTML content - BEAUTIFUL EMAIL MATCHING YOUR BRAND
         html_content = f"""
@@ -1277,7 +1282,7 @@ async def send_questionnaire_email(client_name: str, client_email: str, question
                     <!-- Call to Action Button -->
                     <div style="text-align: center; margin: 50px 0;">
                         <a href="{questionnaire_url}" style="display: inline-block; background: linear-gradient(135deg, #8b7355 0%, #a0845c 100%); color: #ffffff; font-size: 18px; font-weight: 600; padding: 18px 45px; border-radius: 50px; text-decoration: none; box-shadow: 0 10px 30px rgba(139, 115, 85, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2); letter-spacing: 1px; text-transform: uppercase;">
-                            ✨ Begin Your Questionnaire ✨
+                            Begin Your Questionnaire
                         </a>
                     </div>
 
@@ -1286,19 +1291,19 @@ async def send_questionnaire_email(client_name: str, client_email: str, question
                         <h3 style="font-size: 20px; font-weight: 400; color: #D4A574; margin: 0 0 20px 0; letter-spacing: 1px; text-align: center;">What We'll Discover Together:</h3>
                         <div style="color: #e0e0e0; font-size: 15px; line-height: 2;">
                             <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
-                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Your unique style preferences and inspirations
+                                <span style="position: absolute; left: 0; color: #D4A574;">-</span> Your unique style preferences and inspirations
                             </div>
                             <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
-                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Spaces you want to transform
+                                <span style="position: absolute; left: 0; color: #D4A574;">-</span> Spaces you want to transform
                             </div>
                             <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
-                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Your lifestyle and functional needs
+                                <span style="position: absolute; left: 0; color: #D4A574;">-</span> Your lifestyle and functional needs
                             </div>
                             <div style="margin-bottom: 12px; padding-left: 25px; position: relative;">
-                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Color palettes and material preferences
+                                <span style="position: absolute; left: 0; color: #D4A574;">-</span> Color palettes and material preferences
                             </div>
                             <div style="padding-left: 25px; position: relative;">
-                                <span style="position: absolute; left: 0; color: #D4A574;">✦</span> Budget and timeline expectations
+                                <span style="position: absolute; left: 0; color: #D4A574;">-</span> Budget and timeline expectations
                             </div>
                         </div>
                     </div>

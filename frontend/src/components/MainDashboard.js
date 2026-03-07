@@ -39,6 +39,7 @@ const MainDashboard = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailData, setEmailData] = useState({ email: '', name: '' });
   const [companyTodos, setCompanyTodos] = useState([]);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [projectTodos, setProjectTodos] = useState({});
 
   useEffect(() => {
@@ -147,6 +148,8 @@ const MainDashboard = () => {
   };
 
   const handleSendEmail = async () => {
+    if (sendingEmail) return; // Prevent double-click
+    setSendingEmail(true);
     try {
       const BACKEND_URL = window.ENV?.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${BACKEND_URL}/api/send-questionnaire`, {
@@ -158,7 +161,7 @@ const MainDashboard = () => {
         })
       });
       if (response.ok) {
-        alert('✅ Email sent!');
+        alert('Email sent successfully!');
         setShowEmailModal(false);
         setEmailData({ email: '', name: '' });
       } else {
@@ -167,6 +170,8 @@ const MainDashboard = () => {
       }
     } catch (error) {
       alert('Failed: ' + error.message);
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -337,7 +342,7 @@ const MainDashboard = () => {
               <div><label className="block text-stone-400 text-sm mb-1">Client Email</label><input type="email" value={emailData.email} onChange={(e) => setEmailData({...emailData, email: e.target.value})} className="w-full bg-black/50 border border-[#8b7355] rounded px-3 py-2 text-white" placeholder="Enter client email" /></div>
               <div className="flex justify-end gap-3 mt-6">
                 <button onClick={() => setShowEmailModal(false)} className="px-4 py-2 rounded text-stone-400 hover:text-white">Cancel</button>
-                <button onClick={handleSendEmail} className="px-4 py-2 rounded text-white" style={{ background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 100%)' }}>Send</button>
+                <button onClick={handleSendEmail} disabled={sendingEmail} className="px-4 py-2 rounded text-white disabled:opacity-50" style={{ background: 'linear-gradient(135deg, #8b7355 0%, #a0845c 100%)' }}>{sendingEmail ? 'Sending...' : 'Send'}</button>
               </div>
             </div>
           </div>
