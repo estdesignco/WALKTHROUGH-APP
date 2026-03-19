@@ -380,7 +380,9 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
       (room.categories || []).forEach(cat => {
         (cat.subcategories || []).forEach(sub => {
           (sub.items || []).forEach(item => {
-            items.push({ ...item, categoryName: cat.name });
+            // Resolve the best image from all possible fields
+            const bestImage = item.image_url || item.finish_image || item.image || (item.photos && item.photos.length > 0 ? item.photos[0] : '') || '';
+            items.push({ ...item, categoryName: cat.name, subcategoryName: sub.name, _bestImage: bestImage });
           });
         });
       });
@@ -482,7 +484,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
       sku: item.sku || '',
       size: item.size || '',
       color: item.finish_color || item.color || '',
-      image: item.image || item.image_url || '',
+      image: item._bestImage || item.image_url || item.finish_image || item.image || '',
       link: item.link || '',
       position_label: '',
       item_id: item.id,
@@ -713,24 +715,30 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
                       {surface.materials.length === 0 ? (
                         <div className="text-center py-3 text-[#B49B7E]/30 text-xs italic">No materials assigned</div>
                       ) : (
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-3">
                           {surface.materials.map(mat => (
                             <div key={mat.id} className="group relative" data-testid={`tile-swatch-${mat.id}`}>
                               <div
-                                className="w-20 h-20 rounded-lg border-2 border-[#B49B7E]/40 flex items-center justify-center cursor-pointer overflow-hidden transition-all hover:border-[#D4A574] hover:scale-105"
-                                style={{ background: mat.image ? `url(${mat.image}) center/cover` : (mat.color || '#333') }}
+                                className="w-24 h-24 rounded-lg border-2 border-[#B49B7E]/40 flex items-center justify-center cursor-pointer overflow-hidden transition-all hover:border-[#D4A574] hover:scale-105"
                                 onClick={() => { if (mat.link) window.open(mat.link, '_blank'); }}
                               >
-                                {!mat.image && !mat.color && (
-                                  <span className="text-white text-[10px] text-center px-1 leading-tight">{mat.name?.substring(0, 15) || '?'}</span>
+                                {mat.image ? (
+                                  <img src={mat.image} alt={mat.name} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = '#333'; }} />
+                                ) : mat.color ? (
+                                  <div className="w-full h-full" style={{ background: mat.color }} />
+                                ) : (
+                                  <span className="text-white text-[10px] text-center px-1 leading-tight">{mat.name?.substring(0, 20) || '?'}</span>
                                 )}
                               </div>
                               {mat.position_label && (
-                                <div className="text-center text-[10px] text-[#B49B7E] mt-1 truncate w-20">{mat.position_label}</div>
+                                <div className="text-center text-[10px] text-[#B49B7E] mt-1 truncate w-24">{mat.position_label}</div>
                               )}
-                              <div className="text-center text-[9px] text-[#B49B7E]/50 truncate w-20">{mat.name}</div>
+                              <div className="text-center text-[9px] text-[#B49B7E]/50 truncate w-24">{mat.name}</div>
                               {/* Hover Tooltip */}
-                              <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-48 p-2 rounded-lg border border-[#B49B7E]/40 text-xs shadow-xl" style={{ background: 'rgba(0,0,0,0.95)' }}>
+                              <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-52 p-2 rounded-lg border border-[#B49B7E]/40 text-xs shadow-xl" style={{ background: 'rgba(0,0,0,0.95)' }}>
+                                {mat.image && (
+                                  <img src={mat.image} alt={mat.name} className="w-full h-28 object-cover rounded mb-2" />
+                                )}
                                 <div className="text-white font-bold">{mat.name}</div>
                                 {mat.vendor && <div className="text-[#B49B7E]">Vendor: {mat.vendor}</div>}
                                 {mat.sku && <div className="text-[#B49B7E]">SKU: {mat.sku}</div>}
@@ -741,7 +749,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
                               {/* Remove Button */}
                               <button
                                 onClick={() => handleRemoveMaterial(surface.id, mat.id)}
-                                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white text-[10px] leading-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] leading-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                               >
                                 x
                               </button>
@@ -753,37 +761,98 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
                       {/* Add Material Form (inline) */}
                       {showAddMaterial === surface.id && (
                         <div className="mt-3 p-3 rounded-lg border-t border-[#B49B7E]/20" style={{ background: 'rgba(30,30,40,0.9)' }}>
+                          {/* Visual item picker - shows actual images from checklist/FFE */}
                           {roomItems.length > 0 && (
-                            <div className="mb-3">
-                              <div className="text-xs text-[#B49B7E] mb-1">Quick pick from room items:</div>
-                              <div className="flex gap-1 flex-wrap max-h-24 overflow-y-auto">
-                                {roomItems.map(item => (
-                                  <button
-                                    key={item.id}
-                                    onClick={() => handleAddFromItem(item)}
-                                    className="px-2 py-1 rounded text-[10px] text-white border border-[#B49B7E]/20 hover:border-[#D4A574] truncate max-w-[140px]"
-                                  >
-                                    {item.name}
-                                  </button>
-                                ))}
+                            <div className="mb-4">
+                              <div className="text-xs font-bold text-[#D4A574] mb-2">Select from Checklist / FF&E items:</div>
+                              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 max-h-64 overflow-y-auto p-1">
+                                {roomItems.map(item => {
+                                  const img = item._bestImage;
+                                  const isSelected = materialForm.item_id === item.id;
+                                  return (
+                                    <button
+                                      key={item.id}
+                                      onClick={() => handleAddFromItem(item)}
+                                      data-testid={`pick-item-${item.id}`}
+                                      className={`relative rounded-lg border-2 overflow-hidden transition-all text-left group ${isSelected ? 'border-[#D4A574] ring-2 ring-[#D4A574]/50 scale-105' : 'border-[#B49B7E]/20 hover:border-[#B49B7E]/60'}`}
+                                      style={{ background: 'rgba(0,0,0,0.5)' }}
+                                    >
+                                      {/* Image */}
+                                      <div
+                                        className="w-full aspect-square flex items-center justify-center overflow-hidden"
+                                        style={img ? { backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: '#222' }}
+                                      >
+                                        {!img && (
+                                          <span className="text-[#B49B7E]/30 text-[10px] text-center px-1">No image</span>
+                                        )}
+                                      </div>
+                                      {/* Item info */}
+                                      <div className="p-1.5">
+                                        <div className="text-white text-[10px] font-bold leading-tight truncate">{item.name || 'Unnamed'}</div>
+                                        {item.vendor && <div className="text-[#B49B7E]/60 text-[9px] truncate">{item.vendor}</div>}
+                                        {item.finish_color && <div className="text-[#B49B7E]/40 text-[9px] truncate">{item.finish_color}</div>}
+                                        {item.status && (
+                                          <div className={`text-[8px] font-bold mt-0.5 ${item.status === 'APPROVED' ? 'text-green-400' : 'text-[#B49B7E]/40'}`}>
+                                            {item.status}
+                                          </div>
+                                        )}
+                                      </div>
+                                      {/* Selected checkmark */}
+                                      {isSelected && (
+                                        <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#D4A574] flex items-center justify-center">
+                                          <span className="text-white text-[10px] font-bold">&#10003;</span>
+                                        </div>
+                                      )}
+                                    </button>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
-                          <div className="grid grid-cols-2 gap-2 mb-2">
-                            <input placeholder="Material name" value={materialForm.name} onChange={e => setMaterialForm(p => ({...p, name: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                            <input placeholder="Vendor" value={materialForm.vendor} onChange={e => setMaterialForm(p => ({...p, vendor: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                            <input placeholder="SKU" value={materialForm.sku} onChange={e => setMaterialForm(p => ({...p, sku: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                            <input placeholder='Size (e.g., 12x24)' value={materialForm.size} onChange={e => setMaterialForm(p => ({...p, size: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                            <input placeholder="Color" value={materialForm.color} onChange={e => setMaterialForm(p => ({...p, color: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                            <input placeholder="Image URL" value={materialForm.image} onChange={e => setMaterialForm(p => ({...p, image: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                            <input placeholder="Product link" value={materialForm.link} onChange={e => setMaterialForm(p => ({...p, link: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                            <input placeholder="Position (e.g., Upper, Border)" value={materialForm.position_label} onChange={e => setMaterialForm(p => ({...p, position_label: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
-                          </div>
-                          <div className="flex gap-2">
-                            <button onClick={() => handleAddMaterial(surface.id)} disabled={saving || !materialForm.name} className="px-3 py-1 rounded text-xs font-bold text-white bg-green-600 hover:bg-green-500 disabled:opacity-50">
+
+                          {/* Selected item preview + form fields */}
+                          {materialForm.name && (
+                            <div className="mb-3 p-2 rounded-lg border border-[#D4A574]/30 flex gap-3 items-center" style={{ background: 'rgba(212,165,116,0.08)' }}>
+                              {materialForm.image ? (
+                                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-[#B49B7E]/30">
+                                  <img src={materialForm.image} alt={materialForm.name} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none'; }} />
+                                </div>
+                              ) : (
+                                <div className="w-16 h-16 rounded-lg flex-shrink-0 bg-[#333] flex items-center justify-center border border-[#B49B7E]/30">
+                                  <span className="text-[#B49B7E]/40 text-[10px]">No img</span>
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="text-white text-sm font-bold truncate">{materialForm.name}</div>
+                                {materialForm.vendor && <div className="text-[#B49B7E] text-xs">{materialForm.vendor}</div>}
+                                <div className="text-[#B49B7E]/50 text-[10px]">
+                                  {[materialForm.sku, materialForm.size, materialForm.color].filter(Boolean).join(' | ')}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Manual fields (collapsed by default if an item was picked) */}
+                          <details className={materialForm.item_id ? '' : 'open'}>
+                            <summary className="text-[10px] text-[#B49B7E]/50 cursor-pointer mb-2 hover:text-[#B49B7E]">
+                              {materialForm.item_id ? 'Edit details or enter manually' : 'Enter material details'}
+                            </summary>
+                            <div className="grid grid-cols-2 gap-2 mb-2">
+                              <input placeholder="Material name" value={materialForm.name} onChange={e => setMaterialForm(p => ({...p, name: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                              <input placeholder="Vendor" value={materialForm.vendor} onChange={e => setMaterialForm(p => ({...p, vendor: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                              <input placeholder="SKU" value={materialForm.sku} onChange={e => setMaterialForm(p => ({...p, sku: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                              <input placeholder='Size (e.g., 12x24)' value={materialForm.size} onChange={e => setMaterialForm(p => ({...p, size: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                              <input placeholder="Color" value={materialForm.color} onChange={e => setMaterialForm(p => ({...p, color: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                              <input placeholder="Image URL" value={materialForm.image} onChange={e => setMaterialForm(p => ({...p, image: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                              <input placeholder="Product link" value={materialForm.link} onChange={e => setMaterialForm(p => ({...p, link: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                              <input placeholder="Position (e.g., Upper, Border)" value={materialForm.position_label} onChange={e => setMaterialForm(p => ({...p, position_label: e.target.value}))} className="px-2 py-1 rounded border border-[#B49B7E]/30 bg-black/50 text-white text-xs focus:outline-none" />
+                            </div>
+                          </details>
+                          <div className="flex gap-2 mt-2">
+                            <button onClick={() => handleAddMaterial(surface.id)} disabled={saving || !materialForm.name} className="px-4 py-1.5 rounded text-xs font-bold text-white bg-green-600 hover:bg-green-500 disabled:opacity-50">
                               {saving ? 'Adding...' : 'Add Material'}
                             </button>
-                            <button onClick={() => setShowAddMaterial(null)} className="px-3 py-1 rounded text-xs text-[#D4C5A9]/60 border border-[#B49B7E]/30">Cancel</button>
+                            <button onClick={() => setShowAddMaterial(null)} className="px-3 py-1.5 rounded text-xs text-[#D4C5A9]/60 border border-[#B49B7E]/30">Cancel</button>
                           </div>
                         </div>
                       )}
