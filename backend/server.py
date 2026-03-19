@@ -18985,20 +18985,34 @@ class MaterialEntry(BaseModel):
     link: str = ""
     position_label: str = ""
 
+class MeasurementLine(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    start_x: float = 0
+    start_y: float = 0
+    end_x: float = 0
+    end_y: float = 0
+    measurement: str = ""
+    label: str = ""
+    color: str = "#FF4444"
+    thickness: int = 2
+
 class SurfaceEntry(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     surface_type: str = "wall"
     materials: List[MaterialEntry] = []
+    measurement_lines: List[MeasurementLine] = []
 
 class FinishScheduleCreate(BaseModel):
     schedule_type: str = "tile"
     name: str
     surfaces: List[SurfaceEntry] = []
+    measurement_lines: List[MeasurementLine] = []
 
 class FinishScheduleUpdate(BaseModel):
     name: Optional[str] = None
     surfaces: Optional[List[SurfaceEntry]] = None
+    measurement_lines: Optional[List[MeasurementLine]] = None
 
 @api_router.get("/projects/{project_id}/rooms/{room_id}/finish-schedules")
 async def get_room_finish_schedules(project_id: str, room_id: str):
@@ -19054,6 +19068,7 @@ async def create_finish_schedule(project_id: str, room_id: str, data: FinishSche
         "schedule_type": data.schedule_type,
         "name": data.name,
         "surfaces": [s.dict() for s in surfaces],
+        "measurement_lines": [ml.dict() for ml in data.measurement_lines] if data.measurement_lines else [],
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -19068,6 +19083,8 @@ async def update_finish_schedule(project_id: str, schedule_id: str, data: Finish
         update_data["name"] = data.name
     if data.surfaces is not None:
         update_data["surfaces"] = [s.dict() for s in data.surfaces]
+    if data.measurement_lines is not None:
+        update_data["measurement_lines"] = [ml.dict() for ml in data.measurement_lines]
     
     result = await db.finish_schedules.update_one(
         {"id": schedule_id, "project_id": project_id},

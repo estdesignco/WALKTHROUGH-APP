@@ -32,6 +32,7 @@ import ShippingTracker from './ShippingTracker';
 import TradeDiscountManager from './TradeDiscountManager';
 import SampleTracker from './SampleTracker';
 import WholeHomeFinishes from './WholeHomeFinishes';
+import ProjectFinishSchedules from './ProjectFinishSchedules';
 
 import EditableQuestionnaireView from './EditableQuestionnaireView';
 
@@ -966,6 +967,11 @@ export default function ProjectDetailPage() {
                 <WholeHomeFinishes projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading whole home finishes...</div> },
+        { name: "Room Finishes", icon: Ruler, component: project ? (
+            <div className="room-finishes-content">
+                <ProjectFinishSchedules projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading room finishes...</div> },
         { name: "Samples", icon: Package, component: project ? (
             <div className="samples-content">
                 <SampleTracker projectId={projectId} />
