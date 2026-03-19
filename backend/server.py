@@ -18968,5 +18968,124 @@ async def sync_samples_to_master():
     return await fix_sample_images()
 
 
+
+# ============================================================================
+# ROOM FINISH SCHEDULES (Tile, Paint/Wallpaper, Wood/Mixed)
+# ============================================================================
+
+class MaterialEntry(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    item_id: Optional[str] = None
+    name: str = ""
+    vendor: str = ""
+    sku: str = ""
+    size: str = ""
+    color: str = ""
+    image: str = ""
+    link: str = ""
+    position_label: str = ""
+
+class SurfaceEntry(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    surface_type: str = "wall"
+    materials: List[MaterialEntry] = []
+
+class FinishScheduleCreate(BaseModel):
+    schedule_type: str = "tile"
+    name: str
+    surfaces: List[SurfaceEntry] = []
+
+class FinishScheduleUpdate(BaseModel):
+    name: Optional[str] = None
+    surfaces: Optional[List[SurfaceEntry]] = None
+
+@api_router.get("/projects/{project_id}/rooms/{room_id}/finish-schedules")
+async def get_room_finish_schedules(project_id: str, room_id: str):
+    schedules = await db.finish_schedules.find(
+        {"project_id": project_id, "room_id": room_id},
+        {"_id": 0}
+    ).to_list(100)
+    return schedules
+
+@api_router.post("/projects/{project_id}/rooms/{room_id}/finish-schedules")
+async def create_finish_schedule(project_id: str, room_id: str, data: FinishScheduleCreate):
+    room = await db.rooms.find_one({"id": room_id, "project_id": project_id}, {"_id": 0})
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+    
+    default_surfaces = []
+    if data.schedule_type == "tile":
+        default_surfaces = [
+            SurfaceEntry(name="Back Wall", surface_type="wall"),
+            SurfaceEntry(name="Left Wall", surface_type="wall"),
+            SurfaceEntry(name="Right Wall", surface_type="wall"),
+            SurfaceEntry(name="Front Wall", surface_type="wall"),
+            SurfaceEntry(name="Floor", surface_type="floor"),
+            SurfaceEntry(name="Ceiling", surface_type="ceiling"),
+            SurfaceEntry(name="Niche", surface_type="niche"),
+            SurfaceEntry(name="Schluter", surface_type="trim"),
+        ]
+    elif data.schedule_type == "paint_wallpaper":
+        default_surfaces = [
+            SurfaceEntry(name="Wall 1", surface_type="wall"),
+            SurfaceEntry(name="Wall 2", surface_type="wall"),
+            SurfaceEntry(name="Wall 3", surface_type="wall"),
+            SurfaceEntry(name="Wall 4", surface_type="wall"),
+            SurfaceEntry(name="Ceiling", surface_type="ceiling"),
+            SurfaceEntry(name="Floor", surface_type="floor"),
+            SurfaceEntry(name="Nook/Niche", surface_type="niche"),
+        ]
+    elif data.schedule_type == "wood_mixed":
+        default_surfaces = [
+            SurfaceEntry(name="Accent Wall", surface_type="wall"),
+            SurfaceEntry(name="Ceiling", surface_type="ceiling"),
+            SurfaceEntry(name="Wainscoting", surface_type="trim"),
+            SurfaceEntry(name="Floor", surface_type="floor"),
+        ]
+    
+    surfaces = data.surfaces if data.surfaces else default_surfaces
+    
+    schedule = {
+        "id": str(uuid.uuid4()),
+        "project_id": project_id,
+        "room_id": room_id,
+        "room_name": room.get("name", ""),
+        "schedule_type": data.schedule_type,
+        "name": data.name,
+        "surfaces": [s.dict() for s in surfaces],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.finish_schedules.insert_one(schedule)
+    schedule.pop("_id", None)
+    return schedule
+
+@api_router.put("/projects/{project_id}/finish-schedules/{schedule_id}")
+async def update_finish_schedule(project_id: str, schedule_id: str, data: FinishScheduleUpdate):
+    update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    if data.name is not None:
+        update_data["name"] = data.name
+    if data.surfaces is not None:
+        update_data["surfaces"] = [s.dict() for s in data.surfaces]
+    
+    result = await db.finish_schedules.update_one(
+        {"id": schedule_id, "project_id": project_id},
+        {"$set": update_data}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    
+    updated = await db.finish_schedules.find_one({"id": schedule_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/projects/{project_id}/finish-schedules/{schedule_id}")
+async def delete_finish_schedule(project_id: str, schedule_id: str):
+    result = await db.finish_schedules.delete_one({"id": schedule_id, "project_id": project_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    return {"status": "deleted"}
+
+
 # Include all routers
 app.include_router(api_router)
