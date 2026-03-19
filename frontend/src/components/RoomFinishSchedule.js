@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Ruler, Plus, Trash2, MousePointer, X, Pencil, Check, ChevronRight, Layers } from 'lucide-react';
+import { Ruler, Plus, Trash2, MousePointer, X, Pencil, ChevronDown } from 'lucide-react';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -9,135 +9,25 @@ const SCHEDULE_TYPES = [
   { value: 'wood_mixed', label: 'Wood / Mixed' },
 ];
 
+const TILE_PATTERNS = [
+  { value: 'stacked_horizontal', label: 'Stacked Horizontal' },
+  { value: 'stacked_vertical', label: 'Stacked Vertical' },
+  { value: 'offset', label: 'Offset (Brick Lay)' },
+  { value: 'one_third_offset', label: '1/3 Offset' },
+  { value: 'herringbone', label: 'Herringbone' },
+  { value: 'block_herringbone', label: 'Block Herringbone' },
+  { value: 'basket_weave', label: 'Basket Weave' },
+  { value: 'stepladder', label: 'Stepladder' },
+  { value: 'diagonal', label: 'Diagonal' },
+  { value: 'mosaic', label: 'Mosaic' },
+  { value: 'random', label: 'Random' },
+  { value: 'none', label: 'None / Solid' },
+];
+
 const LINE_COLORS = ['#FF4444', '#44AAFF', '#44FF44', '#FFAA44', '#FF44FF', '#FFFFFF'];
 
 const getItemImage = (item) =>
   item.image_url || item.finish_image || item.image || (item.photos?.length ? item.photos[0] : '') || '';
-
-// ─── WALL ELEVATION DIAGRAM ──────────────────────────────────────────
-// A visual rectangle representing a wall, divided into clickable zones.
-// Each zone can have a tile/material assigned with its swatch image.
-const WallDiagram = ({ surface, roomItems, onAssignMaterial, onRemoveMaterial, onUpdateZoneLabel }) => {
-  const [pickerZone, setPickerZone] = useState(null);
-
-  // Default zones for a wall surface
-  const defaultZones = [
-    { id: 'ceiling', label: 'Ceiling', top: 0, height: 10, color: '#9B8EC4' },
-    { id: 'upper_wall', label: 'Upper Wall / Accent', top: 10, height: 20, color: '#6B8EAE' },
-    { id: 'main_wall', label: 'Main Wall', top: 30, height: 35, color: '#6B8EAE' },
-    { id: 'stool', label: 'Stool / Chair Rail', top: 65, height: 8, color: '#AE6B8E' },
-    { id: 'curb', label: 'Curb / Wainscot', top: 73, height: 12, color: '#8B7355' },
-    { id: 'floor', label: 'Floor', top: 85, height: 15, color: '#6BAE8E' },
-  ];
-
-  // Build zone-to-material map from surface materials
-  const zoneMap = {};
-  (surface.materials || []).forEach(mat => {
-    if (mat.position_label) {
-      zoneMap[mat.position_label] = mat;
-    }
-  });
-
-  const handlePickItem = (zoneId, item) => {
-    onAssignMaterial(surface.id, zoneId, item);
-    setPickerZone(null);
-  };
-
-  const itemsWithImages = roomItems.filter(i => i._img);
-  const allItems = roomItems;
-
-  return (
-    <div className="relative" data-testid={`wall-diagram-${surface.id}`}>
-      {/* Wall elevation - visual rectangle */}
-      <div className="relative w-full rounded-lg overflow-hidden border-2 border-[#B49B7E]/40" style={{ height: '420px', background: '#1a1a24' }}>
-        {/* Zone rows */}
-        {defaultZones.map(zone => {
-          const mat = zoneMap[zone.id];
-          const hasImage = mat?.image;
-          const isPickerOpen = pickerZone === zone.id;
-
-          return (
-            <div
-              key={zone.id}
-              className={`absolute left-0 right-0 flex items-center border-b border-[#B49B7E]/15 cursor-pointer transition-all group ${isPickerOpen ? 'ring-2 ring-[#D4A574] z-20' : 'hover:ring-1 hover:ring-[#B49B7E]/30'}`}
-              style={{
-                top: `${zone.top}%`,
-                height: `${zone.height}%`,
-                backgroundImage: hasImage ? `url(${mat.image})` : 'none',
-                backgroundSize: hasImage ? '150px 150px' : 'auto',
-                backgroundRepeat: 'repeat',
-                backgroundColor: hasImage ? 'transparent' : `${zone.color}08`,
-              }}
-              onClick={() => setPickerZone(isPickerOpen ? null : zone.id)}
-            >
-              {/* Zone label overlay */}
-              <div className={`absolute inset-0 flex items-center justify-between px-3 ${hasImage ? 'bg-black/40' : ''}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold ${hasImage ? 'text-white' : 'text-[#B49B7E]/50'}`}>
-                    {zone.label}
-                  </span>
-                  {mat && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white" style={{ background: 'rgba(0,0,0,0.7)' }}>
-                      {mat.name} {mat.size ? `(${mat.size})` : ''} {mat.vendor ? `— ${mat.vendor}` : ''}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {mat && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onRemoveMaterial(surface.id, mat.id); }}
-                      className="px-1.5 py-0.5 rounded text-[10px] text-white bg-red-600/80 hover:bg-red-600"
-                    >
-                      <Trash2 size={10} className="inline" />
-                    </button>
-                  )}
-                  <span className="px-1.5 py-0.5 rounded text-[10px] text-white bg-[#D4A574]/80">
-                    {mat ? 'Change' : 'Assign'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-
-        {/* Dimension annotations on the right side */}
-        <div className="absolute right-0 top-0 bottom-0 w-8 flex flex-col justify-between pointer-events-none" style={{ right: '-32px' }}>
-          {/* This space reserved for measurement lines */}
-        </div>
-      </div>
-
-      {/* Item picker popup */}
-      {pickerZone && (
-        <div className="mt-2 p-3 rounded-lg border border-[#D4A574]/30 shadow-xl" style={{ background: 'rgba(0,0,0,0.95)' }} data-testid="zone-item-picker">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-bold text-[#D4A574]">
-              Select material for: <span className="text-white">{defaultZones.find(z => z.id === pickerZone)?.label}</span>
-            </span>
-            <button onClick={() => setPickerZone(null)} className="text-[#B49B7E]/40 hover:text-white"><X size={14} /></button>
-          </div>
-          {allItems.length === 0 ? (
-            <div className="text-[#B49B7E]/30 text-xs py-2">No items in this room. Add items in the Checklist or FF&E first.</div>
-          ) : (
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-48 overflow-y-auto">
-              {itemsWithImages.map(item => (
-                <button key={item.id} onClick={() => handlePickItem(pickerZone, item)} className="rounded-lg border border-[#B49B7E]/20 overflow-hidden hover:border-[#D4A574] hover:scale-105 transition-all" data-testid={`pick-${item.id}`}>
-                  <img src={item._img} alt={item.name} className="w-full aspect-square object-cover" />
-                  <div className="p-1 text-[8px] text-white font-bold truncate">{item.name}</div>
-                </button>
-              ))}
-              {roomItems.filter(i => !i._img).map(item => (
-                <button key={item.id} onClick={() => handlePickItem(pickerZone, item)} className="rounded-lg border border-[#B49B7E]/10 overflow-hidden hover:border-[#B49B7E]/40 transition-all">
-                  <div className="w-full aspect-square bg-[#1a1a24] flex items-center justify-center"><span className="text-[#B49B7E]/20 text-[8px]">No img</span></div>
-                  <div className="p-1 text-[7px] text-[#B49B7E]/50 truncate">{item.name}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
 
 // ─── MEASUREMENT CANVAS ──────────────────────────────────────────────
 const MeasurementCanvas = ({ lines = [], onLinesChange }) => {
@@ -168,7 +58,7 @@ const MeasurementCanvas = ({ lines = [], onLinesChange }) => {
           <button onClick={() => { setEditingId(selectedLine); setInputVal(lines.find(l => l.id === selectedLine)?.measurement || ''); }} className="ml-auto px-2 py-0.5 rounded text-[10px] text-white bg-blue-600"><Pencil size={8} className="inline mr-1" />Edit</button>
           <button onClick={() => { onLinesChange(lines.filter(l => l.id !== selectedLine)); setSelectedLine(null); }} className="px-2 py-0.5 rounded text-[10px] text-white bg-red-600"><Trash2 size={8} className="inline mr-1" />Del</button>
         </>}
-        <span className="text-[9px] text-[#B49B7E]/30 ml-auto">{toolMode === 'draw' ? 'Click + drag' : 'Click a line'}</span>
+        <span className="text-[9px] text-[#B49B7E]/30 ml-auto">{toolMode === 'draw' ? 'Click + drag' : 'Click line'}</span>
       </div>
       <svg ref={svgRef} viewBox="0 0 100 60" className="w-full border border-[#B49B7E]/15 rounded" style={{ height: '120px', background: 'rgba(10,10,18,0.4)', cursor: toolMode === 'draw' ? 'crosshair' : 'default' }}
         onMouseDown={(e) => { if (toolMode !== 'draw') return; e.preventDefault(); const pt = getSvgPoint(e); setDrawing(true); setDrawStart(pt); setCurrentMouse(pt); }}
@@ -212,6 +102,117 @@ const MeasurementCanvas = ({ lines = [], onLinesChange }) => {
   );
 };
 
+// ─── WALL ELEVATION DIAGRAM ──────────────────────────────────────────
+const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onChangePattern }) => {
+  const defaultZones = [
+    { id: 'ceiling', label: 'Ceiling', top: 0, height: 8 },
+    { id: 'upper_wall', label: 'Upper Wall / Accent', top: 8, height: 18 },
+    { id: 'main_wall', label: 'Main Wall', top: 26, height: 38 },
+    { id: 'stool', label: 'Stool / Chair Rail', top: 64, height: 7 },
+    { id: 'curb', label: 'Curb / Wainscot', top: 71, height: 13 },
+    { id: 'floor', label: 'Floor', top: 84, height: 16 },
+  ];
+
+  const zoneMap = {};
+  (surface.materials || []).forEach(mat => {
+    if (mat.position_label) zoneMap[mat.position_label] = mat;
+  });
+
+  const [patternPickerZone, setPatternPickerZone] = useState(null);
+
+  return (
+    <div data-testid={`wall-diagram-${surface.id}`}>
+      <div className="relative w-full rounded-lg overflow-hidden border-2 border-[#B49B7E]/30" style={{ height: '380px', background: '#18181f' }}>
+        {defaultZones.map(zone => {
+          const mat = zoneMap[zone.id];
+          const hasImage = mat?.image;
+          const isSelected = selectedItem !== null;
+
+          return (
+            <div
+              key={zone.id}
+              className={`absolute left-0 right-0 border-b border-[#B49B7E]/10 cursor-pointer transition-all group ${isSelected ? 'hover:ring-2 hover:ring-[#D4A574] hover:z-10' : 'hover:ring-1 hover:ring-[#B49B7E]/20'}`}
+              style={{
+                top: `${zone.top}%`,
+                height: `${zone.height}%`,
+                backgroundImage: hasImage ? `url(${mat.image})` : 'none',
+                backgroundSize: hasImage ? '120px 120px' : 'auto',
+                backgroundRepeat: 'repeat',
+                backgroundColor: hasImage ? 'transparent' : 'rgba(180,155,126,0.03)',
+              }}
+              onClick={() => {
+                if (selectedItem) {
+                  onPlaceItem(surface.id, zone.id, selectedItem);
+                }
+              }}
+            >
+              <div className={`absolute inset-0 flex items-center justify-between px-3 ${hasImage ? 'bg-black/35' : ''}`}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`text-xs font-bold ${hasImage ? 'text-white drop-shadow' : 'text-[#B49B7E]/30'}`}>{zone.label}</span>
+                  {mat && (
+                    <>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap" style={{ background: 'rgba(0,0,0,0.75)' }}>
+                        {mat.name} {mat.size ? `(${mat.size})` : ''} {mat.vendor ? `- ${mat.vendor}` : ''}
+                      </span>
+                      {mat.pattern && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] text-[#D4A574] font-bold" style={{ background: 'rgba(0,0,0,0.75)' }}>
+                          {TILE_PATTERNS.find(p => p.value === mat.pattern)?.label || mat.pattern}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {mat && (
+                    <>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setPatternPickerZone(patternPickerZone === zone.id ? null : zone.id); }}
+                        className="px-1.5 py-0.5 rounded text-[9px] text-[#D4A574] font-bold border border-[#D4A574]/40 hover:bg-[#D4A574]/20"
+                        data-testid={`pattern-btn-${zone.id}`}
+                      >
+                        Pattern
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onRemoveMaterial(surface.id, mat.id); }}
+                        className="px-1.5 py-0.5 rounded text-[9px] text-red-400 bg-red-600/20 hover:bg-red-600/40"
+                      >
+                        <Trash2 size={10} className="inline" />
+                      </button>
+                    </>
+                  )}
+                  {!mat && isSelected && (
+                    <span className="px-2 py-0.5 rounded text-[10px] text-green-300 font-bold animate-pulse" style={{ background: 'rgba(0,0,0,0.7)' }}>
+                      Click to place here
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Pattern picker dropdown */}
+              {patternPickerZone === zone.id && mat && (
+                <div className="absolute z-30 right-2 top-full mt-1 p-2 rounded-lg border border-[#B49B7E]/30 shadow-xl w-56" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={e => e.stopPropagation()}>
+                  <div className="text-[10px] text-[#D4A574] font-bold mb-1">Tile Pattern:</div>
+                  <div className="grid grid-cols-2 gap-1 max-h-40 overflow-y-auto">
+                    {TILE_PATTERNS.map(p => (
+                      <button
+                        key={p.value}
+                        onClick={() => { onChangePattern(surface.id, mat.id, p.value); setPatternPickerZone(null); }}
+                        className={`px-2 py-1.5 rounded text-[9px] text-left font-bold transition-all ${mat.pattern === p.value ? 'bg-[#D4A574] text-black' : 'text-[#D4C5A9]/60 hover:text-white hover:bg-[#B49B7E]/20'}`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────
 const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const [schedules, setSchedules] = useState([]);
@@ -222,6 +223,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const [newType, setNewType] = useState('tile');
   const [saving, setSaving] = useState(false);
   const [roomItems, setRoomItems] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null); // item currently picked from palette
   const [showMeasurements, setShowMeasurements] = useState(false);
   const saveTimeoutRef = useRef(null);
 
@@ -298,24 +300,15 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     } catch (err) { console.error(err); }
   };
 
-  // Assign a material to a specific zone on a surface wall diagram
-  const assignMaterialToZone = (surfaceId, zoneId, item) => {
+  const placeItemOnZone = (surfaceId, zoneId, item) => {
     if (!activeSchedule) return;
-    // Remove any existing material in that zone first
     const updatedSurfaces = activeSchedule.surfaces.map(s => {
       if (s.id !== surfaceId) return s;
       const filtered = s.materials.filter(m => m.position_label !== zoneId);
       const newMat = {
-        id: crypto.randomUUID(),
-        item_id: item.id,
-        name: item.name || '',
-        vendor: item.vendor || '',
-        sku: item.sku || '',
-        size: item.size || '',
-        color: item.finish_color || item.color || '',
-        image: item._img || '',
-        link: item.link || '',
-        position_label: zoneId,
+        id: crypto.randomUUID(), item_id: item.id, name: item.name || '', vendor: item.vendor || '',
+        sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
+        image: item._img || '', link: item.link || '', position_label: zoneId, pattern: '',
       };
       return { ...s, materials: [...filtered, newMat] };
     });
@@ -334,6 +327,17 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     debouncedSave(updated);
   };
 
+  const changePattern = (surfaceId, materialId, pattern) => {
+    if (!activeSchedule) return;
+    const updatedSurfaces = activeSchedule.surfaces.map(s => {
+      if (s.id !== surfaceId) return s;
+      return { ...s, materials: s.materials.map(m => m.id === materialId ? { ...m, pattern } : m) };
+    });
+    const updated = { ...activeSchedule, surfaces: updatedSurfaces };
+    setActiveSchedule(updated);
+    debouncedSave(updated);
+  };
+
   const addSurface = () => {
     if (!activeSchedule) return;
     const name = prompt('Surface name (e.g., "Shower Niche", "Tub Surround"):');
@@ -344,7 +348,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   };
 
   const removeSurface = (surfaceId) => {
-    if (!activeSchedule || !window.confirm('Delete this surface?')) return;
+    if (!activeSchedule || !window.confirm('Remove this wall?')) return;
     const updated = { ...activeSchedule, surfaces: activeSchedule.surfaces.filter(s => s.id !== surfaceId) };
     setActiveSchedule(updated);
     debouncedSave(updated);
@@ -358,85 +362,158 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
 
   if (loading) return <div className="text-center py-8 text-[#D4C5A9]/60">Loading...</div>;
 
+  const itemsWithImages = roomItems.filter(i => i._img);
+  const itemsNoImages = roomItems.filter(i => !i._img);
+
   return (
-    <div data-testid="room-finish-schedule" className="rounded-xl border border-[#B49B7E]/20 p-4" style={{ background: 'rgba(0,0,0,0.9)' }}>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="text-base font-bold text-white">{roomName}</h3>
-        <div className="flex gap-2">
-          <button onClick={() => setShowCreate(true)} className="px-3 py-1.5 rounded text-xs font-bold text-white hover:scale-105 transition-all" style={{ background: 'linear-gradient(135deg, #D4A574 0%, #8B7355 100%)' }} data-testid="create-schedule-btn"><Plus size={12} className="inline mr-1" />New Schedule</button>
-          {onClose && <button onClick={onClose} className="px-2 py-1.5 rounded text-xs text-[#D4C5A9]/50 border border-[#B49B7E]/20"><X size={12} /></button>}
-        </div>
-      </div>
+    <div data-testid="room-finish-schedule" className="rounded-xl border border-[#B49B7E]/20" style={{ background: 'rgba(0,0,0,0.9)' }}>
 
-      {/* Create Form */}
-      {showCreate && (
-        <div className="mb-3 p-3 rounded-lg border border-[#B49B7E]/20" style={{ background: 'rgba(30,30,40,0.9)' }}>
-          <input type="text" data-testid="schedule-name-input" placeholder="Name (e.g., Primary Shower, Powder Room)" value={newName} onChange={e => setNewName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleCreate(); }} className="w-full px-3 py-2 mb-2 rounded border border-[#B49B7E] bg-black/50 text-white text-sm focus:outline-none focus:border-[#D4A574]" />
-          <div className="flex gap-2 mb-2">
-            {SCHEDULE_TYPES.map(t => <button key={t.value} onClick={() => setNewType(t.value)} className={`px-3 py-1.5 rounded text-xs font-bold ${newType === t.value ? 'text-white' : 'text-[#D4C5A9]/40 border border-[#B49B7E]/15'}`} style={newType === t.value ? { background: 'linear-gradient(135deg, #D4A574 0%, #8B7355 100%)' } : {}}>{t.label}</button>)}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* MATERIAL PALETTE — always visible at top                       */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="p-3 border-b border-[#B49B7E]/15" style={{ background: 'rgba(212,165,116,0.04)' }}>
+        <div className="flex justify-between items-center mb-2">
+          <div className="text-xs font-bold text-[#D4A574]">
+            Available Materials (from Checklist & FF&E)
+            {selectedItem && (
+              <span className="ml-3 text-green-400 animate-pulse">
+                Selected: {selectedItem.name} — now click a zone on the wall below
+              </span>
+            )}
           </div>
-          <div className="flex gap-2">
-            <button onClick={handleCreate} disabled={saving || !newName.trim()} className="px-4 py-1.5 rounded text-xs font-bold text-white bg-green-600 disabled:opacity-40">{saving ? 'Creating...' : 'Create'}</button>
-            <button onClick={() => setShowCreate(false)} className="px-3 py-1.5 rounded text-xs text-[#D4C5A9]/50 border border-[#B49B7E]/20">Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* Schedule Tabs */}
-      {schedules.length > 0 && (
-        <div className="flex gap-1 mb-3 overflow-x-auto">
-          {schedules.map(s => (
-            <button key={s.id} onClick={() => setActiveSchedule(s)} className={`px-3 py-1.5 rounded text-xs font-bold whitespace-nowrap ${activeSchedule?.id === s.id ? 'text-white' : 'text-[#D4C5A9]/40 border border-[#B49B7E]/15'}`} style={activeSchedule?.id === s.id ? { background: 'linear-gradient(135deg, #D4A574 0%, #8B7355 100%)' } : {}}>
-              {s.name}
+          {selectedItem && (
+            <button onClick={() => setSelectedItem(null)} className="px-2 py-1 rounded text-[10px] font-bold text-red-400 border border-red-400/30 hover:bg-red-400/10">
+              <X size={10} className="inline mr-1" />Deselect
             </button>
-          ))}
-        </div>
-      )}
-
-      {activeSchedule ? (
-        <div>
-          {/* Actions */}
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="text-sm font-bold text-[#D4A574]">{activeSchedule.name}</h4>
-            <div className="flex gap-1">
-              <button onClick={() => setShowMeasurements(!showMeasurements)} className={`px-2 py-1 rounded text-[10px] flex items-center gap-1 ${showMeasurements ? 'bg-blue-600 text-white' : 'text-[#D4C5A9]/40 border border-[#B49B7E]/15'}`} data-testid="toggle-measurements-btn"><Ruler size={10} />Dimensions</button>
-              <button onClick={addSurface} className="px-2 py-1 rounded text-[10px] text-white bg-blue-700" data-testid="add-surface-btn"><Plus size={10} className="inline" /> Wall</button>
-              <button onClick={() => handleDelete(activeSchedule.id)} className="px-2 py-1 rounded text-[10px] text-white bg-red-700"><Trash2 size={10} className="inline" /></button>
-            </div>
-          </div>
-
-          {/* Measurement Canvas */}
-          {showMeasurements && (
-            <div className="mb-4">
-              <MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} />
-            </div>
           )}
-
-          {/* ═══════ WALL DIAGRAMS — one per surface ═══════ */}
-          <div className="space-y-4">
-            {activeSchedule.surfaces.map(surface => (
-              <div key={surface.id} data-testid={`surface-${surface.id}`}>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-white font-bold text-sm">{surface.name}</span>
-                  <button onClick={() => removeSurface(surface.id)} className="text-[#B49B7E]/20 hover:text-red-400"><Trash2 size={12} /></button>
+        </div>
+        {roomItems.length === 0 ? (
+          <div className="text-[#B49B7E]/30 text-xs py-3 text-center">No items in this room yet — add items in the Checklist or FF&E tab first</div>
+        ) : (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {/* Items WITH images */}
+            {itemsWithImages.map(item => (
+              <button
+                key={item.id}
+                data-testid={`palette-item-${item.id}`}
+                onClick={() => setSelectedItem(selectedItem?.id === item.id ? null : item)}
+                className={`flex-shrink-0 rounded-lg border-2 overflow-hidden transition-all w-24 ${selectedItem?.id === item.id ? 'border-[#D4A574] ring-2 ring-[#D4A574]/40 scale-105' : 'border-[#B49B7E]/15 hover:border-[#B49B7E]/40'}`}
+              >
+                <img src={item._img} alt={item.name} className="w-full h-20 object-cover" />
+                <div className="px-1 py-0.5">
+                  <div className="text-white text-[8px] font-bold truncate">{item.name}</div>
+                  <div className="text-[#B49B7E]/50 text-[7px] truncate">{item.vendor}{item.size ? ` | ${item.size}` : ''}</div>
                 </div>
-                <WallDiagram
-                  surface={surface}
-                  roomItems={roomItems}
-                  onAssignMaterial={assignMaterialToZone}
-                  onRemoveMaterial={removeMaterial}
-                />
-              </div>
+              </button>
+            ))}
+            {/* Items WITHOUT images */}
+            {itemsNoImages.map(item => (
+              <button
+                key={item.id}
+                data-testid={`palette-item-${item.id}`}
+                onClick={() => setSelectedItem(selectedItem?.id === item.id ? null : item)}
+                className={`flex-shrink-0 rounded-lg border-2 overflow-hidden transition-all w-24 ${selectedItem?.id === item.id ? 'border-[#D4A574] ring-2 ring-[#D4A574]/40 scale-105' : 'border-[#B49B7E]/10 hover:border-[#B49B7E]/30'}`}
+              >
+                <div className="w-full h-20 bg-[#1a1a24] flex items-center justify-center">
+                  <span className="text-[#B49B7E]/20 text-[9px] text-center px-1">{item.name?.substring(0, 30)}</span>
+                </div>
+                <div className="px-1 py-0.5">
+                  <div className="text-[#B49B7E]/50 text-[8px] font-bold truncate">{item.name}</div>
+                </div>
+              </button>
             ))}
           </div>
+        )}
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/* SCHEDULE CONTENT                                               */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      <div className="p-3">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-base font-bold text-white">{roomName}</h3>
+          <div className="flex gap-2">
+            <button onClick={() => setShowCreate(true)} className="px-3 py-1.5 rounded text-xs font-bold text-white hover:scale-105 transition-all" style={{ background: 'linear-gradient(135deg, #D4A574 0%, #8B7355 100%)' }} data-testid="create-schedule-btn"><Plus size={12} className="inline mr-1" />New Schedule</button>
+            {onClose && <button onClick={onClose} className="px-2 py-1.5 rounded text-xs text-[#D4C5A9]/50 border border-[#B49B7E]/20"><X size={12} /></button>}
+          </div>
         </div>
-      ) : schedules.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="text-[#D4C5A9]/30 text-sm mb-1">No finish schedules yet</div>
-          <div className="text-[#B49B7E]/30 text-xs">Create one to start placing tiles, paint, and materials on wall diagrams</div>
-        </div>
-      ) : null}
+
+        {/* Create Form */}
+        {showCreate && (
+          <div className="mb-3 p-3 rounded-lg border border-[#B49B7E]/20" style={{ background: 'rgba(30,30,40,0.9)' }}>
+            <input type="text" data-testid="schedule-name-input" placeholder="Name (e.g., Primary Shower, Powder Room)" value={newName} onChange={e => setNewName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleCreate(); }} className="w-full px-3 py-2 mb-2 rounded border border-[#B49B7E] bg-black/50 text-white text-sm focus:outline-none focus:border-[#D4A574]" />
+            <div className="flex gap-2 mb-2">
+              {SCHEDULE_TYPES.map(t => <button key={t.value} onClick={() => setNewType(t.value)} className={`px-3 py-1.5 rounded text-xs font-bold ${newType === t.value ? 'text-white' : 'text-[#D4C5A9]/40 border border-[#B49B7E]/15'}`} style={newType === t.value ? { background: 'linear-gradient(135deg, #D4A574 0%, #8B7355 100%)' } : {}}>{t.label}</button>)}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={handleCreate} disabled={saving || !newName.trim()} className="px-4 py-1.5 rounded text-xs font-bold text-white bg-green-600 disabled:opacity-40">{saving ? 'Creating...' : 'Create'}</button>
+              <button onClick={() => setShowCreate(false)} className="px-3 py-1.5 rounded text-xs text-[#D4C5A9]/50 border border-[#B49B7E]/20">Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {/* Schedule Tabs */}
+        {schedules.length > 0 && (
+          <div className="flex gap-1 mb-3 overflow-x-auto">
+            {schedules.map(s => (
+              <button key={s.id} onClick={() => setActiveSchedule(s)} className={`px-3 py-1.5 rounded text-xs font-bold whitespace-nowrap ${activeSchedule?.id === s.id ? 'text-white' : 'text-[#D4C5A9]/40 border border-[#B49B7E]/15'}`} style={activeSchedule?.id === s.id ? { background: 'linear-gradient(135deg, #D4A574 0%, #8B7355 100%)' } : {}}>{s.name}</button>
+            ))}
+          </div>
+        )}
+
+        {activeSchedule ? (
+          <div>
+            {/* Action bar */}
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-bold text-[#D4A574]">{activeSchedule.name}</h4>
+              <div className="flex gap-1">
+                <button onClick={() => setShowMeasurements(!showMeasurements)} className={`px-2 py-1 rounded text-[10px] flex items-center gap-1 ${showMeasurements ? 'bg-blue-600 text-white' : 'text-[#D4C5A9]/40 border border-[#B49B7E]/15'}`} data-testid="toggle-measurements-btn"><Ruler size={10} />Dimensions</button>
+                <button onClick={addSurface} className="px-2 py-1 rounded text-[10px] text-white bg-blue-700" data-testid="add-surface-btn"><Plus size={10} className="inline" /> Wall</button>
+                <button onClick={() => handleDelete(activeSchedule.id)} className="px-2 py-1 rounded text-[10px] text-white bg-red-700"><Trash2 size={10} className="inline" /></button>
+              </div>
+            </div>
+
+            {/* Measurement Canvas */}
+            {showMeasurements && (
+              <div className="mb-3">
+                <MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} />
+              </div>
+            )}
+
+            {/* Instruction */}
+            {!selectedItem && (
+              <div className="mb-2 text-[10px] text-[#B49B7E]/40 text-center">
+                Select a material from the palette above, then click a zone on the wall to place it
+              </div>
+            )}
+
+            {/* Wall diagrams */}
+            <div className="space-y-4">
+              {activeSchedule.surfaces.map(surface => (
+                <div key={surface.id} data-testid={`surface-${surface.id}`}>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-white font-bold text-sm">{surface.name}</span>
+                    <button onClick={() => removeSurface(surface.id)} className="text-[#B49B7E]/20 hover:text-red-400"><Trash2 size={12} /></button>
+                  </div>
+                  <WallDiagram
+                    surface={surface}
+                    selectedItem={selectedItem}
+                    onPlaceItem={placeItemOnZone}
+                    onRemoveMaterial={removeMaterial}
+                    onChangePattern={changePattern}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : schedules.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="text-[#D4C5A9]/30 text-sm mb-1">No finish schedules yet</div>
+            <div className="text-[#B49B7E]/30 text-xs">Create one to start placing tiles, paint, and materials on wall diagrams</div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 };

@@ -18984,6 +18984,7 @@ class MaterialEntry(BaseModel):
     image: str = ""
     link: str = ""
     position_label: str = ""
+    pattern: str = ""
 
 class MeasurementLine(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
