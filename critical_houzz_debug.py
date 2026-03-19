@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Get backend URL from frontend env
-BACKEND_URL = "https://bugfix-sprint-9.preview.emergentagent.com"
+BACKEND_URL = "https://stability-first-2.preview.emergentagent.com"
 
 def print_header(title):
     print(f"\n{'='*60}")

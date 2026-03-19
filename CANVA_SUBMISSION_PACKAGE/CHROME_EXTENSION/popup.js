@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://bugfix-sprint-9.preview.emergentagent.com';
+const BACKEND_URL = 'https://stability-first-2.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

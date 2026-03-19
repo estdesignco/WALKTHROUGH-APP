@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # Configuration
-API_BASE = "https://bugfix-sprint-9.preview.emergentagent.com/api"
+API_BASE = "https://stability-first-2.preview.emergentagent.com/api"
 
 def print_header(title):
     """Print formatted test header"""

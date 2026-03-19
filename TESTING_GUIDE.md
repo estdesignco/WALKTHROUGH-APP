@@ -6,7 +6,7 @@
 
 ## 📱 ACCESS THE APP
 
-**Live URL:** https://bugfix-sprint-9.preview.emergentagent.com/mobile-app
+**Live URL:** https://stability-first-2.preview.emergentagent.com/mobile-app
 
 ---
 
@@ -483,7 +483,7 @@ After testing, grade each area:
 
 ## 🚀 READY TO TEST!
 
-**Start here:** https://bugfix-sprint-9.preview.emergentagent.com/mobile-app
+**Start here:** https://stability-first-2.preview.emergentagent.com/mobile-app
 
 **Estimated time:** 30-60 minutes for full testing
 

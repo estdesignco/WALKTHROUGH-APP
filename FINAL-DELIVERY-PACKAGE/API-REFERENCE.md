@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://bugfix-sprint-9.preview.emergentagent.com/api
+https://stability-first-2.preview.emergentagent.com/api
 ```
 
 ---

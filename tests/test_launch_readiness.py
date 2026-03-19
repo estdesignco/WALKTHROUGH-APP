@@ -8,7 +8,7 @@ import os
 import time
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://bugfix-sprint-9.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://stability-first-2.preview.emergentagent.com')
 
 # Test project ID from context
 TEST_PROJECT_ID = "f69691c7-5255-4ec2-848e-9967b6dae9c9"

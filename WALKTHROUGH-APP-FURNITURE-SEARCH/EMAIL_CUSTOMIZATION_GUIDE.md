@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://bugfix-sprint-9.preview.emergentagent.com/email-template.html
+https://stability-first-2.preview.emergentagent.com/email-template.html
 
 ---
 
