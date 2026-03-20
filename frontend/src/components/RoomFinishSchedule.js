@@ -24,6 +24,38 @@ const TILE_PATTERNS = [
   { value: 'none', label: 'None / Solid' },
 ];
 
+// SVG pattern preview thumbnails
+const PatternSvg = ({ pattern, size = 60, color = '#6B8EAE' }) => {
+  const s = size;
+  const stroke = '#555';
+  const fill = '#e8e8e8';
+  const sw = 0.8;
+  switch (pattern) {
+    case 'stacked_horizontal':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/>{[0,10,20,30].map(y => <>{[0,20].map(x => <rect key={`${x}-${y}`} x={x+0.5} y={y+0.5} width={19} height={9} fill={fill} stroke={stroke} strokeWidth={sw}/>)}</>)}</svg>);
+    case 'stacked_vertical':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/>{[0,10,20,30].map(x => <>{[0,20].map(y => <rect key={`${x}-${y}`} x={x+0.5} y={y+0.5} width={9} height={19} fill={fill} stroke={stroke} strokeWidth={sw}/>)}</>)}</svg>);
+    case 'offset':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/>{[0,10,20,30].map((y,i) => <>{[-10+((i%2)*10),10+((i%2)*10),30+((i%2)*10)].map(x => <rect key={`${x}-${y}`} x={x+0.5} y={y+0.5} width={19} height={9} fill={fill} stroke={stroke} strokeWidth={sw}/>)}</>)}</svg>);
+    case 'one_third_offset':
+      return (<svg width={s} height={s} viewBox="0 0 42 40"><rect width="42" height="40" fill="#f0f0f0"/>{[0,10,20,30].map((y,i) => {const off=(i%3)*7; return [-14+off,7+off,28+off].map(x => <rect key={`${x}-${y}`} x={x+0.5} y={y+0.5} width={20} height={9} fill={fill} stroke={stroke} strokeWidth={sw}/>);})}</svg>);
+    case 'herringbone':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/><g transform="translate(20,20)">{[-1,0,1].map(row => [-1,0,1].map(col => <g key={`${row}-${col}`} transform={`translate(${col*16},${row*16})`}><rect x="-1" y="-8" width="4" height="15" rx="0.3" fill={fill} stroke={stroke} strokeWidth={sw} transform="rotate(45)"/><rect x="-1" y="-8" width="4" height="15" rx="0.3" fill={fill} stroke={stroke} strokeWidth={sw} transform="rotate(-45) translate(0,-2)"/></g>))}</g></svg>);
+    case 'block_herringbone':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/>{[0,20].map(y => [0,20].map(x => <g key={`${x}-${y}`}><rect x={x+1} y={y+1} width={8} height={18} fill={fill} stroke={stroke} strokeWidth={sw}/><rect x={x+11} y={y+1} width={8} height={18} fill={fill} stroke={stroke} strokeWidth={sw}/></g>))}{[10,30].map(y => [0,20].map(x => <g key={`v${x}-${y}`}><rect x={x+1} y={y+1} width={18} height={8} fill={fill} stroke={stroke} strokeWidth={sw}/></g>))}</svg>);
+    case 'basket_weave':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/>{[0,20].map(y => [0,20].map(x => <g key={`${x}-${y}`}><rect x={x+1} y={y+1} width={18} height={8} fill={fill} stroke={stroke} strokeWidth={sw}/><rect x={x+1} y={y+11} width={18} height={8} fill={fill} stroke={stroke} strokeWidth={sw}/></g>))}{[0,20].map(y => [10,30].map(x => <g key={`v${x}-${y}`}><rect x={x+1} y={y+1} width={8} height={18} fill={fill} stroke={stroke} strokeWidth={sw}/></g>))}</svg>);
+    case 'stepladder':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/>{[0,8,16,24,32].map((x,i) => {const off=(i%2)*10; return [-10+off,10+off,30+off].map(y => <rect key={`${x}-${y}`} x={x+0.5} y={y+0.5} width={7} height={19} fill={fill} stroke={stroke} strokeWidth={sw}/>);})}</svg>);
+    case 'diagonal':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/><g transform="translate(20,20) rotate(45)">{[-20,-10,0,10].map(y => [-30,-10,10].map(x => <rect key={`${x}-${y}`} x={x+0.5} y={y+0.5} width={19} height={9} fill={fill} stroke={stroke} strokeWidth={sw}/>))}</g></svg>);
+    case 'mosaic':
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/>{[0,8,16,24,32].map(y => [0,8,16,24,32].map(x => <rect key={`${x}-${y}`} x={x+0.5} y={y+0.5} width={7} height={7} rx="0.3" fill={fill} stroke={stroke} strokeWidth={sw}/>))}</svg>);
+    default:
+      return (<svg width={s} height={s} viewBox="0 0 40 40"><rect width="40" height="40" fill="#f0f0f0"/><rect x="1" y="1" width="38" height="38" fill={fill} stroke={stroke} strokeWidth={sw}/></svg>);
+  }
+};
+
 const LINE_COLORS = ['#FF4444', '#44AAFF', '#44FF44', '#FFAA44', '#FF44FF', '#FFFFFF'];
 
 const getItemImage = (item) =>
@@ -154,8 +186,9 @@ const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onC
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap" style={{ background: 'rgba(0,0,0,0.75)' }}>
                         {mat.name} {mat.size ? `(${mat.size})` : ''} {mat.vendor ? `- ${mat.vendor}` : ''}
                       </span>
-                      {mat.pattern && (
-                        <span className="px-1.5 py-0.5 rounded text-[9px] text-[#D4A574] font-bold" style={{ background: 'rgba(0,0,0,0.75)' }}>
+                      {mat.pattern && mat.pattern !== 'none' && (
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] text-[#D4A574] font-bold" style={{ background: 'rgba(0,0,0,0.75)' }}>
+                          <span className="inline-block" style={{ width: '16px', height: '16px', verticalAlign: 'middle' }}><PatternSvg pattern={mat.pattern} size={16} /></span>
                           {TILE_PATTERNS.find(p => p.value === mat.pattern)?.label || mat.pattern}
                         </span>
                       )}
@@ -190,16 +223,17 @@ const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onC
 
               {/* Pattern picker dropdown */}
               {patternPickerZone === zone.id && mat && (
-                <div className="absolute z-30 right-2 top-full mt-1 p-2 rounded-lg border border-[#B49B7E]/30 shadow-xl w-56" style={{ background: 'rgba(0,0,0,0.95)' }} onClick={e => e.stopPropagation()}>
-                  <div className="text-[10px] text-[#D4A574] font-bold mb-1">Tile Pattern:</div>
-                  <div className="grid grid-cols-2 gap-1 max-h-40 overflow-y-auto">
+                <div className="absolute z-30 right-2 top-full mt-1 p-3 rounded-lg border border-[#B49B7E]/30 shadow-xl" style={{ background: 'rgba(0,0,0,0.97)', width: '340px' }} onClick={e => e.stopPropagation()}>
+                  <div className="text-[10px] text-[#D4A574] font-bold mb-2">Select Tile Pattern:</div>
+                  <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
                     {TILE_PATTERNS.map(p => (
                       <button
                         key={p.value}
                         onClick={() => { onChangePattern(surface.id, mat.id, p.value); setPatternPickerZone(null); }}
-                        className={`px-2 py-1.5 rounded text-[9px] text-left font-bold transition-all ${mat.pattern === p.value ? 'bg-[#D4A574] text-black' : 'text-[#D4C5A9]/60 hover:text-white hover:bg-[#B49B7E]/20'}`}
+                        className={`flex flex-col items-center p-1.5 rounded-lg border-2 transition-all ${mat.pattern === p.value ? 'border-[#D4A574] bg-[#D4A574]/10' : 'border-[#B49B7E]/15 hover:border-[#B49B7E]/40'}`}
                       >
-                        {p.label}
+                        <PatternSvg pattern={p.value} size={56} />
+                        <span className={`text-[8px] font-bold mt-1 text-center leading-tight ${mat.pattern === p.value ? 'text-[#D4A574]' : 'text-[#D4C5A9]/50'}`}>{p.label}</span>
                       </button>
                     ))}
                   </div>
