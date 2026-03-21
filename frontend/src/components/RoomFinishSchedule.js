@@ -53,57 +53,157 @@ const PatternThumb = ({ pattern, size = 80 }) => {
   }
 };
 
-// ─── CSS pattern rendering on wall zones ──────────────────────────────
-// Returns inline style that renders the tile image in the selected pattern
-const getPatternStyle = (imageUrl, pattern) => {
-  if (!imageUrl) return {};
-  const base = { backgroundImage: `url(${imageUrl})`, backgroundRepeat: 'repeat' };
-  switch (pattern) {
-    case 'stacked_horizontal':
-      return { ...base, backgroundSize: '80px 40px' };
-    case 'stacked_vertical':
-      return { ...base, backgroundSize: '40px 80px' };
-    case 'offset':
-      return {
-        backgroundImage: `url(${imageUrl}), url(${imageUrl})`,
-        backgroundSize: '80px 40px, 80px 40px',
-        backgroundPosition: '0 0, 40px 40px',
-        backgroundRepeat: 'repeat',
-      };
-    case 'one_third_offset':
-      return {
-        backgroundImage: `url(${imageUrl}), url(${imageUrl}), url(${imageUrl})`,
-        backgroundSize: '90px 30px',
-        backgroundPosition: '0 0, 30px 30px, 60px 60px',
-        backgroundRepeat: 'repeat',
-      };
-    case 'herringbone':
-      return { ...base, backgroundSize: '60px 60px', transform: 'rotate(0deg)',
-        backgroundImage: `url(${imageUrl}), url(${imageUrl})`,
-        backgroundSize: '40px 80px, 40px 80px',
-        backgroundPosition: '0 0, 40px 40px',
-      };
-    case 'basket_weave':
-      return {
-        backgroundImage: `url(${imageUrl}), url(${imageUrl})`,
-        backgroundSize: '60px 30px, 30px 60px',
-        backgroundPosition: '0 0, 60px 0',
-        backgroundRepeat: 'repeat',
-      };
-    case 'stepladder':
-      return { ...base, backgroundSize: '30px 80px' };
-    case 'diagonal':
-      return { ...base, backgroundSize: '60px 60px', transform: 'rotate(45deg) scale(1.5)' };
-    default:
-      return { ...base, backgroundSize: '100px 100px' };
-  }
+// ─── SVG GROUT LINE OVERLAY — renders the actual pattern visually ──────
+// This creates an SVG that draws grout/joint lines in the tile pattern
+// over the tile image, so you can CLEARLY SEE the pattern
+const PatternOverlay = ({ pattern, width, height }) => {
+  const grout = 'rgba(80,80,80,0.9)';
+  const gw = 2; // grout width in px
+  
+  // Each pattern returns an SVG with a repeating tile unit
+  const renderPattern = () => {
+    switch (pattern) {
+      case 'stacked_horizontal':
+        // Horizontal rows of tiles
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`sh-${pattern}`} x="0" y="0" width="120" height="60" patternUnits="userSpaceOnUse">
+                <rect x="0" y="0" width="120" height="60" fill="none" />
+                <line x1="0" y1="0" x2="120" y2="0" stroke={grout} strokeWidth={gw} />
+                <line x1="60" y1="0" x2="60" y2="60" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="60" x2="120" y2="60" stroke={grout} strokeWidth={gw} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#sh-${pattern})`} />
+          </svg>
+        );
+      case 'stacked_vertical':
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`sv-${pattern}`} x="0" y="0" width="60" height="120" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="120" stroke={grout} strokeWidth={gw} />
+                <line x1="60" y1="0" x2="60" y2="120" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="60" x2="60" y2="60" stroke={grout} strokeWidth={gw} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#sv-${pattern})`} />
+          </svg>
+        );
+      case 'offset':
+        // Brick lay — every other row offset 50%
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`off-${pattern}`} x="0" y="0" width="120" height="80" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="120" y2="0" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="40" x2="120" y2="40" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="80" x2="120" y2="80" stroke={grout} strokeWidth={gw} />
+                <line x1="60" y1="0" x2="60" y2="40" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="40" x2="0" y2="80" stroke={grout} strokeWidth={gw} />
+                <line x1="120" y1="40" x2="120" y2="80" stroke={grout} strokeWidth={gw} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#off-${pattern})`} />
+          </svg>
+        );
+      case 'one_third_offset':
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`oto-${pattern}`} x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+                {[0,40,80,120].map(y => <line key={y} x1="0" y1={y} x2="120" y2={y} stroke={grout} strokeWidth={gw} />)}
+                <line x1="60" y1="0" x2="60" y2="40" stroke={grout} strokeWidth={gw} />
+                <line x1="100" y1="40" x2="100" y2="80" stroke={grout} strokeWidth={gw} />
+                <line x1="20" y1="80" x2="20" y2="120" stroke={grout} strokeWidth={gw} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#oto-${pattern})`} />
+          </svg>
+        );
+      case 'herringbone':
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`hb-${pattern}`} x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                {/* V-shaped herringbone joints */}
+                <line x1="0" y1="0" x2="40" y2="40" stroke={grout} strokeWidth={gw} />
+                <line x1="40" y1="40" x2="0" y2="80" stroke={grout} strokeWidth={gw} />
+                <line x1="40" y1="0" x2="80" y2="40" stroke={grout} strokeWidth={gw} />
+                <line x1="80" y1="40" x2="40" y2="80" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="40" x2="40" y2="40" stroke={grout} strokeWidth={gw*0.5} />
+                <line x1="40" y1="0" x2="40" y2="40" stroke={grout} strokeWidth={gw*0.5} />
+                <line x1="40" y1="40" x2="80" y2="40" stroke={grout} strokeWidth={gw*0.5} />
+                <line x1="40" y1="40" x2="40" y2="80" stroke={grout} strokeWidth={gw*0.5} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#hb-${pattern})`} />
+          </svg>
+        );
+      case 'basket_weave':
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`bw-${pattern}`} x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+                {/* Horizontal pair */}
+                <rect x="0" y="0" width="60" height="60" fill="none" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="30" x2="60" y2="30" stroke={grout} strokeWidth={gw} />
+                {/* Vertical pair */}
+                <rect x="60" y="0" width="60" height="60" fill="none" stroke={grout} strokeWidth={gw} />
+                <line x1="90" y1="0" x2="90" y2="60" stroke={grout} strokeWidth={gw} />
+                {/* Vertical pair */}
+                <rect x="0" y="60" width="60" height="60" fill="none" stroke={grout} strokeWidth={gw} />
+                <line x1="30" y1="60" x2="30" y2="120" stroke={grout} strokeWidth={gw} />
+                {/* Horizontal pair */}
+                <rect x="60" y="60" width="60" height="60" fill="none" stroke={grout} strokeWidth={gw} />
+                <line x1="60" y1="90" x2="120" y2="90" stroke={grout} strokeWidth={gw} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#bw-${pattern})`} />
+          </svg>
+        );
+      case 'stepladder':
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`sl-${pattern}`} x="0" y="0" width="80" height="120" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="120" stroke={grout} strokeWidth={gw} />
+                <line x1="40" y1="0" x2="40" y2="120" stroke={grout} strokeWidth={gw} />
+                <line x1="80" y1="0" x2="80" y2="120" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="60" x2="40" y2="60" stroke={grout} strokeWidth={gw} />
+                <line x1="40" y1="30" x2="80" y2="30" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="0" x2="40" y2="0" stroke={grout} strokeWidth={gw} />
+                <line x1="40" y1="90" x2="80" y2="90" stroke={grout} strokeWidth={gw} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#sl-${pattern})`} />
+          </svg>
+        );
+      case 'diagonal':
+        return (
+          <svg width="100%" height="100%" style={{ position: 'absolute', inset: 0 }}>
+            <defs>
+              <pattern id={`diag-${pattern}`} x="0" y="0" width="85" height="85" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="85" y2="0" stroke={grout} strokeWidth={gw} />
+                <line x1="0" y1="0" x2="0" y2="85" stroke={grout} strokeWidth={gw} />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill={`url(#diag-${pattern})`} />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return renderPattern();
 };
 
 
 // ─── WALL ZONE with pattern rendering ─────────────────────────────────
 const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern }) => {
   const hasImage = mat?.image;
-  const patternStyle = hasImage ? getPatternStyle(mat.image, mat.pattern || '') : {};
   const patternLabel = mat?.pattern ? TILE_PATTERNS.find(p => p.value === mat.pattern)?.label : null;
 
   return (
@@ -112,11 +212,14 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
       style={{ top: `${zone.top}%`, height: `${zone.height}%` }}
       onClick={onClickZone}
     >
-      {/* Tile image rendered in pattern */}
+      {/* Tile image as background */}
       {hasImage && (
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-[-20px]" style={patternStyle} />
-        </div>
+        <div className="absolute inset-0" style={{ backgroundImage: `url(${mat.image})`, backgroundSize: '100px 100px', backgroundRepeat: 'repeat' }} />
+      )}
+
+      {/* Pattern grout line overlay — THIS is what makes the pattern visible */}
+      {hasImage && mat.pattern && (
+        <PatternOverlay pattern={mat.pattern} />
       )}
 
       {/* Empty zone background */}
