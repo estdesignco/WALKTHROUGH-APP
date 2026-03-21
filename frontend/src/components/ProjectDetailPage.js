@@ -70,6 +70,7 @@ const DropdownNavigation = ({ tabs, activeTab, onTabChange }) => {
         { type: 'single', name: 'Checklist' },
         { type: 'single', name: 'FF&E' },
         { type: 'single', name: 'Whole Home Finishes' },
+        { type: 'single', name: 'Room Finishes' },
         { type: 'dropdown', label: 'Tasks', items: ['To Do', 'Punch List'] },
         { type: 'single', name: 'Calendar' },
         { type: 'single', name: 'Design' },
