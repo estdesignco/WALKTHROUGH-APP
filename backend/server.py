@@ -97,54 +97,67 @@ app = FastAPI(title="Interior Design Management System", version="1.0.0")
 @app.on_event("startup")
 async def startup_event():
     """Run on application startup"""
-    # DISABLED - This was wiping real user data with test data on every startup
-    # try:
-    #     from auto_populate_projects import ensure_test_projects_exist
-    #     await ensure_test_projects_exist()
-    # except Exception as e:
-    #     logger.error(f"Error in startup auto-population: {e}")
-    
     # Create database indexes for faster queries
     try:
-        # Project indexes
         await db.projects.create_index("id", unique=True, sparse=True)
-        
-        # Room indexes
         await db.rooms.create_index([("project_id", 1), ("sheet_type", 1)])
         await db.rooms.create_index("project_id")
         await db.rooms.create_index("id", unique=True, sparse=True)
-        
-        # Category/Subcategory indexes
         await db.categories.create_index("room_id")
         await db.categories.create_index("id", unique=True, sparse=True)
         await db.subcategories.create_index("category_id")
         await db.subcategories.create_index("id", unique=True, sparse=True)
-        
-        # Item indexes - CRITICAL for performance
         await db.items.create_index("subcategory_id")
         await db.items.create_index([("subcategory_id", 1), ("created_at", -1)])
         await db.items.create_index("id", unique=True, sparse=True)
         await db.items.create_index("room_id")
         await db.items.create_index("project_id")
-        
-        # Todo indexes
         await db.todos.create_index("project_id")
         await db.todos.create_index("id", unique=True, sparse=True)
         await db.todos.create_index([("project_id", 1), ("status", 1)])
         await db.todos.create_index("completed_at")
-        
-        # Punch item indexes
         await db.punch_items.create_index("project_id")
         await db.punch_items.create_index("id", unique=True, sparse=True)
-        
-        # Master data indexes
         await db.master_contacts.create_index("id", unique=True, sparse=True)
         await db.master_contacts.create_index("type")
         await db.master_materials.create_index("id", unique=True, sparse=True)
-        
-        logger.info("✅ Database indexes created for optimized queries")
+        logger.info("Database indexes created")
     except Exception as e:
-        logger.warning(f"Index creation skipped (may already exist): {e}")
+        logger.warning(f"Index creation skipped: {e}")
+
+    # Auto-seed demo project with tile items if DB is empty (preview env)
+    try:
+        project_count = await db.projects.count_documents({})
+        if project_count == 0:
+            logger.info("Empty DB detected — seeding demo project with tile items...")
+            import uuid as _uuid
+            pid = str(_uuid.uuid4())
+            rid = str(_uuid.uuid4())
+            cid = str(_uuid.uuid4())
+            sid = str(_uuid.uuid4())
+            now = datetime.now(timezone.utc).isoformat()
+
+            await db.projects.insert_one({"id": pid, "name": "Wheeler Ridge Residence", "client_info": {"full_name": "Demo Client", "email": "demo@test.com", "phone": "555-0100", "address": "123 Demo St"}, "created_at": now, "updated_at": now})
+            await db.rooms.insert_one({"id": rid, "name": "Master Bathroom", "project_id": pid, "sheet_type": "walkthrough", "created_at": now})
+            await db.rooms.insert_one({"id": str(_uuid.uuid4()), "name": "Kitchen", "project_id": pid, "sheet_type": "walkthrough", "created_at": now})
+            await db.categories.insert_one({"id": cid, "name": "Tile & Stone", "room_id": rid, "created_at": now})
+            await db.subcategories.insert_one({"id": sid, "name": "Shower Tile", "category_id": cid, "created_at": now})
+
+            tile_items = [
+                {"name": "Black & White Basket Weave", "vendor": "Daltile", "sku": "BWV-2424", "size": "2x2 Mosaic", "finish_color": "Black/White", "status": "APPROVED", "image_url": "https://static.prod-images.emergentagent.com/jobs/7932d827-12dd-45f6-923f-dedc2d66add5/images/1ac7f6ff8285b0790a13035bff206ee25bc5a88f0c649fd5ac5f6eafd371cc04.png"},
+                {"name": "Calacatta Gold Marble", "vendor": "MSI", "sku": "CAL-1224", "size": "12x24", "finish_color": "White/Gold", "status": "APPROVED", "image_url": "https://static.prod-images.emergentagent.com/jobs/7932d827-12dd-45f6-923f-dedc2d66add5/images/67146b1855ddd586643ea9cac07be8c469caa4c6bf3e910498c240b6db07f906.png"},
+                {"name": "Subway Tile White Gloss", "vendor": "Daltile", "sku": "SUB-3612", "size": "3x12", "finish_color": "White Gloss", "status": "ORDERED", "image_url": "https://static.prod-images.emergentagent.com/jobs/7932d827-12dd-45f6-923f-dedc2d66add5/images/c2147a2164972e94624fbd184860b0f82b5bbc7677032aca215da908850d59cb.png"},
+                {"name": "Hexagon Carrara", "vendor": "Floor & Decor", "sku": "HEX-CAR-2", "size": "2 inch hex", "finish_color": "Carrara White", "status": "APPROVED", "image_url": "https://static.prod-images.emergentagent.com/jobs/7932d827-12dd-45f6-923f-dedc2d66add5/images/95ef8164da97fcf4ea7f98200f4ddd22e793caf0870380e504fab372f5e4422f.png"},
+            ]
+            for t in tile_items:
+                await db.items.insert_one({"id": str(_uuid.uuid4()), "subcategory_id": sid, "room_id": rid, "project_id": pid, "created_at": now, "updated_at": now, **t})
+
+            # Create default surfaces for tile schedule
+            surfaces = [{"id": str(_uuid.uuid4()), "name": n, "surface_type": "wall", "materials": [], "measurement_lines": []} for n in ["Back Wall", "Left Wall", "Right Wall", "Front Wall", "Floor"]]
+            await db.finish_schedules.insert_one({"id": str(_uuid.uuid4()), "project_id": pid, "room_id": rid, "room_name": "Master Bathroom", "schedule_type": "tile", "name": "Primary Shower", "surfaces": surfaces, "measurement_lines": [], "created_at": now, "updated_at": now})
+            logger.info(f"Demo project seeded: {pid}")
+    except Exception as e:
+        logger.warning(f"Demo seed skipped: {e}")
     
     # Seed vendor products from JSON files
     # NOTE: Disabled for faster startup - products already exist in production
