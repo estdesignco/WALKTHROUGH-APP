@@ -10,7 +10,7 @@ import os
 import json
 from datetime import datetime
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://stability-first-2.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://material-mapper-1.preview.emergentagent.com')
 
 class TestHealthEndpoints:
     """Test health and basic API endpoints"""

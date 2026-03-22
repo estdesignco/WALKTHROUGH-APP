@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 # Backend configuration
-BACKEND_URL = "https://stability-first-2.preview.emergentagent.com"
+BACKEND_URL = "https://material-mapper-1.preview.emergentagent.com"
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test URLs for vendor finish/color extraction

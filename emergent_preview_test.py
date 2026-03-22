@@ -13,7 +13,7 @@ class EmergentPreviewTester:
     def __init__(self):
         self.backend_url = "http://localhost:8000"
         self.frontend_url = "http://localhost:80"
-        self.preview_url = "https://stability-first-2.preview.emergentagent.com"
+        self.preview_url = "https://material-mapper-1.preview.emergentagent.com"
         self.tests_run = 0
         self.tests_passed = 0
 

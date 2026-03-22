@@ -3,8 +3,8 @@
 // Main image = Large product photo (NOT a swatch)
 // Swatch image = Small color/finish chip ONLY
 
-const APP_URL = 'https://stability-first-2.preview.emergentagent.com';
-const BACKEND_URL = 'https://stability-first-2.preview.emergentagent.com';
+const APP_URL = 'https://material-mapper-1.preview.emergentagent.com';
+const BACKEND_URL = 'https://material-mapper-1.preview.emergentagent.com';
 let scrapedData = null;
 let selectedProjectId = null;
 

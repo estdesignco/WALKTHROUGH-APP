@@ -56,7 +56,7 @@ async def test_furniture_api():
     print(f"\n🌐 TESTING FURNITURE SEARCH API")
     print("=" * 40)
     
-    base_url = "https://stability-first-2.preview.emergentagent.com/api"
+    base_url = "https://material-mapper-1.preview.emergentagent.com/api"
     
     endpoints_to_test = [
         "/furniture/search",

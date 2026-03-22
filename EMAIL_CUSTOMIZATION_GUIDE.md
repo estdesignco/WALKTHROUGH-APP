@@ -3,7 +3,7 @@
 ## 🎯 **HOW TO EDIT YOUR EMAIL TEMPLATE**
 
 ### **🔗 Email Template Link:**
-https://stability-first-2.preview.emergentagent.com/email-template.html
+https://material-mapper-1.preview.emergentagent.com/email-template.html
 
 ---
 

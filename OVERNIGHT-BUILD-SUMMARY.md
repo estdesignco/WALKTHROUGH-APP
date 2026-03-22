@@ -3,7 +3,7 @@
 ## ✅ What Was Built
 
 ### 1. **Canva Live Checklist** (WORKING!)
-**URL:** `https://stability-first-2.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+**URL:** `https://material-mapper-1.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
 
 **Features:**
 - ✅ Clean, simple UI with dark gold theme
@@ -25,7 +25,7 @@
 ---
 
 ### 2. **Chrome Extension** (COMPLETE!)
-**Download:** `https://stability-first-2.preview.emergentagent.com/chrome-extension.zip`
+**Download:** `https://material-mapper-1.preview.emergentagent.com/chrome-extension.zip`
 
 **Features:**
 - ✅ Scans entire Canva boards for images with links
@@ -55,7 +55,7 @@
 ---
 
 ### 3. **Comprehensive Documentation**
-**Guide:** `https://stability-first-2.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+**Guide:** `https://material-mapper-1.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
 
 Complete visual guide with:
 - Setup instructions
@@ -205,11 +205,11 @@ Complete visual guide with:
 4. **Bulk Import Tool:** `bulk-import.html` (backup option)
 
 ### All URLs:
-- Main App: `https://stability-first-2.preview.emergentagent.com`
-- Live Checklist: `https://stability-first-2.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
-- Extension: `https://stability-first-2.preview.emergentagent.com/chrome-extension.zip`
-- Guide: `https://stability-first-2.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
-- Bulk Import: `https://stability-first-2.preview.emergentagent.com/bulk-import.html`
+- Main App: `https://material-mapper-1.preview.emergentagent.com`
+- Live Checklist: `https://material-mapper-1.preview.emergentagent.com/canva-live-checklist-CLEAN.js`
+- Extension: `https://material-mapper-1.preview.emergentagent.com/chrome-extension.zip`
+- Guide: `https://material-mapper-1.preview.emergentagent.com/CANVA-INTEGRATION-GUIDE.html`
+- Bulk Import: `https://material-mapper-1.preview.emergentagent.com/bulk-import.html`
 
 ---
 

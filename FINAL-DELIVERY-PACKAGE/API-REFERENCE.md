@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://stability-first-2.preview.emergentagent.com/api
+https://material-mapper-1.preview.emergentagent.com/api
 ```
 
 ---

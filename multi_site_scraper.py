@@ -279,6 +279,6 @@ for i in range(3):
 
 print(f"\n{'='*70}")
 print(f"✅ {success}/3 succeeded with HIGH QUALITY images!")
-print(f"View: https://stability-first-2.preview.emergentagent.com/furniture-search\n")
+print(f"View: https://material-mapper-1.preview.emergentagent.com/furniture-search\n")
 
 client.close()

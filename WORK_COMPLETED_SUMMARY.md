@@ -171,7 +171,7 @@ Created comprehensive integration plan document:
 ## 🚀 How to Test
 
 ### Test Offline Mode:
-1. Open mobile app: `https://stability-first-2.preview.emergentagent.com/mobile-app`
+1. Open mobile app: `https://material-mapper-1.preview.emergentagent.com/mobile-app`
 2. Select a project
 3. Open Walkthrough or FF&E
 4. **Turn off WiFi/mobile data**
@@ -221,10 +221,10 @@ Created comprehensive integration plan document:
 ## 📱 Mobile App URL
 
 **Main App:**
-`https://stability-first-2.preview.emergentagent.com`
+`https://material-mapper-1.preview.emergentagent.com`
 
 **Mobile Simulator:**
-`https://stability-first-2.preview.emergentagent.com/mobile-app`
+`https://material-mapper-1.preview.emergentagent.com/mobile-app`
 
 ---
 

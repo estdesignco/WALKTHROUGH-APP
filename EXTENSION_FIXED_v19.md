@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://stability-first-2.preview.emergentagent.com/chrome-extension-v19.zip
+https://material-mapper-1.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://stability-first-2.preview.emergentagent.com/api/download/chrome-extension
+https://material-mapper-1.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 
