@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Ruler, ChevronRight, Home, Layers } from 'lucide-react';
 import RoomFinishSchedule from './RoomFinishSchedule';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
 const ProjectFinishSchedules = ({ projectId }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -17,6 +19,13 @@ const ProjectFinishSchedules = ({ projectId }) => {
         const project = await res.json();
         const projectRooms = project.rooms || [];
         setRooms(projectRooms);
+
+        // Auto-select room if roomId is in URL params
+        const roomIdParam = searchParams.get('roomId');
+        if (roomIdParam) {
+          const targetRoom = projectRooms.find(r => r.id === roomIdParam);
+          if (targetRoom) setSelectedRoom(targetRoom);
+        }
 
         // Fetch schedule counts per room
         const counts = {};
@@ -34,7 +43,7 @@ const ProjectFinishSchedules = ({ projectId }) => {
       finally { setLoading(false); }
     };
     if (projectId) fetchRooms();
-  }, [projectId]);
+  }, [projectId, searchParams]);
 
   if (loading) {
     return (

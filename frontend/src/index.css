@@ -104,3 +104,9 @@ table td .relative {
     @apply bg-background text-foreground;
     }
 }
+
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(212,165,116,0.7), 0 0 32px rgba(212,165,116,0.4); }
+  50% { box-shadow: 0 0 24px rgba(212,165,116,1), 0 0 48px rgba(212,165,116,0.6), 0 0 64px rgba(212,165,116,0.3); }
+}

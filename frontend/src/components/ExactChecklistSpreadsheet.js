@@ -2257,6 +2257,23 @@ const ExactChecklistSpreadsheet = ({
                         }
                       }}
                     >{room.name.toUpperCase()}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const baseUrl = window.location.origin;
+                        window.location.href = `${baseUrl}/project/${project.id}?tab=Room+Finishes&roomId=${room.id}`;
+                      }}
+                      className="ml-3 px-3 py-1 rounded-md text-[11px] font-black uppercase tracking-wider text-white"
+                      style={{
+                        background: 'linear-gradient(135deg, #D4A574 0%, #B8860B 50%, #D4A574 100%)',
+                        boxShadow: '0 0 16px rgba(212,165,116,0.7), 0 0 32px rgba(212,165,116,0.4), inset 0 1px 0 rgba(255,255,255,0.3)',
+                        animation: 'glowPulse 2s ease-in-out infinite',
+                        textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+                      }}
+                      data-testid={`checklist-finish-schedule-btn-${room.id}`}
+                    >
+                      FINISH SCHEDULE
+                    </button>
                   </div>
                   <div className="flex items-center gap-2">
                     {/* ADD ITEM BUTTON - TOP LEVEL */}
