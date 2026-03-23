@@ -54,140 +54,224 @@ const PatternThumb = ({ pattern, size = 80 }) => {
 };
 
 
-// CSS MASK-BASED PATTERN RENDERING
-// Instead of drawing lines ON TOP of the image, we MASK the image into
-// tile shapes. Grout-colored background shows through the gaps.
-// This makes patterns look like ACTUAL TILES on a wall.
-const getPatternMask = (pattern) => {
-  const g = 10;
-  const hg = g / 2;
-  let svg, w, h;
+// CANVAS-BASED TILE PATTERN RENDERER
+// Draws the ACTUAL tile image at every position in the pattern
+// Each individual tile is drawn at the correct position and rotation
+// Grout gaps between tiles. This looks like REAL TILES on a REAL WALL.
+
+const drawTilePattern = (ctx, img, pattern, w, h) => {
+  const grout = 6;
+  const gc = '#c8bfb0'; // warm grout color
+
+  // Fill entire canvas with grout color first
+  ctx.fillStyle = gc;
+  ctx.fillRect(0, 0, w, h);
+
+  // Helper: draw a single tile with subtle inset shadow for depth
+  const drawTile = (x, y, tw, th) => {
+    ctx.drawImage(img, x, y, tw, th);
+    // Subtle dark edge for depth
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, tw - 1, th - 1);
+  };
+
+  // Tile dimensions — BIG enough to be clearly visible
+  const tl = 160; // tile long side
+  const ts = 54;  // tile short side  
+  const sq = 100; // square tile side
 
   switch (pattern) {
     case 'stacked_horizontal': {
-      const tw = 180, th = 90;
-      w = tw + g; h = th + g;
-      svg = `<rect x='${hg}' y='${hg}' width='${tw}' height='${th}' fill='white' rx='2'/>`;
+      // Simple horizontal rows of tiles, joints aligned
+      for (let y = 0; y < h + ts; y += ts + grout) {
+        for (let x = 0; x < w + tl; x += tl + grout) {
+          drawTile(x, y, tl, ts);
+        }
+      }
       break;
     }
     case 'stacked_vertical': {
-      const tw = 90, th = 180;
-      w = tw + g; h = th + g;
-      svg = `<rect x='${hg}' y='${hg}' width='${tw}' height='${th}' fill='white' rx='2'/>`;
+      // Simple vertical columns of tiles, joints aligned
+      for (let x = 0; x < w + ts; x += ts + grout) {
+        for (let y = 0; y < h + tl; y += tl + grout) {
+          drawTile(x, y, ts, tl);
+        }
+      }
       break;
     }
     case 'offset': {
-      const tw = 180, th = 90;
-      w = tw + g; h = 2 * (th + g);
-      svg = `<rect x='${hg}' y='${hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${(tw + g) / 2 + hg}' y='${th + g + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${-(tw + g) / 2 + hg}' y='${th + g + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>`;
+      // Classic brick pattern, every other row offset 50%
+      let row = 0;
+      for (let y = 0; y < h + ts; y += ts + grout, row++) {
+        const off = (row % 2) * ((tl + grout) / 2);
+        for (let x = -tl; x < w + tl * 2; x += tl + grout) {
+          drawTile(x + off, y, tl, ts);
+        }
+      }
       break;
     }
     case 'one_third_offset': {
-      const tw = 180, th = 90;
-      const row = th + g;
-      w = tw + g; h = 3 * row;
-      const off = Math.round((tw + g) / 3);
-      svg = `<rect x='${hg}' y='${hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${hg + off}' y='${row + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${hg - (tw + g) + off}' y='${row + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${hg + 2 * off}' y='${2 * row + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${hg - (tw + g) + 2 * off}' y='${2 * row + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>`;
+      // Each row offset by 1/3 of tile length
+      let row = 0;
+      for (let y = 0; y < h + ts; y += ts + grout, row++) {
+        const off = (row % 3) * ((tl + grout) / 3);
+        for (let x = -tl; x < w + tl * 2; x += tl + grout) {
+          drawTile(x + off, y, tl, ts);
+        }
+      }
       break;
     }
     case 'herringbone': {
-      const L = 100, T = 32;
-      const d = Math.round(L * 0.707);
-      const t = Math.round(T * 0.707);
-      w = 2 * d; h = 2 * d;
-      const ne = (cx, cy) => {
-        const pts = [
-          [cx - d/2 + t/2, cy + d/2 + t/2],
-          [cx - d/2 - t/2, cy + d/2 - t/2],
-          [cx + d/2 - t/2, cy - d/2 - t/2],
-          [cx + d/2 + t/2, cy - d/2 + t/2],
-        ].map(p => p.map(v => Math.round(v)).join(',')).join(' ');
-        return `<polygon points='${pts}' fill='white'/>`;
-      };
-      const se = (cx, cy) => {
-        const pts = [
-          [cx - d/2 - t/2, cy - d/2 + t/2],
-          [cx - d/2 + t/2, cy - d/2 - t/2],
-          [cx + d/2 + t/2, cy + d/2 - t/2],
-          [cx + d/2 - t/2, cy + d/2 + t/2],
-        ].map(p => p.map(v => Math.round(v)).join(',')).join(' ');
-        return `<polygon points='${pts}' fill='white'/>`;
-      };
-      const m = d;
-      svg = ne(m * 0.5, m) + se(m * 1.5, m) +
-            ne(m * 0.5, 0) + se(m * 1.5, 0) +
-            ne(m * 0.5, 2 * m) + se(m * 1.5, 2 * m) +
-            ne(m * 1.5 + m, m) + se(m * 0.5 - m, m) +
-            ne(m * 1.5 + m, 0) + se(m * 0.5 - m, 0) +
-            ne(m * 1.5 + m, 2 * m) + se(m * 0.5 - m, 2 * m);
+      // V-shaped zigzag: tiles angled at +45 and -45 degrees
+      // Each tile is drawn rotated around its center
+      const cos45 = 0.707;
+      const hStep = (tl + ts) * cos45 / 2 + grout;
+      const vStep = tl * cos45 + grout;
+
+      for (let gy = -3; gy < h / vStep + 3; gy++) {
+        for (let gx = -3; gx < w / hStep + 3; gx++) {
+          const baseX = gx * hStep;
+          const baseY = gy * vStep;
+
+          // Tile going NE (↗) - rotated -45 degrees
+          ctx.save();
+          ctx.translate(baseX, baseY);
+          ctx.rotate(-Math.PI / 4);
+          ctx.drawImage(img, -tl / 2, -ts / 2, tl, ts);
+          ctx.restore();
+
+          // Tile going SE (↘) - rotated +45 degrees, offset
+          ctx.save();
+          ctx.translate(baseX + hStep / 2, baseY + vStep / 2);
+          ctx.rotate(Math.PI / 4);
+          ctx.drawImage(img, -tl / 2, -ts / 2, tl, ts);
+          ctx.restore();
+        }
+      }
       break;
     }
     case 'basket_weave': {
-      const tl = 90, tw = 40;
-      const cell = tl + g;
-      w = 2 * cell; h = 2 * cell;
-      svg = `<rect x='${hg}' y='${hg}' width='${tl}' height='${tw}' fill='white' rx='2'/>` +
-            `<rect x='${hg}' y='${tw + g + hg}' width='${tl}' height='${tw}' fill='white' rx='2'/>` +
-            `<rect x='${cell + hg}' y='${hg}' width='${tw}' height='${tl}' fill='white' rx='2'/>` +
-            `<rect x='${cell + tw + g + hg}' y='${hg}' width='${tw}' height='${tl}' fill='white' rx='2'/>` +
-            `<rect x='${hg}' y='${cell + hg}' width='${tw}' height='${tl}' fill='white' rx='2'/>` +
-            `<rect x='${tw + g + hg}' y='${cell + hg}' width='${tw}' height='${tl}' fill='white' rx='2'/>` +
-            `<rect x='${cell + hg}' y='${cell + hg}' width='${tl}' height='${tw}' fill='white' rx='2'/>` +
-            `<rect x='${cell + hg}' y='${cell + tw + g + hg}' width='${tl}' height='${tw}' fill='white' rx='2'/>`;
+      // Alternating: 2 horizontal tiles next to 2 vertical tiles
+      // Vertical tiles are ROTATED 90deg so the image orientation changes
+      const block = ts * 2 + grout; // 2 tiles = one block side
+      const cell = block + grout;   // cell = block + grout gap
+
+      for (let gy = -1; gy < Math.ceil(h / cell) + 2; gy++) {
+        for (let gx = -1; gx < Math.ceil(w / cell) + 2; gx++) {
+          const bx = gx * cell;
+          const by = gy * cell;
+          const isHoriz = ((gx + gy) % 2 === 0);
+
+          if (isHoriz) {
+            // 2 horizontal tiles stacked vertically
+            drawTile(bx, by, block, ts);
+            drawTile(bx, by + ts + grout, block, ts);
+          } else {
+            // 2 vertical tiles side by side — ROTATED 90 degrees
+            ctx.save();
+            ctx.translate(bx + ts / 2, by + block / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
+            ctx.restore();
+
+            ctx.save();
+            ctx.translate(bx + ts + grout + ts / 2, by + block / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
+            ctx.restore();
+          }
+        }
+      }
       break;
     }
     case 'stepladder': {
-      const tw = 80, th = 170;
-      w = 2 * (tw + g); h = 2 * (th + g);
-      const off = Math.round((th + g) / 2);
-      svg = `<rect x='${hg}' y='${hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${hg}' y='${th + g + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${tw + g + hg}' y='${off + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${tw + g + hg}' y='${off + th + g + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>` +
-            `<rect x='${tw + g + hg}' y='${off - th - g + hg}' width='${tw}' height='${th}' fill='white' rx='2'/>`;
+      // Vertical tiles with staggered horizontal joints
+      let col = 0;
+      for (let x = 0; x < w + ts; x += ts + grout, col++) {
+        const off = col * ((tl + grout) / 3);
+        for (let y = -tl * 2; y < h + tl * 2; y += tl + grout) {
+          drawTile(x, y + off, ts, tl);
+        }
+      }
       break;
     }
     case 'diagonal': {
-      const ts = 120;
-      w = ts + g; h = ts + g;
-      const rects = [];
-      for (let r = -3; r < 4; r++) {
-        for (let c = -3; c < 4; c++) {
-          rects.push(`<rect x='${c * (ts + g) + hg}' y='${r * (ts + g) + hg}' width='${ts}' height='${ts}' fill='white' rx='2'/>`);
+      // Square tiles rotated 45 degrees
+      const step = sq + grout;
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(Math.PI / 4);
+      const range = Math.max(w, h) * 2;
+      for (let y = -range; y < range; y += step) {
+        for (let x = -range; x < range; x += step) {
+          ctx.drawImage(img, x, y, sq, sq);
         }
       }
-      svg = `<g transform='rotate(45, ${w / 2}, ${h / 2})'>${rects.join('')}</g>`;
+      ctx.restore();
       break;
     }
-    default:
-      return null;
+    default: {
+      // No pattern — just draw tile image as cover
+      ctx.drawImage(img, 0, 0, w, h);
+    }
   }
+};
 
-  if (!svg) return null;
-  const full = `<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'>${svg}</svg>`;
-  const enc = encodeURIComponent(full);
-  return {
-    WebkitMaskImage: `url("data:image/svg+xml,${enc}")`,
-    maskImage: `url("data:image/svg+xml,${enc}")`,
-    WebkitMaskSize: `${w}px ${h}px`,
-    maskSize: `${w}px ${h}px`,
-    WebkitMaskRepeat: 'repeat',
-    maskRepeat: 'repeat',
-  };
+// React component that renders tile pattern on a canvas
+const TilePatternCanvas = ({ pattern, imageUrl }) => {
+  const containerRef = React.useRef(null);
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
+    if (!container || !canvas || !imageUrl) return;
+
+    const w = container.clientWidth || 800;
+    const h = container.clientHeight || 200;
+
+    // Set canvas pixel dimensions
+    canvas.width = w;
+    canvas.height = h;
+
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = imageUrl;
+
+    img.onload = () => {
+      drawTilePattern(ctx, img, pattern, w, h);
+    };
+
+    img.onerror = () => {
+      // CORS failed - try without crossOrigin using a fallback
+      const img2 = new Image();
+      img2.src = imageUrl;
+      img2.onload = () => {
+        drawTilePattern(ctx, img2, pattern, w, h);
+      };
+      img2.onerror = () => {
+        // Final fallback: draw colored rectangles in the pattern
+        ctx.fillStyle = '#ddd';
+        ctx.fillRect(0, 0, w, h);
+      };
+    };
+  }, [pattern, imageUrl]);
+
+  return (
+    <div ref={containerRef} className="absolute inset-0">
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
+    </div>
+  );
 };
 
 
-// WALL ZONE - grout background + masked tile image
+// WALL ZONE — shows actual tile images drawn in the actual pattern
 const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern }) => {
   const hasImage = mat?.image;
   const patternLabel = mat?.pattern ? TILE_PATTERNS.find(p => p.value === mat.pattern)?.label : null;
-  const maskCSS = mat?.pattern ? getPatternMask(mat.pattern) : null;
 
   return (
     <div
@@ -195,33 +279,29 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
       style={{ top: `${zone.top}%`, height: `${zone.height}%` }}
       onClick={onClickZone}
     >
-      {/* GROUT BACKGROUND visible in gaps between tile shapes */}
-      {hasImage && (
-        <div className="absolute inset-0" style={{ background: '#c8bfb0' }} />
+      {/* TILE PATTERN: Canvas draws every individual tile at the correct position/rotation */}
+      {hasImage && mat.pattern && (
+        <TilePatternCanvas pattern={mat.pattern} imageUrl={mat.image} />
       )}
 
-      {/* TILE IMAGE CSS masked into tile shapes */}
-      {hasImage && (
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${mat.image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            ...(maskCSS || {}),
-          }}
-        />
+      {/* NO PATTERN: just show the tile image as cover */}
+      {hasImage && !mat.pattern && (
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url(${mat.image})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }} />
       )}
 
-      {/* Empty zone subtle tint */}
+      {/* Empty zone */}
       {!hasImage && (
-        <div className="absolute inset-0" style={{ background: 'rgba(220,220,230,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)' }} />
+        <div className="absolute inset-0" style={{ background: '#f5f5f0' }} />
       )}
 
       {/* Compact label bar at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-1" style={hasImage ? { background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' } : {}}>
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-1" style={hasImage ? { background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' } : { borderTop: '1px solid #ddd' }}>
         <div className="flex items-center gap-2 flex-wrap min-w-0">
-          <span className={`text-[11px] font-black uppercase tracking-wider ${hasImage ? 'text-white' : 'text-white/20'}`}>
+          <span className={`text-[11px] font-black uppercase tracking-wider ${hasImage ? 'text-white' : 'text-gray-400'}`}>
             {zone.label}
           </span>
           {mat && (
@@ -260,6 +340,7 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
     </div>
   );
 };
+
 
 
 // ─── WALL DIAGRAM ─────────────────────────────────────────────────────
