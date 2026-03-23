@@ -123,29 +123,36 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'herringbone': {
-      // V-shaped zigzag: tiles angled at +45 and -45 degrees
-      // Each tile is drawn rotated around its center
-      const cos45 = 0.707;
-      const hStep = (tl + ts) * cos45 / 2 + grout;
-      const vStep = tl * cos45 + grout;
+      // Herringbone: alternating rows of tiles at -45° and +45°
+      // Uses alternating tints + thick grout to make the V-pattern clear
+      const htl = Math.min(100, Math.max(30, h * 0.5));
+      const hts = Math.max(8, Math.round(htl / 3));
+      const hg = Math.max(4, grout);
 
-      for (let gy = -3; gy < h / vStep + 3; gy++) {
-        for (let gx = -3; gx < w / hStep + 3; gx++) {
-          const baseX = gx * hStep;
-          const baseY = gy * vStep;
+      const rowH = hts * 0.707 + hg / 2;
+      const colStep = htl * 0.707 + hg;
 
-          // Tile going NE (↗) - rotated -45 degrees
+      for (let row = -5; row < h / rowH + 5; row++) {
+        const angle = (row % 2 === 0) ? -Math.PI / 4 : Math.PI / 4;
+        const xOffset = (row % 2 !== 0) ? colStep / 2 : 0;
+
+        for (let col = -3; col < w / colStep + 3; col++) {
+          const cx = col * colStep + xOffset;
+          const cy = row * rowH;
+
           ctx.save();
-          ctx.translate(baseX, baseY);
-          ctx.rotate(-Math.PI / 4);
-          ctx.drawImage(img, -tl / 2, -ts / 2, tl, ts);
-          ctx.restore();
-
-          // Tile going SE (↘) - rotated +45 degrees, offset
-          ctx.save();
-          ctx.translate(baseX + hStep / 2, baseY + vStep / 2);
-          ctx.rotate(Math.PI / 4);
-          ctx.drawImage(img, -tl / 2, -ts / 2, tl, ts);
+          ctx.translate(cx, cy);
+          ctx.rotate(angle);
+          ctx.drawImage(img, -htl / 2, -hts / 2, htl, hts);
+          // Alternating tint so V-pattern is visible even with white tiles
+          if (row % 2 !== 0) {
+            ctx.fillStyle = 'rgba(0,0,0,0.07)';
+            ctx.fillRect(-htl / 2, -hts / 2, htl, hts);
+          }
+          // Thick grout border in the actual grout color
+          ctx.strokeStyle = '#9a8a75';
+          ctx.lineWidth = hg * 0.7;
+          ctx.strokeRect(-htl / 2 + 0.5, -hts / 2 + 0.5, htl - 1, hts - 1);
           ctx.restore();
         }
       }
@@ -173,12 +180,18 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
             ctx.translate(bx + ts / 2, by + block / 2);
             ctx.rotate(-Math.PI / 2);
             ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
+            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-block / 2 + 0.5, -ts / 2 + 0.5, block - 1, ts - 1);
             ctx.restore();
 
             ctx.save();
             ctx.translate(bx + ts + grout + ts / 2, by + block / 2);
             ctx.rotate(-Math.PI / 2);
             ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
+            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(-block / 2 + 0.5, -ts / 2 + 0.5, block - 1, ts - 1);
             ctx.restore();
           }
         }
@@ -205,7 +218,7 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       const range = Math.max(w, h) * 2;
       for (let y = -range; y < range; y += step) {
         for (let x = -range; x < range; x += step) {
-          ctx.drawImage(img, x, y, sq, sq);
+          drawTile(x, y, sq, sq);
         }
       }
       ctx.restore();
@@ -219,50 +232,58 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
 };
 
 // React component that renders tile pattern on a canvas
+// Uses ResizeObserver to guarantee correct dimensions (no CSS stretch distortion)
 const TilePatternCanvas = ({ pattern, imageUrl }) => {
   const containerRef = React.useRef(null);
   const canvasRef = React.useRef(null);
+  const imgRef = React.useRef(null);
 
-  React.useEffect(() => {
+  const draw = React.useCallback(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!container || !canvas || !imageUrl) return;
+    const img = imgRef.current;
+    if (!container || !canvas || !img) return;
+    if (!img.complete || img.naturalWidth === 0) return;
 
-    const w = container.clientWidth || 800;
-    const h = container.clientHeight || 200;
+    const rect = container.getBoundingClientRect();
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+    if (w < 10 || h < 10) return;
 
-    // Set canvas pixel dimensions
     canvas.width = w;
     canvas.height = h;
-
     const ctx = canvas.getContext('2d');
+    drawTilePattern(ctx, img, pattern, w, h);
+  }, [pattern]);
 
+  // Load image, store in ref
+  React.useEffect(() => {
+    if (!imageUrl) return;
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = imageUrl;
-
-    img.onload = () => {
-      drawTilePattern(ctx, img, pattern, w, h);
-    };
-
+    img.onload = () => { imgRef.current = img; draw(); };
     img.onerror = () => {
-      // CORS failed - try without crossOrigin using a fallback
       const img2 = new Image();
+      img2.onload = () => { imgRef.current = img2; draw(); };
+      img2.onerror = () => { imgRef.current = null; };
       img2.src = imageUrl;
-      img2.onload = () => {
-        drawTilePattern(ctx, img2, pattern, w, h);
-      };
-      img2.onerror = () => {
-        // Final fallback: draw colored rectangles in the pattern
-        ctx.fillStyle = '#ddd';
-        ctx.fillRect(0, 0, w, h);
-      };
     };
-  }, [pattern, imageUrl]);
+    img.src = imageUrl;
+    return () => { img.onload = null; img.onerror = null; };
+  }, [imageUrl, draw]);
+
+  // ResizeObserver redraws when container gets real dimensions or resizes
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const ro = new ResizeObserver(() => draw());
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [draw]);
 
   return (
-    <div ref={containerRef} className="absolute inset-0">
-      <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden">
+      <canvas ref={canvasRef} className="block" />
     </div>
   );
 };
@@ -275,7 +296,7 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
 
   return (
     <div
-      className={`absolute left-0 right-0 cursor-pointer transition-all group overflow-hidden ${isSelected ? 'ring-2 ring-green-400 z-10' : ''}`}
+      className={`absolute left-0 right-0 cursor-pointer transition-all group overflow-hidden`}
       style={{ top: `${zone.top}%`, height: `${zone.height}%` }}
       onClick={onClickZone}
     >
@@ -295,7 +316,13 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
 
       {/* Empty zone */}
       {!hasImage && (
-        <div className="absolute inset-0" style={{ background: '#f5f5f0' }} />
+        <div className="absolute inset-0" style={{ background: '#f5f5f0', borderBottom: '1px solid #ddd' }}>
+          {isSelected && (
+            <div className="absolute inset-0 border-2 border-dashed border-amber-400/40 bg-amber-400/5 flex items-center justify-center">
+              <span className="text-amber-600/40 text-xs font-bold">CLICK TO PLACE</span>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Compact label bar at bottom */}
