@@ -19016,6 +19016,7 @@ class MaterialEntry(BaseModel):
     link: str = ""
     position_label: str = ""
     pattern: str = ""
+    tile_crop: Optional[dict] = None
 
 class MeasurementLine(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

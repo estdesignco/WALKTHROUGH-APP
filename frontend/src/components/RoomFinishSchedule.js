@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Ruler, Plus, Trash2, MousePointer, X, Pencil, ChevronRight, Layers } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Ruler, Plus, Trash2, MousePointer, X, Pencil, Crop, Layers } from 'lucide-react';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -25,7 +25,7 @@ const LINE_COLORS = ['#FF4444', '#44AAFF', '#44FF44', '#FFAA44', '#FF44FF', '#FF
 const getItemImage = (item) =>
   item.image_url || item.finish_image || item.image || (item.photos?.length ? item.photos[0] : '') || '';
 
-// ─── SVG PATTERN THUMBNAILS (for the picker) ─────────────────────────
+// SVG PATTERN THUMBNAILS (for the picker)
 const PatternThumb = ({ pattern, size = 80 }) => {
   const s = size;
   const f = '#d6e4ed';
@@ -54,13 +54,173 @@ const PatternThumb = ({ pattern, size = 80 }) => {
 };
 
 
-// CANVAS-BASED TILE PATTERN RENDERER
-// Draws ACTUAL tile images at correct positions with realistic 3D effects.
-// Each tile is a unique crop of the source material with individual bevels,
-// brightness variation, and shadow — looks like a real tiled wall.
+// TILE CROP MODAL - Lets user select ONE individual tile from a multi-tile source image
+const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
+  const canvasRef = useRef(null);
+  const previewCanvasRef = useRef(null);
+  const imgRef = useRef(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [startPt, setStartPt] = useState(null);
+  const [crop, setCrop] = useState(existingCrop || null);
+  const scaleRef = useRef(1);
 
-const drawTilePattern = (ctx, img, pattern, w, h) => {
-  const grout = 8;
+  // Load image via proxy
+  useEffect(() => {
+    const proxyUrl = `${API_URL}/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { imgRef.current = img; setImgLoaded(true); };
+    img.onerror = () => {
+      const img2 = new Image();
+      img2.onload = () => { imgRef.current = img2; setImgLoaded(true); };
+      img2.src = imageUrl;
+    };
+    img.src = proxyUrl;
+  }, [imageUrl]);
+
+  // Draw source image + crop overlay
+  const redraw = useCallback((currentCrop) => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img) return;
+
+    const maxW = 520, maxH = 420;
+    const s = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
+    scaleRef.current = s;
+    canvas.width = Math.round(img.naturalWidth * s);
+    canvas.height = Math.round(img.naturalHeight * s);
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    if (currentCrop && currentCrop.w > 2 && currentCrop.h > 2) {
+      // Darken everything outside crop
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Redraw the cropped area at full brightness
+      const cx = currentCrop.x * s, cy = currentCrop.y * s;
+      const cw = currentCrop.w * s, ch = currentCrop.h * s;
+      ctx.drawImage(img, currentCrop.x, currentCrop.y, currentCrop.w, currentCrop.h, cx, cy, cw, ch);
+      // Green selection border
+      ctx.strokeStyle = '#00ff88';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 3]);
+      ctx.strokeRect(cx, cy, cw, ch);
+      ctx.setLineDash([]);
+
+      // Update preview canvas
+      const preview = previewCanvasRef.current;
+      if (preview) {
+        const pSize = 120;
+        const aspect = currentCrop.w / currentCrop.h;
+        preview.width = aspect >= 1 ? pSize : Math.round(pSize * aspect);
+        preview.height = aspect >= 1 ? Math.round(pSize / aspect) : pSize;
+        const pctx = preview.getContext('2d');
+        pctx.drawImage(img, currentCrop.x, currentCrop.y, currentCrop.w, currentCrop.h, 0, 0, preview.width, preview.height);
+      }
+    }
+  }, []);
+
+  useEffect(() => { if (imgLoaded) redraw(crop); }, [imgLoaded, crop, redraw]);
+
+  const getImageCoords = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect();
+    const s = scaleRef.current;
+    return {
+      x: (e.clientX - rect.left) / s,
+      y: (e.clientY - rect.top) / s,
+    };
+  };
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    setDragging(true);
+    setStartPt(getImageCoords(e));
+    setCrop(null);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!dragging || !startPt) return;
+    const pt = getImageCoords(e);
+    setCrop({
+      x: Math.round(Math.min(startPt.x, pt.x)),
+      y: Math.round(Math.min(startPt.y, pt.y)),
+      w: Math.round(Math.abs(pt.x - startPt.x)),
+      h: Math.round(Math.abs(pt.y - startPt.y)),
+    });
+  };
+
+  const handleMouseUp = () => setDragging(false);
+
+  const validCrop = crop && crop.w > 10 && crop.h > 10;
+
+  return (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.88)' }} data-testid="tile-crop-modal">
+      <div className="rounded-xl p-6 max-w-[720px] w-full mx-4" style={{ background: '#1c1c2a', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <h3 className="text-white font-black text-lg mb-1">EXTRACT SINGLE TILE</h3>
+        <p className="text-white/50 text-sm mb-4">
+          Click and drag a rectangle around <span className="text-green-400 font-bold">ONE individual tile</span> in the source image below.
+          This extracted tile will be used to build your pattern.
+        </p>
+
+        <div className="flex gap-5 items-start">
+          <div className="flex-1 overflow-auto rounded border border-white/10" style={{ background: '#111' }}>
+            {!imgLoaded ? (
+              <div className="flex items-center justify-center h-48 text-white/30 text-sm">Loading image...</div>
+            ) : (
+              <canvas
+                ref={canvasRef}
+                className="cursor-crosshair block mx-auto"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={() => { if (dragging) setDragging(false); }}
+              />
+            )}
+          </div>
+
+          {validCrop && (
+            <div className="w-40 flex-shrink-0">
+              <div className="text-[10px] font-black text-green-400 mb-2 tracking-wider">EXTRACTED TILE:</div>
+              <div className="rounded border-2 border-green-400/50 overflow-hidden" style={{ background: '#fff' }}>
+                <canvas ref={previewCanvasRef} className="block mx-auto" />
+              </div>
+              <div className="text-[9px] text-white/30 mt-1.5">
+                {crop.w} x {crop.h} px from source
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3 mt-5">
+          <button
+            disabled={!validCrop}
+            onClick={() => onConfirm(crop)}
+            className="px-6 py-2.5 rounded-lg text-sm font-black text-black bg-green-400 hover:bg-green-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            data-testid="crop-confirm-btn"
+          >
+            USE THIS TILE
+          </button>
+          <button
+            onClick={onCancel}
+            className="px-4 py-2.5 rounded-lg text-sm text-white/50 border border-white/20 hover:border-white/40 transition-colors"
+            data-testid="crop-cancel-btn"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// CANVAS TILE PATTERN RENDERER
+// Draws the SINGLE EXTRACTED TILE at correct positions for each pattern.
+// tileCrop = { x, y, w, h } pixel coords in the source image for the single tile.
+const drawTilePattern = (ctx, img, pattern, w, h, tileCrop) => {
+  const grout = 6;
   const gc = '#4a4035';
 
   ctx.fillStyle = gc;
@@ -69,78 +229,38 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
   const imgW = img.naturalWidth || 200;
   const imgH = img.naturalHeight || 200;
 
-  // Each tile: unique crop + DRAMATIC individual character
-  // For white/uniform tiles, the #1 visual distinction comes from:
-  // 1) Strong bevel edges (like real subway tile with cushion edge)
-  // 2) Significant brightness differences per tile
-  // 3) Glaze reflection at different angles
+  // Source region: the single extracted tile, or fallback to whole image
+  const src = tileCrop && tileCrop.w > 0 && tileCrop.h > 0
+    ? tileCrop
+    : { x: 0, y: 0, w: imgW, h: imgH };
+
+  // Draw one tile at position (x, y) with dimensions (tw, th)
+  // Uses the SAME single extracted tile for every position
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
+
+    // Draw the single extracted tile scaled to fill this slot
+    ctx.drawImage(img, src.x, src.y, src.w, src.h, x, y, tw, th);
+
+    // Subtle per-tile brightness variation for realism
     const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
-    const hash2 = Math.abs(((x * 6271 + y * 83777) | 0) % 10000);
-
-    // 1) Base material image crop
-    const cropW = imgW * 0.55;
-    const cropH = imgH * 0.55;
-    const sx = (hash % Math.max(1, Math.floor(imgW - cropW)));
-    const sy = ((hash * 3) % Math.max(1, Math.floor(imgH - cropH)));
-    ctx.drawImage(img, sx, sy, cropW, cropH, x, y, tw, th);
-
-    // 2) DRAMATIC brightness shift — ±35%
-    //    This is what makes each tile visibly different on a white wall
-    const bright = ((hash % 15) - 7) * 0.05;
-    ctx.fillStyle = bright > 0 ? `rgba(255,255,255,${bright})` : `rgba(0,0,0,${-bright})`;
-    ctx.fillRect(x, y, tw, th);
-
-    // 3) Warm/cool color tint per tile
-    const warmth = ((hash * 7) % 7) - 3;
-    if (warmth > 0) {
-      ctx.fillStyle = `rgba(255,230,180,${warmth * 0.04})`;
-      ctx.fillRect(x, y, tw, th);
-    } else if (warmth < 0) {
-      ctx.fillStyle = `rgba(180,210,255,${-warmth * 0.04})`;
+    const bright = ((hash % 7) - 3) * 0.012;
+    if (bright !== 0) {
+      ctx.fillStyle = bright > 0 ? `rgba(255,255,255,${bright})` : `rgba(0,0,0,${-bright})`;
       ctx.fillRect(x, y, tw, th);
     }
 
-    // 4) GLAZE REFLECTION — wide diagonal highlight band across the tile
-    const angle = ((hash2 % 6) * 30 + 15) * Math.PI / 180;
-    const cx = x + tw / 2, cy = y + th / 2;
-    const len = Math.max(tw, th) * 0.7;
-    const grad = ctx.createLinearGradient(
-      cx - Math.cos(angle) * len, cy - Math.sin(angle) * len,
-      cx + Math.cos(angle) * len, cy + Math.sin(angle) * len
-    );
-    const hi = 0.12 + (hash2 % 12) * 0.025;
-    grad.addColorStop(0, `rgba(255,255,255,${hi})`);
-    grad.addColorStop(0.35, `rgba(255,255,255,${hi * 0.3})`);
-    grad.addColorStop(0.5, 'rgba(0,0,0,0)');
-    grad.addColorStop(0.65, `rgba(0,0,0,${hi * 0.25})`);
-    grad.addColorStop(1, `rgba(0,0,0,${hi * 0.7})`);
-    ctx.fillStyle = grad;
-    ctx.fillRect(x, y, tw, th);
-
-    // 5) THICK 3D BEVEL — the signature look of subway tile
-    const bev = Math.max(5, Math.min(tw, th) * 0.12);
-    // Top edge bright highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    // Very subtle edge highlight/shadow for depth
+    const bev = Math.max(1, Math.min(tw, th) * 0.03);
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
     ctx.fillRect(x, y, tw, bev);
-    // Left edge highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillRect(x, y + bev, bev, th - bev * 2);
-    // Bottom edge deep shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(x, y, bev, th);
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
     ctx.fillRect(x, y + th - bev, tw, bev);
-    // Right edge shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.fillRect(x + tw - bev, y + bev, bev, th - bev * 2);
-    // Corner accents for depth
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.fillRect(x, y, bev, bev);
-    ctx.fillStyle = 'rgba(0,0,0,0.7)';
-    ctx.fillRect(x + tw - bev, y + th - bev, bev, bev);
+    ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
-  // Tile dimensions — 3:1 ratio subway tile proportional to zone
+  // Tile dimensions proportional to the zone
   const tl = Math.max(80, Math.min(160, h * 0.7));
   const ts = Math.max(22, Math.round(tl / 3));
   const sq = Math.max(50, Math.min(100, h * 0.45));
@@ -178,7 +298,6 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'herringbone': {
-      // Classic 90-degree herringbone: alternating V + H tiles in zigzag
       const sL = Math.min(tl, Math.max(40, h * 0.55));
       const sS = Math.max(14, Math.round(sL / 3));
       const diagX = sL + g;
@@ -248,8 +367,7 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
 };
 
 // React component that renders tile pattern on a canvas
-// Uses ResizeObserver to guarantee correct dimensions (no CSS stretch distortion)
-const TilePatternCanvas = ({ pattern, imageUrl }) => {
+const TilePatternCanvas = ({ pattern, imageUrl, tileCrop }) => {
   const containerRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const imgRef = React.useRef(null);
@@ -272,25 +390,26 @@ const TilePatternCanvas = ({ pattern, imageUrl }) => {
     canvas.style.height = h + 'px';
 
     const ctx = canvas.getContext('2d');
-    drawTilePattern(ctx, img, pattern, w, h);
-  }, [pattern]);
+    drawTilePattern(ctx, img, pattern, w, h, tileCrop);
+  }, [pattern, tileCrop]);
 
   React.useEffect(() => {
     if (!imageUrl) return;
-    // Route through backend proxy to avoid CORS blocking canvas rendering
     const proxyUrl = `${API_URL}/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
     const img = new Image();
+    img.crossOrigin = 'anonymous';
     img.onload = () => { imgRef.current = img; draw(); };
     img.onerror = () => {
-      // Fallback: try direct URL without crossOrigin (tainted canvas is fine)
       const img2 = new Image();
       img2.onload = () => { imgRef.current = img2; draw(); };
-      img2.onerror = () => { imgRef.current = null; };
       img2.src = imageUrl;
     };
     img.src = proxyUrl;
     return () => { img.onload = null; img.onerror = null; };
   }, [imageUrl, draw]);
+
+  // Re-draw when pattern or tileCrop changes
+  React.useEffect(() => { draw(); }, [draw]);
 
   React.useEffect(() => {
     const container = containerRef.current;
@@ -308,20 +427,27 @@ const TilePatternCanvas = ({ pattern, imageUrl }) => {
 };
 
 
-// WALL ZONE — shows actual tile images drawn in the actual pattern
-const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern }) => {
+// WALL ZONE - shows actual tile images drawn in the selected pattern
+const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern, onCropTile }) => {
   const hasImage = mat?.image;
+  const hasCrop = mat?.tile_crop && mat.tile_crop.w > 0;
   const patternLabel = mat?.pattern ? TILE_PATTERNS.find(p => p.value === mat.pattern)?.label : null;
 
   return (
     <div
-      className={`absolute left-0 right-0 cursor-pointer transition-all group overflow-hidden`}
+      className="absolute left-0 right-0 cursor-pointer transition-all group overflow-hidden"
       style={{ top: `${zone.top}%`, height: `${zone.height}%` }}
       onClick={onClickZone}
+      data-testid={`wall-zone-${zone.id}`}
     >
-      {/* TILE PATTERN: Canvas draws every individual tile at the correct position/rotation */}
+      {/* TILE PATTERN: Canvas draws every individual tile at the correct position */}
       {hasImage && mat.pattern && (
-        <TilePatternCanvas key={`${mat.pattern}-${mat.id}`} pattern={mat.pattern} imageUrl={mat.image} />
+        <TilePatternCanvas
+          key={`${mat.pattern}-${mat.id}-${hasCrop ? 'cropped' : 'raw'}`}
+          pattern={mat.pattern}
+          imageUrl={mat.image}
+          tileCrop={mat.tile_crop}
+        />
       )}
 
       {/* NO PATTERN: just show the tile image as cover */}
@@ -341,6 +467,13 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
               <span className="text-amber-600/40 text-xs font-bold">CLICK TO PLACE</span>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Warning if tile placed but no crop defined yet */}
+      {hasImage && !hasCrop && (
+        <div className="absolute top-1 left-1 px-2 py-0.5 rounded text-[9px] font-black text-orange-300 bg-black/70 animate-pulse z-10">
+          CROP A SINGLE TILE TO FIX PATTERN
         </div>
       )}
 
@@ -368,6 +501,9 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
           {mat && (
             <>
+              <button onClick={e => { e.stopPropagation(); onCropTile(); }} className={`px-2 py-1 rounded text-[10px] font-black flex items-center gap-1 ${hasCrop ? 'text-green-300 bg-black/80 hover:bg-black border border-green-400/40' : 'text-orange-300 bg-black/80 hover:bg-black border border-orange-400/60 animate-pulse'}`} data-testid={`crop-btn-${zone.id}`}>
+                <Crop size={10} />CROP TILE
+              </button>
               <button onClick={e => { e.stopPropagation(); onOpenPattern(); }} className="px-2 py-1 rounded text-[10px] font-black text-amber-300 bg-black/80 hover:bg-black border border-amber-400/40" data-testid={`pattern-btn-${zone.id}`}>
                 PATTERN
               </button>
@@ -388,9 +524,8 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
 };
 
 
-
-// ─── WALL DIAGRAM ─────────────────────────────────────────────────────
-const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onChangePattern }) => {
+// WALL DIAGRAM
+const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onChangePattern, onCropTile }) => {
   const [patternPickerZone, setPatternPickerZone] = useState(null);
 
   const defaultZones = [
@@ -407,11 +542,8 @@ const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onC
 
   return (
     <div data-testid={`wall-diagram-${surface.id}`}>
-      {/* THE WALL - light background like a real elevation drawing */}
       <div className="relative w-full rounded-lg overflow-hidden" style={{ height: '560px', border: '3px solid #888', background: '#f5f5f0', boxShadow: 'inset 0 0 30px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.3)' }}>
-        {/* Top trim */}
         <div className="absolute top-0 left-0 right-0 h-1" style={{ background: '#aaa' }} />
-        {/* Bottom trim */}
         <div className="absolute bottom-0 left-0 right-0 h-1" style={{ background: '#999' }} />
 
         {defaultZones.map(zone => {
@@ -425,12 +557,13 @@ const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onC
               onClickZone={() => { if (selectedItem) onPlaceItem(surface.id, zone.id, selectedItem); }}
               onRemove={() => mat && onRemoveMaterial(surface.id, mat.id)}
               onOpenPattern={() => setPatternPickerZone(patternPickerZone === zone.id ? null : zone.id)}
+              onCropTile={() => mat && onCropTile(surface.id, mat.id, mat.image, mat.tile_crop)}
             />
           );
         })}
       </div>
 
-      {/* Pattern picker - BIG visual grid */}
+      {/* Pattern picker */}
       {patternPickerZone && zoneMap[patternPickerZone] && (
         <div className="mt-3 p-4 rounded-xl border-2 border-amber-400/30 shadow-2xl" style={{ background: 'rgba(0,0,0,0.97)' }} data-testid="pattern-picker">
           <div className="flex justify-between items-center mb-3">
@@ -461,7 +594,7 @@ const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onC
 };
 
 
-// ─── MEASUREMENT CANVAS ──────────────────────────────────────────────
+// MEASUREMENT CANVAS
 const MeasurementCanvas = ({ lines = [], onLinesChange }) => {
   const svgRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
@@ -535,7 +668,7 @@ const MeasurementCanvas = ({ lines = [], onLinesChange }) => {
 };
 
 
-// ─── MAIN COMPONENT ──────────────────────────────────────────────────
+// MAIN COMPONENT
 const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const [schedules, setSchedules] = useState([]);
   const [activeSchedule, setActiveSchedule] = useState(null);
@@ -548,6 +681,14 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showMeasurements, setShowMeasurements] = useState(false);
   const saveTimeoutRef = useRef(null);
+
+  // Crop modal state
+  const [cropModal, setCropModal] = useState(null);
+  // cropModal = { surfaceId, materialId, imageUrl, existingCrop, mode: 'place' | 'edit' }
+  // mode 'place': placing a new tile, need crop before finalizing
+  // mode 'edit': re-cropping an existing material
+  const pendingPlaceRef = useRef(null);
+  // pendingPlaceRef = { surfaceId, zoneId, item } — stored when user clicks zone to place
 
   const fetchSchedules = useCallback(async () => {
     try {
@@ -622,7 +763,45 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     } catch (err) { console.error(err); }
   };
 
-  const placeItemOnZone = (surfaceId, zoneId, item) => {
+  // Check if this item already has a tile_crop defined somewhere in the active schedule
+  const findExistingCropForItem = (itemId) => {
+    if (!activeSchedule) return null;
+    for (const surface of activeSchedule.surfaces) {
+      for (const mat of surface.materials) {
+        if (mat.item_id === itemId && mat.tile_crop && mat.tile_crop.w > 0) {
+          return mat.tile_crop;
+        }
+      }
+    }
+    return null;
+  };
+
+  // PLACE ITEM: When user clicks a zone to place a tile
+  const handlePlaceRequest = (surfaceId, zoneId, item) => {
+    if (!activeSchedule || !item) return;
+
+    // Check if this item already has a crop from another placement
+    const existingCrop = findExistingCropForItem(item.id);
+
+    if (existingCrop) {
+      // Reuse existing crop — place immediately without showing modal
+      placeItemWithCrop(surfaceId, zoneId, item, existingCrop);
+    } else if (item._img) {
+      // No crop yet — show the crop modal
+      pendingPlaceRef.current = { surfaceId, zoneId, item };
+      setCropModal({
+        imageUrl: item._img,
+        existingCrop: null,
+        mode: 'place',
+      });
+    } else {
+      // No image — place without crop
+      placeItemWithCrop(surfaceId, zoneId, item, null);
+    }
+  };
+
+  // Actually place the item with crop data
+  const placeItemWithCrop = (surfaceId, zoneId, item, tileCrop) => {
     if (!activeSchedule) return;
     const updatedSurfaces = activeSchedule.surfaces.map(s => {
       if (s.id !== surfaceId) return s;
@@ -631,10 +810,56 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         id: crypto.randomUUID(), item_id: item.id, name: item.name || '', vendor: item.vendor || '',
         sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
         image: item._img || '', link: item.link || '', position_label: zoneId, pattern: '',
+        tile_crop: tileCrop,
       }] };
     });
     const updated = { ...activeSchedule, surfaces: updatedSurfaces };
     setActiveSchedule(updated); debouncedSave(updated);
+  };
+
+  // Handle crop confirmation from the modal
+  const handleCropConfirm = (crop) => {
+    if (cropModal?.mode === 'place' && pendingPlaceRef.current) {
+      // Placing a new tile
+      const { surfaceId, zoneId, item } = pendingPlaceRef.current;
+      placeItemWithCrop(surfaceId, zoneId, item, crop);
+      pendingPlaceRef.current = null;
+    } else if (cropModal?.mode === 'edit' && cropModal.surfaceId && cropModal.materialId) {
+      // Re-cropping an existing material
+      updateMaterialCrop(cropModal.surfaceId, cropModal.materialId, crop);
+    }
+    setCropModal(null);
+  };
+
+  // Handle crop cancel
+  const handleCropCancel = () => {
+    if (cropModal?.mode === 'place' && pendingPlaceRef.current) {
+      // User cancelled — don't place the tile
+      pendingPlaceRef.current = null;
+    }
+    setCropModal(null);
+  };
+
+  // Update crop on an existing material
+  const updateMaterialCrop = (surfaceId, materialId, crop) => {
+    if (!activeSchedule) return;
+    const updatedSurfaces = activeSchedule.surfaces.map(s => {
+      if (s.id !== surfaceId) return s;
+      return { ...s, materials: s.materials.map(m => m.id === materialId ? { ...m, tile_crop: crop } : m) };
+    });
+    const updated = { ...activeSchedule, surfaces: updatedSurfaces };
+    setActiveSchedule(updated); debouncedSave(updated);
+  };
+
+  // Open crop modal for an existing material (re-crop)
+  const handleCropTile = (surfaceId, materialId, imageUrl, existingCrop) => {
+    setCropModal({
+      surfaceId,
+      materialId,
+      imageUrl,
+      existingCrop: existingCrop || null,
+      mode: 'edit',
+    });
   };
 
   const removeMaterial = (surfaceId, materialId) => {
@@ -683,16 +908,26 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   return (
     <div data-testid="room-finish-schedule" style={{ background: '#1a1a24' }} className="rounded-xl">
 
-      {/* ═══ MATERIAL PALETTE — always visible ═══ */}
+      {/* Crop Modal */}
+      {cropModal && (
+        <TileCropModal
+          imageUrl={cropModal.imageUrl}
+          existingCrop={cropModal.existingCrop}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
+      )}
+
+      {/* MATERIAL PALETTE */}
       <div className="p-4 border-b border-white/10" style={{ background: 'linear-gradient(180deg, #222230 0%, #1a1a24 100%)' }}>
         <div className="flex justify-between items-center mb-3">
           <div>
             <h3 className="text-lg font-black text-white">{roomName} — Finish Schedule</h3>
             <div className="text-xs text-amber-400/80 font-bold mt-0.5">
               {selectedItem ? (
-                <span className="text-green-400 animate-pulse">SELECTED: {selectedItem.name} — now click a zone on the wall to place it</span>
+                <span className="text-green-400 animate-pulse">SELECTED: {selectedItem.name} — click a zone on the wall to place it</span>
               ) : (
-                'Step 1: Click a tile below to select it'
+                'Step 1: Click a tile below to select it. Step 2: Click a wall zone to place. Step 3: Crop one tile from the image.'
               )}
             </div>
           </div>
@@ -702,7 +937,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           </div>
         </div>
 
-        {/* Tile/Material swatches */}
         {roomItems.length === 0 ? (
           <div className="text-white/20 text-sm py-4 text-center">No items in this room — add items via Checklist or FF&E first</div>
         ) : (
@@ -738,7 +972,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         )}
       </div>
 
-      {/* ═══ SCHEDULE CONTENT ═══ */}
+      {/* SCHEDULE CONTENT */}
       <div className="p-4">
         {/* Schedule tabs + actions */}
         <div className="flex justify-between items-center mb-3">
@@ -773,7 +1007,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
 
         {activeSchedule ? (
           <div>
-            {/* Measurement canvas */}
             {showMeasurements && (
               <div className="mb-4">
                 <MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} />
@@ -782,7 +1015,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
 
             {!selectedItem && (
               <div className="mb-3 text-center text-white/20 text-xs font-bold">
-                Step 2: Click a zone on the wall to place tile &bull; Step 3: Click PATTERN to set the tile pattern
+                Select a tile from the palette above, then click a zone on the wall to place it
               </div>
             )}
 
@@ -797,9 +1030,10 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
                   <WallDiagram
                     surface={surface}
                     selectedItem={selectedItem}
-                    onPlaceItem={placeItemOnZone}
+                    onPlaceItem={handlePlaceRequest}
                     onRemoveMaterial={removeMaterial}
                     onChangePattern={changePattern}
+                    onCropTile={handleCropTile}
                   />
                 </div>
               ))}
