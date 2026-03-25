@@ -265,8 +265,13 @@ const TilePatternCanvas = ({ pattern, imageUrl }) => {
     const h = Math.round(rect.height);
     if (w < 10 || h < 10) return;
 
+    // Set BOTH canvas pixel buffer AND CSS display to EXACT same dimensions
+    // This makes stretching/distortion physically impossible
     canvas.width = w;
     canvas.height = h;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+
     const ctx = canvas.getContext('2d');
     drawTilePattern(ctx, img, pattern, w, h);
   }, [pattern]);
@@ -298,7 +303,7 @@ const TilePatternCanvas = ({ pattern, imageUrl }) => {
 
   return (
     <div ref={containerRef} className="absolute inset-0 overflow-hidden">
-      <canvas ref={canvasRef} className="block" />
+      <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, display: 'block' }} />
     </div>
   );
 };
@@ -317,7 +322,7 @@ const WallZone = ({ zone, mat, isSelected, onClickZone, onRemove, onOpenPattern 
     >
       {/* TILE PATTERN: Canvas draws every individual tile at the correct position/rotation */}
       {hasImage && mat.pattern && (
-        <TilePatternCanvas pattern={mat.pattern} imageUrl={mat.image} />
+        <TilePatternCanvas key={`${mat.pattern}-${mat.id}`} pattern={mat.pattern} imageUrl={mat.image} />
       )}
 
       {/* NO PATTERN: just show the tile image as cover */}
