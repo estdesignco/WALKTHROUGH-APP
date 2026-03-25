@@ -60,8 +60,8 @@ const PatternThumb = ({ pattern, size = 80 }) => {
 // brightness variation, and shadow — looks like a real tiled wall.
 
 const drawTilePattern = (ctx, img, pattern, w, h) => {
-  const grout = 6;
-  const gc = '#7a6e5e';
+  const grout = 8;
+  const gc = '#4a4035';
 
   ctx.fillStyle = gc;
   ctx.fillRect(0, 0, w, h);
@@ -69,44 +69,75 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
   const imgW = img.naturalWidth || 200;
   const imgH = img.naturalHeight || 200;
 
-  // Each tile: unique crop + brightness shift + thick 3D bevel
+  // Each tile: unique crop + DRAMATIC individual character
+  // For white/uniform tiles, the #1 visual distinction comes from:
+  // 1) Strong bevel edges (like real subway tile with cushion edge)
+  // 2) Significant brightness differences per tile
+  // 3) Glaze reflection at different angles
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
     const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
+    const hash2 = Math.abs(((x * 6271 + y * 83777) | 0) % 10000);
+
+    // 1) Base material image crop
     const cropW = imgW * 0.55;
     const cropH = imgH * 0.55;
     const sx = (hash % Math.max(1, Math.floor(imgW - cropW)));
     const sy = ((hash * 3) % Math.max(1, Math.floor(imgH - cropH)));
     ctx.drawImage(img, sx, sy, cropW, cropH, x, y, tw, th);
 
-    // Strong brightness variation per tile (±20%)
-    const v = ((hash % 11) - 5) * 0.04;
-    ctx.fillStyle = v > 0 ? `rgba(255,255,255,${v})` : `rgba(0,0,0,${-v})`;
+    // 2) DRAMATIC brightness shift — ±35%
+    //    This is what makes each tile visibly different on a white wall
+    const bright = ((hash % 15) - 7) * 0.05;
+    ctx.fillStyle = bright > 0 ? `rgba(255,255,255,${bright})` : `rgba(0,0,0,${-bright})`;
     ctx.fillRect(x, y, tw, th);
 
-    // Thick 3D bevels — highly visible raised edges
-    const bev = Math.max(4, Math.min(tw, th) * 0.09);
-    // Top highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.fillRect(x, y, tw, bev);
-    // Left highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.38)';
-    ctx.fillRect(x, y + bev, bev, th - bev);
-    // Bottom shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.50)';
-    ctx.fillRect(x, y + th - bev, tw, bev);
-    // Right shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.35)';
-    ctx.fillRect(x + tw - bev, y, bev, th - bev);
+    // 3) Warm/cool color tint per tile
+    const warmth = ((hash * 7) % 7) - 3;
+    if (warmth > 0) {
+      ctx.fillStyle = `rgba(255,230,180,${warmth * 0.04})`;
+      ctx.fillRect(x, y, tw, th);
+    } else if (warmth < 0) {
+      ctx.fillStyle = `rgba(180,210,255,${-warmth * 0.04})`;
+      ctx.fillRect(x, y, tw, th);
+    }
 
-    // Inner highlight line (catches light on the flat face)
-    ctx.fillStyle = 'rgba(255,255,255,0.13)';
-    ctx.fillRect(x + bev, y + bev, tw - bev * 2, 1);
-    ctx.fillRect(x + bev, y + bev, 1, th - bev * 2);
-    // Inner shadow line
-    ctx.fillStyle = 'rgba(0,0,0,0.13)';
-    ctx.fillRect(x + bev, y + th - bev - 1, tw - bev * 2, 1);
-    ctx.fillRect(x + tw - bev - 1, y + bev, 1, th - bev * 2);
+    // 4) GLAZE REFLECTION — wide diagonal highlight band across the tile
+    const angle = ((hash2 % 6) * 30 + 15) * Math.PI / 180;
+    const cx = x + tw / 2, cy = y + th / 2;
+    const len = Math.max(tw, th) * 0.7;
+    const grad = ctx.createLinearGradient(
+      cx - Math.cos(angle) * len, cy - Math.sin(angle) * len,
+      cx + Math.cos(angle) * len, cy + Math.sin(angle) * len
+    );
+    const hi = 0.12 + (hash2 % 12) * 0.025;
+    grad.addColorStop(0, `rgba(255,255,255,${hi})`);
+    grad.addColorStop(0.35, `rgba(255,255,255,${hi * 0.3})`);
+    grad.addColorStop(0.5, 'rgba(0,0,0,0)');
+    grad.addColorStop(0.65, `rgba(0,0,0,${hi * 0.25})`);
+    grad.addColorStop(1, `rgba(0,0,0,${hi * 0.7})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y, tw, th);
+
+    // 5) THICK 3D BEVEL — the signature look of subway tile
+    const bev = Math.max(5, Math.min(tw, th) * 0.12);
+    // Top edge bright highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillRect(x, y, tw, bev);
+    // Left edge highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillRect(x, y + bev, bev, th - bev * 2);
+    // Bottom edge deep shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(x, y + th - bev, tw, bev);
+    // Right edge shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.fillRect(x + tw - bev, y + bev, bev, th - bev * 2);
+    // Corner accents for depth
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillRect(x, y, bev, bev);
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(x + tw - bev, y + th - bev, bev, bev);
   };
 
   // Tile dimensions — 3:1 ratio subway tile proportional to zone
