@@ -18290,6 +18290,24 @@ async def restore_contacts(data: dict):
         raise HTTPException(status_code=500, detail=f"Restore failed: {str(e)}")
 
 
+@api_router.get("/proxy-image")
+async def proxy_image(url: str):
+    """Proxy external images to avoid CORS issues with canvas rendering"""
+    import aiohttp
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+                if resp.status != 200:
+                    raise HTTPException(status_code=resp.status, detail="Image fetch failed")
+                content = await resp.read()
+                content_type = resp.headers.get('content-type', 'image/png')
+                return Response(content=content, media_type=content_type, headers={
+                    "Cache-Control": "public, max-age=86400",
+                    "Access-Control-Allow-Origin": "*",
+                })
+    except aiohttp.ClientError as e:
+        raise HTTPException(status_code=502, detail=f"Failed to fetch image: {str(e)}")
+
 app.include_router(api_router)
 
 

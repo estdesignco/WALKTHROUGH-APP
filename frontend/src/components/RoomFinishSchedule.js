@@ -55,13 +55,13 @@ const PatternThumb = ({ pattern, size = 80 }) => {
 
 
 // CANVAS-BASED TILE PATTERN RENDERER
-// Draws the ACTUAL tile image at every position in the pattern
-// Each individual tile is drawn at the correct position and rotation
-// Grout gaps between tiles. This looks like REAL TILES on a REAL WALL.
+// Draws ACTUAL tile images at correct positions with realistic 3D effects.
+// Each tile is a unique crop of the source material with individual bevels,
+// brightness variation, and shadow — looks like a real tiled wall.
 
 const drawTilePattern = (ctx, img, pattern, w, h) => {
-  const grout = 8;
-  const gc = '#a89880';
+  const grout = 6;
+  const gc = '#7a6e5e';
 
   ctx.fillStyle = gc;
   ctx.fillRect(0, 0, w, h);
@@ -69,170 +69,121 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
   const imgW = img.naturalWidth || 200;
   const imgH = img.naturalHeight || 200;
 
-  // CRITICAL: Each tile shows a DIFFERENT crop of the source image
-  // AND has slight brightness variation so even uniform tiles look individual
+  // Each tile: unique crop + brightness shift + thick 3D bevel
   const drawTile = (x, y, tw, th) => {
+    if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
     const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
-    const cropW = imgW * 0.6;
-    const cropH = imgH * 0.6;
+    const cropW = imgW * 0.55;
+    const cropH = imgH * 0.55;
     const sx = (hash % Math.max(1, Math.floor(imgW - cropW)));
     const sy = ((hash * 3) % Math.max(1, Math.floor(imgH - cropH)));
     ctx.drawImage(img, sx, sy, cropW, cropH, x, y, tw, th);
 
-    // Random brightness variation — makes each tile visually distinct
-    // even for uniform materials like white subway tile
-    const variation = ((hash % 9) - 4) * 0.018;
-    if (variation > 0) {
-      ctx.fillStyle = `rgba(255,255,255,${variation})`;
-    } else {
-      ctx.fillStyle = `rgba(0,0,0,${-variation})`;
-    }
+    // Strong brightness variation per tile (±20%)
+    const v = ((hash % 11) - 5) * 0.04;
+    ctx.fillStyle = v > 0 ? `rgba(255,255,255,${v})` : `rgba(0,0,0,${-v})`;
     ctx.fillRect(x, y, tw, th);
 
-    // STRONG 3D bevel — each tile looks like a raised physical piece
-    const bev = Math.max(3, Math.min(tw, th) * 0.06);
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    // Thick 3D bevels — highly visible raised edges
+    const bev = Math.max(4, Math.min(tw, th) * 0.09);
+    // Top highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
     ctx.fillRect(x, y, tw, bev);
-    ctx.fillRect(x, y, bev, th);
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    // Left highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.38)';
+    ctx.fillRect(x, y + bev, bev, th - bev);
+    // Bottom shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.50)';
     ctx.fillRect(x, y + th - bev, tw, bev);
-    ctx.fillRect(x + tw - bev, y, bev, th);
+    // Right shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(x + tw - bev, y, bev, th - bev);
+
+    // Inner highlight line (catches light on the flat face)
+    ctx.fillStyle = 'rgba(255,255,255,0.13)';
+    ctx.fillRect(x + bev, y + bev, tw - bev * 2, 1);
+    ctx.fillRect(x + bev, y + bev, 1, th - bev * 2);
+    // Inner shadow line
+    ctx.fillStyle = 'rgba(0,0,0,0.13)';
+    ctx.fillRect(x + bev, y + th - bev - 1, tw - bev * 2, 1);
+    ctx.fillRect(x + tw - bev - 1, y + bev, 1, th - bev * 2);
   };
 
-  // Tile dimensions — visible and proportional
-  const tl = 160; // tile long side
-  const ts = 54;  // tile short side  
-  const sq = 100; // square tile side
+  // Tile dimensions — 3:1 ratio subway tile proportional to zone
+  const tl = Math.max(80, Math.min(160, h * 0.7));
+  const ts = Math.max(22, Math.round(tl / 3));
+  const sq = Math.max(50, Math.min(100, h * 0.45));
+  const g = grout;
 
   switch (pattern) {
     case 'stacked_horizontal': {
-      for (let y = 0; y < h + ts; y += ts + grout) {
-        for (let x = 0; x < w + tl; x += tl + grout) {
+      for (let y = 0; y < h + ts; y += ts + g)
+        for (let x = 0; x < w + tl; x += tl + g)
           drawTile(x, y, tl, ts);
-        }
-      }
       break;
     }
     case 'stacked_vertical': {
-      for (let x = 0; x < w + ts; x += ts + grout) {
-        for (let y = 0; y < h + tl; y += tl + grout) {
+      for (let x = 0; x < w + ts; x += ts + g)
+        for (let y = 0; y < h + tl; y += tl + g)
           drawTile(x, y, ts, tl);
-        }
-      }
       break;
     }
     case 'offset': {
       let row = 0;
-      for (let y = 0; y < h + ts; y += ts + grout, row++) {
-        const off = (row % 2) * ((tl + grout) / 2);
-        for (let x = -tl; x < w + tl * 2; x += tl + grout) {
+      for (let y = 0; y < h + ts; y += ts + g, row++) {
+        const off = (row % 2) * ((tl + g) / 2);
+        for (let x = -tl; x < w + tl * 2; x += tl + g)
           drawTile(x + off, y, tl, ts);
-        }
       }
       break;
     }
     case 'one_third_offset': {
       let row = 0;
-      for (let y = 0; y < h + ts; y += ts + grout, row++) {
-        const off = (row % 3) * ((tl + grout) / 3);
-        for (let x = -tl; x < w + tl * 2; x += tl + grout) {
+      for (let y = 0; y < h + ts; y += ts + g, row++) {
+        const off = (row % 3) * ((tl + g) / 3);
+        for (let x = -tl; x < w + tl * 2; x += tl + g)
           drawTile(x + off, y, tl, ts);
-        }
       }
       break;
     }
     case 'herringbone': {
-      // 90° HERRINGBONE: L-shaped pairs of tiles in a diagonal staircase
-      // This is the standard herringbone used in real tile installations
-      // Each "L" = one vertical tile + one horizontal tile
+      // Classic 90-degree herringbone: alternating V + H tiles in zigzag
       const sL = Math.min(tl, Math.max(40, h * 0.55));
       const sS = Math.max(14, Math.round(sL / 3));
-      const g = grout;
-
-      // Each L-pair: V tile at (0,0) size (sS, sL), H tile at (sS+g, sL-sS) size (sL, sS)
-      // Pairs step diagonally: dx = sL + g, dy = sL + g
-      // Parallel lines offset: dx = sS + g, dy = -(sS + g)
       const diagX = sL + g;
       const diagY = sL + g;
       const perpX = sS + g;
       const perpY = -(sS + g);
-
       const maxLines = Math.ceil((w + h) / (sS + g)) + 4;
       const maxPairs = Math.ceil(Math.max(w, h) * 2 / diagX) + 4;
 
       for (let line = -maxLines; line < maxLines; line++) {
         const lx = line * perpX;
         const ly = line * perpY;
-
         for (let pair = -maxPairs; pair < maxPairs; pair++) {
-          // V tile position
           const vx = lx + pair * diagX;
           const vy = ly + pair * diagY;
-          // H tile position
           const hx = vx + sS + g;
           const hy = vy + sL - sS;
-
-          // Only draw if visible
-          if (vx < w + sS && vx + sS > -sS && vy < h + sL && vy + sL > -sL) {
-            drawTile(vx, vy, sS, sL);
-          }
-          if (hx < w + sL && hx + sL > -sL && hy < h + sS && hy + sS > -sS) {
-            drawTile(hx, hy, sL, sS);
-          }
+          drawTile(vx, vy, sS, sL);
+          drawTile(hx, hy, sL, sS);
         }
       }
       break;
     }
     case 'basket_weave': {
-      const block = ts * 2 + grout;
-      const cell = block + grout;
-
+      const block = ts * 2 + g;
+      const cell = block + g;
       for (let gy = -1; gy < Math.ceil(h / cell) + 2; gy++) {
         for (let gx = -1; gx < Math.ceil(w / cell) + 2; gx++) {
           const bx = gx * cell;
           const by = gy * cell;
-          const isHoriz = ((gx + gy) % 2 === 0);
-
-          if (isHoriz) {
+          if ((gx + gy) % 2 === 0) {
             drawTile(bx, by, block, ts);
-            drawTile(bx, by + ts + grout, block, ts);
+            drawTile(bx, by + ts + g, block, ts);
           } else {
-            // 2 vertical tiles side by side — ROTATED 90 degrees
-            // Each tile gets a unique crop for realistic look
-            const hash1 = Math.abs(((bx * 7919 + by * 104729) | 0) % 10000);
-            const hash2 = Math.abs((((bx + 100) * 7919 + by * 104729) | 0) % 10000);
-            const cropW = imgW * 0.6;
-            const cropH = imgH * 0.6;
-            const block = ts * 2 + grout;
-
-            ctx.save();
-            ctx.translate(bx + ts / 2, by + block / 2);
-            ctx.rotate(-Math.PI / 2);
-            const sx1 = (hash1 % Math.max(1, Math.floor(imgW - cropW)));
-            const sy1 = ((hash1 * 3) % Math.max(1, Math.floor(imgH - cropH)));
-            ctx.drawImage(img, sx1, sy1, cropW, cropH, -block / 2, -ts / 2, block, ts);
-            const bev = Math.max(2, ts * 0.04);
-            ctx.fillStyle = 'rgba(255,255,255,0.22)';
-            ctx.fillRect(-block / 2, -ts / 2, block, bev);
-            ctx.fillRect(-block / 2, -ts / 2, bev, ts);
-            ctx.fillStyle = 'rgba(0,0,0,0.22)';
-            ctx.fillRect(-block / 2, ts / 2 - bev, block, bev);
-            ctx.fillRect(block / 2 - bev, -ts / 2, bev, ts);
-            ctx.restore();
-
-            ctx.save();
-            ctx.translate(bx + ts + grout + ts / 2, by + block / 2);
-            ctx.rotate(-Math.PI / 2);
-            const sx2 = (hash2 % Math.max(1, Math.floor(imgW - cropW)));
-            const sy2 = ((hash2 * 3) % Math.max(1, Math.floor(imgH - cropH)));
-            ctx.drawImage(img, sx2, sy2, cropW, cropH, -block / 2, -ts / 2, block, ts);
-            ctx.fillStyle = 'rgba(255,255,255,0.22)';
-            ctx.fillRect(-block / 2, -ts / 2, block, bev);
-            ctx.fillRect(-block / 2, -ts / 2, bev, ts);
-            ctx.fillStyle = 'rgba(0,0,0,0.22)';
-            ctx.fillRect(-block / 2, ts / 2 - bev, block, bev);
-            ctx.fillRect(block / 2 - bev, -ts / 2, bev, ts);
-            ctx.restore();
+            drawTile(bx, by, ts, block);
+            drawTile(bx + ts + g, by, ts, block);
           }
         }
       }
@@ -240,25 +191,22 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
     }
     case 'stepladder': {
       let col = 0;
-      for (let x = 0; x < w + ts; x += ts + grout, col++) {
-        const off = col * ((tl + grout) / 3);
-        for (let y = -tl * 2; y < h + tl * 2; y += tl + grout) {
+      for (let x = 0; x < w + ts; x += ts + g, col++) {
+        const off = col * ((tl + g) / 3);
+        for (let y = -tl * 2; y < h + tl * 2; y += tl + g)
           drawTile(x, y + off, ts, tl);
-        }
       }
       break;
     }
     case 'diagonal': {
-      const step = sq + grout;
+      const step = sq + g;
       ctx.save();
       ctx.translate(w / 2, h / 2);
       ctx.rotate(Math.PI / 4);
       const range = Math.max(w, h) * 2;
-      for (let y = -range; y < range; y += step) {
-        for (let x = -range; x < range; x += step) {
+      for (let y = -range; y < range; y += step)
+        for (let x = -range; x < range; x += step)
           drawTile(x, y, sq, sq);
-        }
-      }
       ctx.restore();
       break;
     }
@@ -287,8 +235,6 @@ const TilePatternCanvas = ({ pattern, imageUrl }) => {
     const h = Math.round(rect.height);
     if (w < 10 || h < 10) return;
 
-    // Set BOTH canvas pixel buffer AND CSS display to EXACT same dimensions
-    // This makes stretching/distortion physically impossible
     canvas.width = w;
     canvas.height = h;
     canvas.style.width = w + 'px';
@@ -298,23 +244,23 @@ const TilePatternCanvas = ({ pattern, imageUrl }) => {
     drawTilePattern(ctx, img, pattern, w, h);
   }, [pattern]);
 
-  // Load image, store in ref
   React.useEffect(() => {
     if (!imageUrl) return;
+    // Route through backend proxy to avoid CORS blocking canvas rendering
+    const proxyUrl = `${API_URL}/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
     const img = new Image();
-    img.crossOrigin = 'anonymous';
     img.onload = () => { imgRef.current = img; draw(); };
     img.onerror = () => {
+      // Fallback: try direct URL without crossOrigin (tainted canvas is fine)
       const img2 = new Image();
       img2.onload = () => { imgRef.current = img2; draw(); };
       img2.onerror = () => { imgRef.current = null; };
       img2.src = imageUrl;
     };
-    img.src = imageUrl;
+    img.src = proxyUrl;
     return () => { img.onload = null; img.onerror = null; };
   }, [imageUrl, draw]);
 
-  // ResizeObserver redraws when container gets real dimensions or resizes
   React.useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -431,7 +377,7 @@ const WallDiagram = ({ surface, selectedItem, onPlaceItem, onRemoveMaterial, onC
   return (
     <div data-testid={`wall-diagram-${surface.id}`}>
       {/* THE WALL - light background like a real elevation drawing */}
-      <div className="relative w-full rounded-lg overflow-hidden" style={{ height: '420px', border: '3px solid #888', background: '#f5f5f0', boxShadow: 'inset 0 0 30px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.3)' }}>
+      <div className="relative w-full rounded-lg overflow-hidden" style={{ height: '560px', border: '3px solid #888', background: '#f5f5f0', boxShadow: 'inset 0 0 30px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.3)' }}>
         {/* Top trim */}
         <div className="absolute top-0 left-0 right-0 h-1" style={{ background: '#aaa' }} />
         {/* Bottom trim */}
