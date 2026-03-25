@@ -61,27 +61,34 @@ const PatternThumb = ({ pattern, size = 80 }) => {
 
 const drawTilePattern = (ctx, img, pattern, w, h) => {
   const grout = 8;
-  const gc = '#a89880'; // darker warm grout for visibility
+  const gc = '#a89880';
 
-  // Fill entire canvas with grout color first
   ctx.fillStyle = gc;
   ctx.fillRect(0, 0, w, h);
 
-  // Helper: draw a single tile with 3D bevel effect for realism
+  const imgW = img.naturalWidth || 200;
+  const imgH = img.naturalHeight || 200;
+
+  // CRITICAL: Each tile shows a DIFFERENT crop of the source image
+  // so they look like INDIVIDUAL physical tiles, NOT a wallpaper with grid lines
   const drawTile = (x, y, tw, th) => {
-    ctx.drawImage(img, x, y, tw, th);
-    // 3D bevel: light highlight top + left edges
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.fillRect(x, y, tw, Math.max(2, th * 0.04));
-    ctx.fillRect(x, y, Math.max(2, tw * 0.04), th);
-    // 3D bevel: dark shadow bottom + right edges
-    ctx.fillStyle = 'rgba(0,0,0,0.18)';
-    ctx.fillRect(x, y + th - Math.max(2, th * 0.04), tw, Math.max(2, th * 0.04));
-    ctx.fillRect(x + tw - Math.max(2, tw * 0.04), y, Math.max(2, tw * 0.04), th);
-    // Crisp border
-    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-    ctx.lineWidth = 0.5;
-    ctx.strokeRect(x + 0.5, y + 0.5, tw - 1, th - 1);
+    // Use tile position to deterministically pick a unique crop region
+    const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
+    const cropW = imgW * 0.6;
+    const cropH = imgH * 0.6;
+    const sx = (hash % Math.max(1, Math.floor(imgW - cropW)));
+    const sy = ((hash * 3) % Math.max(1, Math.floor(imgH - cropH)));
+    ctx.drawImage(img, sx, sy, cropW, cropH, x, y, tw, th);
+
+    // 3D bevel: highlight top + left
+    const bev = Math.max(2, Math.min(tw, th) * 0.04);
+    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    ctx.fillRect(x, y, tw, bev);
+    ctx.fillRect(x, y, bev, th);
+    // 3D bevel: shadow bottom + right
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.fillRect(x, y + th - bev, tw, bev);
+    ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
   // Tile dimensions — visible and proportional
@@ -182,34 +189,41 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
             drawTile(bx, by, block, ts);
             drawTile(bx, by + ts + grout, block, ts);
           } else {
+            // 2 vertical tiles side by side — ROTATED 90 degrees
+            // Each tile gets a unique crop for realistic look
+            const hash1 = Math.abs(((bx * 7919 + by * 104729) | 0) % 10000);
+            const hash2 = Math.abs((((bx + 100) * 7919 + by * 104729) | 0) % 10000);
+            const cropW = imgW * 0.6;
+            const cropH = imgH * 0.6;
+            const block = ts * 2 + grout;
+
             ctx.save();
             ctx.translate(bx + ts / 2, by + block / 2);
             ctx.rotate(-Math.PI / 2);
-            ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
-            ctx.fillStyle = 'rgba(255,255,255,0.18)';
-            ctx.fillRect(-block / 2, -ts / 2, block, 2);
-            ctx.fillRect(-block / 2, -ts / 2, 2, ts);
-            ctx.fillStyle = 'rgba(0,0,0,0.18)';
-            ctx.fillRect(-block / 2, ts / 2 - 2, block, 2);
-            ctx.fillRect(block / 2 - 2, -ts / 2, 2, ts);
-            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-            ctx.lineWidth = 0.5;
-            ctx.strokeRect(-block / 2, -ts / 2, block, ts);
+            const sx1 = (hash1 % Math.max(1, Math.floor(imgW - cropW)));
+            const sy1 = ((hash1 * 3) % Math.max(1, Math.floor(imgH - cropH)));
+            ctx.drawImage(img, sx1, sy1, cropW, cropH, -block / 2, -ts / 2, block, ts);
+            const bev = Math.max(2, ts * 0.04);
+            ctx.fillStyle = 'rgba(255,255,255,0.22)';
+            ctx.fillRect(-block / 2, -ts / 2, block, bev);
+            ctx.fillRect(-block / 2, -ts / 2, bev, ts);
+            ctx.fillStyle = 'rgba(0,0,0,0.22)';
+            ctx.fillRect(-block / 2, ts / 2 - bev, block, bev);
+            ctx.fillRect(block / 2 - bev, -ts / 2, bev, ts);
             ctx.restore();
 
             ctx.save();
             ctx.translate(bx + ts + grout + ts / 2, by + block / 2);
             ctx.rotate(-Math.PI / 2);
-            ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
-            ctx.fillStyle = 'rgba(255,255,255,0.18)';
-            ctx.fillRect(-block / 2, -ts / 2, block, 2);
-            ctx.fillRect(-block / 2, -ts / 2, 2, ts);
-            ctx.fillStyle = 'rgba(0,0,0,0.18)';
-            ctx.fillRect(-block / 2, ts / 2 - 2, block, 2);
-            ctx.fillRect(block / 2 - 2, -ts / 2, 2, ts);
-            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-            ctx.lineWidth = 0.5;
-            ctx.strokeRect(-block / 2, -ts / 2, block, ts);
+            const sx2 = (hash2 % Math.max(1, Math.floor(imgW - cropW)));
+            const sy2 = ((hash2 * 3) % Math.max(1, Math.floor(imgH - cropH)));
+            ctx.drawImage(img, sx2, sy2, cropW, cropH, -block / 2, -ts / 2, block, ts);
+            ctx.fillStyle = 'rgba(255,255,255,0.22)';
+            ctx.fillRect(-block / 2, -ts / 2, block, bev);
+            ctx.fillRect(-block / 2, -ts / 2, bev, ts);
+            ctx.fillStyle = 'rgba(0,0,0,0.22)';
+            ctx.fillRect(-block / 2, ts / 2 - bev, block, bev);
+            ctx.fillRect(block / 2 - bev, -ts / 2, bev, ts);
             ctx.restore();
           }
         }
