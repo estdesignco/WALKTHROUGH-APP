@@ -70,9 +70,8 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
   const imgH = img.naturalHeight || 200;
 
   // CRITICAL: Each tile shows a DIFFERENT crop of the source image
-  // so they look like INDIVIDUAL physical tiles, NOT a wallpaper with grid lines
+  // AND has slight brightness variation so even uniform tiles look individual
   const drawTile = (x, y, tw, th) => {
-    // Use tile position to deterministically pick a unique crop region
     const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
     const cropW = imgW * 0.6;
     const cropH = imgH * 0.6;
@@ -80,13 +79,22 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
     const sy = ((hash * 3) % Math.max(1, Math.floor(imgH - cropH)));
     ctx.drawImage(img, sx, sy, cropW, cropH, x, y, tw, th);
 
-    // 3D bevel: highlight top + left
-    const bev = Math.max(2, Math.min(tw, th) * 0.04);
-    ctx.fillStyle = 'rgba(255,255,255,0.22)';
+    // Random brightness variation — makes each tile visually distinct
+    // even for uniform materials like white subway tile
+    const variation = ((hash % 9) - 4) * 0.018;
+    if (variation > 0) {
+      ctx.fillStyle = `rgba(255,255,255,${variation})`;
+    } else {
+      ctx.fillStyle = `rgba(0,0,0,${-variation})`;
+    }
+    ctx.fillRect(x, y, tw, th);
+
+    // STRONG 3D bevel — each tile looks like a raised physical piece
+    const bev = Math.max(3, Math.min(tw, th) * 0.06);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.fillRect(x, y, tw, bev);
     ctx.fillRect(x, y, bev, th);
-    // 3D bevel: shadow bottom + right
-    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.fillRect(x, y + th - bev, tw, bev);
     ctx.fillRect(x + tw - bev, y, bev, th);
   };
