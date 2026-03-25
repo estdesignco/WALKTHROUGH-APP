@@ -60,30 +60,37 @@ const PatternThumb = ({ pattern, size = 80 }) => {
 // Grout gaps between tiles. This looks like REAL TILES on a REAL WALL.
 
 const drawTilePattern = (ctx, img, pattern, w, h) => {
-  const grout = 6;
-  const gc = '#c8bfb0'; // warm grout color
+  const grout = 8;
+  const gc = '#a89880'; // darker warm grout for visibility
 
   // Fill entire canvas with grout color first
   ctx.fillStyle = gc;
   ctx.fillRect(0, 0, w, h);
 
-  // Helper: draw a single tile with subtle inset shadow for depth
+  // Helper: draw a single tile with 3D bevel effect for realism
   const drawTile = (x, y, tw, th) => {
     ctx.drawImage(img, x, y, tw, th);
-    // Subtle dark edge for depth
-    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-    ctx.lineWidth = 1;
+    // 3D bevel: light highlight top + left edges
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.fillRect(x, y, tw, Math.max(2, th * 0.04));
+    ctx.fillRect(x, y, Math.max(2, tw * 0.04), th);
+    // 3D bevel: dark shadow bottom + right edges
+    ctx.fillStyle = 'rgba(0,0,0,0.18)';
+    ctx.fillRect(x, y + th - Math.max(2, th * 0.04), tw, Math.max(2, th * 0.04));
+    ctx.fillRect(x + tw - Math.max(2, tw * 0.04), y, Math.max(2, tw * 0.04), th);
+    // Crisp border
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+    ctx.lineWidth = 0.5;
     ctx.strokeRect(x + 0.5, y + 0.5, tw - 1, th - 1);
   };
 
-  // Tile dimensions — BIG enough to be clearly visible
+  // Tile dimensions — visible and proportional
   const tl = 160; // tile long side
   const ts = 54;  // tile short side  
   const sq = 100; // square tile side
 
   switch (pattern) {
     case 'stacked_horizontal': {
-      // Simple horizontal rows of tiles, joints aligned
       for (let y = 0; y < h + ts; y += ts + grout) {
         for (let x = 0; x < w + tl; x += tl + grout) {
           drawTile(x, y, tl, ts);
@@ -92,7 +99,6 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'stacked_vertical': {
-      // Simple vertical columns of tiles, joints aligned
       for (let x = 0; x < w + ts; x += ts + grout) {
         for (let y = 0; y < h + tl; y += tl + grout) {
           drawTile(x, y, ts, tl);
@@ -101,7 +107,6 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'offset': {
-      // Classic brick pattern, every other row offset 50%
       let row = 0;
       for (let y = 0; y < h + ts; y += ts + grout, row++) {
         const off = (row % 2) * ((tl + grout) / 2);
@@ -112,7 +117,6 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'one_third_offset': {
-      // Each row offset by 1/3 of tile length
       let row = 0;
       for (let y = 0; y < h + ts; y += ts + grout, row++) {
         const off = (row % 3) * ((tl + grout) / 3);
@@ -123,46 +127,50 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'herringbone': {
-      // Herringbone: alternating rows of tiles at -45° and +45°
-      // Uses alternating tints + thick grout to make the V-pattern clear
-      const htl = Math.min(100, Math.max(30, h * 0.5));
-      const hts = Math.max(8, Math.round(htl / 3));
-      const hg = Math.max(4, grout);
+      // 90° HERRINGBONE: L-shaped pairs of tiles in a diagonal staircase
+      // This is the standard herringbone used in real tile installations
+      // Each "L" = one vertical tile + one horizontal tile
+      const sL = Math.min(tl, Math.max(40, h * 0.55));
+      const sS = Math.max(14, Math.round(sL / 3));
+      const g = grout;
 
-      const rowH = hts * 0.707 + hg / 2;
-      const colStep = htl * 0.707 + hg;
+      // Each L-pair: V tile at (0,0) size (sS, sL), H tile at (sS+g, sL-sS) size (sL, sS)
+      // Pairs step diagonally: dx = sL + g, dy = sL + g
+      // Parallel lines offset: dx = sS + g, dy = -(sS + g)
+      const diagX = sL + g;
+      const diagY = sL + g;
+      const perpX = sS + g;
+      const perpY = -(sS + g);
 
-      for (let row = -5; row < h / rowH + 5; row++) {
-        const angle = (row % 2 === 0) ? -Math.PI / 4 : Math.PI / 4;
-        const xOffset = (row % 2 !== 0) ? colStep / 2 : 0;
+      const maxLines = Math.ceil((w + h) / (sS + g)) + 4;
+      const maxPairs = Math.ceil(Math.max(w, h) * 2 / diagX) + 4;
 
-        for (let col = -3; col < w / colStep + 3; col++) {
-          const cx = col * colStep + xOffset;
-          const cy = row * rowH;
+      for (let line = -maxLines; line < maxLines; line++) {
+        const lx = line * perpX;
+        const ly = line * perpY;
 
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(angle);
-          ctx.drawImage(img, -htl / 2, -hts / 2, htl, hts);
-          // Alternating tint so V-pattern is visible even with white tiles
-          if (row % 2 !== 0) {
-            ctx.fillStyle = 'rgba(0,0,0,0.07)';
-            ctx.fillRect(-htl / 2, -hts / 2, htl, hts);
+        for (let pair = -maxPairs; pair < maxPairs; pair++) {
+          // V tile position
+          const vx = lx + pair * diagX;
+          const vy = ly + pair * diagY;
+          // H tile position
+          const hx = vx + sS + g;
+          const hy = vy + sL - sS;
+
+          // Only draw if visible
+          if (vx < w + sS && vx + sS > -sS && vy < h + sL && vy + sL > -sL) {
+            drawTile(vx, vy, sS, sL);
           }
-          // Thick grout border in the actual grout color
-          ctx.strokeStyle = '#9a8a75';
-          ctx.lineWidth = hg * 0.7;
-          ctx.strokeRect(-htl / 2 + 0.5, -hts / 2 + 0.5, htl - 1, hts - 1);
-          ctx.restore();
+          if (hx < w + sL && hx + sL > -sL && hy < h + sS && hy + sS > -sS) {
+            drawTile(hx, hy, sL, sS);
+          }
         }
       }
       break;
     }
     case 'basket_weave': {
-      // Alternating: 2 horizontal tiles next to 2 vertical tiles
-      // Vertical tiles are ROTATED 90deg so the image orientation changes
-      const block = ts * 2 + grout; // 2 tiles = one block side
-      const cell = block + grout;   // cell = block + grout gap
+      const block = ts * 2 + grout;
+      const cell = block + grout;
 
       for (let gy = -1; gy < Math.ceil(h / cell) + 2; gy++) {
         for (let gx = -1; gx < Math.ceil(w / cell) + 2; gx++) {
@@ -171,27 +179,37 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
           const isHoriz = ((gx + gy) % 2 === 0);
 
           if (isHoriz) {
-            // 2 horizontal tiles stacked vertically
             drawTile(bx, by, block, ts);
             drawTile(bx, by + ts + grout, block, ts);
           } else {
-            // 2 vertical tiles side by side — ROTATED 90 degrees
             ctx.save();
             ctx.translate(bx + ts / 2, by + block / 2);
             ctx.rotate(-Math.PI / 2);
             ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
-            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(-block / 2 + 0.5, -ts / 2 + 0.5, block - 1, ts - 1);
+            ctx.fillStyle = 'rgba(255,255,255,0.18)';
+            ctx.fillRect(-block / 2, -ts / 2, block, 2);
+            ctx.fillRect(-block / 2, -ts / 2, 2, ts);
+            ctx.fillStyle = 'rgba(0,0,0,0.18)';
+            ctx.fillRect(-block / 2, ts / 2 - 2, block, 2);
+            ctx.fillRect(block / 2 - 2, -ts / 2, 2, ts);
+            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(-block / 2, -ts / 2, block, ts);
             ctx.restore();
 
             ctx.save();
             ctx.translate(bx + ts + grout + ts / 2, by + block / 2);
             ctx.rotate(-Math.PI / 2);
             ctx.drawImage(img, -block / 2, -ts / 2, block, ts);
-            ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(-block / 2 + 0.5, -ts / 2 + 0.5, block - 1, ts - 1);
+            ctx.fillStyle = 'rgba(255,255,255,0.18)';
+            ctx.fillRect(-block / 2, -ts / 2, block, 2);
+            ctx.fillRect(-block / 2, -ts / 2, 2, ts);
+            ctx.fillStyle = 'rgba(0,0,0,0.18)';
+            ctx.fillRect(-block / 2, ts / 2 - 2, block, 2);
+            ctx.fillRect(block / 2 - 2, -ts / 2, 2, ts);
+            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(-block / 2, -ts / 2, block, ts);
             ctx.restore();
           }
         }
@@ -199,7 +217,6 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'stepladder': {
-      // Vertical tiles with staggered horizontal joints
       let col = 0;
       for (let x = 0; x < w + ts; x += ts + grout, col++) {
         const off = col * ((tl + grout) / 3);
@@ -210,7 +227,6 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     case 'diagonal': {
-      // Square tiles rotated 45 degrees
       const step = sq + grout;
       ctx.save();
       ctx.translate(w / 2, h / 2);
@@ -225,7 +241,6 @@ const drawTilePattern = (ctx, img, pattern, w, h) => {
       break;
     }
     default: {
-      // No pattern — just draw tile image as cover
       ctx.drawImage(img, 0, 0, w, h);
     }
   }
