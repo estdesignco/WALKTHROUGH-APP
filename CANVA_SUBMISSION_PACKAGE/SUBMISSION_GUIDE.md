@@ -27,7 +27,7 @@
 
 **FIND THIS LINE (around line 20):**
 ```typescript
-const BACKEND_URL = "https://material-mapper-1.preview.emergentagent.com";
+const BACKEND_URL = "https://finish-schedule.preview.emergentagent.com";
 ```
 
 **CHANGE TO YOUR PRODUCTION URL:**

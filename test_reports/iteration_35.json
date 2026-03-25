@@ -85,8 +85,8 @@
   
   "test_credentials": {
     "password": "DesignReady2026!",
-    "app_url": "https://material-mapper-1.preview.emergentagent.com",
-    "mobile_url": "https://material-mapper-1.preview.emergentagent.com/mobile-app"
+    "app_url": "https://finish-schedule.preview.emergentagent.com",
+    "mobile_url": "https://finish-schedule.preview.emergentagent.com/mobile-app"
   },
   
   "seed_data_creation": "Created TEST_ZeroRoomsVerify_1772323886 project for testing zero-rooms flow",

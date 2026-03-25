@@ -7,7 +7,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://material-mapper-1.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://finish-schedule.preview.emergentagent.com')
 
 # Test data
 PROJECT_ID = "a01095cd-9f94-44d5-bc01-8bd5b9ebbc27"

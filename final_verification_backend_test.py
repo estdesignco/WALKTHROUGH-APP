@@ -2,7 +2,7 @@
 """
 FINAL COMPREHENSIVE BACKEND API VERIFICATION
 Testing ALL critical API endpoints as requested in review.
-Backend URL: https://material-mapper-1.preview.emergentagent.com
+Backend URL: https://finish-schedule.preview.emergentagent.com
 """
 
 import requests
@@ -13,7 +13,7 @@ import uuid
 import time
 
 # Backend URL from review request
-BACKEND_URL = "https://material-mapper-1.preview.emergentagent.com"
+BACKEND_URL = "https://finish-schedule.preview.emergentagent.com"
 
 class FinalBackendVerifier:
     def __init__(self):
