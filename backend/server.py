@@ -19017,6 +19017,8 @@ class MaterialEntry(BaseModel):
     position_label: str = ""
     pattern: str = ""
     tile_crop: Optional[dict] = None
+    grout_color: str = "#4a4035"
+    tile_orientation: str = "horizontal"
 
 class MeasurementLine(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
