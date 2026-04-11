@@ -202,8 +202,8 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(x, y + th - bev, tw, bev); ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
-  let tl = Math.max(25, Math.min(300, h * 0.6 * scale));
-  let ts = Math.max(8, Math.round(tl / 3.5));
+  let tl = Math.max(12, Math.min(180, h * 0.12 * scale));
+  let ts = Math.max(6, Math.round(tl / 3.5));
   if (orientation === 'vertical') { const tmp = tl; tl = ts; ts = tmp; }
   const g = grout;
 
@@ -321,16 +321,21 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
 
 
 /* ==================== NICHE / BENCH / FIXTURE OVERLAYS ==================== */
-const NicheOverlay = ({ niche, isSelected, onClick, onDragStart }) => (
+const NicheOverlay = ({ niche, isSelected, onClick, onDragStart, selectedItem, onApplyTile }) => (
   <div
     data-testid={`niche-${niche.id}`}
     className={`absolute cursor-grab active:cursor-grabbing transition-shadow ${isSelected ? 'ring-2 ring-cyan-400 z-20' : 'z-10 hover:ring-1 hover:ring-cyan-300/50'}`}
     style={{
       left: `${niche.x}%`, top: `${niche.y}%`, width: `${niche.w}%`, height: `${niche.h}%`,
       boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5), inset 0 -1px 4px rgba(0,0,0,0.2)',
-      border: '1px solid rgba(0,0,0,0.4)', background: '#c8c4bc', borderRadius: '2px',
+      border: niche.trim === 'schluter' ? '3px solid #c0c0c0' : niche.trim === 'bullnose' ? '3px solid #e8e0d4' : niche.trim === 'pencil' ? '2px solid #8b7355' : '1px solid rgba(0,0,0,0.4)',
+      background: '#c8c4bc', borderRadius: '2px',
     }}
-    onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'niche', niche); }}>
+    onMouseDown={e => {
+      e.stopPropagation(); e.preventDefault();
+      if (selectedItem) { onApplyTile(); }
+      else { onDragStart(e, 'niche', niche); }
+    }}>
     {niche.material?.image && niche.material?.pattern && (
       <TilePatternCanvas pattern={niche.material.pattern} imageUrl={niche.material.image}
         tileCrop={niche.material.tile_crop} groutColor={niche.material.grout_color}
@@ -350,16 +355,21 @@ const NicheOverlay = ({ niche, isSelected, onClick, onDragStart }) => (
   </div>
 );
 
-const BenchOverlay = ({ bench, isSelected, onClick, onDragStart }) => (
+const BenchOverlay = ({ bench, isSelected, onClick, onDragStart, selectedItem, onApplyTile }) => (
   <div
     data-testid={`bench-${bench.id}`}
     className={`absolute cursor-grab active:cursor-grabbing transition-shadow ${isSelected ? 'ring-2 ring-orange-400 z-20' : 'z-10 hover:ring-1 hover:ring-orange-300/50'}`}
     style={{
       left: `${bench.x}%`, top: `${bench.y}%`, width: `${bench.w}%`, height: `${bench.h}%`,
       boxShadow: '0 3px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
-      border: '1px solid rgba(0,0,0,0.3)', background: '#ddd8d0', borderRadius: '2px',
+      border: bench.trim === 'schluter' ? '3px solid #c0c0c0' : bench.trim === 'bullnose' ? '3px solid #e8e0d4' : bench.trim === 'pencil' ? '2px solid #8b7355' : '1px solid rgba(0,0,0,0.3)',
+      background: '#ddd8d0', borderRadius: '2px',
     }}
-    onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'bench', bench); }}>
+    onMouseDown={e => {
+      e.stopPropagation(); e.preventDefault();
+      if (selectedItem) { onApplyTile(); }
+      else { onDragStart(e, 'bench', bench); }
+    }}>
     {bench.material?.image && bench.material?.pattern && (
       <TilePatternCanvas pattern={bench.material.pattern} imageUrl={bench.material.image}
         tileCrop={bench.material.tile_crop} groutColor={bench.material.grout_color}
@@ -399,13 +409,25 @@ const FixtureOverlay = ({ fixture, isSelected, onClick, onDragStart }) => (
 
 /* ==================== WALL ZONE ==================== */
 const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
-  onClickZone, onRemove, onOpenPattern, onCropTile, selectedElement, onDragStart }) => {
+  surfaceId, onClickZone, onRemove, onOpenPattern, onCropTile, selectedElement, onDragStart,
+  selectedItem, onApplyTileToElement }) => {
+  const zoneRef = useRef(null);
   const hasImage = mat?.image;
   const hasCrop = mat?.tile_crop && mat.tile_crop.w > 0;
   const patternLabel = mat?.pattern ? TILE_PATTERNS.find(p => p.value === mat.pattern)?.label : null;
 
+  const wrappedDragStart = useCallback((e, type, el) => {
+    const rect = zoneRef.current?.getBoundingClientRect();
+    if (rect && surfaceId) onDragStart(e, type, el, surfaceId, rect);
+  }, [surfaceId, onDragStart]);
+
+  const wrappedApplyTile = useCallback((elementType, elementId) => {
+    if (surfaceId && selectedItem) onApplyTileToElement(surfaceId, elementType, elementId, selectedItem);
+  }, [surfaceId, selectedItem, onApplyTileToElement]);
+
   return (
     <div
+      ref={zoneRef}
       className="absolute left-0 right-0 cursor-pointer transition-all group overflow-hidden"
       style={{ top: `${zone.top}%`, height: `${zoneHeight}%` }}
       onClick={onClickZone}
@@ -424,13 +446,15 @@ const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
       )}
       {/* Niches */}
       {(niches || []).map(n => <NicheOverlay key={n.id} niche={n}
-        isSelected={selectedElement?.id === n.id} onDragStart={onDragStart} />)}
+        isSelected={selectedElement?.id === n.id} onDragStart={wrappedDragStart}
+        selectedItem={selectedItem} onApplyTile={() => wrappedApplyTile('niche', n.id)} />)}
       {/* Benches */}
       {(benches || []).map(b => <BenchOverlay key={b.id} bench={b}
-        isSelected={selectedElement?.id === b.id} onDragStart={onDragStart} />)}
+        isSelected={selectedElement?.id === b.id} onDragStart={wrappedDragStart}
+        selectedItem={selectedItem} onApplyTile={() => wrappedApplyTile('bench', b.id)} />)}
       {/* Fixtures */}
       {(fixtures || []).map(f => <FixtureOverlay key={f.id} fixture={f}
-        isSelected={selectedElement?.id === f.id} onDragStart={onDragStart} />)}
+        isSelected={selectedElement?.id === f.id} onDragStart={wrappedDragStart} />)}
       {/* Zone info bar */}
       <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 ${compact ? 'py-0' : 'py-0.5'}`}
         style={hasImage ? { background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' } : { borderTop: '1px solid #ddd' }}>
@@ -456,7 +480,7 @@ const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
 const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
   onPlaceItem, onPlaceFixture, onAddNiche, onAddBench, onRemoveMaterial,
   onChangePattern, onCropTile, onChangeGrout, onChangeOrientation, onChangeTileScale,
-  onSelectElement, onDeleteElement, onUpdateElement,
+  onSelectElement, onDeleteElement, onUpdateElement, onApplyTileToElement,
   onResizeZone, onEditDimension, onPlaceCeilingFloor }) => {
 
   const [patternPicker, setPatternPicker] = useState(null);
@@ -557,17 +581,17 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
   };
 
   // Element drag start handler — passed to all overlays
-  const handleElementDragStart = (e, dragType, element) => {
-    const zoneEl = e.target.closest('[data-testid^="wall-zone-"]') || e.target.closest('[data-testid^="surface-"]');
-    if (!zoneEl) return;
-    const zoneRect = zoneEl.getBoundingClientRect();
-    // Find which surface this element belongs to
-    let surfaceId = null;
+  const handleElementDragStart = (e, dragType, element, providedSurfaceId, providedRect) => {
+    const zoneRect = providedRect || (e.target.closest('[data-testid^="wall-zone-"]') || e.target.closest('[data-testid^="surface-"]'))?.getBoundingClientRect();
+    if (!zoneRect) return;
+    let surfaceId = providedSurfaceId || null;
     let elementBaseType = dragType.replace(/-resize-.+$/, '');
-    for (const s of surfaces) {
-      if (elementBaseType === 'niche' && (s.niches || []).find(n => n.id === element.id)) { surfaceId = s.id; break; }
-      if (elementBaseType === 'bench' && (s.benches || []).find(b => b.id === element.id)) { surfaceId = s.id; break; }
-      if (elementBaseType === 'fixture' && (s.fixtures || []).find(f => f.id === element.id)) { surfaceId = s.id; break; }
+    if (!surfaceId) {
+      for (const s of surfaces) {
+        if (elementBaseType === 'niche' && (s.niches || []).find(n => n.id === element.id)) { surfaceId = s.id; break; }
+        if (elementBaseType === 'bench' && (s.benches || []).find(b => b.id === element.id)) { surfaceId = s.id; break; }
+        if (elementBaseType === 'fixture' && (s.fixtures || []).find(f => f.id === element.id)) { surfaceId = s.id; break; }
+      }
     }
     if (!surfaceId) return;
 
@@ -609,10 +633,12 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
       const zoneFixtures = (surface.fixtures || []).filter(f => f.zone_id === zone.id);
       elements.push(
         <WallZone key={zone.id} zone={{ ...zone, top }} zoneHeight={zone.height} mat={mat}
-          compact={compact}
+          compact={compact} surfaceId={surface.id}
           niches={zoneNiches} benches={zoneBenches} fixtures={zoneFixtures}
           selectedElement={selectedElement}
+          selectedItem={selectedItem}
           onDragStart={handleElementDragStart}
+          onApplyTileToElement={onApplyTileToElement}
           onClickZone={(e) => handleZoneClick(surface, zone.id, e)}
           onRemove={() => mat && onRemoveMaterial(surface.id, mat.id)}
           onOpenPattern={() => setPatternPicker(patternPicker?.zoneId === zone.id && patternPicker?.surfaceId === surface.id ? null : { surfaceId: surface.id, zoneId: zone.id })}
@@ -645,7 +671,9 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
     const surfFixtures = surface.fixtures || [];
     return (
       <div className="absolute inset-0 overflow-hidden cursor-pointer group"
-        onClick={() => handleCeilingFloorClick(surface)} data-testid={`surface-${surface.surface_type}`}>
+        onClick={(e) => { e.stopPropagation(); handleCeilingFloorClick(surface); }}
+        data-testid={`surface-${surface.surface_type}`}
+        style={{ pointerEvents: 'auto' }}>
         {hasImage && mat.pattern ? (
           <TilePatternCanvas pattern={mat.pattern} imageUrl={mat.image} tileCrop={mat.tile_crop}
             groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale} />
@@ -655,9 +683,9 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         {surfFixtures.map(f => <FixtureOverlay key={f.id} fixture={f} isSelected={selectedElement?.id === f.id}
           onDragStart={handleElementDragStart} />)}
         <div className="absolute top-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[7px] font-black text-white/70 bg-black/40 z-10 pointer-events-none">{label}</div>
-        {selectedItem && !hasImage && (
-          <div className="absolute inset-0 bg-amber-400/10 border-2 border-dashed border-amber-400/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <span className="text-amber-600/60 text-[9px] font-bold">CLICK TO PLACE</span>
+        {!hasImage && (
+          <div className={`absolute inset-0 flex items-center justify-center transition-all ${selectedItem ? 'bg-amber-400/10 border-2 border-dashed border-amber-400/40' : ''}`}>
+            <span className="text-amber-600/40 text-[9px] font-bold">{selectedItem ? 'CLICK TO PLACE' : ''}</span>
           </div>
         )}
       </div>
@@ -676,7 +704,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', left: 0, top: 0, width: '100%', height: '10%',
           clipPath: 'polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%)',
-          background: '#e8e5df',
+          background: '#e8e5df', zIndex: 1,
         }}>
           {renderSimpleSurface(ceiling, ceiling?.name || 'CEILING')}
         </div>
@@ -685,7 +713,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', left: 0, top: 0, width: '20%', height: '100%',
           clipPath: 'polygon(0% 0%, 100% 10%, 100% 82%, 0% 100%)',
-          background: '#eae6e0',
+          background: '#eae6e0', zIndex: 2,
         }}>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.08), transparent)' }} />
           {renderWallFace(leftWall, true)}
@@ -695,7 +723,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         {/* BACK WALL — flat center rectangle */}
         <div data-surface-id={backWall?.id} style={{
           position: 'absolute', left: '20%', top: '10%', width: '60%', height: '72%',
-          background: '#f5f2ed', border: '2px solid #666',
+          background: '#f5f2ed', border: '2px solid #666', zIndex: 5,
           boxShadow: '0 4px 30px rgba(0,0,0,0.4), inset 0 0 30px rgba(0,0,0,0.04)',
         }}>
           {renderWallFace(backWall, false)}
@@ -731,7 +759,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', right: 0, top: 0, width: '20%', height: '100%',
           clipPath: 'polygon(0% 10%, 100% 0%, 100% 100%, 0% 82%)',
-          background: '#e4e0da',
+          background: '#e4e0da', zIndex: 2,
         }}>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.08), transparent)' }} />
           {renderWallFace(rightWall, true)}
@@ -742,7 +770,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', left: 0, bottom: 0, width: '100%', height: '18%',
           clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)',
-          background: '#d8d4ce',
+          background: '#d8d4ce', zIndex: 6,
         }}>
           {renderSimpleSurface(floor, floor?.name || 'FLOOR')}
         </div>
@@ -799,7 +827,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
             <div className="flex items-center gap-2">
               <Ruler size={12} className="text-white/40" />
               <span className="text-[10px] font-black text-white/50">TILE SIZE:</span>
-              <input type="range" min={30} max={300} step={5}
+              <input type="range" min={50} max={500} step={10}
                 value={Math.round((pickerMat.tile_scale || 1) * 100)}
                 onChange={e => onChangeTileScale(patternPicker.surfaceId, pickerMat.id, Number(e.target.value) / 100)}
                 className="w-24 accent-amber-500" data-testid="tile-size-slider" />
@@ -827,6 +855,8 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
           onDelete={onDeleteElement}
           onUpdate={onUpdateElement}
           onDeselect={() => onSelectElement(null)}
+          selectedItem={selectedItem}
+          onApplyTile={onApplyTileToElement}
         />
       )}
     </div>
@@ -835,7 +865,15 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
 
 
 /* ==================== SELECTED ELEMENT PANEL ==================== */
-const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselect }) => {
+const TRIM_OPTIONS = [
+  { value: 'none', label: 'No Trim' },
+  { value: 'schluter', label: 'Schluter (Metal)' },
+  { value: 'bullnose', label: 'Bullnose' },
+  { value: 'pencil', label: 'Pencil Liner' },
+  { value: 'quarter_round', label: 'Quarter Round' },
+];
+
+const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselect, selectedItem, onApplyTile }) => {
   if (!element) return null;
   let found = null, foundSurface = null;
   for (const s of surfaces) {
@@ -846,22 +884,30 @@ const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselec
   }
   if (!found || !foundSurface) return null;
   const isNicheOrBench = element.type === 'niche' || element.type === 'bench';
+  const hasTile = found.material?.image;
 
   return (
     <div className="mt-3 p-4 rounded-xl border-2 shadow-2xl" data-testid="element-panel"
       style={{ background: 'rgba(0,0,0,0.97)', borderColor: element.type === 'niche' ? 'rgba(0,200,255,0.3)' : element.type === 'bench' ? 'rgba(255,165,0,0.3)' : 'rgba(100,160,255,0.3)' }}>
       <div className="flex justify-between items-center mb-3">
         <span className="text-sm font-black" style={{ color: element.type === 'niche' ? '#00c8ff' : element.type === 'bench' ? '#ffa500' : '#64a0ff' }}>
-          {element.type.toUpperCase()} — Drag to move{isNicheOrBench ? ', drag corners to resize' : ''}
+          {element.type.toUpperCase()} — {isNicheOrBench ? 'Drag corners to resize' : 'Drag to move'}
         </span>
         <div className="flex gap-2">
+          {selectedItem && isNicheOrBench && (
+            <button onClick={() => onApplyTile(foundSurface.id, element.type, element.id, selectedItem)}
+              className="px-2 py-1 rounded text-[9px] font-black text-green-400 border border-green-400/30 hover:bg-green-400/10 animate-pulse" data-testid="apply-tile-to-element-btn">
+              APPLY {selectedItem.name?.substring(0, 15)}
+            </button>
+          )}
           <button onClick={() => onDelete(foundSurface.id, element.type, element.id)} className="px-2 py-1 rounded text-[9px] font-black text-red-400 border border-red-400/30 hover:bg-red-400/10" data-testid="delete-element-btn">
             <Trash2 size={10} className="inline mr-1" />DELETE
           </button>
           <button onClick={onDeselect} className="text-white/40 hover:text-white"><X size={16} /></button>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-2">
+      {/* Position & size controls */}
+      <div className="grid grid-cols-4 gap-2 mb-3">
         {['x', 'y'].concat(isNicheOrBench ? ['w', 'h'] : []).map(field => (
           <div key={field}>
             <label className="text-[8px] font-black text-white/40 uppercase">{field === 'x' ? 'LEFT %' : field === 'y' ? 'TOP %' : field === 'w' ? 'WIDTH %' : 'HEIGHT %'}</label>
@@ -871,6 +917,48 @@ const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselec
           </div>
         ))}
       </div>
+      {/* Bench/Niche specific: Dimension (inches) */}
+      {isNicheOrBench && (
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <div>
+            <label className="text-[8px] font-black text-white/40 uppercase">WIDTH (inches)</label>
+            <input type="text" placeholder='e.g. 36"' value={found.width_inches || ''}
+              onChange={e => onUpdate(foundSurface.id, element.type, element.id, { width_inches: e.target.value })}
+              className="w-full px-2 py-1 rounded text-[10px] font-mono bg-black border border-white/20 text-white" data-testid="element-width-inches" />
+          </div>
+          <div>
+            <label className="text-[8px] font-black text-white/40 uppercase">HEIGHT (inches)</label>
+            <input type="text" placeholder='e.g. 18"' value={found.height_inches || ''}
+              onChange={e => onUpdate(foundSurface.id, element.type, element.id, { height_inches: e.target.value })}
+              className="w-full px-2 py-1 rounded text-[10px] font-mono bg-black border border-white/20 text-white" data-testid="element-height-inches" />
+          </div>
+        </div>
+      )}
+      {/* Trim / Schluter */}
+      {isNicheOrBench && (
+        <div className="mb-3">
+          <label className="text-[8px] font-black text-white/40 uppercase block mb-1">EDGE TRIM / SCHLUTER</label>
+          <div className="flex gap-1 flex-wrap">
+            {TRIM_OPTIONS.map(t => (
+              <button key={t.value} onClick={() => onUpdate(foundSurface.id, element.type, element.id, { trim: t.value })}
+                className={`px-2 py-1 rounded text-[9px] font-black transition-all ${(found.trim || 'none') === t.value ? 'bg-amber-600 text-white' : 'text-white/30 border border-white/10 hover:border-white/30'}`}
+                data-testid={`trim-${t.value}`}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* Tile info on element */}
+      {hasTile && (
+        <div className="pt-2 border-t border-white/10">
+          <div className="text-[8px] font-black text-green-400/70 mb-1">TILE APPLIED</div>
+          <div className="flex items-center gap-2">
+            <img src={found.material.image} alt="" className="w-8 h-8 rounded object-cover border border-white/20" />
+            <span className="text-[9px] text-white/50">{found.material.pattern || 'No pattern'}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1068,19 +1156,33 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   };
 
   const placeItemWithCrop = (surfaceId, zoneId, item, tileCrop) => {
-    updateSchedule(prev => ({
-      ...prev,
-      surfaces: prev.surfaces.map(s => {
-        if (s.id !== surfaceId) return s;
-        const filtered = s.materials.filter(m => m.position_label !== zoneId);
-        return { ...s, materials: [...filtered, {
-          id: crypto.randomUUID(), item_id: item.id, name: item.name || '', vendor: item.vendor || '',
-          sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
-          image: item._img || '', link: item.link || '', position_label: zoneId, pattern: '',
-          tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
-        }] };
-      })
-    }));
+    updateSchedule(prev => {
+      const targetSurface = prev.surfaces.find(s => s.id === surfaceId);
+      const isBackWall = targetSurface?.name?.toLowerCase().includes('back');
+      const matEntry = {
+        item_id: item.id, name: item.name || '', vendor: item.vendor || '',
+        sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
+        image: item._img || '', link: item.link || '', position_label: zoneId, pattern: '',
+        tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
+      };
+      return {
+        ...prev,
+        surfaces: prev.surfaces.map(s => {
+          if (s.id === surfaceId) {
+            const filtered = s.materials.filter(m => m.position_label !== zoneId);
+            return { ...s, materials: [...filtered, { ...matEntry, id: crypto.randomUUID() }] };
+          }
+          // Auto-fill side walls when placing on back wall
+          if (isBackWall && s.surface_type === 'wall' && s.id !== surfaceId) {
+            const alreadyHas = s.materials.find(m => m.position_label === zoneId);
+            if (!alreadyHas) {
+              return { ...s, materials: [...s.materials, { ...matEntry, id: crypto.randomUUID() }] };
+            }
+          }
+          return s;
+        })
+      };
+    });
   };
 
   const handlePlaceCeilingFloor = (surfaceId, item) => {
@@ -1132,7 +1234,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         return { ...s, niches: [...(s.niches || []), {
           id: crypto.randomUUID(), zone_id: zoneId,
           x: Math.max(0, Math.min(70, xPct - 15)), y: Math.max(0, Math.min(75, yPct - 12)),
-          w: 30, h: 25, material: null,
+          w: 30, h: 25, material: null, trim: 'none',
         }] };
       })
     }));
@@ -1146,8 +1248,8 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         if (s.id !== surfaceId) return s;
         return { ...s, benches: [...(s.benches || []), {
           id: crypto.randomUUID(), zone_id: zoneId,
-          x: Math.max(0, Math.min(60, xPct - 20)), y: Math.max(0, Math.min(70, yPct - 15)),
-          w: 40, h: 30, material: null,
+          x: Math.max(0, Math.min(60, xPct - 20)), y: 65,
+          w: 40, h: 35, material: null, trim: 'none',
         }] };
       })
     }));
@@ -1219,6 +1321,24 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         if (type === 'niche') return { ...s, niches: (s.niches || []).map(n => n.id === elementId ? { ...n, ...updates } : n) };
         if (type === 'bench') return { ...s, benches: (s.benches || []).map(b => b.id === elementId ? { ...b, ...updates } : b) };
         if (type === 'fixture') return { ...s, fixtures: (s.fixtures || []).map(f => f.id === elementId ? { ...f, ...updates } : f) };
+        return s;
+      })
+    }));
+  };
+
+  const handleApplyTileToElement = (surfaceId, elementType, elementId, item) => {
+    const existingCrop = findExistingCropForItem(item.id);
+    const material = {
+      image: item._img || '', pattern: 'stacked_horizontal',
+      tile_crop: existingCrop || null, grout_color: '#4a4035',
+      tile_orientation: 'horizontal', tile_scale: 1.0,
+    };
+    updateSchedule(prev => ({
+      ...prev,
+      surfaces: prev.surfaces.map(s => {
+        if (s.id !== surfaceId) return s;
+        if (elementType === 'niche') return { ...s, niches: (s.niches || []).map(n => n.id === elementId ? { ...n, material } : n) };
+        if (elementType === 'bench') return { ...s, benches: (s.benches || []).map(b => b.id === elementId ? { ...b, material } : b) };
         return s;
       })
     }));
@@ -1365,6 +1485,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               onSelectElement={setSelectedElement}
               onDeleteElement={handleDeleteElement}
               onUpdateElement={handleUpdateElement}
+              onApplyTileToElement={handleApplyTileToElement}
               onResizeZone={handleResizeZone}
               onEditDimension={handleEditDimension}
               onPlaceCeilingFloor={handlePlaceCeilingFloor}
