@@ -3,7 +3,7 @@
 ## Original Problem Statement
 Full-stack project management tool for an interior design company. Core feature: Room Finish Schedule with a 3D shower enclosure viewer where tile patterns can be visually and realistically applied to all surfaces.
 
-**Critical User Requirement**: Source material images already contain patterns (e.g., a photo of a sheet of subway tiles). The app MUST extract a single individual tile from the source image, then use that extracted tile to render new patterns on the canvas.
+**Critical User Requirement**: Source material images already contain patterns. The app MUST extract a single individual tile from the source image, then use that extracted tile to render new patterns on the canvas.
 
 ## Architecture
 - **Frontend**: React + Tailwind CSS + Shadcn/UI
@@ -11,70 +11,60 @@ Full-stack project management tool for an interior design company. Core feature:
 - **Database**: MongoDB (`interior_design_db`) with auto-seed on startup
 - **Key files**: 
   - `/app/backend/server.py` - API, models, seed, image proxy
-  - `/app/frontend/src/components/RoomFinishSchedule.js` - 3D shower viewer, crop modal, canvas rendering
+  - `/app/frontend/src/components/RoomFinishSchedule.js` - 3D shower viewer
 
 ## What's Been Implemented
 
-### Room Finish Schedule - FULLY WORKING
-- **3D Shower Enclosure Viewer** with CSS 3D perspective transforms
-  - Ceiling surface (rotateX 58deg)
-  - Floor surface (rotateX -52deg)
-  - Left wall (rotateY 42deg), Back wall (flat), Right wall (rotateY -42deg)
-  - Corner shadow lines for depth
-- **4 Wall Zones per wall**: Upper, Main Wall, Wainscot, Floor
-- **Zone Dimension Labels**: Editable "SIZE" buttons on back wall zones
-- **Single Tile Extraction** via Crop Modal (offscreen canvas approach)
-- **9 Tile Patterns**: Stacked H/V, Offset, 1/3 Offset, Herringbone, Herringbone Vertical, Basket Weave, Stepladder, Diagonal
+### 3D Shower Enclosure Viewer (One-Point Perspective)
+- **Clip-path perspective box** (NOT CSS 3D transforms): 5 surfaces rendered as trapezoids
+  - Ceiling: `clip-path: polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%)` at top 10%
+  - Floor: `clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)` at bottom 18%
+  - Left/Right walls: trapezoidal clip-paths
+  - Back wall: flat center rectangle (20%-80% width, 10%-82% height)
+  - SVG corner shadow lines for depth
+- **4 Configurable Wall Zones**: Upper, Main Wall, Wainscot, Floor
+  - Zone resize by dragging dividers between zones
+  - Editable dimension labels (SIZE buttons)
+- **Single Tile Extraction** via Crop Modal + **USE FULL IMAGE** button
+- **Tile Size Slider** (30%-300% scale, stored as tile_scale on material)
+- **9 Tile Patterns**: Stacked H/V, Offset, 1/3 Offset, Herringbone H/V, Basket Weave, Stepladder, Diagonal
 - **Grout Color Selection**: White, Light Gray, Gray, Brown, Charcoal, Black
 - **Tile Orientation Control**: Horizontal / Vertical toggle
-- **Niche Placement**: Click-to-place recessed shelf on any wall zone, with position/size controls
-- **Bench Placement**: Click-to-place seating on any wall zone, with position/size controls
-- **Fixture Placement**: Place plumbing items from FFE/Checklist as fixture pins on walls
-- **Material Palette** from room FFE items
-- **Measurement Canvas** with draw/edit/delete measurement lines
-- **Ceiling & Floor** as tileable surfaces
+- **Niche Placement**: Click-to-place, drag-to-move, drag corners to resize, tileable interior
+- **Bench Placement**: Click-to-place, drag-to-move, drag corners to resize, tileable
+- **Fixture Placement**: From FFE/Checklist items, drag-to-move
+- **Ceiling & Floor**: Clickable tileable surfaces
+- **Measurement Canvas**: Draw/edit/delete measurement lines
 
-### Key Technical Detail: Offscreen Canvas Approach
-```
-Source Image (1024x1024, shows many tiles)
-    → User crops one tile region {x, y, w, h}
-    → Offscreen Canvas created (crop.w x crop.h pixels)
-    → Only cropped region drawn onto offscreen canvas
-    → drawTilePattern receives offscreen canvas (NOT source image)
-    → Result: clean individual tiles in the pattern
-```
-
-### Backend Model (SurfaceEntry)
-- `zone_config`: Array of {id, label, height, dimension} for wall zone sizes
-- `niches`: Array of {id, zone_id, x, y, w, h, material} for recessed shelves
-- `benches`: Array of {id, zone_id, x, y, w, h, material} for seats
-- `fixtures`: Array of {id, item_id, name, image, zone_id, x, y} for plumbing
-- `class Config: extra = "allow"` for future extensibility
+### Backend Model
+- `SurfaceEntry`: zone_config, niches, benches, fixtures (class Config: extra = "allow")
+- `MaterialEntry`: tile_scale (Optional[float] = 1.0)
 
 ## Testing
-- iteration_44.json: 100% (2D version before 3D shower)
-- iteration_45.json: 100% backend (18/18) + 100% frontend (all 3D features verified)
+- iteration_44.json: 100% (original 2D version)
+- iteration_45.json: 100% (CSS 3D version)
+- iteration_46.json: 100% backend (19/19) + 100% frontend (clip-path version with all features)
 
 ## Key API Endpoints
-- `GET /api/proxy-image?url=<url>` - CORS proxy for canvas
-- `POST/GET/PUT/DELETE` for finish schedules under `/api/projects/{id}/rooms/{room_id}/finish-schedules`
+- `GET /api/proxy-image?url=<url>` - CORS proxy
+- `POST/GET/PUT/DELETE` finish schedules
 
 ## Prioritized Backlog
 
 ### P0 (Done)
-- 3D shower enclosure with ceiling + floor
-- Grout color selection
-- Tile orientation control
-- Niche, bench, fixture placement
-- Zone dimension labels
+- 3D shower enclosure with ceiling + floor (clip-path perspective)
+- Tile size control (slider 30-300%)
+- USE FULL IMAGE option in crop modal
+- Zone resize by dragging dividers
+- Niche/bench/fixture drag-to-move and drag-to-resize
+- Grout color, tile orientation controls
 
 ### P1
-- User verification and feedback on 3D shower visual quality
-- Drag-to-move and drag-to-resize for niches/benches/fixtures
-- Zone resize by dragging dividers between zones
+- User verification and feedback on updated 3D visual
+- Glass door panel / shower enclosure frame
 
 ### P2
 - Refactor ExactChecklistSpreadsheet.js (4000+ lines)
 - Break RoomFinishSchedule.js into smaller components
-- Rename GoogleAddressInput.js to AddressAutocompleteInput.js
+- Rename GoogleAddressInput.js
 - Archive /app/mobile/
