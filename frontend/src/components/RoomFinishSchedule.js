@@ -202,11 +202,10 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(x, y + th - bev, tw, bev); ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
-  // FIXED tile size — real tiles don't shrink based on wall size
-  // ~80px at scale 1.0 matches realistic shower tile proportions
+  // FIXED tile size — consistent across ALL zones and walls
   const refDim = Math.min(w, h);
-  let tl = Math.max(30, Math.min(200, 80 * scale));
-  let ts = Math.max(10, Math.round(tl / 3));
+  let tl = Math.max(20, Math.min(200, 35 * scale));
+  let ts = Math.max(8, Math.round(tl / 3));
   if (orientation === 'vertical') { const tmp = tl; tl = ts; ts = tmp; }
   const g = grout;
 
@@ -264,7 +263,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
       break;
     }
     case 'diagonal': {
-      const sq = Math.max(30, Math.min(200, 80 * scale)); const step = sq + g;
+      const sq = Math.max(20, Math.min(200, 35 * scale)); const step = sq + g;
       ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(Math.PI / 4);
       const range = Math.max(w, h) * 1.5;
       for (let y = -range; y < range; y += step) for (let x = -range; x < range; x += step) drawTile(x, y, sq, sq);
