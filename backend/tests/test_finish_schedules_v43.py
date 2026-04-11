@@ -15,9 +15,9 @@ import uuid
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://finish-schedule.preview.emergentagent.com').rstrip('/')
 
-# Test project and room IDs from the demo data
-TEST_PROJECT_ID = "7a2bfdad-57ef-4c34-876a-beefcc8c3115"
-TEST_ROOM_ID = "b36cc7f7-da5a-48cb-b3f5-185271975d64"
+# Test project and room IDs from the demo data (updated for iteration 44)
+TEST_PROJECT_ID = "a3f6f6c5-0cbd-41c3-a997-34321e21cea4"
+TEST_ROOM_ID = "c607262f-28b6-418c-a5b3-2812e0830bc7"
 
 
 class TestFinishScheduleAPI:

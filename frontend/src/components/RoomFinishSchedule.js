@@ -217,30 +217,24 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 
 // CANVAS TILE PATTERN RENDERER
-// Draws the SINGLE EXTRACTED TILE at correct positions for each pattern.
-// tileCrop = { x, y, w, h } pixel coords in the source image for the single tile.
-const drawTilePattern = (ctx, img, pattern, w, h, tileCrop) => {
+// tileImg = a canvas/image containing ONLY the single extracted tile (pre-cropped).
+const drawTilePattern = (ctx, tileImg, pattern, w, h) => {
   const grout = 6;
   const gc = '#4a4035';
 
   ctx.fillStyle = gc;
   ctx.fillRect(0, 0, w, h);
 
-  const imgW = img.naturalWidth || 200;
-  const imgH = img.naturalHeight || 200;
-
-  // Source region: the single extracted tile, or fallback to whole image
-  const src = tileCrop && tileCrop.w > 0 && tileCrop.h > 0
-    ? tileCrop
-    : { x: 0, y: 0, w: imgW, h: imgH };
+  const imgW = tileImg.width || tileImg.naturalWidth || 200;
+  const imgH = tileImg.height || tileImg.naturalHeight || 200;
 
   // Draw one tile at position (x, y) with dimensions (tw, th)
-  // Uses the SAME single extracted tile for every position
+  // tileImg IS the single tile — draw the ENTIRE thing into each slot
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
 
-    // Draw the single extracted tile scaled to fill this slot
-    ctx.drawImage(img, src.x, src.y, src.w, src.h, x, y, tw, th);
+    // Draw the whole tileImg (which contains ONLY one tile) scaled to fill this slot
+    ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
 
     // Subtle per-tile brightness variation for realism
     const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
@@ -367,6 +361,9 @@ const drawTilePattern = (ctx, img, pattern, w, h, tileCrop) => {
 };
 
 // React component that renders tile pattern on a canvas
+// KEY: Creates an OFFSCREEN CANVAS with ONLY the extracted single tile,
+// then passes that to drawTilePattern. This makes it IMPOSSIBLE to accidentally
+// render the full multi-tile source image.
 const TilePatternCanvas = ({ pattern, imageUrl, tileCrop }) => {
   const containerRef = React.useRef(null);
   const canvasRef = React.useRef(null);
@@ -390,7 +387,27 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop }) => {
     canvas.style.height = h + 'px';
 
     const ctx = canvas.getContext('2d');
-    drawTilePattern(ctx, img, pattern, w, h, tileCrop);
+
+    // Determine crop region: user-defined crop OR auto-crop center ~25% of image
+    const hasCrop = tileCrop && tileCrop.w > 0 && tileCrop.h > 0;
+    const crop = hasCrop
+      ? tileCrop
+      : {
+          x: Math.round(img.naturalWidth * 0.38),
+          y: Math.round(img.naturalHeight * 0.38),
+          w: Math.round(img.naturalWidth * 0.24),
+          h: Math.round(img.naturalHeight * 0.24),
+        };
+
+    // Create an offscreen canvas containing ONLY the single extracted tile
+    const tileCanvas = document.createElement('canvas');
+    tileCanvas.width = Math.max(1, Math.round(crop.w));
+    tileCanvas.height = Math.max(1, Math.round(crop.h));
+    const tctx = tileCanvas.getContext('2d');
+    tctx.drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, tileCanvas.width, tileCanvas.height);
+
+    // Now render the pattern using ONLY the single tile canvas
+    drawTilePattern(ctx, tileCanvas, pattern, w, h);
   }, [pattern, tileCrop]);
 
   React.useEffect(() => {
@@ -408,7 +425,6 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop }) => {
     return () => { img.onload = null; img.onerror = null; };
   }, [imageUrl, draw]);
 
-  // Re-draw when pattern or tileCrop changes
   React.useEffect(() => { draw(); }, [draw]);
 
   React.useEffect(() => {
