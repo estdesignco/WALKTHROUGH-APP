@@ -19032,11 +19032,17 @@ class MeasurementLine(BaseModel):
     thickness: int = 2
 
 class SurfaceEntry(BaseModel):
+    class Config:
+        extra = "allow"
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     surface_type: str = "wall"
     materials: List[MaterialEntry] = []
     measurement_lines: List[MeasurementLine] = []
+    zone_config: Optional[list] = None
+    niches: Optional[list] = None
+    benches: Optional[list] = None
+    fixtures: Optional[list] = None
 
 class FinishScheduleCreate(BaseModel):
     schedule_type: str = "tile"
