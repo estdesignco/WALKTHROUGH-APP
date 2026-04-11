@@ -184,7 +184,7 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
 const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale) => {
-  const grout = 5;
+  const grout = 3;
   ctx.fillStyle = groutColor || '#4a4035';
   ctx.fillRect(0, 0, w, h);
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
@@ -202,8 +202,10 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(x, y + th - bev, tw, bev); ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
-  let tl = Math.max(12, Math.min(180, h * 0.12 * scale));
-  let ts = Math.max(6, Math.round(tl / 3.5));
+  // Use the SMALLER dimension so tiles stay proportional on narrow side walls
+  const refDim = Math.min(w, h);
+  let tl = Math.max(8, Math.min(80, refDim * 0.07 * scale));
+  let ts = Math.max(4, Math.round(tl / 3.5));
   if (orientation === 'vertical') { const tmp = tl; tl = ts; ts = tmp; }
   const g = grout;
 
@@ -261,7 +263,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
       break;
     }
     case 'diagonal': {
-      const sq = Math.max(25, Math.min(120, h * 0.35 * scale)); const step = sq + g;
+      const sq = Math.max(8, Math.min(80, refDim * 0.07 * scale)); const step = sq + g;
       ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(Math.PI / 4);
       const range = Math.max(w, h) * 1.5;
       for (let y = -range; y < range; y += step) for (let x = -range; x < range; x += step) drawTile(x, y, sq, sq);
@@ -433,12 +435,10 @@ const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
       onClick={onClickZone}
       data-testid={`wall-zone-${zone.id}`}
     >
-      {hasImage && mat.pattern ? (
-        <TilePatternCanvas key={`${mat.pattern}-${mat.id}-${hasCrop ? 'c' : 'r'}-${mat.grout_color}-${mat.tile_orientation}-${mat.tile_scale}`}
-          pattern={mat.pattern} imageUrl={mat.image} tileCrop={mat.tile_crop}
+      {hasImage ? (
+        <TilePatternCanvas key={`${mat.pattern || 'sh'}-${mat.id}-${hasCrop ? 'c' : 'r'}-${mat.grout_color}-${mat.tile_orientation}-${mat.tile_scale}`}
+          pattern={mat.pattern || 'stacked_horizontal'} imageUrl={mat.image} tileCrop={mat.tile_crop}
           groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale} />
-      ) : hasImage ? (
-        <div className="absolute inset-0" style={{ backgroundImage: `url(${mat.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
       ) : (
         <div className="absolute inset-0" style={{ background: '#f5f5f0', borderBottom: '1px solid #ddd' }}>
           <div className="absolute inset-0 flex items-center justify-center"><span className="text-amber-600/30 text-[8px] font-bold">CLICK TO PLACE</span></div>
@@ -510,11 +510,15 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         callbacksRef.current.onResizeZone(d.surfaceId, newConfig);
       } else if (d.dragType.startsWith('niche') || d.dragType.startsWith('bench') || d.dragType === 'fixture') {
         const rect = d.zoneRect;
-        if (d.dragType === 'niche' || d.dragType === 'bench' || d.dragType === 'fixture') {
+        if (d.dragType === 'niche' || d.dragType === 'fixture') {
           const newX = Math.max(0, Math.min(95, ((e.clientX - rect.left - d.offsetX) / rect.width) * 100));
           const newY = Math.max(0, Math.min(95, ((e.clientY - rect.top - d.offsetY) / rect.height) * 100));
           const elType = d.dragType === 'fixture' ? 'fixture' : d.dragType;
           callbacksRef.current.onUpdateElement(d.surfaceId, elType, d.elementId, { x: Math.round(newX), y: Math.round(newY) });
+        } else if (d.dragType === 'bench') {
+          // Bench only moves horizontally — stays at bottom
+          const newX = Math.max(0, Math.min(95, ((e.clientX - rect.left - d.offsetX) / rect.width) * 100));
+          callbacksRef.current.onUpdateElement(d.surfaceId, 'bench', d.elementId, { x: Math.round(newX) });
         } else if (d.dragType.includes('resize')) {
           // Resize handles (tl, tr, bl, br)
           const corner = d.dragType.split('-').pop(); // tl, tr, bl, br
@@ -522,10 +526,18 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
           const pxToW = (1 / rect.width) * 100;
           const pxToH = (1 / rect.height) * 100;
           let { x, y, w, h } = d.startProps;
-          if (corner === 'br') { w = Math.max(10, d.startProps.w + dx * pxToW); h = Math.max(10, d.startProps.h + dy * pxToH); }
-          else if (corner === 'bl') { x = Math.max(0, d.startProps.x + dx * pxToW); w = Math.max(10, d.startProps.w - dx * pxToW); h = Math.max(10, d.startProps.h + dy * pxToH); }
-          else if (corner === 'tr') { y = d.startProps.y; w = Math.max(10, d.startProps.w + dx * pxToW); y = Math.max(0, d.startProps.y + dy * pxToH); h = Math.max(10, d.startProps.h - dy * pxToH); }
-          else if (corner === 'tl') { x = Math.max(0, d.startProps.x + dx * pxToW); y = Math.max(0, d.startProps.y + dy * pxToH); w = Math.max(10, d.startProps.w - dx * pxToW); h = Math.max(10, d.startProps.h - dy * pxToH); }
+          if (elType === 'bench') {
+            // Bench resize: only adjust width and height (bottom stays anchored)
+            if (corner === 'tl') { x = Math.max(0, d.startProps.x + dx * pxToW); w = Math.max(10, d.startProps.w - dx * pxToW); h = Math.max(5, d.startProps.h - dy * pxToH); }
+            else if (corner === 'tr') { w = Math.max(10, d.startProps.w + dx * pxToW); h = Math.max(5, d.startProps.h - dy * pxToH); }
+            else if (corner === 'bl') { x = Math.max(0, d.startProps.x + dx * pxToW); w = Math.max(10, d.startProps.w - dx * pxToW); }
+            else if (corner === 'br') { w = Math.max(10, d.startProps.w + dx * pxToW); }
+          } else {
+            if (corner === 'br') { w = Math.max(10, d.startProps.w + dx * pxToW); h = Math.max(10, d.startProps.h + dy * pxToH); }
+            else if (corner === 'bl') { x = Math.max(0, d.startProps.x + dx * pxToW); w = Math.max(10, d.startProps.w - dx * pxToW); h = Math.max(10, d.startProps.h + dy * pxToH); }
+            else if (corner === 'tr') { y = d.startProps.y; w = Math.max(10, d.startProps.w + dx * pxToW); y = Math.max(0, d.startProps.y + dy * pxToH); h = Math.max(10, d.startProps.h - dy * pxToH); }
+            else if (corner === 'tl') { x = Math.max(0, d.startProps.x + dx * pxToW); y = Math.max(0, d.startProps.y + dy * pxToH); w = Math.max(10, d.startProps.w - dx * pxToW); h = Math.max(10, d.startProps.h - dy * pxToH); }
+          }
           callbacksRef.current.onUpdateElement(d.surfaceId, elType, d.elementId, { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
         }
       }
@@ -629,12 +641,12 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
       accTop += zone.height;
       const mat = zoneMap[zone.id];
       const zoneNiches = (surface.niches || []).filter(n => n.zone_id === zone.id);
-      const zoneBenches = (surface.benches || []).filter(b => b.zone_id === zone.id);
       const zoneFixtures = (surface.fixtures || []).filter(f => f.zone_id === zone.id);
+      // Benches are rendered at wall level (below), NOT inside zones
       elements.push(
         <WallZone key={zone.id} zone={{ ...zone, top }} zoneHeight={zone.height} mat={mat}
           compact={compact} surfaceId={surface.id}
-          niches={zoneNiches} benches={zoneBenches} fixtures={zoneFixtures}
+          niches={zoneNiches} benches={[]} fixtures={zoneFixtures}
           selectedElement={selectedElement}
           selectedItem={selectedItem}
           onDragStart={handleElementDragStart}
@@ -661,6 +673,53 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         );
       }
     });
+    // Render ALL benches at the wall level, anchored to the bottom
+    const wallBenches = surface.benches || [];
+    wallBenches.forEach(bench => {
+      const benchRef = React.createRef();
+      elements.push(
+        <div key={`bench-${bench.id}`}
+          ref={benchRef}
+          data-testid={`bench-${bench.id}`}
+          className={`absolute cursor-grab active:cursor-grabbing z-20 transition-shadow ${selectedElement?.id === bench.id ? 'ring-2 ring-orange-400' : 'hover:ring-1 hover:ring-orange-300/50'}`}
+          style={{
+            left: `${bench.x}%`, bottom: '0%',
+            width: `${bench.w}%`, height: `${bench.h}%`,
+            boxShadow: '0 -2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+            border: bench.trim === 'schluter' ? '3px solid #c0c0c0' : bench.trim === 'bullnose' ? '3px solid #e8e0d4' : bench.trim === 'pencil' ? '2px solid #8b7355' : '2px solid rgba(100,80,60,0.5)',
+            background: '#ddd8d0', borderRadius: '2px 2px 0 0',
+          }}
+          onMouseDown={e => {
+            e.stopPropagation(); e.preventDefault();
+            if (selectedItem) {
+              if (surface.id && onApplyTileToElement) onApplyTileToElement(surface.id, 'bench', bench.id, selectedItem);
+            } else {
+              const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+              if (rect) handleElementDragStart(e, 'bench', bench, surface.id, rect);
+            }
+          }}>
+          {bench.material?.image && bench.material?.pattern && (
+            <TilePatternCanvas pattern={bench.material.pattern} imageUrl={bench.material.image}
+              tileCrop={bench.material.tile_crop} groutColor={bench.material.grout_color}
+              tileOrientation={bench.material.tile_orientation} tileScale={(bench.material.tile_scale || 1) * 0.5} />
+          )}
+          <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-[7px] font-black text-white/80 bg-black/60 text-center pointer-events-none">
+            BENCH {bench.width_inches ? `${bench.width_inches} × ${bench.height_inches || ''}` : ''}
+          </div>
+          {selectedElement?.id === bench.id && <>
+            <div className="absolute -top-1 -left-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-nw-resize z-30"
+              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); const rect = e.currentTarget.parentElement?.parentElement?.getBoundingClientRect(); if (rect) handleElementDragStart(e, 'bench-resize-tl', bench, surface.id, rect); }} />
+            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-ne-resize z-30"
+              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); const rect = e.currentTarget.parentElement?.parentElement?.getBoundingClientRect(); if (rect) handleElementDragStart(e, 'bench-resize-tr', bench, surface.id, rect); }} />
+            <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-sw-resize z-30"
+              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); const rect = e.currentTarget.parentElement?.parentElement?.getBoundingClientRect(); if (rect) handleElementDragStart(e, 'bench-resize-bl', bench, surface.id, rect); }} />
+            <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-se-resize z-30"
+              onMouseDown={e => { e.stopPropagation(); e.preventDefault(); const rect = e.currentTarget.parentElement?.parentElement?.getBoundingClientRect(); if (rect) handleElementDragStart(e, 'bench-resize-br', bench, surface.id, rect); }} />
+          </>}
+        </div>
+      );
+    });
     return elements;
   };
 
@@ -674,8 +733,8 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         onClick={(e) => { e.stopPropagation(); handleCeilingFloorClick(surface); }}
         data-testid={`surface-${surface.surface_type}`}
         style={{ pointerEvents: 'auto' }}>
-        {hasImage && mat.pattern ? (
-          <TilePatternCanvas pattern={mat.pattern} imageUrl={mat.image} tileCrop={mat.tile_crop}
+        {hasImage ? (
+          <TilePatternCanvas pattern={mat.pattern || 'stacked_horizontal'} imageUrl={mat.image} tileCrop={mat.tile_crop}
             groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale} />
         ) : (
           <div className="absolute inset-0" style={{ background: surface.surface_type === 'ceiling' ? '#e8e5df' : '#d8d4ce' }} />
@@ -1172,12 +1231,10 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
             const filtered = s.materials.filter(m => m.position_label !== zoneId);
             return { ...s, materials: [...filtered, { ...matEntry, id: crypto.randomUUID() }] };
           }
-          // Auto-fill side walls when placing on back wall
+          // Auto-fill side walls when placing on back wall — ALWAYS overwrite to stay in sync
           if (isBackWall && s.surface_type === 'wall' && s.id !== surfaceId) {
-            const alreadyHas = s.materials.find(m => m.position_label === zoneId);
-            if (!alreadyHas) {
-              return { ...s, materials: [...s.materials, { ...matEntry, id: crypto.randomUUID() }] };
-            }
+            const filtered = s.materials.filter(m => m.position_label !== zoneId);
+            return { ...s, materials: [...filtered, { ...matEntry, id: crypto.randomUUID() }] };
           }
           return s;
         })
@@ -1206,7 +1263,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         return { ...s, materials: [{
           id: crypto.randomUUID(), item_id: item.id, name: item.name || '',
           vendor: item.vendor || '', image: item._img || '', position_label: '_surface',
-          pattern: '', tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
+          pattern: 'stacked_horizontal', tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
         }] };
       })
     }));
@@ -1247,9 +1304,9 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
       surfaces: prev.surfaces.map(s => {
         if (s.id !== surfaceId) return s;
         return { ...s, benches: [...(s.benches || []), {
-          id: crypto.randomUUID(), zone_id: zoneId,
-          x: Math.max(0, Math.min(60, xPct - 20)), y: 65,
-          w: 40, h: 35, material: null, trim: 'none',
+          id: crypto.randomUUID(), zone_id: '_wall_level',
+          x: Math.max(0, Math.min(60, xPct - 20)), y: 0,
+          w: 40, h: 22, material: null, trim: 'none',
         }] };
       })
     }));
