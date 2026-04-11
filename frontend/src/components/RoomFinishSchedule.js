@@ -204,8 +204,8 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
 
   // Use the SMALLER dimension so tiles stay proportional on narrow side walls
   const refDim = Math.min(w, h);
-  let tl = Math.max(8, Math.min(80, refDim * 0.07 * scale));
-  let ts = Math.max(4, Math.round(tl / 3.5));
+  let tl = Math.max(14, Math.min(90, refDim * 0.12 * scale));
+  let ts = Math.max(6, Math.round(tl / 3.5));
   if (orientation === 'vertical') { const tmp = tl; tl = ts; ts = tmp; }
   const g = grout;
 
@@ -263,7 +263,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
       break;
     }
     case 'diagonal': {
-      const sq = Math.max(8, Math.min(80, refDim * 0.07 * scale)); const step = sq + g;
+      const sq = Math.max(14, Math.min(90, refDim * 0.12 * scale)); const step = sq + g;
       ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(Math.PI / 4);
       const range = Math.max(w, h) * 1.5;
       for (let y = -range; y < range; y += step) for (let x = -range; x < range; x += step) drawTile(x, y, sq, sq);

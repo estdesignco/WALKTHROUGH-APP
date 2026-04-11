@@ -27,7 +27,7 @@ Full-stack project management tool for an interior design company. Core feature:
   - Editable dimension labels (SIZE buttons)
 - **Single Tile Extraction** via Crop Modal + USE FULL IMAGE button
 - **Tile Size Slider** (50%-500% scale, stored as tile_scale on material)
-- **Realistic Tile Scale**: Base tile size = 12% of zone height (was 60%, way too big)
+- **Realistic Tile Scale**: Base tile size = 12% of min(width, height) with 3px grout lines
 - **9 Tile Patterns**: Stacked H/V, Offset, 1/3 Offset, Herringbone H/V, Basket Weave, Stepladder, Diagonal
 - **Grout Color Selection**: White, Light Gray, Gray, Brown, Charcoal, Black
 - **Tile Orientation Control**: Horizontal / Vertical toggle
