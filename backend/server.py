@@ -19019,6 +19019,7 @@ class MaterialEntry(BaseModel):
     tile_crop: Optional[dict] = None
     grout_color: str = "#4a4035"
     tile_orientation: str = "horizontal"
+    tile_scale: Optional[float] = 1.0  # Tile size scale (0.3 to 3.0, default 1.0 = 100%)
 
 class MeasurementLine(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

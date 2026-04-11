@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Ruler, Plus, Trash2, MousePointer, X, Pencil, Crop, RotateCw, Palette, Square, Droplet, GripVertical, ChevronDown, Move } from 'lucide-react';
+import { Ruler, Plus, Trash2, MousePointer, X, Pencil, Crop, RotateCw, Palette, Square, Droplet, GripVertical, Move } from 'lucide-react';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -54,14 +54,13 @@ const ensureSurfaceDefaults = (s) => ({
 
 const ensureAllSurfaces = (surfaces) => {
   let result = (surfaces || []).map(ensureSurfaceDefaults);
-  const hasType = (type) => result.some(s => s.surface_type === type);
-  if (!hasType('ceiling')) result.push(ensureSurfaceDefaults({ id: crypto.randomUUID(), name: 'Ceiling', surface_type: 'ceiling', materials: [] }));
-  if (!hasType('floor')) result.push(ensureSurfaceDefaults({ id: crypto.randomUUID(), name: 'Floor', surface_type: 'floor', materials: [] }));
+  if (!result.find(s => s.surface_type === 'ceiling')) result.push(ensureSurfaceDefaults({ id: crypto.randomUUID(), name: 'Ceiling', surface_type: 'ceiling', materials: [] }));
+  if (!result.find(s => s.surface_type === 'floor')) result.push(ensureSurfaceDefaults({ id: crypto.randomUUID(), name: 'Floor', surface_type: 'floor', materials: [] }));
   return result;
 };
 
 
-// ==================== SVG PATTERN THUMBNAILS ====================
+/* ==================== SVG PATTERN THUMBNAILS ==================== */
 const PatternThumb = ({ pattern, size = 60 }) => {
   const s = size, f = '#d6e4ed', k = '#555', w = 0.6;
   switch (pattern) {
@@ -89,7 +88,7 @@ const PatternThumb = ({ pattern, size = 60 }) => {
 };
 
 
-// ==================== TILE CROP MODAL ====================
+/* ==================== TILE CROP MODAL ==================== */
 const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
   const canvasRef = useRef(null);
   const previewCanvasRef = useRef(null);
@@ -142,11 +141,16 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
   const validCrop = crop && crop.w > 10 && crop.h > 10;
 
+  const handleUseFullImage = () => {
+    const img = imgRef.current;
+    if (img) onConfirm({ x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight });
+  };
+
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.88)' }} data-testid="tile-crop-modal">
       <div className="rounded-xl p-6 max-w-[720px] w-full mx-4" style={{ background: '#1c1c2a', border: '1px solid rgba(255,255,255,0.1)' }}>
         <h3 className="text-white font-black text-lg mb-1">EXTRACT SINGLE TILE</h3>
-        <p className="text-white/50 text-sm mb-4">Draw a rectangle around <span className="text-green-400 font-bold">ONE individual tile</span>.</p>
+        <p className="text-white/50 text-sm mb-4">Draw a rectangle around <span className="text-green-400 font-bold">ONE individual tile</span>, or use the full image.</p>
         <div className="flex gap-5 items-start">
           <div className="flex-1 overflow-auto rounded border border-white/10" style={{ background: '#111' }}>
             {!imgLoaded ? <div className="flex items-center justify-center h-48 text-white/30 text-sm">Loading...</div> : (
@@ -164,8 +168,12 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
             </div>
           )}
         </div>
-        <div className="flex gap-3 mt-5">
+        <div className="flex gap-3 mt-5 flex-wrap">
           <button disabled={!validCrop} onClick={() => onConfirm(crop)} className="px-6 py-2.5 rounded-lg text-sm font-black text-black bg-green-400 hover:bg-green-300 disabled:opacity-30 disabled:cursor-not-allowed" data-testid="crop-confirm-btn">USE THIS TILE</button>
+          <button onClick={handleUseFullImage} disabled={!imgLoaded}
+            className="px-6 py-2.5 rounded-lg text-sm font-black text-black bg-amber-400 hover:bg-amber-300 disabled:opacity-30 disabled:cursor-not-allowed" data-testid="use-full-image-btn">
+            USE FULL IMAGE
+          </button>
           <button onClick={onCancel} className="px-4 py-2.5 rounded-lg text-sm text-white/50 border border-white/20 hover:border-white/40" data-testid="crop-cancel-btn">Cancel</button>
         </div>
       </div>
@@ -174,13 +182,14 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 };
 
 
-// ==================== CANVAS TILE PATTERN RENDERER ====================
-const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation) => {
+/* ==================== CANVAS TILE PATTERN RENDERER ==================== */
+const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale) => {
   const grout = 5;
   ctx.fillStyle = groutColor || '#4a4035';
   ctx.fillRect(0, 0, w, h);
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
   const imgH = tileImg.height || tileImg.naturalHeight || 200;
+  const scale = tileScale || 1.0;
 
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
@@ -193,8 +202,8 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation) =
     ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(x, y + th - bev, tw, bev); ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
-  let tl = Math.max(60, Math.min(140, h * 0.6));
-  let ts = Math.max(18, Math.round(tl / 3.5));
+  let tl = Math.max(25, Math.min(300, h * 0.6 * scale));
+  let ts = Math.max(8, Math.round(tl / 3.5));
   if (orientation === 'vertical') { const tmp = tl; tl = ts; ts = tmp; }
   const g = grout;
 
@@ -216,7 +225,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation) =
       break;
     }
     case 'herringbone': {
-      const tw = Math.max(20, ts); const th = Math.max(50, tl);
+      const tw = Math.max(15, ts); const th = Math.max(35, tl);
       for (let row = -2; row < Math.ceil(h / (tw + g)) + 4; row++) {
         for (let col = -2; col < Math.ceil(w / (th + g)) + 4; col++) {
           const bx = col * (th + g); const by = row * (tw * 2 + g * 2);
@@ -227,7 +236,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation) =
       break;
     }
     case 'herringbone_vertical': {
-      const tw = Math.max(18, ts); const th = Math.max(50, tl);
+      const tw = Math.max(12, ts); const th = Math.max(35, tl);
       for (let col = -4; col < Math.ceil(w / (tw + g)) + 4; col++) {
         for (let row = -4; row < Math.ceil(h / (th / 2 + g)) + 4; row++) {
           const x = col * (tw * 2 + g); const y = row * (th / 2 + g);
@@ -252,7 +261,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation) =
       break;
     }
     case 'diagonal': {
-      const sq = Math.max(40, Math.min(80, h * 0.35)); const step = sq + g;
+      const sq = Math.max(25, Math.min(120, h * 0.35 * scale)); const step = sq + g;
       ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(Math.PI / 4);
       const range = Math.max(w, h) * 1.5;
       for (let y = -range; y < range; y += step) for (let x = -range; x < range; x += step) drawTile(x, y, sq, sq);
@@ -263,8 +272,8 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation) =
 };
 
 
-// ==================== TILE PATTERN CANVAS ====================
-const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrientation }) => {
+/* ==================== TILE PATTERN CANVAS ==================== */
+const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrientation, tileScale }) => {
   const containerRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const imgRef = React.useRef(null);
@@ -279,12 +288,12 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     const ctx = canvas.getContext('2d');
     const crop = (tileCrop && tileCrop.w > 0 && tileCrop.h > 0) ? tileCrop
-      : { x: Math.round(img.naturalWidth * 0.38), y: Math.round(img.naturalHeight * 0.38), w: Math.round(img.naturalWidth * 0.24), h: Math.round(img.naturalHeight * 0.24) };
+      : { x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight };
     const tileCanvas = document.createElement('canvas');
     tileCanvas.width = Math.max(1, Math.round(crop.w)); tileCanvas.height = Math.max(1, Math.round(crop.h));
     tileCanvas.getContext('2d').drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, tileCanvas.width, tileCanvas.height);
-    drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation);
-  }, [pattern, tileCrop, groutColor, tileOrientation]);
+    drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale);
+  }, [pattern, tileCrop, groutColor, tileOrientation, tileScale]);
 
   React.useEffect(() => {
     if (!imageUrl) return;
@@ -311,65 +320,86 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
 };
 
 
-// ==================== NICHE / BENCH / FIXTURE OVERLAYS ====================
-const NicheOverlay = ({ niche, isSelected, onClick }) => (
+/* ==================== NICHE / BENCH / FIXTURE OVERLAYS ==================== */
+const NicheOverlay = ({ niche, isSelected, onClick, onDragStart }) => (
   <div
-    onClick={e => { e.stopPropagation(); onClick(); }}
     data-testid={`niche-${niche.id}`}
-    className={`absolute cursor-pointer transition-all ${isSelected ? 'ring-2 ring-cyan-400 z-20' : 'z-10 hover:ring-1 hover:ring-cyan-300/50'}`}
+    className={`absolute cursor-grab active:cursor-grabbing transition-shadow ${isSelected ? 'ring-2 ring-cyan-400 z-20' : 'z-10 hover:ring-1 hover:ring-cyan-300/50'}`}
     style={{
       left: `${niche.x}%`, top: `${niche.y}%`, width: `${niche.w}%`, height: `${niche.h}%`,
       boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5), inset 0 -1px 4px rgba(0,0,0,0.2)',
       border: '1px solid rgba(0,0,0,0.4)', background: '#c8c4bc', borderRadius: '2px',
-    }}>
+    }}
+    onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'niche', niche); }}>
     {niche.material?.image && niche.material?.pattern && (
       <TilePatternCanvas pattern={niche.material.pattern} imageUrl={niche.material.image}
-        tileCrop={niche.material.tile_crop} groutColor={niche.material.grout_color} tileOrientation={niche.material.tile_orientation} />
+        tileCrop={niche.material.tile_crop} groutColor={niche.material.grout_color}
+        tileOrientation={niche.material.tile_orientation} tileScale={niche.material.tile_scale} />
     )}
-    <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-[7px] font-black text-white/80 bg-black/60 text-center">NICHE</div>
+    <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-[7px] font-black text-white/80 bg-black/60 text-center pointer-events-none">NICHE</div>
+    {isSelected && <>
+      <div className="absolute -top-1 -left-1 w-2.5 h-2.5 bg-cyan-400 border border-white rounded-full cursor-nw-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'niche-resize-tl', niche); }} />
+      <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-cyan-400 border border-white rounded-full cursor-ne-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'niche-resize-tr', niche); }} />
+      <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 bg-cyan-400 border border-white rounded-full cursor-sw-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'niche-resize-bl', niche); }} />
+      <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-cyan-400 border border-white rounded-full cursor-se-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'niche-resize-br', niche); }} />
+    </>}
   </div>
 );
 
-const BenchOverlay = ({ bench, isSelected, onClick }) => (
+const BenchOverlay = ({ bench, isSelected, onClick, onDragStart }) => (
   <div
-    onClick={e => { e.stopPropagation(); onClick(); }}
     data-testid={`bench-${bench.id}`}
-    className={`absolute cursor-pointer transition-all ${isSelected ? 'ring-2 ring-orange-400 z-20' : 'z-10 hover:ring-1 hover:ring-orange-300/50'}`}
+    className={`absolute cursor-grab active:cursor-grabbing transition-shadow ${isSelected ? 'ring-2 ring-orange-400 z-20' : 'z-10 hover:ring-1 hover:ring-orange-300/50'}`}
     style={{
       left: `${bench.x}%`, top: `${bench.y}%`, width: `${bench.w}%`, height: `${bench.h}%`,
       boxShadow: '0 3px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2)',
       border: '1px solid rgba(0,0,0,0.3)', background: '#ddd8d0', borderRadius: '2px',
-    }}>
+    }}
+    onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'bench', bench); }}>
     {bench.material?.image && bench.material?.pattern && (
       <TilePatternCanvas pattern={bench.material.pattern} imageUrl={bench.material.image}
-        tileCrop={bench.material.tile_crop} groutColor={bench.material.grout_color} tileOrientation={bench.material.tile_orientation} />
+        tileCrop={bench.material.tile_crop} groutColor={bench.material.grout_color}
+        tileOrientation={bench.material.tile_orientation} tileScale={bench.material.tile_scale} />
     )}
-    <div className="absolute top-0 left-0 right-0 h-[6px] bg-gradient-to-b from-white/20 to-transparent" />
-    <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-[7px] font-black text-white/80 bg-black/60 text-center">BENCH</div>
+    <div className="absolute top-0 left-0 right-0 h-[6px] bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+    <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-[7px] font-black text-white/80 bg-black/60 text-center pointer-events-none">BENCH</div>
+    {isSelected && <>
+      <div className="absolute -top-1 -left-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-nw-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'bench-resize-tl', bench); }} />
+      <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-ne-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'bench-resize-tr', bench); }} />
+      <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-sw-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'bench-resize-bl', bench); }} />
+      <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-orange-400 border border-white rounded-full cursor-se-resize z-30"
+        onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'bench-resize-br', bench); }} />
+    </>}
   </div>
 );
 
-const FixtureOverlay = ({ fixture, isSelected, onClick }) => (
+const FixtureOverlay = ({ fixture, isSelected, onClick, onDragStart }) => (
   <div
-    onClick={e => { e.stopPropagation(); onClick(); }}
     data-testid={`fixture-${fixture.id}`}
-    className={`absolute cursor-pointer z-10 ${isSelected ? 'ring-2 ring-blue-400 scale-110' : 'hover:scale-105'}`}
+    className={`absolute cursor-grab active:cursor-grabbing z-10 ${isSelected ? 'ring-2 ring-blue-400 scale-110' : 'hover:scale-105'}`}
     style={{
       left: `${fixture.x}%`, top: `${fixture.y}%`, transform: 'translate(-50%, -50%)',
       width: '36px', height: '36px', borderRadius: '50%',
       background: 'rgba(20,20,30,0.85)', border: '2px solid rgba(100,160,255,0.5)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      transition: 'transform 0.15s',
-    }}>
-    {fixture.image ? <img src={fixture.image} alt="" className="w-5 h-5 rounded-full object-cover" /> : <Droplet size={14} className="text-blue-400" />}
-    <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 px-1 py-0 rounded text-[6px] font-black text-white bg-black/80 whitespace-nowrap">{fixture.name || 'Fixture'}</div>
+      display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.15s',
+    }}
+    onMouseDown={e => { e.stopPropagation(); e.preventDefault(); onDragStart(e, 'fixture', fixture); }}>
+    {fixture.image ? <img src={fixture.image} alt="" className="w-5 h-5 rounded-full object-cover pointer-events-none" /> : <Droplet size={14} className="text-blue-400 pointer-events-none" />}
+    <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 px-1 py-0 rounded text-[6px] font-black text-white bg-black/80 whitespace-nowrap pointer-events-none">{fixture.name || 'Fixture'}</div>
   </div>
 );
 
 
-// ==================== WALL ZONE ====================
-const WallZone = ({ zone, zoneHeight, mat, isSelected, compact, niches, benches, fixtures,
-  onClickZone, onRemove, onOpenPattern, onCropTile, selectedElement, onSelectElement }) => {
+/* ==================== WALL ZONE ==================== */
+const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
+  onClickZone, onRemove, onOpenPattern, onCropTile, selectedElement, onDragStart }) => {
   const hasImage = mat?.image;
   const hasCrop = mat?.tile_crop && mat.tile_crop.w > 0;
   const patternLabel = mat?.pattern ? TILE_PATTERNS.find(p => p.value === mat.pattern)?.label : null;
@@ -382,23 +412,27 @@ const WallZone = ({ zone, zoneHeight, mat, isSelected, compact, niches, benches,
       data-testid={`wall-zone-${zone.id}`}
     >
       {hasImage && mat.pattern ? (
-        <TilePatternCanvas key={`${mat.pattern}-${mat.id}-${hasCrop ? 'c' : 'r'}-${mat.grout_color}-${mat.tile_orientation}`}
-          pattern={mat.pattern} imageUrl={mat.image} tileCrop={mat.tile_crop} groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} />
+        <TilePatternCanvas key={`${mat.pattern}-${mat.id}-${hasCrop ? 'c' : 'r'}-${mat.grout_color}-${mat.tile_orientation}-${mat.tile_scale}`}
+          pattern={mat.pattern} imageUrl={mat.image} tileCrop={mat.tile_crop}
+          groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale} />
       ) : hasImage ? (
         <div className="absolute inset-0" style={{ backgroundImage: `url(${mat.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
       ) : (
         <div className="absolute inset-0" style={{ background: '#f5f5f0', borderBottom: '1px solid #ddd' }}>
-          {isSelected && <div className="absolute inset-0 border-2 border-dashed border-amber-400/40 bg-amber-400/5 flex items-center justify-center"><span className="text-amber-600/40 text-[8px] font-bold">CLICK TO PLACE</span></div>}
+          <div className="absolute inset-0 flex items-center justify-center"><span className="text-amber-600/30 text-[8px] font-bold">CLICK TO PLACE</span></div>
         </div>
       )}
       {/* Niches */}
-      {(niches || []).map(n => <NicheOverlay key={n.id} niche={n} isSelected={selectedElement?.id === n.id} onClick={() => onSelectElement({ type: 'niche', id: n.id })} />)}
+      {(niches || []).map(n => <NicheOverlay key={n.id} niche={n}
+        isSelected={selectedElement?.id === n.id} onDragStart={onDragStart} />)}
       {/* Benches */}
-      {(benches || []).map(b => <BenchOverlay key={b.id} bench={b} isSelected={selectedElement?.id === b.id} onClick={() => onSelectElement({ type: 'bench', id: b.id })} />)}
+      {(benches || []).map(b => <BenchOverlay key={b.id} bench={b}
+        isSelected={selectedElement?.id === b.id} onDragStart={onDragStart} />)}
       {/* Fixtures */}
-      {(fixtures || []).map(f => <FixtureOverlay key={f.id} fixture={f} isSelected={selectedElement?.id === f.id} onClick={() => onSelectElement({ type: 'fixture', id: f.id })} />)}
+      {(fixtures || []).map(f => <FixtureOverlay key={f.id} fixture={f}
+        isSelected={selectedElement?.id === f.id} onDragStart={onDragStart} />)}
       {/* Zone info bar */}
-      <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 py-0.5 ${compact ? 'py-0' : ''}`}
+      <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 ${compact ? 'py-0' : 'py-0.5'}`}
         style={hasImage ? { background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' } : { borderTop: '1px solid #ddd' }}>
         <div className="flex items-center gap-1 flex-wrap min-w-0">
           <span className={`text-[${compact ? '7' : '9'}px] font-black uppercase tracking-wider ${hasImage ? 'text-white' : 'text-gray-400'}`}>{zone.label}</span>
@@ -408,28 +442,84 @@ const WallZone = ({ zone, zoneHeight, mat, isSelected, compact, niches, benches,
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
           {mat && <>
             <button onClick={e => { e.stopPropagation(); onCropTile(); }} className={`px-1 py-0.5 rounded text-[8px] font-black flex items-center gap-0.5 ${hasCrop ? 'text-green-300 bg-black/80' : 'text-orange-300 bg-black/80 animate-pulse'}`} data-testid={`crop-btn-${zone.id}`}><Crop size={8} />CROP</button>
-            <button onClick={e => { e.stopPropagation(); onOpenPattern(); }} className="px-1 py-0.5 rounded text-[8px] font-black text-amber-300 bg-black/80" data-testid={`pattern-btn-${zone.id}`}>PTN</button>
+            <button onClick={e => { e.stopPropagation(); onOpenPattern(); }} className="px-1 py-0.5 rounded text-[8px] font-black text-amber-300 bg-black/80" data-testid={`pattern-btn-${zone.id}`}>PATTERN</button>
             <button onClick={e => { e.stopPropagation(); onRemove(); }} className="px-0.5 py-0.5 rounded text-[8px] text-red-300 bg-black/80"><Trash2 size={8} /></button>
           </>}
         </div>
       </div>
-      {/* Resize handle at bottom */}
-      {!compact && <div className="absolute bottom-0 left-0 right-0 h-[3px] cursor-row-resize hover:bg-amber-400/50 z-30 group-hover:bg-amber-400/20" data-testid={`zone-resize-${zone.id}`} />}
     </div>
   );
 };
 
 
-// ==================== 3D SHOWER PERSPECTIVE VIEW ====================
+/* ==================== 3D SHOWER PERSPECTIVE VIEW ==================== */
 const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
   onPlaceItem, onPlaceFixture, onAddNiche, onAddBench, onRemoveMaterial,
-  onChangePattern, onCropTile, onChangeGrout, onChangeOrientation,
+  onChangePattern, onCropTile, onChangeGrout, onChangeOrientation, onChangeTileScale,
   onSelectElement, onDeleteElement, onUpdateElement,
   onResizeZone, onEditDimension, onPlaceCeilingFloor }) => {
 
   const [patternPicker, setPatternPicker] = useState(null);
   const [editingDim, setEditingDim] = useState(null);
   const [dimValue, setDimValue] = useState('');
+  const dragRef = useRef(null);
+  const callbacksRef = useRef({});
+  callbacksRef.current = { onUpdateElement, onResizeZone, onSelectElement };
+
+  // Global drag handlers for element move/resize and zone resize
+  useEffect(() => {
+    const handleMove = (e) => {
+      if (!dragRef.current) return;
+      const d = dragRef.current;
+      const dx = e.clientX - d.startMouseX;
+      const dy = e.clientY - d.startMouseY;
+      if (!d.moved && Math.abs(dx) + Math.abs(dy) < 4) return;
+      d.moved = true;
+
+      if (d.dragType === 'zone-resize') {
+        const deltaPct = (dy / d.wallHeight) * 100;
+        const newConfig = d.startConfig.map(z => ({ ...z }));
+        const total = newConfig[d.zoneIdx].height + newConfig[d.zoneIdx + 1].height;
+        const newH = Math.max(5, Math.min(total - 5, d.startConfig[d.zoneIdx].height + deltaPct));
+        newConfig[d.zoneIdx] = { ...newConfig[d.zoneIdx], height: newH };
+        newConfig[d.zoneIdx + 1] = { ...newConfig[d.zoneIdx + 1], height: total - newH };
+        callbacksRef.current.onResizeZone(d.surfaceId, newConfig);
+      } else if (d.dragType.startsWith('niche') || d.dragType.startsWith('bench') || d.dragType === 'fixture') {
+        const rect = d.zoneRect;
+        if (d.dragType === 'niche' || d.dragType === 'bench' || d.dragType === 'fixture') {
+          const newX = Math.max(0, Math.min(95, ((e.clientX - rect.left - d.offsetX) / rect.width) * 100));
+          const newY = Math.max(0, Math.min(95, ((e.clientY - rect.top - d.offsetY) / rect.height) * 100));
+          const elType = d.dragType === 'fixture' ? 'fixture' : d.dragType;
+          callbacksRef.current.onUpdateElement(d.surfaceId, elType, d.elementId, { x: Math.round(newX), y: Math.round(newY) });
+        } else if (d.dragType.includes('resize')) {
+          // Resize handles (tl, tr, bl, br)
+          const corner = d.dragType.split('-').pop(); // tl, tr, bl, br
+          const elType = d.dragType.startsWith('niche') ? 'niche' : 'bench';
+          const pxToW = (1 / rect.width) * 100;
+          const pxToH = (1 / rect.height) * 100;
+          let { x, y, w, h } = d.startProps;
+          if (corner === 'br') { w = Math.max(10, d.startProps.w + dx * pxToW); h = Math.max(10, d.startProps.h + dy * pxToH); }
+          else if (corner === 'bl') { x = Math.max(0, d.startProps.x + dx * pxToW); w = Math.max(10, d.startProps.w - dx * pxToW); h = Math.max(10, d.startProps.h + dy * pxToH); }
+          else if (corner === 'tr') { y = d.startProps.y; w = Math.max(10, d.startProps.w + dx * pxToW); y = Math.max(0, d.startProps.y + dy * pxToH); h = Math.max(10, d.startProps.h - dy * pxToH); }
+          else if (corner === 'tl') { x = Math.max(0, d.startProps.x + dx * pxToW); y = Math.max(0, d.startProps.y + dy * pxToH); w = Math.max(10, d.startProps.w - dx * pxToW); h = Math.max(10, d.startProps.h - dy * pxToH); }
+          callbacksRef.current.onUpdateElement(d.surfaceId, elType, d.elementId, { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
+        }
+      }
+    };
+
+    const handleUp = () => {
+      if (dragRef.current && !dragRef.current.moved) {
+        // Was a click, not a drag — select the element
+        const d = dragRef.current;
+        if (d.elementId) callbacksRef.current.onSelectElement({ type: d.elementBaseType, id: d.elementId });
+      }
+      dragRef.current = null;
+    };
+
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    return () => { document.removeEventListener('mousemove', handleMove); document.removeEventListener('mouseup', handleUp); };
+  }, []);
 
   const surfaces = schedule.surfaces || [];
   const walls = surfaces.filter(s => s.surface_type === 'wall');
@@ -454,24 +544,54 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
     const xPct = ((e.clientX - rect.left) / rect.width) * 100;
     const yPct = ((e.clientY - rect.top) / rect.height) * 100;
 
-    if (placementMode === 'niche') {
-      onAddNiche(surface.id, zoneId, xPct, yPct);
-    } else if (placementMode === 'bench') {
-      onAddBench(surface.id, zoneId, xPct, yPct);
-    } else if (placementMode === 'fixture' && selectedItem) {
-      onPlaceFixture(surface.id, zoneId, selectedItem, xPct, yPct);
-    } else if (selectedItem) {
-      onPlaceItem(surface.id, zoneId, selectedItem);
-    }
+    if (placementMode === 'niche') onAddNiche(surface.id, zoneId, xPct, yPct);
+    else if (placementMode === 'bench') onAddBench(surface.id, zoneId, xPct, yPct);
+    else if (placementMode === 'fixture' && selectedItem) onPlaceFixture(surface.id, zoneId, selectedItem, xPct, yPct);
+    else if (selectedItem) onPlaceItem(surface.id, zoneId, selectedItem);
   };
 
   const handleCeilingFloorClick = (surface) => {
     if (!surface || !selectedItem) return;
-    if (placementMode === 'fixture') {
-      onPlaceFixture(surface.id, '_surface', selectedItem, 50, 50);
-    } else {
-      onPlaceCeilingFloor(surface.id, selectedItem);
+    if (placementMode === 'fixture') onPlaceFixture(surface.id, '_surface', selectedItem, 50, 50);
+    else onPlaceCeilingFloor(surface.id, selectedItem);
+  };
+
+  // Element drag start handler — passed to all overlays
+  const handleElementDragStart = (e, dragType, element) => {
+    const zoneEl = e.target.closest('[data-testid^="wall-zone-"]') || e.target.closest('[data-testid^="surface-"]');
+    if (!zoneEl) return;
+    const zoneRect = zoneEl.getBoundingClientRect();
+    // Find which surface this element belongs to
+    let surfaceId = null;
+    let elementBaseType = dragType.replace(/-resize-.+$/, '');
+    for (const s of surfaces) {
+      if (elementBaseType === 'niche' && (s.niches || []).find(n => n.id === element.id)) { surfaceId = s.id; break; }
+      if (elementBaseType === 'bench' && (s.benches || []).find(b => b.id === element.id)) { surfaceId = s.id; break; }
+      if (elementBaseType === 'fixture' && (s.fixtures || []).find(f => f.id === element.id)) { surfaceId = s.id; break; }
     }
+    if (!surfaceId) return;
+
+    dragRef.current = {
+      dragType, surfaceId, elementId: element.id, elementBaseType,
+      zoneRect, startMouseX: e.clientX, startMouseY: e.clientY, moved: false,
+      offsetX: e.clientX - zoneRect.left - (element.x / 100) * zoneRect.width,
+      offsetY: e.clientY - zoneRect.top - (element.y / 100) * zoneRect.height,
+      startProps: { x: element.x, y: element.y, w: element.w, h: element.h },
+    };
+  };
+
+  // Zone resize start handler
+  const handleZoneResizeStart = (e, surface, zoneIdx) => {
+    e.preventDefault(); e.stopPropagation();
+    const wallEl = e.currentTarget.parentElement;
+    if (!wallEl) return;
+    const wallRect = wallEl.getBoundingClientRect();
+    const zones = getZoneConfig(surface);
+    dragRef.current = {
+      dragType: 'zone-resize', surfaceId: surface.id, zoneIdx,
+      startMouseX: e.clientX, startMouseY: e.clientY, moved: false,
+      wallHeight: wallRect.height, startConfig: zones.map(z => ({ ...z })),
+    };
   };
 
   const renderWallFace = (surface, compact) => {
@@ -479,26 +599,43 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
     const zoneMap = getZoneMap(surface);
     const zones = getZoneConfig(surface);
     let accTop = 0;
-    return zones.map((zone, idx) => {
+    const elements = [];
+    zones.forEach((zone, idx) => {
       const top = accTop;
       accTop += zone.height;
       const mat = zoneMap[zone.id];
       const zoneNiches = (surface.niches || []).filter(n => n.zone_id === zone.id);
       const zoneBenches = (surface.benches || []).filter(b => b.zone_id === zone.id);
       const zoneFixtures = (surface.fixtures || []).filter(f => f.zone_id === zone.id);
-      return (
+      elements.push(
         <WallZone key={zone.id} zone={{ ...zone, top }} zoneHeight={zone.height} mat={mat}
-          isSelected={!!selectedItem && !placementMode} compact={compact}
+          compact={compact}
           niches={zoneNiches} benches={zoneBenches} fixtures={zoneFixtures}
           selectedElement={selectedElement}
-          onSelectElement={onSelectElement}
+          onDragStart={handleElementDragStart}
           onClickZone={(e) => handleZoneClick(surface, zone.id, e)}
           onRemove={() => mat && onRemoveMaterial(surface.id, mat.id)}
           onOpenPattern={() => setPatternPicker(patternPicker?.zoneId === zone.id && patternPicker?.surfaceId === surface.id ? null : { surfaceId: surface.id, zoneId: zone.id })}
           onCropTile={() => mat && onCropTile(surface.id, mat.id, mat.image, mat.tile_crop)}
         />
       );
+      // Zone resize handle between zones (only on non-compact walls)
+      if (!compact && idx < zones.length - 1) {
+        elements.push(
+          <div key={`resize-${idx}`}
+            className="absolute left-0 right-0 z-30 cursor-row-resize group/rz"
+            style={{ top: `${accTop}%`, height: '10px', transform: 'translateY(-5px)' }}
+            onMouseDown={(e) => handleZoneResizeStart(e, surface, idx)}
+            data-testid={`zone-handle-${idx}`}>
+            <div className="absolute left-[10%] right-[10%] top-1/2 -translate-y-1/2 h-[3px] rounded bg-transparent group-hover/rz:bg-amber-400/70 transition-all" />
+            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-6 h-3 rounded bg-transparent group-hover/rz:bg-amber-400 flex items-center justify-center opacity-0 group-hover/rz:opacity-100 transition-all">
+              <GripVertical size={8} className="text-black rotate-90" />
+            </div>
+          </div>
+        );
+      }
     });
+    return elements;
   };
 
   const renderSimpleSurface = (surface, label) => {
@@ -511,12 +648,12 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         onClick={() => handleCeilingFloorClick(surface)} data-testid={`surface-${surface.surface_type}`}>
         {hasImage && mat.pattern ? (
           <TilePatternCanvas pattern={mat.pattern} imageUrl={mat.image} tileCrop={mat.tile_crop}
-            groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} />
+            groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale} />
         ) : (
           <div className="absolute inset-0" style={{ background: surface.surface_type === 'ceiling' ? '#e8e5df' : '#d8d4ce' }} />
         )}
         {surfFixtures.map(f => <FixtureOverlay key={f.id} fixture={f} isSelected={selectedElement?.id === f.id}
-          onClick={() => onSelectElement({ type: 'fixture', id: f.id })} />)}
+          onDragStart={handleElementDragStart} />)}
         <div className="absolute top-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[7px] font-black text-white/70 bg-black/40 z-10 pointer-events-none">{label}</div>
         {selectedItem && !hasImage && (
           <div className="absolute inset-0 bg-amber-400/10 border-2 border-dashed border-amber-400/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -530,102 +667,103 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
   const pickerSurface = patternPicker ? surfaces.find(s => s.id === patternPicker.surfaceId) : null;
   const pickerMat = pickerSurface ? (pickerSurface.materials || []).find(m => m.position_label === patternPicker?.zoneId) : null;
 
-  const dimEditZone = editingDim;
-
   return (
     <div data-testid="shower-3d-view">
-      {/* 3D SHOWER ENCLOSURE */}
-      <div style={{ perspective: '1400px', perspectiveOrigin: '50% 45%', width: '100%', height: '660px', position: 'relative' }}>
-        <div style={{ transformStyle: 'preserve-3d', width: '100%', height: '100%', position: 'relative' }}>
+      {/* 3D SHOWER ENCLOSURE — one-point perspective box using clip-path */}
+      <div style={{ width: '100%', height: '720px', position: 'relative', background: '#0a0a10', borderRadius: '12px', overflow: 'hidden' }}>
 
-          {/* CEILING */}
-          <div style={{
-            position: 'absolute', left: '22%', width: '56%', top: 0, height: '60px',
-            transformOrigin: 'center bottom', transform: 'rotateX(58deg)',
-            overflow: 'hidden', borderRadius: '4px 4px 0 0',
-            boxShadow: 'inset 0 -3px 12px rgba(0,0,0,0.15)',
-          }}>
-            {renderSimpleSurface(ceiling, ceiling?.name || 'CEILING')}
-          </div>
-
-          {/* LEFT WALL */}
-          <div style={{
-            position: 'absolute', left: 0, top: '60px', width: '22%', height: '490px',
-            transformOrigin: 'right center', transform: 'rotateY(42deg)',
-            overflow: 'hidden', borderRadius: '4px 0 0 4px',
-            boxShadow: 'inset -15px 0 30px rgba(0,0,0,0.12)',
-          }}>
-            <div className="absolute inset-0" style={{ background: '#eae6e0' }} />
-            {renderWallFace(leftWall, true)}
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.06), transparent)' }} />
-            <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10">{leftWall?.name || 'LEFT WALL'}</div>
-          </div>
-
-          {/* BACK WALL (center, flat) */}
-          <div style={{
-            position: 'absolute', left: '22%', top: '60px', width: '56%', height: '490px',
-            overflow: 'hidden', border: '2px solid #888',
-            boxShadow: '0 4px 30px rgba(0,0,0,0.3), inset 0 0 30px rgba(0,0,0,0.04)',
-          }}>
-            <div className="absolute inset-0" style={{ background: '#f5f2ed' }} />
-            {renderWallFace(backWall, false)}
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[8px] font-black text-white/70 bg-black/40 z-10">{backWall?.name || 'BACK WALL'}</div>
-            {/* Zone dimension labels on the right edge */}
-            {backWall && getZoneConfig(backWall).reduce((acc, zone) => {
-              const top = acc.top;
-              acc.items.push(
-                <div key={zone.id} className="absolute right-0 flex items-center z-20" style={{ top: `${top}%`, height: `${zone.height}%` }}>
-                  <div className="flex flex-col items-end pr-1 gap-0.5">
-                    <div className="flex items-center">
-                      {editingDim?.surfaceId === backWall.id && editingDim?.zoneId === zone.id ? (
-                        <input autoFocus value={dimValue} onChange={e => setDimValue(e.target.value)}
-                          onKeyDown={e => { if (e.key === 'Enter') { onEditDimension(backWall.id, zone.id, dimValue); setEditingDim(null); } if (e.key === 'Escape') setEditingDim(null); }}
-                          onBlur={() => { onEditDimension(backWall.id, zone.id, dimValue); setEditingDim(null); }}
-                          className="w-16 px-1 py-0 text-[9px] font-mono bg-black text-amber-300 border border-amber-400/60 rounded text-right"
-                          onClick={e => e.stopPropagation()} data-testid={`dim-input-${zone.id}`} />
-                      ) : (
-                        <button onClick={e => { e.stopPropagation(); setEditingDim({ surfaceId: backWall.id, zoneId: zone.id }); setDimValue(zone.dimension || ''); }}
-                          className="px-1.5 py-0.5 rounded text-[8px] font-mono text-amber-300/70 bg-black/50 hover:bg-black/70 border border-transparent hover:border-amber-400/40 transition-all"
-                          data-testid={`dim-label-${zone.id}`}>
-                          {zone.dimension || 'SIZE'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-              acc.top += zone.height;
-              return acc;
-            }, { top: 0, items: [] }).items}
-          </div>
-
-          {/* RIGHT WALL */}
-          <div style={{
-            position: 'absolute', right: 0, top: '60px', width: '22%', height: '490px',
-            transformOrigin: 'left center', transform: 'rotateY(-42deg)',
-            overflow: 'hidden', borderRadius: '0 4px 4px 0',
-            boxShadow: 'inset 15px 0 30px rgba(0,0,0,0.12)',
-          }}>
-            <div className="absolute inset-0" style={{ background: '#e4e0da' }} />
-            {renderWallFace(rightWall, true)}
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.06), transparent)' }} />
-            <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10">{rightWall?.name || 'RIGHT WALL'}</div>
-          </div>
-
-          {/* FLOOR */}
-          <div style={{
-            position: 'absolute', left: '22%', width: '56%', bottom: 0, height: '110px',
-            transformOrigin: 'center top', transform: 'rotateX(-52deg)',
-            overflow: 'hidden', borderRadius: '0 0 4px 4px',
-            boxShadow: 'inset 0 3px 12px rgba(0,0,0,0.15)',
-          }}>
-            {renderSimpleSurface(floor, floor?.name || 'FLOOR')}
-          </div>
-
-          {/* Corner shadow lines */}
-          <div className="absolute pointer-events-none" style={{ left: '21.8%', top: '60px', width: '3px', height: '490px', background: 'rgba(0,0,0,0.3)', zIndex: 25 }} />
-          <div className="absolute pointer-events-none" style={{ right: '21.8%', top: '60px', width: '3px', height: '490px', background: 'rgba(0,0,0,0.3)', zIndex: 25 }} />
+        {/* CEILING — trapezoid */}
+        <div style={{
+          position: 'absolute', left: 0, top: 0, width: '100%', height: '10%',
+          clipPath: 'polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%)',
+          background: '#e8e5df',
+        }}>
+          {renderSimpleSurface(ceiling, ceiling?.name || 'CEILING')}
         </div>
+
+        {/* LEFT WALL — trapezoid */}
+        <div style={{
+          position: 'absolute', left: 0, top: 0, width: '20%', height: '100%',
+          clipPath: 'polygon(0% 0%, 100% 10%, 100% 82%, 0% 100%)',
+          background: '#eae6e0',
+        }}>
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.08), transparent)' }} />
+          {renderWallFace(leftWall, true)}
+          <div className="absolute top-[12%] left-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10 pointer-events-none">{leftWall?.name || 'LEFT WALL'}</div>
+        </div>
+
+        {/* BACK WALL — flat center rectangle */}
+        <div data-surface-id={backWall?.id} style={{
+          position: 'absolute', left: '20%', top: '10%', width: '60%', height: '72%',
+          background: '#f5f2ed', border: '2px solid #666',
+          boxShadow: '0 4px 30px rgba(0,0,0,0.4), inset 0 0 30px rgba(0,0,0,0.04)',
+        }}>
+          {renderWallFace(backWall, false)}
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[8px] font-black text-white/70 bg-black/40 z-10 pointer-events-none">{backWall?.name || 'BACK WALL'}</div>
+          {/* Zone dimension labels on the right edge */}
+          {backWall && getZoneConfig(backWall).reduce((acc, zone) => {
+            const top = acc.top;
+            acc.items.push(
+              <div key={zone.id} className="absolute right-0 flex items-center z-20" style={{ top: `${top}%`, height: `${zone.height}%` }}>
+                <div className="flex flex-col items-end pr-1 gap-0.5">
+                  {editingDim?.surfaceId === backWall.id && editingDim?.zoneId === zone.id ? (
+                    <input autoFocus value={dimValue} onChange={e => setDimValue(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { onEditDimension(backWall.id, zone.id, dimValue); setEditingDim(null); } if (e.key === 'Escape') setEditingDim(null); }}
+                      onBlur={() => { onEditDimension(backWall.id, zone.id, dimValue); setEditingDim(null); }}
+                      className="w-16 px-1 py-0 text-[9px] font-mono bg-black text-amber-300 border border-amber-400/60 rounded text-right"
+                      onClick={e => e.stopPropagation()} data-testid={`dim-input-${zone.id}`} />
+                  ) : (
+                    <button onClick={e => { e.stopPropagation(); setEditingDim({ surfaceId: backWall.id, zoneId: zone.id }); setDimValue(zone.dimension || ''); }}
+                      className="px-1.5 py-0.5 rounded text-[8px] font-mono text-amber-300/70 bg-black/50 hover:bg-black/70 border border-transparent hover:border-amber-400/40 transition-all"
+                      data-testid={`dim-label-${zone.id}`}>
+                      {zone.dimension || 'SIZE'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+            acc.top += zone.height;
+            return acc;
+          }, { top: 0, items: [] }).items}
+        </div>
+
+        {/* RIGHT WALL — trapezoid */}
+        <div style={{
+          position: 'absolute', right: 0, top: 0, width: '20%', height: '100%',
+          clipPath: 'polygon(0% 10%, 100% 0%, 100% 100%, 0% 82%)',
+          background: '#e4e0da',
+        }}>
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.08), transparent)' }} />
+          {renderWallFace(rightWall, true)}
+          <div className="absolute top-[12%] right-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10 pointer-events-none">{rightWall?.name || 'RIGHT WALL'}</div>
+        </div>
+
+        {/* FLOOR — trapezoid, much larger and visible */}
+        <div style={{
+          position: 'absolute', left: 0, bottom: 0, width: '100%', height: '18%',
+          clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)',
+          background: '#d8d4ce',
+        }}>
+          {renderSimpleSurface(floor, floor?.name || 'FLOOR')}
+        </div>
+
+        {/* Corner shadow lines for depth */}
+        <svg className="absolute inset-0 pointer-events-none z-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+          {/* Top-left corner */}
+          <line x1="0" y1="0" x2="20" y2="10" stroke="rgba(0,0,0,0.5)" strokeWidth="0.3" />
+          {/* Top-right corner */}
+          <line x1="100" y1="0" x2="80" y2="10" stroke="rgba(0,0,0,0.5)" strokeWidth="0.3" />
+          {/* Bottom-left corner */}
+          <line x1="0" y1="100" x2="20" y2="82" stroke="rgba(0,0,0,0.5)" strokeWidth="0.3" />
+          {/* Bottom-right corner */}
+          <line x1="100" y1="100" x2="80" y2="82" stroke="rgba(0,0,0,0.5)" strokeWidth="0.3" />
+          {/* Back wall vertical edges */}
+          <line x1="20" y1="10" x2="20" y2="82" stroke="rgba(0,0,0,0.4)" strokeWidth="0.25" />
+          <line x1="80" y1="10" x2="80" y2="82" stroke="rgba(0,0,0,0.4)" strokeWidth="0.25" />
+          {/* Back wall horizontal edges */}
+          <line x1="20" y1="10" x2="80" y2="10" stroke="rgba(0,0,0,0.3)" strokeWidth="0.2" />
+          <line x1="20" y1="82" x2="80" y2="82" stroke="rgba(0,0,0,0.3)" strokeWidth="0.2" />
+        </svg>
       </div>
 
       {/* PATTERN PICKER + CONTROLS */}
@@ -637,7 +775,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
             </span>
             <button onClick={() => setPatternPicker(null)} className="text-white/40 hover:text-white"><X size={18} /></button>
           </div>
-          {/* Grout + Orientation row */}
+          {/* Grout + Orientation + Tile Size row */}
           <div className="flex items-center gap-4 mb-3 pb-3 border-b border-white/10 flex-wrap">
             <div className="flex items-center gap-2">
               <Palette size={12} className="text-white/40" />
@@ -657,6 +795,15 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
               <button onClick={() => onChangeOrientation(patternPicker.surfaceId, pickerMat.id, 'vertical')}
                 className={`px-2 py-1 rounded text-[9px] font-black ${pickerMat.tile_orientation === 'vertical' ? 'bg-amber-600 text-white' : 'text-white/30 border border-white/10'}`}
                 data-testid="orient-vertical">VERTICAL</button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Ruler size={12} className="text-white/40" />
+              <span className="text-[10px] font-black text-white/50">TILE SIZE:</span>
+              <input type="range" min={30} max={300} step={5}
+                value={Math.round((pickerMat.tile_scale || 1) * 100)}
+                onChange={e => onChangeTileScale(patternPicker.surfaceId, pickerMat.id, Number(e.target.value) / 100)}
+                className="w-24 accent-amber-500" data-testid="tile-size-slider" />
+              <span className="text-[9px] font-mono text-amber-300 w-8">{Math.round((pickerMat.tile_scale || 1) * 100)}%</span>
             </div>
           </div>
           <div className="grid grid-cols-5 gap-2">
@@ -680,7 +827,6 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
           onDelete={onDeleteElement}
           onUpdate={onUpdateElement}
           onDeselect={() => onSelectElement(null)}
-          onCropTile={onCropTile}
         />
       )}
     </div>
@@ -688,11 +834,9 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
 };
 
 
-// ==================== SELECTED ELEMENT PANEL ====================
-const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselect, onCropTile }) => {
+/* ==================== SELECTED ELEMENT PANEL ==================== */
+const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselect }) => {
   if (!element) return null;
-
-  // Find the element in surfaces
   let found = null, foundSurface = null;
   for (const s of surfaces) {
     if (element.type === 'niche') found = (s.niches || []).find(n => n.id === element.id);
@@ -701,7 +845,6 @@ const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselec
     if (found) { foundSurface = s; break; }
   }
   if (!found || !foundSurface) return null;
-
   const isNicheOrBench = element.type === 'niche' || element.type === 'bench';
 
   return (
@@ -709,7 +852,7 @@ const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselec
       style={{ background: 'rgba(0,0,0,0.97)', borderColor: element.type === 'niche' ? 'rgba(0,200,255,0.3)' : element.type === 'bench' ? 'rgba(255,165,0,0.3)' : 'rgba(100,160,255,0.3)' }}>
       <div className="flex justify-between items-center mb-3">
         <span className="text-sm font-black" style={{ color: element.type === 'niche' ? '#00c8ff' : element.type === 'bench' ? '#ffa500' : '#64a0ff' }}>
-          {element.type.toUpperCase()} SELECTED
+          {element.type.toUpperCase()} — Drag to move{isNicheOrBench ? ', drag corners to resize' : ''}
         </span>
         <div className="flex gap-2">
           <button onClick={() => onDelete(foundSurface.id, element.type, element.id)} className="px-2 py-1 rounded text-[9px] font-black text-red-400 border border-red-400/30 hover:bg-red-400/10" data-testid="delete-element-btn">
@@ -718,10 +861,8 @@ const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselec
           <button onClick={onDeselect} className="text-white/40 hover:text-white"><X size={16} /></button>
         </div>
       </div>
-
-      {/* Position & Size controls */}
-      <div className="grid grid-cols-4 gap-2 mb-3">
-        {['x', 'y', 'w', 'h'].filter(f => found[f] !== undefined).map(field => (
+      <div className="grid grid-cols-4 gap-2">
+        {['x', 'y'].concat(isNicheOrBench ? ['w', 'h'] : []).map(field => (
           <div key={field}>
             <label className="text-[8px] font-black text-white/40 uppercase">{field === 'x' ? 'LEFT %' : field === 'y' ? 'TOP %' : field === 'w' ? 'WIDTH %' : 'HEIGHT %'}</label>
             <input type="number" min={0} max={100} value={Math.round(found[field] || 0)}
@@ -730,26 +871,12 @@ const SelectedElementPanel = ({ element, surfaces, onDelete, onUpdate, onDeselec
           </div>
         ))}
       </div>
-
-      {/* Material for niche/bench */}
-      {isNicheOrBench && (
-        <div className="text-[9px] text-white/40 font-bold">
-          {found.material?.image ? (
-            <div className="flex items-center gap-2">
-              <img src={found.material.image} alt="" className="w-8 h-8 rounded object-cover" />
-              <span className="text-green-400">Material set. Use CROP/PATTERN buttons on the zone to customize.</span>
-            </div>
-          ) : (
-            <span>Select a tile from the palette, then click this {element.type} to apply a material.</span>
-          )}
-        </div>
-      )}
     </div>
   );
 };
 
 
-// ==================== MEASUREMENT CANVAS ====================
+/* ==================== MEASUREMENT CANVAS ==================== */
 const MeasurementCanvas = ({ lines = [], onLinesChange }) => {
   const svgRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
@@ -816,7 +943,7 @@ const MeasurementCanvas = ({ lines = [], onLinesChange }) => {
 };
 
 
-// ==================== MAIN COMPONENT ====================
+/* ==================== MAIN COMPONENT ==================== */
 const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const [schedules, setSchedules] = useState([]);
   const [activeSchedule, setActiveSchedule] = useState(null);
@@ -828,8 +955,8 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const [roomItems, setRoomItems] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showMeasurements, setShowMeasurements] = useState(false);
-  const [placementMode, setPlacementMode] = useState(null); // null | 'fixture' | 'niche' | 'bench'
-  const [selectedElement, setSelectedElement] = useState(null); // { type, id }
+  const [placementMode, setPlacementMode] = useState(null);
+  const [selectedElement, setSelectedElement] = useState(null);
   const saveTimeoutRef = useRef(null);
   const [cropModal, setCropModal] = useState(null);
   const pendingPlaceRef = useRef(null);
@@ -838,7 +965,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     try {
       const res = await fetch(`${API_URL}/api/projects/${projectId}/rooms/${roomId}/finish-schedules`);
       const data = await res.json();
-      // Ensure all surfaces have defaults
       const enhanced = data.map(s => ({ ...s, surfaces: ensureAllSurfaces(s.surfaces) }));
       setSchedules(enhanced);
       if (enhanced.length > 0 && !activeSchedule) setActiveSchedule(enhanced[0]);
@@ -874,7 +1000,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         body: JSON.stringify({ surfaces: schedule.surfaces, measurement_lines: schedule.measurement_lines || [] })
       });
       const updated = await res.json();
-      // Re-apply defaults in case backend stripped extra fields
       if (updated.surfaces) updated.surfaces = ensureAllSurfaces(updated.surfaces);
       setSchedules(prev => prev.map(s => s.id === updated.id ? updated : s));
       return updated;
@@ -929,7 +1054,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     return null;
   };
 
-  // === TILE PLACEMENT ===
   const handlePlaceItem = (surfaceId, zoneId, item) => {
     if (!activeSchedule || !item) return;
     const existingCrop = findExistingCropForItem(item.id);
@@ -953,13 +1077,12 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           id: crypto.randomUUID(), item_id: item.id, name: item.name || '', vendor: item.vendor || '',
           sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
           image: item._img || '', link: item.link || '', position_label: zoneId, pattern: '',
-          tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal',
+          tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
         }] };
       })
     }));
   };
 
-  // === CEILING/FLOOR PLACEMENT ===
   const handlePlaceCeilingFloor = (surfaceId, item) => {
     if (!activeSchedule || !item) return;
     const existingCrop = findExistingCropForItem(item.id);
@@ -981,13 +1104,12 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         return { ...s, materials: [{
           id: crypto.randomUUID(), item_id: item.id, name: item.name || '',
           vendor: item.vendor || '', image: item._img || '', position_label: '_surface',
-          pattern: '', tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal',
+          pattern: '', tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
         }] };
       })
     }));
   };
 
-  // === FIXTURE PLACEMENT ===
   const handlePlaceFixture = (surfaceId, zoneId, item, xPct, yPct) => {
     updateSchedule(prev => ({
       ...prev,
@@ -1002,43 +1124,36 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     setPlacementMode(null);
   };
 
-  // === NICHE PLACEMENT ===
   const handleAddNiche = (surfaceId, zoneId, xPct, yPct) => {
-    const nicheW = 30, nicheH = 25;
     updateSchedule(prev => ({
       ...prev,
       surfaces: prev.surfaces.map(s => {
         if (s.id !== surfaceId) return s;
         return { ...s, niches: [...(s.niches || []), {
           id: crypto.randomUUID(), zone_id: zoneId,
-          x: Math.max(0, Math.min(100 - nicheW, xPct - nicheW / 2)),
-          y: Math.max(0, Math.min(100 - nicheH, yPct - nicheH / 2)),
-          w: nicheW, h: nicheH, material: null,
+          x: Math.max(0, Math.min(70, xPct - 15)), y: Math.max(0, Math.min(75, yPct - 12)),
+          w: 30, h: 25, material: null,
         }] };
       })
     }));
     setPlacementMode(null);
   };
 
-  // === BENCH PLACEMENT ===
   const handleAddBench = (surfaceId, zoneId, xPct, yPct) => {
-    const benchW = 40, benchH = 30;
     updateSchedule(prev => ({
       ...prev,
       surfaces: prev.surfaces.map(s => {
         if (s.id !== surfaceId) return s;
         return { ...s, benches: [...(s.benches || []), {
           id: crypto.randomUUID(), zone_id: zoneId,
-          x: Math.max(0, Math.min(100 - benchW, xPct - benchW / 2)),
-          y: Math.max(0, Math.min(100 - benchH, yPct - benchH / 2)),
-          w: benchW, h: benchH, material: null,
+          x: Math.max(0, Math.min(60, xPct - 20)), y: Math.max(0, Math.min(70, yPct - 15)),
+          w: 40, h: 30, material: null,
         }] };
       })
     }));
     setPlacementMode(null);
   };
 
-  // === CROP HANDLERS ===
   const handleCropConfirm = (crop) => {
     if (cropModal?.mode === 'place' && pendingPlaceRef.current) {
       const { surfaceId, zoneId, item } = pendingPlaceRef.current;
@@ -1054,9 +1169,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     setCropModal(null);
   };
 
-  const handleCropCancel = () => { pendingPlaceRef.current = null; setCropModal(null); };
-
-  // === MATERIAL FIELD UPDATES ===
   const updateMaterialField = (surfaceId, materialId, field, value) => {
     updateSchedule(prev => ({
       ...prev,
@@ -1083,8 +1195,8 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const changePattern = (surfaceId, materialId, pattern) => updateMaterialField(surfaceId, materialId, 'pattern', pattern);
   const changeGrout = (surfaceId, materialId, color) => updateMaterialField(surfaceId, materialId, 'grout_color', color);
   const changeOrientation = (surfaceId, materialId, orientation) => updateMaterialField(surfaceId, materialId, 'tile_orientation', orientation);
+  const changeTileScale = (surfaceId, materialId, scale) => updateMaterialField(surfaceId, materialId, 'tile_scale', scale);
 
-  // === ELEMENT MANAGEMENT ===
   const handleDeleteElement = (surfaceId, type, elementId) => {
     updateSchedule(prev => ({
       ...prev,
@@ -1112,7 +1224,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     }));
   };
 
-  // === ZONE DIMENSION ===
   const handleEditDimension = (surfaceId, zoneId, value) => {
     updateSchedule(prev => ({
       ...prev,
@@ -1125,21 +1236,12 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     }));
   };
 
-  // === SURFACE MANAGEMENT ===
-  const addSurface = () => {
-    const name = prompt('Wall name (e.g. "Back Wall", "Left Wall", "Right Wall"):');
-    if (!name) return;
+  const handleResizeZone = (surfaceId, newConfig) => {
     updateSchedule(prev => ({
       ...prev,
-      surfaces: [...prev.surfaces, ensureSurfaceDefaults({ id: crypto.randomUUID(), name, surface_type: 'wall', materials: [] })]
-    }));
-  };
-
-  const removeSurface = (surfaceId) => {
-    if (!window.confirm('Remove this surface?')) return;
-    updateSchedule(prev => ({
-      ...prev,
-      surfaces: prev.surfaces.filter(s => s.id !== surfaceId)
+      surfaces: prev.surfaces.map(s =>
+        s.id === surfaceId ? { ...s, zone_config: newConfig } : s
+      )
     }));
   };
 
@@ -1150,7 +1252,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   if (loading) return <div className="text-center py-8 text-gray-500">Loading...</div>;
 
   const itemsWithImages = roomItems.filter(i => i._img);
-  const itemsNoImages = roomItems.filter(i => !i._img);
 
   const modeLabel = placementMode === 'niche' ? 'NICHE MODE: Click a wall zone to place a niche'
     : placementMode === 'bench' ? 'BENCH MODE: Click a wall zone to place a bench'
@@ -1162,7 +1263,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
 
   return (
     <div data-testid="room-finish-schedule" style={{ background: '#1a1a24' }} className="rounded-xl">
-      {cropModal && <TileCropModal imageUrl={cropModal.imageUrl} existingCrop={cropModal.existingCrop} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
+      {cropModal && <TileCropModal imageUrl={cropModal.imageUrl} existingCrop={cropModal.existingCrop} onConfirm={handleCropConfirm} onCancel={() => { pendingPlaceRef.current = null; setCropModal(null); }} />}
 
       {/* MATERIAL PALETTE */}
       <div className="p-4 border-b border-white/10" style={{ background: 'linear-gradient(180deg, #222230 0%, #1a1a24 100%)' }}>
@@ -1187,7 +1288,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           <div className="flex gap-3 overflow-x-auto pb-2">
             {itemsWithImages.map(item => (
               <button key={item.id} data-testid={`palette-item-${item.id}`}
-                onClick={() => { setSelectedItem(selectedItem?.id === item.id ? null : item); setSelectedElement(null); }}
+                onClick={() => { setSelectedItem(selectedItem?.id === item.id ? null : item); setSelectedElement(null); setPlacementMode(null); }}
                 className={`flex-shrink-0 rounded-lg overflow-hidden transition-all w-24 ${selectedItem?.id === item.id ? 'ring-3 ring-green-400 scale-105' : 'ring-1 ring-white/10 hover:ring-white/30'}`}>
                 <img src={item._img} alt={item.name} className="w-full h-20 object-cover" />
                 <div className="p-1" style={{ background: '#111' }}>
@@ -1196,21 +1297,12 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
                 </div>
               </button>
             ))}
-            {itemsNoImages.map(item => (
-              <button key={item.id} data-testid={`palette-item-${item.id}`}
-                onClick={() => { setSelectedItem(selectedItem?.id === item.id ? null : item); setSelectedElement(null); }}
-                className={`flex-shrink-0 rounded-lg overflow-hidden transition-all w-24 ${selectedItem?.id === item.id ? 'ring-3 ring-green-400 scale-105' : 'ring-1 ring-white/5'}`}>
-                <div className="w-full h-20 bg-[#111] flex items-center justify-center"><span className="text-white/10 text-[8px] text-center px-1">{item.name}</span></div>
-                <div className="p-1" style={{ background: '#111' }}><div className="text-white/40 text-[7px] font-bold truncate">{item.name}</div></div>
-              </button>
-            ))}
           </div>
         )}
       </div>
 
       {/* SCHEDULE CONTENT */}
       <div className="p-4">
-        {/* Schedule tabs + toolbar */}
         <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
           <div className="flex gap-1 overflow-x-auto">
             {schedules.map(s => (
@@ -1233,7 +1325,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               <button onClick={() => setPlacementMode(placementMode === 'fixture' ? null : 'fixture')}
                 className={`px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 ${placementMode === 'fixture' ? 'bg-blue-600 text-white' : 'text-white/30 border border-white/10'}`}
                 data-testid="add-fixture-btn"><Droplet size={10} />FIXTURE</button>
-              <button onClick={addSurface} className="px-2 py-1.5 rounded text-[10px] font-bold text-white bg-blue-700" data-testid="add-surface-btn"><Plus size={10} /> WALL</button>
               <button onClick={() => handleDelete(activeSchedule.id)} className="px-2 py-1.5 rounded text-[10px] text-red-400 border border-red-400/20"><Trash2 size={10} /></button>
             </>}
           </div>
@@ -1256,7 +1347,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           <div>
             {showMeasurements && <div className="mb-4"><MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} /></div>}
 
-            {/* 3D SHOWER VIEW */}
             <Shower3DView
               schedule={activeSchedule}
               selectedItem={selectedItem}
@@ -1271,20 +1361,19 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               onCropTile={handleCropTile}
               onChangeGrout={changeGrout}
               onChangeOrientation={changeOrientation}
+              onChangeTileScale={changeTileScale}
               onSelectElement={setSelectedElement}
               onDeleteElement={handleDeleteElement}
               onUpdateElement={handleUpdateElement}
-              onResizeZone={() => {}}
+              onResizeZone={handleResizeZone}
               onEditDimension={handleEditDimension}
               onPlaceCeilingFloor={handlePlaceCeilingFloor}
             />
 
-            {/* Surface list */}
             <div className="mt-3 flex gap-1 flex-wrap">
               {activeSchedule.surfaces.map(s => (
                 <span key={s.id} className="px-2 py-1 rounded text-[8px] font-bold text-white/40 bg-white/5 flex items-center gap-1">
                   <span className={s.surface_type === 'ceiling' ? 'text-purple-300' : s.surface_type === 'floor' ? 'text-green-300' : 'text-white/40'}>{s.name}</span>
-                  {s.surface_type === 'wall' && <button onClick={() => removeSurface(s.id)} className="text-white/20 hover:text-red-400"><X size={8} /></button>}
                 </span>
               ))}
             </div>
