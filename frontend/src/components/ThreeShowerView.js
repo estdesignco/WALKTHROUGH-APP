@@ -14,12 +14,13 @@ const proxyUrl = (url) => url ? `${API_URL}/api/proxy-image?url=${encodeURICompo
 
 /* ---- Tile-textured wall mesh ---- */
 const TiledWall = ({ position, rotation, size, imageUrl, color = '#444' }) => {
-  const meshRef = useRef();
-  const [texture, setTexture] = useState(null);
+  const matRef = useRef();
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if (!imageUrl) return;
+    if (!imageUrl || !matRef.current) return;
     const src = proxyUrl(imageUrl);
+    console.log('[TiledWall] Loading texture from:', src?.substring(0, 80));
     fetch(src)
       .then(r => r.blob())
       .then(blob => new Promise((resolve) => {
@@ -30,6 +31,7 @@ const TiledWall = ({ position, rotation, size, imageUrl, color = '#444' }) => {
       .then(dataUrl => {
         const img = new Image();
         img.onload = () => {
+          console.log('[TiledWall] Image decoded:', img.width, 'x', img.height);
           const tex = new THREE.Texture(img);
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.RepeatWrapping;
@@ -37,21 +39,25 @@ const TiledWall = ({ position, rotation, size, imageUrl, color = '#444' }) => {
           const aspect = img.width / img.height;
           tex.repeat.set(size[0] * 1.2, (size[1] * 1.2) / aspect);
           tex.needsUpdate = true;
-          setTexture(tex);
+          // Apply directly to material via ref
+          if (matRef.current) {
+            matRef.current.map = tex;
+            matRef.current.color.set('#ffffff');
+            matRef.current.needsUpdate = true;
+            setLoaded(true);
+            console.log('[TiledWall] Texture applied to material');
+          }
         };
+        img.onerror = (e) => console.error('[TiledWall] Image decode failed:', e);
         img.src = dataUrl;
       })
-      .catch(err => console.error('Texture load error:', err));
-  }, [imageUrl]);
+      .catch(err => console.error('[TiledWall] Texture load error:', err));
+  }, [imageUrl, size]);
 
   return (
-    <mesh ref={meshRef} position={position} rotation={rotation}>
+    <mesh position={position} rotation={rotation}>
       <planeGeometry args={size} />
-      {texture ? (
-        <meshStandardMaterial map={texture} color="#ffffff" side={THREE.FrontSide} />
-      ) : (
-        <meshStandardMaterial color={color} side={THREE.FrontSide} />
-      )}
+      <meshStandardMaterial ref={matRef} color={color} side={THREE.FrontSide} />
     </mesh>
   );
 };
