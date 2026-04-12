@@ -182,7 +182,7 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
 const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0, hasCrop = false) => {
-  const g = hasCrop ? 1 : 0;
+  const g = hasCrop ? 2 : 0;
   if (g > 0) { ctx.fillStyle = groutColor || '#4a4035'; ctx.fillRect(0, 0, w, h); }
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
   const imgH = tileImg.height || tileImg.naturalHeight || 200;
@@ -191,6 +191,14 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
     ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
+    // Subtle brightness variation per tile (realism)
+    const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
+    const bright = ((hash % 7) - 3) * 0.015;
+    if (bright !== 0) { ctx.fillStyle = bright > 0 ? `rgba(255,255,255,${bright})` : `rgba(0,0,0,${-bright})`; ctx.fillRect(x, y, tw, th); }
+    // Bevel edges for depth
+    const bev = Math.max(1, Math.min(tw, th) * 0.02);
+    ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillRect(x, y, tw, bev); ctx.fillRect(x, y, bev, th);
+    ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(x, y + th - bev, tw, bev); ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
   // FIXED base 90px — same on ALL walls (back, side, floor, ceiling) for consistency
@@ -300,7 +308,10 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     canvas.width = w; canvas.height = h;
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     const ctx = canvas.getContext('2d');
-    const hasCrop = tileCrop && tileCrop.w > 0 && tileCrop.h > 0;
+    // Detect if crop is the full image (USE FULL IMAGE stores full dimensions as crop)
+    const isFullImageCrop = tileCrop && tileCrop.x === 0 && tileCrop.y === 0
+      && Math.abs(tileCrop.w - img.naturalWidth) < 5 && Math.abs(tileCrop.h - img.naturalHeight) < 5;
+    const hasCrop = tileCrop && tileCrop.w > 0 && tileCrop.h > 0 && !isFullImageCrop;
 
     if (hasCrop) {
       // CROPPED SINGLE TILE: apply pattern with grout
@@ -314,8 +325,12 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
       }
       drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY, true);
     } else {
-      // FULL IMAGE: just fill the zone with the picture. That's it.
-      ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, w, h);
+      // FULL IMAGE: cover the zone maintaining aspect ratio (no distortion)
+      const imgW = img.naturalWidth; const imgH = img.naturalHeight;
+      const scaleX = w / imgW; const scaleY = h / imgH;
+      const coverScale = Math.max(scaleX, scaleY);
+      const dw = imgW * coverScale; const dh = imgH * coverScale;
+      ctx.drawImage(img, 0, 0, imgW, imgH, (w - dw) / 2, (h - dh) / 2, dw, dh);
     }
   }, [pattern, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct]);
 
@@ -463,8 +478,8 @@ const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
           groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale}
           zoneTopPct={zone.top} zoneHeightPct={zoneHeight} />
       ) : (
-        <div className="absolute inset-0" style={{ background: '#f5f5f0', borderBottom: '1px solid #ddd' }}>
-          <div className="absolute inset-0 flex items-center justify-center"><span className="text-amber-600/30 text-[8px] font-bold">CLICK TO PLACE</span></div>
+        <div className="absolute inset-0" style={{ background: '#4a4842', borderBottom: '1px solid #333' }}>
+          <div className="absolute inset-0 flex items-center justify-center"><span className="text-white/20 text-[8px] font-bold">CLICK TO PLACE</span></div>
         </div>
       )}
       {/* Niches */}
@@ -480,7 +495,7 @@ const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
         isSelected={selectedElement?.id === f.id} onDragStart={wrappedDragStart} />)}
       {/* Zone info bar */}
       <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 ${compact ? 'py-0' : 'py-0.5'}`}
-        style={hasImage ? { background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' } : { borderTop: '1px solid #ddd' }}>
+        style={hasImage ? { background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' } : { borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="flex items-center gap-1 flex-wrap min-w-0">
           <span className={`text-[${compact ? '7' : '9'}px] font-black uppercase tracking-wider ${hasImage ? 'text-white' : 'text-gray-400'}`}>{zone.label}</span>
           {zone.dimension && <span className="text-[8px] font-mono text-amber-300/80 bg-black/40 px-1 rounded">{zone.dimension}</span>}
@@ -760,7 +775,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
           <TilePatternCanvas pattern={mat.pattern || 'stacked_horizontal'} imageUrl={mat.image} tileCrop={mat.tile_crop}
             groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale} />
         ) : (
-          <div className="absolute inset-0" style={{ background: surface.surface_type === 'ceiling' ? '#e8e5df' : '#d8d4ce' }} />
+          <div className="absolute inset-0" style={{ background: surface.surface_type === 'ceiling' ? '#c8c5bf' : '#504c46' }} />
         )}
         {surfFixtures.map(f => <FixtureOverlay key={f.id} fixture={f} isSelected={selectedElement?.id === f.id}
           onDragStart={handleElementDragStart} />)}
@@ -776,7 +791,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         )}
         {!hasImage && (
           <div className={`absolute inset-0 flex items-center justify-center transition-all ${selectedItem ? 'bg-amber-400/10 border-2 border-dashed border-amber-400/40' : ''}`}>
-            <span className="text-amber-600/40 text-[9px] font-bold">{selectedItem ? 'CLICK TO PLACE' : ''}</span>
+            <span className="text-white/30 text-[9px] font-bold">{selectedItem ? 'CLICK TO PLACE' : ''}</span>
           </div>
         )}
       </div>
@@ -795,7 +810,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', left: 0, top: 0, width: '100%', height: '10%',
           clipPath: 'polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%)',
-          background: '#e8e5df', zIndex: 1,
+          background: '#c8c5bf', zIndex: 1,
         }}>
           {renderSimpleSurface(ceiling, ceiling?.name || 'CEILING')}
         </div>
@@ -804,9 +819,9 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', left: 0, top: 0, width: '20%', height: '100%',
           clipPath: 'polygon(0% 0%, 100% 10%, 100% 82%, 0% 100%)',
-          background: '#eae6e0', zIndex: 2,
+          background: '#3a3832', zIndex: 2,
         }}>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.08), transparent)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.25), rgba(0,0,0,0.05))' }} />
           {renderWallFace(leftWall, true)}
           <div className="absolute top-[12%] left-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10 pointer-events-none">{leftWall?.name || 'LEFT WALL'}</div>
         </div>
@@ -814,8 +829,8 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         {/* BACK WALL — flat center rectangle */}
         <div data-surface-id={backWall?.id} style={{
           position: 'absolute', left: '20%', top: '10%', width: '60%', height: '72%',
-          background: '#f5f2ed', border: '2px solid #666', zIndex: 5,
-          boxShadow: '0 4px 30px rgba(0,0,0,0.4), inset 0 0 30px rgba(0,0,0,0.04)',
+          background: '#4a4842', border: '2px solid #333', zIndex: 5,
+          boxShadow: '0 4px 30px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.08)',
         }}>
           {renderWallFace(backWall, false)}
           <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[8px] font-black text-white/70 bg-black/40 z-10 pointer-events-none">{backWall?.name || 'BACK WALL'}</div>
@@ -850,9 +865,9 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', right: 0, top: 0, width: '20%', height: '100%',
           clipPath: 'polygon(0% 10%, 100% 0%, 100% 100%, 0% 82%)',
-          background: '#e4e0da', zIndex: 2,
+          background: '#3a3832', zIndex: 2,
         }}>
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.08), transparent)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.25), rgba(0,0,0,0.05))' }} />
           {renderWallFace(rightWall, true)}
           <div className="absolute top-[12%] right-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10 pointer-events-none">{rightWall?.name || 'RIGHT WALL'}</div>
         </div>
@@ -861,7 +876,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div style={{
           position: 'absolute', left: 0, bottom: 0, width: '100%', height: '18%',
           clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)',
-          background: '#d8d4ce', zIndex: 6,
+          background: '#504c46', zIndex: 6,
         }}>
           {renderSimpleSurface(floor, floor?.name || 'FLOOR')}
         </div>
