@@ -1635,9 +1635,42 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
             {/* 3D Photorealistic View */}
             <ThreeShowerView schedule={activeSchedule} />
 
-            {/* 2D Interactive Controls */}
-            <details className="mt-2" open>
-              <summary className="cursor-pointer text-xs font-bold text-white/40 px-2 py-1 bg-black/30 rounded">2D Controls (tile placement, crop, patterns)</summary>
+            {/* Quick tile placement — apply selected tile to surfaces */}
+            {selectedItem && (
+              <div className="mt-2 p-2 bg-black/40 rounded-lg border border-white/10">
+                <div className="text-[10px] font-bold text-amber-400 mb-1">APPLY "{selectedItem.name}" TO:</div>
+                <div className="flex gap-1 flex-wrap">
+                  {(activeSchedule.surfaces || []).filter(s => s.surface_type === 'wall').map(s => (
+                    <button key={s.id} onClick={() => {
+                      const existingCrop = findExistingCropForItem(selectedItem.id);
+                      if (existingCrop) { placeItemWithCrop(s.id, 'main_wall', selectedItem, existingCrop); }
+                      else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: s.id, zoneId: 'main_wall', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place' }); }
+                    }} className="px-3 py-1.5 rounded text-[10px] font-bold text-white/70 bg-white/10 hover:bg-white/20 border border-white/10"
+                      data-testid={`quick-place-${s.name}`}>{s.name}</button>
+                  ))}
+                  {activeSchedule.surfaces.filter(s => s.surface_type === 'floor').map(s => (
+                    <button key={s.id} onClick={() => {
+                      const existingCrop = findExistingCropForItem(selectedItem.id);
+                      if (existingCrop) { placeCeilingFloorWithCrop(s.id, selectedItem, existingCrop); }
+                      else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: s.id, zoneId: '_surface', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place_surface' }); }
+                    }} className="px-3 py-1.5 rounded text-[10px] font-bold text-green-300/70 bg-green-900/20 hover:bg-green-900/40 border border-green-400/20"
+                      data-testid={`quick-place-floor`}>Floor</button>
+                  ))}
+                  {activeSchedule.surfaces.filter(s => s.surface_type === 'ceiling').map(s => (
+                    <button key={s.id} onClick={() => {
+                      const existingCrop = findExistingCropForItem(selectedItem.id);
+                      if (existingCrop) { placeCeilingFloorWithCrop(s.id, selectedItem, existingCrop); }
+                      else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: s.id, zoneId: '_surface', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place_surface' }); }
+                    }} className="px-3 py-1.5 rounded text-[10px] font-bold text-purple-300/70 bg-purple-900/20 hover:bg-purple-900/40 border border-purple-400/20"
+                      data-testid={`quick-place-ceiling`}>Ceiling</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 2D Controls — hidden by default */}
+            <details className="mt-2">
+              <summary className="cursor-pointer text-xs font-bold text-white/30 px-2 py-1 bg-black/20 rounded hover:text-white/50">Click here to place tiles (2D Controls)</summary>
             <Shower3DView
               schedule={activeSchedule}
               selectedItem={selectedItem}
