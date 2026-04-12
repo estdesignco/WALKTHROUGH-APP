@@ -141,7 +141,14 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
   const handleUseFullImage = () => {
     const img = imgRef.current;
-    if (img) onConfirm({ x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight });
+    if (!img) return;
+    // Auto-extract a single tile from the center of the product photo
+    // This makes it render as individual tiles with grout (like the reference)
+    const cropW = Math.round(img.naturalWidth * 0.2);
+    const cropH = Math.round(img.naturalHeight * 0.2);
+    const cropX = Math.round((img.naturalWidth - cropW) / 2);
+    const cropY = Math.round((img.naturalHeight - cropH) / 2);
+    onConfirm({ x: cropX, y: cropY, w: cropW, h: cropH });
   };
 
   return (
@@ -182,7 +189,7 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
 const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0, hasCrop = false) => {
-  const g = hasCrop ? 2 : -3; // -3 = 3px overlap to hide seams for full images
+  const g = 2; // Always show grout between individual tiles
   if (g > 0) { ctx.fillStyle = groutColor || '#4a4035'; ctx.fillRect(0, 0, w, h); }
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
   const imgH = tileImg.height || tileImg.naturalHeight || 200;
@@ -190,13 +197,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
 
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
-    if (g < 0) {
-      // Full image mode: crop 3px from each edge to eliminate seam artifacts
-      const c = 3;
-      ctx.drawImage(tileImg, c, c, imgW - c * 2, imgH - c * 2, x, y, tw, th);
-    } else {
-      ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
-    }
+    ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
     // Subtle brightness variation per tile (realism)
     const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
     const bright = ((hash % 7) - 3) * 0.015;
@@ -304,30 +305,8 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
   const containerRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const imgRef = React.useRef(null);
-  const [imgLoaded, setImgLoaded] = React.useState(false);
-  const [isFullImage, setIsFullImage] = React.useState(false);
 
-  // Load image
-  React.useEffect(() => {
-    if (!imageUrl) return;
-    const proxyUrl = `${API_URL}/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
-    const img = new Image(); img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      imgRef.current = img;
-      // Detect full image vs actual crop
-      const full = !tileCrop || tileCrop.w <= 0 || tileCrop.h <= 0 ||
-        (tileCrop.x === 0 && tileCrop.y === 0 && Math.abs(tileCrop.w - img.naturalWidth) < 5 && Math.abs(tileCrop.h - img.naturalHeight) < 5);
-      setIsFullImage(full);
-      setImgLoaded(true);
-    };
-    img.onerror = () => { const img2 = new Image(); img2.onload = () => { imgRef.current = img2; setIsFullImage(true); setImgLoaded(true); }; img2.src = imageUrl; };
-    img.src = proxyUrl;
-    return () => { img.onload = null; img.onerror = null; };
-  }, [imageUrl, tileCrop]);
-
-  // Draw on canvas ONLY for cropped tiles (patterns + grout)
-  const drawCropped = React.useCallback(() => {
-    if (isFullImage) return;
+  const draw = React.useCallback(() => {
     const container = containerRef.current; const canvas = canvasRef.current; const img = imgRef.current;
     if (!container || !canvas || !img || !img.complete || img.naturalWidth === 0) return;
     const rect = container.getBoundingClientRect();
@@ -336,39 +315,41 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     canvas.width = w; canvas.height = h;
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     const ctx = canvas.getContext('2d');
+    // Use crop if available, otherwise auto-crop center 20%
+    const crop = (tileCrop && tileCrop.w > 0 && tileCrop.h > 0) ? tileCrop : {
+      x: Math.round(img.naturalWidth * 0.4),
+      y: Math.round(img.naturalHeight * 0.4),
+      w: Math.round(img.naturalWidth * 0.2),
+      h: Math.round(img.naturalHeight * 0.2),
+    };
     const tileCanvas = document.createElement('canvas');
-    tileCanvas.width = Math.max(1, Math.round(tileCrop.w)); tileCanvas.height = Math.max(1, Math.round(tileCrop.h));
-    tileCanvas.getContext('2d').drawImage(img, tileCrop.x, tileCrop.y, tileCrop.w, tileCrop.h, 0, 0, tileCanvas.width, tileCanvas.height);
+    tileCanvas.width = Math.max(1, Math.round(crop.w)); tileCanvas.height = Math.max(1, Math.round(crop.h));
+    tileCanvas.getContext('2d').drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, tileCanvas.width, tileCanvas.height);
     let offsetY = 0;
     if (zoneTopPct > 0 && zoneHeightPct > 0) {
       const wallPxH = h * (100 / zoneHeightPct);
       offsetY = wallPxH * (zoneTopPct / 100);
     }
     drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY, true);
-  }, [isFullImage, pattern, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct]);
+  }, [pattern, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct]);
 
-  React.useEffect(() => { if (imgLoaded && !isFullImage) drawCropped(); }, [imgLoaded, isFullImage, drawCropped]);
   React.useEffect(() => {
-    if (isFullImage) return;
-    const container = containerRef.current; if (!container) return;
-    const ro = new ResizeObserver(() => drawCropped()); ro.observe(container);
-    return () => ro.disconnect();
-  }, [drawCropped, isFullImage]);
-
-  // For FULL IMAGE: use CSS background-image (smooth native browser tiling)
-  if (isFullImage && imageUrl) {
+    if (!imageUrl) return;
     const proxyUrl = `${API_URL}/api/proxy-image?url=${encodeURIComponent(imageUrl)}`;
-    return (
-      <div className="absolute inset-0 overflow-hidden" style={{
-        backgroundImage: `url(${proxyUrl})`,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-      }} />
-    );
-  }
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    img.onload = () => { imgRef.current = img; draw(); };
+    img.onerror = () => { const img2 = new Image(); img2.onload = () => { imgRef.current = img2; draw(); }; img2.src = imageUrl; };
+    img.src = proxyUrl;
+    return () => { img.onload = null; img.onerror = null; };
+  }, [imageUrl, draw]);
 
-  // For CROPPED TILE: use canvas with pattern system
+  React.useEffect(() => { draw(); }, [draw]);
+  React.useEffect(() => {
+    const container = containerRef.current; if (!container) return;
+    const ro = new ResizeObserver(() => draw()); ro.observe(container);
+    return () => ro.disconnect();
+  }, [draw]);
+
   return (
     <div ref={containerRef} className="absolute inset-0 overflow-hidden">
       <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0, display: 'block' }} />
