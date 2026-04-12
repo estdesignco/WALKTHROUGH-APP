@@ -301,16 +301,22 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     const ctx = canvas.getContext('2d');
     const hasCrop = tileCrop && tileCrop.w > 0 && tileCrop.h > 0;
-    const crop = hasCrop ? tileCrop : { x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight };
-    const tileCanvas = document.createElement('canvas');
-    tileCanvas.width = Math.max(1, Math.round(crop.w)); tileCanvas.height = Math.max(1, Math.round(crop.h));
-    tileCanvas.getContext('2d').drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, tileCanvas.width, tileCanvas.height);
-    let offsetY = 0;
-    if (zoneTopPct > 0 && zoneHeightPct > 0) {
-      const wallPxH = h * (100 / zoneHeightPct);
-      offsetY = wallPxH * (zoneTopPct / 100);
+
+    if (hasCrop) {
+      // CROPPED SINGLE TILE: apply pattern with grout
+      const tileCanvas = document.createElement('canvas');
+      tileCanvas.width = Math.max(1, Math.round(tileCrop.w)); tileCanvas.height = Math.max(1, Math.round(tileCrop.h));
+      tileCanvas.getContext('2d').drawImage(img, tileCrop.x, tileCrop.y, tileCrop.w, tileCrop.h, 0, 0, tileCanvas.width, tileCanvas.height);
+      let offsetY = 0;
+      if (zoneTopPct > 0 && zoneHeightPct > 0) {
+        const wallPxH = h * (100 / zoneHeightPct);
+        offsetY = wallPxH * (zoneTopPct / 100);
+      }
+      drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY, true);
+    } else {
+      // FULL IMAGE: just fill the zone with the picture. That's it.
+      ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, w, h);
     }
-    drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY, hasCrop);
   }, [pattern, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct]);
 
   React.useEffect(() => {
