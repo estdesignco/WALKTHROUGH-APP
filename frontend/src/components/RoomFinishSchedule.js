@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Ruler, Plus, Trash2, MousePointer, X, Pencil, Crop, RotateCw, Palette, Square, Droplet, GripVertical, Move } from 'lucide-react';
-import ThreeShowerView from './ThreeShowerView';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -183,7 +182,7 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
 const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0, hasCrop = false) => {
-  const g = hasCrop ? 2 : -1; // -1 = 1px overlap to hide seams for full images
+  const g = hasCrop ? 2 : -3; // -3 = 3px overlap to hide seams for full images
   if (g > 0) { ctx.fillStyle = groutColor || '#4a4035'; ctx.fillRect(0, 0, w, h); }
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
   const imgH = tileImg.height || tileImg.naturalHeight || 200;
@@ -191,7 +190,13 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
 
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
-    ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
+    if (g < 0) {
+      // Full image mode: crop 3px from each edge to eliminate seam artifacts
+      const c = 3;
+      ctx.drawImage(tileImg, c, c, imgW - c * 2, imgH - c * 2, x, y, tw, th);
+    } else {
+      ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
+    }
     // Subtle brightness variation per tile (realism)
     const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
     const bright = ((hash % 7) - 3) * 0.015;
@@ -498,8 +503,8 @@ const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
       {/* Fixtures */}
       {(fixtures || []).map(f => <FixtureOverlay key={f.id} fixture={f}
         isSelected={selectedElement?.id === f.id} onDragStart={wrappedDragStart} />)}
-      {/* Zone info bar */}
-      <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 ${compact ? 'py-0' : 'py-0.5'}`}
+      {/* Zone info bar — hidden when tile applied, shows on hover */}
+      <div className={`absolute bottom-0 left-0 right-0 flex items-center justify-between px-1.5 ${compact ? 'py-0' : 'py-0.5'} ${hasImage ? 'opacity-0 group-hover:opacity-100' : ''} transition-opacity`}
         style={hasImage ? { background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' } : { borderTop: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="flex items-center gap-1 flex-wrap min-w-0">
           <span className={`text-[${compact ? '7' : '9'}px] font-black uppercase tracking-wider ${hasImage ? 'text-white' : 'text-gray-400'}`}>{zone.label}</span>
@@ -828,7 +833,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         }}>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.25), rgba(0,0,0,0.05))' }} />
           {renderWallFace(leftWall, true)}
-          <div className="absolute top-[12%] left-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10 pointer-events-none">{leftWall?.name || 'LEFT WALL'}</div>
+          <div className="absolute top-[12%] left-1 px-1.5 py-0.5 rounded text-[6px] font-black text-white/30 z-10 pointer-events-none">{leftWall?.name || 'LEFT WALL'}</div>
         </div>
 
         {/* BACK WALL — flat center rectangle */}
@@ -838,7 +843,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
           boxShadow: '0 4px 30px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.08)',
         }}>
           {renderWallFace(backWall, false)}
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[8px] font-black text-white/70 bg-black/40 z-10 pointer-events-none">{backWall?.name || 'BACK WALL'}</div>
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[7px] font-black text-white/30 z-10 pointer-events-none">{backWall?.name || 'BACK WALL'}</div>
           {/* Zone dimension labels on the right edge */}
           {backWall && getZoneConfig(backWall).reduce((acc, zone) => {
             const top = acc.top;
@@ -874,7 +879,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         }}>
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.25), rgba(0,0,0,0.05))' }} />
           {renderWallFace(rightWall, true)}
-          <div className="absolute top-[12%] right-1 px-1.5 py-0.5 rounded text-[7px] font-black text-white/60 bg-black/40 z-10 pointer-events-none">{rightWall?.name || 'RIGHT WALL'}</div>
+          <div className="absolute top-[12%] right-1 px-1.5 py-0.5 rounded text-[6px] font-black text-white/30 z-10 pointer-events-none">{rightWall?.name || 'RIGHT WALL'}</div>
         </div>
 
         {/* FLOOR — trapezoid, much larger and visible */}
@@ -1633,10 +1638,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           <div>
             {showMeasurements && <div className="mb-4"><MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} /></div>}
 
-            {/* 3D Realistic Shower View */}
-            <ThreeShowerView schedule={activeSchedule} />
-
-            {/* Interactive 2D controls below */}
             <Shower3DView
               schedule={activeSchedule}
               selectedItem={selectedItem}
