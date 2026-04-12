@@ -174,8 +174,8 @@ leicaService.onMeasurement((measurement) => {
 ### Backend URL
 Edit `/app/mobile/.env`:
 ```env
-BACKEND_URL=https://finish-schedule.preview.emergentagent.com
-API_URL=https://finish-schedule.preview.emergentagent.com/api
+BACKEND_URL=https://design-preview-131.preview.emergentagent.com
+API_URL=https://design-preview-131.preview.emergentagent.com/api
 ```
 
 ### Permissions (app.json)
@@ -307,7 +307,7 @@ yarn start --clear
 **Q: Can't connect to backend?**
 - Check backend is running: `sudo supervisorctl status backend`
 - Verify URL in `/app/mobile/.env`
-- Test endpoint: `curl https://finish-schedule.preview.emergentagent.com/api/projects`
+- Test endpoint: `curl https://design-preview-131.preview.emergentagent.com/api/projects`
 
 **Q: Photos not uploading?**
 - Check network connection

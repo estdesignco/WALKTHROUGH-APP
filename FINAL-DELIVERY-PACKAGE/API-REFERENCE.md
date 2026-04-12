@@ -8,7 +8,7 @@
 
 ```
 http://localhost:8001/api
-https://finish-schedule.preview.emergentagent.com/api
+https://design-preview-131.preview.emergentagent.com/api
 ```
 
 ---

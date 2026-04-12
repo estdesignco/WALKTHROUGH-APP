@@ -312,10 +312,10 @@ Office: #6366F1 (Indigo)
 ## 📱 Mobile App URLs
 
 **Main App:**
-https://finish-schedule.preview.emergentagent.com
+https://design-preview-131.preview.emergentagent.com
 
 **Mobile Simulator:**
-https://finish-schedule.preview.emergentagent.com/mobile-app
+https://design-preview-131.preview.emergentagent.com/mobile-app
 
 ---
 

@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Backend URL from .env
-BACKEND_URL = "https://finish-schedule.preview.emergentagent.com/api"
+BACKEND_URL = "https://design-preview-131.preview.emergentagent.com/api"
 
 # Test project ID from review request
 PROJECT_ID = "8bb8cbf2-e691-4227-9892-d78c79d5b0a4"

@@ -183,8 +183,8 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
-const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale) => {
-  const grout = 3;
+const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0) => {
+  const g = 1;
   ctx.fillStyle = groutColor || '#4a4035';
   ctx.fillRect(0, 0, w, h);
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
@@ -194,43 +194,52 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
     ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
-    const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
-    const bright = ((hash % 7) - 3) * 0.012;
-    if (bright !== 0) { ctx.fillStyle = bright > 0 ? `rgba(255,255,255,${bright})` : `rgba(0,0,0,${-bright})`; ctx.fillRect(x, y, tw, th); }
-    const bev = Math.max(1, Math.min(tw, th) * 0.025);
-    ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(x, y, tw, bev); ctx.fillRect(x, y, bev, th);
-    ctx.fillStyle = 'rgba(0,0,0,0.08)'; ctx.fillRect(x, y + th - bev, tw, bev); ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
-  // FIXED tile size — consistent across ALL zones and walls
-  const refDim = Math.min(w, h);
-  let tl = Math.max(20, Math.min(200, 35 * scale));
-  let ts = Math.max(8, Math.round(tl / 3));
+  // Scale tiles proportionally to canvas width, using the tile image's real aspect ratio
+  const longSide = Math.max(imgW, imgH);
+  const shortSide = Math.min(imgW, imgH);
+  const ratio = Math.max(1, longSide / shortSide);
+  let tl = Math.max(12, Math.round((w / 6) * scale));
+  let ts = Math.max(6, Math.round(tl / ratio));
   if (orientation === 'vertical') { const tmp = tl; tl = ts; ts = tmp; }
-  const g = grout;
+
+  // Zone offset: ensures tiles align continuously across wall zones
+  const oY = offsetY > 0 ? (offsetY % (ts + g)) : 0;
+  const baseRow = offsetY > 0 ? Math.floor(offsetY / (ts + g)) : 0;
 
   switch (pattern) {
     case 'stacked_horizontal':
-      for (let y = -ts; y < h + ts * 2; y += ts + g) for (let x = -tl; x < w + tl * 2; x += tl + g) drawTile(x, y, tl, ts);
+      for (let y = -ts - oY; y < h + ts; y += ts + g) for (let x = -tl; x < w + tl; x += tl + g) drawTile(x, y, tl, ts);
       break;
-    case 'stacked_vertical':
-      for (let x = -ts; x < w + ts * 2; x += ts + g) for (let y = -tl; y < h + tl * 2; y += tl + g) drawTile(x, y, ts, tl);
+    case 'stacked_vertical': {
+      const oYv = offsetY > 0 ? (offsetY % (tl + g)) : 0;
+      for (let x = -ts; x < w + ts; x += ts + g) for (let y = -tl - oYv; y < h + tl; y += tl + g) drawTile(x, y, ts, tl);
       break;
+    }
     case 'offset': {
       let row = 0;
-      for (let y = -ts; y < h + ts * 2; y += ts + g, row++) { const off = (row % 2) * ((tl + g) / 2); for (let x = -tl * 2; x < w + tl * 2; x += tl + g) drawTile(x + off, y, tl, ts); }
+      for (let y = -ts - oY; y < h + ts; y += ts + g, row++) {
+        const actualRow = baseRow + row;
+        const off = (actualRow % 2) * ((tl + g) / 2);
+        for (let x = -tl * 2; x < w + tl * 2; x += tl + g) drawTile(x + off, y, tl, ts);
+      }
       break;
     }
     case 'one_third_offset': {
       let row = 0;
-      for (let y = -ts; y < h + ts * 2; y += ts + g, row++) { const off = (row % 3) * ((tl + g) / 3); for (let x = -tl * 2; x < w + tl * 2; x += tl + g) drawTile(x + off, y, tl, ts); }
+      for (let y = -ts - oY; y < h + ts; y += ts + g, row++) {
+        const actualRow = baseRow + row;
+        const off = (actualRow % 3) * ((tl + g) / 3);
+        for (let x = -tl * 2; x < w + tl * 2; x += tl + g) drawTile(x + off, y, tl, ts);
+      }
       break;
     }
     case 'herringbone': {
       const tw = Math.max(15, ts); const th = Math.max(35, tl);
       for (let row = -2; row < Math.ceil(h / (tw + g)) + 4; row++) {
         for (let col = -2; col < Math.ceil(w / (th + g)) + 4; col++) {
-          const bx = col * (th + g); const by = row * (tw * 2 + g * 2);
+          const bx = col * (th + g); const by = row * (tw * 2 + g * 2) - oY;
           drawTile(bx, by + (col % 2) * (tw + g), th, tw);
           drawTile(bx + th - tw, by + (col % 2) * (tw + g) + tw + g, tw, th);
         }
@@ -239,9 +248,10 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     }
     case 'herringbone_vertical': {
       const tw = Math.max(12, ts); const th = Math.max(35, tl);
+      const oYhv = offsetY > 0 ? (offsetY % (th / 2 + g)) : 0;
       for (let col = -4; col < Math.ceil(w / (tw + g)) + 4; col++) {
         for (let row = -4; row < Math.ceil(h / (th / 2 + g)) + 4; row++) {
-          const x = col * (tw * 2 + g); const y = row * (th / 2 + g);
+          const x = col * (tw * 2 + g); const y = row * (th / 2 + g) - oYhv;
           if (row % 2 === 0) { drawTile(x, y, tw, th); drawTile(x + tw + g, y + th / 2, tw, th); }
           else { drawTile(x + tw + g, y, tw, th); drawTile(x, y + th / 2, tw, th); }
         }
@@ -250,20 +260,22 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     }
     case 'basket_weave': {
       const block = ts * 2 + g; const cell = block + g;
+      const oYbw = offsetY > 0 ? (offsetY % cell) : 0;
       for (let gy = -2; gy < Math.ceil(h / cell) + 2; gy++) for (let gx = -2; gx < Math.ceil(w / cell) + 2; gx++) {
-        const bx = gx * cell, by = gy * cell;
+        const bx = gx * cell, by = gy * cell - oYbw;
         if ((gx + gy) % 2 === 0) { drawTile(bx, by, block, ts); drawTile(bx, by + ts + g, block, ts); }
         else { drawTile(bx, by, ts, block); drawTile(bx + ts + g, by, ts, block); }
       }
       break;
     }
     case 'stepladder': {
+      const oYsl = offsetY > 0 ? (offsetY % (tl + g)) : 0;
       let col = 0;
-      for (let x = -ts; x < w + ts * 2; x += ts + g, col++) { const off = ((col % 4) * ((tl + g) / 4)); for (let y = -tl * 2 + off; y < h + tl * 2; y += tl + g) drawTile(x, y, ts, tl); }
+      for (let x = -ts; x < w + ts; x += ts + g, col++) { const off = ((col % 4) * ((tl + g) / 4)); for (let y = -tl * 2 + off - oYsl; y < h + tl; y += tl + g) drawTile(x, y, ts, tl); }
       break;
     }
     case 'diagonal': {
-      const sq = Math.max(20, Math.min(200, 35 * scale)); const step = sq + g;
+      const sq = Math.max(15, Math.round(Math.sqrt(tl * ts))); const step = sq + g;
       ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(Math.PI / 4);
       const range = Math.max(w, h) * 1.5;
       for (let y = -range; y < range; y += step) for (let x = -range; x < range; x += step) drawTile(x, y, sq, sq);
@@ -275,7 +287,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
 
 
 /* ==================== TILE PATTERN CANVAS ==================== */
-const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrientation, tileScale }) => {
+const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct }) => {
   const containerRef = React.useRef(null);
   const canvasRef = React.useRef(null);
   const imgRef = React.useRef(null);
@@ -289,13 +301,36 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     canvas.width = w; canvas.height = h;
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     const ctx = canvas.getContext('2d');
-    const crop = (tileCrop && tileCrop.w > 0 && tileCrop.h > 0) ? tileCrop
-      : { x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight };
-    const tileCanvas = document.createElement('canvas');
-    tileCanvas.width = Math.max(1, Math.round(crop.w)); tileCanvas.height = Math.max(1, Math.round(crop.h));
-    tileCanvas.getContext('2d').drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, tileCanvas.width, tileCanvas.height);
-    drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale);
-  }, [pattern, tileCrop, groutColor, tileOrientation, tileScale]);
+    const hasCrop = tileCrop && tileCrop.w > 0 && tileCrop.h > 0;
+
+    if (hasCrop) {
+      // CROPPED SINGLE TILE: apply selected pattern with grout
+      const tileCanvas = document.createElement('canvas');
+      tileCanvas.width = Math.max(1, Math.round(tileCrop.w)); tileCanvas.height = Math.max(1, Math.round(tileCrop.h));
+      tileCanvas.getContext('2d').drawImage(img, tileCrop.x, tileCrop.y, tileCrop.w, tileCrop.h, 0, 0, tileCanvas.width, tileCanvas.height);
+      let offsetY = 0;
+      if (zoneTopPct > 0 && zoneHeightPct > 0) {
+        const wallPxHeight = h * (100 / zoneHeightPct);
+        offsetY = wallPxHeight * (zoneTopPct / 100);
+      }
+      drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY);
+    } else {
+      // FULL IMAGE: tile it seamlessly — no grout, no pattern manipulation
+      const imgW = img.naturalWidth; const imgH = img.naturalHeight;
+      const scale = tileScale || 1.0;
+      const tw = Math.max(10, Math.round((w / 6) * scale));
+      const th = Math.max(10, Math.round(tw * (imgH / imgW)));
+      // Seamless offset for zone alignment
+      let startY = 0;
+      if (zoneTopPct > 0 && zoneHeightPct > 0) {
+        const wallPxH = h * (100 / zoneHeightPct);
+        startY = -(wallPxH * (zoneTopPct / 100) % th);
+      }
+      for (let y = startY; y < h; y += th)
+        for (let x = 0; x < w; x += tw)
+          ctx.drawImage(img, 0, 0, imgW, imgH, x, y, tw, th);
+    }
+  }, [pattern, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct]);
 
   React.useEffect(() => {
     if (!imageUrl) return;
@@ -436,9 +471,10 @@ const WallZone = ({ zone, zoneHeight, mat, compact, niches, benches, fixtures,
       data-testid={`wall-zone-${zone.id}`}
     >
       {hasImage ? (
-        <TilePatternCanvas key={`${mat.pattern || 'sh'}-${mat.id}-${hasCrop ? 'c' : 'r'}-${mat.grout_color}-${mat.tile_orientation}-${mat.tile_scale}`}
+        <TilePatternCanvas key={`${mat.pattern || 'sh'}-${mat.id}-${hasCrop ? 'c' : 'r'}-${mat.grout_color}-${mat.tile_orientation}-${mat.tile_scale}-${zone.top}`}
           pattern={mat.pattern || 'stacked_horizontal'} imageUrl={mat.image} tileCrop={mat.tile_crop}
-          groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale} />
+          groutColor={mat.grout_color} tileOrientation={mat.tile_orientation} tileScale={mat.tile_scale}
+          zoneTopPct={zone.top} zoneHeightPct={zoneHeight} />
       ) : (
         <div className="absolute inset-0" style={{ background: '#f5f5f0', borderBottom: '1px solid #ddd' }}>
           <div className="absolute inset-0 flex items-center justify-center"><span className="text-amber-600/30 text-[8px] font-bold">CLICK TO PLACE</span></div>
@@ -701,7 +737,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
           {bench.material?.image && bench.material?.pattern && (
             <TilePatternCanvas pattern={bench.material.pattern} imageUrl={bench.material.image}
               tileCrop={bench.material.tile_crop} groutColor={bench.material.grout_color}
-              tileOrientation={bench.material.tile_orientation} tileScale={(bench.material.tile_scale || 1) * 0.5} />
+              tileOrientation={bench.material.tile_orientation} tileScale={bench.material.tile_scale} />
           )}
           <div className="absolute top-0 left-0 right-0 h-[4px] bg-gradient-to-b from-white/30 to-transparent pointer-events-none" />
           <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5 text-[7px] font-black text-white/80 bg-black/60 text-center pointer-events-none">
