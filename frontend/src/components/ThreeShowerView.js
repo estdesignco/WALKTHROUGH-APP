@@ -266,7 +266,15 @@ const ThreeShowerView = ({ schedule }) => {
   const rightWall = walls.find(s => s.name?.toLowerCase().includes('right')) || walls[2];
   const getImg = (surface) => {
     if (!surface) return null;
-    for (const m of (surface.materials || [])) { if (m.image) return m.image; }
+    const mats = surface.materials || [];
+    // Prefer main_wall zone material (the primary tile the user placed)
+    const mainMat = mats.find(m => m.position_label === 'main_wall' && m.image);
+    if (mainMat) return mainMat.image;
+    // Then try _surface (for floor/ceiling)
+    const surfMat = mats.find(m => m.position_label === '_surface' && m.image);
+    if (surfMat) return surfMat.image;
+    // Fallback to any material with image
+    for (const m of mats) { if (m.image) return m.image; }
     return null;
   };
 
