@@ -33,9 +33,7 @@ const GROUT_COLORS = [
 const LINE_COLORS = ['#FF4444', '#44AAFF', '#44FF44', '#FFAA44', '#FF44FF', '#FFFFFF'];
 
 const DEFAULT_ZONE_CONFIG = [
-  { id: 'upper_accent', label: 'Upper', height: 25, dimension: '' },
-  { id: 'main_wall', label: 'Main Wall', height: 45, dimension: '' },
-  { id: 'wainscot', label: 'Wainscot', height: 15, dimension: '' },
+  { id: 'main_wall', label: 'Main Wall', height: 85, dimension: '' },
   { id: 'floor', label: 'Floor', height: 15, dimension: '' },
 ];
 
@@ -183,10 +181,9 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
-const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0) => {
-  const g = 1;
-  ctx.fillStyle = groutColor || '#4a4035';
-  ctx.fillRect(0, 0, w, h);
+const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0, hasCrop = false) => {
+  const g = hasCrop ? 1 : 0;
+  if (g > 0) { ctx.fillStyle = groutColor || '#4a4035'; ctx.fillRect(0, 0, w, h); }
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
   const imgH = tileImg.height || tileImg.naturalHeight || 200;
   const scale = tileScale || 1.0;
@@ -196,30 +193,32 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
   };
 
-  // Scale tiles proportionally to canvas width, using the tile image's real aspect ratio
+  // FIXED base 90px — same on ALL walls (back, side, floor, ceiling) for consistency
+  const basePx = 90;
   const longSide = Math.max(imgW, imgH);
   const shortSide = Math.min(imgW, imgH);
   const ratio = Math.max(1, longSide / shortSide);
-  let tl = Math.max(12, Math.round((w / 6) * scale));
+  let tl = Math.max(12, Math.round(basePx * scale));
   let ts = Math.max(6, Math.round(tl / ratio));
   if (orientation === 'vertical') { const tmp = tl; tl = ts; ts = tmp; }
 
-  // Zone offset: ensures tiles align continuously across wall zones
-  const oY = offsetY > 0 ? (offsetY % (ts + g)) : 0;
-  const baseRow = offsetY > 0 ? Math.floor(offsetY / (ts + g)) : 0;
+  const stepH = ts + g || ts;
+  const stepV = tl + g || tl;
+  const oY = offsetY > 0 ? (offsetY % stepH) : 0;
+  const baseRow = offsetY > 0 ? Math.floor(offsetY / stepH) : 0;
 
   switch (pattern) {
     case 'stacked_horizontal':
-      for (let y = -ts - oY; y < h + ts; y += ts + g) for (let x = -tl; x < w + tl; x += tl + g) drawTile(x, y, tl, ts);
+      for (let y = -ts - oY; y < h + ts; y += stepH) for (let x = -tl; x < w + tl; x += tl + g) drawTile(x, y, tl, ts);
       break;
     case 'stacked_vertical': {
-      const oYv = offsetY > 0 ? (offsetY % (tl + g)) : 0;
-      for (let x = -ts; x < w + ts; x += ts + g) for (let y = -tl - oYv; y < h + tl; y += tl + g) drawTile(x, y, ts, tl);
+      const oYv = offsetY > 0 ? (offsetY % stepV) : 0;
+      for (let x = -ts; x < w + ts; x += ts + g) for (let y = -tl - oYv; y < h + tl; y += stepV) drawTile(x, y, ts, tl);
       break;
     }
     case 'offset': {
       let row = 0;
-      for (let y = -ts - oY; y < h + ts; y += ts + g, row++) {
+      for (let y = -ts - oY; y < h + ts; y += stepH, row++) {
         const actualRow = baseRow + row;
         const off = (actualRow % 2) * ((tl + g) / 2);
         for (let x = -tl * 2; x < w + tl * 2; x += tl + g) drawTile(x + off, y, tl, ts);
@@ -228,7 +227,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     }
     case 'one_third_offset': {
       let row = 0;
-      for (let y = -ts - oY; y < h + ts; y += ts + g, row++) {
+      for (let y = -ts - oY; y < h + ts; y += stepH, row++) {
         const actualRow = baseRow + row;
         const off = (actualRow % 3) * ((tl + g) / 3);
         for (let x = -tl * 2; x < w + tl * 2; x += tl + g) drawTile(x + off, y, tl, ts);
@@ -237,8 +236,8 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     }
     case 'herringbone': {
       const tw = Math.max(15, ts); const th = Math.max(35, tl);
-      for (let row = -2; row < Math.ceil(h / (tw + g)) + 4; row++) {
-        for (let col = -2; col < Math.ceil(w / (th + g)) + 4; col++) {
+      for (let row = -4; row < Math.ceil(h / (tw + g || tw)) + 4; row++) {
+        for (let col = -4; col < Math.ceil(w / (th + g || th)) + 4; col++) {
           const bx = col * (th + g); const by = row * (tw * 2 + g * 2) - oY;
           drawTile(bx, by + (col % 2) * (tw + g), th, tw);
           drawTile(bx + th - tw, by + (col % 2) * (tw + g) + tw + g, tw, th);
@@ -248,9 +247,9 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
     }
     case 'herringbone_vertical': {
       const tw = Math.max(12, ts); const th = Math.max(35, tl);
-      const oYhv = offsetY > 0 ? (offsetY % (th / 2 + g)) : 0;
-      for (let col = -4; col < Math.ceil(w / (tw + g)) + 4; col++) {
-        for (let row = -4; row < Math.ceil(h / (th / 2 + g)) + 4; row++) {
+      const oYhv = offsetY > 0 ? (offsetY % (th / 2 + g || th / 2)) : 0;
+      for (let col = -4; col < Math.ceil(w / (tw + g || tw)) + 4; col++) {
+        for (let row = -4; row < Math.ceil(h / (th / 2 + g || th / 2)) + 4; row++) {
           const x = col * (tw * 2 + g); const y = row * (th / 2 + g) - oYhv;
           if (row % 2 === 0) { drawTile(x, y, tw, th); drawTile(x + tw + g, y + th / 2, tw, th); }
           else { drawTile(x + tw + g, y, tw, th); drawTile(x, y + th / 2, tw, th); }
@@ -259,7 +258,7 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
       break;
     }
     case 'basket_weave': {
-      const block = ts * 2 + g; const cell = block + g;
+      const block = ts * 2 + g; const cell = block + g || block;
       const oYbw = offsetY > 0 ? (offsetY % cell) : 0;
       for (let gy = -2; gy < Math.ceil(h / cell) + 2; gy++) for (let gx = -2; gx < Math.ceil(w / cell) + 2; gx++) {
         const bx = gx * cell, by = gy * cell - oYbw;
@@ -269,13 +268,13 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
       break;
     }
     case 'stepladder': {
-      const oYsl = offsetY > 0 ? (offsetY % (tl + g)) : 0;
+      const oYsl = offsetY > 0 ? (offsetY % stepV) : 0;
       let col = 0;
-      for (let x = -ts; x < w + ts; x += ts + g, col++) { const off = ((col % 4) * ((tl + g) / 4)); for (let y = -tl * 2 + off - oYsl; y < h + tl; y += tl + g) drawTile(x, y, ts, tl); }
+      for (let x = -ts; x < w + ts; x += ts + g, col++) { const off = ((col % 4) * ((tl + g) / 4)); for (let y = -tl * 2 + off - oYsl; y < h + tl; y += stepV) drawTile(x, y, ts, tl); }
       break;
     }
     case 'diagonal': {
-      const sq = Math.max(15, Math.round(Math.sqrt(tl * ts))); const step = sq + g;
+      const sq = Math.max(15, Math.round(Math.sqrt(tl * ts))); const step = sq + g || sq;
       ctx.save(); ctx.translate(w / 2, h / 2); ctx.rotate(Math.PI / 4);
       const range = Math.max(w, h) * 1.5;
       for (let y = -range; y < range; y += step) for (let x = -range; x < range; x += step) drawTile(x, y, sq, sq);
@@ -302,34 +301,16 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     const ctx = canvas.getContext('2d');
     const hasCrop = tileCrop && tileCrop.w > 0 && tileCrop.h > 0;
-
-    if (hasCrop) {
-      // CROPPED SINGLE TILE: apply selected pattern with grout
-      const tileCanvas = document.createElement('canvas');
-      tileCanvas.width = Math.max(1, Math.round(tileCrop.w)); tileCanvas.height = Math.max(1, Math.round(tileCrop.h));
-      tileCanvas.getContext('2d').drawImage(img, tileCrop.x, tileCrop.y, tileCrop.w, tileCrop.h, 0, 0, tileCanvas.width, tileCanvas.height);
-      let offsetY = 0;
-      if (zoneTopPct > 0 && zoneHeightPct > 0) {
-        const wallPxHeight = h * (100 / zoneHeightPct);
-        offsetY = wallPxHeight * (zoneTopPct / 100);
-      }
-      drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY);
-    } else {
-      // FULL IMAGE: tile it seamlessly — no grout, no pattern manipulation
-      const imgW = img.naturalWidth; const imgH = img.naturalHeight;
-      const scale = tileScale || 1.0;
-      const tw = Math.max(10, Math.round((w / 6) * scale));
-      const th = Math.max(10, Math.round(tw * (imgH / imgW)));
-      // Seamless offset for zone alignment
-      let startY = 0;
-      if (zoneTopPct > 0 && zoneHeightPct > 0) {
-        const wallPxH = h * (100 / zoneHeightPct);
-        startY = -(wallPxH * (zoneTopPct / 100) % th);
-      }
-      for (let y = startY; y < h; y += th)
-        for (let x = 0; x < w; x += tw)
-          ctx.drawImage(img, 0, 0, imgW, imgH, x, y, tw, th);
+    const crop = hasCrop ? tileCrop : { x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight };
+    const tileCanvas = document.createElement('canvas');
+    tileCanvas.width = Math.max(1, Math.round(crop.w)); tileCanvas.height = Math.max(1, Math.round(crop.h));
+    tileCanvas.getContext('2d').drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, tileCanvas.width, tileCanvas.height);
+    let offsetY = 0;
+    if (zoneTopPct > 0 && zoneHeightPct > 0) {
+      const wallPxH = h * (100 / zoneHeightPct);
+      offsetY = wallPxH * (zoneTopPct / 100);
     }
+    drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY, hasCrop);
   }, [pattern, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct]);
 
   React.useEffect(() => {
@@ -517,7 +498,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
   onPlaceItem, onPlaceFixture, onAddNiche, onAddBench, onRemoveMaterial,
   onChangePattern, onCropTile, onChangeGrout, onChangeOrientation, onChangeTileScale,
   onSelectElement, onDeleteElement, onUpdateElement, onApplyTileToElement,
-  onResizeZone, onEditDimension, onPlaceCeilingFloor }) => {
+  onResizeZone, onEditDimension, onPlaceCeilingFloor, onAddZone, onRemoveZone }) => {
 
   const [patternPicker, setPatternPicker] = useState(null);
   const [editingDim, setEditingDim] = useState(null);
@@ -778,6 +759,15 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         {surfFixtures.map(f => <FixtureOverlay key={f.id} fixture={f} isSelected={selectedElement?.id === f.id}
           onDragStart={handleElementDragStart} />)}
         <div className="absolute top-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded text-[7px] font-black text-white/70 bg-black/40 z-10 pointer-events-none">{label}</div>
+        {hasImage && (
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-end px-1 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            style={{ background: 'rgba(0,0,0,0.65)' }}>
+            <button onClick={e => { e.stopPropagation(); mat && onCropTile(surface.id, mat.id, mat.image, mat.tile_crop); }}
+              className="px-1 py-0.5 rounded text-[8px] font-black text-orange-300 bg-black/80 mr-1" data-testid={`crop-btn-${surface.surface_type}`}><Crop size={8} className="inline mr-0.5" />CROP</button>
+            <button onClick={e => { e.stopPropagation(); setPatternPicker(patternPicker?.zoneId === '_surface' && patternPicker?.surfaceId === surface.id ? null : { surfaceId: surface.id, zoneId: '_surface' }); }}
+              className="px-1 py-0.5 rounded text-[8px] font-black text-amber-300 bg-black/80" data-testid={`pattern-btn-${surface.surface_type}`}>PATTERN</button>
+          </div>
+        )}
         {!hasImage && (
           <div className={`absolute inset-0 flex items-center justify-center transition-all ${selectedItem ? 'bg-amber-400/10 border-2 border-dashed border-amber-400/40' : ''}`}>
             <span className="text-amber-600/40 text-[9px] font-bold">{selectedItem ? 'CLICK TO PLACE' : ''}</span>
@@ -894,7 +884,7 @@ const Shower3DView = ({ schedule, selectedItem, placementMode, selectedElement,
         <div className="mt-3 p-4 rounded-xl border-2 border-amber-400/30 shadow-2xl" style={{ background: 'rgba(0,0,0,0.97)' }} data-testid="pattern-picker">
           <div className="flex justify-between items-center mb-3">
             <span className="text-sm font-black text-amber-400">
-              PATTERN FOR: <span className="text-white">{getZoneConfig(pickerSurface).find(z => z.id === patternPicker.zoneId)?.label || patternPicker.zoneId}</span>
+              PATTERN FOR: <span className="text-white">{patternPicker.zoneId === '_surface' ? (pickerSurface?.surface_type === 'ceiling' ? 'Ceiling' : 'Floor') : (getZoneConfig(pickerSurface).find(z => z.id === patternPicker.zoneId)?.label || patternPicker.zoneId)}</span>
             </span>
             <button onClick={() => setPatternPicker(null)} className="text-white/40 hover:text-white"><X size={18} /></button>
           </div>
@@ -1458,6 +1448,52 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     }));
   };
 
+  const handleAddZone = (zoneType) => {
+    updateSchedule(prev => ({
+      ...prev,
+      surfaces: prev.surfaces.map(s => {
+        if (s.surface_type !== 'wall') return s;
+        const zones = s.zone_config || DEFAULT_ZONE_CONFIG.map(z => ({ ...z }));
+        if (zoneType === 'upper_accent' && !zones.find(z => z.id === 'upper_accent')) {
+          const mainIdx = zones.findIndex(z => z.id === 'main_wall');
+          if (mainIdx < 0) return s;
+          const newZones = [...zones];
+          newZones[mainIdx] = { ...newZones[mainIdx], height: newZones[mainIdx].height - 20 };
+          newZones.splice(mainIdx, 0, { id: 'upper_accent', label: 'Upper', height: 20, dimension: '' });
+          return { ...s, zone_config: newZones };
+        }
+        if (zoneType === 'wainscot' && !zones.find(z => z.id === 'wainscot')) {
+          const mainIdx = zones.findIndex(z => z.id === 'main_wall');
+          const floorIdx = zones.findIndex(z => z.id === 'floor');
+          if (mainIdx < 0 || floorIdx < 0) return s;
+          const newZones = [...zones];
+          newZones[mainIdx] = { ...newZones[mainIdx], height: newZones[mainIdx].height - 15 };
+          newZones.splice(floorIdx, 0, { id: 'wainscot', label: 'Wainscot', height: 15, dimension: '' });
+          return { ...s, zone_config: newZones };
+        }
+        return s;
+      })
+    }));
+  };
+
+  const handleRemoveZone = (zoneType) => {
+    updateSchedule(prev => ({
+      ...prev,
+      surfaces: prev.surfaces.map(s => {
+        if (s.surface_type !== 'wall') return s;
+        const zones = s.zone_config || DEFAULT_ZONE_CONFIG.map(z => ({ ...z }));
+        const idx = zones.findIndex(z => z.id === zoneType);
+        if (idx < 0) return s;
+        const mainIdx = zones.findIndex(z => z.id === 'main_wall');
+        if (mainIdx < 0) return s;
+        const newZones = zones.filter(z => z.id !== zoneType);
+        const mIdx = newZones.findIndex(z => z.id === 'main_wall');
+        newZones[mIdx] = { ...newZones[mIdx], height: newZones[mIdx].height + zones[idx].height };
+        return { ...s, zone_config: newZones, materials: (s.materials || []).filter(m => m.position_label !== zoneType) };
+      })
+    }));
+  };
+
   const handleLinesChange = (newLines) => {
     updateSchedule(prev => ({ ...prev, measurement_lines: newLines }));
   };
@@ -1538,6 +1574,17 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               <button onClick={() => setPlacementMode(placementMode === 'fixture' ? null : 'fixture')}
                 className={`px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 ${placementMode === 'fixture' ? 'bg-blue-600 text-white' : 'text-white/30 border border-white/10'}`}
                 data-testid="add-fixture-btn"><Droplet size={10} />FIXTURE</button>
+              {(() => {
+                const wallZones = (activeSchedule?.surfaces || []).find(s => s.surface_type === 'wall')?.zone_config || [];
+                const hasUpper = wallZones.some(z => z.id === 'upper_accent');
+                const hasWainscot = wallZones.some(z => z.id === 'wainscot');
+                return <>
+                  {!hasUpper ? <button onClick={() => handleAddZone('upper_accent')} className="px-2 py-1.5 rounded text-[10px] font-bold text-purple-300 border border-purple-400/20" data-testid="add-upper-btn"><Plus size={8} className="inline" /> UPPER</button>
+                    : <button onClick={() => handleRemoveZone('upper_accent')} className="px-2 py-1.5 rounded text-[10px] font-bold text-purple-400 bg-purple-900/30 border border-purple-400/30" data-testid="remove-upper-btn"><X size={8} className="inline" /> UPPER</button>}
+                  {!hasWainscot ? <button onClick={() => handleAddZone('wainscot')} className="px-2 py-1.5 rounded text-[10px] font-bold text-teal-300 border border-teal-400/20" data-testid="add-wainscot-btn"><Plus size={8} className="inline" /> WAINSCOT</button>
+                    : <button onClick={() => handleRemoveZone('wainscot')} className="px-2 py-1.5 rounded text-[10px] font-bold text-teal-400 bg-teal-900/30 border border-teal-400/30" data-testid="remove-wainscot-btn"><X size={8} className="inline" /> WAINSCOT</button>}
+                </>;
+              })()}
               <button onClick={() => handleDelete(activeSchedule.id)} className="px-2 py-1.5 rounded text-[10px] text-red-400 border border-red-400/20"><Trash2 size={10} /></button>
             </>}
           </div>
@@ -1582,6 +1629,8 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               onResizeZone={handleResizeZone}
               onEditDimension={handleEditDimension}
               onPlaceCeilingFloor={handlePlaceCeilingFloor}
+              onAddZone={handleAddZone}
+              onRemoveZone={handleRemoveZone}
             />
 
             <div className="mt-3 flex gap-1 flex-wrap">
