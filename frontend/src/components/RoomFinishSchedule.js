@@ -361,8 +361,8 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     return (
       <div className="absolute inset-0 overflow-hidden" style={{
         backgroundImage: `url(${proxyUrl})`,
-        backgroundSize: `${90 * (tileScale || 1)}px auto`,
-        backgroundRepeat: 'repeat',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
       }} />
     );
