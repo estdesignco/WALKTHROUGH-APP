@@ -1640,6 +1640,13 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               <div className="mt-2 p-2 bg-black/40 rounded-lg border border-white/10">
                 <div className="text-[10px] font-bold text-amber-400 mb-1">APPLY "{selectedItem.name}" TO:</div>
                 <div className="flex gap-1 flex-wrap">
+                  <button onClick={() => {
+                    const wallSurfaces = (activeSchedule.surfaces || []).filter(s => s.surface_type === 'wall');
+                    const existingCrop = findExistingCropForItem(selectedItem.id);
+                    if (existingCrop) { wallSurfaces.forEach(s => placeItemWithCrop(s.id, 'main_wall', selectedItem, existingCrop)); }
+                    else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: wallSurfaces[0]?.id, zoneId: 'main_wall', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place' }); }
+                  }} className="px-3 py-1.5 rounded text-[10px] font-black text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-400/30"
+                    data-testid="quick-place-all-walls">ALL WALLS</button>
                   {(activeSchedule.surfaces || []).filter(s => s.surface_type === 'wall').map(s => (
                     <button key={s.id} onClick={() => {
                       const existingCrop = findExistingCropForItem(selectedItem.id);
