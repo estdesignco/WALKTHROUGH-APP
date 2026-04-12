@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Ruler, Plus, Trash2, MousePointer, X, Pencil, Crop, RotateCw, Palette, Square, Droplet, GripVertical, Move } from 'lucide-react';
+import ThreeShowerView from './ThreeShowerView';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -1256,23 +1257,35 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     updateSchedule(prev => {
       const targetSurface = prev.surfaces.find(s => s.id === surfaceId);
       const isBackWall = targetSurface?.name?.toLowerCase().includes('back');
-      const matEntry = {
-        item_id: item.id, name: item.name || '', vendor: item.vendor || '',
+      const makeMat = (posLabel) => ({
+        id: crypto.randomUUID(), item_id: item.id, name: item.name || '', vendor: item.vendor || '',
         sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
-        image: item._img || '', link: item.link || '', position_label: zoneId, pattern: '',
+        image: item._img || '', link: item.link || '', position_label: posLabel, pattern: '',
         tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
+      });
+
+      const fillAllZones = (surface) => {
+        const zones = surface.zone_config || DEFAULT_ZONE_CONFIG;
+        let mats = [...(surface.materials || [])];
+        zones.forEach(z => {
+          if (!mats.find(m => m.position_label === z.id)) {
+            mats.push(makeMat(z.id));
+          }
+        });
+        // Also update the clicked zone
+        mats = mats.map(m => m.position_label === zoneId ? makeMat(zoneId) : m);
+        return mats;
       };
+
       return {
         ...prev,
         surfaces: prev.surfaces.map(s => {
           if (s.id === surfaceId) {
-            const filtered = s.materials.filter(m => m.position_label !== zoneId);
-            return { ...s, materials: [...filtered, { ...matEntry, id: crypto.randomUUID() }] };
+            return { ...s, materials: fillAllZones(s) };
           }
-          // Auto-fill side walls when placing on back wall — ALWAYS overwrite to stay in sync
+          // Auto-fill side walls when placing on back wall
           if (isBackWall && s.surface_type === 'wall' && s.id !== surfaceId) {
-            const filtered = s.materials.filter(m => m.position_label !== zoneId);
-            return { ...s, materials: [...filtered, { ...matEntry, id: crypto.randomUUID() }] };
+            return { ...s, materials: fillAllZones(s) };
           }
           return s;
         })
@@ -1619,6 +1632,12 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           <div>
             {showMeasurements && <div className="mb-4"><MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} /></div>}
 
+            {/* 3D Photorealistic View */}
+            <ThreeShowerView schedule={activeSchedule} />
+
+            {/* 2D Interactive Controls */}
+            <details className="mt-2" open>
+              <summary className="cursor-pointer text-xs font-bold text-white/40 px-2 py-1 bg-black/30 rounded">2D Controls (tile placement, crop, patterns)</summary>
             <Shower3DView
               schedule={activeSchedule}
               selectedItem={selectedItem}
@@ -1644,6 +1663,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               onAddZone={handleAddZone}
               onRemoveZone={handleRemoveZone}
             />
+            </details>
 
             <div className="mt-3 flex gap-1 flex-wrap">
               {activeSchedule.surfaces.map(s => (

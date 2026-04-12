@@ -1,156 +1,150 @@
-import React, { useRef, useMemo, useEffect, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
-
-// Shower box dimensions (in 3D units — roughly inches scaled down)
-const W = 5;   // width
-const H = 8;   // height
-const D = 4;   // depth
-
+const W = 5, H = 8, D = 4;
 const proxyUrl = (url) => url ? `${API_URL}/api/proxy-image?url=${encodeURIComponent(url)}` : null;
 
-/* ---- Tile-textured wall mesh ---- */
-const TiledWall = ({ position, rotation, size, imageUrl, color = '#444' }) => {
-  const matRef = useRef();
-  const [loaded, setLoaded] = useState(false);
+/* Load a texture from URL via fetch → blob → dataURL → Image → THREE.Texture */
+function useImageTexture(imageUrl, repeatX = 6, repeatY = 4) {
+  const [texture, setTexture] = useState(null);
 
   useEffect(() => {
-    if (!imageUrl || !matRef.current) return;
+    if (!imageUrl) { setTexture(null); return; }
+    let cancelled = false;
     const src = proxyUrl(imageUrl);
-    console.log('[TiledWall] Loading texture from:', src?.substring(0, 80));
+
     fetch(src)
-      .then(r => r.blob())
-      .then(blob => new Promise((resolve) => {
+      .then(r => { if (!r.ok) throw new Error('Proxy failed'); return r.blob(); })
+      .then(blob => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
         reader.readAsDataURL(blob);
       }))
-      .then(dataUrl => {
+      .then(dataUrl => new Promise((resolve, reject) => {
         const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = dataUrl;
+      }))
+      .then(img => {
+        if (cancelled) return;
+        const tex = new THREE.Texture(img);
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.RepeatWrapping;
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.repeat.set(repeatX, repeatY);
+        tex.needsUpdate = true;
+        setTexture(tex);
+      })
+      .catch(() => {
+        // Fallback: try loading image directly
+        if (cancelled) return;
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
         img.onload = () => {
-          console.log('[TiledWall] Image decoded:', img.width, 'x', img.height);
+          if (cancelled) return;
           const tex = new THREE.Texture(img);
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.RepeatWrapping;
           tex.colorSpace = THREE.SRGBColorSpace;
-          const aspect = img.width / img.height;
-          tex.repeat.set(size[0] * 1.2, (size[1] * 1.2) / aspect);
+          tex.repeat.set(repeatX, repeatY);
           tex.needsUpdate = true;
-          // Apply directly to material via ref
-          if (matRef.current) {
-            matRef.current.map = tex;
-            matRef.current.color.set('#ffffff');
-            matRef.current.needsUpdate = true;
-            setLoaded(true);
-            console.log('[TiledWall] Texture applied to material');
-          }
+          setTexture(tex);
         };
-        img.onerror = (e) => console.error('[TiledWall] Image decode failed:', e);
-        img.src = dataUrl;
-      })
-      .catch(err => console.error('[TiledWall] Texture load error:', err));
-  }, [imageUrl, size]);
+        img.src = imageUrl;
+      });
+
+    return () => { cancelled = true; };
+  }, [imageUrl, repeatX, repeatY]);
+
+  return texture;
+}
+
+/* Wall mesh with texture */
+const Wall = ({ position, rotation, size, imageUrl, color = '#444', repeatX, repeatY }) => {
+  const aspect = size[0] / size[1];
+  const rx = repeatX || Math.round(size[0] * 1.5);
+  const ry = repeatY || Math.round(rx / aspect);
+  const texture = useImageTexture(imageUrl, rx, ry);
 
   return (
-    <mesh position={position} rotation={rotation}>
+    <mesh position={position} rotation={rotation} receiveShadow>
       <planeGeometry args={size} />
-      <meshStandardMaterial ref={matRef} color={color} side={THREE.FrontSide} />
+      <meshStandardMaterial
+        key={texture ? `tex-${texture.id}` : 'no-tex'}
+        map={texture || undefined}
+        color={texture ? '#ffffff' : color}
+        side={THREE.FrontSide}
+        roughness={0.8}
+        metalness={0.05}
+      />
     </mesh>
   );
 };
 
-/* ---- The 3D shower scene ---- */
-const ShowerScene = ({ backWallImg, leftWallImg, rightWallImg, floorImg, ceilingImg }) => {
+/* Scene with all walls + lighting */
+const Scene = ({ backImg, leftImg, rightImg, floorImg, ceilingImg }) => {
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.4} />
-      <pointLight position={[0, H - 0.5, 0]} intensity={0.8} distance={20} decay={2} />
-      <directionalLight position={[2, H, 3]} intensity={0.5} castShadow />
-      <directionalLight position={[-2, H * 0.5, -1]} intensity={0.2} />
+      <ambientLight intensity={0.5} />
+      <pointLight position={[0, H - 0.3, D * 0.3]} intensity={1.2} distance={20} decay={2} castShadow />
+      <directionalLight position={[2, H, 4]} intensity={0.4} />
+      <directionalLight position={[-1, H * 0.4, -1]} intensity={0.15} />
 
       {/* Back wall */}
-      <TiledWall
-        position={[0, H / 2, -D / 2]}
-        rotation={[0, 0, 0]}
-        size={[W, H]}
-        imageUrl={backWallImg}
-        color="#3a3a3a"
-      />
+      <Wall position={[0, H / 2, -D / 2]} rotation={[0, 0, 0]} size={[W, H]}
+        imageUrl={backImg} color="#3a3a3a" repeatX={8} repeatY={6} />
 
       {/* Left wall */}
-      <TiledWall
-        position={[-W / 2, H / 2, 0]}
-        rotation={[0, Math.PI / 2, 0]}
-        size={[D, H]}
-        imageUrl={leftWallImg || backWallImg}
-        color="#333"
-      />
+      <Wall position={[-W / 2, H / 2, 0]} rotation={[0, Math.PI / 2, 0]} size={[D, H]}
+        imageUrl={leftImg || backImg} color="#333" repeatX={6} repeatY={6} />
 
       {/* Right wall */}
-      <TiledWall
-        position={[W / 2, H / 2, 0]}
-        rotation={[0, -Math.PI / 2, 0]}
-        size={[D, H]}
-        imageUrl={rightWallImg || backWallImg}
-        color="#333"
-      />
+      <Wall position={[W / 2, H / 2, 0]} rotation={[0, -Math.PI / 2, 0]} size={[D, H]}
+        imageUrl={rightImg || backImg} color="#333" repeatX={6} repeatY={6} />
 
       {/* Floor */}
-      <TiledWall
-        position={[0, 0, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        size={[W, D]}
-        imageUrl={floorImg}
-        color="#555"
-      />
+      <Wall position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} size={[W, D]}
+        imageUrl={floorImg} color="#555" repeatX={6} repeatY={5} />
 
       {/* Ceiling */}
-      <TiledWall
-        position={[0, H, 0]}
-        rotation={[Math.PI / 2, 0, 0]}
-        size={[W, D]}
-        imageUrl={ceilingImg}
-        color="#bbb"
-      />
+      <Wall position={[0, H, 0]} rotation={[Math.PI / 2, 0, 0]} size={[W, D]}
+        imageUrl={ceilingImg} color="#ccc" repeatX={4} repeatY={3} />
 
-      {/* Corner shadows — dark edges for ambient occlusion effect */}
-      {/* Back-left edge */}
-      <mesh position={[-W / 2 + 0.02, H / 2, -D / 2 + 0.02]}>
-        <boxGeometry args={[0.04, H, 0.04]} />
-        <meshBasicMaterial color="#000" transparent opacity={0.3} />
+      {/* Corner ambient occlusion lines */}
+      <mesh position={[-W / 2 + 0.01, H / 2, -D / 2 + 0.01]}>
+        <boxGeometry args={[0.03, H, 0.03]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.4} />
       </mesh>
-      {/* Back-right edge */}
-      <mesh position={[W / 2 - 0.02, H / 2, -D / 2 + 0.02]}>
-        <boxGeometry args={[0.04, H, 0.04]} />
-        <meshBasicMaterial color="#000" transparent opacity={0.3} />
+      <mesh position={[W / 2 - 0.01, H / 2, -D / 2 + 0.01]}>
+        <boxGeometry args={[0.03, H, 0.03]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.4} />
       </mesh>
-      {/* Floor-back edge */}
-      <mesh position={[0, 0.02, -D / 2 + 0.02]}>
-        <boxGeometry args={[W, 0.04, 0.04]} />
-        <meshBasicMaterial color="#000" transparent opacity={0.2} />
+      <mesh position={[-W / 2 + 0.01, H / 2, D / 2 - 0.01]}>
+        <boxGeometry args={[0.03, H, 0.03]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.15} />
+      </mesh>
+      <mesh position={[W / 2 - 0.01, H / 2, D / 2 - 0.01]}>
+        <boxGeometry args={[0.03, H, 0.03]} />
+        <meshBasicMaterial color="#000" transparent opacity={0.15} />
       </mesh>
 
-      {/* Camera controls — limited to inside the box */}
       <OrbitControls
-        enablePan={false}
-        enableZoom={true}
-        minPolarAngle={Math.PI * 0.25}
-        maxPolarAngle={Math.PI * 0.65}
-        minAzimuthAngle={-Math.PI * 0.3}
-        maxAzimuthAngle={Math.PI * 0.3}
+        enablePan={false} enableZoom={true}
+        minPolarAngle={Math.PI * 0.2} maxPolarAngle={Math.PI * 0.7}
+        minAzimuthAngle={-Math.PI * 0.35} maxAzimuthAngle={Math.PI * 0.35}
         target={[0, H * 0.45, -D / 2]}
-        minDistance={3}
-        maxDistance={8}
+        minDistance={2.5} maxDistance={9}
       />
     </>
   );
 };
 
-/* ---- Main exported component ---- */
+/* Main component */
 const ThreeShowerView = ({ schedule }) => {
   const surfaces = schedule?.surfaces || [];
   const walls = surfaces.filter(s => s.surface_type === 'wall');
@@ -161,44 +155,30 @@ const ThreeShowerView = ({ schedule }) => {
   const leftWall = walls.find(s => s.name?.toLowerCase().includes('left')) || walls[1];
   const rightWall = walls.find(s => s.name?.toLowerCase().includes('right')) || walls[2];
 
-  // Get the first material image from a surface
   const getImg = (surface) => {
     if (!surface) return null;
-    const mats = surface.materials || [];
-    for (const m of mats) {
-      if (m.image) return m.image;
-    }
+    for (const m of (surface.materials || [])) { if (m.image) return m.image; }
     return null;
   };
 
-  const backImg = getImg(backWall);
-  const leftImg = getImg(leftWall);
-  const rightImg = getImg(rightWall);
-  const floorImg = getImg(floor);
-  const ceilingImg = getImg(ceiling);
-
-  // Debug: log what images we found
-  useEffect(() => {
-    console.log('[ThreeShowerView] surfaces:', surfaces.length, 'walls:', walls.length);
-    console.log('[ThreeShowerView] backWall:', backWall?.name, 'mats:', backWall?.materials?.length);
-    console.log('[ThreeShowerView] backImg:', backImg ? backImg.substring(0, 60) : 'NONE');
-    console.log('[ThreeShowerView] floorImg:', floorImg ? floorImg.substring(0, 60) : 'NONE');
-  }, [surfaces, backImg, floorImg]);
-
   return (
-    <div data-testid="shower-3d-view" style={{ width: '100%', height: '720px', borderRadius: '12px', overflow: 'hidden', background: '#0a0a0a' }}>
+    <div data-testid="shower-3d-view" style={{
+      width: '100%', height: '720px', borderRadius: '12px', overflow: 'hidden',
+      background: '#080808', border: '2px solid #222',
+    }}>
       <Canvas
-        camera={{ position: [0, H * 0.5, D * 1.1], fov: 55 }}
+        camera={{ position: [0, H * 0.5, D * 1.2], fov: 50 }}
         shadows
         frameloop="always"
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
+        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
+        onCreated={({ gl }) => { gl.setClearColor('#080808'); }}
       >
-        <ShowerScene
-          backWallImg={backImg}
-          leftWallImg={leftImg}
-          rightWallImg={rightImg}
-          floorImg={floorImg}
-          ceilingImg={ceilingImg}
+        <Scene
+          backImg={getImg(backWall)}
+          leftImg={getImg(leftWall)}
+          rightImg={getImg(rightWall)}
+          floorImg={getImg(floor)}
+          ceilingImg={getImg(ceiling)}
         />
       </Canvas>
     </div>
