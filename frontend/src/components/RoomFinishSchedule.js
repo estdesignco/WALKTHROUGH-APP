@@ -142,10 +142,9 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
   const handleUseFullImage = () => {
     const img = imgRef.current;
     if (!img) return;
-    // Auto-extract a single tile from the center of the product photo
-    // This makes it render as individual tiles with grout (like the reference)
-    const cropW = Math.round(img.naturalWidth * 0.2);
-    const cropH = Math.round(img.naturalHeight * 0.2);
+    // Auto-extract tile: use 80% of the image (trim edges only)
+    const cropW = Math.round(img.naturalWidth * 0.8);
+    const cropH = Math.round(img.naturalHeight * 0.8);
     const cropX = Math.round((img.naturalWidth - cropW) / 2);
     const cropY = Math.round((img.naturalHeight - cropH) / 2);
     onConfirm({ x: cropX, y: cropY, w: cropW, h: cropH });
@@ -189,8 +188,9 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
 const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0, hasCrop = false) => {
-  const g = 2; // Always show grout between individual tiles
-  if (g > 0) { ctx.fillStyle = groutColor || '#4a4035'; ctx.fillRect(0, 0, w, h); }
+  const g = 0; // No gap — tiles placed seamlessly side by side
+  ctx.fillStyle = groutColor || '#4a4035';
+  ctx.fillRect(0, 0, w, h);
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
   const imgH = tileImg.height || tileImg.naturalHeight || 200;
   const scale = tileScale || 1.0;
@@ -198,14 +198,6 @@ const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, t
   const drawTile = (x, y, tw, th) => {
     if (x + tw < 0 || x > w || y + th < 0 || y > h) return;
     ctx.drawImage(tileImg, 0, 0, imgW, imgH, x, y, tw, th);
-    // Subtle brightness variation per tile (realism)
-    const hash = Math.abs(((x * 7919 + y * 104729) | 0) % 10000);
-    const bright = ((hash % 7) - 3) * 0.015;
-    if (bright !== 0) { ctx.fillStyle = bright > 0 ? `rgba(255,255,255,${bright})` : `rgba(0,0,0,${-bright})`; ctx.fillRect(x, y, tw, th); }
-    // Bevel edges for depth
-    const bev = Math.max(1, Math.min(tw, th) * 0.02);
-    ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fillRect(x, y, tw, bev); ctx.fillRect(x, y, bev, th);
-    ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(x, y + th - bev, tw, bev); ctx.fillRect(x + tw - bev, y, bev, th);
   };
 
   // FIXED base 90px — same on ALL walls (back, side, floor, ceiling) for consistency
@@ -315,12 +307,12 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
     canvas.width = w; canvas.height = h;
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     const ctx = canvas.getContext('2d');
-    // Use crop if available, otherwise auto-crop center 20%
+    // Use crop if available, otherwise use 80% of image (trim edges)
     const crop = (tileCrop && tileCrop.w > 0 && tileCrop.h > 0) ? tileCrop : {
-      x: Math.round(img.naturalWidth * 0.4),
-      y: Math.round(img.naturalHeight * 0.4),
-      w: Math.round(img.naturalWidth * 0.2),
-      h: Math.round(img.naturalHeight * 0.2),
+      x: Math.round(img.naturalWidth * 0.1),
+      y: Math.round(img.naturalHeight * 0.1),
+      w: Math.round(img.naturalWidth * 0.8),
+      h: Math.round(img.naturalHeight * 0.8),
     };
     const tileCanvas = document.createElement('canvas');
     tileCanvas.width = Math.max(1, Math.round(crop.w)); tileCanvas.height = Math.max(1, Math.round(crop.h));
