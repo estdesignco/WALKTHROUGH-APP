@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Ruler, Plus, Trash2, MousePointer, X, Pencil, Crop, RotateCw, Palette, Square, Droplet, GripVertical, Move } from 'lucide-react';
+import ThreeShowerView from './ThreeShowerView';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -182,7 +183,7 @@ const TileCropModal = ({ imageUrl, existingCrop, onConfirm, onCancel }) => {
 
 /* ==================== CANVAS TILE PATTERN RENDERER ==================== */
 const drawTilePattern = (ctx, tileImg, pattern, w, h, groutColor, orientation, tileScale, offsetY = 0, hasCrop = false) => {
-  const g = hasCrop ? 2 : 0;
+  const g = hasCrop ? 2 : -1; // -1 = 1px overlap to hide seams for full images
   if (g > 0) { ctx.fillStyle = groutColor || '#4a4035'; ctx.fillRect(0, 0, w, h); }
   const imgW = tileImg.width || tileImg.naturalWidth || 200;
   const imgH = tileImg.height || tileImg.naturalHeight || 200;
@@ -325,12 +326,16 @@ const TilePatternCanvas = ({ pattern, imageUrl, tileCrop, groutColor, tileOrient
       }
       drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY, true);
     } else {
-      // FULL IMAGE: cover the zone maintaining aspect ratio (no distortion)
-      const imgW = img.naturalWidth; const imgH = img.naturalHeight;
-      const scaleX = w / imgW; const scaleY = h / imgH;
-      const coverScale = Math.max(scaleX, scaleY);
-      const dw = imgW * coverScale; const dh = imgH * coverScale;
-      ctx.drawImage(img, 0, 0, imgW, imgH, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      // FULL IMAGE: use drawTilePattern for brightness variation + overlap to hide seams
+      const tileCanvas = document.createElement('canvas');
+      tileCanvas.width = img.naturalWidth; tileCanvas.height = img.naturalHeight;
+      tileCanvas.getContext('2d').drawImage(img, 0, 0);
+      let offsetY = 0;
+      if (zoneTopPct > 0 && zoneHeightPct > 0) {
+        const wallPxH = h * (100 / zoneHeightPct);
+        offsetY = wallPxH * (zoneTopPct / 100);
+      }
+      drawTilePattern(ctx, tileCanvas, pattern, w, h, groutColor, tileOrientation, tileScale, offsetY, false);
     }
   }, [pattern, tileCrop, groutColor, tileOrientation, tileScale, zoneTopPct, zoneHeightPct]);
 
@@ -1628,6 +1633,10 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           <div>
             {showMeasurements && <div className="mb-4"><MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} /></div>}
 
+            {/* 3D Realistic Shower View */}
+            <ThreeShowerView schedule={activeSchedule} />
+
+            {/* Interactive 2D controls below */}
             <Shower3DView
               schedule={activeSchedule}
               selectedItem={selectedItem}
