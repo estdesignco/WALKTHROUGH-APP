@@ -1469,6 +1469,25 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const handleDropOnWall = (wallKey, item) => {
     if (!activeSchedule || !item) return;
     const surfaces = activeSchedule.surfaces || [];
+    item._img = item._img || getItemImage(item);
+    const existingCrop = findExistingCropForItem(item.id);
+
+    // Handle bench/niche drops
+    if (wallKey === 'bench') {
+      const backWall = surfaces.find(s => s.surface_type === 'wall' && s.name?.toLowerCase().includes('back')) || surfaces.find(s => s.surface_type === 'wall');
+      if (backWall?.benches?.length) {
+        handleApplyTileToElement(backWall.id, 'bench', backWall.benches[0].id, item);
+      }
+      return;
+    }
+    if (wallKey === 'niche') {
+      const backWall = surfaces.find(s => s.surface_type === 'wall' && s.name?.toLowerCase().includes('back')) || surfaces.find(s => s.surface_type === 'wall');
+      if (backWall?.niches?.length) {
+        handleApplyTileToElement(backWall.id, 'niche', backWall.niches[0].id, item);
+      }
+      return;
+    }
+
     let targetSurface;
     switch (wallKey) {
       case 'back_wall':
@@ -1489,8 +1508,6 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
       default: return;
     }
     if (!targetSurface) return;
-    item._img = item._img || getItemImage(item);
-    const existingCrop = findExistingCropForItem(item.id);
     if (targetSurface.surface_type === 'floor' || targetSurface.surface_type === 'ceiling') {
       placeCeilingFloorWithCrop(targetSurface.id, item, existingCrop);
     } else {
