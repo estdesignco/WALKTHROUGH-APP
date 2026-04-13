@@ -40,9 +40,11 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH
       .then(img => {
         if (cancelled || !img) return;
 
-        // STEP 1: Crop to single tile if crop data exists and we're in tile mode
+        // STEP 1: Crop to single tile ONLY for patterns that rearrange tiles.
+        // For stacked_horizontal (default), the full sheet image IS already a perfect stacked pattern.
         let tileImg = img;
-        if (mode !== 'full' && tileCrop && tileCrop.w > 0 && tileCrop.h > 0) {
+        const needsCrop = pattern && pattern !== 'stacked_horizontal';
+        if (mode !== 'full' && needsCrop && tileCrop && tileCrop.w > 0 && tileCrop.h > 0) {
           const cropCanvas = document.createElement('canvas');
           cropCanvas.width = tileCrop.w;
           cropCanvas.height = tileCrop.h;
