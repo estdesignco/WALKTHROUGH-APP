@@ -8,7 +8,7 @@ const W = 5, H = 8, D = 4;
 const proxyUrl = (url) => url ? `${API_URL}/api/proxy-image?url=${encodeURIComponent(url)}` : null;
 
 /* ---- Texture loader ---- */
-function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH = 8) {
+function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH = 8, pattern = 'stacked_horizontal') {
   const [texture, setTexture] = useState(null);
   useEffect(() => {
     if (!imageUrl) { setTexture(null); return; }
@@ -28,8 +28,33 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH
       }))
       .then(img => {
         if (cancelled || !img) return;
-        const tex = new THREE.Texture(img);
+
+        let sourceCanvas;
+        const imgW = img.width, imgH = img.height;
+
+        if (mode !== 'full' && pattern === 'offset') {
+          // Create 2-row offset/brick pattern
+          sourceCanvas = document.createElement('canvas');
+          sourceCanvas.width = imgW * 2;
+          sourceCanvas.height = imgH * 2;
+          const pCtx = sourceCanvas.getContext('2d');
+          pCtx.drawImage(img, 0, 0); pCtx.drawImage(img, imgW, 0);
+          pCtx.drawImage(img, -imgW / 2, imgH); pCtx.drawImage(img, imgW / 2, imgH); pCtx.drawImage(img, imgW * 1.5, imgH);
+        } else if (mode !== 'full' && pattern === 'stacked_vertical') {
+          // Rotate the tile 90 degrees
+          sourceCanvas = document.createElement('canvas');
+          sourceCanvas.width = imgH;
+          sourceCanvas.height = imgW;
+          const pCtx = sourceCanvas.getContext('2d');
+          pCtx.translate(imgH / 2, imgW / 2);
+          pCtx.rotate(Math.PI / 2);
+          pCtx.drawImage(img, -imgW / 2, -imgH / 2);
+        }
+
+        const texSource = sourceCanvas || img;
+        const tex = new THREE.Texture(texSource);
         tex.colorSpace = THREE.SRGBColorSpace;
+
         if (mode === 'full') {
           tex.wrapS = THREE.ClampToEdgeWrapping;
           tex.wrapT = THREE.ClampToEdgeWrapping;
@@ -37,17 +62,19 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH
         } else {
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.RepeatWrapping;
-          // Auto-calculate repeatY to preserve image aspect ratio on the wall
-          const imgAspect = img.width / img.height;
-          const repeatY = repeatX * (wallH / wallW) * imgAspect;
-          tex.repeat.set(repeatX, repeatY);
+          const srcW = texSource.width || imgW;
+          const srcH = texSource.height || imgH;
+          const imgAspect = srcW / srcH;
+          const rx = pattern === 'offset' ? repeatX / 2 : repeatX;
+          const ry = rx * (wallH / wallW) * imgAspect;
+          tex.repeat.set(rx, ry);
         }
         tex.needsUpdate = true;
         setTexture(tex);
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [imageUrl, mode, repeatX, wallW, wallH]);
+  }, [imageUrl, mode, repeatX, wallW, wallH, pattern]);
   return texture;
 }
 
@@ -64,12 +91,14 @@ function getSurfaceMaterial(surface) {
 function getZoneMaterial(surface, zoneId) {
   if (!surface) return null;
   const mats = surface.materials || [];
-  return mats.find(m => m.position_label === zoneId && m.image) || null;
+  return mats.find(m => m.position_label === zoneId && m.image)
+    || mats.find(m => m.position_label === 'main_wall' && m.image)
+    || null;
 }
 
 /* ---- Textured Wall ---- */
-const TexturedWall = ({ position, rotation, size, imageUrl, color = '#444', mode = 'sheet', repeatX }) => {
-  const texture = useImageTexture(imageUrl, mode, repeatX, size[0], size[1]);
+const TexturedWall = ({ position, rotation, size, imageUrl, color = '#444', mode = 'sheet', repeatX, pattern = 'stacked_horizontal' }) => {
+  const texture = useImageTexture(imageUrl, mode, repeatX, size[0], size[1], pattern);
   return (
     <mesh position={position} rotation={rotation} receiveShadow>
       <planeGeometry args={size} />
@@ -109,8 +138,9 @@ const ZonedWall = ({ position, rotation, totalSize, surface, defaultColor = '#3a
             size={[totalW, zoneH]}
             imageUrl={mat?.image || null}
             color={defaultColor}
-            mode="sheet"
+            mode={mat?.display_mode || 'sheet'}
             repeatX={repeatX}
+            pattern={mat?.pattern || 'stacked_horizontal'}
           />
         );
       })}
@@ -279,8 +309,9 @@ const Scene = ({ schedule }) => {
         size={[W, D]}
         imageUrl={floorMat?.image}
         color="#4a4a4a"
-        mode="sheet"
+        mode={floorMat?.display_mode || 'sheet'}
         repeatX={3}
+        pattern={floorMat?.pattern || 'stacked_horizontal'}
       />
 
       {/* Ceiling */}
@@ -296,10 +327,10 @@ const Scene = ({ schedule }) => {
           const ny = H - (n.y_pct / 100) * H - (n.h_pct / 100) * H / 2;
           const nw = (n.w_pct / 100) * W;
           const nh = (n.h_pct / 100) * H;
-          return <Niche key={i} position={[nx, ny, -D / 2 + 0.01]} nicheW={nw} nicheH={nh} wallImg={backImg} />;
+          return <Niche key={i} position={[nx, ny, -D / 2 + 0.05]} nicheW={nw} nicheH={nh} wallImg={backImg} />;
         })
       ) : (
-        <Niche position={[0, H * 0.58, -D / 2 + 0.01]} nicheW={1.3} nicheH={0.9} wallImg={backImg} />
+        <Niche position={[0, H * 0.58, -D / 2 + 0.05]} nicheW={1.3} nicheH={0.9} wallImg={backImg} />
       )}
 
       {/* Bench — from data or default */}

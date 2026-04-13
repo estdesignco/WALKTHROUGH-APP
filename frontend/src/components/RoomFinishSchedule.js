@@ -1142,6 +1142,19 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [showMeasurements, setShowMeasurements] = useState(false);
   const [placementMode, setPlacementMode] = useState(null);
+  const [displayMode, setDisplayMode] = useState('sheet'); // 'full' or 'sheet'
+  const [selectedPattern, setSelectedPattern] = useState('stacked_horizontal');
+
+  // Update display mode + pattern on ALL wall materials
+  const updateAllWallMaterials = (updates) => {
+    updateSchedule(prev => ({
+      ...prev,
+      surfaces: prev.surfaces.map(s => {
+        if (s.surface_type !== 'wall') return s;
+        return { ...s, materials: (s.materials || []).map(m => ({ ...m, ...updates })) };
+      })
+    }));
+  };
   const [selectedElement, setSelectedElement] = useState(null);
   const saveTimeoutRef = useRef(null);
   const [cropModal, setCropModal] = useState(null);
@@ -1262,18 +1275,19 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
         sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
         image: item._img || '', link: item.link || '', position_label: posLabel, pattern: '',
         tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
+        display_mode: displayMode || 'sheet',
+        pattern: selectedPattern || 'stacked_horizontal',
       });
 
       const fillAllZones = (surface) => {
         const zones = surface.zone_config || DEFAULT_ZONE_CONFIG;
         let mats = [...(surface.materials || [])];
+        // Overwrite ALL zones with the new material
         zones.forEach(z => {
-          if (!mats.find(m => m.position_label === z.id)) {
-            mats.push(makeMat(z.id));
-          }
+          const idx = mats.findIndex(m => m.position_label === z.id);
+          if (idx >= 0) { mats[idx] = makeMat(z.id); }
+          else { mats.push(makeMat(z.id)); }
         });
-        // Also update the clicked zone
-        mats = mats.map(m => m.position_label === zoneId ? makeMat(zoneId) : m);
         return mats;
       };
 
@@ -1590,11 +1604,17 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
               <button onClick={() => setShowMeasurements(!showMeasurements)}
                 className={`px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 ${showMeasurements ? 'bg-red-600 text-white' : 'text-white/30 border border-white/10'}`}
                 data-testid="toggle-measurements-btn"><Ruler size={10} />DIMS</button>
-              <button onClick={() => setPlacementMode(placementMode === 'niche' ? null : 'niche')}
-                className={`px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 ${placementMode === 'niche' ? 'bg-cyan-600 text-white' : 'text-white/30 border border-white/10'}`}
+              <button onClick={() => {
+                const backWall = activeSchedule.surfaces?.find(s => s.surface_type === 'wall' && s.name?.toLowerCase().includes('back'));
+                if (backWall) handleAddNiche(backWall.id, 'main_wall', 50, 35);
+              }}
+                className="px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 text-white/30 border border-white/10 hover:bg-cyan-600 hover:text-white"
                 data-testid="add-niche-btn"><Square size={10} />NICHE</button>
-              <button onClick={() => setPlacementMode(placementMode === 'bench' ? null : 'bench')}
-                className={`px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 ${placementMode === 'bench' ? 'bg-orange-600 text-white' : 'text-white/30 border border-white/10'}`}
+              <button onClick={() => {
+                const backWall = activeSchedule.surfaces?.find(s => s.surface_type === 'wall' && s.name?.toLowerCase().includes('back'));
+                if (backWall) handleAddBench(backWall.id, '_wall_level', 60, 0);
+              }}
+                className="px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 text-white/30 border border-white/10 hover:bg-orange-600 hover:text-white"
                 data-testid="add-bench-btn"><GripVertical size={10} />BENCH</button>
               <button onClick={() => setPlacementMode(placementMode === 'fixture' ? null : 'fixture')}
                 className={`px-2 py-1.5 rounded text-[10px] font-bold flex items-center gap-1 ${placementMode === 'fixture' ? 'bg-blue-600 text-white' : 'text-white/30 border border-white/10'}`}
@@ -1637,22 +1657,41 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
 
             {/* Quick tile placement — apply selected tile to surfaces */}
             {selectedItem && (
-              <div className="mt-2 p-2 bg-black/40 rounded-lg border border-white/10">
-                <div className="text-[10px] font-bold text-amber-400 mb-1">APPLY "{selectedItem.name}" TO:</div>
+              <div className="mt-2 p-2 bg-black/40 rounded-lg border border-white/10 space-y-2">
+                {/* Display mode toggle */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[9px] font-bold text-white/40">MODE:</span>
+                  <button onClick={() => { setDisplayMode('sheet'); updateAllWallMaterials({ display_mode: 'sheet' }); }}
+                    className={`px-2 py-1 rounded text-[9px] font-black ${displayMode === 'sheet' ? 'bg-amber-600 text-white' : 'text-white/40 border border-white/10'}`}
+                    data-testid="mode-sheet">TILE</button>
+                  <button onClick={() => { setDisplayMode('full'); updateAllWallMaterials({ display_mode: 'full' }); }}
+                    className={`px-2 py-1 rounded text-[9px] font-black ${displayMode === 'full' ? 'bg-amber-600 text-white' : 'text-white/40 border border-white/10'}`}
+                    data-testid="mode-full">FULL SHEET</button>
+                  <span className="text-white/20 mx-1">|</span>
+                  <span className="text-[9px] font-bold text-white/40">PATTERN:</span>
+                  {[['stacked_horizontal','STACKED'],['offset','OFFSET'],['stacked_vertical','VERTICAL']].map(([p, label]) => (
+                    <button key={p} onClick={() => { setSelectedPattern(p); updateAllWallMaterials({ pattern: p }); }}
+                      className={`px-2 py-1 rounded text-[9px] font-black ${selectedPattern === p ? 'bg-cyan-600 text-white' : 'text-white/40 border border-white/10'}`}
+                      data-testid={`pattern-${p}`}>{label}</button>
+                  ))}
+                </div>
+
+                {/* Surface placement buttons */}
                 <div className="flex gap-1 flex-wrap">
+                  <span className="text-[9px] font-bold text-amber-400 self-center mr-1">APPLY "{selectedItem.name}":</span>
                   <button onClick={() => {
                     const wallSurfaces = (activeSchedule.surfaces || []).filter(s => s.surface_type === 'wall');
                     const existingCrop = findExistingCropForItem(selectedItem.id);
                     if (existingCrop) { wallSurfaces.forEach(s => placeItemWithCrop(s.id, 'main_wall', selectedItem, existingCrop)); }
                     else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: wallSurfaces[0]?.id, zoneId: 'main_wall', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place' }); }
-                  }} className="px-3 py-1.5 rounded text-[10px] font-black text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-400/30"
+                  }} className="px-3 py-1 rounded text-[9px] font-black text-amber-300 bg-amber-900/30 hover:bg-amber-900/50 border border-amber-400/30"
                     data-testid="quick-place-all-walls">ALL WALLS</button>
                   {(activeSchedule.surfaces || []).filter(s => s.surface_type === 'wall').map(s => (
                     <button key={s.id} onClick={() => {
                       const existingCrop = findExistingCropForItem(selectedItem.id);
                       if (existingCrop) { placeItemWithCrop(s.id, 'main_wall', selectedItem, existingCrop); }
                       else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: s.id, zoneId: 'main_wall', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place' }); }
-                    }} className="px-3 py-1.5 rounded text-[10px] font-bold text-white/70 bg-white/10 hover:bg-white/20 border border-white/10"
+                    }} className="px-2 py-1 rounded text-[9px] font-bold text-white/60 bg-white/10 hover:bg-white/20 border border-white/10"
                       data-testid={`quick-place-${s.name}`}>{s.name}</button>
                   ))}
                   {activeSchedule.surfaces.filter(s => s.surface_type === 'floor').map(s => (
@@ -1660,16 +1699,16 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
                       const existingCrop = findExistingCropForItem(selectedItem.id);
                       if (existingCrop) { placeCeilingFloorWithCrop(s.id, selectedItem, existingCrop); }
                       else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: s.id, zoneId: '_surface', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place_surface' }); }
-                    }} className="px-3 py-1.5 rounded text-[10px] font-bold text-green-300/70 bg-green-900/20 hover:bg-green-900/40 border border-green-400/20"
-                      data-testid={`quick-place-floor`}>Floor</button>
+                    }} className="px-2 py-1 rounded text-[9px] font-bold text-green-300/60 bg-green-900/20 hover:bg-green-900/40 border border-green-400/20"
+                      data-testid="quick-place-floor">Floor</button>
                   ))}
                   {activeSchedule.surfaces.filter(s => s.surface_type === 'ceiling').map(s => (
                     <button key={s.id} onClick={() => {
                       const existingCrop = findExistingCropForItem(selectedItem.id);
                       if (existingCrop) { placeCeilingFloorWithCrop(s.id, selectedItem, existingCrop); }
                       else if (selectedItem._img) { pendingPlaceRef.current = { surfaceId: s.id, zoneId: '_surface', item: selectedItem }; setCropModal({ imageUrl: selectedItem._img, existingCrop: null, mode: 'place_surface' }); }
-                    }} className="px-3 py-1.5 rounded text-[10px] font-bold text-purple-300/70 bg-purple-900/20 hover:bg-purple-900/40 border border-purple-400/20"
-                      data-testid={`quick-place-ceiling`}>Ceiling</button>
+                    }} className="px-2 py-1 rounded text-[9px] font-bold text-purple-300/60 bg-purple-900/20 hover:bg-purple-900/40 border border-purple-400/20"
+                      data-testid="quick-place-ceiling">Ceiling</button>
                   ))}
                 </div>
               </div>
