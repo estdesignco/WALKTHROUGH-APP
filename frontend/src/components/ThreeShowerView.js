@@ -16,8 +16,8 @@ function SceneRefCapture({ sceneRefObj }) {
   return null;
 }
 
-/* ---- Texture loader with grout lines and pattern support ---- */
-function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH = 8, pattern = 'stacked_horizontal', groutColor = '#4a4035') {
+/* ---- Texture loader — tile image repeats seamlessly, NO artificial grout ---- */
+function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH = 8, pattern = 'stacked_horizontal') {
   const [texture, setTexture] = useState(null);
   useEffect(() => {
     if (!imageUrl) { setTexture(null); return; }
@@ -37,126 +37,89 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH
       }))
       .then(img => {
         if (cancelled || !img) return;
-        const tw = img.width, th = img.height;
-        // Grout thickness: 3% of shorter tile dimension
-        const g = Math.max(2, Math.round(Math.min(tw, th) * 0.03));
+        const imgW = img.width, imgH = img.height;
 
         let sourceCanvas = null;
-        let tilesPerRow = 1;
+        let colsInCanvas = 1; // tile columns in the pattern canvas
 
         if (mode !== 'full') {
-          sourceCanvas = document.createElement('canvas');
-          const c = sourceCanvas.getContext('2d');
-
           switch (pattern) {
             case 'offset': {
-              // Brick/offset: 2 cols x 2 rows, row 2 shifted by half
-              sourceCanvas.width = (tw + g) * 2;
-              sourceCanvas.height = (th + g) * 2;
-              c.fillStyle = groutColor;
-              c.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-              // Row 1
-              c.drawImage(img, 0, 0);
-              c.drawImage(img, tw + g, 0);
-              // Row 2 offset by half tile+grout
-              const ox = Math.round((tw + g) / 2);
-              for (let i = -1; i <= 2; i++) c.drawImage(img, ox + i * (tw + g), th + g);
-              tilesPerRow = 2;
+              // Brick/offset: 2 cols × 2 rows, row 2 shifted by half
+              sourceCanvas = document.createElement('canvas');
+              sourceCanvas.width = imgW * 2; sourceCanvas.height = imgH * 2;
+              const p = sourceCanvas.getContext('2d');
+              p.drawImage(img, 0, 0); p.drawImage(img, imgW, 0);
+              p.drawImage(img, -imgW / 2, imgH); p.drawImage(img, imgW / 2, imgH); p.drawImage(img, imgW * 1.5, imgH);
+              colsInCanvas = 2;
               break;
             }
             case 'one_third_offset': {
               // 1/3 offset: 3 rows each shifted by 1/3
-              sourceCanvas.width = (tw + g) * 3;
-              sourceCanvas.height = (th + g) * 3;
-              c.fillStyle = groutColor;
-              c.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-              for (let row = 0; row < 3; row++) {
-                const y = row * (th + g);
-                const shift = Math.round(row * (tw + g) / 3);
-                for (let col = -1; col <= 3; col++) c.drawImage(img, shift + col * (tw + g), y);
-              }
-              tilesPerRow = 3;
+              sourceCanvas = document.createElement('canvas');
+              sourceCanvas.width = imgW * 3; sourceCanvas.height = imgH * 3;
+              const p = sourceCanvas.getContext('2d');
+              for (let c = 0; c < 4; c++) p.drawImage(img, c * imgW, 0);
+              for (let c = -1; c < 4; c++) p.drawImage(img, c * imgW + imgW / 3, imgH);
+              for (let c = -1; c < 4; c++) p.drawImage(img, c * imgW + (imgW * 2 / 3), imgH * 2);
+              colsInCanvas = 3;
               break;
             }
             case 'stacked_vertical': {
               // Rotate tile 90 degrees
-              sourceCanvas.width = th + g;
-              sourceCanvas.height = tw + g;
-              c.fillStyle = groutColor;
-              c.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-              c.save();
-              c.translate(th / 2, tw / 2);
-              c.rotate(Math.PI / 2);
-              c.drawImage(img, -tw / 2, -th / 2);
-              c.restore();
-              tilesPerRow = 1;
+              sourceCanvas = document.createElement('canvas');
+              sourceCanvas.width = imgH; sourceCanvas.height = imgW;
+              const p = sourceCanvas.getContext('2d');
+              p.translate(imgH / 2, imgW / 2); p.rotate(Math.PI / 2);
+              p.drawImage(img, -imgW / 2, -imgH / 2);
+              colsInCanvas = 1;
               break;
             }
             case 'herringbone': {
-              // V-shape herringbone pattern
-              const longSide = Math.max(tw, th);
-              const shortSide = Math.min(tw, th);
-              const cSize = (longSide + g) * 4;
-              sourceCanvas.width = cSize;
-              sourceCanvas.height = cSize;
-              c.fillStyle = groutColor;
-              c.fillRect(0, 0, cSize, cSize);
-              const tW = longSide * 0.8, tH = shortSide * 0.35;
-              for (let row = -2; row < cSize / tH + 2; row++) {
-                for (let col = -2; col < cSize / tW + 2; col++) {
-                  const x = col * (tW + g), y = row * (tH + g) * 2;
-                  c.save();
-                  c.translate(x, y + (col % 2) * (tH + g));
-                  c.drawImage(img, 0, 0, tw, th, 0, 0, tW, tH);
-                  c.translate(tW + g, 0);
-                  c.scale(-1, 1);
-                  c.drawImage(img, 0, 0, tw, th, -tW, tH + g, tW, tH);
-                  c.restore();
+              // V-shape herringbone
+              const size = Math.max(imgW, imgH) * 4;
+              sourceCanvas = document.createElement('canvas');
+              sourceCanvas.width = size; sourceCanvas.height = size;
+              const p = sourceCanvas.getContext('2d');
+              const tw = imgW * 0.8, th = imgH * 0.3;
+              for (let row = -2; row < size / th + 2; row++) {
+                for (let col = -2; col < size / tw + 2; col++) {
+                  const x = col * tw, y = row * th * 2;
+                  p.save(); p.translate(x, y + (col % 2) * th);
+                  p.drawImage(img, 0, 0, imgW, imgH, 0, 0, tw, th);
+                  p.translate(tw, 0); p.scale(-1, 1);
+                  p.drawImage(img, 0, 0, imgW, imgH, -tw, th, tw, th);
+                  p.restore();
                 }
               }
-              tilesPerRow = Math.round(cSize / (tW + g));
+              colsInCanvas = Math.round(size / imgW);
               break;
             }
             case 'basket_weave': {
-              // Alternating horizontal/vertical tile pairs
-              sourceCanvas.width = (tw + g) * 4;
-              sourceCanvas.height = (th + g) * 4;
-              c.fillStyle = groutColor;
-              c.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-              for (let gy = 0; gy < 4; gy++) {
-                for (let gx = 0; gx < 4; gx++) {
-                  const bx = gx * (tw + g), by = gy * (th + g);
-                  if ((gx + gy) % 2 === 0) {
-                    c.drawImage(img, 0, 0, tw, th, bx, by, tw, th / 2 - g / 2);
-                    c.drawImage(img, 0, 0, tw, th, bx, by + th / 2 + g / 2, tw, th / 2 - g / 2);
-                  } else {
-                    c.save();
-                    c.translate(bx + tw / 2, by + th / 2);
-                    c.rotate(Math.PI / 2);
-                    c.drawImage(img, -tw / 2, -th / 2);
-                    c.restore();
-                  }
+              // Alternating horizontal/vertical pairs
+              sourceCanvas = document.createElement('canvas');
+              sourceCanvas.width = imgW * 4; sourceCanvas.height = imgH * 4;
+              const p = sourceCanvas.getContext('2d');
+              for (let gy = 0; gy < 4; gy++) for (let gx = 0; gx < 4; gx++) {
+                const bx = gx * imgW, by = gy * imgH;
+                if ((gx + gy) % 2 === 0) {
+                  p.drawImage(img, 0, 0, imgW, imgH, bx, by, imgW, imgH / 2);
+                  p.drawImage(img, 0, 0, imgW, imgH, bx, by + imgH / 2, imgW, imgH / 2);
+                } else {
+                  p.save(); p.translate(bx + imgW / 2, by + imgH / 2); p.rotate(Math.PI / 2);
+                  p.drawImage(img, 0, 0, imgW, imgH, -imgH / 2, -imgW / 2, imgH, imgW);
+                  p.restore();
                 }
               }
-              tilesPerRow = 4;
+              colsInCanvas = 4;
               break;
             }
-            case 'stacked_horizontal':
-            default: {
-              // Simple grid with grout lines
-              sourceCanvas.width = tw + g;
-              sourceCanvas.height = th + g;
-              c.fillStyle = groutColor;
-              c.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-              c.drawImage(img, 0, 0);
-              tilesPerRow = 1;
-              break;
-            }
+            // stacked_horizontal (default): no canvas needed, raw image repeats
           }
         }
 
-        const src = sourceCanvas || img;
-        const tex = new THREE.Texture(src);
+        const texSource = sourceCanvas || img;
+        const tex = new THREE.Texture(texSource);
         tex.colorSpace = THREE.SRGBColorSpace;
 
         if (mode === 'full') {
@@ -166,9 +129,11 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH
         } else {
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.RepeatWrapping;
-          const cw = src.width, ch = src.height;
-          const rx = repeatX / tilesPerRow;
-          const ry = rx * (wallH / wallW) * (cw / ch);
+          const srcW = texSource.width || imgW;
+          const srcH = texSource.height || imgH;
+          const imgAspect = srcW / srcH;
+          const rx = repeatX / colsInCanvas;
+          const ry = rx * (wallH / wallW) * imgAspect;
           tex.repeat.set(rx, ry);
         }
         tex.needsUpdate = true;
@@ -176,7 +141,7 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [imageUrl, mode, repeatX, wallW, wallH, pattern, groutColor]);
+  }, [imageUrl, mode, repeatX, wallW, wallH, pattern]);
   return texture;
 }
 
@@ -198,9 +163,9 @@ function getZoneMaterial(surface, zoneId) {
     || null;
 }
 
-/* ---- Textured Wall: meshBasicMaterial for textures (pure pixel color), meshStandardMaterial for plain ---- */
-const TexturedWall = ({ position, rotation, size, imageUrl, color = '#444', mode = 'sheet', repeatX, pattern = 'stacked_horizontal', groutColor = '#4a4035', name }) => {
-  const texture = useImageTexture(imageUrl, mode, repeatX, size[0], size[1], pattern, groutColor);
+/* ---- Textured Wall: meshBasicMaterial for textures (pixel-perfect color), meshStandardMaterial for plain ---- */
+const TexturedWall = ({ position, rotation, size, imageUrl, color = '#444', mode = 'sheet', repeatX, pattern = 'stacked_horizontal', name }) => {
+  const texture = useImageTexture(imageUrl, mode, repeatX, size[0], size[1], pattern);
   return (
     <mesh position={position} rotation={rotation} name={name}>
       <planeGeometry args={size} />
@@ -239,19 +204,18 @@ const ZonedWall = ({ position, rotation, totalSize, surface, defaultColor = '#3a
             mode={mat?.display_mode || 'sheet'}
             repeatX={repeatX}
             pattern={mat?.pattern || 'stacked_horizontal'}
-            groutColor={mat?.grout_color || '#4a4035'}
           />
         );
       })}
-      {/* Trim lines between zones — visible metallic strip */}
+      {/* Thin metallic trim lines between zones (like Schluter strip) */}
       {zones.length > 1 && zones.slice(0, -1).map((zone, i) => {
         let accTop = 0;
         for (let j = 0; j <= i; j++) accTop += zones[j].height;
         const yPos = totalH / 2 - (accTop / 100) * totalH;
         return (
-          <mesh key={`trim-${i}`} position={[0, yPos, 0.01]}>
-            <planeGeometry args={[totalW, 0.06]} />
-            <meshBasicMaterial color="#b0b0b0" />
+          <mesh key={`trim-${i}`} position={[0, yPos, 0.008]}>
+            <planeGeometry args={[totalW, 0.04]} />
+            <meshStandardMaterial color="#999" metalness={0.7} roughness={0.2} />
           </mesh>
         );
       })}
@@ -259,34 +223,39 @@ const ZonedWall = ({ position, rotation, totalSize, surface, defaultColor = '#3a
   );
 };
 
-/* ---- Niche ---- */
-const Niche = ({ position, nicheW = 1.2, nicheH = 0.9, nicheD = 0.35, wallImg }) => {
-  const texture = useImageTexture(wallImg, 'sheet', 1.5, 1);
+/* ---- Niche — clean dark recess matching reference (individual planes, no box edges) ---- */
+const Niche = ({ position, nicheW = 1.2, nicheH = 0.9, nicheD = 0.3, wallImg }) => {
+  const texture = useImageTexture(wallImg, 'sheet', 1, nicheW, nicheH);
   return (
     <group position={position}>
-      <mesh position={[0, 0, nicheD / 2]}>
-        <boxGeometry args={[nicheW, nicheH, nicheD]} />
-        <meshStandardMaterial color="#080808" side={THREE.BackSide} roughness={0.95} />
-      </mesh>
-      <mesh position={[0, 0, nicheD - 0.01]}>
-        <planeGeometry args={[nicheW - 0.04, nicheH - 0.04]} />
+      {/* Back panel — same tile but darkened (shadow inside recess) */}
+      <mesh position={[0, 0, -0.005]}>
+        <planeGeometry args={[nicheW, nicheH]} />
         {texture ? (
-          <meshBasicMaterial map={texture} color="#ffffff" side={THREE.FrontSide} />
+          <meshBasicMaterial map={texture} color="#555555" side={THREE.FrontSide} />
         ) : (
-          <meshStandardMaterial color="#1a1a1a" roughness={0.95} side={THREE.FrontSide} />
+          <meshBasicMaterial color="#111111" side={THREE.FrontSide} />
         )}
       </mesh>
+      {/* Top interior — darkest (shadow) */}
       <mesh position={[0, nicheH / 2, nicheD / 2]} rotation={[Math.PI / 2, 0, 0]}>
         <planeGeometry args={[nicheW, nicheD]} />
-        <meshStandardMaterial color="#111" roughness={0.95} side={THREE.FrontSide} />
+        <meshBasicMaterial color="#080808" side={THREE.FrontSide} />
       </mesh>
-      <mesh position={[0, -nicheH / 2 + 0.01, nicheD / 2]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Bottom shelf — slightly lighter */}
+      <mesh position={[0, -nicheH / 2, nicheD / 2]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[nicheW, nicheD]} />
-        {texture ? (
-          <meshBasicMaterial map={texture} color="#ffffff" side={THREE.FrontSide} />
-        ) : (
-          <meshStandardMaterial color="#1a1a1a" roughness={0.95} side={THREE.FrontSide} />
-        )}
+        <meshBasicMaterial color="#1a1a1a" side={THREE.FrontSide} />
+      </mesh>
+      {/* Left side */}
+      <mesh position={[-nicheW / 2, 0, nicheD / 2]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[nicheD, nicheH]} />
+        <meshBasicMaterial color="#0e0e0e" side={THREE.FrontSide} />
+      </mesh>
+      {/* Right side */}
+      <mesh position={[nicheW / 2, 0, nicheD / 2]} rotation={[0, -Math.PI / 2, 0]}>
+        <planeGeometry args={[nicheD, nicheH]} />
+        <meshBasicMaterial color="#0e0e0e" side={THREE.FrontSide} />
       </mesh>
     </group>
   );
@@ -368,7 +337,7 @@ const Scene = ({ schedule, sceneRef }) => {
     <>
       <SceneRefCapture sceneRefObj={sceneRef} />
 
-      {/* Lighting — bright ambient so meshBasicMaterial textures look natural, fixtures get PBR shine */}
+      {/* Lighting — soft diffused, matching reference quality */}
       <ambientLight intensity={0.9} color="#ffffff" />
       <pointLight position={[0, H - 0.2, D * 0.2]} intensity={1.2} distance={20} decay={2} color="#ffffff" />
       <directionalLight position={[1.5, H, 3]} intensity={0.5} color="#ffffff" />
@@ -385,21 +354,19 @@ const Scene = ({ schedule, sceneRef }) => {
       <ZonedWall position={[W / 2, H / 2, 0]} rotation={[0, -Math.PI / 2, 0]}
         totalSize={[D, H]} surface={rightWall} defaultColor="#2e2e2e" repeatX={2.8} name="right_wall" />
 
-      {/* Floor — textured */}
+      {/* Floor */}
       <TexturedWall position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}
         size={[W, D]} imageUrl={floorMat?.image} color="#4a4a4a"
         mode={floorMat?.display_mode || 'sheet'} repeatX={3}
-        pattern={floorMat?.pattern || 'stacked_horizontal'}
-        groutColor={floorMat?.grout_color || '#4a4035'} name="floor" />
+        pattern={floorMat?.pattern || 'stacked_horizontal'} name="floor" />
 
-      {/* Ceiling — textured */}
+      {/* Ceiling */}
       <TexturedWall position={[0, H, 0]} rotation={[Math.PI / 2, 0, 0]}
         size={[W, D]} imageUrl={ceilMat?.image} color="#c5c0b8"
         mode={ceilMat?.display_mode || 'full'} repeatX={3}
-        pattern={ceilMat?.pattern || 'stacked_horizontal'}
-        groutColor={ceilMat?.grout_color || '#4a4035'} name="ceiling" />
+        pattern={ceilMat?.pattern || 'stacked_horizontal'} name="ceiling" />
 
-      {/* Niches — FIXED: use n.x not n.x_pct */}
+      {/* Niches — FIXED field names: use n.x not n.x_pct */}
       {backNiches.length > 0 ? (
         backNiches.map((n, i) => {
           const nx = ((n.x ?? n.x_pct ?? 35) / 100 - 0.5) * W;
@@ -412,7 +379,7 @@ const Scene = ({ schedule, sceneRef }) => {
         <Niche position={[0, H * 0.58, -D / 2 + 0.05]} nicheW={1.3} nicheH={0.9} wallImg={backImg} />
       )}
 
-      {/* Benches — FIXED: use b.w not b.w_pct */}
+      {/* Benches — FIXED field names */}
       {backBenches.length > 0 ? (
         backBenches.map((b, i) => {
           const bw = ((b.w ?? b.w_pct ?? 20) / 100) * W;
@@ -431,10 +398,10 @@ const Scene = ({ schedule, sceneRef }) => {
       <ValveTrim position={[W / 2 - 0.08, H * 0.5, 0]} />
       <FloorDrain position={[0, 0.02, 0.3]} />
 
-      {/* Corner shadows */}
-      {[[-W/2+0.01, -D/2+0.01, 0.5], [W/2-0.01, -D/2+0.01, 0.5], [-W/2+0.01, D/2-0.01, 0.2], [W/2-0.01, D/2-0.01, 0.2]].map(([x, z, op], i) => (
+      {/* Subtle corner shadow lines */}
+      {[[-W/2+0.005, -D/2+0.005, 0.35], [W/2-0.005, -D/2+0.005, 0.35], [-W/2+0.005, D/2-0.005, 0.15], [W/2-0.005, D/2-0.005, 0.15]].map(([x, z, op], i) => (
         <mesh key={`c${i}`} position={[x, H/2, z]}>
-          <boxGeometry args={[0.04, H, 0.04]} />
+          <boxGeometry args={[0.02, H, 0.02]} />
           <meshBasicMaterial color="#000" transparent opacity={op} />
         </mesh>
       ))}
@@ -493,7 +460,7 @@ const ThreeShowerView = ({ schedule, onDropTile }) => {
           obj = obj.parent;
         }
       }
-      // Fallback: apply to back wall if drop position didn't raycast a specific wall
+      // Fallback: apply to back wall
       onDropTile('back_wall', item);
     } catch (err) {
       console.error('Drop error:', err);
