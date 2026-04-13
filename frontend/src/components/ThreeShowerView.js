@@ -418,7 +418,7 @@ const ThreeShowerView = ({ schedule }) => {
         camera={{ position: [0, H * 0.48, D * 1.15], fov: 52 }}
         shadows
         frameloop="always"
-        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
+        gl={{ antialias: true, toneMapping: THREE.NoToneMapping }}
         onCreated={({ gl }) => { gl.setClearColor('#050505'); }}
       >
         <Scene schedule={schedule} />
