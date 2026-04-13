@@ -1273,7 +1273,7 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
       const makeMat = (posLabel) => ({
         id: crypto.randomUUID(), item_id: item.id, name: item.name || '', vendor: item.vendor || '',
         sku: item.sku || '', size: item.size || '', color: item.finish_color || item.color || '',
-        image: item._img || '', link: item.link || '', position_label: posLabel, pattern: '',
+        image: item._img || '', link: item.link || '', position_label: posLabel,
         tile_crop: tileCrop, grout_color: '#4a4035', tile_orientation: 'horizontal', tile_scale: 1.0,
         display_mode: displayMode || 'sheet',
         pattern: selectedPattern || 'stacked_horizontal',
@@ -1466,6 +1466,63 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
     }));
   };
 
+  const handleDropOnWall = (wallKey, item) => {
+    if (!activeSchedule || !item) return;
+    const surfaces = activeSchedule.surfaces || [];
+    let targetSurface;
+    switch (wallKey) {
+      case 'back_wall':
+        targetSurface = surfaces.find(s => s.surface_type === 'wall' && s.name?.toLowerCase().includes('back')) || surfaces.find(s => s.surface_type === 'wall');
+        break;
+      case 'left_wall':
+        targetSurface = surfaces.find(s => s.surface_type === 'wall' && s.name?.toLowerCase().includes('left'));
+        break;
+      case 'right_wall':
+        targetSurface = surfaces.find(s => s.surface_type === 'wall' && s.name?.toLowerCase().includes('right'));
+        break;
+      case 'floor':
+        targetSurface = surfaces.find(s => s.surface_type === 'floor');
+        break;
+      case 'ceiling':
+        targetSurface = surfaces.find(s => s.surface_type === 'ceiling');
+        break;
+      default: return;
+    }
+    if (!targetSurface) return;
+    item._img = item._img || getItemImage(item);
+    const existingCrop = findExistingCropForItem(item.id);
+    if (targetSurface.surface_type === 'floor' || targetSurface.surface_type === 'ceiling') {
+      placeCeilingFloorWithCrop(targetSurface.id, item, existingCrop);
+    } else {
+      // Place on THIS wall only (not auto-fill other walls)
+      updateSchedule(prev => {
+        const makeMat = (posLabel) => ({
+          id: crypto.randomUUID(), item_id: item.id, name: item.name || '',
+          vendor: item.vendor || '', sku: item.sku || '', size: item.size || '',
+          color: item.finish_color || item.color || '',
+          image: item._img || '', link: item.link || '', position_label: posLabel,
+          tile_crop: existingCrop, grout_color: '#4a4035', tile_orientation: 'horizontal',
+          tile_scale: 1.0, display_mode: displayMode || 'sheet',
+          pattern: selectedPattern || 'stacked_horizontal',
+        });
+        return {
+          ...prev,
+          surfaces: prev.surfaces.map(s => {
+            if (s.id !== targetSurface.id) return s;
+            const zones = s.zone_config || DEFAULT_ZONE_CONFIG;
+            let mats = [...(s.materials || [])];
+            zones.forEach(z => {
+              const idx = mats.findIndex(m => m.position_label === z.id);
+              if (idx >= 0) mats[idx] = makeMat(z.id);
+              else mats.push(makeMat(z.id));
+            });
+            return { ...s, materials: mats };
+          })
+        };
+      });
+    }
+  };
+
   const handleEditDimension = (surfaceId, zoneId, value) => {
     updateSchedule(prev => ({
       ...prev,
@@ -1574,11 +1631,21 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           <div className="text-white/20 text-sm py-4 text-center">No items — add items via Checklist or FFE first</div>
         ) : (
           <div className="flex gap-3 overflow-x-auto pb-2">
+            <div className="flex-shrink-0 self-center text-[8px] text-white/30 font-bold px-1" style={{ writingMode: 'vertical-rl' }}>DRAG TO 3D</div>
             {itemsWithImages.map(item => (
               <button key={item.id} data-testid={`palette-item-${item.id}`}
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('application/json', JSON.stringify({
+                    id: item.id, name: item.name, _img: item._img,
+                    vendor: item.vendor || '', sku: item.sku || '', size: item.size || '',
+                    finish_color: item.finish_color || '', color: item.color || '', link: item.link || '',
+                  }));
+                  e.dataTransfer.effectAllowed = 'copy';
+                }}
                 onClick={() => { setSelectedItem(selectedItem?.id === item.id ? null : item); setSelectedElement(null); setPlacementMode(null); }}
-                className={`flex-shrink-0 rounded-lg overflow-hidden transition-all w-24 ${selectedItem?.id === item.id ? 'ring-3 ring-green-400 scale-105' : 'ring-1 ring-white/10 hover:ring-white/30'}`}>
-                <img src={item._img} alt={item.name} className="w-full h-20 object-cover" />
+                className={`flex-shrink-0 rounded-lg overflow-hidden transition-all w-24 cursor-grab active:cursor-grabbing ${selectedItem?.id === item.id ? 'ring-3 ring-green-400 scale-105' : 'ring-1 ring-white/10 hover:ring-white/30'}`}>
+                <img src={item._img} alt={item.name} className="w-full h-20 object-cover" draggable={false} />
                 <div className="p-1" style={{ background: '#111' }}>
                   <div className="text-white text-[8px] font-black truncate">{item.name}</div>
                   <div className="text-white/40 text-[7px] truncate">{item.vendor} {item.size ? `| ${item.size}` : ''}</div>
@@ -1652,8 +1719,8 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
           <div>
             {showMeasurements && <div className="mb-4"><MeasurementCanvas lines={activeSchedule.measurement_lines || []} onLinesChange={handleLinesChange} /></div>}
 
-            {/* 3D Photorealistic View */}
-            <ThreeShowerView schedule={activeSchedule} />
+            {/* 3D Photorealistic View — drag tiles from palette above and drop onto walls */}
+            <ThreeShowerView schedule={activeSchedule} onDropTile={handleDropOnWall} />
 
             {/* Quick tile placement — apply selected tile to surfaces */}
             {selectedItem && (
