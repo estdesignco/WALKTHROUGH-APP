@@ -8,7 +8,7 @@ const W = 5, H = 8, D = 4;
 const proxyUrl = (url) => url ? `${API_URL}/api/proxy-image?url=${encodeURIComponent(url)}` : null;
 
 /* ---- Texture loader ---- */
-function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, repeatY = 2.5) {
+function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH = 8) {
   const [texture, setTexture] = useState(null);
   useEffect(() => {
     if (!imageUrl) { setTexture(null); return; }
@@ -31,14 +31,15 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, repeatY = 2.5) {
         const tex = new THREE.Texture(img);
         tex.colorSpace = THREE.SRGBColorSpace;
         if (mode === 'full') {
-          // Full sheet — stretch to fill, no repeat
           tex.wrapS = THREE.ClampToEdgeWrapping;
           tex.wrapT = THREE.ClampToEdgeWrapping;
           tex.repeat.set(1, 1);
         } else {
-          // Sheet / single tile — repeat
           tex.wrapS = THREE.RepeatWrapping;
           tex.wrapT = THREE.RepeatWrapping;
+          // Auto-calculate repeatY to preserve image aspect ratio on the wall
+          const imgAspect = img.width / img.height;
+          const repeatY = repeatX * (wallH / wallW) * imgAspect;
           tex.repeat.set(repeatX, repeatY);
         }
         tex.needsUpdate = true;
@@ -46,7 +47,7 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, repeatY = 2.5) {
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [imageUrl, mode, repeatX, repeatY]);
+  }, [imageUrl, mode, repeatX, wallW, wallH]);
   return texture;
 }
 
@@ -67,8 +68,8 @@ function getZoneMaterial(surface, zoneId) {
 }
 
 /* ---- Textured Wall ---- */
-const TexturedWall = ({ position, rotation, size, imageUrl, color = '#444', mode = 'sheet', repeatX, repeatY }) => {
-  const texture = useImageTexture(imageUrl, mode, repeatX, repeatY);
+const TexturedWall = ({ position, rotation, size, imageUrl, color = '#444', mode = 'sheet', repeatX }) => {
+  const texture = useImageTexture(imageUrl, mode, repeatX, size[0], size[1]);
   return (
     <mesh position={position} rotation={rotation} receiveShadow>
       <planeGeometry args={size} />
@@ -85,16 +86,17 @@ const TexturedWall = ({ position, rotation, size, imageUrl, color = '#444', mode
 };
 
 /* ---- Multi-zone wall (supports wainscoting) ---- */
-const ZonedWall = ({ position, rotation, totalSize, surface, defaultColor = '#3a3a3a', repeatX = 3.5, repeatY = 2.5 }) => {
+const ZonedWall = ({ position, rotation, totalSize, surface, defaultColor = '#3a3a3a', repeatX = 3.5 }) => {
   const zones = surface?.zone_config || [{ id: 'main_wall', height: 100 }];
   const totalW = totalSize[0], totalH = totalSize[1];
+  // Get main_wall material as fallback for zones without their own material
+  const mainMat = getZoneMaterial(surface, 'main_wall');
 
   return (
     <group position={position} rotation={rotation}>
       {zones.map((zone, i) => {
-        const mat = getZoneMaterial(surface, zone.id);
+        const mat = getZoneMaterial(surface, zone.id) || mainMat;
         const zoneH = totalH * (zone.height / 100);
-        // Calculate Y position (zones stack from top to bottom)
         let accTop = 0;
         for (let j = 0; j < i; j++) accTop += zones[j].height;
         const yCenter = totalH / 2 - (accTop + zone.height / 2) / 100 * totalH;
@@ -109,7 +111,6 @@ const ZonedWall = ({ position, rotation, totalSize, surface, defaultColor = '#3a
             color={defaultColor}
             mode="sheet"
             repeatX={repeatX}
-            repeatY={Math.max(1, repeatY * (zone.height / 100))}
           />
         );
       })}
@@ -249,7 +250,6 @@ const Scene = ({ schedule }) => {
         surface={backWall}
         defaultColor="#3a3a3a"
         repeatX={3.5}
-        repeatY={2.5}
       />
 
       {/* Left wall — zoned */}
@@ -260,7 +260,6 @@ const Scene = ({ schedule }) => {
         surface={leftWall}
         defaultColor="#2e2e2e"
         repeatX={2.8}
-        repeatY={2.5}
       />
 
       {/* Right wall — zoned */}
@@ -271,7 +270,6 @@ const Scene = ({ schedule }) => {
         surface={rightWall}
         defaultColor="#2e2e2e"
         repeatX={2.8}
-        repeatY={2.5}
       />
 
       {/* Floor */}
@@ -283,7 +281,6 @@ const Scene = ({ schedule }) => {
         color="#4a4a4a"
         mode="sheet"
         repeatX={3}
-        repeatY={2.5}
       />
 
       {/* Ceiling */}
