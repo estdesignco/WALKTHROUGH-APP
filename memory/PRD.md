@@ -1,42 +1,35 @@
 # PRD — Interior Design Project Management Tool
 
-## Architecture
+## Architecture  
 React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
-## Implemented Features (Apr 13, 2026)
+## Implemented (Apr 13, 2026)
 
 ### 3D Shower View
-- 5-wall enclosure with texture mapping
-- **Full Sheet mode** — one slab covers entire wall
-- **Tile mode** — image repeats with correct aspect ratio
-- **Offset/Brick pattern** — working in 3D (2-row offset canvas)
-- **Stacked + Vertical patterns** — working
-- Auto-calculated repeatY preserving image proportions
-- Zoned walls (wainscoting support with trim lines)
-- Zone fallback to main_wall material
-- Recessed niche (data-driven + default)
-- Marble bench (data-driven + default)
+- White tiles render WHITE (boosted lighting)
+- Tile aspect ratio preserved (rectangles not squares)
+- Full Sheet mode (per-wall, not global)
+- 6 patterns: Stacked, Offset, 1/3 Offset, Vertical, Herringbone, Basket Weave
+- Zoned walls with wainscoting + trim lines
+- Data-driven niches and benches
 - Gold fixtures (rain head, wall head, handshower, valve, drain)
-- Warm atmospheric lighting, corner shadows, OrbitControls
+- OrbitControls for rotate/zoom
 
-### Quick-Place Panel
-- MODE toggle: TILE / FULL SHEET
-- PATTERN toggle: STACKED / OFFSET / VERTICAL
-- Surface buttons: ALL WALLS, individual walls, Floor, Ceiling
-- Mode + pattern stored on materials and passed to 3D
+### Quick-Place Panel  
+- MODE: TILE / FULL SHEET (per-wall)
+- PATTERN: 6 options, stored per-material
+- Surface buttons: ALL WALLS + individual walls + Floor + Ceiling
 
-### Toolbar Buttons
-- NICHE: directly adds niche to back wall (shows in 3D)
-- BENCH: directly adds bench to back wall (shows in 3D)
-- + UPPER: adds upper accent zone
-- + WAINSCOT: adds wainscot zone with trim line
-- × buttons to remove zones
+### Toolbar
+- NICHE: adds to back wall, renders in 3D
+- BENCH: adds to back wall, renders in 3D
+- + UPPER / + WAINSCOT: zone management
 
 ## Credentials
-- App Password: `DesignReady2026!`
+App Password: `DesignReady2026!`
 
-## Remaining Work
-- Glass door panel / shower enclosure frame
-- Dynamic niche/bench repositioning (drag in 3D)
-- More patterns (herringbone, basket weave)
-- Click-to-place on 3D surfaces
+## Remaining
+- Glass door panel
+- Drag-and-drop UX for tiles
+- Auto-populate fixtures from FFE/checklist
+- Niche/bench repositioning in 3D

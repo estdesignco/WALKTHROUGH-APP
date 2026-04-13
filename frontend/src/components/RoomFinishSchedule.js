@@ -1661,15 +1661,15 @@ const RoomFinishSchedule = ({ projectId, roomId, roomName, onClose }) => {
                 {/* Display mode toggle */}
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[9px] font-bold text-white/40">MODE:</span>
-                  <button onClick={() => { setDisplayMode('sheet'); updateAllWallMaterials({ display_mode: 'sheet' }); }}
+                  <button onClick={() => setDisplayMode('sheet')}
                     className={`px-2 py-1 rounded text-[9px] font-black ${displayMode === 'sheet' ? 'bg-amber-600 text-white' : 'text-white/40 border border-white/10'}`}
                     data-testid="mode-sheet">TILE</button>
-                  <button onClick={() => { setDisplayMode('full'); updateAllWallMaterials({ display_mode: 'full' }); }}
+                  <button onClick={() => setDisplayMode('full')}
                     className={`px-2 py-1 rounded text-[9px] font-black ${displayMode === 'full' ? 'bg-amber-600 text-white' : 'text-white/40 border border-white/10'}`}
                     data-testid="mode-full">FULL SHEET</button>
                   <span className="text-white/20 mx-1">|</span>
                   <span className="text-[9px] font-bold text-white/40">PATTERN:</span>
-                  {[['stacked_horizontal','STACKED'],['offset','OFFSET'],['stacked_vertical','VERTICAL']].map(([p, label]) => (
+                  {[['stacked_horizontal','STACKED'],['offset','OFFSET'],['one_third_offset','1/3'],['stacked_vertical','VERTICAL'],['herringbone','HERRING'],['basket_weave','BASKET']].map(([p, label]) => (
                     <button key={p} onClick={() => { setSelectedPattern(p); updateAllWallMaterials({ pattern: p }); }}
                       className={`px-2 py-1 rounded text-[9px] font-black ${selectedPattern === p ? 'bg-cyan-600 text-white' : 'text-white/40 border border-white/10'}`}
                       data-testid={`pattern-${p}`}>{label}</button>

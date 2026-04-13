@@ -33,22 +33,58 @@ function useImageTexture(imageUrl, mode = 'sheet', repeatX = 3, wallW = 5, wallH
         const imgW = img.width, imgH = img.height;
 
         if (mode !== 'full' && pattern === 'offset') {
-          // Create 2-row offset/brick pattern
+          // Brick/offset: every other row shifted by half
           sourceCanvas = document.createElement('canvas');
-          sourceCanvas.width = imgW * 2;
-          sourceCanvas.height = imgH * 2;
-          const pCtx = sourceCanvas.getContext('2d');
-          pCtx.drawImage(img, 0, 0); pCtx.drawImage(img, imgW, 0);
-          pCtx.drawImage(img, -imgW / 2, imgH); pCtx.drawImage(img, imgW / 2, imgH); pCtx.drawImage(img, imgW * 1.5, imgH);
+          sourceCanvas.width = imgW * 2; sourceCanvas.height = imgH * 2;
+          const p = sourceCanvas.getContext('2d');
+          p.drawImage(img, 0, 0); p.drawImage(img, imgW, 0);
+          p.drawImage(img, -imgW / 2, imgH); p.drawImage(img, imgW / 2, imgH); p.drawImage(img, imgW * 1.5, imgH);
+        } else if (mode !== 'full' && pattern === 'one_third_offset') {
+          // 1/3 offset: each row shifted by 1/3
+          sourceCanvas = document.createElement('canvas');
+          sourceCanvas.width = imgW * 3; sourceCanvas.height = imgH * 3;
+          const p = sourceCanvas.getContext('2d');
+          for (let c = 0; c < 4; c++) p.drawImage(img, c * imgW, 0);
+          for (let c = -1; c < 4; c++) p.drawImage(img, c * imgW + imgW / 3, imgH);
+          for (let c = -1; c < 4; c++) p.drawImage(img, c * imgW + (imgW * 2 / 3), imgH * 2);
+        } else if (mode !== 'full' && pattern === 'herringbone') {
+          // Herringbone: V-shape pattern
+          sourceCanvas = document.createElement('canvas');
+          const size = Math.max(imgW, imgH) * 4;
+          sourceCanvas.width = size; sourceCanvas.height = size;
+          const p = sourceCanvas.getContext('2d');
+          const tw = imgW * 0.8, th = imgH * 0.3;
+          for (let row = -2; row < size / th + 2; row++) {
+            for (let col = -2; col < size / tw + 2; col++) {
+              const x = col * tw, y = row * th * 2;
+              p.save(); p.translate(x, y + (col % 2) * th);
+              p.drawImage(img, 0, 0, imgW, imgH, 0, 0, tw, th);
+              p.translate(tw, 0); p.scale(-1, 1); p.drawImage(img, 0, 0, imgW, imgH, -tw, th, tw, th);
+              p.restore();
+            }
+          }
+        } else if (mode !== 'full' && pattern === 'basket_weave') {
+          // Basket weave: alternating horizontal/vertical pairs
+          sourceCanvas = document.createElement('canvas');
+          sourceCanvas.width = imgW * 4; sourceCanvas.height = imgH * 4;
+          const p = sourceCanvas.getContext('2d');
+          for (let gy = 0; gy < 4; gy++) for (let gx = 0; gx < 4; gx++) {
+            const bx = gx * imgW, by = gy * imgH;
+            if ((gx + gy) % 2 === 0) {
+              p.drawImage(img, 0, 0, imgW, imgH, bx, by, imgW, imgH / 2);
+              p.drawImage(img, 0, 0, imgW, imgH, bx, by + imgH / 2, imgW, imgH / 2);
+            } else {
+              p.save(); p.translate(bx + imgW / 2, by + imgH / 2); p.rotate(Math.PI / 2);
+              p.drawImage(img, 0, 0, imgW, imgH, -imgH / 2, -imgW / 2, imgH, imgW);
+              p.restore();
+            }
+          }
         } else if (mode !== 'full' && pattern === 'stacked_vertical') {
-          // Rotate the tile 90 degrees
           sourceCanvas = document.createElement('canvas');
-          sourceCanvas.width = imgH;
-          sourceCanvas.height = imgW;
-          const pCtx = sourceCanvas.getContext('2d');
-          pCtx.translate(imgH / 2, imgW / 2);
-          pCtx.rotate(Math.PI / 2);
-          pCtx.drawImage(img, -imgW / 2, -imgH / 2);
+          sourceCanvas.width = imgH; sourceCanvas.height = imgW;
+          const p = sourceCanvas.getContext('2d');
+          p.translate(imgH / 2, imgW / 2); p.rotate(Math.PI / 2);
+          p.drawImage(img, -imgW / 2, -imgH / 2);
         }
 
         const texSource = sourceCanvas || img;
@@ -265,12 +301,12 @@ const Scene = ({ schedule }) => {
 
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.35} color="#f5f0e8" />
-      <pointLight position={[0, H - 0.2, D * 0.2]} intensity={1.5} distance={18} decay={2} castShadow color="#fff5e6" />
-      <directionalLight position={[1.5, H, 3]} intensity={0.5} castShadow color="#ffffff" />
-      <directionalLight position={[-2, H * 0.3, -1]} intensity={0.12} color="#d0d5e0" />
-      <pointLight position={[0, 0.5, D * 0.3]} intensity={0.15} distance={10} color="#e0e0e0" />
+      {/* Lighting — bright enough for white tiles to appear white */}
+      <ambientLight intensity={0.7} color="#ffffff" />
+      <pointLight position={[0, H - 0.2, D * 0.2]} intensity={2.0} distance={20} decay={2} castShadow color="#ffffff" />
+      <directionalLight position={[1.5, H, 3]} intensity={0.8} castShadow color="#ffffff" />
+      <directionalLight position={[-2, H * 0.5, 2]} intensity={0.4} color="#ffffff" />
+      <pointLight position={[0, 0.5, D * 0.5]} intensity={0.4} distance={12} color="#ffffff" />
 
       {/* Back wall — zoned (supports wainscoting) */}
       <ZonedWall
@@ -336,9 +372,10 @@ const Scene = ({ schedule }) => {
       {/* Bench — from data or default */}
       {backBenches.length > 0 ? (
         backBenches.map((b, i) => {
-          const bw = (b.w_pct / 100) * W;
-          const bh = (b.h_pct / 100) * H;
-          return <Bench key={i} benchW={bw} benchH={bh} side={b.x_pct > 50 ? 'right' : 'left'} />;
+          const bw = ((b.w_pct || b.w || 20) / 100) * W;
+          const bh = ((b.h_pct || b.h || 22) / 100) * H;
+          const bx = (b.x_pct || b.x || 60);
+          return <Bench key={i} benchW={Math.max(0.5, bw)} benchH={Math.max(0.5, bh)} side={bx > 50 ? 'right' : 'left'} />;
         })
       ) : (
         <Bench />
