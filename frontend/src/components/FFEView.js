@@ -843,6 +843,42 @@ const ExactFFESpreadsheet = ({
                                           {isRoomExpanded ? '▼' : '▶'}
                                         </button>
                                         <span>{room.name.toUpperCase()}</span>
+                                        {/* FLOOR SELECTOR */}
+                                        <select
+                                          data-testid={`floor-select-ffe-${room.id}`}
+                                          className="ml-3 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                                          style={{
+                                            background: 'rgba(0,0,0,0.6)',
+                                            border: '1px solid #D4A574',
+                                            color: '#D4A574',
+                                            outline: 'none',
+                                          }}
+                                          value={room.floor || '1ST FLOOR'}
+                                          onClick={(e) => e.stopPropagation()}
+                                          onChange={async (e) => {
+                                            e.stopPropagation();
+                                            const newFloor = e.target.value;
+                                            try {
+                                              const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                                              await fetch(`${backendUrl}/api/rooms/${room.id}`, {
+                                                method: 'PUT',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ floor: newFloor })
+                                              });
+                                              window.location.reload();
+                                            } catch (err) {
+                                              console.error('Failed to update floor:', err);
+                                            }
+                                          }}
+                                        >
+                                          <option value="1ST FLOOR">1ST FLOOR</option>
+                                          <option value="2ND FLOOR">2ND FLOOR</option>
+                                          <option value="3RD FLOOR">3RD FLOOR</option>
+                                          <option value="BASEMENT">BASEMENT</option>
+                                          <option value="ATTIC">ATTIC</option>
+                                          <option value="GARAGE">GARAGE</option>
+                                          <option value="EXTERIOR">EXTERIOR</option>
+                                        </select>
                                       </div>
                                       <button
                                         onClick={() => handleDeleteRoom(room.id)}
