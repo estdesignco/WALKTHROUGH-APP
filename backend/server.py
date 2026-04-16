@@ -1165,12 +1165,14 @@ class RoomUpdate(BaseModel):
     order_index: Optional[int] = None
     notes: Optional[str] = None
     color: Optional[str] = None
+    floor: Optional[str] = None
 
 class Room(RoomBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     project_id: str
     color: str = "#7A5A8A"  # Purple color
     notes: str = ""  # Room notes - shared between walkthrough and checklist
+    floor: str = "1st Floor"  # Floor grouping
     categories: List[Category] = []
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)

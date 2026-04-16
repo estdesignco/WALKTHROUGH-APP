@@ -1011,11 +1011,76 @@ const SimpleWalkthroughSpreadsheet = ({
               <div className="overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
           
           {/* USE FILTERED PROJECT DATA */}
-          {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
-          const isRoomExpanded = expandedRooms[room.id];
+          {(() => {
+            const rooms = (filteredProject || project)?.rooms || [];
+            let lastFloor = null;
+            return rooms.map((room, roomIndex) => {
+            const isRoomExpanded = expandedRooms[room.id];
+            const currentFloor = room.floor || '1st Floor';
+            const showFloorBanner = currentFloor !== lastFloor;
+            lastFloor = currentFloor;
           
           return (
-            <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+            <React.Fragment key={room.id}>
+            {/* FLOOR DIVIDER BANNER */}
+            {showFloorBanner && (
+              <div className="mt-6 mb-2" style={{
+                background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
+                borderTop: '3px solid #D4A574',
+                borderBottom: '3px solid #D4A574',
+                padding: '12px 24px',
+                position: 'relative',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  position: 'absolute', inset: 0, opacity: 0.06,
+                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #D4A574 10px, #D4A574 11px)',
+                }} />
+                <div className="flex items-center justify-between relative">
+                  <div className="flex items-center gap-4">
+                    <div style={{
+                      width: '40px', height: '40px', borderRadius: '8px',
+                      background: 'linear-gradient(135deg, #D4A574, #8B6914)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '18px', fontWeight: '900', color: '#000',
+                      boxShadow: '0 2px 12px rgba(212, 165, 116, 0.4)',
+                    }}>
+                      {currentFloor.match(/\d+/) ? currentFloor.match(/\d+/)[0] : 'B'}
+                    </div>
+                    <span
+                      contentEditable={true}
+                      suppressContentEditableWarning={true}
+                      className="outline-none"
+                      style={{
+                        fontSize: '22px', fontWeight: '900', letterSpacing: '6px',
+                        color: '#D4A574',
+                        textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 30px rgba(212,165,116,0.3)',
+                      }}
+                      onBlur={async (e) => {
+                        const newFloor = e.target.textContent?.trim();
+                        if (newFloor && newFloor.toUpperCase() !== currentFloor.toUpperCase()) {
+                          // Update ALL rooms on this floor
+                          const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                          const floorRooms = rooms.filter(r => (r.floor || '1st Floor') === currentFloor);
+                          await Promise.all(floorRooms.map(r =>
+                            fetch(`${backendUrl}/api/rooms/${r.id}`, {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ floor: newFloor.toUpperCase() })
+                            })
+                          ));
+                          if (onReload) onReload();
+                        }
+                      }}
+                    >{currentFloor.toUpperCase()}</span>
+                  </div>
+                  <div style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
+                    {rooms.filter(r => (r.floor || '1st Floor') === currentFloor).length} ROOMS
+                  </div>
+                </div>
+              </div>
+            )}
+            <Draggable draggableId={room.id} index={roomIndex}>
               {(provided, snapshot) => (
                 <div 
                   ref={provided.innerRef}
@@ -1415,8 +1480,10 @@ const SimpleWalkthroughSpreadsheet = ({
                 </div>
               )}
             </Draggable>
+            </React.Fragment>
           );
-        })}
+        });
+        })()}
                 {provided.placeholder}
               </div>
             )}
