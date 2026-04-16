@@ -1046,7 +1046,25 @@ const SimpleWalkthroughSpreadsheet = ({
                     >
                       {isRoomExpanded ? '▼' : '▶'}
                     </button>
-                    <span>{room.name.toUpperCase()}</span>
+                    <span
+                      contentEditable={true}
+                      suppressContentEditableWarning={true}
+                      className="outline-none px-1"
+                      onBlur={async (e) => {
+                        const newName = e.target.textContent?.trim();
+                        if (newName && newName.toUpperCase() !== room.name.toUpperCase()) {
+                          try {
+                            const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                            await fetch(`${backendUrl}/api/rooms/${room.id}`, {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ name: newName.toUpperCase() })
+                            });
+                            if (onReload) onReload();
+                          } catch (err) { console.error('Failed to update room name:', err); }
+                        }
+                      }}
+                    >{room.name.toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <input
@@ -1112,7 +1130,25 @@ const SimpleWalkthroughSpreadsheet = ({
                               >
                                 {isCategoryExpanded ? '▼' : '▶'}
                               </button>
-                              <span>{category.name.toUpperCase()}</span>
+                              <span
+                                contentEditable={true}
+                                suppressContentEditableWarning={true}
+                                className="outline-none px-1"
+                                onBlur={async (e) => {
+                                  const newName = e.target.textContent?.trim();
+                                  if (newName && newName.toUpperCase() !== category.name.toUpperCase()) {
+                                    try {
+                                      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                                      await fetch(`${backendUrl}/api/categories/${category.id}`, {
+                                        method: 'PUT',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ name: newName.toUpperCase() })
+                                      });
+                                      if (onReload) onReload();
+                                    } catch (err) { console.error('Failed to update category name:', err); }
+                                  }
+                                }}
+                              >{category.name.toUpperCase()}</span>
                             </div>
                             <button
                               onClick={() => handleDeleteCategory(category.id)}
@@ -1138,7 +1174,25 @@ const SimpleWalkthroughSpreadsheet = ({
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
                                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 255, 255, 0.3)'
-                                  }}>{subcategory.name.toUpperCase()}</th>
+                                  }}><span
+                                    contentEditable={true}
+                                    suppressContentEditableWarning={true}
+                                    className="outline-none px-1"
+                                    onBlur={async (e) => {
+                                      const newName = e.target.textContent?.trim();
+                                      if (newName && newName.toUpperCase() !== subcategory.name.toUpperCase()) {
+                                        try {
+                                          const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                                          await fetch(`${backendUrl}/api/subcategories/${subcategory.id}`, {
+                                            method: 'PUT',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ name: newName.toUpperCase() })
+                                          });
+                                          if (onReload) onReload();
+                                        } catch (err) { console.error('Failed to update subcategory name:', err); }
+                                      }
+                                    }}
+                                  >{subcategory.name.toUpperCase()}</span></th>
                                       <th className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white shadow-inner shadow-[#B49B7E]/20" style={{ 
                                     background: 'linear-gradient(135deg, #8B4444FF 0%, #8B4444AA 20%, #8B4444 40%, #8B4444AA 80%, #8B4444FF 100%)',
                                     boxShadow: '0 0 20px #8B444450, inset 0 0 40px rgba(255, 255, 255, 0.12), inset 0 0 70px rgba(0, 0, 0, 0.4)',
@@ -1204,7 +1258,12 @@ const SimpleWalkthroughSpreadsheet = ({
                                           suppressContentEditableWarning={true}
                                           className="w-full bg-transparent text-sm outline-none"
                                           style={{ color: '#F5F5DC' }}
-                                          onBlur={(e) => console.log('Item name updated:', e.target.textContent)}
+                                          onBlur={(e) => {
+                                            const newValue = e.target.textContent?.trim();
+                                            if (newValue !== item.name) {
+                                              handleUpdateItemField(item.id, 'name', newValue);
+                                            }
+                                          }}
                                         >
                                           {item.name}
                                         </div>
@@ -1215,7 +1274,12 @@ const SimpleWalkthroughSpreadsheet = ({
                                           suppressContentEditableWarning={true}
                                           className="w-full bg-transparent text-sm outline-none text-center"
                                           style={{ color: '#F5F5DC' }}
-                                          onBlur={(e) => console.log('Quantity updated:', e.target.textContent)}
+                                          onBlur={(e) => {
+                                            const newValue = e.target.textContent?.trim();
+                                            if (newValue !== (item.quantity || '')) {
+                                              handleUpdateItemField(item.id, 'quantity', newValue);
+                                            }
+                                          }}
                                         >
                                           {item.quantity || ''}
                                         </div>
@@ -1226,7 +1290,12 @@ const SimpleWalkthroughSpreadsheet = ({
                                           suppressContentEditableWarning={true}
                                           className="w-full bg-transparent text-sm outline-none"
                                           style={{ color: '#F5F5DC' }}
-                                          onBlur={(e) => console.log('Size updated:', e.target.textContent)}
+                                          onBlur={(e) => {
+                                            const newValue = e.target.textContent?.trim();
+                                            if (newValue !== (item.size || '')) {
+                                              handleUpdateItemField(item.id, 'size', newValue);
+                                            }
+                                          }}
                                         >
                                           {item.size || ''}
                                         </div>
