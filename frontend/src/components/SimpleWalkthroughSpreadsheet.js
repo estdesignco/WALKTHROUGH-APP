@@ -1010,9 +1010,17 @@ const SimpleWalkthroughSpreadsheet = ({
             {(provided) => (
               <div className="overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
           
-          {/* USE FILTERED PROJECT DATA */}
+          {/* USE FILTERED PROJECT DATA — SORTED BY FLOOR */}
           {(() => {
-            const rooms = (filteredProject || project)?.rooms || [];
+            const rooms = [...((filteredProject || project)?.rooms || [])];
+            // Sort rooms by floor, then by order_index within each floor
+            const floorOrder = { '1ST FLOOR': 0, '2ND FLOOR': 1, '3RD FLOOR': 2, 'BASEMENT': 3, 'ATTIC': 4, 'GARAGE': 5, 'EXTERIOR': 6 };
+            rooms.sort((a, b) => {
+              const fa = floorOrder[a.floor || '1ST FLOOR'] ?? 99;
+              const fb = floorOrder[b.floor || '1ST FLOOR'] ?? 99;
+              if (fa !== fb) return fa - fb;
+              return (a.order_index || 0) - (b.order_index || 0);
+            });
             let lastFloor = null;
             return rooms.map((room, roomIndex) => {
             const isRoomExpanded = expandedRooms[room.id];

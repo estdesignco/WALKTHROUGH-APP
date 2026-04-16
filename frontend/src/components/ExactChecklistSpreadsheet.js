@@ -2190,12 +2190,63 @@ const ExactChecklistSpreadsheet = ({
           <Droppable droppableId="rooms" type="ROOM">
             {(provided) => (
               <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
-                {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
+                {(() => {
+                  const rooms = [...((filteredProject || project)?.rooms || [])];
+                  const floorOrder = { '1ST FLOOR': 0, '2ND FLOOR': 1, '3RD FLOOR': 2, 'BASEMENT': 3, 'ATTIC': 4, 'GARAGE': 5, 'EXTERIOR': 6 };
+                  rooms.sort((a, b) => {
+                    const fa = floorOrder[a.floor || '1ST FLOOR'] ?? 99;
+                    const fb = floorOrder[b.floor || '1ST FLOOR'] ?? 99;
+                    if (fa !== fb) return fa - fb;
+                    return (a.order_index || 0) - (b.order_index || 0);
+                  });
+                  let lastFloor = null;
+                  return rooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
-                  const roomColor = room.color || getColorByIndex(roomIndex); // Use DB color, fallback to index
+                  const roomColor = room.color || getColorByIndex(roomIndex);
+                  const currentFloor = room.floor || '1ST FLOOR';
+                  const showFloorBanner = currentFloor !== lastFloor;
+                  lastFloor = currentFloor;
                   
                   return (
-                    <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
+                    <React.Fragment key={room.id}>
+                    {/* FLOOR DIVIDER BANNER */}
+                    {showFloorBanner && (
+                      <div className="mt-6 mb-2" style={{
+                        background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
+                        borderTop: '3px solid #D4A574',
+                        borderBottom: '3px solid #D4A574',
+                        padding: '12px 24px',
+                        position: 'relative',
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          position: 'absolute', inset: 0, opacity: 0.06,
+                          backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #D4A574 10px, #D4A574 11px)',
+                        }} />
+                        <div className="flex items-center justify-between relative">
+                          <div className="flex items-center gap-4">
+                            <div style={{
+                              width: '40px', height: '40px', borderRadius: '8px',
+                              background: 'linear-gradient(135deg, #D4A574, #8B6914)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: '18px', fontWeight: '900', color: '#000',
+                              boxShadow: '0 2px 12px rgba(212, 165, 116, 0.4)',
+                            }}>
+                              {currentFloor.match(/\d+/) ? currentFloor.match(/\d+/)[0] : currentFloor.charAt(0)}
+                            </div>
+                            <span style={{
+                              fontSize: '22px', fontWeight: '900', letterSpacing: '6px',
+                              color: '#D4A574',
+                              textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 30px rgba(212,165,116,0.3)',
+                            }}>{currentFloor}</span>
+                          </div>
+                          <div style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
+                            {rooms.filter(r => (r.floor || '1ST FLOOR') === currentFloor).length} ROOMS
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <Draggable draggableId={room.id} index={roomIndex}>
                       {(provided, snapshot) => (
                         <div 
                           ref={provided.innerRef}
@@ -3860,8 +3911,10 @@ const ExactChecklistSpreadsheet = ({
                         </div>
                       )}
                     </Draggable>
+                    </React.Fragment>
                   );
-                })}
+                });
+                })()}
                 {provided.placeholder}
               </div>
             )}
