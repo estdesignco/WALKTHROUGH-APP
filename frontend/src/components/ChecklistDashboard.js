@@ -192,19 +192,16 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         ...roomData,
         project_id: projectId,
         order_index: project.rooms.length,
-        sheet_type: 'checklist'  // Make rooms independent per sheet
+        sheet_type: 'checklist'
       };
       
       console.log('🏠 Creating room with data:', newRoom);
       const roomResponse = await roomAPI.create(newRoom);
       console.log('🏠 Room created successfully:', roomResponse);
-      
-      // RELOAD PROJECT TO SHOW NEW ROOM
-      await loadSimpleProject();
-      setShowAddRoom(false);
+      // Don't close modal or reload here — let AddMultipleRoomsModal handle its own loop
     } catch (err) {
-      setError('Failed to create room');
       console.error('Error creating room:', err);
+      throw err;
     }
   };
 
@@ -586,7 +583,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       {/* Add Multiple Rooms Modal */}
       {showAddRoom && (
         <AddMultipleRoomsModal
-          onClose={() => setShowAddRoom(false)}
+          onClose={() => { setShowAddRoom(false); loadSimpleProject(); }}
           onSubmit={handleAddRoom}
           roomColors={roomColors}
           existingRooms={project?.rooms || []}

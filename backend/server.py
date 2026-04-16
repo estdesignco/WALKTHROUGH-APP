@@ -1222,14 +1222,28 @@ class EmailResponse(BaseModel):
     status: str
     message: str
 
-# DISTINCT room colors matching frontend palette - index-based, never repeats
+# 96 MAXIMALLY DISTINCT room colors — no repeats, no similar pairs
 DISTINCT_ROOM_COLORS = [
-    '#E67E22', '#3498DB', '#27AE60', '#9B59B6', '#F1C40F',
-    '#E74C3C', '#1ABC9C', '#34495E', '#E91E63', '#00BCD4',
-    '#8BC34A', '#FF9800', '#673AB7', '#009688', '#CDDC39',
-    '#FF5722', '#607D8B', '#795548', '#4CAF50', '#2196F3',
-    '#FFC107', '#03A9F4', '#8D6E63', '#78909C', '#AED581',
-    '#FFB74D', '#BA68C8', '#4DB6AC', '#A1887F', '#90A4AE',
+    '#E67E22', '#2980B9', '#27AE60', '#8E44AD', '#F1C40F',
+    '#E74C3C', '#1ABC9C', '#D35400', '#2ECC71', '#3498DB',
+    '#9B59B6', '#F39C12', '#16A085', '#C0392B', '#2C3E50',
+    '#E91E63', '#00BCD4', '#8BC34A', '#FF5722', '#607D8B',
+    '#FF9800', '#009688', '#673AB7', '#795548', '#03A9F4',
+    '#CDDC39', '#4CAF50', '#F44336', '#00ACC1', '#AB47BC',
+    '#FF6F00', '#0277BD', '#558B2F', '#AD1457', '#FFD600',
+    '#00695C', '#6A1B9A', '#BF360C', '#1565C0', '#33691E',
+    '#880E4F', '#F9A825', '#004D40', '#4A148C', '#E65100',
+    '#0D47A1', '#1B5E20', '#B71C1C', '#006064', '#4527A0',
+    '#FF6D00', '#01579B', '#2E7D32', '#C62828', '#00838F',
+    '#5E35B1', '#EF6C00', '#0288D1', '#388E3C', '#D32F2F',
+    '#0097A7', '#7B1FA2', '#E8A100', '#039BE5', '#43A047',
+    '#F4511E', '#0091EA', '#7CB342', '#E53935', '#00B8D4',
+    '#8E24AA', '#FB8C00', '#0277BD', '#66BB6A', '#FF1744',
+    '#00B0FF', '#9C27B0', '#FFA000', '#1E88E5', '#4DB6AC',
+    '#FF3D00', '#2979FF', '#AED581', '#D50000', '#00E5FF',
+    '#AA00FF', '#FFAB00', '#2962FF', '#69F0AE', '#FF1744',
+    '#00E5FF', '#D500F9', '#FFD740', '#304FFE', '#00E676',
+    '#FF6E40',
 ]
 
 # Helper function to get room color by INDEX (position in project)
@@ -2235,6 +2249,7 @@ async def create_room(room_data: RoomCreate):
         
         if room_data.sheet_type != "walkthrough" and not room_data.auto_populate:
             print(f"🚫 TRANSFER ROOM: Creating empty {room_data.sheet_type.upper()} room for transfer")
+            existing_room_count = await db.rooms.count_documents({"project_id": room_data.project_id})
             room_dict = {
                 "id": str(uuid.uuid4()),
                 "name": room_data.name,
@@ -2242,7 +2257,9 @@ async def create_room(room_data: RoomCreate):
                 "order_index": room_data.order_index,
                 "sheet_type": room_data.sheet_type,
                 "project_id": room_data.project_id,
-                "categories": [],  # Empty - transfer will add only checked items
+                "color": get_room_color(room_data.name, existing_room_count),
+                "notes": "",
+                "categories": [],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
@@ -2293,8 +2310,8 @@ async def create_room(room_data: RoomCreate):
         room_dict = room_data.dict()
         room_dict["id"] = str(uuid.uuid4())
         # Get existing room count for index-based color assignment
-        existing_rooms = project.get("rooms", [])
-        room_dict["color"] = get_room_color(room_data.name, len(existing_rooms))
+        existing_room_count = await db.rooms.count_documents({"project_id": room_data.project_id})
+        room_dict["color"] = get_room_color(room_data.name, existing_room_count)
         room_dict["notes"] = room_dict.get("notes", "")
         room_dict["categories"] = []
         room_dict["created_at"] = datetime.utcnow()

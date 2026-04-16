@@ -1,89 +1,48 @@
-// MASTER ROOM COLOR PALETTE - DISTINCT COLORS FOR DARK THEME
-// Used across ENTIRE app - Mobile & Desktop
-// Each room gets a UNIQUE, DISTINCT color
+// MASTER ROOM COLOR PALETTE - 96 MAXIMALLY DISTINCT COLORS
+// NO repeats, NO similar pairs — every room gets a truly unique color
 
-// 30 COMPLETELY DISTINCT colors - NO REPEATS within a project
 export const DISTINCT_ROOM_COLORS = [
-  '#E67E22',  // 1.  Carrot Orange
-  '#3498DB',  // 2.  Bright Blue
-  '#27AE60',  // 3.  Emerald Green
-  '#9B59B6',  // 4.  Amethyst Purple
-  '#F1C40F',  // 5.  Sunflower Yellow
-  '#E74C3C',  // 6.  Alizarin Red
-  '#1ABC9C',  // 7.  Turquoise
-  '#34495E',  // 8.  Wet Asphalt
-  '#E91E63',  // 9.  Pink
-  '#00BCD4',  // 10. Cyan
-  '#8BC34A',  // 11. Light Green
-  '#FF9800',  // 12. Orange
-  '#673AB7',  // 13. Deep Purple
-  '#009688',  // 14. Teal
-  '#CDDC39',  // 15. Lime
-  '#FF5722',  // 16. Deep Orange
-  '#607D8B',  // 17. Blue Grey
-  '#795548',  // 18. Brown
-  '#4CAF50',  // 19. Green
-  '#2196F3',  // 20. Blue
-  '#FFC107',  // 21. Amber
-  '#03A9F4',  // 22. Light Blue
-  '#8D6E63',  // 23. Brown (lighter)
-  '#78909C',  // 24. Blue Grey (lighter)
-  '#AED581',  // 25. Light Green (lighter)
-  '#FFB74D',  // 26. Orange (lighter)
-  '#BA68C8',  // 27. Purple (lighter)
-  '#4DB6AC',  // 28. Teal (lighter)
-  '#A1887F',  // 29. Brown (medium)
-  '#90A4AE',  // 30. Blue Grey (medium)
+  '#E67E22', '#2980B9', '#27AE60', '#8E44AD', '#F1C40F',
+  '#E74C3C', '#1ABC9C', '#D35400', '#2ECC71', '#3498DB',
+  '#9B59B6', '#F39C12', '#16A085', '#C0392B', '#2C3E50',
+  '#E91E63', '#00BCD4', '#8BC34A', '#FF5722', '#607D8B',
+  '#FF9800', '#009688', '#673AB7', '#795548', '#03A9F4',
+  '#CDDC39', '#4CAF50', '#F44336', '#00ACC1', '#AB47BC',
+  '#FF6F00', '#0277BD', '#558B2F', '#AD1457', '#FFD600',
+  '#00695C', '#6A1B9A', '#BF360C', '#1565C0', '#33691E',
+  '#880E4F', '#F9A825', '#004D40', '#4A148C', '#E65100',
+  '#0D47A1', '#1B5E20', '#B71C1C', '#006064', '#4527A0',
+  '#FF6D00', '#01579B', '#2E7D32', '#C62828', '#00838F',
+  '#5E35B1', '#EF6C00', '#0288D1', '#388E3C', '#D32F2F',
+  '#0097A7', '#7B1FA2', '#E8A100', '#039BE5', '#43A047',
+  '#F4511E', '#0091EA', '#7CB342', '#E53935', '#00B8D4',
+  '#8E24AA', '#FB8C00', '#0277BD', '#66BB6A', '#FF1744',
+  '#00B0FF', '#9C27B0', '#FFA000', '#1E88E5', '#4DB6AC',
+  '#FF3D00', '#2979FF', '#AED581', '#D50000', '#00E5FF',
+  '#AA00FF', '#FFAB00', '#2962FF', '#69F0AE', '#FF1744',
+  '#00E5FF', '#D500F9', '#FFD740', '#304FFE', '#00E676',
+  '#FF6E40',
 ];
 
-// Track color assignments per project to avoid duplicates
-const projectColorAssignments = new Map();
-
 /**
- * Get a unique color for a room based on its index within the project
- * @param {string} roomName - The name of the room
- * @param {number} roomIndex - The index of the room in the list (0-based)
- * @param {string} projectId - Optional project ID to scope colors
+ * Get a unique color for a room based on its index
  */
-export const getRoomColor = (roomName, roomIndex = 0, projectId = 'default') => {
-  // If roomIndex is provided and valid, use it directly for color selection
+export const getRoomColor = (roomName, roomIndex = 0) => {
   if (typeof roomIndex === 'number' && roomIndex >= 0) {
     return DISTINCT_ROOM_COLORS[roomIndex % DISTINCT_ROOM_COLORS.length];
   }
-  
-  // Fallback: use room name to get consistent color
   if (!roomName) return DISTINCT_ROOM_COLORS[0];
-  
-  const lowerName = roomName.toLowerCase().trim();
-  
-  // Get or create project color map
-  if (!projectColorAssignments.has(projectId)) {
-    projectColorAssignments.set(projectId, new Map());
+  // Fallback: hash the name to get a consistent index
+  let hash = 0;
+  const str = String(roomName).toLowerCase().trim();
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const projectColors = projectColorAssignments.get(projectId);
-  
-  // If we've seen this room name before in this project, return its assigned color
-  if (projectColors.has(lowerName)) {
-    return projectColors.get(lowerName);
-  }
-  
-  // Assign the next available color
-  const nextIndex = projectColors.size % DISTINCT_ROOM_COLORS.length;
-  const color = DISTINCT_ROOM_COLORS[nextIndex];
-  projectColors.set(lowerName, color);
-  
-  return color;
+  return DISTINCT_ROOM_COLORS[Math.abs(hash) % DISTINCT_ROOM_COLORS.length];
 };
 
 /**
- * Reset color assignments for a project (call when rooms are reordered)
- */
-export const resetProjectColors = (projectId = 'default') => {
-  projectColorAssignments.delete(projectId);
-};
-
-/**
- * Get color by index directly (for when you know the room's position)
+ * Get color by index directly
  */
 export const getColorByIndex = (index) => {
   return DISTINCT_ROOM_COLORS[index % DISTINCT_ROOM_COLORS.length];

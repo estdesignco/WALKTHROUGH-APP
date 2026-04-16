@@ -5,6 +5,7 @@ const AddMultipleRoomsModal = ({ onClose, onSubmit, roomColors, existingRooms = 
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [customRoom, setCustomRoom] = useState('');
   const [loading, setLoading] = useState(false);
+  const existingCount = existingRooms.length;
 
   // Room list ordered by INTERIOR DESIGN PROJECT PRIORITY
   // First 10: Main living spaces designers typically start with
@@ -190,8 +191,8 @@ const AddMultipleRoomsModal = ({ onClose, onSubmit, roomColors, existingRooms = 
               <div className="flex flex-wrap gap-2 p-3 rounded-lg border border-[#D4A574]/30" style={{
                 background: 'rgba(212, 165, 116, 0.05)'
               }}>
-                {selectedRooms.map((room) => {
-                  const roomColor = getRoomColor(room);
+                {selectedRooms.map((room, index) => {
+                  const roomColor = getRoomColor(room, existingCount + index);
                   return (
                     <span
                       key={room}
@@ -259,8 +260,8 @@ const AddMultipleRoomsModal = ({ onClose, onSubmit, roomColors, existingRooms = 
                 </p>
               ) : (
                 <div className="grid grid-cols-3 gap-3">
-                  {availableRooms.map((room) => {
-                    const roomColor = getRoomColor(room);
+                  {availableRooms.map((room, index) => {
+                    const roomColor = getRoomColor(room, existingCount + index);
                     const isSelected = selectedRooms.includes(room);
                     return (
                       <button
