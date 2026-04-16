@@ -528,25 +528,14 @@ const ExactFFESpreadsheet = ({
 
   // MUTED ROOM COLORS FOR FFE - CONSISTENT WITH OTHER SHEETS
   const getRoomColor = (roomName, index = 0) => {
-    const mutedColors = [
-      '#8B5A6B',  // Muted rose
-      '#6B7C93',  // Muted blue  
-      '#7A8B5A',  // Muted olive
-      '#9B6B8B',  // Muted purple
-      '#8B7A5A',  // Muted brown
-      '#5A8B7A',  // Muted teal
-      '#8B5A7A',  // Muted mauve
-      '#7A5A8B',  // Muted violet
-      '#5A7A8B',  // Muted slate
-      '#8B6B5A'   // Muted tan
-    ];
+    // Use room.color from DB if available (set via the shared DISTINCT_ROOM_COLORS palette)
+    const rooms = (filteredProject || project)?.rooms || [];
+    const room = rooms.find(r => r.name === roomName);
+    if (room?.color) return room.color;
     
-    // Use room name hash for consistent color per room
-    let hash = 0;
-    for (let i = 0; i < roomName.length; i++) {
-      hash = roomName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return mutedColors[Math.abs(hash) % mutedColors.length];
+    // Fallback: index-based from shared palette
+    const { getColorByIndex } = require('../utils/roomColors');
+    return getColorByIndex(index);
   };
 
   const getCategoryColor = () => '#065F46';  // Dark green
@@ -844,7 +833,7 @@ const ExactFFESpreadsheet = ({
                                 <tr>
                                   <td colSpan="12" 
                                       className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold"
-                                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                                      style={{ backgroundColor: room.color || getRoomColor(room.name, roomIndex) }}>
                                     <div className="flex justify-between items-center">
                                       <div className="flex items-center gap-2">
                                         <button
@@ -865,7 +854,7 @@ const ExactFFESpreadsheet = ({
                                     </div>
                                   </td>
                                   <td className="border border-[#D4A574] px-2 py-2 text-center"
-                                      style={{ backgroundColor: getRoomColor(room.name) }}>
+                                      style={{ backgroundColor: room.color || getRoomColor(room.name, roomIndex) }}>
                                     <button
                                       onClick={() => handleAddRoom()}
                                       className="text-green-300 hover:text-green-100 text-sm font-bold"
@@ -1302,6 +1291,39 @@ const ExactFFESpreadsheet = ({
                                           );
                                         })}
                                       </React.Fragment>
+                                )}
+                                {/* ROOM NOTES SECTION - FFE */}
+                                {isRoomExpanded && (
+                                  <tr>
+                                    <td colSpan="20" style={{ padding: '12px 8px' }}>
+                                      <div className="p-3 border border-[#B49B7E]/30 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                                        <label className="block text-xs font-bold text-[#D4A574] mb-1 uppercase tracking-wider">Room Notes</label>
+                                        <textarea
+                                          data-testid={`room-notes-ffe-${room.id}`}
+                                          className="w-full bg-black/60 border border-[#B49B7E]/20 rounded p-2 text-sm text-[#F5F5DC] placeholder-[#B49B7E]/40 focus:border-[#D4A574] focus:outline-none resize-y"
+                                          rows={3}
+                                          placeholder="Add notes for this room..."
+                                          defaultValue={room.notes || ''}
+                                          key={`ffe-notes-${room.id}`}
+                                          onBlur={async (e) => {
+                                            const newNotes = e.target.value;
+                                            if (newNotes !== (room.notes || '')) {
+                                              try {
+                                                const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                                                await fetch(`${backendUrl}/api/rooms/${room.id}`, {
+                                                  method: 'PUT',
+                                                  headers: { 'Content-Type': 'application/json' },
+                                                  body: JSON.stringify({ notes: newNotes })
+                                                });
+                                              } catch (err) {
+                                                console.error('Failed to save notes:', err);
+                                              }
+                                            }
+                                          }}
+                                        />
+                                      </div>
+                                    </td>
+                                  </tr>
                                 )}
                               </React.Fragment>
                         );
