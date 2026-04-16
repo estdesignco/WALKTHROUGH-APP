@@ -1,20 +1,20 @@
-// MASTER ROOM COLOR PALETTE - 96 GOLDEN-ANGLE DISTRIBUTED COLORS
-// Uses golden angle (137.5°) hue rotation for MAXIMUM visual distance between consecutive colors
-// No two adjacent rooms will ever look similar
+// 96 DRAMATICALLY DISTINCT ROOM COLORS
+// 12 base hues (RED, MAGENTA, YELLOW, GOLD, CYAN, ROSE, PURPLE, ORANGE, TEAL, GREEN, SKY, BLUE)
+// × 8 brightness/saturation combos, interleaved so no two adjacent colors share a hue family
 
 export const DISTINCT_ROOM_COLORS = [
-  '#ED2A2A', '#05DF45', '#B062E8', '#EDD52A', '#05BBDF', '#E862AB', '#5BED2A', '#0F05DF',
-  '#E88F62', '#2AEDA4', '#CD05DF', '#CCE862', '#2A8BED', '#DF0532', '#62E86E', '#742AED',
-  '#DF9705', '#62E8E3', '#ED2ABC', '#69DF05', '#6278E8', '#ED432A', '#05DF61', '#C262E8',
-  '#EDED2A', '#059FDF', '#E8629A', '#42ED2A', '#2A05DF', '#E8A062', '#2AEDBD', '#DF05D5',
-  '#BBE862', '#2A73ED', '#DF0516', '#62E87F', '#8D2AED', '#DFB305', '#62DCE8', '#ED2AA3',
-  '#4DDF05', '#6267E8', '#ED5C2A', '#05DF7D', '#D362E8', '#D4ED2A', '#0583DF', '#E86289',
-  '#2AED2B', '#4605DF', '#E8B162', '#2AEDD6', '#DF05B9', '#AAE862', '#2A5AED', '#DF1005',
-  '#62E890', '#A62AED', '#DFCF05', '#62CBE8', '#ED2A8A', '#31DF05', '#6F62E8', '#ED752A',
-  '#05DF98', '#E462E8', '#BBED2A', '#0567DF', '#E86277', '#2AED44', '#6205DF', '#E8C262',
-  '#2AEBED', '#DF059E', '#99E862', '#2A41ED', '#DF2C05', '#62E8A1', '#BF2AED', '#D4DF05',
-  '#62BAE8', '#ED2A71', '#15DF05', '#8062E8', '#ED8E2A', '#05DFB4', '#E862DB', '#A2ED2A',
-  '#054BDF', '#E86266', '#2AED5D', '#7E05DF', '#E8D462', '#2AD2ED', '#DF0582', '#88E862',
+  '#FF0000', '#FF00FE', '#FEFF00', '#FFBF00', '#00FEFF', '#FF007F', '#7F00FF', '#FF7F00',
+  '#00FF7F', '#00FF00', '#007FFF', '#0000FF', '#A50D0D', '#A50DA5', '#A5A50D', '#A57F0D',
+  '#0DA5A5', '#A50D59', '#590DA5', '#A5590D', '#0DA559', '#0DA50D', '#0D59A5', '#0D0DA5',
+  '#F65555', '#F655F6', '#F6F655', '#F6CD55', '#55F6F6', '#F655A5', '#A555F6', '#F6A555',
+  '#55F6A5', '#55F655', '#55A5F6', '#5555F6', '#D60000', '#D600D6', '#D6D600', '#D6A000',
+  '#00D6D6', '#D6006B', '#6B00D6', '#D66B00', '#00D66B', '#00D600', '#006BD6', '#0000D6',
+  '#E23636', '#E236E2', '#E2E236', '#E2B736', '#36E2E2', '#E2368C', '#8C36E2', '#E28C36',
+  '#36E28C', '#36E236', '#368CE2', '#3636E2', '#950303', '#950395', '#959503', '#957003',
+  '#039595', '#95034C', '#4C0395', '#954C03', '#03954C', '#039503', '#034C95', '#030395',
+  '#EF7575', '#EF75EF', '#EFEF75', '#EFD175', '#75EFEF', '#EF75B2', '#B275EF', '#EFB275',
+  '#75EFB2', '#75EF75', '#75B2EF', '#7575EF', '#FF2828', '#FF28FE', '#FEFF28', '#FFC928',
+  '#28FEFF', '#FF2893', '#9328FF', '#FF9328', '#28FF93', '#28FF28', '#2893FF', '#2828FF',
 ];
 
 /**
