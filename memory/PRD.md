@@ -5,37 +5,28 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
 ## Implemented (Apr 13, 2026)
 
+### Room Notes (NEW)
+- **Notes textarea** at bottom of each room section in Walkthrough, Checklist, and Mobile
+- Saves via `PUT /api/rooms/{roomId}` on blur
+- Transfers from Walkthrough to Checklist (shared room data)
+- Persists in MongoDB
+
+### Room Colors Fix (NEW)
+- Backend: `DISTINCT_ROOM_COLORS` array (30 unique colors) assigned by room creation index
+- Frontend: Uses `room.color` from DB with fallback to `getColorByIndex(roomIndex)`
+- Fixed `SimpleWalkthroughSpreadsheet` calling `getRoomColor(room.name)` without index
+- Fixed `AddMultipleRoomsModal` passing object instead of string
+- Existing rooms patched with distinct colors
+
 ### 3D Shower View (ThreeShowerView.js)
-- **meshBasicMaterial** for textured walls — pixel-perfect color rendering
-- **tile_crop** support — extracts single tile from sheet before applying patterns
-- **Background fill** on all pattern canvases — samples tile average color, no more black artifacts
-- Tile aspect ratio preserved
-- Full Sheet mode (per-wall via drag-and-drop)
+- meshBasicMaterial for pixel-perfect color rendering
+- tile_crop extracts single tile from sheet before applying patterns
+- Background fill on pattern canvases (no black artifacts)
+- Stacked pattern uses full sheet image directly (no crop seam lines)
 - 6 patterns: Stacked, Offset, 1/3 Offset, Vertical, Herringbone, Basket Weave
-- Zoned walls with wainscoting + metallic trim lines
-- Clean niche rendering (individual planes, no box-edge artifacts)
-- Niche accepts its own tile material (drop target)
-- Bench accepts tile material (drop target)
-- Data-driven niches and benches (fixed x/y/w/h field mapping)
-- Gold fixtures (rain head, wall head, handshower, valve, drain)
-- OrbitControls for rotate/zoom
-- **Drag-and-drop** tiles from palette onto 3D walls, bench, niche (Three.js raycasting)
-- Ceiling rendered as TexturedWall (supports tile textures)
-
-### Tile Palette
-- 4 tile items with draggable thumbnails
-- "DRAG TO 3D" label
-- Click-to-select with green ring indicator
-
-### Quick-Place Panel  
-- MODE: TILE / FULL SHEET (per-wall)
-- PATTERN: 6 options
-- Surface buttons: ALL WALLS + individual walls + Floor + Ceiling
-
-### Toolbar
-- NICHE: adds to back wall, renders in 3D
-- BENCH: adds to back wall, renders in 3D
-- UPPER / WAINSCOT: zone management
+- Drag-and-drop tiles onto walls, bench, niche
+- Bench/Niche accept tile material
+- Gold fixtures, OrbitControls, zoned walls with wainscoting
 
 ## Credentials
 App Password: `DesignReady2026!`
@@ -44,5 +35,4 @@ App Password: `DesignReady2026!`
 - Auto-populate plumbing fixtures from FFE/checklist into palette
 - Glass door panel / shower enclosure frame
 - More specific drag-and-drop targeting (individual zones)
-- Niche/bench repositioning in 3D
 - Refactor ExactChecklistSpreadsheet.js (4000+ lines)
