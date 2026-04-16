@@ -2192,7 +2192,7 @@ const ExactChecklistSpreadsheet = ({
               <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
                 {((filteredProject || project)?.rooms || []).map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
-                  const roomColor = getColorByIndex(roomIndex); // Use index-based color to ensure no repeats
+                  const roomColor = room.color || getColorByIndex(roomIndex); // Use DB color, fallback to index
                   
                   return (
                     <Draggable key={room.id} draggableId={room.id} index={roomIndex}>
@@ -3793,6 +3793,34 @@ const ExactChecklistSpreadsheet = ({
                   )}
                 </Droppable>
               )}
+                        {/* ROOM NOTES SECTION */}
+                        {isRoomExpanded && (
+                          <div className="mx-1 mb-4 p-3 border border-[#B49B7E]/30 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                            <label className="block text-xs font-bold text-[#D4A574] mb-1 uppercase tracking-wider">Room Notes</label>
+                            <textarea
+                              data-testid={`room-notes-${room.id}`}
+                              className="w-full bg-black/60 border border-[#B49B7E]/20 rounded p-2 text-sm text-[#F5F5DC] placeholder-[#B49B7E]/40 focus:border-[#D4A574] focus:outline-none resize-y"
+                              rows={3}
+                              placeholder="Add notes for this room..."
+                              defaultValue={room.notes || ''}
+                              onBlur={async (e) => {
+                                const newNotes = e.target.value;
+                                if (newNotes !== (room.notes || '')) {
+                                  try {
+                                    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                                    await fetch(`${backendUrl}/api/rooms/${room.id}`, {
+                                      method: 'PUT',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ notes: newNotes })
+                                    });
+                                  } catch (err) {
+                                    console.error('Failed to save notes:', err);
+                                  }
+                                }
+                              }}
+                            />
+                          </div>
+                        )}
                         </div>
                       )}
                     </Draggable>

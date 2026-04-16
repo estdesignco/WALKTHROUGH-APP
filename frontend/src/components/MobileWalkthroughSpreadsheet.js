@@ -500,7 +500,7 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
             <div className="mb-6">
               <div 
                 className="border border-[#B49B7E] p-3 font-bold text-[#D4C5A9] text-lg shadow-lg shadow-[#B49B7E]/10"
-                style={{ backgroundColor: getRoomColor(room.name) }}
+                style={{ backgroundColor: room.color || getRoomColor(room.name) }}
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
@@ -805,6 +805,34 @@ export default function MobileWalkthroughSpreadsheet({ projectId }) {
                 </div>
               ))}
             </div>
+            {/* ROOM NOTES - MOBILE */}
+            {expandedRooms[room.id] && (
+              <div className="mx-1 mb-4 p-3 border border-[#B49B7E]/30 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                <label className="block text-xs font-bold text-[#D4A574] mb-1 uppercase tracking-wider">Room Notes</label>
+                <textarea
+                  data-testid={`room-notes-mobile-${room.id}`}
+                  className="w-full bg-black/60 border border-[#B49B7E]/20 rounded p-2 text-sm text-[#F5F5DC] placeholder-[#B49B7E]/40 focus:border-[#D4A574] focus:outline-none resize-y"
+                  rows={3}
+                  placeholder="Add notes for this room..."
+                  defaultValue={room.notes || ''}
+                  onBlur={async (e) => {
+                    const newNotes = e.target.value;
+                    if (newNotes !== (room.notes || '')) {
+                      try {
+                        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                        await fetch(`${backendUrl}/api/rooms/${room.id}`, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ notes: newNotes })
+                        });
+                      } catch (err) {
+                        console.error('Failed to save notes:', err);
+                      }
+                    }
+                  }}
+                />
+              </div>
+            )}
           </React.Fragment>
         ))}
       </div>

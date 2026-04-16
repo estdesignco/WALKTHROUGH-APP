@@ -1031,8 +1031,8 @@ const SimpleWalkthroughSpreadsheet = ({
                 >
               {/* ROOM HEADER - GRADIENT WITH SHIMMER */}
               <div className="mt-8 mb-4 px-4 py-2 text-white font-bold border border-[#B49B7E]" style={{ 
-                background: `linear-gradient(135deg, ${getRoomColor(room.name)}FF 0%, ${getRoomColor(room.name)}AA 20%, ${getRoomColor(room.name)} 40%, ${getRoomColor(room.name)}AA 80%, ${getRoomColor(room.name)}FF 100%)`,
-                boxShadow: `0 0 35px ${getRoomColor(room.name)}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
+                background: `linear-gradient(135deg, ${room.color || getRoomColor(room.name, roomIndex)}FF 0%, ${room.color || getRoomColor(room.name, roomIndex)}AA 20%, ${room.color || getRoomColor(room.name, roomIndex)} 40%, ${room.color || getRoomColor(room.name, roomIndex)}AA 80%, ${room.color || getRoomColor(room.name, roomIndex)}FF 100%)`,
+                boxShadow: `0 0 35px ${room.color || getRoomColor(room.name, roomIndex)}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
                 textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)'
               }}>
                 <div className="flex justify-between items-center">
@@ -1314,6 +1314,35 @@ const SimpleWalkthroughSpreadsheet = ({
                     </div>
                   )}
                 </Droppable>
+              )}
+
+              {/* ROOM NOTES SECTION */}
+              {isRoomExpanded && (
+                <div className="mx-1 mb-4 p-3 border border-[#B49B7E]/30 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                  <label className="block text-xs font-bold text-[#D4A574] mb-1 uppercase tracking-wider">Room Notes</label>
+                  <textarea
+                    data-testid={`room-notes-${room.id}`}
+                    className="w-full bg-black/60 border border-[#B49B7E]/20 rounded p-2 text-sm text-[#F5F5DC] placeholder-[#B49B7E]/40 focus:border-[#D4A574] focus:outline-none resize-y"
+                    rows={3}
+                    placeholder="Add notes for this room..."
+                    defaultValue={room.notes || ''}
+                    onBlur={async (e) => {
+                      const newNotes = e.target.value;
+                      if (newNotes !== (room.notes || '')) {
+                        try {
+                          const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                          await fetch(`${backendUrl}/api/rooms/${room.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ notes: newNotes })
+                          });
+                        } catch (err) {
+                          console.error('Failed to save notes:', err);
+                        }
+                      }
+                    }}
+                  />
+                </div>
               )}
                 </div>
               )}

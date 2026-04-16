@@ -1163,11 +1163,14 @@ class RoomUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     order_index: Optional[int] = None
+    notes: Optional[str] = None
+    color: Optional[str] = None
 
 class Room(RoomBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     project_id: str
     color: str = "#7A5A8A"  # Purple color
+    notes: str = ""  # Room notes - shared between walkthrough and checklist
     categories: List[Category] = []
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -1219,9 +1222,19 @@ class EmailResponse(BaseModel):
     status: str
     message: str
 
-# Helper function to get room color
-def get_room_color(room_name: str) -> str:
-    return ROOM_COLORS.get(room_name.lower(), "#7A5A8A")
+# DISTINCT room colors matching frontend palette - index-based, never repeats
+DISTINCT_ROOM_COLORS = [
+    '#E67E22', '#3498DB', '#27AE60', '#9B59B6', '#F1C40F',
+    '#E74C3C', '#1ABC9C', '#34495E', '#E91E63', '#00BCD4',
+    '#8BC34A', '#FF9800', '#673AB7', '#009688', '#CDDC39',
+    '#FF5722', '#607D8B', '#795548', '#4CAF50', '#2196F3',
+    '#FFC107', '#03A9F4', '#8D6E63', '#78909C', '#AED581',
+    '#FFB74D', '#BA68C8', '#4DB6AC', '#A1887F', '#90A4AE',
+]
+
+# Helper function to get room color by INDEX (position in project)
+def get_room_color(room_name: str, room_index: int = 0) -> str:
+    return DISTINCT_ROOM_COLORS[room_index % len(DISTINCT_ROOM_COLORS)]
 
 def get_category_color(category_name: str) -> str:
     return CATEGORY_COLORS.get(category_name.lower(), "#5A7A5A")
@@ -2279,7 +2292,10 @@ async def create_room(room_data: RoomCreate):
         # Create room object
         room_dict = room_data.dict()
         room_dict["id"] = str(uuid.uuid4())
-        room_dict["color"] = get_room_color(room_data.name)
+        # Get existing room count for index-based color assignment
+        existing_rooms = project.get("rooms", [])
+        room_dict["color"] = get_room_color(room_data.name, len(existing_rooms))
+        room_dict["notes"] = room_dict.get("notes", "")
         room_dict["categories"] = []
         room_dict["created_at"] = datetime.utcnow()
         room_dict["updated_at"] = datetime.utcnow()
