@@ -1081,11 +1081,11 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                 background: activeRoomTab === index 
                   ? 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(15,15,25,0.95) 70%, rgba(0,0,0,0.95) 100%)'
                   : 'linear-gradient(135deg, rgba(15,15,25,0.95) 0%, rgba(45,45,55,0.9) 30%, rgba(25,25,35,0.95) 70%, rgba(15,15,25,0.95) 100%)',
-                borderTop: `4px solid ${getRoomColor(room.name)}`,
+                borderTop: `4px solid ${room.color || getRoomColor(room.name)}`,
                 borderBottom: activeRoomTab === index ? '4px solid #D4A574' : '4px solid transparent',
                 boxShadow: activeRoomTab === index 
-                  ? `0 -2px 15px ${getRoomColor(room.name)}60, inset 0 0 30px ${getRoomColor(room.name)}08` 
-                  : `0 -2px 6px ${getRoomColor(room.name)}30, inset 0 0 15px ${getRoomColor(room.name)}04`
+                  ? `0 -2px 15px ${room.color || getRoomColor(room.name)}60, inset 0 0 30px ${room.color || getRoomColor(room.name)}08` 
+                  : `0 -2px 6px ${room.color || getRoomColor(room.name)}30, inset 0 0 15px ${room.color || getRoomColor(room.name)}04`
               }}
             >
               {room.name}
@@ -1756,6 +1756,36 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                   ))}
                 </div>
               ))}
+            {/* ROOM NOTES SECTION - MOBILE */}
+            {activeRoom && (
+              <div className="mb-4 p-3 border border-[#B49B7E]/30 rounded-lg" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                <label className="block text-xs font-bold text-[#D4A574] mb-1 uppercase tracking-wider">Room Notes</label>
+                <textarea
+                  data-testid={`room-notes-mobile-${activeRoom.id}`}
+                  className="w-full bg-black/60 border border-[#B49B7E]/20 rounded p-2 text-sm text-[#F5F5DC] placeholder-[#B49B7E]/40 focus:border-[#D4A574] focus:outline-none resize-y"
+                  rows={3}
+                  placeholder="Add notes for this room..."
+                  defaultValue={activeRoom.notes || ''}
+                  key={activeRoom.id}
+                  onBlur={async (e) => {
+                    const newNotes = e.target.value;
+                    if (newNotes !== (activeRoom.notes || '')) {
+                      try {
+                        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                        await fetch(`${backendUrl}/api/rooms/${activeRoom.id}`, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ notes: newNotes })
+                        });
+                      } catch (err) {
+                        console.error('Failed to save notes:', err);
+                      }
+                    }
+                  }}
+                />
+              </div>
+            )}
+
             {activeRoom && (
             <div className="bg-[#1E293B] p-6 border-t-4 border-[#D4A574] mt-8">
               <div className="flex justify-between items-center mb-4">
