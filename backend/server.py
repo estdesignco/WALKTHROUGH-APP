@@ -2241,7 +2241,18 @@ async def create_room(room_data: RoomCreate):
         
         if room_data.sheet_type != "walkthrough" and not room_data.auto_populate:
             print(f"🚫 TRANSFER ROOM: Creating empty {room_data.sheet_type.upper()} room for transfer")
-            existing_room_count = await db.rooms.count_documents({"project_id": room_data.project_id})
+            # MATCH COLOR from walkthrough room with same name
+            existing_same_name = await db.rooms.find_one(
+                {"project_id": room_data.project_id, "name": {"$regex": f"^{room_data.name}$", "$options": "i"}},
+                {"_id": 0, "color": 1, "notes": 1}
+            )
+            if existing_same_name:
+                room_color = existing_same_name.get("color", "#7A5A8A")
+                room_notes = existing_same_name.get("notes", "")
+            else:
+                existing_room_count = await db.rooms.count_documents({"project_id": room_data.project_id})
+                room_color = get_room_color(room_data.name, existing_room_count)
+                room_notes = ""
             room_dict = {
                 "id": str(uuid.uuid4()),
                 "name": room_data.name,
@@ -2249,8 +2260,8 @@ async def create_room(room_data: RoomCreate):
                 "order_index": room_data.order_index,
                 "sheet_type": room_data.sheet_type,
                 "project_id": room_data.project_id,
-                "color": get_room_color(room_data.name, existing_room_count),
-                "notes": "",
+                "color": room_color,
+                "notes": room_notes,
                 "categories": [],
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
@@ -2301,10 +2312,18 @@ async def create_room(room_data: RoomCreate):
         # Create room object
         room_dict = room_data.dict()
         room_dict["id"] = str(uuid.uuid4())
-        # Get existing room count for index-based color assignment
-        existing_room_count = await db.rooms.count_documents({"project_id": room_data.project_id})
-        room_dict["color"] = get_room_color(room_data.name, existing_room_count)
-        room_dict["notes"] = room_dict.get("notes", "")
+        # MATCH COLOR: Check if a room with same name exists in ANY tab — use its color
+        existing_same_name = await db.rooms.find_one(
+            {"project_id": room_data.project_id, "name": {"$regex": f"^{room_data.name}$", "$options": "i"}},
+            {"_id": 0, "color": 1, "notes": 1}
+        )
+        if existing_same_name and existing_same_name.get("color"):
+            room_dict["color"] = existing_same_name["color"]
+            room_dict["notes"] = existing_same_name.get("notes", "") or room_dict.get("notes", "")
+        else:
+            existing_room_count = await db.rooms.count_documents({"project_id": room_data.project_id})
+            room_dict["color"] = get_room_color(room_data.name, existing_room_count)
+            room_dict["notes"] = room_dict.get("notes", "")
         room_dict["categories"] = []
         room_dict["created_at"] = datetime.utcnow()
         room_dict["updated_at"] = datetime.utcnow()
@@ -4284,6 +4303,7 @@ async def sync_walkthrough_to_checklist(project_id: str, sync_options: SyncReque
                     "order_index": wt_room.get("order_index", 0),
                     "sheet_type": "checklist",
                     "color": wt_room.get("color", "#7A5A8A"),
+                    "notes": wt_room.get("notes", ""),
                     "created_at": datetime.now(timezone.utc).isoformat(),
                     "updated_at": datetime.now(timezone.utc).isoformat()
                 }

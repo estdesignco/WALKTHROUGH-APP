@@ -84,13 +84,12 @@ const SimpleWalkthroughSpreadsheet = ({
         updatedProject.rooms = newRooms;
         
         console.log('🔄 WALKTHROUGH: Moving room from', source.index, 'to', destination.index);
-        console.log('📦 WALKTHROUGH: New room order:', newRooms.map(r => r.name));
         
-        // Force React to re-render
+        // Force React to re-render immediately
         setFilteredProject(updatedProject);
 
-        // Update backend silently
-        Promise.all(newRooms.map((room, i) => 
+        // Update backend and WAIT for it to complete
+        await Promise.all(newRooms.map((room, i) => 
           fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/rooms/${room.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -98,7 +97,7 @@ const SimpleWalkthroughSpreadsheet = ({
           })
         ));
 
-        console.log('✅ WALKTHROUGH: Rooms reordered!');
+        console.log('✅ WALKTHROUGH: Rooms reordered and saved!');
       } else if (type === 'CATEGORY') {
         // Create deep copy of project
         const updatedProject = {...project};
@@ -114,11 +113,11 @@ const SimpleWalkthroughSpreadsheet = ({
         
         console.log('🔄 WALKTHROUGH: Moving category from', source.index, 'to', destination.index);
         
-        // Force React to re-render
+        // Force React to re-render immediately
         setFilteredProject(updatedProject);
 
-        // Update backend silently
-        Promise.all(newCategories.map((category, i) => 
+        // Update backend and WAIT for it to complete
+        await Promise.all(newCategories.map((category, i) => 
           fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/categories/${category.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -126,7 +125,7 @@ const SimpleWalkthroughSpreadsheet = ({
           })
         ));
 
-        console.log('✅ WALKTHROUGH: Categories reordered!');
+        console.log('✅ WALKTHROUGH: Categories reordered and saved!');
       }
     } catch (error) {
       console.error('Drag and drop error:', error);
