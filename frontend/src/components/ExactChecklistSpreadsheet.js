@@ -357,13 +357,15 @@ const ExactChecklistSpreadsheet = ({
         console.log('📦 New room order:', newRooms.map(r => r.name));
         
         // Update backend FIRST - await all updates
-        await Promise.all(newRooms.map((room, i) => 
+        const results = await Promise.all(newRooms.map((room, i) => 
           fetch(`${backendUrl}/api/rooms/${room.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_index: i })
-          })
+          }).then(r => ({ ok: r.ok, status: r.status, roomId: room.id }))
         ));
+        const failed = results.filter(r => !r.ok);
+        if (failed.length) console.error('Failed room updates:', failed);
 
         console.log('✅ Rooms reordered in backend!');
         
@@ -425,7 +427,9 @@ const ExactChecklistSpreadsheet = ({
       }
     } catch (error) {
       console.error('Drag and drop error:', error);
-      alert('Failed to reorder items. Please try again.');
+      console.error('Error details:', error?.message, error?.stack);
+      // Don't show alert - just log. The reload will fix the UI.
+      if (onReload) await onReload();
     }
   };
 
