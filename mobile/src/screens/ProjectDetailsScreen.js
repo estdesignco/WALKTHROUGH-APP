@@ -124,36 +124,60 @@ export default function ProjectDetailsScreen({ route, navigation }) {
           <InfoRow label="Best Time to Call" value={answers.best_time_to_call} />
         </View>
 
-        {/* Rooms Involved */}
+        {/* Rooms Involved - Grouped by Floor */}
         {project.rooms && project.rooms.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>ROOMS IN PROJECT</Text>
-            <View style={styles.roomsList}>
-              {project.rooms.map((room, index) => {
-                const roomColor = getColorByIndex(index);
+            {(() => {
+              const allRooms = project.rooms;
+              const floorOrder = project.floor_order?.length ? [...project.floor_order] : [];
+              allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floorOrder.includes(f)) floorOrder.push(f); });
+              
+              return floorOrder.map((floorName) => {
+                const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
+                if (floorRooms.length === 0) return null;
+                
                 return (
-                  <TouchableOpacity 
-                    key={room.id || index} 
-                    style={[styles.roomChip, { 
-                      backgroundColor: `${roomColor}30`,
-                      borderColor: roomColor,
-                      borderWidth: 2
-                    }]}
-                    onPress={() => navigation.navigate('PhotoManager', {
-                      projectId,
-                      projectName: project.name,
-                      roomId: room.id,
-                      roomName: room.name,
-                    })}
-                  >
-                    <Text style={[styles.roomChipText, { color: roomColor }]}>📁 {room.name}</Text>
-                    <Text style={[styles.roomPhotoCount, { color: roomColor }]}>
-                      {room.photo_count || 0} photos
-                    </Text>
-                  </TouchableOpacity>
+                  <View key={`floor-${floorName}`} style={{ marginBottom: 12 }}>
+                    <View style={styles.floorLabel}>
+                      <View style={styles.floorBadge}>
+                        <Text style={styles.floorBadgeText}>
+                          {floorName.match(/\d+/) ? floorName.match(/\d+/)[0] : floorName.charAt(0)}
+                        </Text>
+                      </View>
+                      <Text style={styles.floorLabelText}>{floorName}</Text>
+                      <Text style={styles.floorRoomCount}>{floorRooms.length}</Text>
+                    </View>
+                    <View style={styles.roomsList}>
+                      {floorRooms.map((room, idx) => {
+                        const roomColor = room.color || getColorByIndex(allRooms.indexOf(room));
+                        return (
+                          <TouchableOpacity 
+                            key={room.id || idx} 
+                            style={[styles.roomChip, { 
+                              backgroundColor: `${roomColor}30`,
+                              borderColor: roomColor,
+                              borderWidth: 2
+                            }]}
+                            onPress={() => navigation.navigate('PhotoManager', {
+                              projectId,
+                              projectName: project.name,
+                              roomId: room.id,
+                              roomName: room.name,
+                            })}
+                          >
+                            <Text style={[styles.roomChipText, { color: roomColor }]}>{room.name}</Text>
+                            <Text style={[styles.roomPhotoCount, { color: roomColor }]}>
+                              {room.photo_count || 0} photos
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
                 );
-              })}
-            </View>
+              });
+            })()}
           </View>
         )}
 
@@ -291,6 +315,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+  },
+  floorLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+    paddingBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(212,165,116,0.3)',
+  },
+  floorBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    backgroundColor: '#D4A574',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  floorBadgeText: {
+    color: '#000',
+    fontWeight: '900',
+    fontSize: 12,
+  },
+  floorLabelText: {
+    color: '#D4A574',
+    fontWeight: '900',
+    fontSize: 13,
+    letterSpacing: 2,
+    flex: 1,
+  },
+  floorRoomCount: {
+    color: '#D4A574',
+    opacity: 0.5,
+    fontSize: 11,
+    fontWeight: '700',
   },
   roomChip: {
     backgroundColor: '#374151',

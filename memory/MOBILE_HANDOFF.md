@@ -88,6 +88,7 @@
   "id": "uuid",
   "name": "Wheeler Ridge Residence",
   "client_info": { "name": "Demo Client", "email": "demo@test.com", "phone": "555-0100", "address": "123 Demo St" },
+  "floor_order": ["1ST FLOOR", "2ND FLOOR", "BASEMENT"],
   "rooms": [Room],
   "created_at": "datetime",
   "updated_at": "datetime"
@@ -104,6 +105,7 @@
   "order_index": 0,
   "sheet_type": "walkthrough|checklist|ffe",
   "color": "#ED2A2A",
+  "floor": "1ST FLOOR",
   "notes": "Room notes text — shared across walkthrough/checklist/FFE",
   "categories": [Category],
   "created_at": "datetime",
