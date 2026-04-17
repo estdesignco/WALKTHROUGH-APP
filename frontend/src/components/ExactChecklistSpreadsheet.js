@@ -99,6 +99,24 @@ const ExactChecklistSpreadsheet = ({
     const saved = localStorage.getItem('checklist_expandedRooms');
     return saved ? JSON.parse(saved) : {};
   });
+  const [expandedFloors, setExpandedFloors] = useState({});
+  const getFloorOrder = () => {
+    const p = filteredProject || project;
+    if (p?.floor_order?.length) return p.floor_order;
+    const floors = [];
+    (p?.rooms || []).forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+    return floors.length ? floors : ['1ST FLOOR'];
+  };
+  const toggleFloor = (f) => setExpandedFloors(prev => ({ ...prev, [f]: !prev[f] }));
+  const saveFloorOrder = async (newOrder) => {
+    try { const bu = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+      await fetch(`${bu}/api/projects/${project.id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({floor_order: newOrder}) });
+    } catch(e) { console.error(e); }
+  };
+  const moveFloor = async (from, to) => { const f = [...getFloorOrder()]; const [m] = f.splice(from,1); f.splice(to,0,m); await saveFloorOrder(f); if (onReload) await onReload(); };
+  const addFloor = async (name) => { const f = getFloorOrder(); if (!f.includes(name)) { await saveFloorOrder([...f, name]); if (onReload) await onReload(); } };
+  const deleteFloor = async (fn) => { const f = getFloorOrder().filter(x=>x!==fn); const bu=(window.ENV?.REACT_APP_BACKEND_URL||process.env.REACT_APP_BACKEND_URL||window.location.origin); const target=f[0]||'1ST FLOOR'; const rooms=(project?.rooms||[]).filter(r=>(r.floor||'1ST FLOOR')===fn); await Promise.all(rooms.map(r=>fetch(`${bu}/api/rooms/${r.id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({floor:target})}))); await saveFloorOrder(f); if(onReload) await onReload(); };
+  const renameFloor = async (old, nw) => { if(!nw||nw===old) return; const bu=(window.ENV?.REACT_APP_BACKEND_URL||process.env.REACT_APP_BACKEND_URL||window.location.origin); const rooms=(project?.rooms||[]).filter(r=>(r.floor||'1ST FLOOR')===old); await Promise.all(rooms.map(r=>fetch(`${bu}/api/rooms/${r.id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({floor:nw})}))); await saveFloorOrder(getFloorOrder().map(f=>f===old?nw:f)); if(onReload) await onReload(); };
   const [expandedCategories, setExpandedCategories] = useState(() => {
     const saved = localStorage.getItem('checklist_expandedCategories');
     return saved ? JSON.parse(saved) : {};
@@ -2322,7 +2340,14 @@ const ExactChecklistSpreadsheet = ({
                       onClick={(e) => e.stopPropagation()}
                       onChange={async (e) => {
                         e.stopPropagation();
-                        const newFloor = e.target.value;
+                        let newFloor = e.target.value;
+                        if (newFloor === '__CUSTOM__') {
+                          const custom = window.prompt('Enter custom floor/section name:');
+                          if (!custom) return;
+                          newFloor = custom.toUpperCase();
+                          const floors = getFloorOrder();
+                          if (!floors.includes(newFloor)) await saveFloorOrder([...floors, newFloor]);
+                        }
                         try {
                           const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
                           await fetch(`${backendUrl}/api/rooms/${room.id}`, {
@@ -2336,13 +2361,10 @@ const ExactChecklistSpreadsheet = ({
                         }
                       }}
                     >
-                      <option value="1ST FLOOR">1ST FLOOR</option>
-                      <option value="2ND FLOOR">2ND FLOOR</option>
-                      <option value="3RD FLOOR">3RD FLOOR</option>
-                      <option value="BASEMENT">BASEMENT</option>
-                      <option value="ATTIC">ATTIC</option>
-                      <option value="GARAGE">GARAGE</option>
-                      <option value="EXTERIOR">EXTERIOR</option>
+                      {getFloorOrder().map(f => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                      <option value="__CUSTOM__">+ CUSTOM...</option>
                     </select>
                     <button
                       onClick={(e) => {
@@ -3915,6 +3937,27 @@ const ExactChecklistSpreadsheet = ({
                   );
                 });
                 })()}
+
+                {/* ADD FLOOR / SECTION BUTTON */}
+                <div className="mt-4 mb-2 flex justify-center">
+                  <button
+                    data-testid="add-floor-btn-checklist"
+                    onClick={() => {
+                      const input = document.getElementById('new-floor-input-checklist');
+                      if (input) { input.style.display = input.style.display === 'none' ? 'flex' : 'none'; if (input.style.display === 'flex') input.querySelector('input')?.focus(); }
+                    }}
+                    className="px-6 py-2 text-[#D4A574] border border-[#D4A574]/30 rounded-lg hover:bg-[#D4A574]/10 text-sm font-bold tracking-wider"
+                  >+ ADD FLOOR / SECTION</button>
+                </div>
+                <div id="new-floor-input-checklist" className="mb-4 flex justify-center gap-2" style={{ display: 'none' }}>
+                  <input type="text" placeholder="Enter floor or section name..."
+                    className="px-4 py-2 bg-black/60 border border-[#D4A574]/40 rounded-lg text-[#F5F5DC] placeholder-[#B49B7E]/40 text-sm w-80 focus:border-[#D4A574] focus:outline-none"
+                    onKeyDown={async (e) => { if (e.key === 'Enter' && e.target.value.trim()) { await addFloor(e.target.value.trim().toUpperCase()); e.target.value = ''; document.getElementById('new-floor-input-checklist').style.display = 'none'; } }}
+                  />
+                  <button onClick={async (e) => { const input = e.target.parentElement.querySelector('input'); if (input?.value?.trim()) { await addFloor(input.value.trim().toUpperCase()); input.value = ''; document.getElementById('new-floor-input-checklist').style.display = 'none'; } }}
+                    className="px-4 py-2 bg-[#D4A574] text-black rounded-lg font-bold text-sm hover:bg-[#C4955A]">ADD</button>
+                </div>
+
                 {provided.placeholder}
               </div>
             )}

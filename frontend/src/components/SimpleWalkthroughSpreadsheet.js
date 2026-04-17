@@ -1229,7 +1229,15 @@ const SimpleWalkthroughSpreadsheet = ({
                       onClick={(e) => e.stopPropagation()}
                       onChange={async (e) => {
                         e.stopPropagation();
-                        const newFloor = e.target.value;
+                        let newFloor = e.target.value;
+                        if (newFloor === '__CUSTOM__') {
+                          const custom = window.prompt('Enter custom floor/section name:');
+                          if (!custom) return;
+                          newFloor = custom.toUpperCase();
+                          // Add to floor order if new
+                          const floors = getFloorOrder();
+                          if (!floors.includes(newFloor)) await saveFloorOrder([...floors, newFloor]);
+                        }
                         try {
                           const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
                           await fetch(`${backendUrl}/api/rooms/${room.id}`, {
@@ -1243,13 +1251,10 @@ const SimpleWalkthroughSpreadsheet = ({
                         }
                       }}
                     >
-                      <option value="1ST FLOOR">1ST FLOOR</option>
-                      <option value="2ND FLOOR">2ND FLOOR</option>
-                      <option value="3RD FLOOR">3RD FLOOR</option>
-                      <option value="BASEMENT">BASEMENT</option>
-                      <option value="ATTIC">ATTIC</option>
-                      <option value="GARAGE">GARAGE</option>
-                      <option value="EXTERIOR">EXTERIOR</option>
+                      {getFloorOrder().map(f => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                      <option value="__CUSTOM__">+ CUSTOM...</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1611,14 +1616,43 @@ const SimpleWalkthroughSpreadsheet = ({
               {/* ADD FLOOR BUTTON */}
               <div className="mt-4 mb-2 flex justify-center">
                 <button
+                  data-testid="add-floor-btn"
                   onClick={() => {
-                    const name = window.prompt('Floor name (e.g., BASEMENT, 3RD FLOOR):');
-                    if (name) addFloor(name.toUpperCase());
+                    const input = document.getElementById('new-floor-input');
+                    if (input) {
+                      input.style.display = input.style.display === 'none' ? 'flex' : 'none';
+                      if (input.style.display === 'flex') input.querySelector('input')?.focus();
+                    }
                   }}
                   className="px-6 py-2 text-[#D4A574] border border-[#D4A574]/30 rounded-lg hover:bg-[#D4A574]/10 text-sm font-bold tracking-wider"
                 >
-                  + ADD FLOOR
+                  + ADD FLOOR / SECTION
                 </button>
+              </div>
+              <div id="new-floor-input" className="mb-4 flex justify-center gap-2" style={{ display: 'none' }}>
+                <input
+                  type="text"
+                  placeholder="Enter floor or section name (e.g., BASEMENT, POOL HOUSE)..."
+                  className="px-4 py-2 bg-black/60 border border-[#D4A574]/40 rounded-lg text-[#F5F5DC] placeholder-[#B49B7E]/40 text-sm w-80 focus:border-[#D4A574] focus:outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.target.value.trim()) {
+                      addFloor(e.target.value.trim().toUpperCase());
+                      e.target.value = '';
+                      document.getElementById('new-floor-input').style.display = 'none';
+                    }
+                  }}
+                />
+                <button
+                  onClick={(e) => {
+                    const input = e.target.previousElementSibling || e.target.parentElement.querySelector('input');
+                    if (input?.value?.trim()) {
+                      addFloor(input.value.trim().toUpperCase());
+                      input.value = '';
+                      document.getElementById('new-floor-input').style.display = 'none';
+                    }
+                  }}
+                  className="px-4 py-2 bg-[#D4A574] text-black rounded-lg font-bold text-sm hover:bg-[#C4955A]"
+                >ADD</button>
               </div>
               </>
             );
