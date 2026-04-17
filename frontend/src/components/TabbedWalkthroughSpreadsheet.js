@@ -1068,7 +1068,31 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
         boxShadow: 'inset 0 0 40px rgba(212, 165, 116, 0.08)'
       }}>
         <div className="flex room-tabs">
-          {project.rooms.map((room, index) => (
+          {(() => {
+            const rooms = project.rooms;
+            const floorOrder = project.floor_order?.length ? project.floor_order : [];
+            const floors = [...floorOrder];
+            rooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+            let globalIdx = 0;
+            
+            return floors.map((floorName) => {
+              const floorRooms = rooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
+              if (floorRooms.length === 0) return null;
+              
+              return (
+                <React.Fragment key={`floor-tab-${floorName}`}>
+                  {/* FLOOR LABEL in tab bar */}
+                  <div className="flex items-center px-3 py-2 min-w-max" style={{
+                    background: 'linear-gradient(180deg, #2a2218, #1a1a1a)',
+                    borderTop: '2px solid #D4A574',
+                  }}>
+                    <span style={{ fontSize: '10px', fontWeight: '900', letterSpacing: '2px', color: '#D4A574', opacity: 0.7 }}>
+                      {floorName}
+                    </span>
+                  </div>
+                  {floorRooms.map((room) => {
+                    const index = rooms.indexOf(room);
+                    return (
             <button
               key={room.id}
               onClick={() => setActiveRoomTab(index)}
@@ -1093,7 +1117,12 @@ export default function TabbedWalkthroughSpreadsheet({ projectId, sheetType = 'w
                 {roomPhotos[room.id]?.length || 0} photos
               </div>
             </button>
-          ))}
+                    );
+                  })}
+                </React.Fragment>
+              );
+            });
+          })()}
         </div>
       </div>
 

@@ -15,6 +15,15 @@ export default function MobileFFESpreadsheet({ projectId }) {
   const [project, setProject] = useState(null);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [expandedFloors, setExpandedFloors] = useState({});
+  const toggleFloor = (f) => setExpandedFloors(prev => ({ ...prev, [f]: prev[f] === false ? true : false }));
+  const getFloorOrder = () => {
+    const p = filteredProject || project;
+    if (p?.floor_order?.length) return p.floor_order;
+    const floors = [];
+    (p?.rooms || []).forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+    return floors.length ? floors : ['1ST FLOOR'];
+  };
   const [loading, setLoading] = useState(true);
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [showAddItem, setShowAddItem] = useState(false);
@@ -320,11 +329,77 @@ export default function MobileFFESpreadsheet({ projectId }) {
 
       {/* FFE TABLE - EXACT DESKTOP STRUCTURE */}
       <div className="overflow-x-auto">
+        {/* EXPAND / COLLAPSE ALL */}
+        <div className="flex gap-2 mb-3 px-2">
+          <button data-testid="mobile-ffe-expand-all"
+            onClick={() => {
+              const newR = {}; const newC = {};
+              (displayProject?.rooms || []).forEach(r => { newR[r.id] = true; r.categories?.forEach(c => { newC[c.id] = true; }); });
+              setExpandedRooms(newR); setExpandedCategories(newC); setExpandedFloors({});
+            }}
+            className="px-3 py-1 rounded-full bg-[#D4A574]/20 text-[#D4A574] font-bold text-xs border border-[#D4A574]/30"
+          >EXPAND ALL</button>
+          <button data-testid="mobile-ffe-collapse-all"
+            onClick={() => {
+              const newR = {}; const newC = {}; const newF = {};
+              getFloorOrder().forEach(f => { newF[f] = false; });
+              (displayProject?.rooms || []).forEach(r => { newR[r.id] = false; r.categories?.forEach(c => { newC[c.id] = false; }); });
+              setExpandedRooms(newR); setExpandedCategories(newC); setExpandedFloors(newF);
+            }}
+            className="px-3 py-1 rounded-full bg-gray-600/30 text-gray-300 font-bold text-xs border border-gray-600/30"
+          >COLLAPSE ALL</button>
+        </div>
+
         <table className="border-collapse" style={{ width: 'auto', minWidth: '100%', tableLayout: 'auto' }}>
           <tbody>
-            {displayProject?.rooms?.map((room) => (
+            {/* FLOOR-GROUPED RENDERING */}
+            {(() => {
+              const allRooms = displayProject?.rooms || [];
+              const floors = getFloorOrder();
+              allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+
+              return floors.map((floorName) => {
+                const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
+                const isFloorCollapsed = expandedFloors[floorName] === false;
+
+                return (
+                  <React.Fragment key={`floor-${floorName}`}>
+                    {/* FLOOR BANNER ROW */}
+                    <tr>
+                      <td colSpan="15" style={{
+                        background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
+                        borderTop: '2px solid #D4A574', borderBottom: '2px solid #D4A574',
+                        padding: '8px 12px',
+                      }}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => toggleFloor(floorName)} className="text-[#D4A574] text-base"
+                              data-testid={`mobile-ffe-floor-toggle-${floorName}`}>
+                              {isFloorCollapsed ? '\u25B6' : '\u25BC'}
+                            </button>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '6px',
+                              background: 'linear-gradient(135deg, #D4A574, #8B6914)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: '13px', fontWeight: '900', color: '#000',
+                            }}>
+                              {floorName.match(/\d+/) ? floorName.match(/\d+/)[0] : floorName.charAt(0)}
+                            </div>
+                            <span style={{ fontSize: '15px', fontWeight: '900', letterSpacing: '3px', color: '#D4A574' }}>
+                              {floorName}
+                            </span>
+                          </div>
+                          <span style={{ color: '#D4A574', opacity: 0.5, fontSize: '10px', letterSpacing: '1px', fontWeight: '700' }}>
+                            {floorRooms.length} ROOM{floorRooms.length !== 1 ? 'S' : ''}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* ROOMS */}
+                    {floorRooms.map((room) => (
               <React.Fragment key={room.id}>
                 {/* ROOM HEADER ROW - GRADIENT WITH BALANCED SHIMMER */}
+                {!isFloorCollapsed && (
                 <tr>
                   <td colSpan="15" 
                       className="border-2 border-[#D4A574] px-3 py-2 text-white text-sm font-bold rounded-lg"
@@ -343,9 +418,10 @@ export default function MobileFFESpreadsheet({ projectId }) {
                     </div>
                   </td>
                 </tr>
+                )}
 
                 {/* CATEGORIES */}
-                {expandedRooms[room.id] && room.categories?.map((category) => (
+                {!isFloorCollapsed && expandedRooms[room.id] && room.categories?.map((category) => (
                   <React.Fragment key={category.id}>
                     {/* CATEGORY HEADER ROW - GREEN GRADIENT WITH BALANCED SHIMMER */}
                     <tr>
@@ -620,6 +696,10 @@ export default function MobileFFESpreadsheet({ projectId }) {
                 ))}
               </React.Fragment>
             ))}
+                  </React.Fragment>
+                );
+              });
+            })()}
           </tbody>
         </table>
       </div>
