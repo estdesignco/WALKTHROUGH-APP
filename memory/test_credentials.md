@@ -1,10 +1,13 @@
 # Test Credentials
 
-## App Access
+## App Login
 - Password: `DesignReady2026!`
 
-## Test Data
-- Project: "Wheeler Ridge Residence" (ID: fbcba641-8b17-41be-9fc6-7d5f44bb405a)
-- Room: "Master Bathroom" (ID: 573966c2-a52a-423c-bf82-724c6d519a72)
-- Schedule: "Primary Shower"
-- 4 tile items available in palette
+## Test Project
+- Project Name: Wheeler Ridge Residence
+- Project ID: `07aeb245-c05c-4061-84ab-9d46ffe5f9c9`
+- Rooms: Master Bathroom, Kitchen (both on 1st Floor)
+
+## Backend
+- Backend URL: https://design-preview-131.preview.emergentagent.com
+- MongoDB: mongodb://localhost:27017 / interior_design_db
