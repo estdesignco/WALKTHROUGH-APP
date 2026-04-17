@@ -1206,10 +1206,12 @@ class ProjectUpdate(BaseModel):
     style_preferences: Optional[List[str]] = None
     color_palette: Optional[str] = None
     special_requirements: Optional[str] = None
+    floor_order: Optional[List[str]] = None  # Ordered list of floor names
 
 class Project(ProjectBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     rooms: List[Room] = []
+    floor_order: List[str] = []  # User-controlled floor ordering
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

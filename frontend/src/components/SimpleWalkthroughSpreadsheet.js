@@ -57,6 +57,83 @@ const SimpleWalkthroughSpreadsheet = ({
   const [selectedVendor, setSelectedVendor] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [filteredProject, setFilteredProject] = useState(project);
+  const [expandedFloors, setExpandedFloors] = useState({});
+
+  // Get ordered floor list — user-controlled order, not hardcoded
+  const getFloorOrder = () => {
+    const p = filteredProject || project;
+    if (p?.floor_order?.length) return p.floor_order;
+    // Derive from rooms if no stored order
+    const floors = [];
+    (p?.rooms || []).forEach(r => {
+      const f = r.floor || '1ST FLOOR';
+      if (!floors.includes(f)) floors.push(f);
+    });
+    return floors.length ? floors : ['1ST FLOOR'];
+  };
+
+  const toggleFloor = (floorName) => {
+    setExpandedFloors(prev => ({ ...prev, [floorName]: !prev[floorName] }));
+  };
+
+  const saveFloorOrder = async (newOrder) => {
+    try {
+      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+      await fetch(`${backendUrl}/api/projects/${project.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ floor_order: newOrder })
+      });
+    } catch (err) { console.error('Failed to save floor order:', err); }
+  };
+
+  const addFloor = async (name) => {
+    const floors = getFloorOrder();
+    if (!floors.includes(name)) {
+      const newOrder = [...floors, name];
+      await saveFloorOrder(newOrder);
+      if (onReload) onReload();
+    }
+  };
+
+  const deleteFloor = async (floorName) => {
+    const floors = getFloorOrder().filter(f => f !== floorName);
+    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+    // Move rooms from deleted floor to first remaining floor
+    const targetFloor = floors[0] || '1ST FLOOR';
+    const roomsOnFloor = (project?.rooms || []).filter(r => (r.floor || '1ST FLOOR') === floorName);
+    await Promise.all(roomsOnFloor.map(r =>
+      fetch(`${backendUrl}/api/rooms/${r.id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ floor: targetFloor })
+      })
+    ));
+    await saveFloorOrder(floors);
+    if (onReload) onReload();
+  };
+
+  const moveFloor = async (fromIndex, toIndex) => {
+    const floors = [...getFloorOrder()];
+    const [moved] = floors.splice(fromIndex, 1);
+    floors.splice(toIndex, 0, moved);
+    await saveFloorOrder(floors);
+    setFilteredProject(prev => prev ? { ...prev, floor_order: floors } : prev);
+  };
+
+  const renameFloor = async (oldName, newName) => {
+    if (!newName || newName === oldName) return;
+    const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+    const roomsOnFloor = (project?.rooms || []).filter(r => (r.floor || '1ST FLOOR') === oldName);
+    await Promise.all(roomsOnFloor.map(r =>
+      fetch(`${backendUrl}/api/rooms/${r.id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ floor: newName })
+      })
+    ));
+    const floors = getFloorOrder().map(f => f === oldName ? newName : f);
+    await saveFloorOrder(floors);
+    if (onReload) onReload();
+  };
 
   // DRAG AND DROP HANDLER
   const handleDragEnd = async (result) => {
@@ -1010,85 +1087,86 @@ const SimpleWalkthroughSpreadsheet = ({
             {(provided) => (
               <div className="overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
           
-          {/* USE FILTERED PROJECT DATA — SORTED BY FLOOR */}
+          {/* FLOOR-BASED ROOM RENDERING */}
           {(() => {
-            const rooms = [...((filteredProject || project)?.rooms || [])];
-            // Sort rooms by floor, then by order_index within each floor
-            const floorOrder = { '1ST FLOOR': 0, '2ND FLOOR': 1, '3RD FLOOR': 2, 'BASEMENT': 3, 'ATTIC': 4, 'GARAGE': 5, 'EXTERIOR': 6 };
-            rooms.sort((a, b) => {
-              const fa = floorOrder[a.floor || '1ST FLOOR'] ?? 99;
-              const fb = floorOrder[b.floor || '1ST FLOOR'] ?? 99;
-              if (fa !== fb) return fa - fb;
-              return (a.order_index || 0) - (b.order_index || 0);
+            const allRooms = (filteredProject || project)?.rooms || [];
+            const floors = getFloorOrder();
+            // Ensure all floors that rooms reference are included
+            allRooms.forEach(r => {
+              const f = r.floor || '1ST FLOOR';
+              if (!floors.includes(f)) floors.push(f);
             });
-            let lastFloor = null;
-            return rooms.map((room, roomIndex) => {
-            const isRoomExpanded = expandedRooms[room.id];
-            const currentFloor = room.floor || '1st Floor';
-            const showFloorBanner = currentFloor !== lastFloor;
-            lastFloor = currentFloor;
-          
-          return (
-            <React.Fragment key={room.id}>
-            {/* FLOOR DIVIDER BANNER */}
-            {showFloorBanner && (
-              <div className="mt-6 mb-2" style={{
-                background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
-                borderTop: '3px solid #D4A574',
-                borderBottom: '3px solid #D4A574',
-                padding: '12px 24px',
-                position: 'relative',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  position: 'absolute', inset: 0, opacity: 0.06,
-                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #D4A574 10px, #D4A574 11px)',
-                }} />
-                <div className="flex items-center justify-between relative">
-                  <div className="flex items-center gap-4">
-                    <div style={{
-                      width: '40px', height: '40px', borderRadius: '8px',
-                      background: 'linear-gradient(135deg, #D4A574, #8B6914)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '18px', fontWeight: '900', color: '#000',
-                      boxShadow: '0 2px 12px rgba(212, 165, 116, 0.4)',
+            
+            return (
+              <>
+              {floors.map((floorName, floorIdx) => {
+                const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
+                const isFloorCollapsed = expandedFloors[floorName] === false;
+                
+                return (
+                  <React.Fragment key={`floor-${floorName}`}>
+                    {/* FLOOR BANNER */}
+                    <div className="mt-4 mb-1" style={{
+                      background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
+                      borderTop: '3px solid #D4A574', borderBottom: '3px solid #D4A574',
+                      padding: '10px 16px', position: 'relative', overflow: 'hidden',
                     }}>
-                      {currentFloor.match(/\d+/) ? currentFloor.match(/\d+/)[0] : 'B'}
+                      <div style={{ position: 'absolute', inset: 0, opacity: 0.05,
+                        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #D4A574 10px, #D4A574 11px)',
+                      }} />
+                      <div className="flex items-center justify-between relative">
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col gap-0" style={{ opacity: 0.6 }}>
+                            {floorIdx > 0 && (
+                              <button onClick={() => moveFloor(floorIdx, floorIdx - 1)}
+                                className="text-[#D4A574] hover:text-white text-xs leading-none px-1" title="Move up">&#9650;</button>
+                            )}
+                            {floorIdx < floors.length - 1 && (
+                              <button onClick={() => moveFloor(floorIdx, floorIdx + 1)}
+                                className="text-[#D4A574] hover:text-white text-xs leading-none px-1" title="Move down">&#9660;</button>
+                            )}
+                          </div>
+                          <button onClick={() => toggleFloor(floorName)} className="text-[#D4A574] text-lg w-6 text-center">
+                            {isFloorCollapsed ? '▶' : '▼'}
+                          </button>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '8px',
+                            background: 'linear-gradient(135deg, #D4A574, #8B6914)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: '16px', fontWeight: '900', color: '#000',
+                            boxShadow: '0 2px 12px rgba(212, 165, 116, 0.4)',
+                          }}>
+                            {floorName.match(/\d+/) ? floorName.match(/\d+/)[0] : floorName.charAt(0)}
+                          </div>
+                          <span contentEditable={true} suppressContentEditableWarning={true}
+                            className="outline-none px-1"
+                            style={{ fontSize: '20px', fontWeight: '900', letterSpacing: '5px', color: '#D4A574',
+                              textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(212,165,116,0.3)',
+                            }}
+                            onBlur={(e) => {
+                              const n = e.target.textContent?.trim()?.toUpperCase();
+                              if (n && n !== floorName) renameFloor(floorName, n);
+                            }}
+                          >{floorName}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
+                            {floorRooms.length} ROOM{floorRooms.length !== 1 ? 'S' : ''}
+                          </span>
+                          {floors.length > 1 && (
+                            <button onClick={() => { if (window.confirm(`Delete "${floorName}"? Rooms move to ${floors.find(f => f !== floorName)}.`)) deleteFloor(floorName); }}
+                              className="text-red-500/50 hover:text-red-400 text-sm px-2" title="Delete floor">&#10005;</button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <span
-                      contentEditable={true}
-                      suppressContentEditableWarning={true}
-                      className="outline-none"
-                      style={{
-                        fontSize: '22px', fontWeight: '900', letterSpacing: '6px',
-                        color: '#D4A574',
-                        textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 30px rgba(212,165,116,0.3)',
-                      }}
-                      onBlur={async (e) => {
-                        const newFloor = e.target.textContent?.trim();
-                        if (newFloor && newFloor.toUpperCase() !== currentFloor.toUpperCase()) {
-                          // Update ALL rooms on this floor
-                          const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
-                          const floorRooms = rooms.filter(r => (r.floor || '1st Floor') === currentFloor);
-                          await Promise.all(floorRooms.map(r =>
-                            fetch(`${backendUrl}/api/rooms/${r.id}`, {
-                              method: 'PUT',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ floor: newFloor.toUpperCase() })
-                            })
-                          ));
-                          if (onReload) onReload();
-                        }
-                      }}
-                    >{currentFloor.toUpperCase()}</span>
-                  </div>
-                  <div style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
-                    {rooms.filter(r => (r.floor || '1st Floor') === currentFloor).length} ROOMS
-                  </div>
-                </div>
-              </div>
-            )}
-            <Draggable draggableId={room.id} index={roomIndex}>
+                    
+                    {/* ROOMS UNDER THIS FLOOR */}
+                    {!isFloorCollapsed && floorRooms.map((room) => {
+                      const globalIndex = allRooms.indexOf(room);
+                      const isRoomExpanded = expandedRooms[room.id];
+                      const roomIndex = globalIndex;
+                      return (
+            <Draggable key={room.id} draggableId={room.id} index={globalIndex}>
               {(provided, snapshot) => (
                 <div 
                   ref={provided.innerRef}
@@ -1524,10 +1602,27 @@ const SimpleWalkthroughSpreadsheet = ({
                 </div>
               )}
             </Draggable>
-            </React.Fragment>
-          );
-        });
-        })()}
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              })}
+
+              {/* ADD FLOOR BUTTON */}
+              <div className="mt-4 mb-2 flex justify-center">
+                <button
+                  onClick={() => {
+                    const name = window.prompt('Floor name (e.g., BASEMENT, 3RD FLOOR):');
+                    if (name) addFloor(name.toUpperCase());
+                  }}
+                  className="px-6 py-2 text-[#D4A574] border border-[#D4A574]/30 rounded-lg hover:bg-[#D4A574]/10 text-sm font-bold tracking-wider"
+                >
+                  + ADD FLOOR
+                </button>
+              </div>
+              </>
+            );
+          })()}
                 {provided.placeholder}
               </div>
             )}
