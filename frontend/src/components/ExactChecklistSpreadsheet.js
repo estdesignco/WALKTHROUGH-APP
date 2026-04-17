@@ -2260,16 +2260,9 @@ const ExactChecklistSpreadsheet = ({
             {(provided) => (
               <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
                 {(() => {
-                  const allRooms = [...((filteredProject || project)?.rooms || [])];
+                  const allRooms = (filteredProject || project)?.rooms || [];
                   const floors = getFloorOrder();
                   allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
-                  const floorMap = {}; floors.forEach((f, i) => floorMap[f] = i);
-                  allRooms.sort((a, b) => {
-                    const fa = floorMap[a.floor || '1ST FLOOR'] ?? 99;
-                    const fb = floorMap[b.floor || '1ST FLOOR'] ?? 99;
-                    if (fa !== fb) return fa - fb;
-                    return (a.order_index || 0) - (b.order_index || 0);
-                  });
 
                   return floors.map((floorName, floorIdx) => {
                     const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
@@ -2333,11 +2326,11 @@ const ExactChecklistSpreadsheet = ({
                         </div>
                       </div>
 
-                      {/* ROOMS - ONLY RENDER WHEN FLOOR EXPANDED */}
-                      {!isFloorCollapsed && floorRooms.map((room) => {
+                      {/* ROOMS - Always render Draggables, hide content when floor collapsed */}
+                      {floorRooms.map((room) => {
                         const globalIndex = allRooms.indexOf(room);
                         const roomIndex = globalIndex;
-                        const isRoomExpanded = expandedRooms[room.id];
+                        const isRoomExpanded = !isFloorCollapsed && expandedRooms[room.id];
                         const roomColor = room.color || getColorByIndex(globalIndex);
 
                     return (
@@ -2347,11 +2340,12 @@ const ExactChecklistSpreadsheet = ({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="mb-8"
+                          className={isFloorCollapsed ? '' : 'mb-8'}
                           style={{
                             ...provided.draggableProps.style,
                             opacity: snapshot.isDragging ? 0.8 : 1,
-                            transform: provided.draggableProps.style?.transform || 'none'
+                            transform: provided.draggableProps.style?.transform || 'none',
+                            ...(isFloorCollapsed ? { height: 0, overflow: 'hidden', margin: 0, padding: 0 } : {})
                           }}
                         >
               {/* ROOM HEADER - GRADIENT WITH SHIMMER */}

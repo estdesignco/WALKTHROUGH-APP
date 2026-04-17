@@ -1214,10 +1214,10 @@ const SimpleWalkthroughSpreadsheet = ({
                       </div>
                     </div>
                     
-                    {/* ROOMS UNDER THIS FLOOR */}
-                    {!isFloorCollapsed && floorRooms.map((room) => {
+                    {/* ROOMS UNDER THIS FLOOR - Always render Draggables for DnD */}
+                    {floorRooms.map((room) => {
                       const globalIndex = allRooms.indexOf(room);
-                      const isRoomExpanded = expandedRooms[room.id];
+                      const isRoomExpanded = !isFloorCollapsed && expandedRooms[room.id];
                       const roomIndex = globalIndex;
                       return (
             <Draggable key={room.id} draggableId={room.id} index={globalIndex}>
@@ -1226,11 +1226,12 @@ const SimpleWalkthroughSpreadsheet = ({
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
-                  className="mb-8"
+                  className={isFloorCollapsed ? '' : 'mb-8'}
                   style={{
                     ...provided.draggableProps.style,
                     opacity: snapshot.isDragging ? 0.8 : 1,
-                    transform: provided.draggableProps.style?.transform || 'none'
+                    transform: provided.draggableProps.style?.transform || 'none',
+                    ...(isFloorCollapsed ? { height: 0, overflow: 'hidden', margin: 0, padding: 0 } : {})
                   }}
                 >
               {/* ROOM HEADER - GRADIENT WITH SHIMMER */}
