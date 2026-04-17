@@ -2163,6 +2163,109 @@ async def update_room(room_id: str, room_update: RoomUpdate):
         logger.error(f"Error updating room {room_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to update room: {str(e)}")
 
+# LEGACY FLOOR MIGRATION ENDPOINT
+@api_router.post("/projects/{project_id}/migrate-legacy-floors")
+async def migrate_legacy_floors(project_id: str):
+    """Detect rooms that look like floor headers (no categories/items) and convert them to proper floor assignments"""
+    import re
+    try:
+        # Get all rooms for this project, sorted by order_index
+        rooms = await db.rooms.find({"project_id": project_id}, {"_id": 0}).sort("order_index", 1).to_list(1000)
+        if not rooms:
+            return {"migrated": 0, "message": "No rooms found"}
+
+        # Floor-like patterns
+        floor_patterns = [
+            r'^\d+(st|nd|rd|th)\s+floor$',
+            r'^floor\s+\d+$',
+            r'^basement$',
+            r'^attic$',
+            r'^garage$',
+            r'^exterior$',
+            r'^rooftop$',
+            r'^penthouse$',
+            r'^mezzanine$',
+            r'^ground\s+floor$',
+            r'^lower\s+level$',
+            r'^upper\s+level$',
+            r'^main\s+level$',
+        ]
+
+        def is_floor_header(room):
+            name = room.get("name", "").strip().lower()
+            # Check if room name matches floor patterns
+            for pattern in floor_patterns:
+                if re.match(pattern, name, re.IGNORECASE):
+                    return True
+            return False
+
+        def is_empty_room(room):
+            categories = room.get("categories", [])
+            if not categories:
+                return True
+            # Check if all categories are empty
+            for cat in categories:
+                subs = cat.get("subcategories", [])
+                for sub in subs:
+                    if sub.get("items", []):
+                        return False
+            return True
+
+        migrated = 0
+        removed_rooms = []
+        current_floor = None
+
+        for room in rooms:
+            if is_floor_header(room) and is_empty_room(room):
+                # This is a floor header room - extract floor name
+                current_floor = room["name"].strip().upper()
+                removed_rooms.append(room["id"])
+                migrated += 1
+            elif current_floor:
+                # Assign the detected floor to subsequent rooms
+                existing_floor = room.get("floor")
+                if not existing_floor or existing_floor == "1st Floor":
+                    await db.rooms.update_one(
+                        {"id": room["id"]},
+                        {"$set": {"floor": current_floor}}
+                    )
+
+        # Remove the dummy floor-header rooms
+        if removed_rooms:
+            await db.rooms.delete_many({"id": {"$in": removed_rooms}})
+            # Also remove their categories/subcategories/items
+            for room_id in removed_rooms:
+                cats = await db.categories.find({"room_id": room_id}).to_list(100)
+                for cat in cats:
+                    subs = await db.subcategories.find({"category_id": cat["id"]}).to_list(100)
+                    for sub in subs:
+                        await db.items.delete_many({"subcategory_id": sub["id"]})
+                    await db.subcategories.delete_many({"category_id": cat["id"]})
+                await db.categories.delete_many({"room_id": room_id})
+
+        # Update floor_order on the project
+        if migrated > 0:
+            remaining_rooms = await db.rooms.find({"project_id": project_id}, {"_id": 0, "floor": 1}).to_list(1000)
+            unique_floors = []
+            for r in remaining_rooms:
+                f = r.get("floor", "1ST FLOOR")
+                if f and f not in unique_floors:
+                    unique_floors.append(f)
+            if unique_floors:
+                await db.projects.update_one(
+                    {"id": project_id},
+                    {"$set": {"floor_order": unique_floors}}
+                )
+
+        return {
+            "migrated": migrated,
+            "removed_room_ids": removed_rooms,
+            "message": f"Migrated {migrated} legacy floor headers into floor assignments"
+        }
+    except Exception as e:
+        logger.error(f"Error migrating legacy floors: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # CATEGORY UPDATE ENDPOINT (for drag & drop)
 @api_router.put("/categories/{category_id}", response_model=Category) 
 async def update_category(category_id: str, category_update: CategoryUpdate):

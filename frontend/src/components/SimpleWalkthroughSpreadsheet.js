@@ -73,7 +73,7 @@ const SimpleWalkthroughSpreadsheet = ({
   };
 
   const toggleFloor = (floorName) => {
-    setExpandedFloors(prev => ({ ...prev, [floorName]: !prev[floorName] }));
+    setExpandedFloors(prev => ({ ...prev, [floorName]: prev[floorName] === false ? true : false }));
   };
 
   const saveFloorOrder = async (newOrder) => {
@@ -280,6 +280,14 @@ const SimpleWalkthroughSpreadsheet = ({
       const storageKeyRooms = `walkthrough_${project.id}_expandedRooms`;
       const storageKeyCategories = `walkthrough_${project.id}_expandedCategories`;
       
+      // Migration: clear old "everything expanded" cache
+      const versionKey = `walkthrough_${project.id}_expansion_v2`;
+      if (!localStorage.getItem(versionKey)) {
+        localStorage.removeItem(storageKeyRooms);
+        localStorage.removeItem(storageKeyCategories);
+        localStorage.setItem(versionKey, '1');
+      }
+      
       // Check if we have saved state in localStorage for this project
       const savedRooms = localStorage.getItem(storageKeyRooms);
       const savedCategories = localStorage.getItem(storageKeyCategories);
@@ -292,11 +300,11 @@ const SimpleWalkthroughSpreadsheet = ({
         // Only add new rooms/categories that aren't in saved state
         project.rooms.forEach(room => {
           if (savedRoomState[room.id] === undefined) {
-            savedRoomState[room.id] = true;
+            savedRoomState[room.id] = false;
           }
           room.categories?.forEach(category => {
             if (savedCategoryState[category.id] === undefined) {
-              savedCategoryState[category.id] = true;
+              savedCategoryState[category.id] = false;
             }
           });
         });
@@ -304,14 +312,14 @@ const SimpleWalkthroughSpreadsheet = ({
         setExpandedRooms(savedRoomState);
         setExpandedCategories(savedCategoryState);
       } else {
-        // First time - expand all
+        // First time - collapse all for performance
         const roomExpansion = {};
         const categoryExpansion = {};
         
         project.rooms.forEach(room => {
-          roomExpansion[room.id] = true;
+          roomExpansion[room.id] = false;
           room.categories?.forEach(category => {
-            categoryExpansion[category.id] = true;
+            categoryExpansion[category.id] = false;
           });
         });
         
@@ -1061,6 +1069,52 @@ const SimpleWalkthroughSpreadsheet = ({
                 🗑️ Delete {selectedRoomsForDelete.size} Room{selectedRoomsForDelete.size > 1 ? 's' : ''}
               </button>
             )}
+            {/* EXPAND / COLLAPSE ALL */}
+            <button
+              data-testid="walkthrough-expand-all"
+              onClick={() => {
+                const newRoomState = {};
+                const newCatState = {};
+                (project?.rooms || []).forEach(room => {
+                  newRoomState[room.id] = true;
+                  room.categories?.forEach(cat => { newCatState[cat.id] = true; });
+                });
+                setExpandedRooms(newRoomState);
+                setExpandedCategories(newCatState);
+                setExpandedFloors({});
+                const sk1 = `walkthrough_${project?.id || 'default'}_expandedRooms`;
+                const sk2 = `walkthrough_${project?.id || 'default'}_expandedCategories`;
+                localStorage.setItem(sk1, JSON.stringify(newRoomState));
+                localStorage.setItem(sk2, JSON.stringify(newCatState));
+              }}
+              className="px-4 py-2 rounded-full bg-[#D4A574]/20 hover:bg-[#D4A574]/40 text-[#D4A574] font-bold text-sm border border-[#D4A574]/30"
+            >
+              EXPAND ALL
+            </button>
+            <button
+              data-testid="walkthrough-collapse-all"
+              onClick={() => {
+                const newRoomState = {};
+                const newCatState = {};
+                const newFloorState = {};
+                const floors = getFloorOrder();
+                floors.forEach(f => { newFloorState[f] = false; });
+                (project?.rooms || []).forEach(room => {
+                  newRoomState[room.id] = false;
+                  room.categories?.forEach(cat => { newCatState[cat.id] = false; });
+                });
+                setExpandedRooms(newRoomState);
+                setExpandedCategories(newCatState);
+                setExpandedFloors(newFloorState);
+                const sk1 = `walkthrough_${project?.id || 'default'}_expandedRooms`;
+                const sk2 = `walkthrough_${project?.id || 'default'}_expandedCategories`;
+                localStorage.setItem(sk1, JSON.stringify(newRoomState));
+                localStorage.setItem(sk2, JSON.stringify(newCatState));
+              }}
+              className="px-4 py-2 rounded-full bg-gray-600/30 hover:bg-gray-600/50 text-gray-300 font-bold text-sm border border-gray-600/30"
+            >
+              COLLAPSE ALL
+            </button>
             <button 
               onClick={onAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-black"
@@ -1627,6 +1681,22 @@ const SimpleWalkthroughSpreadsheet = ({
                   className="px-6 py-2 text-[#D4A574] border border-[#D4A574]/30 rounded-lg hover:bg-[#D4A574]/10 text-sm font-bold tracking-wider"
                 >
                   + ADD FLOOR / SECTION
+                </button>
+                <button
+                  data-testid="migrate-legacy-floors-btn"
+                  onClick={async () => {
+                    if (!window.confirm('This will detect rooms that look like floor headers (e.g., "1ST FLOOR", "BASEMENT") with no items, convert them to actual floor separators, and remove the dummy rooms. Continue?')) return;
+                    try {
+                      const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                      const res = await fetch(`${backendUrl}/api/projects/${project.id}/migrate-legacy-floors`, { method: 'POST' });
+                      const data = await res.json();
+                      alert(data.message || `Migrated ${data.migrated} floor headers`);
+                      if (data.migrated > 0 && onReload) await onReload();
+                    } catch (err) { alert('Migration failed: ' + err.message); }
+                  }}
+                  className="px-4 py-2 text-yellow-400/70 border border-yellow-600/30 rounded-lg hover:bg-yellow-600/10 text-xs font-bold tracking-wider"
+                >
+                  FIX LEGACY FLOORS
                 </button>
               </div>
               <div id="new-floor-input" className="mb-4 flex justify-center gap-2" style={{ display: 'none' }}>

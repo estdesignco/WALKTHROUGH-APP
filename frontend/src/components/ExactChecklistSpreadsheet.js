@@ -107,7 +107,7 @@ const ExactChecklistSpreadsheet = ({
     (p?.rooms || []).forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
     return floors.length ? floors : ['1ST FLOOR'];
   };
-  const toggleFloor = (f) => setExpandedFloors(prev => ({ ...prev, [f]: !prev[f] }));
+  const toggleFloor = (f) => setExpandedFloors(prev => ({ ...prev, [f]: prev[f] === false ? true : false }));
   const saveFloorOrder = async (newOrder) => {
     try { const bu = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
       await fetch(`${bu}/api/projects/${project.id}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({floor_order: newOrder}) });
@@ -588,6 +588,14 @@ const ExactChecklistSpreadsheet = ({
       
       const initialCheckedItems = new Set();
       
+      // Migration: clear old "everything expanded" cache
+      const versionKey = 'checklist_expansion_v2';
+      if (!localStorage.getItem(versionKey)) {
+        localStorage.removeItem('checklist_expandedRooms');
+        localStorage.removeItem('checklist_expandedCategories');
+        localStorage.setItem(versionKey, '1');
+      }
+      
       // Get saved states from localStorage
       const savedRoomExpansion = localStorage.getItem('checklist_expandedRooms');
       const savedCategoryExpansion = localStorage.getItem('checklist_expandedCategories');
@@ -601,12 +609,12 @@ const ExactChecklistSpreadsheet = ({
       project.rooms.forEach(room => {
         // Only default to expanded if no saved state exists for this room
         if (roomExpansion[room.id] === undefined) {
-          roomExpansion[room.id] = true;
+          roomExpansion[room.id] = false;
         }
         room.categories?.forEach(category => {
           // Only default to expanded if no saved state exists for this category
           if (categoryExpansion[category.id] === undefined) {
-            categoryExpansion[category.id] = true;
+            categoryExpansion[category.id] = false;
           }
           // Initialize checkedItems ONLY from is_checked field - NOT from status
           category.subcategories?.forEach(subcategory => {
@@ -2105,6 +2113,49 @@ const ExactChecklistSpreadsheet = ({
               </button>
             )}
             
+            {/* EXPAND / COLLAPSE ALL */}
+            <button
+              data-testid="checklist-expand-all"
+              onClick={() => {
+                const newRoomState = {};
+                const newCatState = {};
+                (project?.rooms || []).forEach(room => {
+                  newRoomState[room.id] = true;
+                  room.categories?.forEach(cat => { newCatState[cat.id] = true; });
+                });
+                setExpandedRooms(newRoomState);
+                setExpandedCategories(newCatState);
+                setExpandedFloors({});
+                localStorage.setItem('checklist_expandedRooms', JSON.stringify(newRoomState));
+                localStorage.setItem('checklist_expandedCategories', JSON.stringify(newCatState));
+              }}
+              className="px-4 py-2 rounded-full bg-[#D4A574]/20 hover:bg-[#D4A574]/40 text-[#D4A574] font-bold text-sm border border-[#D4A574]/30"
+            >
+              EXPAND ALL
+            </button>
+            <button
+              data-testid="checklist-collapse-all"
+              onClick={() => {
+                const newRoomState = {};
+                const newCatState = {};
+                const newFloorState = {};
+                const floors = getFloorOrder();
+                floors.forEach(f => { newFloorState[f] = false; });
+                (project?.rooms || []).forEach(room => {
+                  newRoomState[room.id] = false;
+                  room.categories?.forEach(cat => { newCatState[cat.id] = false; });
+                });
+                setExpandedRooms(newRoomState);
+                setExpandedCategories(newCatState);
+                setExpandedFloors(newFloorState);
+                localStorage.setItem('checklist_expandedRooms', JSON.stringify(newRoomState));
+                localStorage.setItem('checklist_expandedCategories', JSON.stringify(newCatState));
+              }}
+              className="px-4 py-2 rounded-full bg-gray-600/30 hover:bg-gray-600/50 text-gray-300 font-bold text-sm border border-gray-600/30"
+            >
+              COLLAPSE ALL
+            </button>
+
             <button 
               onClick={onAddRoom}
               className="px-6 py-2 rounded-full shadow-xl hover:shadow-[#D4A574]/40 transition-all duration-300 transform hover:scale-105 tracking-wide font-bold text-black border border-[#B49B7E]"
@@ -2209,62 +2260,88 @@ const ExactChecklistSpreadsheet = ({
             {(provided) => (
               <div className="w-full overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
                 {(() => {
-                  const rooms = [...((filteredProject || project)?.rooms || [])];
-                  const floorOrder = { '1ST FLOOR': 0, '2ND FLOOR': 1, '3RD FLOOR': 2, 'BASEMENT': 3, 'ATTIC': 4, 'GARAGE': 5, 'EXTERIOR': 6 };
-                  rooms.sort((a, b) => {
-                    const fa = floorOrder[a.floor || '1ST FLOOR'] ?? 99;
-                    const fb = floorOrder[b.floor || '1ST FLOOR'] ?? 99;
+                  const allRooms = [...((filteredProject || project)?.rooms || [])];
+                  const floors = getFloorOrder();
+                  allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+                  const floorMap = {}; floors.forEach((f, i) => floorMap[f] = i);
+                  allRooms.sort((a, b) => {
+                    const fa = floorMap[a.floor || '1ST FLOOR'] ?? 99;
+                    const fb = floorMap[b.floor || '1ST FLOOR'] ?? 99;
                     if (fa !== fb) return fa - fb;
                     return (a.order_index || 0) - (b.order_index || 0);
                   });
-                  let lastFloor = null;
-                  return rooms.map((room, roomIndex) => {
-                  const isRoomExpanded = expandedRooms[room.id];
-                  const roomColor = room.color || getColorByIndex(roomIndex);
-                  const currentFloor = room.floor || '1ST FLOOR';
-                  const showFloorBanner = currentFloor !== lastFloor;
-                  lastFloor = currentFloor;
-                  
-                  return (
-                    <React.Fragment key={room.id}>
-                    {/* FLOOR DIVIDER BANNER */}
-                    {showFloorBanner && (
-                      <div className="mt-6 mb-2" style={{
+
+                  return floors.map((floorName, floorIdx) => {
+                    const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
+                    const isFloorCollapsed = expandedFloors[floorName] === false;
+
+                    return (
+                      <React.Fragment key={`floor-${floorName}`}>
+                      {/* FLOOR BANNER - COLLAPSIBLE */}
+                      <div className="mt-4 mb-1" data-testid={`floor-banner-${floorName}`} style={{
                         background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
-                        borderTop: '3px solid #D4A574',
-                        borderBottom: '3px solid #D4A574',
-                        padding: '12px 24px',
-                        position: 'relative',
-                        overflow: 'hidden',
+                        borderTop: '3px solid #D4A574', borderBottom: '3px solid #D4A574',
+                        padding: '10px 16px', position: 'relative', overflow: 'hidden',
                       }}>
-                        <div style={{
-                          position: 'absolute', inset: 0, opacity: 0.06,
+                        <div style={{ position: 'absolute', inset: 0, opacity: 0.05,
                           backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #D4A574 10px, #D4A574 11px)',
                         }} />
                         <div className="flex items-center justify-between relative">
-                          <div className="flex items-center gap-4">
-                            <div style={{
-                              width: '40px', height: '40px', borderRadius: '8px',
+                          <div className="flex items-center gap-3">
+                            <div className="flex flex-col gap-0" style={{ opacity: 0.6 }}>
+                              {floorIdx > 0 && (
+                                <button onClick={() => moveFloor(floorIdx, floorIdx - 1)}
+                                  className="text-[#D4A574] hover:text-white text-xs leading-none px-1" title="Move up">&#9650;</button>
+                              )}
+                              {floorIdx < floors.length - 1 && (
+                                <button onClick={() => moveFloor(floorIdx, floorIdx + 1)}
+                                  className="text-[#D4A574] hover:text-white text-xs leading-none px-1" title="Move down">&#9660;</button>
+                              )}
+                            </div>
+                            <button onClick={() => toggleFloor(floorName)} className="text-[#D4A574] text-lg w-6 text-center"
+                              data-testid={`floor-toggle-${floorName}`}>
+                              {isFloorCollapsed ? '\u25B6' : '\u25BC'}
+                            </button>
+                            <div style={{ width: '36px', height: '36px', borderRadius: '8px',
                               background: 'linear-gradient(135deg, #D4A574, #8B6914)',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: '18px', fontWeight: '900', color: '#000',
+                              fontSize: '16px', fontWeight: '900', color: '#000',
                               boxShadow: '0 2px 12px rgba(212, 165, 116, 0.4)',
                             }}>
-                              {currentFloor.match(/\d+/) ? currentFloor.match(/\d+/)[0] : currentFloor.charAt(0)}
+                              {floorName.match(/\d+/) ? floorName.match(/\d+/)[0] : floorName.charAt(0)}
                             </div>
-                            <span style={{
-                              fontSize: '22px', fontWeight: '900', letterSpacing: '6px',
-                              color: '#D4A574',
-                              textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 30px rgba(212,165,116,0.3)',
-                            }}>{currentFloor}</span>
+                            <span contentEditable={true} suppressContentEditableWarning={true}
+                              className="outline-none px-1"
+                              style={{ fontSize: '20px', fontWeight: '900', letterSpacing: '5px', color: '#D4A574',
+                                textShadow: '0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(212,165,116,0.3)',
+                              }}
+                              onBlur={(e) => {
+                                const n = e.target.textContent?.trim()?.toUpperCase();
+                                if (n && n !== floorName) renameFloor(floorName, n);
+                              }}
+                            >{floorName}</span>
                           </div>
-                          <div style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
-                            {rooms.filter(r => (r.floor || '1ST FLOOR') === currentFloor).length} ROOMS
+                          <div className="flex items-center gap-4">
+                            <span style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
+                              {floorRooms.length} ROOM{floorRooms.length !== 1 ? 'S' : ''}
+                            </span>
+                            {floors.length > 1 && (
+                              <button onClick={() => { if (window.confirm(`Delete "${floorName}"? Rooms move to ${floors.find(f => f !== floorName)}.`)) deleteFloor(floorName); }}
+                                className="text-red-500/50 hover:text-red-400 text-sm px-2" title="Delete floor">&#10005;</button>
+                            )}
                           </div>
                         </div>
                       </div>
-                    )}
-                    <Draggable draggableId={room.id} index={roomIndex}>
+
+                      {/* ROOMS - ONLY RENDER WHEN FLOOR EXPANDED */}
+                      {!isFloorCollapsed && floorRooms.map((room) => {
+                        const globalIndex = allRooms.indexOf(room);
+                        const roomIndex = globalIndex;
+                        const isRoomExpanded = expandedRooms[room.id];
+                        const roomColor = room.color || getColorByIndex(globalIndex);
+
+                    return (
+                    <Draggable key={room.id} draggableId={room.id} index={globalIndex}>
                       {(provided, snapshot) => (
                         <div 
                           ref={provided.innerRef}
@@ -3933,9 +4010,11 @@ const ExactChecklistSpreadsheet = ({
                         </div>
                       )}
                     </Draggable>
-                    </React.Fragment>
+                    );
+                  })}
+                  </React.Fragment>
                   );
-                });
+                  });
                 })()}
 
                 {/* ADD FLOOR / SECTION BUTTON */}
@@ -3948,6 +4027,22 @@ const ExactChecklistSpreadsheet = ({
                     }}
                     className="px-6 py-2 text-[#D4A574] border border-[#D4A574]/30 rounded-lg hover:bg-[#D4A574]/10 text-sm font-bold tracking-wider"
                   >+ ADD FLOOR / SECTION</button>
+                  <button
+                    data-testid="migrate-legacy-floors-btn-checklist"
+                    onClick={async () => {
+                      if (!window.confirm('This will detect rooms that look like floor headers (e.g., "1ST FLOOR", "BASEMENT") with no items, convert them to actual floor separators, and remove the dummy rooms. Continue?')) return;
+                      try {
+                        const backendUrl = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
+                        const res = await fetch(`${backendUrl}/api/projects/${project.id}/migrate-legacy-floors`, { method: 'POST' });
+                        const data = await res.json();
+                        alert(data.message || `Migrated ${data.migrated} floor headers`);
+                        if (data.migrated > 0 && onReload) await onReload();
+                      } catch (err) { alert('Migration failed: ' + err.message); }
+                    }}
+                    className="px-4 py-2 text-yellow-400/70 border border-yellow-600/30 rounded-lg hover:bg-yellow-600/10 text-xs font-bold tracking-wider"
+                  >
+                    FIX LEGACY FLOORS
+                  </button>
                 </div>
                 <div id="new-floor-input-checklist" className="mb-4 flex justify-center gap-2" style={{ display: 'none' }}>
                   <input type="text" placeholder="Enter floor or section name..."

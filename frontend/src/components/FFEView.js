@@ -24,6 +24,15 @@ const ExactFFESpreadsheet = ({
   const [availableCategories, setAvailableCategories] = useState([]);
   const [expandedRooms, setExpandedRooms] = useState({});
   const [expandedCategories, setExpandedCategories] = useState({});
+  const [expandedFloors, setExpandedFloors] = useState({});
+  const toggleFloor = (f) => setExpandedFloors(prev => ({ ...prev, [f]: prev[f] === false ? true : false }));
+  const getFloorOrder = () => {
+    const p = filteredProject || project;
+    if (p?.floor_order?.length) return p.floor_order;
+    const floors = [];
+    (p?.rooms || []).forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+    return floors.length ? floors : ['1ST FLOOR'];
+  };
 
   // FILTER STATE - MAKE IT ACTUALLY WORK
   const [filteredProject, setFilteredProject] = useState(project);
@@ -195,15 +204,15 @@ const ExactFFESpreadsheet = ({
     
     loadAvailableCategories();
     
-    // Initialize all rooms and categories as expanded by default
+    // Initialize all rooms and categories as COLLAPSED by default for performance
     if (project?.rooms) {
       const roomExpansion = {};
       const categoryExpansion = {};
       
       project.rooms.forEach(room => {
-        roomExpansion[room.id] = true;
+        roomExpansion[room.id] = false;
         room.categories?.forEach(category => {
-          categoryExpansion[category.id] = true;
+          categoryExpansion[category.id] = false;
         });
       });
       
@@ -783,7 +792,45 @@ const ExactFFESpreadsheet = ({
           </div>
           
           {/* Action Buttons - ADD ROOM AND TRANSFER */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
+            {/* EXPAND / COLLAPSE ALL */}
+            <button
+              data-testid="ffe-expand-all"
+              onClick={() => {
+                const newRoomState = {};
+                const newCatState = {};
+                (project?.rooms || []).forEach(room => {
+                  newRoomState[room.id] = true;
+                  room.categories?.forEach(cat => { newCatState[cat.id] = true; });
+                });
+                setExpandedRooms(newRoomState);
+                setExpandedCategories(newCatState);
+                setExpandedFloors({});
+              }}
+              className="px-4 py-2 rounded-full bg-[#D4A574]/20 hover:bg-[#D4A574]/40 text-[#D4A574] font-bold text-sm border border-[#D4A574]/30"
+            >
+              EXPAND ALL
+            </button>
+            <button
+              data-testid="ffe-collapse-all"
+              onClick={() => {
+                const newRoomState = {};
+                const newCatState = {};
+                const newFloorState = {};
+                const floors = getFloorOrder();
+                floors.forEach(f => { newFloorState[f] = false; });
+                (project?.rooms || []).forEach(room => {
+                  newRoomState[room.id] = false;
+                  room.categories?.forEach(cat => { newCatState[cat.id] = false; });
+                });
+                setExpandedRooms(newRoomState);
+                setExpandedCategories(newCatState);
+                setExpandedFloors(newFloorState);
+              }}
+              className="px-4 py-2 rounded-full bg-gray-600/30 hover:bg-gray-600/50 text-gray-300 font-bold text-sm border border-gray-600/30"
+            >
+              COLLAPSE ALL
+            </button>
             <button 
               onClick={handleAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#D4C5A9]"
@@ -822,10 +869,53 @@ const ExactFFESpreadsheet = ({
 
                   {/* TABLE BODY - Keep original hierarchical structure */}
                   <tbody>
-                {/* USE FILTERED PROJECT DATA */}
-                {(filteredProject || project).rooms.map((room, roomIndex) => {
+                {/* USE FILTERED PROJECT DATA - GROUPED BY FLOOR */}
+                {(() => {
+                  const allRooms = (filteredProject || project).rooms || [];
+                  const floors = getFloorOrder();
+                  allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+
+                  return floors.map((floorName) => {
+                    const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
+                    const isFloorCollapsed = expandedFloors[floorName] === false;
+
+                    return (
+                      <React.Fragment key={`floor-${floorName}`}>
+                        {/* FLOOR BANNER ROW */}
+                        <tr>
+                          <td colSpan="13" style={{
+                            background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
+                            borderTop: '3px solid #D4A574', borderBottom: '3px solid #D4A574',
+                            padding: '8px 16px',
+                          }}>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <button onClick={() => toggleFloor(floorName)} className="text-[#D4A574] text-lg w-6 text-center"
+                                  data-testid={`floor-toggle-ffe-${floorName}`}>
+                                  {isFloorCollapsed ? '\u25B6' : '\u25BC'}
+                                </button>
+                                <div style={{ width: '30px', height: '30px', borderRadius: '6px',
+                                  background: 'linear-gradient(135deg, #D4A574, #8B6914)',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  fontSize: '14px', fontWeight: '900', color: '#000',
+                                }}>
+                                  {floorName.match(/\d+/) ? floorName.match(/\d+/)[0] : floorName.charAt(0)}
+                                </div>
+                                <span style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '4px', color: '#D4A574',
+                                  textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+                                }}>{floorName}</span>
+                              </div>
+                              <span style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
+                                {floorRooms.length} ROOM{floorRooms.length !== 1 ? 'S' : ''}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* ROOMS UNDER THIS FLOOR */}
+                        {!isFloorCollapsed && floorRooms.map((room, roomIndex) => {
                   const isRoomExpanded = expandedRooms[room.id];
-                  console.log(`🏠 RENDERING ROOM ${roomIndex}: ${room.name} with ${room.categories?.length || 0} categories`);
+                  const globalIndex = allRooms.indexOf(room);
                   
                   return (
                               <React.Fragment key={room.id}>
@@ -833,7 +923,7 @@ const ExactFFESpreadsheet = ({
                                 <tr>
                                   <td colSpan="12" 
                                       className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold"
-                                      style={{ backgroundColor: room.color || getRoomColor(room.name, roomIndex) }}>
+                                      style={{ backgroundColor: room.color || getRoomColor(room.name, globalIndex) }}>
                                     <div className="flex justify-between items-center">
                                       <div className="flex items-center gap-2">
                                         <button
@@ -890,7 +980,7 @@ const ExactFFESpreadsheet = ({
                                     </div>
                                   </td>
                                   <td className="border border-[#D4A574] px-2 py-2 text-center"
-                                      style={{ backgroundColor: room.color || getRoomColor(room.name, roomIndex) }}>
+                                      style={{ backgroundColor: room.color || getRoomColor(room.name, globalIndex) }}>
                                     <button
                                       onClick={() => handleAddRoom()}
                                       className="text-green-300 hover:text-green-100 text-sm font-bold"
@@ -1364,6 +1454,10 @@ const ExactFFESpreadsheet = ({
                               </React.Fragment>
                         );
                       })}
+                      </React.Fragment>
+                    );
+                  });
+                })()}
                   </tbody>
                 </table>
             </div>
