@@ -340,9 +340,16 @@ const ExactChecklistSpreadsheet = ({
     try {
       console.log('🔄 Processing drag for type:', type);
       if (type === 'ROOM') {
-        // Get current rooms order
-        const currentRooms = project?.rooms || [];
-        const newRooms = Array.from(currentRooms);
+        // Build ordered room list matching render order (grouped by floor)
+        const allRooms = (filteredProject || project)?.rooms || [];
+        const floors = getFloorOrder();
+        allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+        const orderedRooms = [];
+        floors.forEach(floorName => {
+          allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName).forEach(r => orderedRooms.push(r));
+        });
+
+        const newRooms = Array.from(orderedRooms);
         const [removed] = newRooms.splice(source.index, 1);
         newRooms.splice(destination.index, 0, removed);
         
@@ -2264,14 +2271,28 @@ const ExactChecklistSpreadsheet = ({
                   const floors = getFloorOrder();
                   allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
 
-                  return floors.map((floorName, floorIdx) => {
-                    const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
-                    const isFloorCollapsed = expandedFloors[floorName] === false;
+                  // Build flat ordered list grouped by floor (sequential indices for DnD)
+                  const orderedRooms = [];
+                  floors.forEach(floorName => {
+                    allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName).forEach(r => orderedRooms.push(r));
+                  });
+
+                  let lastFloor = null;
+                  return orderedRooms.map((room, seqIndex) => {
+                    const currentFloor = room.floor || '1ST FLOOR';
+                    const showFloorBanner = currentFloor !== lastFloor;
+                    const floorIdx = floors.indexOf(currentFloor);
+                    lastFloor = currentFloor;
+                    const isFloorCollapsed = expandedFloors[currentFloor] === false;
+                    const floorRoomCount = orderedRooms.filter(r => (r.floor || '1ST FLOOR') === currentFloor).length;
+                    const isRoomExpanded = !isFloorCollapsed && expandedRooms[room.id];
+                    const roomColor = room.color || getColorByIndex(seqIndex);
 
                     return (
-                      <React.Fragment key={`floor-${floorName}`}>
-                      {/* FLOOR BANNER - COLLAPSIBLE */}
-                      <div className="mt-4 mb-1" data-testid={`floor-banner-${floorName}`} style={{
+                      <React.Fragment key={room.id}>
+                      {/* FLOOR BANNER - shown when floor changes */}
+                      {showFloorBanner && (
+                      <div className="mt-4 mb-1" data-testid={`floor-banner-${currentFloor}`} style={{
                         background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
                         borderTop: '3px solid #D4A574', borderBottom: '3px solid #D4A574',
                         padding: '10px 16px', position: 'relative', overflow: 'hidden',
@@ -2291,8 +2312,8 @@ const ExactChecklistSpreadsheet = ({
                                   className="text-[#D4A574] hover:text-white text-xs leading-none px-1" title="Move down">&#9660;</button>
                               )}
                             </div>
-                            <button onClick={() => toggleFloor(floorName)} className="text-[#D4A574] text-lg w-6 text-center"
-                              data-testid={`floor-toggle-${floorName}`}>
+                            <button onClick={() => toggleFloor(currentFloor)} className="text-[#D4A574] text-lg w-6 text-center"
+                              data-testid={`floor-toggle-${currentFloor}`}>
                               {isFloorCollapsed ? '\u25B6' : '\u25BC'}
                             </button>
                             <div style={{ width: '36px', height: '36px', borderRadius: '8px',
@@ -2301,7 +2322,7 @@ const ExactChecklistSpreadsheet = ({
                               fontSize: '16px', fontWeight: '900', color: '#000',
                               boxShadow: '0 2px 12px rgba(212, 165, 116, 0.4)',
                             }}>
-                              {floorName.match(/\d+/) ? floorName.match(/\d+/)[0] : floorName.charAt(0)}
+                              {currentFloor.match(/\d+/) ? currentFloor.match(/\d+/)[0] : currentFloor.charAt(0)}
                             </div>
                             <span contentEditable={true} suppressContentEditableWarning={true}
                               className="outline-none px-1"
@@ -2310,31 +2331,24 @@ const ExactChecklistSpreadsheet = ({
                               }}
                               onBlur={(e) => {
                                 const n = e.target.textContent?.trim()?.toUpperCase();
-                                if (n && n !== floorName) renameFloor(floorName, n);
+                                if (n && n !== currentFloor) renameFloor(currentFloor, n);
                               }}
-                            >{floorName}</span>
+                            >{currentFloor}</span>
                           </div>
                           <div className="flex items-center gap-4">
                             <span style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
-                              {floorRooms.length} ROOM{floorRooms.length !== 1 ? 'S' : ''}
+                              {floorRoomCount} ROOM{floorRoomCount !== 1 ? 'S' : ''}
                             </span>
                             {floors.length > 1 && (
-                              <button onClick={() => { if (window.confirm(`Delete "${floorName}"? Rooms move to ${floors.find(f => f !== floorName)}.`)) deleteFloor(floorName); }}
+                              <button onClick={() => { if (window.confirm(`Delete "${currentFloor}"? Rooms move to ${floors.find(f => f !== currentFloor)}.`)) deleteFloor(currentFloor); }}
                                 className="text-red-500/50 hover:text-red-400 text-sm px-2" title="Delete floor">&#10005;</button>
                             )}
                           </div>
                         </div>
                       </div>
+                      )}
 
-                      {/* ROOMS - Always render Draggables, hide content when floor collapsed */}
-                      {floorRooms.map((room) => {
-                        const globalIndex = allRooms.indexOf(room);
-                        const roomIndex = globalIndex;
-                        const isRoomExpanded = !isFloorCollapsed && expandedRooms[room.id];
-                        const roomColor = room.color || getColorByIndex(globalIndex);
-
-                    return (
-                    <Draggable key={room.id} draggableId={room.id} index={globalIndex}>
+                    <Draggable key={room.id} draggableId={room.id} index={seqIndex}>
                       {(provided, snapshot) => (
                         <div 
                           ref={provided.innerRef}
@@ -4004,11 +4018,9 @@ const ExactChecklistSpreadsheet = ({
                         </div>
                       )}
                     </Draggable>
-                    );
-                  })}
-                  </React.Fragment>
+                    </React.Fragment>
                   );
-                  });
+                });
                 })()}
 
                 {/* ADD FLOOR / SECTION BUTTON */}

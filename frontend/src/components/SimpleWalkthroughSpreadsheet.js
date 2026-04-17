@@ -152,13 +152,20 @@ const SimpleWalkthroughSpreadsheet = ({
     try {
       console.log('🔄 Processing drag for type:', type);
       if (type === 'ROOM') {
-        // Create deep copy of project
-        const updatedProject = {...project};
-        const newRooms = Array.from(updatedProject.rooms);
+        // Build ordered room list matching render order (grouped by floor)
+        const allRooms = (filteredProject || project)?.rooms || [];
+        const floors = getFloorOrder();
+        allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+        const orderedRooms = [];
+        floors.forEach(floorName => {
+          allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName).forEach(r => orderedRooms.push(r));
+        });
+
+        const newRooms = Array.from(orderedRooms);
         const [removed] = newRooms.splice(source.index, 1);
         newRooms.splice(destination.index, 0, removed);
         
-        updatedProject.rooms = newRooms;
+        const updatedProject = {...project, rooms: newRooms};
         
         console.log('🔄 WALKTHROUGH: Moving room from', source.index, 'to', destination.index);
         
@@ -1141,25 +1148,35 @@ const SimpleWalkthroughSpreadsheet = ({
             {(provided) => (
               <div className="overflow-x-auto" ref={provided.innerRef} {...provided.droppableProps}>
           
-          {/* FLOOR-BASED ROOM RENDERING */}
+          {/* FLOOR-BASED ROOM RENDERING - FLAT SEQUENTIAL FOR DND */}
           {(() => {
             const allRooms = (filteredProject || project)?.rooms || [];
             const floors = getFloorOrder();
-            // Ensure all floors that rooms reference are included
-            allRooms.forEach(r => {
-              const f = r.floor || '1ST FLOOR';
-              if (!floors.includes(f)) floors.push(f);
+            allRooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!floors.includes(f)) floors.push(f); });
+            
+            // Build flat ordered list grouped by floor (sequential indices for DnD)
+            const orderedRooms = [];
+            floors.forEach(floorName => {
+              allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName).forEach(r => orderedRooms.push(r));
             });
             
+            let lastFloor = null;
             return (
               <>
-              {floors.map((floorName, floorIdx) => {
-                const floorRooms = allRooms.filter(r => (r.floor || '1ST FLOOR') === floorName);
-                const isFloorCollapsed = expandedFloors[floorName] === false;
+              {orderedRooms.map((room, seqIndex) => {
+                const currentFloor = room.floor || '1ST FLOOR';
+                const showFloorBanner = currentFloor !== lastFloor;
+                const floorIdx = floors.indexOf(currentFloor);
+                lastFloor = currentFloor;
+                const isFloorCollapsed = expandedFloors[currentFloor] === false;
+                const floorRoomCount = orderedRooms.filter(r => (r.floor || '1ST FLOOR') === currentFloor).length;
+                const isRoomExpanded = !isFloorCollapsed && expandedRooms[room.id];
+                const roomIndex = seqIndex;
                 
                 return (
-                  <React.Fragment key={`floor-${floorName}`}>
+                  <React.Fragment key={room.id}>
                     {/* FLOOR BANNER */}
+                    {showFloorBanner && (
                     <div className="mt-4 mb-1" style={{
                       background: 'linear-gradient(90deg, #1a1a1a 0%, #2a2218 15%, #3d3020 50%, #2a2218 85%, #1a1a1a 100%)',
                       borderTop: '3px solid #D4A574', borderBottom: '3px solid #D4A574',
@@ -1180,7 +1197,7 @@ const SimpleWalkthroughSpreadsheet = ({
                                 className="text-[#D4A574] hover:text-white text-xs leading-none px-1" title="Move down">&#9660;</button>
                             )}
                           </div>
-                          <button onClick={() => toggleFloor(floorName)} className="text-[#D4A574] text-lg w-6 text-center">
+                          <button onClick={() => toggleFloor(currentFloor)} className="text-[#D4A574] text-lg w-6 text-center">
                             {isFloorCollapsed ? '▶' : '▼'}
                           </button>
                           <div style={{ width: '36px', height: '36px', borderRadius: '8px',
@@ -1189,7 +1206,7 @@ const SimpleWalkthroughSpreadsheet = ({
                             fontSize: '16px', fontWeight: '900', color: '#000',
                             boxShadow: '0 2px 12px rgba(212, 165, 116, 0.4)',
                           }}>
-                            {floorName.match(/\d+/) ? floorName.match(/\d+/)[0] : floorName.charAt(0)}
+                            {currentFloor.match(/\d+/) ? currentFloor.match(/\d+/)[0] : currentFloor.charAt(0)}
                           </div>
                           <span contentEditable={true} suppressContentEditableWarning={true}
                             className="outline-none px-1"
@@ -1198,29 +1215,24 @@ const SimpleWalkthroughSpreadsheet = ({
                             }}
                             onBlur={(e) => {
                               const n = e.target.textContent?.trim()?.toUpperCase();
-                              if (n && n !== floorName) renameFloor(floorName, n);
+                              if (n && n !== currentFloor) renameFloor(currentFloor, n);
                             }}
-                          >{floorName}</span>
+                          >{currentFloor}</span>
                         </div>
                         <div className="flex items-center gap-4">
                           <span style={{ color: '#D4A574', opacity: 0.5, fontSize: '11px', letterSpacing: '2px', fontWeight: '700' }}>
-                            {floorRooms.length} ROOM{floorRooms.length !== 1 ? 'S' : ''}
+                            {floorRoomCount} ROOM{floorRoomCount !== 1 ? 'S' : ''}
                           </span>
                           {floors.length > 1 && (
-                            <button onClick={() => { if (window.confirm(`Delete "${floorName}"? Rooms move to ${floors.find(f => f !== floorName)}.`)) deleteFloor(floorName); }}
+                            <button onClick={() => { if (window.confirm(`Delete "${currentFloor}"? Rooms move to ${floors.find(f => f !== currentFloor)}.`)) deleteFloor(currentFloor); }}
                               className="text-red-500/50 hover:text-red-400 text-sm px-2" title="Delete floor">&#10005;</button>
                           )}
                         </div>
                       </div>
                     </div>
+                    )}
                     
-                    {/* ROOMS UNDER THIS FLOOR - Always render Draggables for DnD */}
-                    {floorRooms.map((room) => {
-                      const globalIndex = allRooms.indexOf(room);
-                      const isRoomExpanded = !isFloorCollapsed && expandedRooms[room.id];
-                      const roomIndex = globalIndex;
-                      return (
-            <Draggable key={room.id} draggableId={room.id} index={globalIndex}>
+            <Draggable key={room.id} draggableId={room.id} index={seqIndex}>
               {(provided, snapshot) => (
                 <div 
                   ref={provided.innerRef}
@@ -1662,8 +1674,6 @@ const SimpleWalkthroughSpreadsheet = ({
                 </div>
               )}
             </Draggable>
-                      );
-                    })}
                   </React.Fragment>
                 );
               })}
