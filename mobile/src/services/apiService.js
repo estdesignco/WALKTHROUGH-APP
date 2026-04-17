@@ -2,8 +2,13 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
-// Use environment variable or fallback
-const API_URL = Constants.expoConfig?.extra?.apiUrl || process.env.EXPO_PUBLIC_BACKEND_URL || 'https://app.estdesignco.com/api';
+// Use environment variable or fallback to production
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL 
+  ? `${process.env.EXPO_PUBLIC_BACKEND_URL}/api`
+  : Constants.expoConfig?.extra?.apiUrl 
+    || 'https://app.estdesignco.com/api';
+
+console.log('📡 API URL:', API_URL);
 
 // Create axios instance
 const api = axios.create({

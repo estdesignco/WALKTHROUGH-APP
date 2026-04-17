@@ -54,6 +54,9 @@
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos for project documentation."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "apiUrl": "https://app.estdesignco.com/api"
+    }
   }
 }
