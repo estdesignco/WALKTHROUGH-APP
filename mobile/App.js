@@ -18,6 +18,7 @@ import LeicaConnectionScreen from './src/screens/LeicaConnectionScreen';
 import ToDoListScreen from './src/screens/ToDoListScreen';
 import PunchListScreen from './src/screens/PunchListScreen';
 import SamplesScreen from './src/screens/SamplesScreen';
+import BuilderPortalScreen from './src/screens/BuilderPortalScreen';
 
 // Services
 import { syncService } from './src/services/syncService';
@@ -136,6 +137,11 @@ export default function App() {
           name="Samples" 
           component={SamplesScreen}
           options={{ title: 'Samples Library' }}
+        />
+        <Stack.Screen 
+          name="BuilderPortal" 
+          component={BuilderPortalScreen}
+          options={{ title: 'Builder Portal' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

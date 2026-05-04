@@ -442,7 +442,7 @@ function PhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload
             <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{room.name.toUpperCase()}</h3>
             <label style={{ background: '#D4A574', color: '#1a1f2e', padding: '8px 16px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
               {uploading ? 'Uploading...' : t.uploadFiles}
-              <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt" onChange={e => handleUpload(room.id, Array.from(e.target.files))} style={{ display: 'none' }} />
+              <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt" capture="environment" onChange={e => handleUpload(room.id, Array.from(e.target.files))} style={{ display: 'none' }} />
             </label>
           </div>
 
