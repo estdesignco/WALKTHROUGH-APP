@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import ExactFFESpreadsheet from './FFEView';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -11,23 +12,21 @@ export default function BuilderPortal() {
   const [commentAuthor, setCommentAuthor] = useState(localStorage.getItem('builder_name') || '');
   const [commentSection, setCommentSection] = useState('general');
   const [showCommentForm, setShowCommentForm] = useState(false);
-  const [expandedRooms, setExpandedRooms] = useState({});
-  const [expandedCategories, setExpandedCategories] = useState({});
   const [newChangeOrder, setNewChangeOrder] = useState(null);
   const [newContact, setNewContact] = useState(null);
 
   const accessCode = window.location.pathname.split('/builder/')[1];
 
-  useEffect(() => { if (accessCode) loadPortal(); }, [accessCode]);
-
-  const loadPortal = async () => {
+  const loadPortal = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch(`${API_URL}/api/builder/${accessCode}`);
       if (!res.ok) throw new Error('Portal not found');
       setPortalData(await res.json());
     } catch (err) { setError(err.message); } finally { setLoading(false); }
-  };
+  }, [accessCode]);
+
+  useEffect(() => { if (accessCode) loadPortal(); }, [accessCode, loadPortal]);
 
   const submitComment = async () => {
     if (!commentText.trim() || !commentAuthor.trim()) return;
@@ -57,6 +56,13 @@ export default function BuilderPortal() {
 
   const { portal, project, rooms, photos, todos } = portalData;
   const comments = portal.comments || [];
+
+  // Build a project object that the FFE component expects — with rooms but NO pricing
+  const builderProject = {
+    ...project,
+    id: portal.project_id,
+    rooms: rooms,
+  };
 
   const tabs = [
     { id: 'ffe', label: 'FF&E Schedule' },
@@ -101,113 +107,14 @@ export default function BuilderPortal() {
 
       <main style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 16px' }}>
 
-        {/* ===== FFE TAB - EXACT MATCH TO APP ===== */}
+        {/* ===== FFE TAB - THE ACTUAL FFE COMPONENT ===== */}
         {activeTab === 'ffe' && (
-          <div style={{ overflowX: 'auto' }}>
-            {rooms.map((room) => {
-              const isRoomExpanded = expandedRooms[room.id] !== false;
-              return (
-                <div key={room.id} style={{ marginBottom: 24 }}>
-                  {/* ROOM HEADER - Gradient colored bar matching app */}
-                  <div onClick={() => setExpandedRooms(p => ({ ...p, [room.id]: !isRoomExpanded }))}
-                    style={{
-                      background: `linear-gradient(135deg, ${room.color || '#4A2040'} 0%, ${room.color || '#4A2040'}CC 50%, ${room.color || '#4A2040'} 100%)`,
-                      padding: '10px 16px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      borderLeft: `5px solid ${room.color || '#D4A574'}`,
-                      boxShadow: `0 0 20px ${room.color || '#4A2040'}40, inset 0 0 40px rgba(255,255,255,0.08), inset 0 0 80px rgba(0,0,0,0.3)`,
-                    }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ color: '#fff', fontSize: 14 }}>{isRoomExpanded ? '▼' : '▶'}</span>
-                      <span style={{ color: '#fff', fontWeight: 900, fontSize: 16, letterSpacing: 1, textShadow: '0 2px 4px rgba(0,0,0,0.7)' }}>
-                        {room.name.toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* CATEGORIES + ITEMS TABLE */}
-                  {isRoomExpanded && room.categories?.map(cat => {
-                    const isCatExpanded = expandedCategories[cat.id] !== false;
-                    return (
-                      <div key={cat.id}>
-                        {/* CATEGORY HEADER - teal/emerald gradient */}
-                        <div onClick={() => setExpandedCategories(p => ({ ...p, [cat.id]: !isCatExpanded }))}
-                          style={{
-                            background: 'linear-gradient(135deg, #065F46 0%, #047857 50%, #065F46 100%)',
-                            padding: '8px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
-                            borderBottom: '1px solid #10B981',
-                          }}>
-                          <span style={{ color: '#fff', fontSize: 12 }}>{isCatExpanded ? '▼' : '▶'}</span>
-                          <span style={{ color: '#fff', fontWeight: 700, fontSize: 13, letterSpacing: 1 }}>{cat.name.toUpperCase()}</span>
-                        </div>
-
-                        {/* COLUMN HEADERS - tan/gold gradient - MATCHING APP EXACTLY */}
-                        {isCatExpanded && (
-                          <>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
-                              <colgroup>
-                                <col style={{ width: '25%' }} />
-                                <col style={{ width: '12%' }} />
-                                <col style={{ width: '6%' }} />
-                                <col style={{ width: '10%' }} />
-                                <col style={{ width: '12%' }} />
-                                <col style={{ width: '10%' }} />
-                                <col style={{ width: '10%' }} />
-                                <col style={{ width: '15%' }} />
-                              </colgroup>
-                              <thead>
-                                <tr>
-                                  <th colSpan="4" style={thGroupStyle}></th>
-                                  <th colSpan="2" style={thGroupStyle}>ADDITIONAL INFO.</th>
-                                  <th colSpan="2" style={thGroupStyle}>STOCK INFO.</th>
-                                </tr>
-                                <tr style={{ background: 'linear-gradient(180deg, #8B4513 0%, #654321 100%)' }}>
-                                  <th style={thStyle}>INSTALLED</th>
-                                  <th style={thStyle}>VENDOR/SKU</th>
-                                  <th style={thStyle}>QTY</th>
-                                  <th style={thStyle}>SIZE</th>
-                                  <th style={thStyle}>FINISH/COLOR</th>
-                                  <th style={thStyle}>IMAGE</th>
-                                  <th style={thStyle}>STOCK STATUS/QTY</th>
-                                  <th style={thStyle}>NOTES</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {cat.subcategories?.map(sub => sub.items?.map(item => (
-                                  <tr key={item.id} style={{ background: '#1a1f2e', borderBottom: '1px solid #2a3040' }}>
-                                    <td style={tdStyle}>
-                                      <span style={{ color: '#F5F5DC', fontSize: 13 }}>{item.name}</span>
-                                    </td>
-                                    <td style={tdStyle}>{item.vendor || item.sku || ''}</td>
-                                    <td style={{ ...tdStyle, textAlign: 'center' }}>{item.qty || item.quantity || ''}</td>
-                                    <td style={tdStyle}>{item.size || ''}</td>
-                                    <td style={tdStyle}>{item.finish_color || ''}</td>
-                                    <td style={{ ...tdStyle, textAlign: 'center' }}>
-                                      {(item.image || item.finish_image || item.product_image) ? (
-                                        <img src={item.image || item.finish_image || item.product_image} alt=""
-                                          style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4, border: '1px solid #374151' }} />
-                                      ) : <span style={{ color: '#4B5563' }}>—</span>}
-                                    </td>
-                                    <td style={tdStyle}>
-                                      <span style={{
-                                        padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700,
-                                        background: item.status === 'INSTALLED' ? '#065F46' : item.status === 'ORDERED' ? '#92400E' : item.status === 'APPROVED' ? '#1E40AF' : '#374151',
-                                        color: '#fff',
-                                      }}>{item.status || '—'}</span>
-                                    </td>
-                                    <td style={tdStyle}>{item.notes || ''}</td>
-                                  </tr>
-                                )))}
-                              </tbody>
-                            </table>
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
+          <ExactFFESpreadsheet
+            project={builderProject}
+            roomColors={{}}
+            categoryColors={{}}
+            onReload={loadPortal}
+          />
         )}
 
         {/* ===== PHOTOS TAB ===== */}
@@ -219,7 +126,7 @@ export default function BuilderPortal() {
                 <h3 style={{ color: room.color || '#fff', fontSize: 16, fontWeight: 700, marginBottom: 8, borderLeft: `4px solid ${room.color || '#D4A574'}`, paddingLeft: 12 }}>{room.name}</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                   {(photos[room.id] || []).map((photo, idx) => (
-                    <div key={idx} style={{ width: 160, height: 120, borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040' }}>
+                    <div key={idx} style={{ width: 200, height: 150, borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040' }}>
                       <img src={photo.url || photo.photo_data} alt={photo.file_name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                   ))}
@@ -284,44 +191,17 @@ export default function BuilderPortal() {
           </div>
         )}
 
-        {/* ===== ROOM FINISHES - pulled from actual room data ===== */}
+        {/* ===== ROOM FINISHES - uses same FFE component ===== */}
         {activeTab === 'finishes' && (
-          <div>
-            <h2 style={sectionTitle}>Room Finishes</h2>
-            {rooms.map(room => (
-              <div key={room.id} style={{ marginBottom: 24 }}>
-                <div style={{ background: room.color || '#2a3040', padding: '10px 16px', borderRadius: 6, marginBottom: 8, borderLeft: `5px solid ${room.color || '#D4A574'}`,
-                  boxShadow: `0 0 15px ${room.color || '#4A2040'}30` }}>
-                  <span style={{ color: '#fff', fontWeight: 900, fontSize: 15 }}>{room.name.toUpperCase()}</span>
-                </div>
-                {room.categories?.map(cat => (
-                  <div key={cat.id} style={{ marginLeft: 8, marginBottom: 12 }}>
-                    <p style={{ color: '#10B981', fontSize: 12, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>{cat.name.toUpperCase()}</p>
-                    {cat.subcategories?.map(sub => sub.items?.map(item => (
-                      <div key={item.id} style={{ display: 'flex', gap: 12, padding: '8px 0', borderBottom: '1px solid #1a1f2e', alignItems: 'center' }}>
-                        {(item.image || item.finish_image || item.product_image) && (
-                          <img src={item.image || item.finish_image || item.product_image} alt="" style={{ width: 48, height: 48, borderRadius: 4, objectFit: 'cover', border: '1px solid #374151' }} />
-                        )}
-                        <div style={{ flex: 1 }}>
-                          <p style={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>{item.name}</p>
-                          <p style={{ color: '#6B7280', fontSize: 11 }}>{[item.vendor, item.size, item.finish_color].filter(Boolean).join(' • ')}</p>
-                        </div>
-                        {item.status && (
-                          <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700,
-                            background: item.status === 'INSTALLED' ? '#065F46' : item.status === 'ORDERED' ? '#92400E' : '#1E40AF', color: '#fff' }}>
-                            {item.status}
-                          </span>
-                        )}
-                      </div>
-                    )))}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
+          <ExactFFESpreadsheet
+            project={builderProject}
+            roomColors={{}}
+            categoryColors={{}}
+            onReload={loadPortal}
+          />
         )}
 
-        {/* ===== CHANGE ORDERS - BUILDER CAN ADD/EDIT ===== */}
+        {/* ===== CHANGE ORDERS - BUILDER CAN ADD ===== */}
         {activeTab === 'changes' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -331,17 +211,12 @@ export default function BuilderPortal() {
                 + New Change Order
               </button>
             </div>
-
             {newChangeOrder && (
               <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #F59E0B' }}>
-                <input placeholder="Your name" value={newChangeOrder.author} onChange={e => setNewChangeOrder({ ...newChangeOrder, author: e.target.value })}
-                  style={inputStyle} />
-                <input placeholder="Change order title" value={newChangeOrder.title} onChange={e => setNewChangeOrder({ ...newChangeOrder, title: e.target.value })}
-                  style={inputStyle} />
-                <input type="date" value={newChangeOrder.date} onChange={e => setNewChangeOrder({ ...newChangeOrder, date: e.target.value })}
-                  style={inputStyle} />
-                <textarea placeholder="Description..." value={newChangeOrder.description} onChange={e => setNewChangeOrder({ ...newChangeOrder, description: e.target.value })}
-                  rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
+                <input placeholder="Your name" value={newChangeOrder.author} onChange={e => setNewChangeOrder({ ...newChangeOrder, author: e.target.value })} style={inputStyle} />
+                <input placeholder="Change order title" value={newChangeOrder.title} onChange={e => setNewChangeOrder({ ...newChangeOrder, title: e.target.value })} style={inputStyle} />
+                <input type="date" value={newChangeOrder.date} onChange={e => setNewChangeOrder({ ...newChangeOrder, date: e.target.value })} style={inputStyle} />
+                <textarea placeholder="Description..." value={newChangeOrder.description} onChange={e => setNewChangeOrder({ ...newChangeOrder, description: e.target.value })} rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={async () => {
                     localStorage.setItem('builder_name', newChangeOrder.author);
@@ -351,13 +226,12 @@ export default function BuilderPortal() {
                     });
                     setNewChangeOrder(null); loadPortal();
                   }} style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 24px', borderRadius: 6, fontWeight: 700, cursor: 'pointer' }}>
-                    Submit Change Order
+                    Submit
                   </button>
                   <button onClick={() => setNewChangeOrder(null)} style={{ background: '#374151', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: 6, cursor: 'pointer' }}>Cancel</button>
                 </div>
               </div>
             )}
-
             {(portal.change_orders || []).map((co, idx) => (
               <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 12, borderLeft: '4px solid #F59E0B' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -365,27 +239,16 @@ export default function BuilderPortal() {
                   <span style={{ color: '#F59E0B', fontSize: 12 }}>{co.date}</span>
                 </div>
                 <p style={{ color: '#E5E7EB', fontSize: 13, marginTop: 8, whiteSpace: 'pre-wrap' }}>{co.description}</p>
-                {co.author && <p style={{ color: '#6B7280', fontSize: 11, marginTop: 4 }}>By: {co.author}</p>}
               </div>
             ))}
-
-            {/* Also show change order comments */}
             {comments.filter(c => c.section === 'change_order').map(c => {
               try { const co = JSON.parse(c.text); return (
                 <div key={c.id} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 12, borderLeft: '4px solid #F59E0B' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <h3 style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{co.title}</h3>
-                    <span style={{ color: '#F59E0B', fontSize: 12 }}>{co.date}</span>
-                  </div>
-                  <p style={{ color: '#E5E7EB', fontSize: 13, marginTop: 8, whiteSpace: 'pre-wrap' }}>{co.description}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><h3 style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{co.title}</h3><span style={{ color: '#F59E0B', fontSize: 12 }}>{co.date}</span></div>
+                  <p style={{ color: '#E5E7EB', fontSize: 13, marginTop: 8 }}>{co.description}</p>
                   <p style={{ color: '#6B7280', fontSize: 11, marginTop: 4 }}>By: {co.author} • {new Date(c.created_at).toLocaleDateString()}</p>
                 </div>
-              ); } catch { return (
-                <div key={c.id} style={{ background: '#1a1f2e', padding: 12, borderRadius: 8, marginBottom: 8, borderLeft: '4px solid #F59E0B' }}>
-                  <p style={{ color: '#E5E7EB', fontSize: 13 }}>{c.text}</p>
-                  <p style={{ color: '#6B7280', fontSize: 11 }}>By: {c.author}</p>
-                </div>
-              ); }
+              ); } catch { return null; }
             })}
           </div>
         )}
@@ -400,11 +263,10 @@ export default function BuilderPortal() {
                 + Add Contact
               </button>
             </div>
-
             {newContact && (
               <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #D4A574' }}>
                 <input placeholder="Contact name" value={newContact.name} onChange={e => setNewContact({ ...newContact, name: e.target.value })} style={inputStyle} />
-                <input placeholder="Role (e.g. Plumber, Electrician)" value={newContact.role} onChange={e => setNewContact({ ...newContact, role: e.target.value })} style={inputStyle} />
+                <input placeholder="Role" value={newContact.role} onChange={e => setNewContact({ ...newContact, role: e.target.value })} style={inputStyle} />
                 <input placeholder="Phone" value={newContact.phone} onChange={e => setNewContact({ ...newContact, phone: e.target.value })} style={inputStyle} />
                 <input placeholder="Email" value={newContact.email} onChange={e => setNewContact({ ...newContact, email: e.target.value })} style={inputStyle} />
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -414,32 +276,27 @@ export default function BuilderPortal() {
                       body: JSON.stringify({ section: 'contact', author: newContact.added_by || 'Builder', text: JSON.stringify(newContact) }),
                     });
                     setNewContact(null); loadPortal();
-                  }} style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 24px', borderRadius: 6, fontWeight: 700, cursor: 'pointer' }}>
-                    Add Contact
-                  </button>
+                  }} style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 24px', borderRadius: 6, fontWeight: 700, cursor: 'pointer' }}>Add</button>
                   <button onClick={() => setNewContact(null)} style={{ background: '#374151', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: 6, cursor: 'pointer' }}>Cancel</button>
                 </div>
               </div>
             )}
-
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-              {(portal.contacts || []).map((contact, idx) => (
+              {(portal.contacts || []).map((c, idx) => (
                 <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, border: '1px solid #2a3040' }}>
-                  <p style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{contact.name}</p>
-                  <p style={{ color: '#D4A574', fontSize: 12, fontWeight: 600, marginTop: 2 }}>{contact.role}</p>
-                  {contact.phone && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8 }}>{contact.phone}</p>}
-                  {contact.email && <p style={{ color: '#9CA3AF', fontSize: 13 }}>{contact.email}</p>}
+                  <p style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{c.name}</p>
+                  <p style={{ color: '#D4A574', fontSize: 12, fontWeight: 600 }}>{c.role}</p>
+                  {c.phone && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8 }}>{c.phone}</p>}
+                  {c.email && <p style={{ color: '#9CA3AF', fontSize: 13 }}>{c.email}</p>}
                 </div>
               ))}
-              {/* Show builder-added contacts from comments */}
               {comments.filter(c => c.section === 'contact').map(c => {
                 try { const ct = JSON.parse(c.text); return (
                   <div key={c.id} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, border: '1px solid #2a3040' }}>
                     <p style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{ct.name}</p>
-                    <p style={{ color: '#D4A574', fontSize: 12, fontWeight: 600, marginTop: 2 }}>{ct.role}</p>
+                    <p style={{ color: '#D4A574', fontSize: 12, fontWeight: 600 }}>{ct.role}</p>
                     {ct.phone && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8 }}>{ct.phone}</p>}
                     {ct.email && <p style={{ color: '#9CA3AF', fontSize: 13 }}>{ct.email}</p>}
-                    <p style={{ color: '#4B5563', fontSize: 10, marginTop: 4 }}>Added by builder</p>
                   </div>
                 ); } catch { return null; }
               })}
@@ -447,33 +304,24 @@ export default function BuilderPortal() {
           </div>
         )}
 
-        {/* ===== COMMENTS TAB ===== */}
+        {/* ===== COMMENTS ===== */}
         {activeTab === 'comments' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 style={sectionTitle}>Comments & Notes</h2>
-              <button onClick={() => setShowCommentForm(!showCommentForm)}
-                style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                + Add Comment
-              </button>
+              <h2 style={sectionTitle}>Comments</h2>
+              <button onClick={() => setShowCommentForm(!showCommentForm)} style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>+ Add Comment</button>
             </div>
-
             {showCommentForm && (
               <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #D4A574' }}>
                 <input placeholder="Your name" value={commentAuthor} onChange={e => setCommentAuthor(e.target.value)} style={inputStyle} />
                 <select value={commentSection} onChange={e => setCommentSection(e.target.value)} style={inputStyle}>
-                  <option value="general">General</option>
-                  <option value="ffe">FF&E</option>
-                  <option value="scope">Scope of Work</option>
-                  <option value="schedule">Schedule</option>
-                  <option value="todo">To-Do</option>
+                  <option value="general">General</option><option value="ffe">FF&E</option><option value="scope">Scope</option><option value="schedule">Schedule</option>
                 </select>
-                <textarea placeholder="Type your comment..." value={commentText} onChange={e => setCommentText(e.target.value)} rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
+                <textarea placeholder="Comment..." value={commentText} onChange={e => setCommentText(e.target.value)} rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
                 <button onClick={submitComment} style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 24px', borderRadius: 6, fontWeight: 700, cursor: 'pointer' }}>Submit</button>
               </div>
             )}
-
-            {comments.filter(c => c.section !== 'change_order' && c.section !== 'contact').map(c => (
+            {comments.filter(c => !['change_order', 'contact'].includes(c.section)).map(c => (
               <div key={c.id} style={{ background: '#1a1f2e', padding: 12, borderRadius: 8, marginBottom: 8, borderLeft: '3px solid #D4A574' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                   <span style={{ color: '#D4A574', fontSize: 13, fontWeight: 700 }}>{c.author}</span>
@@ -482,9 +330,6 @@ export default function BuilderPortal() {
                 <p style={{ color: '#E5E7EB', fontSize: 14 }}>{c.text}</p>
               </div>
             ))}
-            {comments.filter(c => c.section !== 'change_order' && c.section !== 'contact').length === 0 && (
-              <p style={{ color: '#6B7280' }}>No comments yet.</p>
-            )}
           </div>
         )}
       </main>
@@ -497,7 +342,4 @@ export default function BuilderPortal() {
 }
 
 const sectionTitle = { color: '#D4A574', fontSize: 20, fontWeight: 700, marginBottom: 16 };
-const thGroupStyle = { padding: '4px 8px', textAlign: 'center', color: '#D4A574', fontSize: 10, fontWeight: 700, letterSpacing: 1, background: '#2a2218', borderBottom: '1px solid #3d3020' };
-const thStyle = { padding: '8px 10px', textAlign: 'left', color: '#F5F5DC', fontSize: 11, fontWeight: 700, letterSpacing: 0.5, background: 'linear-gradient(180deg, #8B6914 0%, #654321 100%)', borderBottom: '2px solid #D4A574' };
-const tdStyle = { padding: '10px 10px', color: '#E5E7EB', fontSize: 13, verticalAlign: 'middle', borderBottom: '1px solid #2a3040' };
 const inputStyle = { width: '100%', background: '#0f1218', border: '1px solid #2a3040', borderRadius: 6, padding: '10px 12px', color: '#fff', fontSize: 14, marginBottom: 8, display: 'block', boxSizing: 'border-box' };
