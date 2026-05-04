@@ -430,19 +430,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
               </div>
             )}
 
-            {/* TAG DROPDOWNS */}
-            <div style={{ marginTop: 8, marginLeft: 36, display: 'flex', gap: 8 }}>
-              <select onChange={e => { if (e.target.value) tagProduct(idx, e.target.value); e.target.value = ''; }}
-                style={{ background: '#0f1218', border: '1px solid #2a3040', borderRadius: 4, padding: '4px 8px', color: '#93C5FD', fontSize: 11 }}>
-                <option value="">{lang === 'en' ? 'Tag product...' : 'Etiquetar producto...'}</option>
-                {allItems.map(item => <option key={item.id} value={item.id}>{item.name} ({item.room})</option>)}
-              </select>
-              <select onChange={e => { if (e.target.value) tagPerson(idx, e.target.value); e.target.value = ''; }}
-                style={{ background: '#0f1218', border: '1px solid #2a3040', borderRadius: 4, padding: '4px 8px', color: '#D4A574', fontSize: 11 }}>
-                <option value="">{lang === 'en' ? 'Tag person...' : 'Etiquetar persona...'}</option>
-                {allContacts.map((c, i) => <option key={i} value={c.username || c.name}>@{c.username || c.name} ({c.role})</option>)}
-              </select>
-            </div>
+            {/* TAG DROPDOWNS - ADMIN SIDE ONLY, NOT ON BUILDER */}
           </div>
         );
       }) : <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope items defined yet.' : 'No hay elementos definidos.'}</p>}
