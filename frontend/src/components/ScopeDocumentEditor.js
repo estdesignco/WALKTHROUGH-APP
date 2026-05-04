@@ -15,12 +15,21 @@ import 'react-quill/dist/quill.snow.css';
 export const TRADE_COLORS = {
   'DEMOLITION': '#EF4444', 'FRAMING': '#F97316', 'ELECTRICAL': '#EAB308', 'PLUMBING': '#3B82F6',
   'HVAC': '#6366F1', 'DRYWALL': '#A3A3A3', 'PAINT': '#EC4899', 'TILE': '#14B8A6', 'FLOORING': '#8B5CF6',
-  'CABINETRY': '#D97706', 'COUNTERTOPS': '#7C3AED', 'MILLWORK': '#B45309', 'HARDWARE': '#78716C',
+  'CABINETRY': '#D97706', 'COUNTERTOPS': '#7C3AED', 'MILLWORK': '#B45309',
+  'TRIM CARPENTER': '#92400E', 'HARDWARE': '#78716C',
   'GLASS & MIRRORS': '#06B6D4', 'APPLIANCES': '#64748B', 'FIXTURES': '#0EA5E9', 'ROOFING': '#DC2626',
   'EXTERIOR': '#059669', 'LANDSCAPING': '#16A34A', 'GENERAL': '#6B7280',
 };
 
 export const DEFAULT_TRADES = Object.keys(TRADE_COLORS);
+
+// Statuses that put an item in CHECKLIST view vs FFE view
+const CHECKLIST_STATUSES = new Set([
+  'ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA',
+  'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION',
+  'TO BE SELECTED', 'RESEARCHING', 'PENDING APPROVAL', '', null,
+]);
+const isChecklistItem = (status) => CHECKLIST_STATUSES.has(status || '');
 
 // =================================================================
 // Custom Quill blots for inline tag pills
@@ -58,9 +67,11 @@ class ProductTagBlot extends Inline {
     const id = (value && value.id) || '';
     const name = (value && value.name) || id;
     const room = (value && value.room) || '';
+    const source = (value && value.source) || 'FFE';
     node.setAttribute('data-product-id', id);
     node.setAttribute('data-product-name', name);
     node.setAttribute('data-product-room', room);
+    node.setAttribute('data-product-source', source);
     node.setAttribute('data-tag', 'product');
     node.setAttribute('contenteditable', 'false');
     return node;
@@ -70,6 +81,7 @@ class ProductTagBlot extends Inline {
       id: node.getAttribute('data-product-id'),
       name: node.getAttribute('data-product-name'),
       room: node.getAttribute('data-product-room'),
+      source: node.getAttribute('data-product-source') || 'FFE',
     };
   }
 }
@@ -139,14 +151,23 @@ export default function ScopeDocumentEditor({
   const [showRoomMenu, setShowRoomMenu] = useState(false);
   const [tradeFilter, setTradeFilter] = useState('');
   const [productFilter, setProductFilter] = useState('');
+  // Inline autocomplete state (triggered by #, @ or 🏷)
+  const [mention, setMention] = useState(null);
+  const mentionRef = useRef(null);
+  useEffect(() => { mentionRef.current = mention; }, [mention]);
 
   const allTrades = [...DEFAULT_TRADES, ...customTrades];
 
-  // Flatten product list for tag picker
+  // Flatten product list for tag picker — include source (FFE vs CHECKLIST) per item
   const allProducts = rooms.flatMap(r =>
     (r.categories || []).flatMap(c =>
       (c.subcategories || []).flatMap(sub =>
-        (sub.items || []).map(item => ({ id: item.id, name: item.name, room: r.name }))
+        (sub.items || []).map(item => ({
+          id: item.id,
+          name: item.name || '(unnamed)',
+          room: r.name,
+          source: isChecklistItem(item.status) ? 'CHECKLIST' : 'FFE',
+        }))
       )
     )
   );
@@ -173,7 +194,8 @@ export default function ScopeDocumentEditor({
     setTradeFilter('');
   };
   const insertProduct = (p) => {
-    insertAtCursor('productTag', { id: p.id, name: p.name, room: p.room }, `🏷 ${p.name}`);
+    const prefix = p.source === 'CHECKLIST' ? '✓' : '🏷';
+    insertAtCursor('productTag', { id: p.id, name: p.name, room: p.room, source: p.source }, `${prefix} ${p.name}`);
     setShowProductMenu(false);
     setProductFilter('');
   };
@@ -207,6 +229,107 @@ export default function ScopeDocumentEditor({
     editor.focus();
     setShowRoomMenu(false);
   };
+
+  // ============================================================
+  // INLINE AUTOCOMPLETE — triggered by typing # or @
+  // ============================================================
+  const checkMention = useCallback(() => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+    const range = editor.getSelection();
+    if (!range || range.length > 0) { setMention(null); return; }
+
+    const cursor = range.index;
+    const text = editor.getText(0, cursor);
+    const lineStart = text.lastIndexOf('\n') + 1;
+    const lineText = text.slice(lineStart);
+
+    // Match #word or @word at the end of current line.
+    // Trigger only when # / @ is at line start OR preceded by whitespace.
+    const match = lineText.match(/(^|\s)([#@])([\w\-& ]{0,30})$/);
+    if (!match) { setMention(null); return; }
+
+    const triggerChar = match[2];
+    const query = match[3];
+    const triggerIndex = lineStart + (lineText.length - query.length - 1);
+    const type = triggerChar === '#' ? 'unified' : 'person';
+
+    const bounds = editor.getBounds(cursor);
+
+    let results = [];
+    if (type === 'unified') {
+      const q = query.trim().toUpperCase();
+      // Trades first
+      const tradeResults = allTrades
+        .filter(t => !q || t.includes(q) || t.replace(/\s/g, '').includes(q.replace(/\s/g, '')))
+        .map(t => ({ kind: 'trade', value: t, label: t, color: TRADE_COLORS[t] || '#6B7280' }));
+      // Products next (FFE then CHECKLIST)
+      const qLower = query.trim().toLowerCase();
+      const productResults = allProducts
+        .filter(p => !qLower || (p.name || '').toLowerCase().includes(qLower) || (p.room || '').toLowerCase().includes(qLower))
+        .map(p => ({ kind: 'product', value: p, label: p.name, source: p.source, room: p.room }))
+        .sort((a, b) => (a.source === b.source ? 0 : a.source === 'FFE' ? -1 : 1));
+      results = [...tradeResults, ...productResults].slice(0, 12);
+    } else {
+      const q = query.trim().toLowerCase();
+      results = (contacts || [])
+        .filter(c => !q || ((c.username || c.name || '').toLowerCase().includes(q) || (c.role || '').toLowerCase().includes(q)))
+        .map(c => ({ kind: 'person', value: c, label: c.username || c.name, role: c.role || '' }))
+        .slice(0, 12);
+    }
+
+    if (results.length === 0) { setMention(null); return; }
+
+    setMention({
+      type, query, triggerIndex, results, selectedIndex: 0,
+      top: bounds.top + bounds.height + 6,
+      left: bounds.left,
+    });
+  }, [allTrades, allProducts, contacts]);
+
+  const selectMention = useCallback((result) => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor || !result) return;
+    const m = mentionRef.current;
+    if (!m) return;
+    const range = editor.getSelection();
+    if (!range) return;
+    // Delete the typed trigger ("@bob" or "#paint") so the pill replaces it.
+    const deleteLen = range.index - m.triggerIndex;
+    if (deleteLen > 0) editor.deleteText(m.triggerIndex, deleteLen, 'user');
+    editor.setSelection(m.triggerIndex, 0);
+    if (result.kind === 'trade') insertTrade(result.value);
+    else if (result.kind === 'product') insertProduct(result.value);
+    else if (result.kind === 'person') insertPerson(result.value);
+    setMention(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keydown listener (capture) on editor root — handles arrow keys, Enter, Tab, Esc when popup open
+  useEffect(() => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+    const root = editor.root;
+    const onKey = (e) => {
+      const m = mentionRef.current;
+      if (!m) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault(); e.stopPropagation();
+        setMention(prev => prev ? ({ ...prev, selectedIndex: (prev.selectedIndex + 1) % prev.results.length }) : null);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault(); e.stopPropagation();
+        setMention(prev => prev ? ({ ...prev, selectedIndex: (prev.selectedIndex - 1 + prev.results.length) % prev.results.length }) : null);
+      } else if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault(); e.stopPropagation();
+        selectMention(m.results[m.selectedIndex]);
+      } else if (e.key === 'Escape') {
+        e.preventDefault(); e.stopPropagation();
+        setMention(null);
+      }
+    };
+    root.addEventListener('keydown', onKey, true);
+    return () => root.removeEventListener('keydown', onKey, true);
+  }, [selectMention]);
 
   // Close menus on outside click
   useEffect(() => {
@@ -364,18 +487,48 @@ export default function ScopeDocumentEditor({
           {showProductMenu && (
             <div className="tag-menu" data-testid="product-menu" style={{ top: '100%', marginTop: 4 }}>
               <input
-                placeholder="Search FFE items..."
+                placeholder="Search FFE or Checklist items..."
                 value={productFilter}
                 onChange={e => setProductFilter(e.target.value)}
                 autoFocus
               />
-              {allProducts.length === 0 && <div style={{ color: '#6B7280', fontSize: 12, padding: 8 }}>No FFE items yet. Add items in the Walkthrough or FFE section first.</div>}
-              {allProducts.filter(p => !productFilter || (p.name || '').toLowerCase().includes(productFilter.toLowerCase()) || (p.room || '').toLowerCase().includes(productFilter.toLowerCase())).slice(0, 50).map(p => (
-                <div key={p.id} className="menu-item" onClick={() => insertProduct(p)}>
-                  <span style={{ color: '#93C5FD', fontWeight: 700 }}>{p.name}</span>
-                  <span style={{ color: '#6B7280', fontSize: 10 }}>({p.room})</span>
-                </div>
-              ))}
+              {allProducts.length === 0 && <div style={{ color: '#6B7280', fontSize: 12, padding: 8 }}>No items yet. Add items in the Walkthrough, Checklist, or FFE section first.</div>}
+              {allProducts.length > 0 && (() => {
+                const filtered = allProducts.filter(p => !productFilter || (p.name || '').toLowerCase().includes(productFilter.toLowerCase()) || (p.room || '').toLowerCase().includes(productFilter.toLowerCase()));
+                const ffeItems = filtered.filter(p => p.source === 'FFE').slice(0, 30);
+                const checklistItems = filtered.filter(p => p.source === 'CHECKLIST').slice(0, 30);
+                return (
+                  <>
+                    {ffeItems.length > 0 && (
+                      <>
+                        <div style={{ color: '#3B82F6', fontSize: 9, fontWeight: 800, letterSpacing: 1.5, padding: '6px 8px 2px', borderBottom: '1px solid #1f2937' }}>🏷 FF&amp;E ITEMS</div>
+                        {ffeItems.map(p => (
+                          <div key={p.id} className="menu-item" onClick={() => insertProduct(p)}>
+                            <span style={{ background: '#3B82F6', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, letterSpacing: 0.5 }}>FFE</span>
+                            <span style={{ color: '#93C5FD', fontWeight: 700 }}>{p.name}</span>
+                            <span style={{ color: '#6B7280', fontSize: 10 }}>({p.room})</span>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                    {checklistItems.length > 0 && (
+                      <>
+                        <div style={{ color: '#10B981', fontSize: 9, fontWeight: 800, letterSpacing: 1.5, padding: '6px 8px 2px', borderBottom: '1px solid #1f2937', marginTop: ffeItems.length > 0 ? 4 : 0 }}>✓ CHECKLIST ITEMS</div>
+                        {checklistItems.map(p => (
+                          <div key={p.id} className="menu-item" onClick={() => insertProduct(p)}>
+                            <span style={{ background: '#10B981', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, letterSpacing: 0.5 }}>CHK</span>
+                            <span style={{ color: '#86EFAC', fontWeight: 700 }}>{p.name}</span>
+                            <span style={{ color: '#6B7280', fontSize: 10 }}>({p.room})</span>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                    {ffeItems.length === 0 && checklistItems.length === 0 && (
+                      <div style={{ color: '#6B7280', fontSize: 12, padding: 8 }}>No items match "{productFilter}"</div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           )}
         </div>
@@ -444,25 +597,119 @@ export default function ScopeDocumentEditor({
         </div>
       </div>
 
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        value={value || ''}
-        onChange={(content, delta, source) => {
-          if (source === 'user' && onChange) onChange(content);
-        }}
-        modules={MODULES}
-        formats={FORMATS}
-        placeholder="Start typing your scope of work...
+      <div style={{ position: 'relative' }}>
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={value || ''}
+          onChange={(content, delta, source) => {
+            if (source === 'user' && onChange) onChange(content);
+            // Defer to allow Quill to settle the selection before checking
+            setTimeout(checkMention, 0);
+          }}
+          onChangeSelection={() => { setTimeout(checkMention, 0); }}
+          modules={MODULES}
+          formats={FORMATS}
+          placeholder="Start typing your scope of work...
+
+Tip: Type # for trades & products (autocomplete), @ for people. Use ▼ ROOM HEADING button for room sections.
 
 Example:
-  FOYER (insert with ▼ ROOM HEADING button)
+  FOYER  (heading)
   1. Paint entire foyer #PAINT
-  2. Hang new chandelier #ELECTRICAL 🏷Chandelier
-  3. Box in beams w/ white oak #MILLWORK @JoeContractor
+  2. Hang new chandelier #ELECTRICAL #Chandelier (auto-suggests products + trades)
+  3. Box in beams w/ white oak #TRIM CARPENTER @JoeContractor"
+        />
 
-Use the buttons above to insert inline tags. The Builder Portal will auto-generate By-Trade and By-Room lists from your tags."
-      />
+        {/* INLINE AUTOCOMPLETE POPUP */}
+        {mention && mention.results.length > 0 && (
+          <div
+            data-testid="mention-popup"
+            style={{
+              position: 'absolute',
+              top: mention.top + 42 /* +toolbar height */,
+              left: mention.left + 16,
+              zIndex: 9999,
+              background: '#0f1218',
+              border: '1px solid #2a3040',
+              borderRadius: 8,
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+              padding: 4,
+              minWidth: 240,
+              maxWidth: 360,
+              maxHeight: 280,
+              overflowY: 'auto',
+            }}
+          >
+            <div style={{ fontSize: 9, color: '#6B7280', fontWeight: 800, letterSpacing: 1.2, padding: '4px 6px', borderBottom: '1px solid #1f2937' }}>
+              {mention.type === 'unified'
+                ? '↑↓ NAVIGATE · ENTER/TAB SELECT · ESC CANCEL'
+                : '↑↓ PEOPLE · ENTER/TAB SELECT · ESC CANCEL'}
+            </div>
+            {mention.results.map((r, idx) => {
+              const selected = idx === mention.selectedIndex;
+              if (r.kind === 'trade') {
+                return (
+                  <div
+                    key={`t-${r.value}`}
+                    onClick={() => selectMention(r)}
+                    onMouseEnter={() => setMention(prev => prev ? { ...prev, selectedIndex: idx } : null)}
+                    style={{
+                      padding: '6px 8px', borderRadius: 4, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      background: selected ? '#1F2937' : 'transparent',
+                    }}
+                    data-testid={`mention-result-${idx}`}
+                  >
+                    <span style={{ background: r.color, color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, letterSpacing: 0.5 }}>TRADE</span>
+                    <span style={{ color: r.color, fontWeight: 800, fontSize: 12 }}>#{r.label}</span>
+                  </div>
+                );
+              }
+              if (r.kind === 'product') {
+                const isCheck = r.source === 'CHECKLIST';
+                return (
+                  <div
+                    key={`p-${r.value.id}`}
+                    onClick={() => selectMention(r)}
+                    onMouseEnter={() => setMention(prev => prev ? { ...prev, selectedIndex: idx } : null)}
+                    style={{
+                      padding: '6px 8px', borderRadius: 4, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      background: selected ? '#1F2937' : 'transparent',
+                    }}
+                    data-testid={`mention-result-${idx}`}
+                  >
+                    <span style={{ background: isCheck ? '#10B981' : '#3B82F6', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, letterSpacing: 0.5 }}>{isCheck ? 'CHK' : 'FFE'}</span>
+                    <span style={{ color: isCheck ? '#86EFAC' : '#93C5FD', fontWeight: 700, fontSize: 12, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.label}</span>
+                    <span style={{ color: '#6B7280', fontSize: 10 }}>{r.room}</span>
+                  </div>
+                );
+              }
+              if (r.kind === 'person') {
+                return (
+                  <div
+                    key={`u-${idx}`}
+                    onClick={() => selectMention(r)}
+                    onMouseEnter={() => setMention(prev => prev ? { ...prev, selectedIndex: idx } : null)}
+                    style={{
+                      padding: '6px 8px', borderRadius: 4, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      background: selected ? '#1F2937' : 'transparent',
+                    }}
+                    data-testid={`mention-result-${idx}`}
+                  >
+                    <span style={{ background: '#D4A574', color: '#1a1f2e', fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3, letterSpacing: 0.5 }}>USER</span>
+                    <span style={{ color: '#D4A574', fontWeight: 800, fontSize: 12 }}>@{r.label}</span>
+                    {r.role && <span style={{ color: '#6B7280', fontSize: 10 }}>({r.role})</span>}
+                  </div>
+                );
+              }
+              return null;
+            })}
+          </div>
+        )}
+      </div>
 
       {/* Custom trade chips */}
       {customTrades.length > 0 && (
