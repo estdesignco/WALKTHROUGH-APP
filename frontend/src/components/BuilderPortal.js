@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import ExactFFESpreadsheet from './FFEView';
 import RichTextEditor from './RichTextEditor';
 import { parseScopeDocument } from './ScopeDocumentEditor';
@@ -233,7 +234,7 @@ export default function BuilderPortal() {
 
         {/* ===== SCOPE OF WORK - WITH CHECKBOXES ===== */}
         {activeTab === 'scope' && (
-          <ScopeSection portal={portal} rooms={rooms} accessCode={accessCode} lang={lang} t={t} onReload={loadPortal} />
+          <ScopeSection portal={portal} rooms={rooms} accessCode={accessCode} lang={lang} t={t} onReload={loadPortal} setActiveTab={setActiveTab} />
         )}
 
         {/* ===== FFE (READ ONLY) ===== */}
@@ -364,29 +365,116 @@ export default function BuilderPortal() {
 }
 
 // ===== SCOPE SECTION (driven by parsed scope_document) =====
-function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
+function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveTab }) {
   const [viewMode, setViewMode] = useState('overall');
+  const [tradeFilter, setTradeFilter] = useState(null); // for "click trade chip" navigation
+  const [productModal, setProductModal] = useState(null); // live item object when opened
+
+  // Build itemsById lookup for live resolution of product tags
+  const itemsById = {};
+  rooms.forEach(r => {
+    (r.categories || []).forEach(c => {
+      (c.subcategories || []).forEach(sub => {
+        (sub.items || []).forEach(item => {
+          itemsById[item.id] = { ...item, _room: r.name, _roomColor: r.color };
+        });
+      });
+    });
+  });
 
   const tradeColors = {
     'DEMOLITION': '#EF4444', 'FRAMING': '#F97316', 'ELECTRICAL': '#EAB308', 'PLUMBING': '#3B82F6',
     'HVAC': '#6366F1', 'DRYWALL': '#A3A3A3', 'PAINT': '#EC4899', 'TILE': '#14B8A6', 'FLOORING': '#8B5CF6',
-    'CABINETRY': '#D97706', 'COUNTERTOPS': '#7C3AED', 'MILLWORK': '#B45309', 'HARDWARE': '#78716C',
+    'CABINETRY': '#D97706', 'COUNTERTOPS': '#7C3AED', 'MILLWORK': '#B45309',
+    'TRIM CARPENTER': '#92400E', 'HARDWARE': '#78716C',
     'GLASS & MIRRORS': '#06B6D4', 'APPLIANCES': '#64748B', 'FIXTURES': '#0EA5E9', 'ROOFING': '#DC2626',
     'EXTERIOR': '#059669', 'LANDSCAPING': '#16A34A', 'GENERAL': '#6B7280',
+  };
+
+  // Status phases that map to "CHECKLIST" (everything else → FFE)
+  const CHK_STATUSES = new Set([
+    'ORDER SAMPLES', 'SAMPLES ARRIVED', 'ASK NEIL', 'ASK CHARLENE', 'ASK JALA',
+    'GET QUOTE', 'WAITING ON QT', 'READY FOR PRESENTATION',
+    'TO BE SELECTED', 'RESEARCHING', 'PENDING APPROVAL', '', null,
+  ]);
+  const isChecklistItem = (status) => CHK_STATUSES.has(status || '');
+
+  // Click handlers
+  const handleTradeClick = (trade) => {
+    setViewMode('trade');
+    setTradeFilter(trade);
+    setTimeout(() => {
+      document.querySelector(`[data-testid="by-trade-${trade}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+  const handleProductClick = (id) => {
+    const item = itemsById[id];
+    if (item) setProductModal(item);
+    else setProductModal({ _missing: true, id });
+  };
+  const handlePersonClick = (name) => {
+    setActiveTab?.('contacts');
+    setTimeout(() => {
+      document.querySelector(`[data-contact="${name}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 200);
+  };
+
+  // Render helper: convert stored HTML → React tree, replacing tag spans with live chips
+  const renderScope = (html) => {
+    if (!html) return null;
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    let key = 0;
+    const walk = (node) => {
+      if (node.nodeType === 3) return node.textContent;
+      if (node.nodeType !== 1) return null;
+      const tagType = node.getAttribute('data-tag');
+      if (tagType === 'trade') {
+        const trade = node.getAttribute('data-trade');
+        const color = node.getAttribute('data-color') || tradeColors[trade] || '#6B7280';
+        return <LiveTradeChip key={`k${key++}`} trade={trade} color={color} onClick={() => handleTradeClick(trade)} />;
+      }
+      if (tagType === 'product') {
+        const id = node.getAttribute('data-product-id');
+        const fallback = node.getAttribute('data-product-name');
+        return <LiveProductChip key={`k${key++}`} id={id} fallbackName={fallback} item={itemsById[id]} isChecklist={itemsById[id] ? isChecklistItem(itemsById[id].status) : false} onClick={() => handleProductClick(id)} />;
+      }
+      if (tagType === 'person') {
+        const pname = node.getAttribute('data-person');
+        const role = node.getAttribute('data-role');
+        return <LivePersonChip key={`k${key++}`} name={pname} role={role} contact={(portal.contacts || []).find(c => (c.username || c.name) === pname)} onClick={() => handlePersonClick(pname)} />;
+      }
+      const TagName = (node.tagName || 'span').toLowerCase();
+      const children = Array.from(node.childNodes).map(walk);
+      const props = { key: `k${key++}` };
+      if (node.getAttribute('class')) props.className = node.getAttribute('class');
+      const styleAttr = node.getAttribute('style');
+      if (styleAttr) {
+        props.style = styleAttr.split(';').reduce((acc, s) => {
+          const [k2, v2] = s.split(':').map(x => x && x.trim());
+          if (k2 && v2) {
+            const camelK = k2.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+            acc[camelK] = v2;
+          }
+          return acc;
+        }, {});
+      }
+      return React.createElement(TagName, props, ...children);
+    };
+    return Array.from(container.childNodes).map(walk);
   };
 
   const scopeDoc = portal.scope_document || '';
   const parsed = parseScopeDocument(scopeDoc, rooms);
   const hasDoc = !!scopeDoc.trim();
 
-  // Sorted trades for By Trade view
-  const tradeKeys = Object.keys(parsed.byTrade).sort((a, b) => {
+  let tradeKeys = Object.keys(parsed.byTrade).sort((a, b) => {
     if (a === '__UNTAGGED__') return 1;
     if (b === '__UNTAGGED__') return -1;
     return a.localeCompare(b);
   });
+  if (tradeFilter) tradeKeys = tradeKeys.filter(k => k === tradeFilter);
 
-  // Ordered room keys for By Room view (project room order, then unmatched headings)
   const orderedRoomNames = (() => {
     const projectRoomNames = rooms.map(r => r.name.toUpperCase());
     const docRoomNames = Object.keys(parsed.byRoom);
@@ -395,58 +483,67 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
     return [...matched, ...extras];
   })();
 
+  // Render a block's items (used for By Room / By Trade lists)
+  const renderBlockItems = (items) => items.map((item, idx) => (
+    <div key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', alignItems: 'flex-start' }}>
+      <span style={{ color: '#6B7280', fontWeight: 700, minWidth: 22, fontSize: 13 }}>{idx + 1}.</span>
+      <div style={{ color: '#E5E7EB', fontSize: 14, lineHeight: 1.5, flex: 1 }}>{renderScope(`<p>${item.html}</p>`)}</div>
+    </div>
+  ));
+
   return (
     <div>
-      {/* Global styles for inline tag pills (apply to all 3 views) */}
       <style>{`
         .qe-tag-trade, .qe-tag-product, .qe-tag-person {
           padding: 1px 8px; border-radius: 4px; font-weight: 800;
-          font-size: 0.85em; margin: 0 2px; display: inline-block; line-height: 1.4;
+          font-size: 0.85em; margin: 0 2px; display: inline-flex; align-items: center; gap: 4px; line-height: 1.4;
+          transition: transform 0.1s, filter 0.1s;
         }
+        .qe-tag-trade:hover, .qe-tag-product:hover, .qe-tag-person:hover { filter: brightness(1.2); transform: translateY(-1px); }
         .qe-tag-trade { background: var(--pill-bg, #6B7280); color: #fff; letter-spacing: 1px; }
         .qe-tag-product { background: #1E3A5F; color: #93C5FD; border: 1px solid #3B82F6; font-weight: 700; }
+        .qe-tag-product.chk { background: #064E3B; color: #86EFAC; border-color: #10B981; }
         .qe-tag-person { background: rgba(212,165,116,0.2); color: #D4A574; border: 1px solid #D4A574; font-weight: 700; }
+        .scope-doc-readonly h1, .scope-doc-readonly h2, .scope-doc-readonly h3 { color: #D4A574; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: 18px; padding-bottom: 4px; border-bottom: 1px solid #D4A574; }
+        .scope-doc-readonly h1 { font-size: 26px; }
+        .scope-doc-readonly h2 { font-size: 21px; }
+        .scope-doc-readonly h3 { font-size: 17px; }
+        .scope-doc-readonly ol, .scope-doc-readonly ul { padding-left: 1.5em; }
+        .scope-doc-readonly li { margin: 4px 0; }
+        .scope-doc-readonly p { margin: 6px 0; }
       `}</style>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
         <h2 style={sectionTitle}>{t.scopeOfWork}</h2>
         <div style={{ display: 'flex', gap: 4, background: '#1a1f2e', borderRadius: 8, padding: 4, border: '1px solid #2a3040' }}>
-          <button data-testid="scope-view-overall" onClick={() => setViewMode('overall')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'overall' ? '#D4A574' : 'transparent', color: viewMode === 'overall' ? '#1a1f2e' : '#6B7280' }}>
+          <button data-testid="scope-view-overall" onClick={() => { setViewMode('overall'); setTradeFilter(null); }} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'overall' ? '#D4A574' : 'transparent', color: viewMode === 'overall' ? '#1a1f2e' : '#6B7280' }}>
             {lang === 'en' ? 'Overall' : 'General'}
           </button>
-          <button data-testid="scope-view-room" onClick={() => setViewMode('room')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'room' ? '#D4A574' : 'transparent', color: viewMode === 'room' ? '#1a1f2e' : '#6B7280' }}>
+          <button data-testid="scope-view-room" onClick={() => { setViewMode('room'); setTradeFilter(null); }} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'room' ? '#D4A574' : 'transparent', color: viewMode === 'room' ? '#1a1f2e' : '#6B7280' }}>
             {lang === 'en' ? 'By Room' : 'Por Hab.'}
           </button>
-          <button data-testid="scope-view-trade" onClick={() => setViewMode('trade')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'trade' ? '#D4A574' : 'transparent', color: viewMode === 'trade' ? '#1a1f2e' : '#6B7280' }}>
+          <button data-testid="scope-view-trade" onClick={() => { setViewMode('trade'); setTradeFilter(null); }} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'trade' ? '#D4A574' : 'transparent', color: viewMode === 'trade' ? '#1a1f2e' : '#6B7280' }}>
             {lang === 'en' ? 'By Trade' : 'Por Oficio'}
           </button>
         </div>
       </div>
 
-      {!hasDoc && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope of work yet.' : 'No hay alcance del trabajo aún.'}</p>}
-
-      {/* OVERALL VIEW — render the source document HTML directly */}
-      {viewMode === 'overall' && hasDoc && (
-        <div data-testid="overall-scope-doc" className="scope-doc-readonly" style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 8, padding: '20px 28px', color: '#E5E7EB', fontSize: 15, lineHeight: 1.7 }}>
-          <style>{`
-            .scope-doc-readonly h1, .scope-doc-readonly h2, .scope-doc-readonly h3 { color: #D4A574; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: 18px; padding-bottom: 4px; border-bottom: 1px solid #D4A574; }
-            .scope-doc-readonly h1 { font-size: 26px; }
-            .scope-doc-readonly h2 { font-size: 21px; }
-            .scope-doc-readonly h3 { font-size: 17px; }
-            .scope-doc-readonly ol, .scope-doc-readonly ul { padding-left: 1.5em; }
-            .scope-doc-readonly li { margin: 4px 0; }
-            .scope-doc-readonly p { margin: 6px 0; }
-            .scope-doc-readonly .qe-tag-trade,
-            .scope-doc-readonly .qe-tag-product,
-            .scope-doc-readonly .qe-tag-person { padding: 1px 8px; border-radius: 4px; font-weight: 800; font-size: 0.85em; margin: 0 2px; display: inline-block; line-height: 1.4; }
-            .scope-doc-readonly .qe-tag-trade { background: var(--pill-bg, #6B7280); color: #fff; letter-spacing: 1px; }
-            .scope-doc-readonly .qe-tag-product { background: #1E3A5F; color: #93C5FD; border: 1px solid #3B82F6; font-weight: 700; }
-            .scope-doc-readonly .qe-tag-person { background: rgba(212,165,116,0.2); color: #D4A574; border: 1px solid #D4A574; font-weight: 700; }
-          `}</style>
-          <div dangerouslySetInnerHTML={{ __html: scopeDoc }} />
+      {tradeFilter && (
+        <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 11, color: '#6B7280' }}>Filtered to trade:</span>
+          <span style={{ background: tradeColors[tradeFilter] || '#6B7280', color: '#fff', padding: '2px 10px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>#{tradeFilter}</span>
+          <button onClick={() => setTradeFilter(null)} style={{ color: '#EF4444', fontSize: 11, background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Clear filter</button>
         </div>
       )}
 
-      {/* BY ROOM VIEW (auto-generated from inline tags + room headings) */}
+      {!hasDoc && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope of work yet.' : 'No hay alcance del trabajo aún.'}</p>}
+
+      {viewMode === 'overall' && hasDoc && (
+        <div data-testid="overall-scope-doc" className="scope-doc-readonly" style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 8, padding: '20px 28px', color: '#E5E7EB', fontSize: 15, lineHeight: 1.7 }}>
+          {renderScope(scopeDoc)}
+        </div>
+      )}
+
       {viewMode === 'room' && hasDoc && orderedRoomNames.map(roomName => {
         const group = parsed.byRoom[roomName];
         if (!group) return null;
@@ -458,25 +555,16 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
               <h3 style={{ color: headerColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{roomName}</h3>
               <span style={{ color: '#6B7280', fontSize: 11 }}>{group.items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
             </div>
-            <ol style={{ listStyle: 'none', padding: '12px 24px 16px 24px', margin: 0 }}>
-              {group.items.map((item, idx) => (
-                <li key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <span style={{ color: headerColor, fontWeight: 700, minWidth: 22 }}>{idx + 1}.</span>
-                  <div style={{ color: '#E5E7EB', fontSize: 14, lineHeight: 1.5, flex: 1 }} dangerouslySetInnerHTML={{ __html: item.html }} />
-                </li>
-              ))}
-            </ol>
+            <div style={{ padding: '12px 24px 16px 24px' }}>{renderBlockItems(group.items)}</div>
           </div>
         );
       })}
 
-      {/* BY TRADE VIEW (auto-generated from #trade inline tags) */}
       {viewMode === 'trade' && hasDoc && tradeKeys.map(trade => {
         const items = parsed.byTrade[trade];
         const isUntagged = trade === '__UNTAGGED__';
         const tColor = isUntagged ? '#4B5563' : (tradeColors[trade] || '#6B7280');
         const label = isUntagged ? (lang === 'en' ? 'NO TRADE TAGGED' : 'SIN OFICIO') : trade;
-        // Group items by room within this trade
         const roomGroups = {};
         items.forEach(item => {
           const rn = item.roomName || 'GENERAL';
@@ -492,17 +580,173 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
             {Object.entries(roomGroups).map(([rName, group]) => (
               <div key={rName} style={{ marginLeft: 12, marginBottom: 12 }}>
                 <p style={{ color: group.room?.color || '#D4A574', fontSize: 13, fontWeight: 700, marginBottom: 6, borderBottom: `1px solid ${group.room?.color || '#D4A574'}30`, paddingBottom: 4, letterSpacing: 1 }}>{rName}</p>
-                {group.items.map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid #1a1f2e' }}>
-                    <span style={{ color: tColor, fontWeight: 700, minWidth: 22, fontSize: 13 }}>{idx + 1}.</span>
-                    <div style={{ color: '#E5E7EB', fontSize: 13, lineHeight: 1.5, flex: 1 }} dangerouslySetInnerHTML={{ __html: item.html }} />
-                  </div>
-                ))}
+                {renderBlockItems(group.items)}
               </div>
             ))}
           </div>
         );
       })}
+
+      {productModal && <ProductDetailModal item={productModal} onClose={() => setProductModal(null)} onGoToFFE={() => { setProductModal(null); setActiveTab?.('ffe'); }} onGoToChecklist={() => { setProductModal(null); setActiveTab?.('ffe'); }} lang={lang} />}
+    </div>
+  );
+}
+
+// ===== LIVE CHIP COMPONENTS =====
+function LiveTradeChip({ trade, color, onClick }) {
+  return (
+    <span
+      onClick={onClick}
+      className="qe-tag-trade"
+      style={{ '--pill-bg': color, cursor: 'pointer' }}
+      title={`Click to view all ${trade} items`}
+      data-testid={`chip-trade-${trade}`}
+    >
+      #{trade}
+    </span>
+  );
+}
+
+function LiveProductChip({ id, fallbackName, item, isChecklist, onClick }) {
+  const [hover, setHover] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const ref = React.useRef(null);
+  const displayName = item?.name || fallbackName || 'Unknown item';
+  const photo = item?.image_url;
+
+  const onEnter = () => {
+    if (ref.current) {
+      const r = ref.current.getBoundingClientRect();
+      setCoords({ top: r.bottom + 6, left: Math.min(r.left, window.innerWidth - 280) });
+    }
+    setHover(true);
+  };
+
+  return (
+    <>
+      <span
+        ref={ref}
+        onClick={onClick}
+        onMouseEnter={onEnter}
+        onMouseLeave={() => setHover(false)}
+        className={`qe-tag-product ${isChecklist ? 'chk' : ''}`}
+        style={{ cursor: 'pointer' }}
+        data-testid={`chip-product-${id}`}
+      >
+        {photo
+          ? <img src={photo} alt="" style={{ width: 16, height: 16, borderRadius: 2, objectFit: 'cover' }} />
+          : <span style={{ fontSize: 10 }}>{isChecklist ? '✓' : '🏷'}</span>}
+        <span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</span>
+      </span>
+      {hover && item && (
+        <ProductHoverCard item={item} isChecklist={isChecklist} top={coords.top} left={coords.left} />
+      )}
+    </>
+  );
+}
+
+function ProductHoverCard({ item, isChecklist, top, left }) {
+  // Render via portal-style fixed position so it's not clipped by overflow
+  return ReactDOM.createPortal(
+    <div
+      style={{
+        position: 'fixed',
+        top, left,
+        zIndex: 99999,
+        background: '#0f1218',
+        border: '1px solid #2a3040',
+        borderRadius: 8,
+        boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
+        width: 260,
+        pointerEvents: 'none',
+        overflow: 'hidden',
+      }}
+      data-testid="product-hover-card"
+    >
+      {item.image_url ? (
+        <img src={item.image_url} alt={item.name} style={{ width: '100%', height: 180, objectFit: 'cover', background: '#0f1218' }} />
+      ) : (
+        <div style={{ width: '100%', height: 80, background: '#1a1f2e', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563', fontSize: 11, fontStyle: 'italic' }}>No photo yet</div>
+      )}
+      <div style={{ padding: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+          <span style={{ background: isChecklist ? '#10B981' : '#3B82F6', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 6px', borderRadius: 3, letterSpacing: 0.5 }}>{isChecklist ? 'CHK' : 'FFE'}</span>
+          {item._room && <span style={{ color: item._roomColor || '#D4A574', fontSize: 10, fontWeight: 700, letterSpacing: 0.8 }}>{item._room}</span>}
+        </div>
+        <div style={{ color: '#F5F5DC', fontSize: 13, fontWeight: 800, marginBottom: 4, lineHeight: 1.25 }}>{item.name || '(unnamed)'}</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 10px', fontSize: 10, color: '#9CA3AF' }}>
+          {item.vendor && <span>{item.vendor}</span>}
+          {item.sku && <span>SKU: {item.sku}</span>}
+          {item.size && <span>Size: {item.size}</span>}
+          {item.finish_color && <span>{item.finish_color}</span>}
+        </div>
+        {item.status && <div style={{ marginTop: 6, fontSize: 10, color: '#D4A574', fontWeight: 700 }}>● {item.status}</div>}
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+function LivePersonChip({ name, role, contact, onClick }) {
+  return (
+    <span
+      onClick={onClick}
+      className="qe-tag-person"
+      style={{ cursor: 'pointer' }}
+      title={contact ? `${contact.name} • ${contact.role}${contact.phone ? ' • ' + contact.phone : ''}${contact.email ? ' • ' + contact.email : ''}` : name}
+      data-testid={`chip-person-${name}`}
+    >
+      @{name}{role ? <span style={{ fontSize: '0.85em', opacity: 0.7 }}> ({role})</span> : null}
+    </span>
+  );
+}
+
+// ===== PRODUCT DETAIL MODAL =====
+function ProductDetailModal({ item, onClose, onGoToFFE, onGoToChecklist, lang }) {
+  if (!item) return null;
+  if (item._missing) {
+    return (
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+        <div onClick={e => e.stopPropagation()} style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 12, padding: 24, maxWidth: 380 }}>
+          <h3 style={{ color: '#EF4444', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>Item not found</h3>
+          <p style={{ color: '#9CA3AF', fontSize: 13 }}>This item may have been deleted or hasn't been created yet. ID: <code style={{ color: '#6B7280' }}>{item.id}</code></p>
+          <button onClick={onClose} style={{ marginTop: 16, padding: '8px 16px', background: '#D4A574', color: '#1a1f2e', border: 'none', borderRadius: 6, fontWeight: 800, cursor: 'pointer' }}>Close</button>
+        </div>
+      </div>
+    );
+  }
+  const CHK_STATUSES = new Set(['ORDER SAMPLES','SAMPLES ARRIVED','ASK NEIL','ASK CHARLENE','ASK JALA','GET QUOTE','WAITING ON QT','READY FOR PRESENTATION','TO BE SELECTED','RESEARCHING','PENDING APPROVAL','', null]);
+  const isChk = CHK_STATUSES.has(item.status || '');
+  return (
+    <div onClick={onClose} data-testid="product-detail-modal" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 12, padding: 0, maxWidth: 480, width: '100%', maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #2a3040' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ background: isChk ? '#10B981' : '#3B82F6', color: '#fff', fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 4, letterSpacing: 1 }}>{isChk ? 'CHECKLIST' : 'FF&E'}</span>
+            <span style={{ color: item._roomColor || '#D4A574', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>{item._room}</span>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 20, cursor: 'pointer' }}>×</button>
+        </div>
+        {item.image_url && (
+          <img src={item.image_url} alt={item.name} style={{ width: '100%', height: 280, objectFit: 'cover', background: '#0f1218' }} />
+        )}
+        <div style={{ padding: 20, overflowY: 'auto' }}>
+          <h3 style={{ color: '#F5F5DC', fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{item.name || '(unnamed)'}</h3>
+          {item.vendor && <p style={{ color: '#9CA3AF', fontSize: 12, marginBottom: 12 }}>{item.vendor}</p>}
+          <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '6px 14px', fontSize: 13, marginTop: 8 }}>
+            {item.sku && (<><span style={{ color: '#6B7280' }}>SKU</span><span style={{ color: '#E5E7EB' }}>{item.sku}</span></>)}
+            {item.size && (<><span style={{ color: '#6B7280' }}>Size</span><span style={{ color: '#E5E7EB' }}>{item.size}</span></>)}
+            {item.finish_color && (<><span style={{ color: '#6B7280' }}>Finish</span><span style={{ color: '#E5E7EB' }}>{item.finish_color}</span></>)}
+            {item.status && (<><span style={{ color: '#6B7280' }}>Status</span><span style={{ color: '#E5E7EB', fontWeight: 700 }}>{item.status}</span></>)}
+            {item.quantity && (<><span style={{ color: '#6B7280' }}>Qty</span><span style={{ color: '#E5E7EB' }}>{item.quantity}</span></>)}
+            {item.remarks && (<><span style={{ color: '#6B7280' }}>Notes</span><span style={{ color: '#E5E7EB' }}>{item.remarks}</span></>)}
+          </div>
+        </div>
+        <div style={{ padding: 12, borderTop: '1px solid #2a3040', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <button onClick={onClose} style={{ padding: '8px 16px', background: '#374151', color: '#E5E7EB', border: 'none', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{lang === 'en' ? 'Close' : 'Cerrar'}</button>
+          <button onClick={onGoToFFE} style={{ padding: '8px 16px', background: '#D4A574', color: '#1a1f2e', border: 'none', borderRadius: 6, fontWeight: 800, fontSize: 12, cursor: 'pointer' }}>{lang === 'en' ? 'View in FF&E →' : 'Ver en FF&E →'}</button>
+        </div>
+      </div>
     </div>
   );
 }

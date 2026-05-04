@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import ReactQuill, { Quill } from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
@@ -346,6 +347,61 @@ export default function ScopeDocumentEditor({
     document.addEventListener('click', close);
     return () => document.removeEventListener('click', close);
   }, []);
+
+  // ============================================================
+  // HOVER PREVIEW — show live thumbnail/info for pills inside the editor
+  // ============================================================
+  const [hoverPill, setHoverPill] = useState(null); // { kind, data, top, left }
+
+  // Build id → item lookup for live resolution
+  const itemsById = {};
+  rooms.forEach(r => {
+    (r.categories || []).forEach(c => {
+      (c.subcategories || []).forEach(sub => {
+        (sub.items || []).forEach(item => {
+          itemsById[item.id] = { ...item, _room: r.name, _roomColor: r.color };
+        });
+      });
+    });
+  });
+
+  useEffect(() => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+    const root = editor.root;
+    const onOver = (e) => {
+      const pill = e.target.closest('[data-tag]');
+      if (!pill) { setHoverPill(null); return; }
+      const r = pill.getBoundingClientRect();
+      const top = r.bottom + 6;
+      const left = Math.min(r.left, window.innerWidth - 280);
+      const tagType = pill.getAttribute('data-tag');
+      if (tagType === 'product') {
+        const id = pill.getAttribute('data-product-id');
+        const fallbackName = pill.getAttribute('data-product-name');
+        const live = itemsById[id];
+        setHoverPill({ kind: 'product', data: live || { _missing: true, id, name: fallbackName }, top, left });
+      } else if (tagType === 'trade') {
+        setHoverPill({ kind: 'trade', data: { trade: pill.getAttribute('data-trade'), color: pill.getAttribute('data-color') }, top, left });
+      } else if (tagType === 'person') {
+        const name = pill.getAttribute('data-person');
+        const contact = (contacts || []).find(c => (c.username || c.name) === name);
+        setHoverPill({ kind: 'person', data: { name, role: pill.getAttribute('data-role'), contact }, top, left });
+      }
+    };
+    const onOut = (e) => {
+      if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest('[data-tag]')) {
+        setHoverPill(null);
+      }
+    };
+    root.addEventListener('mouseover', onOver);
+    root.addEventListener('mouseout', onOut);
+    return () => {
+      root.removeEventListener('mouseover', onOver);
+      root.removeEventListener('mouseout', onOut);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rooms, contacts]);
 
   return (
     <div className="scope-doc-editor" data-testid="scope-document-editor">
@@ -725,8 +781,94 @@ Example:
           ))}
         </div>
       )}
+
+      {/* HOVER PREVIEW — follows mouse over pills inside the Quill editor */}
+      {hoverPill && ReactDOM.createPortal(
+        <PillHoverCard hoverPill={hoverPill} />,
+        document.body
+      )}
     </div>
   );
+}
+
+// Floating preview card for pills inside the editor
+function PillHoverCard({ hoverPill }) {
+  const { kind, data, top, left } = hoverPill;
+  const base = {
+    position: 'fixed', top, left, zIndex: 99999,
+    background: '#0f1218', border: '1px solid #2a3040', borderRadius: 8,
+    boxShadow: '0 12px 40px rgba(0,0,0,0.7)', pointerEvents: 'none', overflow: 'hidden', width: 260,
+  };
+  if (kind === 'product') {
+    if (data._missing) {
+      return (
+        <div style={base} data-testid="pill-hover-missing">
+          <div style={{ padding: 12 }}>
+            <div style={{ color: '#EF4444', fontSize: 11, fontWeight: 800, marginBottom: 4 }}>ITEM NOT FOUND</div>
+            <div style={{ color: '#9CA3AF', fontSize: 11 }}>Was: <strong>{data.name}</strong></div>
+            <div style={{ color: '#6B7280', fontSize: 10, marginTop: 4 }}>It may have been deleted. Tag will still update if re-added.</div>
+          </div>
+        </div>
+      );
+    }
+    const CHK = new Set(['ORDER SAMPLES','SAMPLES ARRIVED','ASK NEIL','ASK CHARLENE','ASK JALA','GET QUOTE','WAITING ON QT','READY FOR PRESENTATION','TO BE SELECTED','RESEARCHING','PENDING APPROVAL','', null]);
+    const isChk = CHK.has(data.status || '');
+    return (
+      <div style={base} data-testid="pill-hover-product">
+        {data.image_url ? (
+          <img src={data.image_url} alt={data.name} style={{ width: '100%', height: 180, objectFit: 'cover', background: '#0f1218' }} />
+        ) : (
+          <div style={{ width: '100%', height: 60, background: '#1a1f2e', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563', fontSize: 11, fontStyle: 'italic' }}>No photo yet</div>
+        )}
+        <div style={{ padding: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+            <span style={{ background: isChk ? '#10B981' : '#3B82F6', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 6px', borderRadius: 3, letterSpacing: 0.5 }}>{isChk ? 'CHK' : 'FFE'}</span>
+            {data._room && <span style={{ color: data._roomColor || '#D4A574', fontSize: 10, fontWeight: 700, letterSpacing: 0.8 }}>{data._room}</span>}
+          </div>
+          <div style={{ color: '#F5F5DC', fontSize: 13, fontWeight: 800, marginBottom: 4, lineHeight: 1.25 }}>{data.name || '(unnamed)'}</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 10px', fontSize: 10, color: '#9CA3AF' }}>
+            {data.vendor && <span>{data.vendor}</span>}
+            {data.sku && <span>SKU: {data.sku}</span>}
+            {data.size && <span>{data.size}</span>}
+            {data.finish_color && <span>{data.finish_color}</span>}
+          </div>
+          {data.status && <div style={{ marginTop: 6, fontSize: 10, color: '#D4A574', fontWeight: 700 }}>● {data.status}</div>}
+        </div>
+      </div>
+    );
+  }
+  if (kind === 'trade') {
+    return (
+      <div style={{ ...base, width: 200 }} data-testid="pill-hover-trade">
+        <div style={{ padding: 12 }}>
+          <div style={{ display: 'inline-block', background: data.color, color: '#fff', fontSize: 10, fontWeight: 800, padding: '3px 10px', borderRadius: 4, letterSpacing: 1, marginBottom: 6 }}>#{data.trade}</div>
+          <div style={{ color: '#9CA3AF', fontSize: 11 }}>Trade category</div>
+          <div style={{ color: '#6B7280', fontSize: 10, marginTop: 4 }}>Click tag in preview to filter all items by this trade.</div>
+        </div>
+      </div>
+    );
+  }
+  if (kind === 'person') {
+    const c = data.contact;
+    return (
+      <div style={{ ...base, width: 240 }} data-testid="pill-hover-person">
+        <div style={{ padding: 12 }}>
+          <div style={{ color: '#D4A574', fontSize: 13, fontWeight: 800, marginBottom: 2 }}>@{data.name}</div>
+          {data.role && <div style={{ color: '#9CA3AF', fontSize: 11, marginBottom: 6 }}>{data.role}</div>}
+          {c ? (
+            <div style={{ fontSize: 11, color: '#E5E7EB' }}>
+              {c.name && <div>{c.name}</div>}
+              {c.phone && <div style={{ color: '#9CA3AF' }}>{c.phone}</div>}
+              {c.email && <div style={{ color: '#9CA3AF' }}>{c.email}</div>}
+            </div>
+          ) : (
+            <div style={{ fontSize: 10, color: '#6B7280', fontStyle: 'italic' }}>Add to Project Contacts to see details here.</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return null;
 }
 
 // =================================================================
