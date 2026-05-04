@@ -11,11 +11,15 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 - **Builder can comment** — section-tagged comments with author name
 - **Admin management**: People → Builder Portal tab in project
   - Select which rooms builder can see
-  - Add scope of work per room
+  - Scope of Work: ONE master rich-text document with inline #trade / 🏷product / @person tag pills
+    - User types freely; toolbar buttons insert color-coded tag pills at cursor
+    - Quill custom blots (TradeTagBlot, ProductTagBlot, PersonTagBlot) for round-tripping
+    - Builder portal AUTO-GENERATES "By Room" and "By Trade" views by parsing inline tags + H2 room headings
   - Add schedule/timeline milestones
   - Add change orders with dates
   - Add project contacts (name, role, phone, email)
   - Copy shareable link
+- **Builder Portal scope views**: Overall (full doc as-is) / By Room (auto-grouped) / By Trade (auto-grouped)
 - **Price stripping**: cost, price, budget, total_cost all removed from builder view
 
 ### Performance Optimization (Apr 17, 2026)

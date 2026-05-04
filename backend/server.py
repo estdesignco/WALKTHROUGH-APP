@@ -19305,13 +19305,15 @@ async def delete_finish_schedule(project_id: str, schedule_id: str):
 class BuilderPortalCreate(BaseModel):
     project_id: str
     selected_room_ids: List[str] = []
-    scope_of_work: List[Dict[str, Any]] = []  # [{room_id, description}]
+    scope_of_work: List[Dict[str, Any]] = []  # [{room_id, description}]  (legacy itemized)
+    scope_document: str = ""  # Free-form HTML doc with inline #trade @product @person tags
     schedule: List[Dict[str, Any]] = []  # [{title, date, status, notes}]
     contacts: List[Dict[str, Any]] = []  # [{name, role, phone, email}]
 
 class BuilderPortalUpdate(BaseModel):
     selected_room_ids: Optional[List[str]] = None
     scope_of_work: Optional[List[Dict[str, Any]]] = None
+    scope_document: Optional[str] = None
     schedule: Optional[List[Dict[str, Any]]] = None
     change_orders: Optional[List[Dict[str, Any]]] = None
     contacts: Optional[List[Dict[str, Any]]] = None
@@ -19335,6 +19337,7 @@ async def create_builder_portal(data: BuilderPortalCreate):
         "access_code": access_code,
         "selected_room_ids": data.selected_room_ids,
         "scope_of_work": data.scope_of_work,
+        "scope_document": data.scope_document,
         "schedule": data.schedule,
         "change_orders": [],
         "contacts": data.contacts,

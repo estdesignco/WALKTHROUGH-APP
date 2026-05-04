@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ExactFFESpreadsheet from './FFEView';
 import RichTextEditor from './RichTextEditor';
+import { parseScopeDocument } from './ScopeDocumentEditor';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -362,22 +363,10 @@ export default function BuilderPortal() {
   );
 }
 
-// ===== SCOPE SECTION WITH CHECKBOXES + TRADE VIEW =====
+// ===== SCOPE SECTION (driven by parsed scope_document) =====
 function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
   const [viewMode, setViewMode] = useState('overall');
 
-  const toggleScope = async (idx) => {
-    const updated = [...(portal.scope_of_work || [])];
-    updated[idx] = { ...updated[idx], completed: !updated[idx].completed };
-    await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scope_of_work: updated }),
-    });
-    onReload();
-  };
-
-  const scopeItems = portal.scope_of_work || [];
-  const tradeCategories = [...new Set(scopeItems.map(s => s.trade_category || 'GENERAL'))].sort();
   const tradeColors = {
     'DEMOLITION': '#EF4444', 'FRAMING': '#F97316', 'ELECTRICAL': '#EAB308', 'PLUMBING': '#3B82F6',
     'HVAC': '#6366F1', 'DRYWALL': '#A3A3A3', 'PAINT': '#EC4899', 'TILE': '#14B8A6', 'FLOORING': '#8B5CF6',
@@ -386,20 +375,38 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
     'EXTERIOR': '#059669', 'LANDSCAPING': '#16A34A', 'GENERAL': '#6B7280',
   };
 
-  // Group items by room (preserving original index for toggling)
-  const itemsByRoom = {};
-  scopeItems.forEach((item, idx) => {
-    const key = item.room_id || '__unassigned__';
-    if (!itemsByRoom[key]) itemsByRoom[key] = [];
-    itemsByRoom[key].push({ item, originalIndex: idx });
+  const scopeDoc = portal.scope_document || '';
+  const parsed = parseScopeDocument(scopeDoc, rooms);
+  const hasDoc = !!scopeDoc.trim();
+
+  // Sorted trades for By Trade view
+  const tradeKeys = Object.keys(parsed.byTrade).sort((a, b) => {
+    if (a === '__UNTAGGED__') return 1;
+    if (b === '__UNTAGGED__') return -1;
+    return a.localeCompare(b);
   });
-  const orderedRoomKeys = [
-    ...rooms.filter(r => itemsByRoom[r.id]).map(r => r.id),
-    ...(itemsByRoom['__unassigned__'] ? ['__unassigned__'] : []),
-  ];
+
+  // Ordered room keys for By Room view (project room order, then unmatched headings)
+  const orderedRoomNames = (() => {
+    const projectRoomNames = rooms.map(r => r.name.toUpperCase());
+    const docRoomNames = Object.keys(parsed.byRoom);
+    const matched = projectRoomNames.filter(n => docRoomNames.includes(n));
+    const extras = docRoomNames.filter(n => !projectRoomNames.includes(n));
+    return [...matched, ...extras];
+  })();
 
   return (
     <div>
+      {/* Global styles for inline tag pills (apply to all 3 views) */}
+      <style>{`
+        .qe-tag-trade, .qe-tag-product, .qe-tag-person {
+          padding: 1px 8px; border-radius: 4px; font-weight: 800;
+          font-size: 0.85em; margin: 0 2px; display: inline-block; line-height: 1.4;
+        }
+        .qe-tag-trade { background: var(--pill-bg, #6B7280); color: #fff; letter-spacing: 1px; }
+        .qe-tag-product { background: #1E3A5F; color: #93C5FD; border: 1px solid #3B82F6; font-weight: 700; }
+        .qe-tag-person { background: rgba(212,165,116,0.2); color: #D4A574; border: 1px solid #D4A574; font-weight: 700; }
+      `}</style>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
         <h2 style={sectionTitle}>{t.scopeOfWork}</h2>
         <div style={{ display: 'flex', gap: 4, background: '#1a1f2e', borderRadius: 8, padding: 4, border: '1px solid #2a3040' }}>
@@ -415,105 +422,80 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
         </div>
       </div>
 
-      {scopeItems.length === 0 && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope items defined yet.' : 'No hay elementos definidos.'}</p>}
+      {!hasDoc && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope of work yet.' : 'No hay alcance del trabajo aún.'}</p>}
 
-      {/* OVERALL VIEW — Document-style grouped by room with numbered items */}
-      {viewMode === 'overall' && orderedRoomKeys.map(roomKey => {
-        const room = rooms.find(r => r.id === roomKey);
-        const groupItems = itemsByRoom[roomKey];
+      {/* OVERALL VIEW — render the source document HTML directly */}
+      {viewMode === 'overall' && hasDoc && (
+        <div data-testid="overall-scope-doc" className="scope-doc-readonly" style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 8, padding: '20px 28px', color: '#E5E7EB', fontSize: 15, lineHeight: 1.7 }}>
+          <style>{`
+            .scope-doc-readonly h1, .scope-doc-readonly h2, .scope-doc-readonly h3 { color: #D4A574; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-top: 18px; padding-bottom: 4px; border-bottom: 1px solid #D4A574; }
+            .scope-doc-readonly h1 { font-size: 26px; }
+            .scope-doc-readonly h2 { font-size: 21px; }
+            .scope-doc-readonly h3 { font-size: 17px; }
+            .scope-doc-readonly ol, .scope-doc-readonly ul { padding-left: 1.5em; }
+            .scope-doc-readonly li { margin: 4px 0; }
+            .scope-doc-readonly p { margin: 6px 0; }
+            .scope-doc-readonly .qe-tag-trade,
+            .scope-doc-readonly .qe-tag-product,
+            .scope-doc-readonly .qe-tag-person { padding: 1px 8px; border-radius: 4px; font-weight: 800; font-size: 0.85em; margin: 0 2px; display: inline-block; line-height: 1.4; }
+            .scope-doc-readonly .qe-tag-trade { background: var(--pill-bg, #6B7280); color: #fff; letter-spacing: 1px; }
+            .scope-doc-readonly .qe-tag-product { background: #1E3A5F; color: #93C5FD; border: 1px solid #3B82F6; font-weight: 700; }
+            .scope-doc-readonly .qe-tag-person { background: rgba(212,165,116,0.2); color: #D4A574; border: 1px solid #D4A574; font-weight: 700; }
+          `}</style>
+          <div dangerouslySetInnerHTML={{ __html: scopeDoc }} />
+        </div>
+      )}
+
+      {/* BY ROOM VIEW (auto-generated from inline tags + room headings) */}
+      {viewMode === 'room' && hasDoc && orderedRoomNames.map(roomName => {
+        const group = parsed.byRoom[roomName];
+        if (!group) return null;
+        const room = group.room;
         const headerColor = room?.color || '#D4A574';
-        const headerName = room?.name || (lang === 'en' ? 'GENERAL' : 'GENERAL');
         return (
-          <div key={roomKey} style={{ marginBottom: 28, background: `linear-gradient(180deg, ${headerColor}08 0%, transparent 100%)`, borderRadius: 8, border: `1px solid ${headerColor}25`, overflow: 'hidden' }} data-testid={`overall-room-${roomKey}`}>
-            <div style={{ background: `${headerColor}20`, borderLeft: `5px solid ${headerColor}`, padding: '12px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ color: headerColor, fontSize: 20, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase' }}>{headerName}</h3>
-              <span style={{ color: '#6B7280', fontSize: 11 }}>{groupItems.length} {lang === 'en' ? 'items' : 'elementos'}</span>
+          <div key={roomName} style={{ marginBottom: 24, background: `${headerColor}08`, borderRadius: 8, border: `1px solid ${headerColor}25`, overflow: 'hidden' }} data-testid={`by-room-${roomName}`}>
+            <div style={{ background: `${headerColor}20`, borderLeft: `5px solid ${headerColor}`, padding: '12px 18px', display: 'flex', justifyContent: 'space-between' }}>
+              <h3 style={{ color: headerColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{roomName}</h3>
+              <span style={{ color: '#6B7280', fontSize: 11 }}>{group.items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
             </div>
             <ol style={{ listStyle: 'none', padding: '12px 24px 16px 24px', margin: 0 }}>
-              {groupItems.map(({ item, originalIndex }, localIdx) => {
-                const tColor = tradeColors[item.trade_category] || '#6B7280';
-                return (
-                  <li key={originalIndex} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '8px 0', borderBottom: localIdx === groupItems.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.04)' }}>
-                    {/* Checkbox */}
-                    <div onClick={() => toggleScope(originalIndex)} style={{ width: 22, height: 22, borderRadius: 4, border: item.completed ? '2px solid #10B981' : `2px solid ${headerColor}80`, background: item.completed ? '#10B981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, cursor: 'pointer' }}>
-                      {item.completed && <span style={{ color: '#fff', fontSize: 13, fontWeight: 900 }}>✓</span>}
-                    </div>
-                    {/* Number */}
-                    <span style={{ color: headerColor, fontSize: 16, fontWeight: 700, minWidth: 28, paddingTop: 1 }}>{localIdx + 1}.</span>
-                    {/* Description + Tags */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div onClick={() => toggleScope(originalIndex)} style={{ cursor: 'pointer' }}>
-                        <div style={{ color: item.completed ? '#6B7280' : '#E5E7EB', fontSize: 15, lineHeight: 1.5, textDecoration: item.completed ? 'line-through' : 'none' }} dangerouslySetInnerHTML={{ __html: item.description || '<em style="opacity:0.4">(no description)</em>' }} />
-                      </div>
-                      {/* Trade & tag chips inline */}
-                      {(item.trade_category || (item.tagged_products || []).length > 0 || (item.tagged_people || []).length > 0) && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
-                          {item.trade_category && (
-                            <span style={{ background: `${tColor}20`, border: `1px solid ${tColor}`, color: tColor, padding: '2px 8px', borderRadius: 4, fontSize: 9, fontWeight: 800, letterSpacing: 1 }}>{item.trade_category}</span>
-                          )}
-                          {(item.tagged_products || []).map((pid, pi) => (
-                            <span key={pi} style={{ background: '#1E3A5F', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>🏷 {pid}</span>
-                          ))}
-                          {(item.tagged_people || []).map((n, pi) => (
-                            <span key={pi} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{n}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
+              {group.items.map((item, idx) => (
+                <li key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <span style={{ color: headerColor, fontWeight: 700, minWidth: 22 }}>{idx + 1}.</span>
+                  <div style={{ color: '#E5E7EB', fontSize: 14, lineHeight: 1.5, flex: 1 }} dangerouslySetInnerHTML={{ __html: item.html }} />
+                </li>
+              ))}
             </ol>
           </div>
         );
       })}
 
-      {/* BY ROOM VIEW */}
-      {viewMode === 'room' && scopeItems.map((scope, idx) => {
-        const room = rooms.find(r => r.id === scope.room_id);
-        const tradeColor = tradeColors[scope.trade_category] || '#6B7280';
-        return (
-          <div key={idx} style={{ background: '#1a1f2e', padding: '14px 16px', borderRadius: 8, marginBottom: 12, borderLeft: `4px solid ${scope.completed ? '#10B981' : room?.color || '#D4A574'}` }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer' }} onClick={() => toggleScope(idx)}>
-              <div style={{ width: 24, height: 24, borderRadius: 4, border: scope.completed ? '2px solid #10B981' : '2px solid #6B7280', background: scope.completed ? '#10B981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-                {scope.completed && <span style={{ color: '#fff', fontSize: 14, fontWeight: 900 }}>✓</span>}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
-                  <p style={{ color: room?.color || '#D4A574', fontSize: 18, fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>{room?.name || 'General'}</p>
-                  {scope.trade_category && <span style={{ background: `${tradeColor}25`, border: `1px solid ${tradeColor}`, color: tradeColor, padding: '1px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{scope.trade_category}</span>}
-                </div>
-                <div style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }} dangerouslySetInnerHTML={{ __html: scope.description }} />
-              </div>
-            </div>
-            {(scope.tagged_products||[]).length > 0 && <div style={{ marginTop: 8, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>{scope.tagged_products.map((pid, pi) => <span key={pi} style={{ background: '#1E3A5F', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{pid}</span>)}</div>}
-            {(scope.tagged_people||[]).length > 0 && <div style={{ marginTop: 4, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>{scope.tagged_people.map((n, pi) => <span key={pi} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{n}</span>)}</div>}
-          </div>
-        );
-      })}
-
-      {/* BY TRADE VIEW */}
-      {viewMode === 'trade' && tradeCategories.map(trade => {
-        const tradeItems = scopeItems.map((s, idx) => ({ ...s, _idx: idx })).filter(s => (s.trade_category || 'GENERAL') === trade);
-        const tradeColor = tradeColors[trade] || '#6B7280';
+      {/* BY TRADE VIEW (auto-generated from #trade inline tags) */}
+      {viewMode === 'trade' && hasDoc && tradeKeys.map(trade => {
+        const items = parsed.byTrade[trade];
+        const isUntagged = trade === '__UNTAGGED__';
+        const tColor = isUntagged ? '#4B5563' : (tradeColors[trade] || '#6B7280');
+        const label = isUntagged ? (lang === 'en' ? 'NO TRADE TAGGED' : 'SIN OFICIO') : trade;
+        // Group items by room within this trade
         const roomGroups = {};
-        tradeItems.forEach(item => { const r = rooms.find(rm => rm.id === item.room_id); const rn = r?.name || 'General'; if (!roomGroups[rn]) roomGroups[rn] = { room: r, items: [] }; roomGroups[rn].items.push(item); });
-
+        items.forEach(item => {
+          const rn = item.roomName || 'GENERAL';
+          if (!roomGroups[rn]) roomGroups[rn] = { room: item.room, items: [] };
+          roomGroups[rn].items.push(item);
+        });
         return (
-          <div key={trade} style={{ marginBottom: 24 }}>
-            <div style={{ background: `${tradeColor}15`, borderLeft: `5px solid ${tradeColor}`, padding: '12px 16px', borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ color: tradeColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{trade}</h3>
-              <span style={{ color: '#6B7280', fontSize: 12 }}>{tradeItems.length} {lang === 'en' ? 'items' : 'elementos'}</span>
+          <div key={trade} style={{ marginBottom: 24 }} data-testid={`by-trade-${trade}`}>
+            <div style={{ background: `${tColor}15`, borderLeft: `5px solid ${tColor}`, padding: '12px 16px', borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ color: tColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{label}</h3>
+              <span style={{ color: '#6B7280', fontSize: 12 }}>{items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
             </div>
             {Object.entries(roomGroups).map(([rName, group]) => (
               <div key={rName} style={{ marginLeft: 12, marginBottom: 12 }}>
-                <p style={{ color: group.room?.color || '#D4A574', fontSize: 14, fontWeight: 700, marginBottom: 6, borderBottom: `1px solid ${group.room?.color || '#D4A574'}30`, paddingBottom: 4 }}>{rName.toUpperCase()}</p>
-                {group.items.map(item => (
-                  <div key={item._idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: '1px solid #1a1f2e', cursor: 'pointer' }} onClick={() => toggleScope(item._idx)}>
-                    <div style={{ width: 20, height: 20, borderRadius: 3, border: item.completed ? '2px solid #10B981' : '2px solid #4B5563', background: item.completed ? '#10B981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-                      {item.completed && <span style={{ color: '#fff', fontSize: 12, fontWeight: 900 }}>✓</span>}
-                    </div>
-                    <div style={{ color: item.completed ? '#6B7280' : '#E5E7EB', fontSize: 13, textDecoration: item.completed ? 'line-through' : 'none', flex: 1 }} dangerouslySetInnerHTML={{ __html: item.description }} />
+                <p style={{ color: group.room?.color || '#D4A574', fontSize: 13, fontWeight: 700, marginBottom: 6, borderBottom: `1px solid ${group.room?.color || '#D4A574'}30`, paddingBottom: 4, letterSpacing: 1 }}>{rName}</p>
+                {group.items.map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid #1a1f2e' }}>
+                    <span style={{ color: tColor, fontWeight: 700, minWidth: 22, fontSize: 13 }}>{idx + 1}.</span>
+                    <div style={{ color: '#E5E7EB', fontSize: 13, lineHeight: 1.5, flex: 1 }} dangerouslySetInnerHTML={{ __html: item.html }} />
                   </div>
                 ))}
               </div>
