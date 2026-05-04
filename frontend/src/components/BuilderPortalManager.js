@@ -231,18 +231,36 @@ export default function BuilderPortalManager({ project, onReload }) {
           </div>
         </div>
         {scheduleEntries.map((s, i) => (
-          <div key={i} className="mb-2 flex gap-2 items-center">
-            <input value={s.title} onChange={e => { const n = [...scheduleEntries]; n[i].title = e.target.value; setScheduleEntries(n); }}
-              placeholder="Milestone" className="flex-1 bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
-            <input type="date" value={s.date} onChange={e => { const n = [...scheduleEntries]; n[i].date = e.target.value; setScheduleEntries(n); }}
-              className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
-            <select value={s.status} onChange={e => { const n = [...scheduleEntries]; n[i].status = e.target.value; setScheduleEntries(n); }}
-              className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-xs">
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
-            <button onClick={() => setScheduleEntries(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400 text-xs">X</button>
+          <div key={i} className="mb-3 p-3 bg-black/30 rounded">
+            <div className="flex gap-2 items-center mb-2">
+              <input value={s.title} onChange={e => { const n = [...scheduleEntries]; n[i].title = e.target.value; setScheduleEntries(n); }}
+                placeholder="Milestone" className="flex-1 bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
+              <input type="date" value={s.date} onChange={e => { const n = [...scheduleEntries]; n[i].date = e.target.value; setScheduleEntries(n); }}
+                className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
+              <select value={s.status} onChange={e => { const n = [...scheduleEntries]; n[i].status = e.target.value; setScheduleEntries(n); }}
+                className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-xs">
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+              <button onClick={() => setScheduleEntries(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400 text-xs">X</button>
+            </div>
+            <div className="flex gap-2 mt-1">
+              <select onChange={e => { if (e.target.value) { const n = [...scheduleEntries]; n[i].tagged_products = [...(n[i].tagged_products||[]), e.target.value]; setScheduleEntries(n); } e.target.value=''; }}
+                className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-blue-300 text-xs">
+                <option value="">Tag product...</option>
+                {rooms.flatMap(r => r.categories?.flatMap(c => c.subcategories?.flatMap(sub => sub.items?.map(item => (
+                  <option key={item.id} value={item.id}>{item.name} ({r.name})</option>
+                )))) || [])}
+              </select>
+              <select onChange={e => { if (e.target.value) { const n = [...scheduleEntries]; n[i].tagged_people = [...(n[i].tagged_people||[]), e.target.value]; setScheduleEntries(n); } e.target.value=''; }}
+                className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#D4A574] text-xs">
+                <option value="">Tag person...</option>
+                {(portal?.contacts||[]).map((c,ci) => <option key={ci} value={c.username||c.name}>@{c.username||c.name} ({c.role})</option>)}
+              </select>
+            </div>
+            {(s.tagged_products||[]).length > 0 && <div className="flex flex-wrap gap-1 mt-1">{s.tagged_products.map((p,pi) => <span key={pi} className="text-[10px] bg-blue-900/30 text-blue-300 border border-blue-600 px-2 py-0.5 rounded">{p}</span>)}</div>}
+            {(s.tagged_people||[]).length > 0 && <div className="flex flex-wrap gap-1 mt-1">{s.tagged_people.map((p,pi) => <span key={pi} className="text-[10px] bg-[#D4A574]/20 text-[#D4A574] border border-[#D4A574] px-2 py-0.5 rounded">@{p}</span>)}</div>}
           </div>
         ))}
       </div>
@@ -264,8 +282,27 @@ export default function BuilderPortalManager({ project, onReload }) {
               <input type="date" value={co.date} onChange={e => { const n = [...changeOrders]; n[i].date = e.target.value; setChangeOrders(n); }}
                 className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
             </div>
-            <textarea value={co.description} onChange={e => { const n = [...changeOrders]; n[i].description = e.target.value; setChangeOrders(n); }}
-              placeholder="Description..." className="w-full bg-[#0f1218] border border-[#2a3040] rounded p-2 text-[#F5F5DC] text-sm" rows={2} />
+            <RichTextEditor
+              value={co.description}
+              onChange={(val) => { const n = [...changeOrders]; n[i].description = val; setChangeOrders(n); }}
+              placeholder="Description..."
+            />
+            <div className="flex gap-2 mt-2">
+              <select onChange={e => { if (e.target.value) { const n = [...changeOrders]; n[i].tagged_products = [...(n[i].tagged_products||[]), e.target.value]; setChangeOrders(n); } e.target.value=''; }}
+                className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-blue-300 text-xs">
+                <option value="">Tag product...</option>
+                {rooms.flatMap(r => r.categories?.flatMap(c => c.subcategories?.flatMap(sub => sub.items?.map(item => (
+                  <option key={item.id} value={item.id}>{item.name} ({r.name})</option>
+                )))) || [])}
+              </select>
+              <select onChange={e => { if (e.target.value) { const n = [...changeOrders]; n[i].tagged_people = [...(n[i].tagged_people||[]), e.target.value]; setChangeOrders(n); } e.target.value=''; }}
+                className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#D4A574] text-xs">
+                <option value="">Tag person...</option>
+                {(portal?.contacts||[]).map((c,ci) => <option key={ci} value={c.username||c.name}>@{c.username||c.name} ({c.role})</option>)}
+              </select>
+            </div>
+            {(co.tagged_products||[]).length > 0 && <div className="flex flex-wrap gap-1 mt-1">{co.tagged_products.map((p,pi) => <span key={pi} className="text-[10px] bg-blue-900/30 text-blue-300 border border-blue-600 px-2 py-0.5 rounded">{p}</span>)}</div>}
+            {(co.tagged_people||[]).length > 0 && <div className="flex flex-wrap gap-1 mt-1">{co.tagged_people.map((p,pi) => <span key={pi} className="text-[10px] bg-[#D4A574]/20 text-[#D4A574] border border-[#D4A574] px-2 py-0.5 rounded">@{p}</span>)}</div>}
             <button onClick={() => setChangeOrders(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400 text-xs mt-1">Remove</button>
           </div>
         ))}

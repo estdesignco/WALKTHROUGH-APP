@@ -113,12 +113,25 @@ export default function BuilderPortalScreen({ route, navigation }) {
   const scopeItems = portal.scope_of_work || [];
   const completedScope = scopeItems.filter(s => s.completed).length;
 
+  // Get all items for tagging
+  const allItems = [];
+  (rooms || []).forEach(room => {
+    room.categories?.forEach(cat => {
+      cat.subcategories?.forEach(sub => {
+        sub.items?.forEach(item => { allItems.push({ id: item.id, name: item.name, room: room.name }); });
+      });
+    });
+  });
+  const allContacts = portal.contacts || [];
+
   const tabs = [
     { id: 'dashboard', label: lang === 'en' ? 'Home' : 'Inicio' },
     { id: 'scope', label: lang === 'en' ? 'Scope' : 'Alcance' },
     { id: 'photos', label: lang === 'en' ? 'Photos' : 'Fotos' },
     { id: 'todos', label: lang === 'en' ? 'Tasks' : 'Tareas' },
     { id: 'schedule', label: lang === 'en' ? 'Schedule' : 'Calendario' },
+    { id: 'changes', label: lang === 'en' ? 'Changes' : 'Cambios' },
+    { id: 'contacts', label: lang === 'en' ? 'Contacts' : 'Contactos' },
   ];
 
   return (
@@ -196,25 +209,43 @@ export default function BuilderPortalScreen({ route, navigation }) {
           </View>
         )}
 
-        {/* TODOS */}
+        {/* TODOS - WITH TAGGING */}
         {activeTab === 'todos' && (
           <View>
             <Text style={styles.sectionTitle}>{lang === 'en' ? 'To-Do List' : 'Lista de Tareas'}</Text>
             <TouchableOpacity onPress={() => {
-              Alert.prompt(lang === 'en' ? 'New Task' : 'Nueva Tarea', '', (text) => { if (text) addTodo(text, ''); });
+              Alert.prompt(lang === 'en' ? 'New Task' : 'Nueva Tarea', '', (text) => {
+                if (text) {
+                  // Show picker for assigning
+                  const names = allContacts.map(c => c.username || c.name);
+                  if (names.length > 0) {
+                    Alert.prompt('Assign to (leave blank to skip)', names.join(', '), (assignee) => {
+                      addTodo(text, assignee || '');
+                    });
+                  } else {
+                    addTodo(text, '');
+                  }
+                }
+              });
             }} style={styles.addBtn}>
               <Text style={styles.addBtnText}>{lang === 'en' ? '+ Add Task' : '+ Agregar Tarea'}</Text>
             </TouchableOpacity>
             {todos.map(todo => (
               <View key={todo.id} style={[styles.todoItem, { borderLeftColor: todo.status === 'completed' ? '#10B981' : '#F59E0B' }]}>
-                <Text style={styles.todoText}>{todo.text}</Text>
+                <Text style={styles.todoText}>{todo.text?.replace(/<[^>]*>/g, '') || ''}</Text>
                 {todo.assigned_to && <Text style={styles.todoAssigned}>@{todo.assigned_to}</Text>}
+                {(todo.tagged_products||[]).length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                  {todo.tagged_products.map((p,i) => <Text key={i} style={{ color: '#93C5FD', fontSize: 10, backgroundColor: '#1E3A5F', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 3 }}>{allItems.find(x=>x.id===p)?.name||p}</Text>)}
+                </View>}
+                {(todo.tagged_people||[]).length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 2 }}>
+                  {todo.tagged_people.map((p,i) => <Text key={i} style={{ color: '#D4A574', fontSize: 10, backgroundColor: '#D4A57420', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 3 }}>@{p}</Text>)}
+                </View>}
               </View>
             ))}
           </View>
         )}
 
-        {/* SCHEDULE */}
+        {/* SCHEDULE - WITH TAGGING */}
         {activeTab === 'schedule' && (
           <View>
             <Text style={styles.sectionTitle}>{lang === 'en' ? 'Schedule' : 'Calendario'}</Text>
@@ -227,7 +258,58 @@ export default function BuilderPortalScreen({ route, navigation }) {
               <View key={idx} style={[styles.scheduleItem, { borderLeftColor: event.status === 'completed' ? '#10B981' : '#D4A574' }]}>
                 <Text style={styles.scheduleTitle}>{event.title}</Text>
                 <Text style={styles.scheduleDate}>{event.date}</Text>
+                {(event.tagged_people||[]).length > 0 && <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                  {event.tagged_people.map((p,i) => <Text key={i} style={{ color: '#D4A574', fontSize: 10, backgroundColor: '#D4A57420', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 3 }}>@{p}</Text>)}
+                </View>}
               </View>
+            ))}
+          </View>
+        )}
+
+        {/* CHANGE ORDERS */}
+        {activeTab === 'changes' && (
+          <View>
+            <Text style={styles.sectionTitle}>{lang === 'en' ? 'Change Orders' : 'Órdenes de Cambio'}</Text>
+            <TouchableOpacity onPress={() => {
+              Alert.prompt(lang === 'en' ? 'Change Order Title' : 'Título', '', async (title) => {
+                if (title) {
+                  Alert.prompt('Description', '', async (desc) => {
+                    await fetch(`${apiService.baseURL}/builder/${accessCode}/comment`, {
+                      method: 'POST', headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ section: 'change_order', author: 'Builder', text: JSON.stringify({ title, description: desc || '', date: new Date().toISOString().split('T')[0] }) }),
+                    });
+                    loadPortal();
+                  });
+                }
+              });
+            }} style={styles.addBtn}>
+              <Text style={styles.addBtnText}>{lang === 'en' ? '+ New Change Order' : '+ Nueva Orden'}</Text>
+            </TouchableOpacity>
+            {(portal.change_orders || []).map((co, idx) => (
+              <View key={idx} style={[styles.scheduleItem, { borderLeftColor: '#F59E0B' }]}>
+                <Text style={styles.scheduleTitle}>{co.title}</Text>
+                <Text style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>{co.description?.replace(/<[^>]*>/g, '') || ''}</Text>
+                <Text style={styles.scheduleDate}>{co.date}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* CONTACTS */}
+        {activeTab === 'contacts' && (
+          <View>
+            <Text style={styles.sectionTitle}>{lang === 'en' ? 'Contacts' : 'Contactos'}</Text>
+            {allContacts.map((c, idx) => (
+              <View key={idx} style={{ backgroundColor: '#1a1f2e', padding: 14, borderRadius: 8, marginBottom: 8, borderLeftWidth: 4, borderLeftColor: '#D4A574' }}>
+                <Text style={{ color: '#fff', fontSize: 15, fontWeight: '700' }}>{c.name}</Text>
+                {c.username && <Text style={{ color: '#D4A574', fontSize: 11 }}>@{c.username}</Text>}
+                <Text style={{ color: '#10B981', fontSize: 12, marginTop: 2 }}>{c.role}</Text>
+                {c.phone && <Text style={{ color: '#9CA3AF', fontSize: 13, marginTop: 6 }}>{c.phone}</Text>}
+                {c.email && <Text style={{ color: '#9CA3AF', fontSize: 13 }}>{c.email}</Text>}
+              </View>
+            ))}
+          </View>
+        )}
             ))}
           </View>
         )}
