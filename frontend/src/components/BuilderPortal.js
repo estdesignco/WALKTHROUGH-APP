@@ -406,7 +406,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
                 {scope.completed && <span style={{ color: '#fff', fontSize: 14, fontWeight: 900 }}>✓</span>}
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ color: room?.color || '#D4A574', fontSize: 11, fontWeight: 700, marginBottom: 2 }}>{room?.name || 'General'}</p>
+                <p style={{ color: room?.color || '#D4A574', fontSize: 18, fontWeight: 900, marginBottom: 6, letterSpacing: 1, textTransform: 'uppercase' }}>{room?.name || 'General'}</p>
                 <p style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }} dangerouslySetInnerHTML={{ __html: scope.description }} />
               </div>
             </div>
@@ -520,12 +520,22 @@ function PhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload
   );
 }
 
-// ===== TODO SECTION - SYNCED =====
+// ===== TODO SECTION - FILTERED TO BUILDER/TRADES ONLY =====
 function TodoSection({ projectId, todos, contacts, t, onReload }) {
   const [showAdd, setShowAdd] = useState(false);
   const [newTodo, setNewTodo] = useState({ text: '', priority: 'Medium', assigned_to: '', deadline: '' });
 
   const allContacts = contacts || [];
+  const contactNames = allContacts.map(c => (c.username || c.name || '').toLowerCase());
+
+  // FILTER: only show todos assigned to builder contacts or tagged as builder source
+  const builderTodos = todos.filter(todo => {
+    if (todo.source_type === 'builder') return true;
+    const assignee = (todo.assigned_to || '').toLowerCase();
+    if (contactNames.some(n => n && assignee.includes(n))) return true;
+    if (assignee && allContacts.some(c => (c.role || '').toLowerCase().match(/builder|contractor|trade|plumber|electric|hvac|framer|paint|tile|floor|roof|cabinet|mason|carpen|drywall|demol/))) return true;
+    return false;
+  });
 
   const addTodo = async () => {
     if (!newTodo.text.trim()) return;
@@ -564,7 +574,7 @@ function TodoSection({ projectId, todos, contacts, t, onReload }) {
           <button onClick={addTodo} style={btnPrimary}>{t.submit}</button>
         </div>
       )}
-      {todos.length > 0 ? todos.map(todo => (
+      {builderTodos.length > 0 ? builderTodos.map(todo => (
         <div key={todo.id} style={{ background: '#1a1f2e', padding: '12px 16px', borderRadius: 8, marginBottom: 8,
           borderLeft: `4px solid ${todo.status === 'completed' ? '#10B981' : todo.priority === 'Urgent' ? '#EF4444' : todo.priority === 'High' ? '#F59E0B' : '#6B7280'}`,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
