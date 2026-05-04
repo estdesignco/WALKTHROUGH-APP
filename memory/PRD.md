@@ -3,59 +3,61 @@
 ## Architecture  
 React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
-## Implemented (Apr 17, 2026)
+## Implemented
 
-### Performance Optimization (P0 - CRITICAL FIX)
-- **Default collapsed state**: All rooms, categories load COLLAPSED on Walkthrough, Checklist, FFE, and Mobile views
-- **DOM reduction**: 38+ rooms → ~50 lightweight headers on load instead of thousands of DOM nodes
-- **EXPAND ALL / COLLAPSE ALL buttons**: All spreadsheet views (desktop + mobile)
-- **Floor collapse on Checklist**: Full collapsible floor banners with toggle/move/rename/delete
-- **Floor grouping on FFE**: Floor banner rows with collapse toggle
-- **Floor grouping on Mobile**: Tab bar floor labels, floor banners on MobileWalkthrough/MobileFFE
-- **localStorage cache migration**: Old "everything expanded" cache invalidated
+### Builder Portal (Apr 17/May 4, 2026) — NEW
+- **Public builder page**: `/builder/{access_code}` — no login, unique link per project
+- **9 sections**: FF&E (no pricing), Photos, Scope of Work, To-Do, Schedule, Room Finishes, Change Orders, Contacts, Comments
+- **Builder can comment** — section-tagged comments with author name
+- **Admin management**: People → Builder Portal tab in project
+  - Select which rooms builder can see
+  - Add scope of work per room
+  - Add schedule/timeline milestones
+  - Add change orders with dates
+  - Add project contacts (name, role, phone, email)
+  - Copy shareable link
+- **Price stripping**: cost, price, budget, total_cost all removed from builder view
 
-### Drag-and-Drop Fix (P0)
-- Fixed index mismatch: removed sort in render IIFE, using original array order with floor grouping
-- Always render ALL Draggables (collapsed floors use height:0 instead of removal from DOM)
-- react-beautiful-dnd index tracking preserved
+### Performance Optimization (Apr 17, 2026)
+- Default collapsed state for all rooms/categories across all views
+- EXPAND ALL / COLLAPSE ALL buttons on all spreadsheets
+- Collapsible floor banners on Checklist and FFE
+- Floor grouping on mobile views
+- localStorage cache migration
 
-### Legacy Floor Migration (P0)
-- Backend: `POST /api/projects/{project_id}/migrate-legacy-floors`
-- Frontend: "FIX LEGACY FLOORS" button on Walkthrough and Checklist
+### Drag-and-Drop Fix (Apr 17, 2026)
+- Flat sequential indices for react-beautiful-dnd compatibility
+- handleDragEnd uses same orderedRooms array as render
+- Removed error popup — silent reload on failure
 
 ### Floor Management System
-- Collapsible floor banners with drag-to-reorder, rename, delete
-- Floor assignment dropdowns on every room header
-- `floor_order` on project for user-controlled ordering
+- Collapsible floor banners with reorder, rename, delete
+- Floor assignment dropdowns on room headers
+- Legacy floor migration endpoint
 
-### Room Notes
-- Synced across Walkthrough, Checklist, FFE, Mobile
-
-### Room Colors
-- 96 distinct colors via golden angle algorithm, synced via DB
-
-### 3D Shower View (ThreeShowerView.js)
-- 6 tile patterns, drag-and-drop tiles, bench/niche support
-
-### Inline Editing
-- contentEditable fields for room names, category names, item properties
+### Other Features
+- Room Notes synced across all views
+- 96 distinct room colors via golden angle algorithm
+- 3D Shower View with tile patterns
+- Inline editing (contentEditable)
 
 ## Credentials
 App Password: `DesignReady2026!`
 
 ## Key API Endpoints
-- `PUT /api/rooms/{room_id}` - Update room
-- `PATCH /api/items/{item_id}/quick-update` - Inline item editing
-- `PUT /api/projects/{project_id}` - Update project (floor_order)
-- `POST /api/projects/{project_id}/migrate-legacy-floors` - Legacy floor migration
+- `POST /api/builder-portal` — Create builder portal
+- `GET /api/builder-portal/project/{project_id}` — Get portal (admin)
+- `PUT /api/builder-portal/{portal_id}` — Update portal
+- `GET /api/builder/{access_code}` — Public builder view
+- `POST /api/builder/{access_code}/comment` — Add comment
+- `PUT /api/rooms/{room_id}` — Update room
+- `PATCH /api/items/{item_id}/quick-update` — Inline item editing
 
 ## Remaining / Backlog
 ### P1
 - Auto-populate plumbing fixtures from FFE/checklist into 3D palette
 
 ### P2
-- Glass door panel / shower enclosure frame in 3D view
+- Glass door panel / shower enclosure in 3D view
 - Refactor ExactChecklistSpreadsheet.js (4000+ lines)
-- Refactor SimpleWalkthroughSpreadsheet.js into smaller components
-- Rename GoogleAddressInput.js to AddressAutocompleteInput.js
-- Archive/remove unused /app/mobile/ directory
+- Refactor SimpleWalkthroughSpreadsheet.js

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, Link, useSearchParams, useNavigate } from "react-router-dom";
-import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users, Sparkles, Home, Package, Phone, Ruler, Bot, PaintBucket, MessageSquare, Clipboard, Truck, Layout, Percent, ChevronDown } from "lucide-react";
+import { Loader2, FileQuestion, Aperture, CheckSquare, ArrowLeft, Trello, ListTodo, DollarSign, Calendar, BarChart3, Palette, Zap, FileText, Calculator, Users, Sparkles, Home, Package, Phone, Ruler, Bot, PaintBucket, MessageSquare, Clipboard, Truck, Layout, Percent, ChevronDown, HardHat } from "lucide-react";
 import EditInput from './EditInput';
 import WalkthroughDashboard from './WalkthroughDashboard';
 import ContactSheet from './ContactSheet';
@@ -8,6 +8,7 @@ import CriticalPathDashboard from './CriticalPathDashboard';
 
 import ChecklistDashboard from './ChecklistDashboard';
 import FFEDashboard from './FFEDashboard';
+import BuilderPortalManager from './BuilderPortalManager';
 import MeasurementsAndFilesPage from './MeasurementsAndFilesPage';
 import ToDoList from './ToDoList';
 import FinanceDashboard from './FinanceDashboard';
@@ -79,7 +80,7 @@ const DropdownNavigation = ({ tabs, activeTab, onTabChange }) => {
         { type: 'dropdown', label: 'Financial', items: ['Budget', 'Finance', 'Trade Discounts'] },
         { type: 'single', name: 'Automation' },
         { type: 'dropdown', label: 'Reports', items: ['Reports', 'Exports', 'AI Assistant'] },
-        { type: 'dropdown', label: 'People', items: ['Contacts', 'Vendors'] },
+        { type: 'dropdown', label: 'People', items: ['Contacts', 'Vendors', 'Builder Portal'] },
         { type: 'single', name: 'Samples' },
         { type: 'single', name: 'Measurements' },
     ];
@@ -1116,6 +1117,9 @@ export default function ProjectDetailPage() {
                 <TeamChat projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading chat...</div> },
+        { name: "Builder Portal", icon: HardHat, component: project ? (
+            <BuilderPortalManager project={project} onReload={fetchProject} />
+        ) : <div className="text-center text-stone-300 py-8">Loading...</div> },
     ];
 
     if (isLoading) {

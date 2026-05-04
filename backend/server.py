@@ -19298,5 +19298,164 @@ async def delete_finish_schedule(project_id: str, schedule_id: str):
     return {"status": "deleted"}
 
 
+# ===============================
+# BUILDER PORTAL ENDPOINTS
+# ===============================
+
+class BuilderPortalCreate(BaseModel):
+    project_id: str
+    selected_room_ids: List[str] = []
+    scope_of_work: List[Dict[str, Any]] = []  # [{room_id, description}]
+    schedule: List[Dict[str, Any]] = []  # [{title, date, status, notes}]
+    contacts: List[Dict[str, Any]] = []  # [{name, role, phone, email}]
+
+class BuilderPortalUpdate(BaseModel):
+    selected_room_ids: Optional[List[str]] = None
+    scope_of_work: Optional[List[Dict[str, Any]]] = None
+    schedule: Optional[List[Dict[str, Any]]] = None
+    change_orders: Optional[List[Dict[str, Any]]] = None
+    contacts: Optional[List[Dict[str, Any]]] = None
+
+class BuilderComment(BaseModel):
+    section: str  # 'ffe', 'scope', 'todo', 'schedule', 'general', 'room'
+    reference_id: Optional[str] = None  # item/room/task ID
+    author: str
+    text: str
+
+@api_router.post("/builder-portal")
+async def create_builder_portal(data: BuilderPortalCreate):
+    """Create a builder portal with unique access code"""
+    import random, string
+    access_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    
+    portal = {
+        "id": str(uuid.uuid4()),
+        "project_id": data.project_id,
+        "access_code": access_code,
+        "selected_room_ids": data.selected_room_ids,
+        "scope_of_work": data.scope_of_work,
+        "schedule": data.schedule,
+        "change_orders": [],
+        "contacts": data.contacts,
+        "comments": [],
+        "created_at": datetime.utcnow().isoformat(),
+        "updated_at": datetime.utcnow().isoformat(),
+    }
+    
+    await db.builder_portals.insert_one(portal)
+    portal.pop("_id", None)
+    return portal
+
+@api_router.get("/builder-portal/project/{project_id}")
+async def get_builder_portal_by_project(project_id: str):
+    """Get builder portal for a project (admin view)"""
+    portal = await db.builder_portals.find_one({"project_id": project_id}, {"_id": 0})
+    if not portal:
+        raise HTTPException(status_code=404, detail="No builder portal for this project")
+    return portal
+
+@api_router.put("/builder-portal/{portal_id}")
+async def update_builder_portal(portal_id: str, data: BuilderPortalUpdate):
+    """Update builder portal settings"""
+    update_data = {k: v for k, v in data.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow().isoformat()
+    
+    result = await db.builder_portals.update_one({"id": portal_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Portal not found")
+    
+    updated = await db.builder_portals.find_one({"id": portal_id}, {"_id": 0})
+    return updated
+
+@api_router.get("/builder/{access_code}")
+async def get_builder_portal_public(access_code: str):
+    """Public endpoint - builder accesses their portal via code"""
+    portal = await db.builder_portals.find_one({"access_code": access_code}, {"_id": 0})
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    
+    # Get project info
+    project = await db.projects.find_one({"id": portal["project_id"]}, {"_id": 0})
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    
+    # Get selected rooms with full data (but NO pricing)
+    selected_ids = portal.get("selected_room_ids", [])
+    rooms = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).to_list(100)
+    
+    # Build full room data without prices
+    for room in rooms:
+        categories = await db.categories.find({"room_id": room["id"]}, {"_id": 0}).to_list(100)
+        for cat in categories:
+            subcategories = await db.subcategories.find({"category_id": cat["id"]}, {"_id": 0}).to_list(100)
+            for sub in subcategories:
+                items = await db.items.find({"subcategory_id": sub["id"]}, {"_id": 0}).to_list(500)
+                # STRIP PRICING from items
+                for item in items:
+                    item.pop("cost", None)
+                    item.pop("price", None)
+                    item.pop("budget", None)
+                    item.pop("total_cost", None)
+                sub["items"] = items
+            cat["subcategories"] = subcategories
+        room["categories"] = categories
+    
+    # Get photos for selected rooms
+    photos = {}
+    for room_id in selected_ids:
+        room_photos = await db.photos.find({"room_id": room_id}, {"_id": 0}).to_list(100)
+        if room_photos:
+            photos[room_id] = room_photos
+    
+    # Get to-do items for this project
+    todos = await db.todos.find({"project_id": portal["project_id"]}, {"_id": 0}).to_list(200)
+    
+    return {
+        "portal": portal,
+        "project": {
+            "name": project.get("name"),
+            "client_info": {
+                "address": project.get("client_info", {}).get("address", ""),
+                "full_name": project.get("client_info", {}).get("full_name", ""),
+            }
+        },
+        "rooms": rooms,
+        "photos": photos,
+        "todos": todos,
+    }
+
+@api_router.post("/builder/{access_code}/comment")
+async def add_builder_comment(access_code: str, comment: BuilderComment):
+    """Builder adds a comment"""
+    portal = await db.builder_portals.find_one({"access_code": access_code})
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    
+    new_comment = {
+        "id": str(uuid.uuid4()),
+        "section": comment.section,
+        "reference_id": comment.reference_id,
+        "author": comment.author,
+        "text": comment.text,
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    
+    await db.builder_portals.update_one(
+        {"access_code": access_code},
+        {"$push": {"comments": new_comment}}
+    )
+    
+    return new_comment
+
+@api_router.delete("/builder-portal/{portal_id}")
+async def delete_builder_portal(portal_id: str):
+    """Delete a builder portal"""
+    result = await db.builder_portals.delete_one({"id": portal_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Portal not found")
+    return {"status": "deleted"}
+
+
+
 # Include all routers
 app.include_router(api_router)

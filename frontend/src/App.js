@@ -23,6 +23,7 @@ import CustomerfacingProjectDetailPage from './components/CustomerfacingProjectD
 import QuestionnaireTestPage from './components/QuestionnaireTestPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import EmailPreview from './components/EmailPreview';
+import BuilderPortal from './components/BuilderPortal';
 import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
 import FurnitureSearchPage from './components/FurnitureSearchPage';
 import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
@@ -267,6 +268,10 @@ const App = () => {
           <Route 
             path="/customer/project/:projectId" 
             element={<CustomerfacingProjectDetailPage />}
+          />
+          <Route 
+            path="/builder/:accessCode" 
+            element={<BuilderPortal />}
           />
           
           {/* Protected Routes - Require Login */}
