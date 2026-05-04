@@ -19315,6 +19315,7 @@ class BuilderPortalUpdate(BaseModel):
     schedule: Optional[List[Dict[str, Any]]] = None
     change_orders: Optional[List[Dict[str, Any]]] = None
     contacts: Optional[List[Dict[str, Any]]] = None
+    custom_trades: Optional[List[str]] = None
 
 class BuilderComment(BaseModel):
     section: str  # 'ffe', 'scope', 'todo', 'schedule', 'general', 'room'

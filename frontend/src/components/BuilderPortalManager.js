@@ -16,6 +16,11 @@ export default function BuilderPortalManager({ project, onReload }) {
   const [showNewChange, setShowNewChange] = useState(false);
   const [showNewContact, setShowNewContact] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [customTrades, setCustomTrades] = useState([]);
+  const [newTradeName, setNewTradeName] = useState('');
+
+  const DEFAULT_TRADES = ['DEMOLITION','FRAMING','ELECTRICAL','PLUMBING','HVAC','DRYWALL','PAINT','TILE','FLOORING','CABINETRY','COUNTERTOPS','MILLWORK','HARDWARE','GLASS & MIRRORS','APPLIANCES','FIXTURES','ROOFING','EXTERIOR','LANDSCAPING','GENERAL'];
+  const allTrades = [...DEFAULT_TRADES, ...customTrades];
 
   useEffect(() => {
     loadPortal();
@@ -33,6 +38,7 @@ export default function BuilderPortalManager({ project, onReload }) {
         setScheduleEntries(data.schedule || []);
         setChangeOrders(data.change_orders || []);
         setContacts(data.contacts || []);
+        setCustomTrades(data.custom_trades || []);
       }
     } catch (err) {
       // No portal yet
@@ -180,6 +186,61 @@ export default function BuilderPortalManager({ project, onReload }) {
             {portal && <button onClick={saveScope} className="px-3 py-1 rounded text-xs font-bold bg-[#D4A574] text-black">SAVE</button>}
           </div>
         </div>
+        {/* ADD CUSTOM TRADE */}
+        <div className="flex gap-2 mb-3">
+          <input
+            value={newTradeName}
+            onChange={e => setNewTradeName(e.target.value.toUpperCase())}
+            placeholder="Add custom trade..."
+            className="flex-1 bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-yellow-400 text-xs"
+            onKeyDown={e => {
+              if (e.key === 'Enter' && newTradeName.trim()) {
+                const t = newTradeName.trim();
+                if (!allTrades.includes(t)) {
+                  const updated = [...customTrades, t];
+                  setCustomTrades(updated);
+                  if (portal) {
+                    fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
+                      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ custom_trades: updated }),
+                    });
+                  }
+                }
+                setNewTradeName('');
+              }
+            }}
+          />
+          <button onClick={() => {
+            if (newTradeName.trim()) {
+              const t = newTradeName.trim();
+              if (!allTrades.includes(t)) {
+                const updated = [...customTrades, t];
+                setCustomTrades(updated);
+                if (portal) {
+                  fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ custom_trades: updated }),
+                  });
+                }
+              }
+              setNewTradeName('');
+            }
+          }} className="px-3 py-1 rounded text-xs font-bold bg-yellow-600/30 text-yellow-400 border border-yellow-600/30">+ TRADE</button>
+        </div>
+        {customTrades.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {customTrades.map((t, i) => (
+              <span key={i} className="text-[10px] bg-yellow-600/20 text-yellow-400 border border-yellow-600/30 px-2 py-0.5 rounded flex items-center gap-1">
+                {t}
+                <span className="cursor-pointer text-red-400 ml-1" onClick={() => {
+                  const updated = customTrades.filter((_, idx) => idx !== i);
+                  setCustomTrades(updated);
+                  if (portal) fetch(`${API_URL}/api/builder-portal/${portal.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ custom_trades: updated }) });
+                }}>x</span>
+              </span>
+            ))}
+          </div>
+        )}
         {scopeEntries.map((s, i) => (
           <div key={i} className="mb-3 p-3 bg-black/30 rounded border-l-4 border-[#D4A574]">
             <select
@@ -196,26 +257,7 @@ export default function BuilderPortalManager({ project, onReload }) {
               className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-yellow-400 text-xs mb-2 w-full"
             >
               <option value="">Select Trade Category</option>
-              <option value="DEMOLITION">DEMOLITION</option>
-              <option value="FRAMING">FRAMING</option>
-              <option value="ELECTRICAL">ELECTRICAL</option>
-              <option value="PLUMBING">PLUMBING</option>
-              <option value="HVAC">HVAC</option>
-              <option value="DRYWALL">DRYWALL</option>
-              <option value="PAINT">PAINT</option>
-              <option value="TILE">TILE</option>
-              <option value="FLOORING">FLOORING</option>
-              <option value="CABINETRY">CABINETRY</option>
-              <option value="COUNTERTOPS">COUNTERTOPS</option>
-              <option value="MILLWORK">MILLWORK</option>
-              <option value="HARDWARE">HARDWARE</option>
-              <option value="GLASS & MIRRORS">GLASS & MIRRORS</option>
-              <option value="APPLIANCES">APPLIANCES</option>
-              <option value="FIXTURES">FIXTURES</option>
-              <option value="ROOFING">ROOFING</option>
-              <option value="EXTERIOR">EXTERIOR</option>
-              <option value="LANDSCAPING">LANDSCAPING</option>
-              <option value="GENERAL">GENERAL</option>
+              {allTrades.map(tr => <option key={tr} value={tr}>{tr}</option>)}
             </select>
             <RichTextEditor
               value={s.description}
