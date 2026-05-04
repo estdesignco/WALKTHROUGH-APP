@@ -124,7 +124,8 @@ export default function BuilderPortal() {
     { id: 'dashboard', label: t.dashboard },
     { id: 'scope', label: t.scopeOfWork },
     { id: 'ffe', label: t.ffeSchedule },
-    { id: 'photos', label: t.photos },
+    { id: 'uploads', label: lang === 'en' ? 'Uploads' : 'Subidas' },
+    { id: 'photos', label: lang === 'en' ? 'Room Photos' : 'Fotos por Hab.' },
     { id: 'todos', label: t.todoList },
     { id: 'schedule', label: t.schedule },
     { id: 'changes', label: t.changeOrders },
@@ -239,9 +240,14 @@ export default function BuilderPortal() {
           <ExactFFESpreadsheet project={builderProject} roomColors={{}} categoryColors={{}} onReload={loadPortal} builderMode={true} />
         )}
 
-        {/* ===== PHOTOS & FILES - BUILDER CAN UPLOAD ===== */}
+        {/* ===== GENERAL UPLOADS - DEDICATED PLACE ===== */}
+        {activeTab === 'uploads' && (
+          <GeneralUploadsSection projectId={portal.project_id} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} />
+        )}
+
+        {/* ===== ROOM PHOTOS - PER ROOM WITH CAMERA ===== */}
         {activeTab === 'photos' && (
-          <PhotosSection rooms={rooms} photos={photos} projectId={portal.project_id} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} />
+          <RoomPhotosSection rooms={rooms} photos={photos} projectId={portal.project_id} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} />
         )}
 
         {/* ===== TO-DO LIST (SYNCED) ===== */}
@@ -459,29 +465,105 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
   );
 }
 
-// ===== PHOTOS SECTION - BUILDER CAN UPLOAD =====
-function PhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload }) {
+// ===== GENERAL UPLOADS SECTION =====
+function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
+  const [uploading, setUploading] = useState(false);
+  const [files, setFiles] = useState([]);
+
+  useEffect(() => { loadFiles(); }, [accessCode]);
+
+  const loadFiles = async () => {
+    const res = await fetch(`${API_URL}/api/builder/${accessCode}`);
+    if (res.ok) {
+      const data = await res.json();
+      // Pull general files from comments with section='general_file'
+      const fileComments = (data.portal?.comments || []).filter(c => c.section === 'general_file');
+      const allFiles = [];
+      fileComments.forEach(c => { try { const parsed = JSON.parse(c.text); if (Array.isArray(parsed)) allFiles.push(...parsed); } catch {} });
+      setFiles(allFiles);
+    }
+  };
+
+  const handleUpload = async (inputFiles) => {
+    if (!inputFiles || inputFiles.length === 0) return;
+    setUploading(true);
+    const newFiles = [...files];
+    for (const file of inputFiles) {
+      const reader = new FileReader();
+      await new Promise((resolve) => {
+        reader.onload = () => {
+          newFiles.push({ name: file.name, type: file.type, data: reader.result, uploaded_at: new Date().toISOString(), uploaded_by: localStorage.getItem('builder_name') || 'Builder' });
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    await fetch(`${API_URL}/api/builder/${accessCode}/comment`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section: 'general_file', author: localStorage.getItem('builder_name') || 'Builder', text: JSON.stringify(newFiles) }),
+    });
+    setFiles(newFiles);
+    setUploading(false);
+  };
+
+  const handleCamera = () => {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+    input.onchange = (e) => handleUpload(Array.from(e.target.files));
+    input.click();
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h2 style={sectionTitle}>{lang === 'en' ? 'General Uploads' : 'Subidas Generales'}</h2>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={handleCamera} style={{ ...btnPrimary, display: 'flex', alignItems: 'center', gap: 6 }}>
+            📷 {lang === 'en' ? 'Take Photo' : 'Tomar Foto'}
+          </button>
+          <label style={{ ...btnPrimary, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            📁 {uploading ? '...' : (lang === 'en' ? 'Upload Files' : 'Subir Archivos')}
+            <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt,.csv" onChange={e => handleUpload(Array.from(e.target.files))} style={{ display: 'none' }} />
+          </label>
+        </div>
+      </div>
+      <p style={{ color: '#6B7280', fontSize: 13, marginBottom: 16 }}>
+        {lang === 'en' ? 'Upload general project documents — permits, plans, insurance, contracts, etc.' : 'Suba documentos generales — permisos, planos, seguros, contratos, etc.'}
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+        {files.map((file, idx) => (
+          <div key={idx} style={{ background: '#1a1f2e', borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040' }}>
+            {file.type?.startsWith('image/') || file.data?.startsWith('data:image') ? (
+              <div style={{ width: '100%', height: 150, overflow: 'hidden' }}><img src={file.data} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
+            ) : (
+              <div style={{ width: '100%', height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f1218' }}><span style={{ fontSize: 40 }}>📄</span></div>
+            )}
+            <div style={{ padding: '8px 12px' }}>
+              <p style={{ color: '#F5F5DC', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
+              <p style={{ color: '#6B7280', fontSize: 10 }}>{file.uploaded_by} • {file.uploaded_at ? new Date(file.uploaded_at).toLocaleDateString() : ''}</p>
+            </div>
+          </div>
+        ))}
+        {files.length === 0 && <p style={{ color: '#6B7280', fontSize: 13 }}>{lang === 'en' ? 'No files uploaded yet.' : 'No hay archivos.'}</p>}
+      </div>
+    </div>
+  );
+}
+
+// ===== ROOM PHOTOS SECTION - PER ROOM WITH CAMERA =====
+function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload }) {
   const [uploading, setUploading] = useState(false);
 
-  const handleUpload = async (roomId, files) => {
-    if (!files || files.length === 0) return;
+  const handleUpload = async (roomId, inputFiles) => {
+    if (!inputFiles || inputFiles.length === 0) return;
     setUploading(true);
-    for (const file of files) {
-      // Convert to base64 for the API
+    for (const file of inputFiles) {
       const reader = new FileReader();
       await new Promise((resolve) => {
         reader.onload = async () => {
-          const base64 = reader.result;
           await fetch(`${API_URL}/api/photos/upload`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              project_id: projectId,
-              room_id: roomId,
-              file_name: file.name,
-              photo_data: base64,
-              metadata: { source: 'builder', uploaded_by: localStorage.getItem('builder_name') || 'Builder' }
-            }),
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: projectId, room_id: roomId, file_name: file.name, photo_data: reader.result, metadata: { source: 'builder', uploaded_by: localStorage.getItem('builder_name') || 'Builder' } }),
           });
           resolve();
         };
@@ -492,36 +574,42 @@ function PhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload
     onReload();
   };
 
+  const handleCamera = (roomId) => {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*'; input.capture = 'environment';
+    input.onchange = (e) => handleUpload(roomId, Array.from(e.target.files));
+    input.click();
+  };
+
   return (
     <div>
-      <h2 style={sectionTitle}>{t.photos}</h2>
+      <h2 style={sectionTitle}>{lang === 'en' ? 'Room Photos' : 'Fotos por Habitación'}</h2>
       {rooms.map(room => (
         <div key={room.id} style={{ marginBottom: 32 }}>
-          {/* ROOM HEADER */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, background: room.color || '#2a3040', padding: '10px 16px', borderRadius: 8, borderLeft: `5px solid ${room.color || '#D4A574'}` }}>
             <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{room.name.toUpperCase()}</h3>
-            <label style={{ background: '#D4A574', color: '#1a1f2e', padding: '8px 16px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
-              {uploading ? 'Uploading...' : t.uploadFiles}
-              <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt" capture="environment" onChange={e => handleUpload(room.id, Array.from(e.target.files))} style={{ display: 'none' }} />
-            </label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => handleCamera(room.id)} style={{ background: '#D4A574', color: '#1a1f2e', padding: '8px 14px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer', border: 'none' }}>
+                📷 {lang === 'en' ? 'Camera' : 'Cámara'}
+              </button>
+              <label style={{ background: '#374151', color: '#F5F5DC', padding: '8px 14px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                📁 {uploading ? '...' : (lang === 'en' ? 'Upload' : 'Subir')}
+                <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt" onChange={e => handleUpload(room.id, Array.from(e.target.files))} style={{ display: 'none' }} />
+              </label>
+            </div>
           </div>
-
-          {/* PHOTOS GRID - organized by room */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12, padding: '0 8px' }}>
             {(photos[room.id] || []).map((photo, idx) => (
               <div key={idx} style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040', background: '#1a1f2e' }}>
-                <div style={{ width: '100%', height: 140, overflow: 'hidden' }}>
-                  <img src={photo.url || photo.photo_data} alt={photo.file_name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
+                <div style={{ width: '100%', height: 140, overflow: 'hidden' }}><img src={photo.url || photo.photo_data} alt={photo.file_name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
                 <div style={{ padding: '6px 10px' }}>
                   <p style={{ color: '#9CA3AF', fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.file_name || `Photo ${idx + 1}`}</p>
-                  {photo.uploaded_at && <p style={{ color: '#4B5563', fontSize: 10 }}>{new Date(photo.uploaded_at).toLocaleDateString()}</p>}
                 </div>
               </div>
             ))}
           </div>
           {(!photos[room.id] || photos[room.id].length === 0) && (
-            <p style={{ color: '#6B7280', fontSize: 13, padding: '0 8px' }}>{lang === 'en' ? 'No photos yet — upload some above' : 'Sin fotos — suba algunas arriba'}</p>
+            <p style={{ color: '#6B7280', fontSize: 13, padding: '0 8px' }}>{lang === 'en' ? 'No photos yet' : 'Sin fotos'}</p>
           )}
         </div>
       ))}
