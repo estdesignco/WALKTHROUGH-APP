@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ExactFFESpreadsheet from './FFEView';
+import RichTextEditor from './RichTextEditor';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -406,7 +407,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
               </div>
               <div style={{ flex: 1 }}>
                 <p style={{ color: room?.color || '#D4A574', fontSize: 11, fontWeight: 700, marginBottom: 2 }}>{room?.name || 'General'}</p>
-                <p style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }}>{scope.description}</p>
+                <p style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }} dangerouslySetInnerHTML={{ __html: scope.description }} />
               </div>
             </div>
 
@@ -545,7 +546,11 @@ function TodoSection({ projectId, todos, contacts, t, onReload }) {
       </div>
       {showAdd && (
         <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #D4A574' }}>
-          <input placeholder="Task description" value={newTodo.text} onChange={e => setNewTodo({ ...newTodo, text: e.target.value })} style={inputStyle} />
+          <RichTextEditor
+            value={newTodo.text}
+            onChange={(val) => setNewTodo({ ...newTodo, text: val })}
+            placeholder="Task description — use bold, lists, colors..."
+          />
           <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
             <select value={newTodo.priority} onChange={e => setNewTodo({ ...newTodo, priority: e.target.value })} style={{ ...inputStyle, flex: 1 }}>
               <option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option><option value="Urgent">Urgent</option>
@@ -564,7 +569,7 @@ function TodoSection({ projectId, todos, contacts, t, onReload }) {
           borderLeft: `4px solid ${todo.status === 'completed' ? '#10B981' : todo.priority === 'Urgent' ? '#EF4444' : todo.priority === 'High' ? '#F59E0B' : '#6B7280'}`,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <p style={{ color: '#fff', fontSize: 14, fontWeight: 600 }}>{todo.text}</p>
+            <p style={{ color: '#fff', fontSize: 14, fontWeight: 600 }} dangerouslySetInnerHTML={{ __html: todo.text }} />
             <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
               {todo.assigned_to && <span style={{ color: '#D4A574', fontSize: 11, fontWeight: 700 }}>@{todo.assigned_to}</span>}
               {todo.deadline && <span style={{ color: '#9CA3AF', fontSize: 11 }}>Due: {todo.deadline}</span>}

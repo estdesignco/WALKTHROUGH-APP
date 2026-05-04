@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import RichTextEditor from './RichTextEditor';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -189,12 +190,10 @@ export default function BuilderPortalManager({ project, onReload }) {
               <option value="">Select Room</option>
               {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
             </select>
-            <textarea
+            <RichTextEditor
               value={s.description}
-              onChange={e => { const n = [...scopeEntries]; n[i].description = e.target.value; setScopeEntries(n); }}
+              onChange={(val) => { const n = [...scopeEntries]; n[i].description = val; setScopeEntries(n); }}
               placeholder="Describe scope of work for this room..."
-              className="w-full bg-[#0f1218] border border-[#2a3040] rounded p-2 text-[#F5F5DC] text-sm resize-y"
-              rows={3}
             />
             <button onClick={() => setScopeEntries(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400 text-xs mt-1">Remove</button>
           </div>
