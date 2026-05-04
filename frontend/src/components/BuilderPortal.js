@@ -248,21 +248,9 @@ export default function BuilderPortal() {
           <TodoSection projectId={portal.project_id} todos={todos} contacts={portal.contacts || []} t={t} onReload={loadPortal} />
         )}
 
-        {/* ===== SCHEDULE (SYNCED) ===== */}
+        {/* ===== SCHEDULE (SYNCED - BUILDER CAN ADD) ===== */}
         {activeTab === 'schedule' && (
-          <div>
-            <h2 style={sectionTitle}>{t.schedule}</h2>
-            {(portal.schedule || []).length > 0 ? portal.schedule.map((event, idx) => (
-              <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 12,
-                borderLeft: `4px solid ${event.status === 'completed' ? '#10B981' : event.status === 'in_progress' ? '#F59E0B' : '#D4A574'}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h3 style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{event.title}</h3>
-                  <span style={{ color: '#D4A574', fontSize: 13, fontWeight: 600 }}>{event.date}</span>
-                </div>
-                {event.notes && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>{event.notes}</p>}
-              </div>
-            )) : <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No schedule items yet.' : 'No hay elementos en el calendario.'}</p>}
-          </div>
+          <ScheduleSection portal={portal} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} />
         )}
 
         {/* ===== ROOM FINISHES ===== */}
@@ -416,14 +404,29 @@ function PhotosSection({ rooms, photos, projectId, accessCode, t, onReload }) {
   const [uploading, setUploading] = useState(false);
 
   const handleUpload = async (roomId, files) => {
+    if (!files || files.length === 0) return;
     setUploading(true);
     for (const file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('room_id', roomId);
-      formData.append('project_id', projectId);
-      formData.append('source', 'builder');
-      await fetch(`${API_URL}/api/photos/upload`, { method: 'POST', body: formData });
+      // Convert to base64 for the API
+      const reader = new FileReader();
+      await new Promise((resolve) => {
+        reader.onload = async () => {
+          const base64 = reader.result;
+          await fetch(`${API_URL}/api/photos/upload`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              project_id: projectId,
+              room_id: roomId,
+              file_name: file.name,
+              photo_data: base64,
+              metadata: { source: 'builder', uploaded_by: localStorage.getItem('builder_name') || 'Builder' }
+            }),
+          });
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
     }
     setUploading(false);
     onReload();
@@ -433,22 +436,33 @@ function PhotosSection({ rooms, photos, projectId, accessCode, t, onReload }) {
     <div>
       <h2 style={sectionTitle}>{t.photos}</h2>
       {rooms.map(room => (
-        <div key={room.id} style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <h3 style={{ color: room.color || '#fff', fontSize: 16, fontWeight: 700, borderLeft: `4px solid ${room.color || '#D4A574'}`, paddingLeft: 12 }}>{room.name}</h3>
-            <label style={{ background: '#D4A574', color: '#1a1f2e', padding: '6px 14px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
-              {uploading ? '...' : t.uploadFiles}
-              <input type="file" multiple accept="image/*,.pdf,.doc,.docx" onChange={e => handleUpload(room.id, e.target.files)} style={{ display: 'none' }} />
+        <div key={room.id} style={{ marginBottom: 32 }}>
+          {/* ROOM HEADER */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, background: room.color || '#2a3040', padding: '10px 16px', borderRadius: 8, borderLeft: `5px solid ${room.color || '#D4A574'}` }}>
+            <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{room.name.toUpperCase()}</h3>
+            <label style={{ background: '#D4A574', color: '#1a1f2e', padding: '8px 16px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+              {uploading ? 'Uploading...' : t.uploadFiles}
+              <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt" onChange={e => handleUpload(room.id, Array.from(e.target.files))} style={{ display: 'none' }} />
             </label>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+
+          {/* PHOTOS GRID - organized by room */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12, padding: '0 8px' }}>
             {(photos[room.id] || []).map((photo, idx) => (
-              <div key={idx} style={{ width: 160, height: 120, borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040' }}>
-                <img src={photo.url || photo.photo_data} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div key={idx} style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040', background: '#1a1f2e' }}>
+                <div style={{ width: '100%', height: 140, overflow: 'hidden' }}>
+                  <img src={photo.url || photo.photo_data} alt={photo.file_name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ padding: '6px 10px' }}>
+                  <p style={{ color: '#9CA3AF', fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.file_name || `Photo ${idx + 1}`}</p>
+                  {photo.uploaded_at && <p style={{ color: '#4B5563', fontSize: 10 }}>{new Date(photo.uploaded_at).toLocaleDateString()}</p>}
+                </div>
               </div>
             ))}
-            {(!photos[room.id] || photos[room.id].length === 0) && <p style={{ color: '#6B7280', fontSize: 13 }}>{lang === 'en' ? 'No photos yet' : 'Sin fotos'}</p>}
           </div>
+          {(!photos[room.id] || photos[room.id].length === 0) && (
+            <p style={{ color: '#6B7280', fontSize: 13, padding: '0 8px' }}>{lang === 'en' ? 'No photos yet — upload some above' : 'Sin fotos — suba algunas arriba'}</p>
+          )}
         </div>
       ))}
     </div>
@@ -512,6 +526,65 @@ function TodoSection({ projectId, todos, contacts, t, onReload }) {
           </span>
         </div>
       )) : <p style={{ color: '#6B7280' }}>No tasks yet.</p>}
+    </div>
+  );
+}
+
+// ===== SCHEDULE SECTION - BUILDER CAN ADD =====
+function ScheduleSection({ portal, accessCode, t, lang, onReload }) {
+  const [showAdd, setShowAdd] = useState(false);
+  const [newItem, setNewItem] = useState({ title: '', date: '', status: 'pending', notes: '' });
+
+  const addScheduleItem = async () => {
+    if (!newItem.title.trim()) return;
+    const updated = [...(portal.schedule || []), newItem];
+    await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ schedule: updated }),
+    });
+    setNewItem({ title: '', date: '', status: 'pending', notes: '' });
+    setShowAdd(false);
+    onReload();
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={sectionTitle}>{t.schedule}</h2>
+        <button onClick={() => setShowAdd(!showAdd)} style={btnPrimary}>+ {lang === 'en' ? 'Add to Schedule' : 'Agregar al Calendario'}</button>
+      </div>
+
+      {showAdd && (
+        <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #D4A574' }}>
+          <input placeholder={lang === 'en' ? 'Milestone / Event title' : 'Título del evento'} value={newItem.title} onChange={e => setNewItem({ ...newItem, title: e.target.value })} style={inputStyle} />
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <input type="date" value={newItem.date} onChange={e => setNewItem({ ...newItem, date: e.target.value })} style={{ ...inputStyle, flex: 1 }} />
+            <select value={newItem.status} onChange={e => setNewItem({ ...newItem, status: e.target.value })} style={{ ...inputStyle, flex: 1 }}>
+              <option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option>
+            </select>
+          </div>
+          <textarea placeholder={lang === 'en' ? 'Notes (optional)' : 'Notas (opcional)'} value={newItem.notes} onChange={e => setNewItem({ ...newItem, notes: e.target.value })} rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={addScheduleItem} style={btnPrimary}>{t.submit}</button>
+            <button onClick={() => setShowAdd(false)} style={btnSecondary}>{t.cancel}</button>
+          </div>
+        </div>
+      )}
+
+      {(portal.schedule || []).length > 0 ? portal.schedule.map((event, idx) => (
+        <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 12,
+          borderLeft: `4px solid ${event.status === 'completed' ? '#10B981' : event.status === 'in_progress' ? '#F59E0B' : '#D4A574'}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{event.title}</h3>
+            <span style={{ color: '#D4A574', fontSize: 13, fontWeight: 600 }}>{event.date}</span>
+          </div>
+          {event.notes && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>{event.notes}</p>}
+          <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, marginTop: 6, display: 'inline-block',
+            background: event.status === 'completed' ? '#065F46' : event.status === 'in_progress' ? '#92400E' : '#374151', color: '#fff' }}>
+            {event.status?.toUpperCase() || 'PENDING'}
+          </span>
+        </div>
+      )) : <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No schedule items yet. Add one above.' : 'No hay elementos. Agregue uno arriba.'}</p>}
     </div>
   );
 }
