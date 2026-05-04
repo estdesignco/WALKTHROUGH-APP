@@ -246,12 +246,12 @@ export default function BuilderPortal() {
 
         {/* ===== TO-DO LIST (SYNCED) ===== */}
         {activeTab === 'todos' && (
-          <TodoSection projectId={portal.project_id} todos={todos} contacts={portal.contacts || []} t={t} onReload={loadPortal} />
+          <TodoSection projectId={portal.project_id} todos={todos} contacts={portal.contacts || []} rooms={rooms} t={t} onReload={loadPortal} />
         )}
 
         {/* ===== SCHEDULE (SYNCED - BUILDER CAN ADD) ===== */}
         {activeTab === 'schedule' && (
-          <ScheduleSection portal={portal} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} />
+          <ScheduleSection portal={portal} accessCode={accessCode} rooms={rooms} contacts={portal.contacts || []} t={t} lang={lang} onReload={loadPortal} />
         )}
 
         {/* ===== ROOM FINISHES ===== */}
@@ -272,7 +272,28 @@ export default function BuilderPortal() {
                 <input placeholder={t.yourName} value={newChangeOrder.author} onChange={e => setNewChangeOrder({ ...newChangeOrder, author: e.target.value })} style={inputStyle} />
                 <input placeholder="Title" value={newChangeOrder.title} onChange={e => setNewChangeOrder({ ...newChangeOrder, title: e.target.value })} style={inputStyle} />
                 <input type="date" value={newChangeOrder.date} onChange={e => setNewChangeOrder({ ...newChangeOrder, date: e.target.value })} style={inputStyle} />
-                <textarea placeholder="Description..." value={newChangeOrder.description} onChange={e => setNewChangeOrder({ ...newChangeOrder, description: e.target.value })} rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
+                <RichTextEditor
+                  value={newChangeOrder.description}
+                  onChange={(val) => setNewChangeOrder({ ...newChangeOrder, description: val })}
+                  placeholder="Description..."
+                />
+                {/* TAG PRODUCTS & PEOPLE */}
+                <div style={{ display: 'flex', gap: 8, marginTop: 8, marginBottom: 8 }}>
+                  <select onChange={e => { if (e.target.value) setNewChangeOrder(prev => ({ ...prev, tagged_products: [...(prev.tagged_products||[]), e.target.value] })); e.target.value=''; }}
+                    style={{ ...inputStyle, flex: 1, color: '#93C5FD' }}>
+                    <option value="">Tag product...</option>
+                    {rooms.flatMap(r => r.categories?.flatMap(c => c.subcategories?.flatMap(sub => sub.items?.map(item => (
+                      <option key={item.id} value={item.id}>{item.name} ({r.name})</option>
+                    )))) || [])}
+                  </select>
+                  <select onChange={e => { if (e.target.value) setNewChangeOrder(prev => ({ ...prev, tagged_people: [...(prev.tagged_people||[]), e.target.value] })); e.target.value=''; }}
+                    style={{ ...inputStyle, flex: 1, color: '#D4A574' }}>
+                    <option value="">Tag person...</option>
+                    {(portal.contacts||[]).map((c,i) => <option key={i} value={c.username||c.name}>@{c.username||c.name} ({c.role})</option>)}
+                  </select>
+                </div>
+                {(newChangeOrder.tagged_products||[]).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>{newChangeOrder.tagged_products.map((p,i) => <span key={i} style={{ background: '#1E3A5F', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{p} <span onClick={() => setNewChangeOrder(prev => ({...prev, tagged_products: prev.tagged_products.filter((_,idx)=>idx!==i)}))} style={{cursor:'pointer',color:'#EF4444'}}>x</span></span>)}</div>}
+                {(newChangeOrder.tagged_people||[]).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>{newChangeOrder.tagged_people.map((p,i) => <span key={i} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{p} <span onClick={() => setNewChangeOrder(prev => ({...prev, tagged_people: prev.tagged_people.filter((_,idx)=>idx!==i)}))} style={{cursor:'pointer',color:'#EF4444'}}>x</span></span>)}</div>}
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={async () => {
                     localStorage.setItem('builder_name', newChangeOrder.author);
@@ -509,12 +530,20 @@ function PhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload
 }
 
 // ===== TODO SECTION - FILTERED TO BUILDER/TRADES ONLY =====
-function TodoSection({ projectId, todos, contacts, t, onReload }) {
+function TodoSection({ projectId, todos, contacts, rooms, t, onReload }) {
   const [showAdd, setShowAdd] = useState(false);
-  const [newTodo, setNewTodo] = useState({ text: '', priority: 'Medium', assigned_to: '', deadline: '' });
+  const [newTodo, setNewTodo] = useState({ text: '', priority: 'Medium', assigned_to: '', deadline: '', tagged_products: [], tagged_people: [] });
 
   const allContacts = contacts || [];
   const contactNames = allContacts.map(c => (c.username || c.name || '').toLowerCase());
+  const allItems = [];
+  (rooms || []).forEach(room => {
+    room.categories?.forEach(cat => {
+      cat.subcategories?.forEach(sub => {
+        sub.items?.forEach(item => { allItems.push({ id: item.id, name: item.name, room: room.name }); });
+      });
+    });
+  });
 
   // FILTER: only show todos assigned to builder contacts or tagged as builder source
   const builderTodos = todos.filter(todo => {
@@ -559,6 +588,21 @@ function TodoSection({ projectId, todos, contacts, t, onReload }) {
             </select>
             <input type="date" value={newTodo.deadline} onChange={e => setNewTodo({ ...newTodo, deadline: e.target.value })} style={{ ...inputStyle, flex: 1 }} />
           </div>
+          {/* TAG PRODUCTS & PEOPLE */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <select onChange={e => { if (e.target.value) setNewTodo(prev => ({ ...prev, tagged_products: [...(prev.tagged_products||[]), e.target.value] })); e.target.value=''; }}
+              style={{ ...inputStyle, flex: 1, color: '#93C5FD' }}>
+              <option value="">Tag product...</option>
+              {allItems.map(item => <option key={item.id} value={item.id}>{item.name} ({item.room})</option>)}
+            </select>
+            <select onChange={e => { if (e.target.value) setNewTodo(prev => ({ ...prev, tagged_people: [...(prev.tagged_people||[]), e.target.value] })); e.target.value=''; }}
+              style={{ ...inputStyle, flex: 1, color: '#D4A574' }}>
+              <option value="">Tag person...</option>
+              {allContacts.map((c, i) => <option key={i} value={c.username || c.name}>@{c.username || c.name} ({c.role})</option>)}
+            </select>
+          </div>
+          {(newTodo.tagged_products||[]).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>{newTodo.tagged_products.map((p,i) => <span key={i} style={{ background: '#1E3A5F', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{allItems.find(x=>x.id===p)?.name||p} <span onClick={() => setNewTodo(prev => ({...prev, tagged_products: prev.tagged_products.filter((_,idx)=>idx!==i)}))} style={{cursor:'pointer',color:'#EF4444'}}>x</span></span>)}</div>}
+          {(newTodo.tagged_people||[]).length > 0 && <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>{newTodo.tagged_people.map((p,i) => <span key={i} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{p} <span onClick={() => setNewTodo(prev => ({...prev, tagged_people: prev.tagged_people.filter((_,idx)=>idx!==i)}))} style={{cursor:'pointer',color:'#EF4444'}}>x</span></span>)}</div>}
           <button onClick={addTodo} style={btnPrimary}>{t.submit}</button>
         </div>
       )}
@@ -685,9 +729,19 @@ function ContactsSection({ portal, accessCode, comments, t, lang, onReload }) {
 }
 
 // ===== SCHEDULE SECTION - BUILDER CAN ADD =====
-function ScheduleSection({ portal, accessCode, t, lang, onReload }) {
+function ScheduleSection({ portal, accessCode, rooms, contacts, t, lang, onReload }) {
   const [showAdd, setShowAdd] = useState(false);
-  const [newItem, setNewItem] = useState({ title: '', date: '', status: 'pending', notes: '' });
+  const [newItem, setNewItem] = useState({ title: '', date: '', status: 'pending', notes: '', tagged_products: [], tagged_people: [] });
+
+  const allItems = [];
+  (rooms || []).forEach(room => {
+    room.categories?.forEach(cat => {
+      cat.subcategories?.forEach(sub => {
+        sub.items?.forEach(item => { allItems.push({ id: item.id, name: item.name, room: room.name }); });
+      });
+    });
+  });
+  const allContacts = contacts || [];
 
   const addScheduleItem = async () => {
     if (!newItem.title.trim()) return;
@@ -717,7 +771,24 @@ function ScheduleSection({ portal, accessCode, t, lang, onReload }) {
               <option value="pending">Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option>
             </select>
           </div>
-          <textarea placeholder={lang === 'en' ? 'Notes (optional)' : 'Notas (opcional)'} value={newItem.notes} onChange={e => setNewItem({ ...newItem, notes: e.target.value })} rows={2} style={{ ...inputStyle, resize: 'vertical' }} />
+          <RichTextEditor
+            value={newItem.notes}
+            onChange={(val) => setNewItem({ ...newItem, notes: val })}
+            placeholder={lang === 'en' ? 'Notes (optional)' : 'Notas (opcional)'}
+          />
+          {/* TAG PRODUCTS & PEOPLE */}
+          <div style={{ display: 'flex', gap: 8, marginTop: 8, marginBottom: 8 }}>
+            <select onChange={e => { if (e.target.value) setNewItem(prev => ({ ...prev, tagged_products: [...(prev.tagged_products||[]), e.target.value] })); e.target.value=''; }}
+              style={{ ...inputStyle, flex: 1, color: '#93C5FD' }}>
+              <option value="">Tag product...</option>
+              {allItems.map(item => <option key={item.id} value={item.id}>{item.name} ({item.room})</option>)}
+            </select>
+            <select onChange={e => { if (e.target.value) setNewItem(prev => ({ ...prev, tagged_people: [...(prev.tagged_people||[]), e.target.value] })); e.target.value=''; }}
+              style={{ ...inputStyle, flex: 1, color: '#D4A574' }}>
+              <option value="">Tag person...</option>
+              {allContacts.map((c, i) => <option key={i} value={c.username || c.name}>@{c.username || c.name} ({c.role})</option>)}
+            </select>
+          </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={addScheduleItem} style={btnPrimary}>{t.submit}</button>
             <button onClick={() => setShowAdd(false)} style={btnSecondary}>{t.cancel}</button>
