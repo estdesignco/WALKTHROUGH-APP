@@ -292,12 +292,14 @@ export default function ScopeDocumentEditor({
     if (!editor || !result) return;
     const m = mentionRef.current;
     if (!m) return;
-    const range = editor.getSelection();
-    if (!range) return;
-    // Delete the typed trigger ("@bob" or "#paint") so the pill replaces it.
-    const deleteLen = range.index - m.triggerIndex;
+    // Compute cursor from saved triggerIndex + current query length.
+    // We CANNOT rely on editor.getSelection() here because clicking the
+    // popup steals focus from the contenteditable and getSelection() returns null.
+    const cursorAtTrigger = m.triggerIndex + 1 + (m.query || '').length; // 1 for the # / @ char
+    const deleteLen = cursorAtTrigger - m.triggerIndex;
     if (deleteLen > 0) editor.deleteText(m.triggerIndex, deleteLen, 'user');
     editor.setSelection(m.triggerIndex, 0);
+    editor.focus();
     if (result.kind === 'trade') insertTrade(result.value);
     else if (result.kind === 'product') insertProduct(result.value);
     else if (result.kind === 'person') insertPerson(result.value);
@@ -652,7 +654,7 @@ Example:
                 return (
                   <div
                     key={`t-${r.value}`}
-                    onClick={() => selectMention(r)}
+                    onMouseDown={(e) => { e.preventDefault(); selectMention(r); }}
                     onMouseEnter={() => setMention(prev => prev ? { ...prev, selectedIndex: idx } : null)}
                     style={{
                       padding: '6px 8px', borderRadius: 4, cursor: 'pointer',
@@ -671,7 +673,7 @@ Example:
                 return (
                   <div
                     key={`p-${r.value.id}`}
-                    onClick={() => selectMention(r)}
+                    onMouseDown={(e) => { e.preventDefault(); selectMention(r); }}
                     onMouseEnter={() => setMention(prev => prev ? { ...prev, selectedIndex: idx } : null)}
                     style={{
                       padding: '6px 8px', borderRadius: 4, cursor: 'pointer',
@@ -690,7 +692,7 @@ Example:
                 return (
                   <div
                     key={`u-${idx}`}
-                    onClick={() => selectMention(r)}
+                    onMouseDown={(e) => { e.preventDefault(); selectMention(r); }}
                     onMouseEnter={() => setMention(prev => prev ? { ...prev, selectedIndex: idx } : null)}
                     style={{
                       padding: '6px 8px', borderRadius: 4, cursor: 'pointer',
