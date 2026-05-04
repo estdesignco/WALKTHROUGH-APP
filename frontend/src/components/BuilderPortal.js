@@ -107,13 +107,14 @@ export default function BuilderPortal() {
 
       <main style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 16px' }}>
 
-        {/* ===== FFE TAB - THE ACTUAL FFE COMPONENT ===== */}
+        {/* ===== FFE TAB - THE ACTUAL FFE COMPONENT (READ ONLY) ===== */}
         {activeTab === 'ffe' && (
           <ExactFFESpreadsheet
             project={builderProject}
             roomColors={{}}
             categoryColors={{}}
             onReload={loadPortal}
+            builderMode={true}
           />
         )}
 
@@ -153,25 +154,9 @@ export default function BuilderPortal() {
           </div>
         )}
 
-        {/* ===== TO-DO LIST ===== */}
+        {/* ===== TO-DO LIST - SYNCED WITH MAIN APP ===== */}
         {activeTab === 'todos' && (
-          <div>
-            <h2 style={sectionTitle}>To-Do List</h2>
-            {todos.length > 0 ? todos.map(todo => (
-              <div key={todo.id} style={{ background: '#1a1f2e', padding: '12px 16px', borderRadius: 8, marginBottom: 8,
-                borderLeft: `4px solid ${todo.status === 'completed' ? '#10B981' : todo.status === 'in_progress' ? '#F59E0B' : '#6B7280'}`,
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <p style={{ color: '#fff', fontSize: 14, fontWeight: 600 }}>{todo.title || todo.text}</p>
-                  {todo.assigned_to && <p style={{ color: '#9CA3AF', fontSize: 12 }}>Assigned: {todo.assigned_to}</p>}
-                </div>
-                <span style={{ padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700,
-                  background: todo.status === 'completed' ? '#065F46' : todo.status === 'in_progress' ? '#92400E' : '#374151', color: '#fff' }}>
-                  {(todo.status || 'pending').toUpperCase()}
-                </span>
-              </div>
-            )) : <p style={{ color: '#6B7280' }}>No to-do items yet.</p>}
-          </div>
+          <BuilderTodoSection projectId={portal.project_id} accessCode={accessCode} contacts={portal.contacts || []} />
         )}
 
         {/* ===== SCHEDULE ===== */}
@@ -191,13 +176,14 @@ export default function BuilderPortal() {
           </div>
         )}
 
-        {/* ===== ROOM FINISHES - uses same FFE component ===== */}
+        {/* ===== ROOM FINISHES - uses same FFE component (READ ONLY) ===== */}
         {activeTab === 'finishes' && (
           <ExactFFESpreadsheet
             project={builderProject}
             roomColors={{}}
             categoryColors={{}}
             onReload={loadPortal}
+            builderMode={true}
           />
         )}
 
@@ -343,3 +329,73 @@ export default function BuilderPortal() {
 
 const sectionTitle = { color: '#D4A574', fontSize: 20, fontWeight: 700, marginBottom: 16 };
 const inputStyle = { width: '100%', background: '#0f1218', border: '1px solid #2a3040', borderRadius: 6, padding: '10px 12px', color: '#fff', fontSize: 14, marginBottom: 8, display: 'block', boxSizing: 'border-box' };
+
+// ===== BUILDER TODO SECTION - SYNCED WITH MAIN APP =====
+function BuilderTodoSection({ projectId, accessCode, contacts }) {
+  const [todos, setTodos] = useState([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newTodo, setNewTodo] = useState({ text: '', priority: 'Medium', assigned_to: '', deadline: '' });
+
+  useEffect(() => { loadTodos(); }, [projectId]);
+
+  const loadTodos = async () => {
+    const res = await fetch(`${API_URL}/api/todos/${projectId}`);
+    if (res.ok) setTodos(await res.json());
+  };
+
+  const addTodo = async () => {
+    if (!newTodo.text.trim()) return;
+    await fetch(`${API_URL}/api/todos`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newTodo, project_id: projectId, source_type: 'builder' }),
+    });
+    setNewTodo({ text: '', priority: 'Medium', assigned_to: '', deadline: '' });
+    setShowAdd(false);
+    loadTodos();
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={sectionTitle}>To-Do List</h2>
+        <button onClick={() => setShowAdd(!showAdd)} style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>+ Add Task</button>
+      </div>
+
+      {showAdd && (
+        <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #D4A574' }}>
+          <input placeholder="Task description" value={newTodo.text} onChange={e => setNewTodo({ ...newTodo, text: e.target.value })} style={inputStyle} />
+          <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+            <select value={newTodo.priority} onChange={e => setNewTodo({ ...newTodo, priority: e.target.value })} style={{ ...inputStyle, flex: 1 }}>
+              <option value="Low">Low Priority</option><option value="Medium">Medium</option><option value="High">High Priority</option><option value="Urgent">Urgent</option>
+            </select>
+            <select value={newTodo.assigned_to} onChange={e => setNewTodo({ ...newTodo, assigned_to: e.target.value })} style={{ ...inputStyle, flex: 1 }}>
+              <option value="">Assign to...</option>
+              {contacts.map((c, i) => <option key={i} value={c.name}>{c.name} ({c.role})</option>)}
+            </select>
+            <input type="date" value={newTodo.deadline} onChange={e => setNewTodo({ ...newTodo, deadline: e.target.value })} style={{ ...inputStyle, flex: 1 }} />
+          </div>
+          <button onClick={addTodo} style={{ background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 24px', borderRadius: 6, fontWeight: 700, cursor: 'pointer' }}>Add Task</button>
+        </div>
+      )}
+
+      {todos.length > 0 ? todos.map(todo => (
+        <div key={todo.id} style={{ background: '#1a1f2e', padding: '12px 16px', borderRadius: 8, marginBottom: 8,
+          borderLeft: `4px solid ${todo.status === 'completed' ? '#10B981' : todo.status === 'in_progress' ? '#F59E0B' : todo.priority === 'High' || todo.priority === 'Urgent' ? '#EF4444' : '#6B7280'}`,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <p style={{ color: '#fff', fontSize: 14, fontWeight: 600 }}>{todo.text}</p>
+            <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+              {todo.assigned_to && <span style={{ color: '#D4A574', fontSize: 11, fontWeight: 700 }}>@{todo.assigned_to}</span>}
+              {todo.deadline && <span style={{ color: '#9CA3AF', fontSize: 11 }}>Due: {todo.deadline}</span>}
+              {todo.priority && <span style={{ color: '#6B7280', fontSize: 11 }}>{todo.priority}</span>}
+            </div>
+          </div>
+          <span style={{ padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700,
+            background: todo.status === 'completed' ? '#065F46' : todo.status === 'in_progress' ? '#92400E' : '#374151', color: '#fff' }}>
+            {(todo.status || 'pending').toUpperCase()}
+          </span>
+        </div>
+      )) : <p style={{ color: '#6B7280' }}>No to-do items yet.</p>}
+    </div>
+  );
+}

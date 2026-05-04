@@ -12,7 +12,8 @@ const ExactFFESpreadsheet = ({
   carrierTypes = [],
   onDeleteRoom, 
   onAddRoom,
-  onReload 
+  onReload,
+  builderMode = false
 }) => {
   // ✅ DEBUG LOGGING TO FIND EMPTY SPREADSHEET ISSUE
   console.log('📊 ExactFFESpreadsheet - Project data:', project);
@@ -831,6 +832,8 @@ const ExactFFESpreadsheet = ({
             >
               COLLAPSE ALL
             </button>
+            {!builderMode && (
+            <>
             <button 
               onClick={handleAddRoom}
               className="bg-gradient-to-r from-[#B49B7E] to-[#A08B6F] hover:from-[#A08B6F] hover:to-[#8B7355] px-6 py-2 rounded-full shadow-xl hover:shadow-[#B49B7E]/30 transition-all duration-300 transform hover:scale-105 tracking-wide font-medium border border-[#D4C5A9]/20 text-[#D4C5A9]"
@@ -846,12 +849,21 @@ const ExactFFESpreadsheet = ({
             >
               → TRANSFER FROM CHECKLIST
             </button>
+            </>
+            )}
           </div>
         </div>
       </div>
 
       {/* SPREADSHEET CONTAINER - EXACT SAME TREATMENT AS GRAPHS */}
-      <div className="rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/20 mb-6" 
+      {builderMode && (
+        <style>{`
+          .builder-mode-active [contenteditable] { pointer-events: none !important; }
+          .builder-mode-active .ffe-edit-control { display: none !important; }
+          .builder-mode-active [draggable] { cursor: default !important; }
+        `}</style>
+      )}
+      <div className={`rounded-2xl shadow-xl backdrop-blur-sm p-6 border border-[#D4A574]/20 mb-6 ${builderMode ? 'builder-mode-active' : ''}`} 
            style={{
              background: 'linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(30,30,30,0.9) 30%, rgba(0,0,0,0.95) 100%)'
            }}>
@@ -972,7 +984,7 @@ const ExactFFESpreadsheet = ({
                                       </div>
                                       <button
                                         onClick={() => handleDeleteRoom(room.id)}
-                                        className="text-red-300 hover:text-red-100 text-lg ml-2"
+                                        className="text-red-300 hover:text-red-100 text-lg ml-2 ffe-edit-control"
                                         title="Delete Room"
                                       >
                                         🗑️
@@ -1366,7 +1378,7 @@ const ExactFFESpreadsheet = ({
                                                           </td>
                                                           
                                                           {/* ACTIONS - DELETE INSTALLED */}
-                                                          <td className="border border-[#D4A574] px-2 py-2 text-center">
+                                                          <td className="border border-[#D4A574] px-2 py-2 text-center ffe-edit-control">
                                                             <button 
                                                               onClick={() => handleDeleteItem(item.id)}
                                                               className="bg-red-600 hover:bg-red-500 text-[#D4C5A9] text-xs px-2 py-1 rounded"
@@ -1465,7 +1477,7 @@ const ExactFFESpreadsheet = ({
         </div>
 
         {/* BOTTOM SECTION - ADD CATEGORY AND ADD ITEM BUTTONS - MATCHING WALKTHROUGH */}
-        <div className="mt-6 flex gap-3">
+        <div className="mt-6 flex gap-3 ffe-edit-control">
           <select
             value=""
             onChange={(e) => {
@@ -1546,7 +1558,7 @@ const ExactFFESpreadsheet = ({
 
       {/* ADD INSTALLED MODAL */}
       {/* FOOTER SECTION - ADD CATEGORY */}
-      <div className="mt-8 p-4 border-t-2 border-[#D4A574]/20">
+      <div className="mt-8 p-4 border-t-2 border-[#D4A574]/20 ffe-edit-control">
         <div className="flex gap-3 justify-center">
           <select
             value=""
