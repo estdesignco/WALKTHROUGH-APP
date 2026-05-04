@@ -245,6 +245,15 @@ export default function ProjectDetailPage() {
         }
     }, [projectId]);
 
+    const refreshProject = async () => {
+        try {
+            const projectData = await Project.get(projectId);
+            setProject(projectData);
+        } catch (error) {
+            console.error("Failed to refresh project:", error);
+        }
+    };
+
     const handleEditClick = () => {
         setEditedProject({ ...project });
         setIsEditing(true);
@@ -1118,7 +1127,7 @@ export default function ProjectDetailPage() {
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading chat...</div> },
         { name: "Builder Portal", icon: HardHat, component: project ? (
-            <BuilderPortalManager project={project} onReload={fetchProject} />
+            <BuilderPortalManager project={project} onReload={refreshProject} />
         ) : <div className="text-center text-stone-300 py-8">Loading...</div> },
     ];
 
