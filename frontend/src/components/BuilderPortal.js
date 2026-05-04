@@ -364,7 +364,7 @@ export default function BuilderPortal() {
 
 // ===== SCOPE SECTION WITH CHECKBOXES + TRADE VIEW =====
 function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
-  const [viewMode, setViewMode] = useState('room');
+  const [viewMode, setViewMode] = useState('overall');
 
   const toggleScope = async (idx) => {
     const updated = [...(portal.scope_of_work || [])];
@@ -386,21 +386,87 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
     'EXTERIOR': '#059669', 'LANDSCAPING': '#16A34A', 'GENERAL': '#6B7280',
   };
 
+  // Group items by room (preserving original index for toggling)
+  const itemsByRoom = {};
+  scopeItems.forEach((item, idx) => {
+    const key = item.room_id || '__unassigned__';
+    if (!itemsByRoom[key]) itemsByRoom[key] = [];
+    itemsByRoom[key].push({ item, originalIndex: idx });
+  });
+  const orderedRoomKeys = [
+    ...rooms.filter(r => itemsByRoom[r.id]).map(r => r.id),
+    ...(itemsByRoom['__unassigned__'] ? ['__unassigned__'] : []),
+  ];
+
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
         <h2 style={sectionTitle}>{t.scopeOfWork}</h2>
         <div style={{ display: 'flex', gap: 4, background: '#1a1f2e', borderRadius: 8, padding: 4, border: '1px solid #2a3040' }}>
-          <button onClick={() => setViewMode('room')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'room' ? '#D4A574' : 'transparent', color: viewMode === 'room' ? '#1a1f2e' : '#6B7280' }}>
+          <button data-testid="scope-view-overall" onClick={() => setViewMode('overall')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'overall' ? '#D4A574' : 'transparent', color: viewMode === 'overall' ? '#1a1f2e' : '#6B7280' }}>
+            {lang === 'en' ? 'Overall' : 'General'}
+          </button>
+          <button data-testid="scope-view-room" onClick={() => setViewMode('room')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'room' ? '#D4A574' : 'transparent', color: viewMode === 'room' ? '#1a1f2e' : '#6B7280' }}>
             {lang === 'en' ? 'By Room' : 'Por Hab.'}
           </button>
-          <button onClick={() => setViewMode('trade')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'trade' ? '#D4A574' : 'transparent', color: viewMode === 'trade' ? '#1a1f2e' : '#6B7280' }}>
+          <button data-testid="scope-view-trade" onClick={() => setViewMode('trade')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'trade' ? '#D4A574' : 'transparent', color: viewMode === 'trade' ? '#1a1f2e' : '#6B7280' }}>
             {lang === 'en' ? 'By Trade' : 'Por Oficio'}
           </button>
         </div>
       </div>
 
       {scopeItems.length === 0 && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope items defined yet.' : 'No hay elementos definidos.'}</p>}
+
+      {/* OVERALL VIEW — Document-style grouped by room with numbered items */}
+      {viewMode === 'overall' && orderedRoomKeys.map(roomKey => {
+        const room = rooms.find(r => r.id === roomKey);
+        const groupItems = itemsByRoom[roomKey];
+        const headerColor = room?.color || '#D4A574';
+        const headerName = room?.name || (lang === 'en' ? 'GENERAL' : 'GENERAL');
+        return (
+          <div key={roomKey} style={{ marginBottom: 28, background: `linear-gradient(180deg, ${headerColor}08 0%, transparent 100%)`, borderRadius: 8, border: `1px solid ${headerColor}25`, overflow: 'hidden' }} data-testid={`overall-room-${roomKey}`}>
+            <div style={{ background: `${headerColor}20`, borderLeft: `5px solid ${headerColor}`, padding: '12px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ color: headerColor, fontSize: 20, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase' }}>{headerName}</h3>
+              <span style={{ color: '#6B7280', fontSize: 11 }}>{groupItems.length} {lang === 'en' ? 'items' : 'elementos'}</span>
+            </div>
+            <ol style={{ listStyle: 'none', padding: '12px 24px 16px 24px', margin: 0 }}>
+              {groupItems.map(({ item, originalIndex }, localIdx) => {
+                const tColor = tradeColors[item.trade_category] || '#6B7280';
+                return (
+                  <li key={originalIndex} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '8px 0', borderBottom: localIdx === groupItems.length - 1 ? 'none' : '1px solid rgba(255,255,255,0.04)' }}>
+                    {/* Checkbox */}
+                    <div onClick={() => toggleScope(originalIndex)} style={{ width: 22, height: 22, borderRadius: 4, border: item.completed ? '2px solid #10B981' : `2px solid ${headerColor}80`, background: item.completed ? '#10B981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2, cursor: 'pointer' }}>
+                      {item.completed && <span style={{ color: '#fff', fontSize: 13, fontWeight: 900 }}>✓</span>}
+                    </div>
+                    {/* Number */}
+                    <span style={{ color: headerColor, fontSize: 16, fontWeight: 700, minWidth: 28, paddingTop: 1 }}>{localIdx + 1}.</span>
+                    {/* Description + Tags */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div onClick={() => toggleScope(originalIndex)} style={{ cursor: 'pointer' }}>
+                        <div style={{ color: item.completed ? '#6B7280' : '#E5E7EB', fontSize: 15, lineHeight: 1.5, textDecoration: item.completed ? 'line-through' : 'none' }} dangerouslySetInnerHTML={{ __html: item.description || '<em style="opacity:0.4">(no description)</em>' }} />
+                      </div>
+                      {/* Trade & tag chips inline */}
+                      {(item.trade_category || (item.tagged_products || []).length > 0 || (item.tagged_people || []).length > 0) && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                          {item.trade_category && (
+                            <span style={{ background: `${tColor}20`, border: `1px solid ${tColor}`, color: tColor, padding: '2px 8px', borderRadius: 4, fontSize: 9, fontWeight: 800, letterSpacing: 1 }}>{item.trade_category}</span>
+                          )}
+                          {(item.tagged_products || []).map((pid, pi) => (
+                            <span key={pi} style={{ background: '#1E3A5F', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>🏷 {pid}</span>
+                          ))}
+                          {(item.tagged_people || []).map((n, pi) => (
+                            <span key={pi} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{n}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        );
+      })}
 
       {/* BY ROOM VIEW */}
       {viewMode === 'room' && scopeItems.map((scope, idx) => {
