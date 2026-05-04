@@ -240,7 +240,7 @@ export default function BuilderPortal() {
 
         {/* ===== PHOTOS & FILES - BUILDER CAN UPLOAD ===== */}
         {activeTab === 'photos' && (
-          <PhotosSection rooms={rooms} photos={photos} projectId={portal.project_id} accessCode={accessCode} t={t} onReload={loadPortal} />
+          <PhotosSection rooms={rooms} photos={photos} projectId={portal.project_id} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} />
         )}
 
         {/* ===== TO-DO LIST (SYNCED) ===== */}
@@ -400,7 +400,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
 }
 
 // ===== PHOTOS SECTION - BUILDER CAN UPLOAD =====
-function PhotosSection({ rooms, photos, projectId, accessCode, t, onReload }) {
+function PhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload }) {
   const [uploading, setUploading] = useState(false);
 
   const handleUpload = async (roomId, files) => {
