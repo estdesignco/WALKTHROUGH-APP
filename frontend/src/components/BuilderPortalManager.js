@@ -190,6 +190,33 @@ export default function BuilderPortalManager({ project, onReload }) {
               <option value="">Select Room</option>
               {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
             </select>
+            <select
+              value={s.trade_category || ''}
+              onChange={e => { const n = [...scopeEntries]; n[i].trade_category = e.target.value; setScopeEntries(n); }}
+              className="bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-yellow-400 text-xs mb-2 w-full"
+            >
+              <option value="">Select Trade Category</option>
+              <option value="DEMOLITION">DEMOLITION</option>
+              <option value="FRAMING">FRAMING</option>
+              <option value="ELECTRICAL">ELECTRICAL</option>
+              <option value="PLUMBING">PLUMBING</option>
+              <option value="HVAC">HVAC</option>
+              <option value="DRYWALL">DRYWALL</option>
+              <option value="PAINT">PAINT</option>
+              <option value="TILE">TILE</option>
+              <option value="FLOORING">FLOORING</option>
+              <option value="CABINETRY">CABINETRY</option>
+              <option value="COUNTERTOPS">COUNTERTOPS</option>
+              <option value="MILLWORK">MILLWORK</option>
+              <option value="HARDWARE">HARDWARE</option>
+              <option value="GLASS & MIRRORS">GLASS & MIRRORS</option>
+              <option value="APPLIANCES">APPLIANCES</option>
+              <option value="FIXTURES">FIXTURES</option>
+              <option value="ROOFING">ROOFING</option>
+              <option value="EXTERIOR">EXTERIOR</option>
+              <option value="LANDSCAPING">LANDSCAPING</option>
+              <option value="GENERAL">GENERAL</option>
+            </select>
             <RichTextEditor
               value={s.description}
               onChange={(val) => { const n = [...scopeEntries]; n[i].description = val; setScopeEntries(n); }}

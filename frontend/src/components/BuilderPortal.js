@@ -362,8 +362,10 @@ export default function BuilderPortal() {
   );
 }
 
-// ===== SCOPE SECTION WITH CHECKBOXES + PRODUCT TAGGING =====
+// ===== SCOPE SECTION WITH CHECKBOXES + TRADE VIEW =====
 function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
+  const [viewMode, setViewMode] = useState('room');
+
   const toggleScope = async (idx) => {
     const updated = [...(portal.scope_of_work || [])];
     updated[idx] = { ...updated[idx], completed: !updated[idx].completed };
@@ -374,58 +376,36 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
     onReload();
   };
 
-  // Get all items for tagging
-  const allItems = [];
-  rooms.forEach(room => {
-    room.categories?.forEach(cat => {
-      cat.subcategories?.forEach(sub => {
-        sub.items?.forEach(item => {
-          allItems.push({ id: item.id, name: item.name, room: room.name, category: cat.name });
-        });
-      });
-    });
-  });
-
-  const tagProduct = async (scopeIdx, itemId) => {
-    const updated = [...(portal.scope_of_work || [])];
-    const tags = updated[scopeIdx].tagged_products || [];
-    if (tags.includes(itemId)) {
-      updated[scopeIdx].tagged_products = tags.filter(t => t !== itemId);
-    } else {
-      updated[scopeIdx].tagged_products = [...tags, itemId];
-    }
-    await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scope_of_work: updated }),
-    });
-    onReload();
-  };
-
-  // Get all contacts for tagging
-  const allContacts = portal.contacts || [];
-
-  const tagPerson = async (scopeIdx, personName) => {
-    const updated = [...(portal.scope_of_work || [])];
-    const tags = updated[scopeIdx].tagged_people || [];
-    if (tags.includes(personName)) {
-      updated[scopeIdx].tagged_people = tags.filter(t => t !== personName);
-    } else {
-      updated[scopeIdx].tagged_people = [...tags, personName];
-    }
-    await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scope_of_work: updated }),
-    });
-    onReload();
+  const scopeItems = portal.scope_of_work || [];
+  const tradeCategories = [...new Set(scopeItems.map(s => s.trade_category || 'GENERAL'))].sort();
+  const tradeColors = {
+    'DEMOLITION': '#EF4444', 'FRAMING': '#F97316', 'ELECTRICAL': '#EAB308', 'PLUMBING': '#3B82F6',
+    'HVAC': '#6366F1', 'DRYWALL': '#A3A3A3', 'PAINT': '#EC4899', 'TILE': '#14B8A6', 'FLOORING': '#8B5CF6',
+    'CABINETRY': '#D97706', 'COUNTERTOPS': '#7C3AED', 'MILLWORK': '#B45309', 'HARDWARE': '#78716C',
+    'GLASS & MIRRORS': '#06B6D4', 'APPLIANCES': '#64748B', 'FIXTURES': '#0EA5E9', 'ROOFING': '#DC2626',
+    'EXTERIOR': '#059669', 'LANDSCAPING': '#16A34A', 'GENERAL': '#6B7280',
   };
 
   return (
     <div>
-      <h2 style={sectionTitle}>{t.scopeOfWork}</h2>
-      {(portal.scope_of_work || []).length > 0 ? portal.scope_of_work.map((scope, idx) => {
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={sectionTitle}>{t.scopeOfWork}</h2>
+        <div style={{ display: 'flex', gap: 4, background: '#1a1f2e', borderRadius: 8, padding: 4, border: '1px solid #2a3040' }}>
+          <button onClick={() => setViewMode('room')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'room' ? '#D4A574' : 'transparent', color: viewMode === 'room' ? '#1a1f2e' : '#6B7280' }}>
+            {lang === 'en' ? 'By Room' : 'Por Hab.'}
+          </button>
+          <button onClick={() => setViewMode('trade')} style={{ padding: '6px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer', border: 'none', background: viewMode === 'trade' ? '#D4A574' : 'transparent', color: viewMode === 'trade' ? '#1a1f2e' : '#6B7280' }}>
+            {lang === 'en' ? 'By Trade' : 'Por Oficio'}
+          </button>
+        </div>
+      </div>
+
+      {scopeItems.length === 0 && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope items defined yet.' : 'No hay elementos definidos.'}</p>}
+
+      {/* BY ROOM VIEW */}
+      {viewMode === 'room' && scopeItems.map((scope, idx) => {
         const room = rooms.find(r => r.id === scope.room_id);
-        const taggedProducts = scope.tagged_products || [];
-        const taggedPeople = scope.tagged_people || [];
+        const tradeColor = tradeColors[scope.trade_category] || '#6B7280';
         return (
           <div key={idx} style={{ background: '#1a1f2e', padding: '14px 16px', borderRadius: 8, marginBottom: 12, borderLeft: `4px solid ${scope.completed ? '#10B981' : room?.color || '#D4A574'}` }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer' }} onClick={() => toggleScope(idx)}>
@@ -433,34 +413,48 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
                 {scope.completed && <span style={{ color: '#fff', fontSize: 14, fontWeight: 900 }}>✓</span>}
               </div>
               <div style={{ flex: 1 }}>
-                <p style={{ color: room?.color || '#D4A574', fontSize: 18, fontWeight: 900, marginBottom: 6, letterSpacing: 1, textTransform: 'uppercase' }}>{room?.name || 'General'}</p>
-                <p style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }} dangerouslySetInnerHTML={{ __html: scope.description }} />
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
+                  <p style={{ color: room?.color || '#D4A574', fontSize: 18, fontWeight: 900, letterSpacing: 1, textTransform: 'uppercase' }}>{room?.name || 'General'}</p>
+                  {scope.trade_category && <span style={{ background: `${tradeColor}25`, border: `1px solid ${tradeColor}`, color: tradeColor, padding: '1px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{scope.trade_category}</span>}
+                </div>
+                <div style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }} dangerouslySetInnerHTML={{ __html: scope.description }} />
               </div>
             </div>
-
-            {/* TAGGED PRODUCTS */}
-            {taggedProducts.length > 0 && (
-              <div style={{ marginTop: 8, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {taggedProducts.map(pid => {
-                  const item = allItems.find(i => i.id === pid);
-                  return item ? <span key={pid} style={{ background: '#3B82F620', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{item.name}</span> : null;
-                })}
-              </div>
-            )}
-
-            {/* TAGGED PEOPLE */}
-            {taggedPeople.length > 0 && (
-              <div style={{ marginTop: 4, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {taggedPeople.map(name => (
-                  <span key={name} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{name}</span>
-                ))}
-              </div>
-            )}
-
-            {/* TAG DROPDOWNS - ADMIN SIDE ONLY, NOT ON BUILDER */}
+            {(scope.tagged_products||[]).length > 0 && <div style={{ marginTop: 8, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>{scope.tagged_products.map((pid, pi) => <span key={pi} style={{ background: '#1E3A5F', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{pid}</span>)}</div>}
+            {(scope.tagged_people||[]).length > 0 && <div style={{ marginTop: 4, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>{scope.tagged_people.map((n, pi) => <span key={pi} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{n}</span>)}</div>}
           </div>
         );
-      }) : <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope items defined yet.' : 'No hay elementos definidos.'}</p>}
+      })}
+
+      {/* BY TRADE VIEW */}
+      {viewMode === 'trade' && tradeCategories.map(trade => {
+        const tradeItems = scopeItems.map((s, idx) => ({ ...s, _idx: idx })).filter(s => (s.trade_category || 'GENERAL') === trade);
+        const tradeColor = tradeColors[trade] || '#6B7280';
+        const roomGroups = {};
+        tradeItems.forEach(item => { const r = rooms.find(rm => rm.id === item.room_id); const rn = r?.name || 'General'; if (!roomGroups[rn]) roomGroups[rn] = { room: r, items: [] }; roomGroups[rn].items.push(item); });
+
+        return (
+          <div key={trade} style={{ marginBottom: 24 }}>
+            <div style={{ background: `${tradeColor}15`, borderLeft: `5px solid ${tradeColor}`, padding: '12px 16px', borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ color: tradeColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{trade}</h3>
+              <span style={{ color: '#6B7280', fontSize: 12 }}>{tradeItems.length} {lang === 'en' ? 'items' : 'elementos'}</span>
+            </div>
+            {Object.entries(roomGroups).map(([rName, group]) => (
+              <div key={rName} style={{ marginLeft: 12, marginBottom: 12 }}>
+                <p style={{ color: group.room?.color || '#D4A574', fontSize: 14, fontWeight: 700, marginBottom: 6, borderBottom: `1px solid ${group.room?.color || '#D4A574'}30`, paddingBottom: 4 }}>{rName.toUpperCase()}</p>
+                {group.items.map(item => (
+                  <div key={item._idx} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: '1px solid #1a1f2e', cursor: 'pointer' }} onClick={() => toggleScope(item._idx)}>
+                    <div style={{ width: 20, height: 20, borderRadius: 3, border: item.completed ? '2px solid #10B981' : '2px solid #4B5563', background: item.completed ? '#10B981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                      {item.completed && <span style={{ color: '#fff', fontSize: 12, fontWeight: 900 }}>✓</span>}
+                    </div>
+                    <div style={{ color: item.completed ? '#6B7280' : '#E5E7EB', fontSize: 13, textDecoration: item.completed ? 'line-through' : 'none', flex: 1 }} dangerouslySetInnerHTML={{ __html: item.description }} />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
