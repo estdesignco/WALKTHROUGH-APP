@@ -19364,6 +19364,36 @@ async def update_builder_portal(portal_id: str, data: BuilderPortalUpdate):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Portal not found")
     
+    # AUTO-SYNC SCOPE TO ROOM NOTES
+    if "scope_of_work" in update_data:
+        portal_doc = await db.builder_portals.find_one({"id": portal_id}, {"_id": 0})
+        scope_items = update_data["scope_of_work"]
+        # Group scope by room_id and update room notes
+        room_scopes = {}
+        for s in scope_items:
+            rid = s.get("room_id", "")
+            if rid:
+                if rid not in room_scopes:
+                    room_scopes[rid] = []
+                status = "✓" if s.get("completed") else "○"
+                room_scopes[rid].append(f"{status} {s.get('description', '')}")
+        
+        for room_id, scope_lines in room_scopes.items():
+            scope_text = "── SCOPE OF WORK ──\n" + "\n".join(scope_lines)
+            # Get existing notes and replace/append scope section
+            room = await db.rooms.find_one({"id": room_id}, {"_id": 0})
+            if room:
+                existing_notes = room.get("notes", "") or ""
+                # Remove old scope section if present
+                if "── SCOPE OF WORK ──" in existing_notes:
+                    parts = existing_notes.split("── SCOPE OF WORK ──")
+                    # Keep everything before the scope section
+                    base_notes = parts[0].rstrip()
+                else:
+                    base_notes = existing_notes.rstrip()
+                new_notes = (base_notes + "\n\n" + scope_text).strip() if base_notes else scope_text
+                await db.rooms.update_one({"id": room_id}, {"$set": {"notes": new_notes}})
+    
     updated = await db.builder_portals.find_one({"id": portal_id}, {"_id": 0})
     return updated
 

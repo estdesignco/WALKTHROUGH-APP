@@ -292,41 +292,9 @@ export default function BuilderPortal() {
           </div>
         )}
 
-        {/* ===== CONTACTS - WITH USERNAME FIELD ===== */}
+        {/* ===== CONTACTS - EDITABLE + TAG PEOPLE ===== */}
         {activeTab === 'contacts' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h2 style={sectionTitle}>{t.contacts}</h2>
-              <button onClick={() => setNewContact({ name: '', username: '', role: '', phone: '', email: '' })} style={btnPrimary}>{t.addContact}</button>
-            </div>
-            {newContact && (
-              <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #D4A574' }}>
-                <input placeholder={t.contactName} value={newContact.name} onChange={e => setNewContact({ ...newContact, name: e.target.value })} style={inputStyle} />
-                <input placeholder={t.username + ' (for tagging in to-do)'} value={newContact.username} onChange={e => setNewContact({ ...newContact, username: e.target.value })} style={inputStyle} />
-                <input placeholder={t.role} value={newContact.role} onChange={e => setNewContact({ ...newContact, role: e.target.value })} style={inputStyle} />
-                <input placeholder={t.phone} value={newContact.phone} onChange={e => setNewContact({ ...newContact, phone: e.target.value })} style={inputStyle} />
-                <input placeholder={t.email} value={newContact.email} onChange={e => setNewContact({ ...newContact, email: e.target.value })} style={inputStyle} />
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={async () => {
-                    await fetch(`${API_URL}/api/builder/${accessCode}/comment`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ section: 'contact', author: newContact.username || newContact.name, text: JSON.stringify(newContact) }) });
-                    setNewContact(null); loadPortal();
-                  }} style={btnPrimary}>{t.submit}</button>
-                  <button onClick={() => setNewContact(null)} style={btnSecondary}>{t.cancel}</button>
-                </div>
-              </div>
-            )}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-              {(portal.contacts || []).concat(comments.filter(c => c.section === 'contact').map(c => { try { return JSON.parse(c.text); } catch { return null; } }).filter(Boolean)).map((c, idx) => (
-                <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, border: '1px solid #2a3040' }}>
-                  <p style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{c.name}</p>
-                  {c.username && <p style={{ color: '#D4A574', fontSize: 11 }}>@{c.username}</p>}
-                  <p style={{ color: '#D4A574', fontSize: 12, fontWeight: 600, marginTop: 2 }}>{c.role}</p>
-                  {c.phone && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8 }}>{c.phone}</p>}
-                  {c.email && <p style={{ color: '#9CA3AF', fontSize: 13 }}>{c.email}</p>}
-                </div>
-              ))}
-            </div>
-          </div>
+          <ContactsSection portal={portal} accessCode={accessCode} comments={comments} t={t} lang={lang} onReload={loadPortal} />
         )}
 
         {/* ===== COMMENTS ===== */}
@@ -366,11 +334,56 @@ export default function BuilderPortal() {
   );
 }
 
-// ===== SCOPE SECTION WITH CHECKBOXES =====
+// ===== SCOPE SECTION WITH CHECKBOXES + PRODUCT TAGGING =====
 function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
   const toggleScope = async (idx) => {
     const updated = [...(portal.scope_of_work || [])];
     updated[idx] = { ...updated[idx], completed: !updated[idx].completed };
+    await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scope_of_work: updated }),
+    });
+    onReload();
+  };
+
+  // Get all items for tagging
+  const allItems = [];
+  rooms.forEach(room => {
+    room.categories?.forEach(cat => {
+      cat.subcategories?.forEach(sub => {
+        sub.items?.forEach(item => {
+          allItems.push({ id: item.id, name: item.name, room: room.name, category: cat.name });
+        });
+      });
+    });
+  });
+
+  const tagProduct = async (scopeIdx, itemId) => {
+    const updated = [...(portal.scope_of_work || [])];
+    const tags = updated[scopeIdx].tagged_products || [];
+    if (tags.includes(itemId)) {
+      updated[scopeIdx].tagged_products = tags.filter(t => t !== itemId);
+    } else {
+      updated[scopeIdx].tagged_products = [...tags, itemId];
+    }
+    await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scope_of_work: updated }),
+    });
+    onReload();
+  };
+
+  // Get all contacts for tagging
+  const allContacts = portal.contacts || [];
+
+  const tagPerson = async (scopeIdx, personName) => {
+    const updated = [...(portal.scope_of_work || [])];
+    const tags = updated[scopeIdx].tagged_people || [];
+    if (tags.includes(personName)) {
+      updated[scopeIdx].tagged_people = tags.filter(t => t !== personName);
+    } else {
+      updated[scopeIdx].tagged_people = [...tags, personName];
+    }
     await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scope_of_work: updated }),
@@ -383,14 +396,51 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload }) {
       <h2 style={sectionTitle}>{t.scopeOfWork}</h2>
       {(portal.scope_of_work || []).length > 0 ? portal.scope_of_work.map((scope, idx) => {
         const room = rooms.find(r => r.id === scope.room_id);
+        const taggedProducts = scope.tagged_products || [];
+        const taggedPeople = scope.tagged_people || [];
         return (
-          <div key={idx} onClick={() => toggleScope(idx)} style={{ background: '#1a1f2e', padding: '14px 16px', borderRadius: 8, marginBottom: 8, borderLeft: `4px solid ${scope.completed ? '#10B981' : room?.color || '#D4A574'}`, cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <div style={{ width: 24, height: 24, borderRadius: 4, border: scope.completed ? '2px solid #10B981' : '2px solid #6B7280', background: scope.completed ? '#10B981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
-              {scope.completed && <span style={{ color: '#fff', fontSize: 14, fontWeight: 900 }}>✓</span>}
+          <div key={idx} style={{ background: '#1a1f2e', padding: '14px 16px', borderRadius: 8, marginBottom: 12, borderLeft: `4px solid ${scope.completed ? '#10B981' : room?.color || '#D4A574'}` }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer' }} onClick={() => toggleScope(idx)}>
+              <div style={{ width: 24, height: 24, borderRadius: 4, border: scope.completed ? '2px solid #10B981' : '2px solid #6B7280', background: scope.completed ? '#10B981' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 }}>
+                {scope.completed && <span style={{ color: '#fff', fontSize: 14, fontWeight: 900 }}>✓</span>}
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ color: room?.color || '#D4A574', fontSize: 11, fontWeight: 700, marginBottom: 2 }}>{room?.name || 'General'}</p>
+                <p style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }}>{scope.description}</p>
+              </div>
             </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ color: room?.color || '#D4A574', fontSize: 12, fontWeight: 700, marginBottom: 2 }}>{room?.name || 'General'}</p>
-              <p style={{ color: scope.completed ? '#6B7280' : '#E5E7EB', fontSize: 14, textDecoration: scope.completed ? 'line-through' : 'none' }}>{scope.description}</p>
+
+            {/* TAGGED PRODUCTS */}
+            {taggedProducts.length > 0 && (
+              <div style={{ marginTop: 8, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {taggedProducts.map(pid => {
+                  const item = allItems.find(i => i.id === pid);
+                  return item ? <span key={pid} style={{ background: '#3B82F620', border: '1px solid #3B82F6', color: '#93C5FD', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>{item.name}</span> : null;
+                })}
+              </div>
+            )}
+
+            {/* TAGGED PEOPLE */}
+            {taggedPeople.length > 0 && (
+              <div style={{ marginTop: 4, marginLeft: 36, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {taggedPeople.map(name => (
+                  <span key={name} style={{ background: '#D4A57420', border: '1px solid #D4A574', color: '#D4A574', padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700 }}>@{name}</span>
+                ))}
+              </div>
+            )}
+
+            {/* TAG DROPDOWNS */}
+            <div style={{ marginTop: 8, marginLeft: 36, display: 'flex', gap: 8 }}>
+              <select onChange={e => { if (e.target.value) tagProduct(idx, e.target.value); e.target.value = ''; }}
+                style={{ background: '#0f1218', border: '1px solid #2a3040', borderRadius: 4, padding: '4px 8px', color: '#93C5FD', fontSize: 11 }}>
+                <option value="">{lang === 'en' ? 'Tag product...' : 'Etiquetar producto...'}</option>
+                {allItems.map(item => <option key={item.id} value={item.id}>{item.name} ({item.room})</option>)}
+              </select>
+              <select onChange={e => { if (e.target.value) tagPerson(idx, e.target.value); e.target.value = ''; }}
+                style={{ background: '#0f1218', border: '1px solid #2a3040', borderRadius: 4, padding: '4px 8px', color: '#D4A574', fontSize: 11 }}>
+                <option value="">{lang === 'en' ? 'Tag person...' : 'Etiquetar persona...'}</option>
+                {allContacts.map((c, i) => <option key={i} value={c.username || c.name}>@{c.username || c.name} ({c.role})</option>)}
+              </select>
             </div>
           </div>
         );
@@ -526,6 +576,107 @@ function TodoSection({ projectId, todos, contacts, t, onReload }) {
           </span>
         </div>
       )) : <p style={{ color: '#6B7280' }}>No tasks yet.</p>}
+    </div>
+  );
+}
+
+// ===== CONTACTS SECTION - EDITABLE =====
+function ContactsSection({ portal, accessCode, comments, t, lang, onReload }) {
+  const [editIdx, setEditIdx] = useState(null);
+  const [editData, setEditData] = useState(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [newContact, setNewContact] = useState({ name: '', username: '', role: '', phone: '', email: '' });
+
+  const allContacts = [...(portal.contacts || [])];
+  // Include builder-added contacts from comments
+  comments.filter(c => c.section === 'contact').forEach(c => {
+    try { allContacts.push(JSON.parse(c.text)); } catch {}
+  });
+
+  const saveContacts = async (updatedList) => {
+    await fetch(`${API_URL}/api/builder-portal/${portal.id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contacts: updatedList }),
+    });
+    onReload();
+  };
+
+  const saveEdit = () => {
+    const updated = [...(portal.contacts || [])];
+    updated[editIdx] = editData;
+    saveContacts(updated);
+    setEditIdx(null);
+  };
+
+  const addContact = () => {
+    const updated = [...(portal.contacts || []), newContact];
+    saveContacts(updated);
+    setNewContact({ name: '', username: '', role: '', phone: '', email: '' });
+    setShowAdd(false);
+  };
+
+  const deleteContact = (idx) => {
+    const updated = [...(portal.contacts || [])];
+    updated.splice(idx, 1);
+    saveContacts(updated);
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={sectionTitle}>{t.contacts}</h2>
+        <button onClick={() => setShowAdd(true)} style={btnPrimary}>{t.addContact}</button>
+      </div>
+
+      {showAdd && (
+        <div style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 16, border: '2px solid #D4A574' }}>
+          <input placeholder={t.contactName} value={newContact.name} onChange={e => setNewContact({ ...newContact, name: e.target.value })} style={inputStyle} />
+          <input placeholder={t.username + ' (for tagging)'} value={newContact.username} onChange={e => setNewContact({ ...newContact, username: e.target.value })} style={inputStyle} />
+          <input placeholder={t.role + ' (e.g. Plumber, GC, Electrician)'} value={newContact.role} onChange={e => setNewContact({ ...newContact, role: e.target.value })} style={inputStyle} />
+          <input placeholder={t.phone} value={newContact.phone} onChange={e => setNewContact({ ...newContact, phone: e.target.value })} style={inputStyle} />
+          <input placeholder={t.email} value={newContact.email} onChange={e => setNewContact({ ...newContact, email: e.target.value })} style={inputStyle} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={addContact} style={btnPrimary}>{t.submit}</button>
+            <button onClick={() => setShowAdd(false)} style={btnSecondary}>{t.cancel}</button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
+        {(portal.contacts || []).map((c, idx) => (
+          <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, border: '1px solid #2a3040' }}>
+            {editIdx === idx ? (
+              <div>
+                <input value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} style={inputStyle} placeholder="Name" />
+                <input value={editData.username} onChange={e => setEditData({ ...editData, username: e.target.value })} style={inputStyle} placeholder="Username" />
+                <input value={editData.role} onChange={e => setEditData({ ...editData, role: e.target.value })} style={inputStyle} placeholder="Role" />
+                <input value={editData.phone} onChange={e => setEditData({ ...editData, phone: e.target.value })} style={inputStyle} placeholder="Phone" />
+                <input value={editData.email} onChange={e => setEditData({ ...editData, email: e.target.value })} style={inputStyle} placeholder="Email" />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={saveEdit} style={btnPrimary}>Save</button>
+                  <button onClick={() => setEditIdx(null)} style={btnSecondary}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <p style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{c.name}</p>
+                    {c.username && <p style={{ color: '#D4A574', fontSize: 11, fontWeight: 700 }}>@{c.username}</p>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button onClick={() => { setEditIdx(idx); setEditData({ ...c }); }} style={{ background: 'none', border: 'none', color: '#D4A574', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>Edit</button>
+                    <button onClick={() => { if (window.confirm('Delete this contact?')) deleteContact(idx); }} style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', fontSize: 12 }}>X</button>
+                  </div>
+                </div>
+                <p style={{ color: '#10B981', fontSize: 12, fontWeight: 600, marginTop: 4 }}>{c.role}</p>
+                {c.phone && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8 }}>{c.phone}</p>}
+                {c.email && <p style={{ color: '#9CA3AF', fontSize: 13 }}>{c.email}</p>}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
