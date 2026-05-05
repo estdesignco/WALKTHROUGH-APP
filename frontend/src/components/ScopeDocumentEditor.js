@@ -232,6 +232,35 @@ export default function ScopeDocumentEditor({
   };
 
   // ============================================================
+  // Detect the current room context (most recent H1/H2/H3 above cursor)
+  // so the product picker can scope to ONLY that room.
+  // ============================================================
+  const getCurrentRoomContext = () => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return null;
+    const sel = editor.getSelection();
+    if (!sel) return null;
+    try {
+      const [leaf] = editor.getLeaf(sel.index);
+      if (!leaf || !leaf.domNode) return null;
+      // Walk up to a direct child of editor.root
+      let block = leaf.domNode;
+      while (block && block.nodeType === 3) block = block.parentNode;
+      while (block && block.parentNode && block.parentNode !== editor.root) block = block.parentNode;
+      if (!block) return null;
+      // Walk previous siblings searching for an H1/H2/H3
+      let prev = block.previousElementSibling;
+      while (prev) {
+        if (/^H[123]$/.test(prev.tagName)) {
+          return (prev.textContent || '').trim().toUpperCase();
+        }
+        prev = prev.previousElementSibling;
+      }
+    } catch { /* noop */ }
+    return null;
+  };
+
+  // ============================================================
   // INLINE AUTOCOMPLETE — triggered by typing # or @
   // ============================================================
   const checkMention = useCallback(() => {
@@ -258,16 +287,21 @@ export default function ScopeDocumentEditor({
     const bounds = editor.getBounds(cursor);
 
     let results = [];
+    let scopedRoom = null;
     if (type === 'unified') {
       const q = query.trim().toUpperCase();
       // Trades first
       const tradeResults = allTrades
         .filter(t => !q || t.includes(q) || t.replace(/\s/g, '').includes(q.replace(/\s/g, '')))
         .map(t => ({ kind: 'trade', value: t, label: t, color: TRADE_COLORS[t] || '#6B7280' }));
-      // Products next (FFE then CHECKLIST)
+      // Products next — STRICTLY filtered to current room context if one is detected
+      scopedRoom = getCurrentRoomContext();
       const qLower = query.trim().toLowerCase();
-      const productResults = allProducts
-        .filter(p => !qLower || (p.name || '').toLowerCase().includes(qLower) || (p.room || '').toLowerCase().includes(qLower))
+      const allProductsForLine = scopedRoom
+        ? allProducts.filter(p => (p.room || '').toUpperCase() === scopedRoom)
+        : allProducts;
+      const productResults = allProductsForLine
+        .filter(p => !qLower || (p.name || '').toLowerCase().includes(qLower))
         .map(p => ({ kind: 'product', value: p, label: p.name, source: p.source, room: p.room }))
         .sort((a, b) => (a.source === b.source ? 0 : a.source === 'FFE' ? -1 : 1));
       results = [...tradeResults, ...productResults].slice(0, 12);
@@ -283,6 +317,7 @@ export default function ScopeDocumentEditor({
 
     setMention({
       type, query, triggerIndex, results, selectedIndex: 0,
+      scopedRoom: scopedRoom || null,
       top: bounds.top + bounds.height + 6,
       left: bounds.left,
     });
@@ -322,9 +357,15 @@ export default function ScopeDocumentEditor({
       } else if (e.key === 'ArrowUp') {
         e.preventDefault(); e.stopPropagation();
         setMention(prev => prev ? ({ ...prev, selectedIndex: (prev.selectedIndex - 1 + prev.results.length) % prev.results.length }) : null);
-      } else if (e.key === 'Enter' || e.key === 'Tab') {
+      } else if (e.key === 'Tab') {
+        // Tab = select highlighted result (keep this so power users get fast insert)
         e.preventDefault(); e.stopPropagation();
         selectMention(m.results[m.selectedIndex]);
+      } else if (e.key === 'Enter') {
+        // Enter just closes the popup so the user gets a normal newline.
+        // Selecting a result is done with Tab or mouse click — Enter is for newlines.
+        setMention(null);
+        // Don't preventDefault — let Quill handle the Enter as a regular newline.
       } else if (e.key === 'Escape') {
         e.preventDefault(); e.stopPropagation();
         setMention(null);
@@ -550,9 +591,24 @@ export default function ScopeDocumentEditor({
                 onChange={e => setProductFilter(e.target.value)}
                 autoFocus
               />
+              {(() => {
+                const roomCtx = getCurrentRoomContext();
+                if (roomCtx) {
+                  return (
+                    <div style={{ fontSize: 9, color: '#10B981', fontWeight: 800, letterSpacing: 1.2, padding: '4px 6px', background: '#10B98115', marginBottom: 4, borderRadius: 4 }}>
+                      🔒 SCOPED TO ROOM: {roomCtx}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
               {allProducts.length === 0 && <div style={{ color: '#6B7280', fontSize: 12, padding: 8 }}>No items yet. Add items in the Walkthrough, Checklist, or FFE section first.</div>}
               {allProducts.length > 0 && (() => {
-                const filtered = allProducts.filter(p => !productFilter || (p.name || '').toLowerCase().includes(productFilter.toLowerCase()) || (p.room || '').toLowerCase().includes(productFilter.toLowerCase()));
+                const roomCtx = getCurrentRoomContext();
+                const scoped = roomCtx
+                  ? allProducts.filter(p => (p.room || '').toUpperCase() === roomCtx)
+                  : allProducts;
+                const filtered = scoped.filter(p => !productFilter || (p.name || '').toLowerCase().includes(productFilter.toLowerCase()) || (p.room || '').toLowerCase().includes(productFilter.toLowerCase()));
                 const ffeItems = filtered.filter(p => p.source === 'FFE').slice(0, 30);
                 const checklistItems = filtered.filter(p => p.source === 'CHECKLIST').slice(0, 30);
                 return (
@@ -582,7 +638,11 @@ export default function ScopeDocumentEditor({
                       </>
                     )}
                     {ffeItems.length === 0 && checklistItems.length === 0 && (
-                      <div style={{ color: '#6B7280', fontSize: 12, padding: 8 }}>No items match "{productFilter}"</div>
+                      <div style={{ color: '#6B7280', fontSize: 12, padding: 8 }}>
+                        {roomCtx
+                          ? `No items in "${roomCtx}". Add items there first or remove the room heading.`
+                          : `No items match "${productFilter}"`}
+                      </div>
                     )}
                   </>
                 );
@@ -701,9 +761,14 @@ Example:
           >
             <div style={{ fontSize: 9, color: '#6B7280', fontWeight: 800, letterSpacing: 1.2, padding: '4px 6px', borderBottom: '1px solid #1f2937' }}>
               {mention.type === 'unified'
-                ? '↑↓ NAVIGATE · ENTER/TAB SELECT · ESC CANCEL'
-                : '↑↓ PEOPLE · ENTER/TAB SELECT · ESC CANCEL'}
+                ? '↑↓ NAVIGATE · TAB OR CLICK SELECT · ENTER NEW LINE · ESC CANCEL'
+                : '↑↓ PEOPLE · TAB OR CLICK SELECT · ENTER NEW LINE · ESC CANCEL'}
             </div>
+            {mention.scopedRoom && (
+              <div style={{ fontSize: 9, color: '#10B981', fontWeight: 800, letterSpacing: 1.2, padding: '4px 6px', background: '#10B98115' }}>
+                🔒 SCOPED TO ROOM: {mention.scopedRoom}
+              </div>
+            )}
             {mention.results.map((r, idx) => {
               const selected = idx === mention.selectedIndex;
               if (r.kind === 'trade') {

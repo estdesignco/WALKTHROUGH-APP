@@ -419,7 +419,9 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
     }, 200);
   };
 
-  // Render helper: convert stored HTML → React tree, replacing tag spans with live chips
+  // Render helper: convert stored HTML → React tree.
+  // BUILDER SIDE BEHAVIOR: trade and person pills are hidden completely;
+  // only product pills are shown to the builder. (Admin still sees all pills.)
   const renderScope = (html) => {
     if (!html) return null;
     const container = document.createElement('div');
@@ -430,9 +432,8 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
       if (node.nodeType !== 1) return null;
       const tagType = node.getAttribute('data-tag');
       if (tagType === 'trade') {
-        const trade = node.getAttribute('data-trade');
-        const color = node.getAttribute('data-color') || tradeColors[trade] || '#6B7280';
-        return <LiveTradeChip key={`k${key++}`} trade={trade} color={color} onClick={() => handleTradeClick(trade)} />;
+        // hide trade pills on builder side per user request
+        return null;
       }
       if (tagType === 'product') {
         const id = node.getAttribute('data-product-id');
@@ -440,9 +441,8 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
         return <LiveProductChip key={`k${key++}`} id={id} fallbackName={fallback} item={itemsById[id]} isChecklist={itemsById[id] ? isChecklistItem(itemsById[id].status) : false} onClick={() => handleProductClick(id)} />;
       }
       if (tagType === 'person') {
-        const pname = node.getAttribute('data-person');
-        const role = node.getAttribute('data-role');
-        return <LivePersonChip key={`k${key++}`} name={pname} role={role} contact={(portal.contacts || []).find(c => (c.username || c.name) === pname)} onClick={() => handlePersonClick(pname)} />;
+        // hide person pills on builder side per user request
+        return null;
       }
       const TagName = (node.tagName || 'span').toLowerCase();
       const children = Array.from(node.childNodes).map(walk);
