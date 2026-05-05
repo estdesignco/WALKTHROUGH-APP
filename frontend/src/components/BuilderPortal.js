@@ -420,8 +420,8 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
   };
 
   // Render helper: convert stored HTML → React tree.
-  // BUILDER SIDE BEHAVIOR: trade and person pills are hidden completely;
-  // only product pills are shown to the builder. (Admin still sees all pills.)
+  // BUILDER SIDE BEHAVIOR: trade pills hidden completely.
+  // Product and person pills are kept (so we can navigate to items / contacts).
   const renderScope = (html) => {
     if (!html) return null;
     const container = document.createElement('div');
@@ -441,8 +441,9 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
         return <LiveProductChip key={`k${key++}`} id={id} fallbackName={fallback} item={itemsById[id]} isChecklist={itemsById[id] ? isChecklistItem(itemsById[id].status) : false} onClick={() => handleProductClick(id)} />;
       }
       if (tagType === 'person') {
-        // hide person pills on builder side per user request
-        return null;
+        const pname = node.getAttribute('data-person');
+        const role = node.getAttribute('data-role');
+        return <LivePersonChip key={`k${key++}`} name={pname} role={role} contact={(portal.contacts || []).find(c => (c.username || c.name) === pname)} onClick={() => handlePersonClick(pname)} />;
       }
       const TagName = (node.tagName || 'span').toLowerCase();
       const children = Array.from(node.childNodes).map(walk);

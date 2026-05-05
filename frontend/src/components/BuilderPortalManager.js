@@ -42,7 +42,24 @@ export default function BuilderPortalManager({ project, onReload }) {
         setScopeSaved(true);
         setScheduleEntries(data.schedule || []);
         setChangeOrders(data.change_orders || []);
-        setContacts(data.contacts || []);
+        // Auto-seed contacts with the designer/firm if empty so it's always available
+        // for @-tagging in scope without the user having to add it manually.
+        let loadedContacts = data.contacts || [];
+        if (loadedContacts.length === 0) {
+          loadedContacts = [{
+            name: 'Established Design Co.',
+            role: 'Designer',
+            username: 'designer',
+            phone: '',
+            email: '',
+          }];
+          // Persist the seed back so next load doesn't re-seed
+          fetch(`${API_URL}/api/builder-portal/${data.id}`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contacts: loadedContacts }),
+          });
+        }
+        setContacts(loadedContacts);
         setCustomTrades(data.custom_trades || []);
       }
     } catch (err) {
@@ -330,26 +347,66 @@ export default function BuilderPortalManager({ project, onReload }) {
 
       {/* CONTACTS */}
       <div className="p-4 rounded-lg bg-[#1a1f2e] border border-[#2a3040]">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="text-[#D4A574] font-bold text-sm tracking-wider">PROJECT CONTACTS</h3>
+        <div className="flex justify-between items-center mb-2">
+          <div>
+            <h3 className="text-[#D4A574] font-bold text-sm tracking-wider">PROJECT CONTACTS</h3>
+            <p className="text-[10px] text-gray-500 mt-0.5">These names show up in the @ picker when tagging people in scope. The first contact is your firm — edit it to your liking.</p>
+          </div>
           <div className="flex gap-2">
-            <button onClick={() => setContacts(prev => [...prev, { name: '', role: '', phone: '', email: '' }])} className="px-3 py-1 rounded text-xs font-bold bg-[#374151] text-white">+ ADD</button>
-            {portal && <button onClick={saveContacts} className="px-3 py-1 rounded text-xs font-bold bg-[#D4A574] text-black">SAVE</button>}
+            <button
+              onClick={() => setContacts(prev => [...prev, { name: '', role: '', username: '', phone: '', email: '' }])}
+              data-testid="add-contact-btn"
+              className="px-3 py-1 rounded text-xs font-bold bg-[#10B981] text-white hover:bg-[#059669]"
+            >
+              + ADD CONTACT
+            </button>
+            {portal && <button onClick={saveContacts} data-testid="save-contacts-btn" className="px-3 py-1 rounded text-xs font-bold bg-[#D4A574] text-black">SAVE</button>}
           </div>
         </div>
+        {contacts.length === 0 && (
+          <p className="text-xs text-gray-500 italic py-3">No contacts yet. Click "+ ADD CONTACT" to add one.</p>
+        )}
         {contacts.map((c, i) => (
-          <div key={i} className="mb-2 flex gap-2 items-center flex-wrap">
-            <input value={c.name} onChange={e => { const n = [...contacts]; n[i].name = e.target.value; setContacts(n); }}
-              placeholder="Name" className="flex-1 min-w-[120px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
-            <input value={c.role} onChange={e => { const n = [...contacts]; n[i].role = e.target.value; setContacts(n); }}
-              placeholder="Role" className="w-[120px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
-            <input value={c.phone} onChange={e => { const n = [...contacts]; n[i].phone = e.target.value; setContacts(n); }}
-              placeholder="Phone" className="w-[130px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
-            <input value={c.email} onChange={e => { const n = [...contacts]; n[i].email = e.target.value; setContacts(n); }}
-              placeholder="Email" className="w-[180px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
-            <button onClick={() => setContacts(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400 text-xs">X</button>
+          <div key={i} className="mb-2 p-2 bg-black/20 rounded flex gap-2 items-center flex-wrap" data-testid={`contact-row-${i}`}>
+            <span className="text-[10px] text-gray-500 font-bold min-w-[20px]">{i + 1}.</span>
+            <input value={c.name || ''} onChange={e => { const n = [...contacts]; n[i].name = e.target.value; setContacts(n); }}
+              placeholder="Full name" className="flex-1 min-w-[120px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
+            <input value={c.role || ''} onChange={e => { const n = [...contacts]; n[i].role = e.target.value; setContacts(n); }}
+              placeholder="Role" className="w-[130px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
+            <div className="flex items-center bg-[#0f1218] border border-[#D4A574] rounded">
+              <span className="text-[#D4A574] text-sm pl-2 font-bold">@</span>
+              <input value={c.username || ''} onChange={e => { const n = [...contacts]; n[i].username = e.target.value.replace(/\s+/g, ''); setContacts(n); }}
+                placeholder="username" title="Used when @-tagging in scope. Auto-generated from name if blank." className="w-[110px] bg-transparent border-none rounded px-1 py-1 text-[#D4A574] text-sm font-bold focus:outline-none" />
+            </div>
+            <input value={c.phone || ''} onChange={e => { const n = [...contacts]; n[i].phone = e.target.value; setContacts(n); }}
+              placeholder="Phone" className="w-[120px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
+            <input value={c.email || ''} onChange={e => { const n = [...contacts]; n[i].email = e.target.value; setContacts(n); }}
+              placeholder="Email" className="w-[170px] bg-[#0f1218] border border-[#2a3040] rounded px-2 py-1 text-[#F5F5DC] text-sm" />
+            <button
+              onClick={() => {
+                if (window.confirm(`Delete contact "${c.name || 'Unnamed'}"?`)) {
+                  setContacts(prev => prev.filter((_, idx) => idx !== i));
+                }
+              }}
+              data-testid={`delete-contact-${i}`}
+              title="Delete contact"
+              className="px-2 py-1 rounded text-xs font-bold bg-red-900/30 text-red-400 border border-red-900/40 hover:bg-red-900/60"
+            >
+              × DELETE
+            </button>
           </div>
         ))}
+        {contacts.length > 0 && (
+          <div className="flex justify-center mt-2">
+            <button
+              onClick={() => setContacts(prev => [...prev, { name: '', role: '', username: '', phone: '', email: '' }])}
+              data-testid="add-contact-bottom-btn"
+              className="px-4 py-1.5 rounded text-xs font-bold bg-[#10B981]/20 text-[#10B981] border border-dashed border-[#10B981] hover:bg-[#10B981] hover:text-white"
+            >
+              + ADD ANOTHER CONTACT
+            </button>
+          </div>
+        )}
       </div>
 
       {/* COMMENTS FROM BUILDER */}
