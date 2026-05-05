@@ -19419,8 +19419,14 @@ async def get_builder_portal_public(access_code: str):
     
     # Build full room data without prices
     for room in rooms:
+        # Inject Room model defaults so frontend can render with proper colors/floor
+        # (Mongo stores rooms without these fields when they were never edited)
+        room.setdefault("color", "#7A5A8A")
+        room.setdefault("floor", "1st Floor")
+        room.setdefault("notes", "")
         categories = await db.categories.find({"room_id": room["id"]}, {"_id": 0}).to_list(100)
         for cat in categories:
+            cat.setdefault("color", "#065F46")
             subcategories = await db.subcategories.find({"category_id": cat["id"]}, {"_id": 0}).to_list(100)
             for sub in subcategories:
                 items = await db.items.find({"subcategory_id": sub["id"]}, {"_id": 0}).to_list(500)

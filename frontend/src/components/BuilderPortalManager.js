@@ -468,7 +468,10 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
     const all = [];
     fileComments.forEach(c => { try { const parsed = JSON.parse(c.text); if (Array.isArray(parsed)) all.push(...parsed); } catch {} });
     setFiles(all);
-    fetch(`${apiUrl}/api/photos/project/${portal.project_id}`).then(r => r.ok ? r.json() : []).then(setPhotos).catch(() => setPhotos([]));
+    fetch(`${apiUrl}/api/photos/project/${portal.project_id}`)
+      .then(r => r.ok ? r.json() : { photos: [] })
+      .then(d => setPhotos(Array.isArray(d) ? d : (d?.photos || [])))
+      .catch(() => setPhotos([]));
   }, [portal, apiUrl]);
 
   if (!portal) {
@@ -531,8 +534,9 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
           reader.readAsDataURL(file);
         });
       }
-      const fresh = await fetch(`${apiUrl}/api/photos/project/${portal.project_id}`).then(r => r.ok ? r.json() : []);
-      setPhotos(fresh);
+      const fresh = await fetch(`${apiUrl}/api/photos/project/${portal.project_id}`)
+        .then(r => r.ok ? r.json() : { photos: [] });
+      setPhotos(Array.isArray(fresh) ? fresh : (fresh?.photos || []));
       onReload && onReload();
     } finally {
       setUploading(false);
