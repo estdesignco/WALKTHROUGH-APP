@@ -11,6 +11,7 @@ import PaintColorAutocomplete from './PaintColorAutocomplete';
 import { getRoomColor, getCategoryColor, getColorByIndex } from '../utils/roomColors';
 import { getStatusColor, STATUS_COLORS } from '../utils/statusColors';
 import { toast } from 'sonner';
+import ScopeReferenceBadge from './ScopeReferenceBadge';
 
 // CRITICAL: Statuses that mean item is PICKED or beyond - checkbox should STAY CHECKED
 // These items still need to transfer to FFE!
@@ -3304,6 +3305,9 @@ const ExactChecklistSpreadsheet = ({
                                             className="text-sm"
                                             style={{ color: textColor }}
                                           />
+                                          {project?.id && (
+                                            <ScopeReferenceBadge itemId={item.id} projectId={project.id} itemName={item.name} />
+                                          )}
                                           </div>
                                         </td>
                                   

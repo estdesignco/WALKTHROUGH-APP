@@ -212,6 +212,14 @@ export default function ProjectDetailPage() {
         }
     }, [searchParams]);
 
+    // Listen for "jump-to-scope" events (fired by ScopeReferenceBadge)
+    useEffect(() => {
+        const handler = () => handleTabChange('Builder Portal');
+        window.addEventListener('jump-to-scope', handler);
+        return () => window.removeEventListener('jump-to-scope', handler);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     useEffect(() => {
         const fetchProject = async () => {
             try {

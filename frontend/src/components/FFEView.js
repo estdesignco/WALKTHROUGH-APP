@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
+import ScopeReferenceBadge from './ScopeReferenceBadge';
 
 const ExactFFESpreadsheet = ({ 
   project, 
@@ -1080,7 +1081,10 @@ const ExactFFESpreadsheet = ({
                                                         }}>
                                                           {/* INSTALLED - INSTALLED NAME GOES HERE */}
                                                           <td className="border border-[#D4A574] px-2 py-2 text-sm text-[#D4C5A9]">
-                                                            {item.name}
+                                                            <span>{item.name}</span>
+                                                            {!builderMode && project?.id && (
+                                                              <ScopeReferenceBadge itemId={item.id} projectId={project.id} itemName={item.name} />
+                                                            )}
                                                           </td>
                                                           
                                                           {/* VENDOR/SKU - DIRECTLY EDITABLE */}

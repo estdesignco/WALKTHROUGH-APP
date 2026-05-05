@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import RichTextEditor from './RichTextEditor';
 import ScopeDocumentEditor from './ScopeDocumentEditor';
+import { invalidateScopeRefs } from './ScopeReferenceBadge';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -99,6 +100,7 @@ export default function BuilderPortalManager({ project, onReload }) {
   const saveScope = async () => {
     await updatePortal({ scope_document: scopeDocument });
     setScopeSaved(true);
+    invalidateScopeRefs();
   };
   const saveSchedule = () => updatePortal({ schedule: scheduleEntries });
   const saveChanges = () => updatePortal({ change_orders: changeOrders });

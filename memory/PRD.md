@@ -12,21 +12,17 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 - **Admin management**: People → Builder Portal tab in project
   - Select which rooms builder can see
   - Scope of Work: ONE master rich-text document with inline #trade / 🏷product / @person tag pills
-    - Toolbar buttons (`# TRADE`, `🏷 PRODUCT`, `@ PERSON`, `▼ ROOM HEADING`) for explicit insertion
-    - **Inline autocomplete**: type `#paint` for trades+products predict-text, `@joe` for people; Up/Down + Enter/Tab to select, Esc to cancel
+    - Toolbar buttons + **inline autocomplete** (`#paint`, `@joe`)
     - **Live reference model** — tags store only `item.id`; name/photo/size/status/room resolved from the current item state at render time. When an item moves Checklist → FFE, changes name, or gets a photo, ALL tags in ALL scope views update automatically.
-    - **Product picker** pulls from BOTH FFE and Checklist with color-coded source badges (blue FFE / green CHK)
-    - **Trades list** includes TRIM CARPENTER + 19 other defaults; user can add custom trades
-    - Quill custom blots (TradeTagBlot, ProductTagBlot, PersonTagBlot) with class-only styling for round-trip persistence
-    - Builder portal AUTO-GENERATES "By Room" and "By Trade" views by parsing inline tags + H2 room headings
-  - **Hover preview**: hover any pill inside the editor → floating card shows live thumbnail + name + vendor/SKU/size/finish/status
-  - **Click navigation** (Builder side): trade chip filters "By Trade" view; person chip switches to Contacts tab; product chip opens full-detail modal with large photo + all specs + "View in FF&E →"
-  - Add schedule/timeline milestones
-  - Add change orders with dates
-  - Add project contacts (name, role, phone, email)
+    - Product picker pulls from BOTH FFE and Checklist (blue FFE / green CHK badges)
+    - TRIM CARPENTER + 19 other default trades + custom trades
+    - **Hover preview**: hover any pill → floating card with live thumbnail, vendor/SKU/size/finish/status
+    - **Click navigation**: trade chip filters "By Trade"; person chip → Contacts tab; product chip → full-detail modal with large photo + "View in FF&E →"
+  - Add schedule/timeline milestones, change orders, contacts
   - Copy shareable link
-- **Builder Portal scope views**: Overall (full doc as-is) / By Room (auto-grouped) / By Trade (auto-grouped)
+- **Builder Portal scope views**: Overall / By Room (auto) / By Trade (auto)
 - **Price stripping**: cost, price, budget, total_cost all removed from builder view
+- **Reverse-lookup badge** (May 4, 2026): every Checklist/FFE item row that is referenced in the scope doc now shows a small `📋 N` badge next to the name. Hover → see every scope sentence that references this item (with room & trade chips). Click → jumps to the Builder Portal Scope editor via `jump-to-scope` custom event. Module-level cache keyed by project id; `invalidateScopeRefs()` fires after scope save so badges update without a page reload.
 
 ### Performance Optimization (Apr 17, 2026)
 - Default collapsed state for all rooms/categories across all views
