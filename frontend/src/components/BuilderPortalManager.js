@@ -42,17 +42,37 @@ export default function BuilderPortalManager({ project, onReload }) {
         setScopeSaved(true);
         setScheduleEntries(data.schedule || []);
         setChangeOrders(data.change_orders || []);
-        // Auto-seed contacts with the designer/firm if empty so it's always available
-        // for @-tagging in scope without the user having to add it manually.
+        // Auto-seed contacts with the firm's team members if empty so they're
+        // always available for @-tagging in scope without manual setup.
         let loadedContacts = data.contacts || [];
-        if (loadedContacts.length === 0) {
-          loadedContacts = [{
-            name: 'Established Design Co.',
-            role: 'Designer',
-            username: 'designer',
-            phone: '',
-            email: '',
-          }];
+        const isLegacyPlaceholder =
+          loadedContacts.length === 1 &&
+          loadedContacts[0].username === 'designer' &&
+          (loadedContacts[0].name || '').toLowerCase().includes('established design');
+        if (loadedContacts.length === 0 || isLegacyPlaceholder) {
+          loadedContacts = [
+            {
+              name: 'Neil Tankersley',
+              role: 'Principal Designer / CEO',
+              username: 'neil',
+              phone: '678-637-3669',
+              email: 'Neil@estdesignco.com',
+            },
+            {
+              name: 'Jala Reid',
+              role: 'Established Design Co.',
+              username: 'jala',
+              phone: '470-272-3304',
+              email: 'Jala@estdesignco.com',
+            },
+            {
+              name: 'Averi Daunch',
+              role: 'Established Design Co.',
+              username: 'averi',
+              phone: '706-969-8557',
+              email: 'Averi@estdesignco.com',
+            },
+          ];
           // Persist the seed back so next load doesn't re-seed
           fetch(`${API_URL}/api/builder-portal/${data.id}`, {
             method: 'PUT', headers: { 'Content-Type': 'application/json' },
