@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import ExactFFESpreadsheet from './FFEView';
 import RichTextEditor from './RichTextEditor';
 import { parseScopeDocument } from './ScopeDocumentEditor';
+import FileLightbox from './FileLightbox';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -789,6 +790,7 @@ function ProductDetailModal({ item, onClose, onGoToFFE, onGoToChecklist, lang })
 function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
   const [uploading, setUploading] = useState(false);
   const [files, setFiles] = useState([]);
+  const [lightbox, setLightbox] = useState(null);
 
   useEffect(() => { loadFiles(); }, [accessCode]);
 
@@ -852,7 +854,14 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
         {files.map((file, idx) => (
-          <div key={idx} style={{ background: '#1a1f2e', borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040' }}>
+          <div
+            key={idx}
+            onClick={() => setLightbox({ files, index: idx })}
+            title={lang === 'en' ? 'Click to open' : 'Clic para abrir'}
+            style={{ background: '#1a1f2e', borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040', cursor: 'pointer', transition: 'transform 0.1s, border-color 0.1s' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#D4A574'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a3040'; e.currentTarget.style.transform = 'translateY(0)'; }}
+          >
             {file.type?.startsWith('image/') || file.data?.startsWith('data:image') ? (
               <div style={{ width: '100%', height: 150, overflow: 'hidden' }}><img src={file.data} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
             ) : (
@@ -866,6 +875,7 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
         ))}
         {files.length === 0 && <p style={{ color: '#6B7280', fontSize: 13 }}>{lang === 'en' ? 'No files uploaded yet.' : 'No hay archivos.'}</p>}
       </div>
+      {lightbox && <FileLightbox files={lightbox.files} startIndex={lightbox.index} onClose={() => setLightbox(null)} />}
     </div>
   );
 }
@@ -873,6 +883,7 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
 // ===== ROOM PHOTOS SECTION - PER ROOM WITH CAMERA =====
 function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload }) {
   const [uploading, setUploading] = useState(false);
+  const [lightbox, setLightbox] = useState(null);
 
   const handleUpload = async (roomId, inputFiles) => {
     if (!inputFiles || inputFiles.length === 0) return;
@@ -919,20 +930,31 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12, padding: '0 8px' }}>
-            {(photos[room.id] || []).map((photo, idx) => (
-              <div key={idx} style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040', background: '#1a1f2e' }}>
-                <div style={{ width: '100%', height: 140, overflow: 'hidden' }}><img src={photo.url || photo.photo_data} alt={photo.file_name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
-                <div style={{ padding: '6px 10px' }}>
-                  <p style={{ color: '#9CA3AF', fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.file_name || `Photo ${idx + 1}`}</p>
+            {(photos[room.id] || []).map((photo, idx) => {
+              const roomFiles = (photos[room.id] || []).map(p => ({ data: p.url || p.photo_data, name: p.file_name || 'photo', type: 'image/*' }));
+              return (
+                <div
+                  key={idx}
+                  onClick={() => setLightbox({ files: roomFiles, index: idx })}
+                  title={lang === 'en' ? 'Click to open' : 'Clic para abrir'}
+                  style={{ borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040', background: '#1a1f2e', cursor: 'pointer', transition: 'transform 0.1s, border-color 0.1s' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#D4A574'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a3040'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div style={{ width: '100%', height: 140, overflow: 'hidden' }}><img src={photo.url || photo.photo_data} alt={photo.file_name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
+                  <div style={{ padding: '6px 10px' }}>
+                    <p style={{ color: '#9CA3AF', fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.file_name || `Photo ${idx + 1}`}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           {(!photos[room.id] || photos[room.id].length === 0) && (
             <p style={{ color: '#6B7280', fontSize: 13, padding: '0 8px' }}>{lang === 'en' ? 'No photos yet' : 'Sin fotos'}</p>
           )}
         </div>
       ))}
+      {lightbox && <FileLightbox files={lightbox.files} startIndex={lightbox.index} onClose={() => setLightbox(null)} />}
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import RichTextEditor from './RichTextEditor';
 import ScopeDocumentEditor from './ScopeDocumentEditor';
 import { invalidateScopeRefs } from './ScopeReferenceBadge';
+import FileLightbox from './FileLightbox';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -461,6 +462,7 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
   const [photos, setPhotos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [activeRoomId, setActiveRoomId] = useState(null);
+  const [lightbox, setLightbox] = useState(null); // { files: [...], index: 0 }
 
   useEffect(() => {
     if (!portal) return;
@@ -579,7 +581,13 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
             {files.map((f, i) => (
-              <div key={i} className="bg-black/30 rounded overflow-hidden border border-[#2a3040]" data-testid={`general-file-${i}`}>
+              <div
+                key={i}
+                onClick={() => setLightbox({ files, index: i })}
+                className="bg-black/30 rounded overflow-hidden border border-[#2a3040] cursor-pointer hover:border-[#D4A574] transition"
+                title="Click to open"
+                data-testid={`general-file-${i}`}
+              >
                 {f.type && f.type.startsWith('image') ? (
                   <img src={f.data} alt={f.name} style={{ width: '100%', height: 80, objectFit: 'cover' }} />
                 ) : (
@@ -638,7 +646,12 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
                   ) : (
                     <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
                       {roomPhotos.map((p, pi) => (
-                        <div key={pi} className="bg-black/30 rounded overflow-hidden">
+                        <div
+                          key={pi}
+                          onClick={() => setLightbox({ files: roomPhotos.map(rp => ({ data: rp.photo_data || rp.url, name: rp.file_name || 'photo', type: 'image/*' })), index: pi })}
+                          className="bg-black/30 rounded overflow-hidden cursor-pointer hover:opacity-80 transition"
+                          title="Click to open"
+                        >
                           <img src={p.photo_data || p.url} alt={p.file_name || 'photo'} style={{ width: '100%', height: 80, objectFit: 'cover' }} />
                           <p className="text-[9px] text-gray-400 truncate px-1 py-0.5">{p.file_name || 'photo'}</p>
                         </div>
@@ -651,6 +664,13 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
           );
         })}
       </div>
+      {lightbox && (
+        <FileLightbox
+          files={lightbox.files}
+          startIndex={lightbox.index}
+          onClose={() => setLightbox(null)}
+        />
+      )}
     </div>
   );
 }
