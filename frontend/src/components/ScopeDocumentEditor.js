@@ -153,13 +153,58 @@ export default function ScopeDocumentEditor({
   const [tradeFilter, setTradeFilter] = useState('');
   const [productFilter, setProductFilter] = useState('');
   const [toast, setToast] = useState(null);
+  const [currentRoom, setCurrentRoom] = useState(null); // {name, color}
   // Inline autocomplete state (triggered by #, @ or 🏷)
   const [mention, setMention] = useState(null);
   const mentionRef = useRef(null);
   useEffect(() => { mentionRef.current = mention; }, [mention]);
 
-  // Auto-clear heading format when the user presses Enter inside an H2/H3 line
-  // so the new line below a room heading is always plain text.
+  // Track the "current room" — the most recent H1/H2/H3 above the user's
+  // viewport (or cursor). Updates live as they scroll OR move the cursor so
+  // the sticky room bar always reflects what room they're in.
+  useEffect(() => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+    // Map room name → color for the sticky bar background
+    const colorByName = {};
+    rooms.forEach(r => { if (r && r.name) colorByName[r.name.trim().toUpperCase()] = r.color || '#D4A574'; });
+
+    const update = () => {
+      const root = editor.root;
+      const headings = Array.from(root.querySelectorAll('h1, h2, h3'));
+      if (headings.length === 0) { setCurrentRoom(null); return; }
+      // Only show the room bar when the editor is in the viewport
+      const editorRect = editor.scroll.domNode.getBoundingClientRect();
+      // If editor is below viewport bottom OR above viewport top → hide
+      if (editorRect.top > window.innerHeight - 50 || editorRect.bottom < 100) {
+        setCurrentRoom(null);
+        return;
+      }
+      // Reference Y line where the bar sits (top of viewport + offset for any app chrome)
+      const referenceY = 100;
+      let active = null;
+      for (const h of headings) {
+        const r = h.getBoundingClientRect();
+        if (r.top <= referenceY) active = h;
+        else break;
+      }
+      if (!active) { setCurrentRoom(null); return; }
+      const name = (active.textContent || '').trim().toUpperCase();
+      setCurrentRoom({ name, color: colorByName[name] || '#D4A574' });
+    };
+
+    update();
+    const onScroll = () => requestAnimationFrame(update);
+    const onSel = () => requestAnimationFrame(update);
+    window.addEventListener('scroll', onScroll, true);
+    editor.on('text-change', onSel);
+    editor.on('selection-change', onSel);
+    return () => {
+      window.removeEventListener('scroll', onScroll, true);
+      editor.off('text-change', onSel);
+      editor.off('selection-change', onSel);
+    };
+  }, [rooms, value]);
   useEffect(() => {
     const editor = quillRef.current?.getEditor();
     if (!editor) return;
@@ -526,6 +571,9 @@ export default function ScopeDocumentEditor({
           background: #1a1f2e;
           border-color: #2a3040 !important;
           border-radius: 8px 8px 0 0;
+          position: sticky;
+          top: 0;
+          z-index: 30;
         }
         .scope-doc-editor .ql-container {
           background: #0f1218;
@@ -577,6 +625,40 @@ export default function ScopeDocumentEditor({
         .tag-toolbar {
           display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 10px;
           background: #1a1f2e; border-left: 1px solid #2a3040; border-right: 1px solid #2a3040;
+          position: sticky;
+          top: 42px;
+          z-index: 29;
+        }
+        /* Fixed-position "current room" indicator — shown when scrolling
+           through the editor so the user always knows which room they're in */
+        .current-room-bar {
+          position: fixed;
+          top: 8px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 99998;
+          padding: 8px 18px;
+          background: #0f1218;
+          border: 2px solid var(--room-color, #D4A574);
+          border-radius: 8px;
+          color: #9CA3AF;
+          font-size: 11px;
+          letter-spacing: 1.5px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+          pointer-events: none;
+        }
+        .current-room-bar .room-label {
+          background: var(--room-color, #D4A574);
+          color: #0f1218;
+          padding: 4px 12px;
+          border-radius: 4px;
+          font-weight: 900;
+          letter-spacing: 1.5px;
+          font-size: 12px;
         }
         .tag-toolbar button.tag-trigger {
           padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800;
@@ -799,6 +881,18 @@ export default function ScopeDocumentEditor({
       </div>
 
       <div style={{ position: 'relative' }}>
+        {/* Fixed "current room" indicator — portal-rendered so it floats above everything */}
+        {currentRoom && ReactDOM.createPortal(
+          <div
+            className="current-room-bar"
+            style={{ '--room-color': currentRoom.color }}
+            data-testid="current-room-bar"
+          >
+            <span style={{ opacity: 0.7 }}>YOU ARE IN:</span>
+            <span className="room-label">{currentRoom.name}</span>
+          </div>,
+          document.body
+        )}
         <ReactQuill
           ref={quillRef}
           theme="snow"
