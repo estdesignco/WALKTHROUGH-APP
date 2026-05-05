@@ -152,10 +152,43 @@ export default function ScopeDocumentEditor({
   const [showRoomMenu, setShowRoomMenu] = useState(false);
   const [tradeFilter, setTradeFilter] = useState('');
   const [productFilter, setProductFilter] = useState('');
+  const [toast, setToast] = useState(null);
   // Inline autocomplete state (triggered by #, @ or 🏷)
   const [mention, setMention] = useState(null);
   const mentionRef = useRef(null);
   useEffect(() => { mentionRef.current = mention; }, [mention]);
+
+  // Auto-dismiss toast after 1.5s
+  useEffect(() => {
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 1500);
+    return () => clearTimeout(id);
+  }, [toast]);
+
+  // Keep the autocomplete popup glued to the cursor on scroll/resize
+  useEffect(() => {
+    if (!mention) return;
+    const reposition = () => {
+      const editor = quillRef.current?.getEditor();
+      if (!editor) return;
+      const sel = editor.getSelection();
+      if (!sel) return;
+      const bounds = editor.getBounds(sel.index);
+      const rootRect = editor.root.getBoundingClientRect();
+      setMention(prev => prev ? ({
+        ...prev,
+        top: rootRect.top + bounds.top + bounds.height + 6,
+        left: Math.min(rootRect.left + bounds.left, window.innerWidth - 340),
+      }) : null);
+    };
+    window.addEventListener('scroll', reposition, true);
+    window.addEventListener('resize', reposition);
+    return () => {
+      window.removeEventListener('scroll', reposition, true);
+      window.removeEventListener('resize', reposition);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mention?.triggerIndex]);
 
   const allTrades = [...DEFAULT_TRADES, ...customTrades];
 
@@ -186,6 +219,23 @@ export default function ScopeDocumentEditor({
     editor.insertText(insertAt + displayText.length, ' ', { [blotName]: false }, 'user');
     editor.setSelection(insertAt + displayText.length + 1, 0);
     editor.focus();
+
+    // Visual feedback #1: flash animation on the newly-inserted pill
+    requestAnimationFrame(() => {
+      const suffix = blotName === 'tradeTag' ? 'trade' : blotName === 'productTag' ? 'product' : 'person';
+      const pills = editor.root.querySelectorAll(`.qe-tag-${suffix}`);
+      const newPill = pills[pills.length - 1];
+      if (newPill) {
+        newPill.classList.add('qe-pill-flash');
+        setTimeout(() => newPill.classList.remove('qe-pill-flash'), 900);
+      }
+    });
+
+    // Visual feedback #2: toast confirmation
+    const label = blotName === 'tradeTag' ? `#${value.trade || value}`
+      : blotName === 'productTag' ? `🏷 ${value.name || displayText}`
+      : `@${value.name || displayText}`;
+    setToast({ text: `Inserted ${label}`, kind: blotName, ts: Date.now() });
   }, []);
 
   const insertTrade = (trade) => {
@@ -284,7 +334,11 @@ export default function ScopeDocumentEditor({
     const triggerIndex = lineStart + (lineText.length - query.length - 1);
     const type = triggerChar === '#' ? 'unified' : 'person';
 
+    // Bounds relative to editor root. Convert to viewport coords so the
+    // popup can be rendered fixed-position and follow the cursor even when
+    // the page is scrolled.
     const bounds = editor.getBounds(cursor);
+    const rootRect = editor.root.getBoundingClientRect();
 
     let results = [];
     let scopedRoom = null;
@@ -318,8 +372,9 @@ export default function ScopeDocumentEditor({
     setMention({
       type, query, triggerIndex, results, selectedIndex: 0,
       scopedRoom: scopedRoom || null,
-      top: bounds.top + bounds.height + 6,
-      left: bounds.left,
+      // Viewport coords (for position: fixed popup)
+      top: rootRect.top + bounds.top + bounds.height + 6,
+      left: Math.min(rootRect.left + bounds.left, window.innerWidth - 340),
     });
   }, [allTrades, allProducts, contacts]);
 
@@ -484,6 +539,14 @@ export default function ScopeDocumentEditor({
         .scope-doc-editor .qe-tag-trade { background: var(--pill-bg, #6B7280); color: #fff; letter-spacing: 1px; }
         .scope-doc-editor .qe-tag-product { background: #1E3A5F; color: #93C5FD; border: 1px solid #3B82F6; font-weight: 700; }
         .scope-doc-editor .qe-tag-person { background: rgba(212,165,116,0.2); color: #D4A574; border: 1px solid #D4A574; font-weight: 700; }
+        /* Flash animation when a new pill is inserted — gives instant visual feedback */
+        @keyframes qe-flash {
+          0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.9); transform: scale(1); }
+          20% { box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.4); transform: scale(1.15); }
+          60% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); transform: scale(1.05); }
+          100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); transform: scale(1); }
+        }
+        .scope-doc-editor .qe-pill-flash { animation: qe-flash 0.9s ease-out; z-index: 10; position: relative; }
         /* Read-only render in builder portal */
         .scope-doc-readonly .qe-tag-trade,
         .scope-doc-readonly .qe-tag-product,
@@ -739,15 +802,15 @@ Example:
   3. Box in beams w/ white oak #TRIM CARPENTER @JoeContractor"
         />
 
-        {/* INLINE AUTOCOMPLETE POPUP */}
-        {mention && mention.results.length > 0 && (
+        {/* INLINE AUTOCOMPLETE POPUP — rendered via portal with fixed viewport coords */}
+        {mention && mention.results.length > 0 && ReactDOM.createPortal(
           <div
             data-testid="mention-popup"
             style={{
-              position: 'absolute',
-              top: mention.top + 42 /* +toolbar height */,
-              left: mention.left + 16,
-              zIndex: 9999,
+              position: 'fixed',
+              top: mention.top,
+              left: mention.left,
+              zIndex: 99999,
               background: '#0f1218',
               border: '1px solid #2a3040',
               borderRadius: 8,
@@ -830,7 +893,8 @@ Example:
               }
               return null;
             })}
-          </div>
+          </div>,
+          document.body
         )}
       </div>
 
@@ -850,6 +914,34 @@ Example:
       {/* HOVER PREVIEW — follows mouse over pills inside the Quill editor */}
       {hoverPill && ReactDOM.createPortal(
         <PillHoverCard hoverPill={hoverPill} />,
+        document.body
+      )}
+
+      {/* TOAST — quick confirmation when a pill is inserted */}
+      {toast && ReactDOM.createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 32,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 999999,
+            background: toast.kind === 'tradeTag' ? '#10B981' : toast.kind === 'productTag' ? '#3B82F6' : '#D4A574',
+            color: toast.kind === 'personTag' ? '#1a1f2e' : '#fff',
+            padding: '10px 18px',
+            borderRadius: 8,
+            fontSize: 13,
+            fontWeight: 800,
+            letterSpacing: 0.5,
+            boxShadow: '0 12px 32px rgba(0,0,0,0.5)',
+            animation: 'qe-toast-in 0.25s ease-out',
+            pointerEvents: 'none',
+          }}
+          data-testid="scope-toast"
+        >
+          <style>{`@keyframes qe-toast-in { from { opacity: 0; transform: translateX(-50%) translateY(12px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }`}</style>
+          ✓ {toast.text}
+        </div>,
         document.body
       )}
     </div>
