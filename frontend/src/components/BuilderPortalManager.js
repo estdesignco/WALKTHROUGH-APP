@@ -278,6 +278,9 @@ export default function BuilderPortalManager({ project, onReload }) {
         />
       </div>
 
+      {/* PHOTO UPLOADS — Admin can upload general files & per-room photos */}
+      <PhotoUploadsSection portal={portal} rooms={rooms} apiUrl={API_URL} onReload={loadPortal} />
+
       {/* SCHEDULE */}
       <div className="p-4 rounded-lg bg-[#1a1f2e] border border-[#2a3040]">
         <div className="flex justify-between items-center mb-3">
@@ -444,6 +447,206 @@ export default function BuilderPortalManager({ project, onReload }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// ============================================================
+// PHOTO UPLOADS SECTION (Admin)
+// General Files (project-wide) + Per-Room Photos
+// Reuses existing builder-portal endpoints so files appear in builder view too.
+// ============================================================
+function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
+  const [files, setFiles] = useState([]);
+  const [photos, setPhotos] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [activeRoomId, setActiveRoomId] = useState(null);
+
+  useEffect(() => {
+    if (!portal) return;
+    const fileComments = (portal.comments || []).filter(c => c.section === 'general_file');
+    const all = [];
+    fileComments.forEach(c => { try { const parsed = JSON.parse(c.text); if (Array.isArray(parsed)) all.push(...parsed); } catch {} });
+    setFiles(all);
+    fetch(`${apiUrl}/api/photos/project/${portal.project_id}`).then(r => r.ok ? r.json() : []).then(setPhotos).catch(() => setPhotos([]));
+  }, [portal, apiUrl]);
+
+  if (!portal) {
+    return (
+      <div className="p-4 rounded-lg bg-[#1a1f2e] border border-[#2a3040]">
+        <h3 className="text-[#D4A574] font-bold text-sm tracking-wider">PHOTOS &amp; FILES</h3>
+        <p className="text-xs text-gray-500 italic mt-2">Save the builder portal first to enable photo uploads.</p>
+      </div>
+    );
+  }
+
+  const author = 'Designer (Admin)';
+
+  const uploadGeneralFiles = async (inputFiles) => {
+    if (!inputFiles || inputFiles.length === 0) return;
+    setUploading(true);
+    try {
+      const newAll = [...files];
+      for (const file of inputFiles) {
+        const reader = new FileReader();
+        await new Promise(resolve => {
+          reader.onload = () => {
+            newAll.push({ name: file.name, type: file.type, data: reader.result, uploaded_at: new Date().toISOString(), uploaded_by: author });
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      await fetch(`${apiUrl}/api/builder/${portal.access_code}/comment`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ section: 'general_file', author, text: JSON.stringify(newAll) }),
+      });
+      setFiles(newAll);
+      onReload && onReload();
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const uploadRoomPhoto = async (roomId, inputFiles) => {
+    if (!inputFiles || inputFiles.length === 0) return;
+    setUploading(true);
+    try {
+      for (const file of inputFiles) {
+        const reader = new FileReader();
+        await new Promise(resolve => {
+          reader.onload = async () => {
+            await fetch(`${apiUrl}/api/photos/upload`, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                project_id: portal.project_id,
+                room_id: roomId,
+                file_name: file.name,
+                photo_data: reader.result,
+                metadata: { source: 'admin', uploaded_by: author },
+              }),
+            });
+            resolve();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      const fresh = await fetch(`${apiUrl}/api/photos/project/${portal.project_id}`).then(r => r.ok ? r.json() : []);
+      setPhotos(fresh);
+      onReload && onReload();
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const photosByRoom = {};
+  photos.forEach(p => {
+    const k = p.room_id || '__no_room__';
+    if (!photosByRoom[k]) photosByRoom[k] = [];
+    photosByRoom[k].push(p);
+  });
+
+  return (
+    <div className="p-4 rounded-lg bg-[#1a1f2e] border border-[#2a3040]" data-testid="admin-photo-uploads">
+      <div className="flex justify-between items-center mb-2">
+        <div>
+          <h3 className="text-[#D4A574] font-bold text-sm tracking-wider">PHOTOS &amp; FILES</h3>
+          <p className="text-[10px] text-gray-500 mt-0.5">Anything you upload here is visible to the builder in their portal.</p>
+        </div>
+      </div>
+
+      {/* GENERAL UPLOADS */}
+      <div className="mb-5">
+        <div className="flex justify-between items-center mb-2">
+          <h4 className="text-[11px] font-bold text-gray-400 tracking-widest">GENERAL UPLOADS</h4>
+          <label className="px-3 py-1.5 rounded text-xs font-bold bg-[#10B981] text-white cursor-pointer hover:bg-[#059669]" data-testid="admin-general-upload-btn">
+            📁 {uploading ? 'UPLOADING...' : '+ UPLOAD FILES'}
+            <input
+              type="file"
+              multiple
+              accept="image/*,.pdf,.doc,.docx,.xlsx,.txt"
+              onChange={e => uploadGeneralFiles(Array.from(e.target.files))}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
+        {files.length === 0 ? (
+          <p className="text-xs text-gray-500 italic py-2">No general files uploaded yet.</p>
+        ) : (
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+            {files.map((f, i) => (
+              <div key={i} className="bg-black/30 rounded overflow-hidden border border-[#2a3040]" data-testid={`general-file-${i}`}>
+                {f.type && f.type.startsWith('image') ? (
+                  <img src={f.data} alt={f.name} style={{ width: '100%', height: 80, objectFit: 'cover' }} />
+                ) : (
+                  <div style={{ width: '100%', height: 80, background: '#0f1218', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D4A574', fontSize: 28 }}>📄</div>
+                )}
+                <div className="px-1.5 py-1">
+                  <p className="text-[10px] text-[#F5F5DC] truncate">{f.name}</p>
+                  <p className="text-[9px] text-gray-500">{f.uploaded_by}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* PER-ROOM PHOTOS */}
+      <div>
+        <h4 className="text-[11px] font-bold text-gray-400 tracking-widest mb-2">PER-ROOM PHOTOS</h4>
+        {rooms.length === 0 && <p className="text-xs text-gray-500 italic">No rooms yet. Add rooms in the Walkthrough first.</p>}
+        {rooms.map(room => {
+          const roomPhotos = photosByRoom[room.id] || [];
+          const isOpen = activeRoomId === room.id;
+          return (
+            <div key={room.id} className="mb-2 rounded overflow-hidden" style={{ border: `1px solid ${room.color || '#2a3040'}40` }} data-testid={`admin-room-photos-${room.id}`}>
+              <div
+                onClick={() => setActiveRoomId(isOpen ? null : room.id)}
+                className="flex justify-between items-center px-3 py-2 cursor-pointer hover:opacity-90"
+                style={{ background: `${room.color || '#374151'}30`, borderLeft: `4px solid ${room.color || '#D4A574'}` }}
+              >
+                <div className="flex items-center gap-2">
+                  <span style={{ color: room.color || '#D4A574', fontSize: 14, fontWeight: 800, letterSpacing: 1 }}>{room.name.toUpperCase()}</span>
+                  <span className="text-[10px] text-gray-400">({roomPhotos.length} photos)</span>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <label
+                    onClick={e => e.stopPropagation()}
+                    className="px-2 py-1 rounded text-[10px] font-bold bg-[#D4A574] text-black cursor-pointer hover:bg-[#E5B585]"
+                    data-testid={`admin-room-upload-${room.id}`}
+                  >
+                    + UPLOAD
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={e => uploadRoomPhoto(room.id, Array.from(e.target.files))}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  <span className="text-gray-400 text-xs">{isOpen ? '▾' : '▸'}</span>
+                </div>
+              </div>
+              {isOpen && (
+                <div className="p-2 bg-black/30">
+                  {roomPhotos.length === 0 ? (
+                    <p className="text-xs text-gray-500 italic py-2">No photos for this room yet.</p>
+                  ) : (
+                    <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-2">
+                      {roomPhotos.map((p, pi) => (
+                        <div key={pi} className="bg-black/30 rounded overflow-hidden">
+                          <img src={p.photo_data || p.url} alt={p.file_name || 'photo'} style={{ width: '100%', height: 80, objectFit: 'cover' }} />
+                          <p className="text-[9px] text-gray-400 truncate px-1 py-0.5">{p.file_name || 'photo'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

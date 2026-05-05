@@ -124,6 +124,17 @@ export default function BuilderPortal() {
   const completedTodos = todos.filter(td => td.status === 'completed' || td.completed).length;
   const openTodos = todos.filter(td => td.status !== 'completed' && !td.completed).length;
 
+  // Build room/category color maps from the live project data so the builder
+  // FFE renders identical to the admin FFE (no "hideous" defaults).
+  const roomColors = {};
+  rooms.forEach(r => { if (r.color) roomColors[r.id] = r.color; });
+  const categoryColors = {};
+  rooms.forEach(r => (r.categories || []).forEach(c => { if (c.color) categoryColors[c.id] = c.color; }));
+
+  const FFE_ITEM_STATUSES = ['PICKED', 'ORDERED', 'SHIPPED', 'DELIVERED TO RECEIVER', 'DELIVERED TO JOB SITE', 'INSTALLED'];
+  const FFE_VENDOR_TYPES = ['Four Hands', 'Uttermost', 'Visual Comfort'];
+  const FFE_CARRIER_TYPES = ['FedEx', 'UPS', 'USPS', 'DHL'];
+
   const builderProject = { ...project, id: portal.project_id, rooms };
 
   const tabs = [
@@ -243,7 +254,16 @@ export default function BuilderPortal() {
 
         {/* ===== FFE (READ ONLY) ===== */}
         {activeTab === 'ffe' && (
-          <ExactFFESpreadsheet project={builderProject} roomColors={{}} categoryColors={{}} onReload={loadPortal} builderMode={true} />
+          <ExactFFESpreadsheet
+            project={builderProject}
+            roomColors={roomColors}
+            categoryColors={categoryColors}
+            itemStatuses={FFE_ITEM_STATUSES}
+            vendorTypes={FFE_VENDOR_TYPES}
+            carrierTypes={FFE_CARRIER_TYPES}
+            onReload={loadPortal}
+            builderMode={true}
+          />
         )}
 
         {/* ===== GENERAL UPLOADS - DEDICATED PLACE ===== */}
@@ -268,7 +288,16 @@ export default function BuilderPortal() {
 
         {/* ===== ROOM FINISHES ===== */}
         {activeTab === 'finishes' && (
-          <ExactFFESpreadsheet project={builderProject} roomColors={{}} categoryColors={{}} onReload={loadPortal} builderMode={true} />
+          <ExactFFESpreadsheet
+            project={builderProject}
+            roomColors={roomColors}
+            categoryColors={categoryColors}
+            itemStatuses={FFE_ITEM_STATUSES}
+            vendorTypes={FFE_VENDOR_TYPES}
+            carrierTypes={FFE_CARRIER_TYPES}
+            onReload={loadPortal}
+            builderMode={true}
+          />
         )}
 
         {/* ===== CHANGE ORDERS ===== */}

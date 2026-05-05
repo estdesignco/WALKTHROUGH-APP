@@ -158,6 +158,26 @@ export default function ScopeDocumentEditor({
   const mentionRef = useRef(null);
   useEffect(() => { mentionRef.current = mention; }, [mention]);
 
+  // Auto-clear heading format when the user presses Enter inside an H2/H3 line
+  // so the new line below a room heading is always plain text.
+  useEffect(() => {
+    const editor = quillRef.current?.getEditor();
+    if (!editor) return;
+    const onKeyUp = (e) => {
+      if (e.key !== 'Enter') return;
+      const sel = editor.getSelection();
+      if (!sel) return;
+      const [line] = editor.getLine(sel.index);
+      if (!line) return;
+      const formats = line.formats ? line.formats() : {};
+      if (formats.header) {
+        editor.formatLine(sel.index, 0, 'header', false, 'user');
+      }
+    };
+    editor.root.addEventListener('keyup', onKeyUp);
+    return () => editor.root.removeEventListener('keyup', onKeyUp);
+  }, []);
+
   // Auto-dismiss toast after 1.5s
   useEffect(() => {
     if (!toast) return;
