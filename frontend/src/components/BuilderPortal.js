@@ -115,8 +115,12 @@ export default function BuilderPortal() {
 
   const { portal, project, rooms, photos } = portalData;
   const comments = portal.comments || [];
-  const scopeItems = portal.scope_of_work || [];
-  const completedScope = scopeItems.filter(s => s.completed).length;
+  // Count scope items from the parsed scope_document (the new master doc)
+  // Legacy scope_of_work[] still counted as fallback for old portals.
+  const parsedScope = parseScopeDocument(portal.scope_document || '', rooms);
+  const legacyScopeItems = portal.scope_of_work || [];
+  const scopeTotal = parsedScope.items.length + legacyScopeItems.length;
+  const completedScope = legacyScopeItems.filter(s => s.completed).length;
   const completedTodos = todos.filter(td => td.status === 'completed' || td.completed).length;
   const openTodos = todos.filter(td => td.status !== 'completed' && !td.completed).length;
 
@@ -192,7 +196,7 @@ export default function BuilderPortal() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
               {[
                 { label: t.totalRooms, value: rooms.length, color: '#D4A574' },
-                { label: t.scopeItems, value: `${completedScope}/${scopeItems.length}`, color: '#10B981' },
+                { label: t.scopeItems, value: scopeTotal > 0 ? `${completedScope}/${scopeTotal}` : '0', color: '#10B981' },
                 { label: t.openTodos, value: openTodos, color: '#F59E0B' },
                 { label: t.completedTasks, value: completedTodos, color: '#3B82F6' },
               ].map((stat, i) => (
