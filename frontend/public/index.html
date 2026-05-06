@@ -29,9 +29,15 @@
         <script src="/config.js"></script>
         <script>
             // iPad/iPhone/Android auto-redirect to mobile app - runs BEFORE React
+            // CRITICAL: PUBLIC routes (builder portal, customer portals, questionnaires) must
+            // NEVER redirect to the admin mobile app — those links are shared with external
+            // builders/clients who must NOT see admin/pricing data.
             (function() {
                 var path = window.location.pathname;
-                if (path.indexOf('/mobile-app') === 0 || path.indexOf('/customer') === 0) return;
+                var PUBLIC_PREFIXES = ['/mobile-app', '/customer', '/builder', '/test-questionnaire'];
+                for (var p = 0; p < PUBLIC_PREFIXES.length; p++) {
+                    if (path.indexOf(PUBLIC_PREFIXES[p]) === 0) return;
+                }
                 var ua = navigator.userAgent;
                 var isMobile = /iPad|iPhone|iPod|Android|webOS|BlackBerry/i.test(ua);
                 var isIPad = ua.indexOf('Macintosh') > -1 && navigator.maxTouchPoints > 1;

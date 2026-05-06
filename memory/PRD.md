@@ -59,6 +59,11 @@ App Password: `DesignReady2026!`
 - `PUT /api/rooms/{room_id}` — Update room
 - `PATCH /api/items/{item_id}/quick-update` — Inline item editing
 
+### Mobile Builder Portal Privacy Fix (May 5/6, 2026) — CRITICAL
+- Bug: `index.html` had a pre-React mobile-redirect script that sent ALL mobile UAs to `/mobile-app`, only whitelisting `/mobile-app` and `/customer`. Result: when a builder opened `https://app.estdesignco.com/builder/{access_code}` on their phone, they were redirected to the **admin** app — exposing pricing/cost data.
+- Fix: `frontend/public/index.html` — extended the whitelist to include `/builder` and `/test-questionnaire` so any public builder/customer link is preserved on mobile.
+- Verified: iPhone UA + viewport on `/builder/7FQKGDCS` stays on the route; renders BuilderPortal header, tabs, and FF&E Schedule with NO leakage of "Cost / Price / Budget / Wholesale / Markup / Margin" terms.
+
 ## Remaining / Backlog
 ### P1
 - Auto-populate plumbing fixtures from FFE/checklist into 3D palette
