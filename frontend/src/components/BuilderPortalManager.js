@@ -214,7 +214,7 @@ export default function BuilderPortalManager({ project, onReload }) {
               onClick={() => toggleRoom(room.id)}
               className="px-3 py-2 rounded text-sm font-bold transition-all"
               style={{
-                background: selectedRooms.has(room.id) ? getMutedRoomColor(room.name) : '#2a3040',
+                background: selectedRooms.has(room.id) ? room.color || getRoomColor(room.name) : '#2a3040',
                 color: selectedRooms.has(room.id) ? '#fff' : '#6B7280',
                 border: selectedRooms.has(room.id) ? '2px solid #fff' : '2px solid #374151',
               }}
@@ -623,8 +623,9 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
           return sortedRooms.map(room => {
           const roomPhotos = photosByRoom[room.id] || [];
           const isOpen = activeRoomId === room.id;
-          // Canonical muted color (mirrors backend ROOM_COLORS dict by name)
-          const roomColor = getMutedRoomColor(room.name);
+          // Use SAME color chain as admin Checklist (room.color → name-hash fallback)
+          // so the Builder Portal Manager renders identical hues to the Checklist.
+          const roomColor = room.color || getRoomColor(room.name);
           return (
             <div key={room.id} className="mb-2 overflow-hidden" style={{ border: '1px solid #D4A574' }} data-testid={`admin-room-photos-${room.id}`}>
               {/* Header styled like Checklist/FFE — muted gradient, cream text, gold border */}

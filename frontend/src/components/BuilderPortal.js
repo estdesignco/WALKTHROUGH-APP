@@ -436,7 +436,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
     (r.categories || []).forEach(c => {
       (c.subcategories || []).forEach(sub => {
         (sub.items || []).forEach(item => {
-          itemsById[item.id] = { ...item, _room: r.name, _roomColor: getMutedRoomColor(r.name) };
+          itemsById[item.id] = { ...item, _room: r.name, _roomColor: r.color };
         });
       });
     });
@@ -954,10 +954,12 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
     <div>
       <h2 style={sectionTitle}>{lang === 'en' ? 'Room Photos' : 'Fotos por Habitación'}</h2>
       {sortedRooms.map(room => {
-        // CANONICAL muted color — pulled from ROOM_COLORS dict by name (mirrors
-        // backend/server.py). Same Kitchen → same muted green everywhere, ignoring
-        // any bright DB-stored room.color the project may have been seeded with.
-        const roomColor = getMutedRoomColor(room.name);
+        // Use the SAME color chain as the admin Checklist (room.color from DB
+        // → name-hash fallback). The muted gradient + inner shadow below
+        // mutes the saturated palette colors into a readable banner — so a
+        // Kitchen with `room.color = "#FF00FE"` renders as the same dark
+        // magenta you see in the Checklist for the same project.
+        const roomColor = room.color || getRoomColor(room.name);
         return (
         <div key={room.id} style={{ marginBottom: 24 }}>
           {/* Header — styled like FFE / Checklist (muted gradient) */}

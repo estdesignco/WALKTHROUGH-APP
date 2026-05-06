@@ -64,14 +64,12 @@ App Password: `DesignReady2026!`
 - Fix: `frontend/public/index.html` — extended the whitelist to include `/builder` and `/test-questionnaire` so any public builder/customer link is preserved on mobile.
 - Verified: iPhone UA + viewport on `/builder/7FQKGDCS` stays on the route; renders BuilderPortal header, tabs, and FF&E Schedule with NO leakage of "Cost / Price / Budget / Wholesale / Markup / Margin" terms.
 
-### Color Parity Fix — Builder Portal uses backend ROOM_COLORS dict by name (May 5/6, 2026)
-- Bug: Builder Portal Photos rows + admin Builder Portal Manager pulled `room.color` from the DB. Newer projects (e.g. Diehl Lakehouse) were seeded with the BRIGHT `DISTINCT_ROOM_COLORS` palette (Kitchen=#FF00FE, Pool Area=#F6F655…), so Photos rendered with neon flat colors. Older projects (e.g. The Elliott's) had muted dict colors stored, so they looked correct — inconsistent across projects.
-- Fix:
-  1. Mirrored the backend `server.py` `ROOM_COLORS` dict EXACTLY into `frontend/src/utils/roomColors.js` as `ROOM_COLORS` (+ extended with custom names from active projects: jack and jill, bunk room, scullery, ladies den, primary sitting area, etc.).
-  2. Added `getMutedRoomColor(roomName)` — looks up the muted color by lowercased name, falls back to the canonical `#7A5A8A` muted purple.
-  3. `BuilderPortal.js` Photos rows, item _roomColor accents, and `BuilderPortalManager.js` (room toggle buttons + photo room headers) now ignore the DB `room.color` and use `getMutedRoomColor(room.name)`.
-  4. Combined with the existing `getMutedRoomHeaderStyle()` (135° gradient + inset glow + inset shadow + textShadow), every "Kitchen" row in the Builder Portal is now `#5A7A5A` muted green, every "Master Bathroom" `#8A6A5A` muted tan — verified via computed style (`rgb(90,122,90)`, `rgb(138,106,90)`).
-- FFE was NOT touched per user's explicit instruction.
+### Color Parity Fix — Builder Portal renders identical to Checklist (May 5/6, 2026)
+- Bug: Builder Portal Photos used flat solid `room.color` (no gradient/shadow) so neon palette colors looked unreadable.
+- Fix: Centralized `getMutedRoomHeaderStyle(roomColor)` in `frontend/src/utils/roomColors.js` that mirrors the EXACT recipe from `ExactChecklistSpreadsheet.js` line 2374-2376 (135° gradient + inset white-glow + heavy inset black shadow + textShadow).
+- Applied to: `BuilderPortal.js` Photos rows, `BuilderPortalManager.js` admin photo room headers + room toggle buttons.
+- Color source: same chain as Checklist — `room.color || getRoomColor(room.name)` — so Diehl Lakehouse Kitchen renders with `#FF00FE` from the DB on BOTH Checklist and Builder Portal Photos. Identical input + identical recipe = identical pixel output.
+- FFE was NOT touched.
 
 ## Remaining / Backlog
 ### P1
