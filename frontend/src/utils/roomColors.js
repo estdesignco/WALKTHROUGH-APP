@@ -52,4 +52,24 @@ export const getColorByIndex = (index) => {
   return DISTINCT_ROOM_COLORS[index % DISTINCT_ROOM_COLORS.length];
 };
 
+/**
+ * Canonical "muted gradient" room-header style used by the Admin CHECKLIST.
+ * The Checklist (the source-of-truth visual reference) wraps every room in a
+ * 135deg gradient with edge highlights + a heavy inset shadow that visually
+ * darkens the saturated palette colors so text stays readable.
+ *
+ * Use this EVERYWHERE we render a room banner (FFE, Builder Portal photos,
+ * Builder Portal scope manager, etc.) so admin and builder views match the
+ * Checklist exactly. Pass the resolved roomColor (e.g.
+ * `room.color || getRoomColor(room.name)`).
+ */
+export const getMutedRoomHeaderStyle = (roomColor) => {
+  const c = roomColor || DISTINCT_ROOM_COLORS[0];
+  return {
+    background: `linear-gradient(135deg, ${c}FF 0%, ${c}AA 20%, ${c} 40%, ${c}AA 80%, ${c}FF 100%)`,
+    boxShadow: `0 0 35px ${c}80, inset 0 0 70px rgba(255, 255, 255, 0.16), inset 0 0 110px rgba(0, 0, 0, 0.5)`,
+    textShadow: '0 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.4)',
+  };
+};
+
 export const getCategoryColor = () => '#065F46';

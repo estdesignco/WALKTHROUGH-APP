@@ -64,6 +64,12 @@ App Password: `DesignReady2026!`
 - Fix: `frontend/public/index.html` — extended the whitelist to include `/builder` and `/test-questionnaire` so any public builder/customer link is preserved on mobile.
 - Verified: iPhone UA + viewport on `/builder/7FQKGDCS` stays on the route; renders BuilderPortal header, tabs, and FF&E Schedule with NO leakage of "Cost / Price / Budget / Wholesale / Markup / Margin" terms.
 
+### Color Parity Fix — Builder FFE / Builder Photos / Manager (May 5/6, 2026)
+- Bug: Admin Checklist used a muted 135deg gradient + heavy inner-shadow on every room banner, but Builder Portal FFE rooms, Builder Portal Photos rows, and the admin Builder Portal Manager rooms used **flat solid `room.color`** — looked neon/unreadable.
+- Fix: Added centralized `getMutedRoomHeaderStyle(roomColor)` to `frontend/src/utils/roomColors.js` (single source of truth for the gradient + boxShadow + textShadow recipe lifted from `ExactChecklistSpreadsheet.js`).
+- Applied to: `FFEView.js` room header rows, `BuilderPortal.js` Photos section, `BuilderPortalManager.js` admin photo room headers.
+- Verified visually: muted gradient now identical between admin Checklist and Builder Portal FFE/Photos.
+
 ## Remaining / Backlog
 ### P1
 - Auto-populate plumbing fixtures from FFE/checklist into 3D palette

@@ -4,7 +4,7 @@ import ExactFFESpreadsheet from './FFEView';
 import RichTextEditor from './RichTextEditor';
 import { parseScopeDocument } from './ScopeDocumentEditor';
 import FileLightbox from './FileLightbox';
-import { getRoomColor } from '../utils/roomColors';
+import { getRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -959,13 +959,13 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
         const roomColor = room.color || getRoomColor(room.name);
         return (
         <div key={room.id} style={{ marginBottom: 24 }}>
-          {/* Header — styled like FFE */}
+          {/* Header — styled like FFE / Checklist (muted gradient) */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 8,
-            background: roomColor,
+            ...getMutedRoomHeaderStyle(roomColor),
             padding: '6px 12px',
             border: '1px solid #D4A574',
             borderRadius: 0,
