@@ -625,9 +625,6 @@ export default function ScopeDocumentEditor({
         .tag-toolbar {
           display: flex; gap: 8px; flex-wrap: wrap; padding: 8px 10px;
           background: #1a1f2e; border-left: 1px solid #2a3040; border-right: 1px solid #2a3040;
-          position: sticky;
-          top: 42px;
-          z-index: 29;
         }
         /* Fixed-position "current room" indicator — shown when scrolling
            through the editor so the user always knows which room they're in */

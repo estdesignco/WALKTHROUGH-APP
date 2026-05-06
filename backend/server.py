@@ -19417,16 +19417,16 @@ async def get_builder_portal_public(access_code: str):
     selected_ids = portal.get("selected_room_ids", [])
     rooms = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).to_list(100)
     
-    # Build full room data without prices
+    # Build full room data without prices.
+    # IMPORTANT: do NOT inject color defaults — the frontend's getRoomColor()
+    # falls back to the shared DISTINCT_ROOM_COLORS palette (rainbow) when
+    # room.color is missing. Forcing a default here would override that and
+    # make all rooms one color on the builder side.
     for room in rooms:
-        # Inject Room model defaults so frontend can render with proper colors/floor
-        # (Mongo stores rooms without these fields when they were never edited)
-        room.setdefault("color", "#7A5A8A")
         room.setdefault("floor", "1st Floor")
         room.setdefault("notes", "")
         categories = await db.categories.find({"room_id": room["id"]}, {"_id": 0}).to_list(100)
         for cat in categories:
-            cat.setdefault("color", "#065F46")
             subcategories = await db.subcategories.find({"category_id": cat["id"]}, {"_id": 0}).to_list(100)
             for sub in subcategories:
                 items = await db.items.find({"subcategory_id": sub["id"]}, {"_id": 0}).to_list(500)
