@@ -607,19 +607,32 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
       <div>
         <h4 className="text-[11px] font-bold text-gray-400 tracking-widest mb-2">PER-ROOM PHOTOS</h4>
         {rooms.length === 0 && <p className="text-xs text-gray-500 italic">No rooms yet. Add rooms in the Walkthrough first.</p>}
-        {rooms.map(room => {
+        {(() => {
+          // Sort identically to FFE so order is consistent across pages
+          const FLOOR_ORDER = ['Basement', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor'];
+          const sortedRooms = [...rooms].sort((a, b) => {
+            const fa = FLOOR_ORDER.indexOf(a.floor || '1st Floor');
+            const fb = FLOOR_ORDER.indexOf(b.floor || '1st Floor');
+            if (fa !== fb) return fa - fb;
+            const oa = a.order_index ?? 999;
+            const ob = b.order_index ?? 999;
+            if (oa !== ob) return oa - ob;
+            return (a.name || '').localeCompare(b.name || '');
+          });
+          return sortedRooms.map(room => {
           const roomPhotos = photosByRoom[room.id] || [];
           const isOpen = activeRoomId === room.id;
           return (
-            <div key={room.id} className="mb-2 rounded overflow-hidden" style={{ border: `1px solid ${room.color || '#2a3040'}40` }} data-testid={`admin-room-photos-${room.id}`}>
+            <div key={room.id} className="mb-2 overflow-hidden" style={{ border: '1px solid #D4A574' }} data-testid={`admin-room-photos-${room.id}`}>
+              {/* Header styled like FFE — full room color, cream text, gold border */}
               <div
                 onClick={() => setActiveRoomId(isOpen ? null : room.id)}
-                className="flex justify-between items-center px-3 py-2 cursor-pointer hover:opacity-90"
-                style={{ background: `${room.color || '#374151'}30`, borderLeft: `4px solid ${room.color || '#D4A574'}` }}
+                className="flex justify-between items-center px-3 py-1.5 cursor-pointer hover:opacity-90"
+                style={{ background: room.color || '#374151' }}
               >
                 <div className="flex items-center gap-2">
-                  <span style={{ color: room.color || '#D4A574', fontSize: 14, fontWeight: 800, letterSpacing: 1 }}>{room.name.toUpperCase()}</span>
-                  <span className="text-[10px] text-gray-400">({roomPhotos.length} photos)</span>
+                  <span className="text-[#D4C5A9]" style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1 }}>{room.name.toUpperCase()}</span>
+                  <span className="text-[10px] text-[#D4C5A9] opacity-70">({roomPhotos.length} photos)</span>
                 </div>
                 <div className="flex gap-2 items-center">
                   <label
@@ -636,7 +649,7 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
                       style={{ display: 'none' }}
                     />
                   </label>
-                  <span className="text-gray-400 text-xs">{isOpen ? '▾' : '▸'}</span>
+                  <span className="text-[#D4C5A9] text-xs">{isOpen ? '▾' : '▸'}</span>
                 </div>
               </div>
               {isOpen && (
@@ -662,7 +675,8 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
               )}
             </div>
           );
-        })}
+          });
+        })()}
       </div>
       {lightbox && (
         <FileLightbox

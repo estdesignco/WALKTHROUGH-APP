@@ -912,18 +912,40 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
     input.click();
   };
 
+  // Sort rooms by floor then order_index then name to match FFE order exactly
+  const FLOOR_ORDER = ['Basement', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor'];
+  const sortedRooms = [...rooms].sort((a, b) => {
+    const fa = FLOOR_ORDER.indexOf(a.floor || '1st Floor');
+    const fb = FLOOR_ORDER.indexOf(b.floor || '1st Floor');
+    if (fa !== fb) return fa - fb;
+    const oa = a.order_index ?? 999;
+    const ob = b.order_index ?? 999;
+    if (oa !== ob) return oa - ob;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+
   return (
     <div>
       <h2 style={sectionTitle}>{lang === 'en' ? 'Room Photos' : 'Fotos por Habitación'}</h2>
-      {rooms.map(room => (
-        <div key={room.id} style={{ marginBottom: 32 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, background: room.color || '#2a3040', padding: '10px 16px', borderRadius: 8, borderLeft: `5px solid ${room.color || '#D4A574'}` }}>
-            <h3 style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{room.name.toUpperCase()}</h3>
+      {sortedRooms.map(room => (
+        <div key={room.id} style={{ marginBottom: 24 }}>
+          {/* Header — styled like FFE: thinner bar, cream-colored text on full color, gold border */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: 8,
+            background: room.color || '#2a3040',
+            padding: '6px 12px',
+            border: '1px solid #D4A574',
+            borderRadius: 0,
+          }}>
+            <h3 style={{ color: '#D4C5A9', fontSize: 14, fontWeight: 700, letterSpacing: 1 }}>{room.name.toUpperCase()}</h3>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => handleCamera(room.id)} style={{ background: '#D4A574', color: '#1a1f2e', padding: '8px 14px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer', border: 'none' }}>
+              <button onClick={() => handleCamera(room.id)} style={{ background: '#D4A574', color: '#1a1f2e', padding: '6px 12px', borderRadius: 6, fontWeight: 700, fontSize: 11, cursor: 'pointer', border: 'none' }}>
                 📷 {lang === 'en' ? 'Camera' : 'Cámara'}
               </button>
-              <label style={{ background: '#374151', color: '#F5F5DC', padding: '8px 14px', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+              <label style={{ background: '#374151', color: '#F5F5DC', padding: '6px 12px', borderRadius: 6, fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>
                 📁 {uploading ? '...' : (lang === 'en' ? 'Upload' : 'Subir')}
                 <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt" onChange={e => handleUpload(room.id, Array.from(e.target.files))} style={{ display: 'none' }} />
               </label>
