@@ -19413,9 +19413,10 @@ async def get_builder_portal_public(access_code: str):
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
     
-    # Get selected rooms with full data (but NO pricing)
+    # Get selected rooms with full data (but NO pricing) — sorted EXACTLY like
+    # the admin Checklist/FFE so room order is identical across every page.
     selected_ids = portal.get("selected_room_ids", [])
-    rooms = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).to_list(100)
+    rooms = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).sort("order_index", 1).to_list(100)
     
     # Build full room data without prices.
     # IMPORTANT: do NOT inject color defaults — the frontend's getRoomColor()
@@ -19423,13 +19424,15 @@ async def get_builder_portal_public(access_code: str):
     # room.color is missing. Forcing a default here would override that and
     # make all rooms one color on the builder side.
     for room in rooms:
-        room.setdefault("floor", "1st Floor")
+        # Default floor matches Checklist convention (`'1ST FLOOR'`, all caps)
+        # so floor grouping/order matches admin views exactly.
+        room.setdefault("floor", "1ST FLOOR")
         room.setdefault("notes", "")
-        categories = await db.categories.find({"room_id": room["id"]}, {"_id": 0}).to_list(100)
+        categories = await db.categories.find({"room_id": room["id"]}, {"_id": 0}).sort("order_index", 1).to_list(100)
         for cat in categories:
-            subcategories = await db.subcategories.find({"category_id": cat["id"]}, {"_id": 0}).to_list(100)
+            subcategories = await db.subcategories.find({"category_id": cat["id"]}, {"_id": 0}).sort("order_index", 1).to_list(100)
             for sub in subcategories:
-                items = await db.items.find({"subcategory_id": sub["id"]}, {"_id": 0}).to_list(500)
+                items = await db.items.find({"subcategory_id": sub["id"]}, {"_id": 0}).sort("order_index", 1).to_list(500)
                 # STRIP PRICING from items
                 for item in items:
                     item.pop("cost", None)
@@ -19457,7 +19460,10 @@ async def get_builder_portal_public(access_code: str):
             "client_info": {
                 "address": project.get("client_info", {}).get("address", ""),
                 "full_name": project.get("client_info", {}).get("full_name", ""),
-            }
+            },
+            # Pass floor_order so the Builder Portal can render rooms in the
+            # SAME order the admin Checklist uses (drag-to-reorder is honored).
+            "floor_order": project.get("floor_order", []),
         },
         "rooms": rooms,
         "photos": photos,

@@ -298,7 +298,7 @@ export default function BuilderPortal() {
 
         {/* ===== ROOM PHOTOS - PER ROOM WITH CAMERA ===== */}
         {activeTab === 'photos' && (
-          <RoomPhotosSection rooms={rooms} photos={photos} projectId={portal.project_id} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} />
+          <RoomPhotosSection rooms={rooms} photos={photos} projectId={portal.project_id} accessCode={accessCode} t={t} lang={lang} onReload={loadPortal} floorOrder={project?.floor_order || []} />
         )}
 
         {/* ===== TO-DO LIST (SYNCED) ===== */}
@@ -907,7 +907,7 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
 }
 
 // ===== ROOM PHOTOS SECTION - PER ROOM WITH CAMERA =====
-function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload }) {
+function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onReload, floorOrder = [] }) {
   const [uploading, setUploading] = useState(false);
   const [lightbox, setLightbox] = useState(null);
 
@@ -938,16 +938,18 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
     input.click();
   };
 
-  // Sort rooms by floor then order_index then name to match FFE order exactly
-  const FLOOR_ORDER = ['Basement', '1st Floor', '2nd Floor', '3rd Floor', '4th Floor', '5th Floor'];
+  // Sort rooms in the EXACT same order the admin Checklist/FFE uses:
+  //   1) Floors in `project.floor_order` (user's drag-to-reorder choice)
+  //   2) Within each floor, by `order_index` ascending
+  // Falls back to insertion order for any floor not in floor_order.
+  const projectFloorOrder = [...(floorOrder || [])];
+  const seenFloors = new Set(projectFloorOrder);
+  rooms.forEach(r => { const f = r.floor || '1ST FLOOR'; if (!seenFloors.has(f)) { projectFloorOrder.push(f); seenFloors.add(f); } });
   const sortedRooms = [...rooms].sort((a, b) => {
-    const fa = FLOOR_ORDER.indexOf(a.floor || '1st Floor');
-    const fb = FLOOR_ORDER.indexOf(b.floor || '1st Floor');
+    const fa = projectFloorOrder.indexOf(a.floor || '1ST FLOOR');
+    const fb = projectFloorOrder.indexOf(b.floor || '1ST FLOOR');
     if (fa !== fb) return fa - fb;
-    const oa = a.order_index ?? 999;
-    const ob = b.order_index ?? 999;
-    if (oa !== ob) return oa - ob;
-    return (a.name || '').localeCompare(b.name || '');
+    return (a.order_index ?? 999) - (b.order_index ?? 999);
   });
 
   return (
