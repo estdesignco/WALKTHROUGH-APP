@@ -64,12 +64,11 @@ App Password: `DesignReady2026!`
 - Fix: `frontend/public/index.html` — extended the whitelist to include `/builder` and `/test-questionnaire` so any public builder/customer link is preserved on mobile.
 - Verified: iPhone UA + viewport on `/builder/7FQKGDCS` stays on the route; renders BuilderPortal header, tabs, and FF&E Schedule with NO leakage of "Cost / Price / Budget / Wholesale / Markup / Margin" terms.
 
-### Color Parity Fix — Builder Portal renders identical to Checklist (May 5/6, 2026)
-- Bug: Builder Portal Photos used flat solid `room.color` (no gradient/shadow) so neon palette colors looked unreadable.
-- Fix: Centralized `getMutedRoomHeaderStyle(roomColor)` in `frontend/src/utils/roomColors.js` that mirrors the EXACT recipe from `ExactChecklistSpreadsheet.js` line 2374-2376 (135° gradient + inset white-glow + heavy inset black shadow + textShadow).
-- Applied to: `BuilderPortal.js` Photos rows, `BuilderPortalManager.js` admin photo room headers + room toggle buttons.
-- Color source: same chain as Checklist — `room.color || getRoomColor(room.name)` — so Diehl Lakehouse Kitchen renders with `#FF00FE` from the DB on BOTH Checklist and Builder Portal Photos. Identical input + identical recipe = identical pixel output.
-- FFE was NOT touched.
+### Builder Portal FFE + Photos color parity (May 5/6, 2026)
+- Bug: `FFEView.js` (Builder Portal-only FFE component, separate from admin `ExactFFESpreadsheet.js`) rendered room headers with flat `backgroundColor: room.color` — bright neon magenta/red on Wheeler Ridge. Admin FFE's `ExactFFESpreadsheet.js` already uses the muted gradient + heavy inner-shadow recipe.
+- Fix: Centralized `getMutedRoomHeaderStyle(roomColor)` in `frontend/src/utils/roomColors.js` (mirrors the admin recipe exactly). Applied to `FFEView.js` room header rows + add-room column, `BuilderPortal.js` Photos rows, and `BuilderPortalManager.js` (admin Builder Portal tab).
+- Color source unchanged: `room.color || getRoomColor(room.name)` — exact same chain as Checklist/admin FFE. Same DB value + same recipe = identical render.
+- Admin FFE (`ExactFFESpreadsheet.js`) NOT touched.
 
 ## Remaining / Backlog
 ### P1

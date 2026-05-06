@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import AddItemModal from './AddItemModal';
 import AdvancedFFEFeatures from './AdvancedFFEFeatures';
 import ScopeReferenceBadge from './ScopeReferenceBadge';
+import { getMutedRoomHeaderStyle } from '../utils/roomColors';
 
 const ExactFFESpreadsheet = ({ 
   project, 
@@ -936,7 +937,7 @@ const ExactFFESpreadsheet = ({
                                 <tr>
                                   <td colSpan="12" 
                                       className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold"
-                                      style={{ backgroundColor: room.color || getRoomColor(room.name, globalIndex) }}>
+                                      style={getMutedRoomHeaderStyle(room.color || getRoomColor(room.name, globalIndex))}>
                                     <div className="flex justify-between items-center">
                                       <div className="flex items-center gap-2">
                                         <button
@@ -993,7 +994,7 @@ const ExactFFESpreadsheet = ({
                                     </div>
                                   </td>
                                   <td className="border border-[#D4A574] px-2 py-2 text-center"
-                                      style={{ backgroundColor: room.color || getRoomColor(room.name, globalIndex) }}>
+                                      style={getMutedRoomHeaderStyle(room.color || getRoomColor(room.name, globalIndex))}>
                                     <button
                                       onClick={() => handleAddRoom()}
                                       className="text-green-300 hover:text-green-100 text-sm font-bold"
