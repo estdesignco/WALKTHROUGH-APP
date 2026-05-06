@@ -136,6 +136,54 @@ export default function BuilderPortalManager({ project, onReload }) {
     }
   };
 
+  // Add a brand new room to this project directly from the Builder Portal manager.
+  // Creates a checklist+FFE pair (matching the admin "ADD ROOM" flow) so it shows
+  // up everywhere, then auto-selects it for the builder.
+  const handleAddRoomFromBuilder = async () => {
+    const name = (window.prompt('New room name (e.g. "Wine Cellar"):') || '').trim();
+    if (!name) return;
+    const floor = (window.prompt('Which floor? (e.g. "1ST FLOOR", "2ND FLOOR", "BASEMENT")', '1ST FLOOR') || '1ST FLOOR').trim();
+    try {
+      // Create the room across all sheet types so it appears in Walkthrough,
+      // Checklist, FFE, and the Builder Portal (matching admin add-room behavior).
+      const sheetTypes = ['walkthrough', 'checklist', 'ffe'];
+      const created = [];
+      for (const sheet_type of sheetTypes) {
+        const res = await fetch(`${API_URL}/api/rooms`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            project_id: project.id,
+            sheet_type,
+            floor,
+            order_index: (project?.rooms?.length || 0),
+            auto_populate: true,
+          }),
+        });
+        if (res.ok) {
+          const room = await res.json();
+          created.push(room);
+        }
+      }
+      if (!created.length) {
+        alert('Failed to create the room. Check console.');
+        return;
+      }
+      // Select the newly-created room IDs for the builder, then save + reload.
+      const newIds = created.map(r => r.id);
+      const nextSelected = new Set([...Array.from(selectedRooms), ...newIds]);
+      setSelectedRooms(nextSelected);
+      if (portal) {
+        await updatePortal({ selected_room_ids: Array.from(nextSelected) });
+      }
+      if (onReload) await onReload();
+    } catch (err) {
+      console.error('Add room failed:', err);
+      alert(`Could not add room: ${err.message}`);
+    }
+  };
+
   const saveScope = async () => {
     await updatePortal({ scope_document: scopeDocument });
     setScopeSaved(true);
@@ -203,9 +251,19 @@ export default function BuilderPortalManager({ project, onReload }) {
       <div className="p-4 rounded-lg bg-[#1a1f2e] border border-[#2a3040]">
         <div className="flex justify-between items-center mb-3">
           <h3 className="text-[#D4A574] font-bold text-sm tracking-wider">SELECT ROOMS FOR BUILDER</h3>
-          {portal && (
-            <button onClick={saveRoomSelection} className="px-3 py-1 rounded text-xs font-bold bg-[#D4A574] text-black">SAVE SELECTION</button>
-          )}
+          <div className="flex gap-2">
+            <button
+              onClick={handleAddRoomFromBuilder}
+              className="px-3 py-1 rounded text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
+              data-testid="builder-add-room-btn"
+              title="Add a new room to this project"
+            >
+              + ADD ROOM
+            </button>
+            {portal && (
+              <button onClick={saveRoomSelection} className="px-3 py-1 rounded text-xs font-bold bg-[#D4A574] text-black">SAVE SELECTION</button>
+            )}
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {rooms.map(room => (
