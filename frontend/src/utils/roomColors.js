@@ -17,6 +17,85 @@ export const DISTINCT_ROOM_COLORS = [
   '#28FEFF', '#FF2893', '#9328FF', '#FF9328', '#28FF93', '#28FF28', '#2893FF', '#2828FF',
 ];
 
+// =============================================================================
+// MUTED ROOM_COLORS (mirrors backend/server.py ROOM_COLORS line 260-295 EXACTLY)
+// THIS is the source of truth for room banner colors across the entire app.
+// "Kitchen" must look the same muted green on every page of every project.
+// Keys are lowercased, trimmed; right-hand side values come straight from the
+// backend dict. Any new entry MUST be added on both sides.
+// =============================================================================
+export const ROOM_COLORS = {
+  'living room': '#7A5A8A',
+  'kitchen': '#5A7A5A',
+  'master bedroom': '#8A5A7A',
+  'bedroom 2': '#7A6A5A',
+  'bedroom 3': '#5A6A8A',
+  'bathroom': '#6A8A5A',
+  'master bathroom': '#8A6A5A',
+  'primary bathroom': '#6A5A8A',
+  'powder room': '#5A8A6A',
+  'dining room': '#8A7A5A',
+  'office': '#5A5A8A',
+  'home office': '#5A5A8A',
+  'family room': '#7A5A6A',
+  'basement': '#6A6A5A',
+  'laundry room': '#5A7A6A',
+  'mudroom': '#7A6A6A',
+  'pantry': '#6A5A6A',
+  'closet': '#5A6A7A',
+  'primary closet': '#5A6A7A',
+  'walk-in closet': '#8A6A7A',
+  'guest room': '#8A5A6A',
+  'guest bedroom': '#8A5A6A',
+  'playroom': '#6A7A5A',
+  'library': '#5A8A7A',
+  'wine cellar': '#9A6A8A',
+  'garage': '#8A7A6A',
+  'patio': '#6A8A7A',
+  'deck': '#7A8A6A',
+  'screened porch': '#8A7A6A',
+  'home gym': '#6A7A8A',
+  'foyer': '#9A7A5A',
+  'pool area': '#5A9A7A',
+  'primary bedroom': '#8A5A7A',
+  'primary sitting area': '#7A5A6A',
+  'sitting area': '#7A5A6A',
+  'guest bathroom': '#6A8A5A',
+  'jack and jill bathroom': '#6A8A5A',
+  'jack and jill': '#6A8A5A',
+  'bunk room': '#7A6A5A',
+  'home theater': '#5A8A7A',
+  'media room': '#5A8A7A',
+  'bar area': '#9A6A8A',
+  'breakfast nook': '#8A7A5A',
+  'scullery': '#6A5A6A',
+  'ladies den': '#7A5A6A',
+  'man cave': '#5A5A8A',
+  'tv room': '#7A5A8A',
+  'music room': '#7A5A8A',
+  'landing': '#7A6A6A',
+  'outdoor kitchen': '#6A8A7A',
+  'back porch': '#7A8A6A',
+};
+
+// Default fallback when a room name isn't in the dict above.
+const DEFAULT_MUTED_FALLBACK = '#7A5A8A';
+
+/**
+ * THE canonical room → muted color lookup.
+ * Always returns the muted color from ROOM_COLORS dict by lowercased name.
+ * Falls back to DEFAULT_MUTED_FALLBACK if the name isn't recognized.
+ *
+ * Use THIS in every room banner — Builder Portal, Photos, Manager, etc.
+ * It ignores any bright DB-stored room.color and guarantees "Kitchen" looks
+ * the same muted green on every page of every project.
+ */
+export const getMutedRoomColor = (roomName) => {
+  if (!roomName) return DEFAULT_MUTED_FALLBACK;
+  const key = String(roomName).toLowerCase().trim();
+  return ROOM_COLORS[key] || DEFAULT_MUTED_FALLBACK;
+};
+
 /**
  * Get a unique, DETERMINISTIC color for a room based on its NAME.
  * Same name → same color, every page, every project, forever.

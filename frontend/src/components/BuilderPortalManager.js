@@ -3,7 +3,7 @@ import RichTextEditor from './RichTextEditor';
 import ScopeDocumentEditor from './ScopeDocumentEditor';
 import { invalidateScopeRefs } from './ScopeReferenceBadge';
 import FileLightbox from './FileLightbox';
-import { getRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
+import { getRoomColor, getMutedRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -214,7 +214,7 @@ export default function BuilderPortalManager({ project, onReload }) {
               onClick={() => toggleRoom(room.id)}
               className="px-3 py-2 rounded text-sm font-bold transition-all"
               style={{
-                background: selectedRooms.has(room.id) ? room.color || '#D4A574' : '#2a3040',
+                background: selectedRooms.has(room.id) ? getMutedRoomColor(room.name) : '#2a3040',
                 color: selectedRooms.has(room.id) ? '#fff' : '#6B7280',
                 border: selectedRooms.has(room.id) ? '2px solid #fff' : '2px solid #374151',
               }}
@@ -623,8 +623,8 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
           return sortedRooms.map(room => {
           const roomPhotos = photosByRoom[room.id] || [];
           const isOpen = activeRoomId === room.id;
-          // Canonical color (DB → name-hash fallback) so colors match FFE on every page
-          const roomColor = room.color || getRoomColor(room.name);
+          // Canonical muted color (mirrors backend ROOM_COLORS dict by name)
+          const roomColor = getMutedRoomColor(room.name);
           return (
             <div key={room.id} className="mb-2 overflow-hidden" style={{ border: '1px solid #D4A574' }} data-testid={`admin-room-photos-${room.id}`}>
               {/* Header styled like Checklist/FFE — muted gradient, cream text, gold border */}

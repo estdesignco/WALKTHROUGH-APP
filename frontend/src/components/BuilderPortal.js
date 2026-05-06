@@ -4,7 +4,7 @@ import ExactFFESpreadsheet from './FFEView';
 import RichTextEditor from './RichTextEditor';
 import { parseScopeDocument } from './ScopeDocumentEditor';
 import FileLightbox from './FileLightbox';
-import { getRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
+import { getRoomColor, getMutedRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -436,7 +436,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
     (r.categories || []).forEach(c => {
       (c.subcategories || []).forEach(sub => {
         (sub.items || []).forEach(item => {
-          itemsById[item.id] = { ...item, _room: r.name, _roomColor: r.color };
+          itemsById[item.id] = { ...item, _room: r.name, _roomColor: getMutedRoomColor(r.name) };
         });
       });
     });
@@ -954,9 +954,10 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
     <div>
       <h2 style={sectionTitle}>{lang === 'en' ? 'Room Photos' : 'Fotos por Habitación'}</h2>
       {sortedRooms.map(room => {
-        // CANONICAL color: room.color from DB → fallback to deterministic name-hash
-        // (same fn used by FFE / Checklist / Walkthrough so Living Room is the same color everywhere).
-        const roomColor = room.color || getRoomColor(room.name);
+        // CANONICAL muted color — pulled from ROOM_COLORS dict by name (mirrors
+        // backend/server.py). Same Kitchen → same muted green everywhere, ignoring
+        // any bright DB-stored room.color the project may have been seeded with.
+        const roomColor = getMutedRoomColor(room.name);
         return (
         <div key={room.id} style={{ marginBottom: 24 }}>
           {/* Header — styled like FFE / Checklist (muted gradient) */}
