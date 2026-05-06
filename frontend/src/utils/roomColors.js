@@ -18,19 +18,31 @@ export const DISTINCT_ROOM_COLORS = [
 ];
 
 /**
- * Get a unique color for a room based on its index
+ * Get a unique, DETERMINISTIC color for a room based on its NAME.
+ * Same name → same color, every page, every project, forever.
+ * The optional roomIndex is ignored unless roomName is missing.
+ *
+ * IMPORTANT: callers should preferably pass `room.color` (from DB) first
+ * and ONLY use this as a fallback. This function exists so that if a room
+ * has no DB color, "Living Room" still gets the same color on every page
+ * (FFE, Checklist, Photos, Walkthrough, Builder Portal).
  */
 export const getRoomColor = (roomName, roomIndex = 0) => {
+  // ALWAYS hash by name first when name is provided so the color is
+  // consistent across every page that shows this room.
+  if (roomName) {
+    let hash = 0;
+    const str = String(roomName).toLowerCase().trim();
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return DISTINCT_ROOM_COLORS[Math.abs(hash) % DISTINCT_ROOM_COLORS.length];
+  }
+  // Final fallback: by index (only when name is empty)
   if (typeof roomIndex === 'number' && roomIndex >= 0) {
     return DISTINCT_ROOM_COLORS[roomIndex % DISTINCT_ROOM_COLORS.length];
   }
-  if (!roomName) return DISTINCT_ROOM_COLORS[0];
-  let hash = 0;
-  const str = String(roomName).toLowerCase().trim();
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return DISTINCT_ROOM_COLORS[Math.abs(hash) % DISTINCT_ROOM_COLORS.length];
+  return DISTINCT_ROOM_COLORS[0];
 };
 
 /**

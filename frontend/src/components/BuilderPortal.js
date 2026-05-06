@@ -4,6 +4,7 @@ import ExactFFESpreadsheet from './FFEView';
 import RichTextEditor from './RichTextEditor';
 import { parseScopeDocument } from './ScopeDocumentEditor';
 import FileLightbox from './FileLightbox';
+import { getRoomColor } from '../utils/roomColors';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -153,19 +154,39 @@ export default function BuilderPortal() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0f1218', color: '#F5F5DC' }}>
+      {/* Global mobile-responsive styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .bp-header { padding: 14px 16px !important; }
+          .bp-header-inner { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .bp-header-title { font-size: 20px !important; }
+          .bp-header-right { width: 100% !important; justify-content: space-between !important; gap: 8px !important; }
+          .bp-header-firm-block { text-align: left !important; }
+          .bp-tab-btn { padding: 10px 12px !important; font-size: 11px !important; }
+          .bp-main { padding: 14px 10px !important; }
+          .bp-welcome { padding: 18px 16px !important; }
+          .bp-welcome h2 { font-size: 20px !important; }
+          .bp-welcome p { font-size: 13px !important; }
+          .bp-stats-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+          .bp-section-title { font-size: 18px !important; }
+          /* Make wide FFE table horizontally scrollable on phones */
+          .bp-ffe-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        }
+      `}</style>
+
       {/* HEADER */}
-      <header style={{ background: 'linear-gradient(135deg, #1a1f2e 0%, #0f1218 100%)', borderBottom: '3px solid #D4A574', padding: '20px 32px' }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <header className="bp-header" style={{ background: 'linear-gradient(135deg, #1a1f2e 0%, #0f1218 100%)', borderBottom: '3px solid #D4A574', padding: '20px 32px' }}>
+        <div className="bp-header-inner" style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <p style={{ color: '#D4A574', fontSize: 11, letterSpacing: 4, fontWeight: 700, marginBottom: 4 }}>{t.builderPortal}</p>
-            <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: 0 }}>{project.name}</h1>
+            <h1 className="bp-header-title" style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: 0 }}>{project.name}</h1>
             <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>{project.client_info?.address}</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div className="bp-header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <button onClick={toggleLang} style={{ background: '#2a3040', border: '1px solid #D4A574', padding: '6px 14px', borderRadius: 6, color: '#D4A574', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
               {t.switchLang}
             </button>
-            <div style={{ textAlign: 'right' }}>
+            <div className="bp-header-firm-block" style={{ textAlign: 'right' }}>
               <p style={{ color: '#D4A574', fontSize: 12, fontWeight: 700 }}>ESTABLISHED DESIGN CO.</p>
               <p style={{ color: '#6B7280', fontSize: 11 }}>{project.client_info?.full_name}</p>
             </div>
@@ -174,10 +195,11 @@ export default function BuilderPortal() {
       </header>
 
       {/* TABS */}
-      <nav style={{ background: '#1a1f2e', borderBottom: '1px solid #2a3040', overflowX: 'auto' }}>
+      <nav style={{ background: '#1a1f2e', borderBottom: '1px solid #2a3040', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex' }}>
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className="bp-tab-btn"
               style={{ padding: '12px 16px', color: activeTab === tab.id ? '#D4A574' : '#6B7280', fontWeight: activeTab === tab.id ? 700 : 500, fontSize: 12, background: 'none', border: 'none', borderBottom: activeTab === tab.id ? '3px solid #D4A574' : '3px solid transparent', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               {tab.label}
             </button>
@@ -185,7 +207,7 @@ export default function BuilderPortal() {
         </div>
       </nav>
 
-      <main style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 16px' }}>
+      <main className="bp-main" style={{ maxWidth: 1400, margin: '0 auto', padding: '24px 16px' }}>
 
         {/* ===== DASHBOARD - IMPRESSIVE FIRST PAGE ===== */}
         {activeTab === 'dashboard' && (
@@ -255,16 +277,18 @@ export default function BuilderPortal() {
 
         {/* ===== FFE (READ ONLY) ===== */}
         {activeTab === 'ffe' && (
-          <ExactFFESpreadsheet
-            project={builderProject}
-            roomColors={roomColors}
-            categoryColors={categoryColors}
-            itemStatuses={FFE_ITEM_STATUSES}
-            vendorTypes={FFE_VENDOR_TYPES}
-            carrierTypes={FFE_CARRIER_TYPES}
-            onReload={loadPortal}
-            builderMode={true}
-          />
+          <div className="bp-ffe-wrap">
+            <ExactFFESpreadsheet
+              project={builderProject}
+              roomColors={roomColors}
+              categoryColors={categoryColors}
+              itemStatuses={FFE_ITEM_STATUSES}
+              vendorTypes={FFE_VENDOR_TYPES}
+              carrierTypes={FFE_CARRIER_TYPES}
+              onReload={loadPortal}
+              builderMode={true}
+            />
+          </div>
         )}
 
         {/* ===== GENERAL UPLOADS - DEDICATED PLACE ===== */}
@@ -289,16 +313,18 @@ export default function BuilderPortal() {
 
         {/* ===== ROOM FINISHES ===== */}
         {activeTab === 'finishes' && (
-          <ExactFFESpreadsheet
-            project={builderProject}
-            roomColors={roomColors}
-            categoryColors={categoryColors}
-            itemStatuses={FFE_ITEM_STATUSES}
-            vendorTypes={FFE_VENDOR_TYPES}
-            carrierTypes={FFE_CARRIER_TYPES}
-            onReload={loadPortal}
-            builderMode={true}
-          />
+          <div className="bp-ffe-wrap">
+            <ExactFFESpreadsheet
+              project={builderProject}
+              roomColors={roomColors}
+              categoryColors={categoryColors}
+              itemStatuses={FFE_ITEM_STATUSES}
+              vendorTypes={FFE_VENDOR_TYPES}
+              carrierTypes={FFE_CARRIER_TYPES}
+              onReload={loadPortal}
+              builderMode={true}
+            />
+          </div>
         )}
 
         {/* ===== CHANGE ORDERS ===== */}
@@ -927,21 +953,27 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
   return (
     <div>
       <h2 style={sectionTitle}>{lang === 'en' ? 'Room Photos' : 'Fotos por Habitación'}</h2>
-      {sortedRooms.map(room => (
+      {sortedRooms.map(room => {
+        // CANONICAL color: room.color from DB → fallback to deterministic name-hash
+        // (same fn used by FFE / Checklist / Walkthrough so Living Room is the same color everywhere).
+        const roomColor = room.color || getRoomColor(room.name);
+        return (
         <div key={room.id} style={{ marginBottom: 24 }}>
-          {/* Header — styled like FFE: thinner bar, cream-colored text on full color, gold border */}
+          {/* Header — styled like FFE */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 8,
-            background: room.color || '#2a3040',
+            background: roomColor,
             padding: '6px 12px',
             border: '1px solid #D4A574',
             borderRadius: 0,
+            flexWrap: 'wrap',
+            gap: 8,
           }}>
             <h3 style={{ color: '#D4C5A9', fontSize: 14, fontWeight: 700, letterSpacing: 1 }}>{room.name.toUpperCase()}</h3>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <button onClick={() => handleCamera(room.id)} style={{ background: '#D4A574', color: '#1a1f2e', padding: '6px 12px', borderRadius: 6, fontWeight: 700, fontSize: 11, cursor: 'pointer', border: 'none' }}>
                 📷 {lang === 'en' ? 'Camera' : 'Cámara'}
               </button>
@@ -975,7 +1007,8 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
             <p style={{ color: '#6B7280', fontSize: 13, padding: '0 8px' }}>{lang === 'en' ? 'No photos yet' : 'Sin fotos'}</p>
           )}
         </div>
-      ))}
+        );
+      })}
       {lightbox && <FileLightbox files={lightbox.files} startIndex={lightbox.index} onClose={() => setLightbox(null)} />}
     </div>
   );

@@ -3,6 +3,7 @@ import RichTextEditor from './RichTextEditor';
 import ScopeDocumentEditor from './ScopeDocumentEditor';
 import { invalidateScopeRefs } from './ScopeReferenceBadge';
 import FileLightbox from './FileLightbox';
+import { getRoomColor } from '../utils/roomColors';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -622,13 +623,15 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
           return sortedRooms.map(room => {
           const roomPhotos = photosByRoom[room.id] || [];
           const isOpen = activeRoomId === room.id;
+          // Canonical color (DB → name-hash fallback) so colors match FFE on every page
+          const roomColor = room.color || getRoomColor(room.name);
           return (
             <div key={room.id} className="mb-2 overflow-hidden" style={{ border: '1px solid #D4A574' }} data-testid={`admin-room-photos-${room.id}`}>
               {/* Header styled like FFE — full room color, cream text, gold border */}
               <div
                 onClick={() => setActiveRoomId(isOpen ? null : room.id)}
                 className="flex justify-between items-center px-3 py-1.5 cursor-pointer hover:opacity-90"
-                style={{ background: room.color || '#374151' }}
+                style={{ background: roomColor }}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-[#D4C5A9]" style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1 }}>{room.name.toUpperCase()}</span>
