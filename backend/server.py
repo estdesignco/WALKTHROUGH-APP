@@ -19838,11 +19838,109 @@ async def upsert_company_profile(access_code: str, payload: CompanyProfile):
 
 # ----------------- Pre-made Snippets library -----------------
 
+# Default snippets seeded for every new builder/trade portal — lifted from the
+# Steve Cseplo construction proposal template so users start with a curated
+# library of common construction line items they can drag into any quote.
+DEFAULT_PROPOSAL_SNIPPETS = [
+    # ---------- DEMO ----------
+    {"name": "Demo - Dumpster (per haul)", "default_quantity": 1, "default_unit": "EA", "default_cost": 650, "default_markup_percent": 15, "category_hint": "Demo"},
+    {"name": "Demo - Tile Floor (labor)", "default_quantity": 100, "default_unit": "SF", "default_cost": 4.5, "default_markup_percent": 20, "category_hint": "Demo"},
+    {"name": "Demo - Tile Walls (labor)", "default_quantity": 100, "default_unit": "SF", "default_cost": 5.5, "default_markup_percent": 20, "category_hint": "Demo"},
+    {"name": "Demo - Drywall (labor)", "default_quantity": 100, "default_unit": "SF", "default_cost": 2.5, "default_markup_percent": 20, "category_hint": "Demo"},
+    {"name": "Demo - Cabinets (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 850, "default_markup_percent": 20, "category_hint": "Demo"},
+    {"name": "Demo - Flooring Wood (labor)", "default_quantity": 100, "default_unit": "SF", "default_cost": 3.5, "default_markup_percent": 20, "category_hint": "Demo"},
+    {"name": "Demo - Trim/Casing (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 350, "default_markup_percent": 20, "category_hint": "Demo"},
+    # ---------- PROTECTION ----------
+    {"name": "Site Protection - Floor (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 450, "default_markup_percent": 15, "category_hint": "Protection"},
+    {"name": "Site Protection - Materials (Ram-Board, plastic)", "default_quantity": 1, "default_unit": "LS", "default_cost": 175, "default_markup_percent": 15, "category_hint": "Protection"},
+    # ---------- FRAMING ----------
+    {"name": "Framing - Lumber + materials", "default_quantity": 1, "default_unit": "LS", "default_cost": 1200, "default_markup_percent": 15, "category_hint": "Framing"},
+    {"name": "Framing - Labor", "default_quantity": 1, "default_unit": "LS", "default_cost": 2400, "default_markup_percent": 20, "category_hint": "Framing"},
+    # ---------- DRYWALL ----------
+    {"name": "Drywall - Sheet rock + materials", "default_quantity": 1, "default_unit": "LS", "default_cost": 850, "default_markup_percent": 15, "category_hint": "Drywall"},
+    {"name": "Drywall - Hang & Tape (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 1850, "default_markup_percent": 20, "category_hint": "Drywall"},
+    {"name": "Drywall - Patch & Finish", "default_quantity": 1, "default_unit": "LS", "default_cost": 425, "default_markup_percent": 20, "category_hint": "Drywall"},
+    # ---------- TRIM / CARPENTRY ----------
+    {"name": "Trim Carpenter - Base/Casing (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 1250, "default_markup_percent": 20, "category_hint": "Trim"},
+    {"name": "Trim Carpenter - Crown Moulding (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 850, "default_markup_percent": 20, "category_hint": "Trim"},
+    {"name": "Trim Materials - Base/Casing", "default_quantity": 1, "default_unit": "LS", "default_cost": 525, "default_markup_percent": 15, "category_hint": "Trim"},
+    {"name": "Door - Interior - Slab + Hardware", "default_quantity": 1, "default_unit": "EA", "default_cost": 285, "default_markup_percent": 15, "category_hint": "Doors"},
+    {"name": "Door - Install (labor)", "default_quantity": 1, "default_unit": "EA", "default_cost": 175, "default_markup_percent": 20, "category_hint": "Doors"},
+    # ---------- TILE ----------
+    {"name": "Tile - Floor Install (labor, per SF)", "default_quantity": 100, "default_unit": "SF", "default_cost": 9.5, "default_markup_percent": 20, "category_hint": "Tile"},
+    {"name": "Tile - Wall Install (labor, per SF)", "default_quantity": 100, "default_unit": "SF", "default_cost": 12.5, "default_markup_percent": 20, "category_hint": "Tile"},
+    {"name": "Tile - Shower Pan Install", "default_quantity": 1, "default_unit": "EA", "default_cost": 850, "default_markup_percent": 20, "category_hint": "Tile"},
+    {"name": "Tile - Schluter / Trim Materials", "default_quantity": 1, "default_unit": "LS", "default_cost": 285, "default_markup_percent": 15, "category_hint": "Tile"},
+    {"name": "Tile - Thinset + Grout + Setting Materials", "default_quantity": 1, "default_unit": "LS", "default_cost": 195, "default_markup_percent": 15, "category_hint": "Tile"},
+    # ---------- FLOORING ----------
+    {"name": "Hardwood Floor Install (labor, per SF)", "default_quantity": 100, "default_unit": "SF", "default_cost": 6.5, "default_markup_percent": 20, "category_hint": "Flooring"},
+    {"name": "Hardwood Floor - Sand & Refinish", "default_quantity": 100, "default_unit": "SF", "default_cost": 4.25, "default_markup_percent": 20, "category_hint": "Flooring"},
+    {"name": "LVP / Vinyl Plank Install", "default_quantity": 100, "default_unit": "SF", "default_cost": 3.5, "default_markup_percent": 20, "category_hint": "Flooring"},
+    # ---------- PLUMBING ----------
+    {"name": "Plumbing - Rough-in Toilet", "default_quantity": 1, "default_unit": "EA", "default_cost": 425, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Set Toilet (labor)", "default_quantity": 1, "default_unit": "EA", "default_cost": 175, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Rough-in Sink", "default_quantity": 1, "default_unit": "EA", "default_cost": 425, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Set Sink + Faucet (labor)", "default_quantity": 1, "default_unit": "EA", "default_cost": 285, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Rough-in Shower", "default_quantity": 1, "default_unit": "EA", "default_cost": 950, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Set Shower Trim (labor)", "default_quantity": 1, "default_unit": "EA", "default_cost": 350, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Rough-in Tub", "default_quantity": 1, "default_unit": "EA", "default_cost": 850, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Set Tub (labor)", "default_quantity": 1, "default_unit": "EA", "default_cost": 425, "default_markup_percent": 20, "category_hint": "Plumbing"},
+    {"name": "Plumbing - Materials (PEX, fittings, valves)", "default_quantity": 1, "default_unit": "LS", "default_cost": 425, "default_markup_percent": 15, "category_hint": "Plumbing"},
+    # ---------- ELECTRICAL ----------
+    {"name": "Electrical - Outlet Rough-in + Trim", "default_quantity": 1, "default_unit": "EA", "default_cost": 145, "default_markup_percent": 20, "category_hint": "Electrical"},
+    {"name": "Electrical - Switch Rough-in + Trim", "default_quantity": 1, "default_unit": "EA", "default_cost": 145, "default_markup_percent": 20, "category_hint": "Electrical"},
+    {"name": "Electrical - Recessed Can Light (incl. fixture)", "default_quantity": 1, "default_unit": "EA", "default_cost": 195, "default_markup_percent": 20, "category_hint": "Electrical"},
+    {"name": "Electrical - Sconce / Pendant Install (labor only)", "default_quantity": 1, "default_unit": "EA", "default_cost": 95, "default_markup_percent": 20, "category_hint": "Electrical"},
+    {"name": "Electrical - 220V Circuit (dryer/range)", "default_quantity": 1, "default_unit": "EA", "default_cost": 525, "default_markup_percent": 20, "category_hint": "Electrical"},
+    {"name": "Electrical - Panel Sub-feed", "default_quantity": 1, "default_unit": "LS", "default_cost": 1850, "default_markup_percent": 20, "category_hint": "Electrical"},
+    # ---------- HVAC ----------
+    {"name": "HVAC - Relocate Supply", "default_quantity": 1, "default_unit": "EA", "default_cost": 425, "default_markup_percent": 20, "category_hint": "HVAC"},
+    {"name": "HVAC - Relocate Return", "default_quantity": 1, "default_unit": "EA", "default_cost": 425, "default_markup_percent": 20, "category_hint": "HVAC"},
+    {"name": "HVAC - Mini-Split Install", "default_quantity": 1, "default_unit": "EA", "default_cost": 4250, "default_markup_percent": 18, "category_hint": "HVAC"},
+    # ---------- PAINT ----------
+    {"name": "Paint - Walls (labor + paint, per SF)", "default_quantity": 100, "default_unit": "SF", "default_cost": 1.85, "default_markup_percent": 20, "category_hint": "Paint"},
+    {"name": "Paint - Ceiling (labor + paint)", "default_quantity": 100, "default_unit": "SF", "default_cost": 1.65, "default_markup_percent": 20, "category_hint": "Paint"},
+    {"name": "Paint - Trim/Doors (labor + paint)", "default_quantity": 1, "default_unit": "LS", "default_cost": 750, "default_markup_percent": 20, "category_hint": "Paint"},
+    # ---------- CABINETS / COUNTERS ----------
+    {"name": "Cabinets - Install Base + Wall (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 1850, "default_markup_percent": 20, "category_hint": "Cabinets"},
+    {"name": "Cabinets - Hardware Install", "default_quantity": 1, "default_unit": "LS", "default_cost": 285, "default_markup_percent": 20, "category_hint": "Cabinets"},
+    {"name": "Counters - Template + Fab + Install (Quartz, per SF)", "default_quantity": 30, "default_unit": "SF", "default_cost": 95, "default_markup_percent": 18, "category_hint": "Counters"},
+    {"name": "Counters - Sink Cutout / Polish", "default_quantity": 1, "default_unit": "EA", "default_cost": 195, "default_markup_percent": 18, "category_hint": "Counters"},
+    # ---------- ADMIN / FEES ----------
+    {"name": "Permit Fees", "default_quantity": 1, "default_unit": "LS", "default_cost": 450, "default_markup_percent": 0, "category_hint": "Admin"},
+    {"name": "Project Management Fee", "default_quantity": 1, "default_unit": "LS", "default_cost": 0, "default_markup_percent": 0, "category_hint": "Admin", "notes": "Or use the PM Fee % at the bottom totals row instead"},
+    {"name": "Cleanup - Final (labor)", "default_quantity": 1, "default_unit": "LS", "default_cost": 425, "default_markup_percent": 15, "category_hint": "Admin"},
+]
+
 @api_router.get("/proposal/snippets")
 async def list_snippets(owner_kind: str, owner_id: str):
     snippets = await db.proposal_snippets.find(
         {"owner_kind": owner_kind, "owner_id": owner_id}, {"_id": 0}
     ).sort("name", 1).to_list(500)
+    # First-time use: auto-seed defaults so the library opens populated.
+    if len(snippets) == 0:
+        seeded = []
+        now = datetime.now(timezone.utc).isoformat()
+        for s in DEFAULT_PROPOSAL_SNIPPETS:
+            doc = {
+                "id": str(uuid.uuid4()),
+                "owner_kind": owner_kind,
+                "owner_id": owner_id,
+                "name": s["name"],
+                "default_quantity": s.get("default_quantity", 1),
+                "default_unit": s.get("default_unit", "EA"),
+                "default_cost": s.get("default_cost", 0),
+                "default_markup_percent": s.get("default_markup_percent", 0),
+                "category_hint": s.get("category_hint", ""),
+                "notes": s.get("notes", ""),
+                "created_at": now,
+            }
+            seeded.append(doc)
+        if seeded:
+            await db.proposal_snippets.insert_many(seeded)
+            for d in seeded:
+                d.pop("_id", None)
+            snippets = seeded
     return snippets
 
 @api_router.post("/proposal/snippets")

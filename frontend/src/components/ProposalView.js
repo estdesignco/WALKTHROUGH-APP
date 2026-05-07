@@ -244,47 +244,46 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       {/* ============ SCOPE TABLE (FFE-styled) ============ */}
       <div style={{ padding: 12 }}>
         <table className="w-full border-collapse" style={{ background: '#000' }}>
-          <thead>
-            <tr>
-              {['#', 'Description', 'Vendor', 'SKU / Notes', 'Qty', 'Unit', 'Cost', 'Markup %', 'Line Total'].map((h, i) => (
-                <th key={i} className="border border-[#D4A574] px-2 py-2 text-[11px] text-[#D4A574] uppercase" style={{ background: '#0f1218' }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
           <tbody>
-            {(data?.rooms || []).map((room, rIdx) => {
+            {(data?.rooms || []).map((room) => {
               const roomColor = room.color || getRoomColor(room.name);
               const roomBanner = getMutedRoomHeaderStyle(roomColor);
               const roomExtras = extrasByParentId[`room:${room.id}`] || [];
               return (
                 <React.Fragment key={room.id}>
+                  {/* ROOM BANNER — once at top of each room (assigned color) */}
+                  <tr>
+                    <td colSpan="9" className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold" style={roomBanner}>
+                      {room.name?.toUpperCase()} {room.floor ? <span style={{ opacity: 0.7, fontSize: 11, marginLeft: 8 }}>· {room.floor}</span> : null}
+                    </td>
+                  </tr>
                   {(room.categories || []).map(cat => {
                     const catExtras = extrasByParentId[`category:${cat.id}`] || [];
                     return (
-                      <React.Fragment key={cat.id}>
-                        {/* CATEGORY BAR (green) */}
-                        <tr>
-                          <td colSpan="9" className="border border-[#D4A574] px-3 py-1.5 text-[#D4C5A9] text-xs font-bold uppercase tracking-wider" style={{ background: '#065F46' }}>
-                            {cat.name}
-                          </td>
-                        </tr>
-                        {/* ROOM BANNER directly under each green category — assigned room color, never deviates */}
-                        <tr>
-                          <td colSpan="9" className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold" style={roomBanner}>
-                            {room.name?.toUpperCase()} {room.floor ? <span style={{ opacity: 0.7, fontSize: 11, marginLeft: 8 }}>· {room.floor}</span> : null}
-                          </td>
-                        </tr>
-                        {(cat.subcategories || []).map(sub => {
-                          const subExtras = extrasByParentId[`subcategory:${sub.id}`] || [];
-                          return (
-                            <React.Fragment key={sub.id}>
-                              {/* SUB-CATEGORY BAR */}
-                              <tr>
-                                <td colSpan="9" className="border border-[#B49B7E] px-3 py-1 text-[#B49B7E] text-[11px] uppercase" style={{ background: '#1a1208' }}>
-                                  {sub.name}
-                                </td>
-                              </tr>
-                              {(sub.items || []).map((item, idx) => {
+                    <React.Fragment key={cat.id}>
+                      {/* CATEGORY BAR (green) */}
+                      <tr>
+                        <td colSpan="9" className="border border-[#D4A574] px-3 py-1.5 text-[#D4C5A9] text-xs font-bold uppercase tracking-wider" style={{ background: '#065F46' }}>
+                          {cat.name}
+                        </td>
+                      </tr>
+                      {/* COLUMN HEADERS — repeated under EVERY green category bar (matches admin Checklist/FFE pattern) */}
+                      <tr>
+                        {['#', 'Description', 'Vendor', 'SKU / Notes', 'Qty', 'Unit', 'Cost', 'Markup %', 'Line Total'].map((h, i) => (
+                          <th key={i} className="border border-[#D4A574] px-2 py-1 text-[10px] text-[#D4A574] uppercase font-semibold" style={{ background: '#1a1208' }}>{h}</th>
+                        ))}
+                      </tr>
+                      {(cat.subcategories || []).map(sub => {
+                        const subExtras = extrasByParentId[`subcategory:${sub.id}`] || [];
+                        return (
+                          <React.Fragment key={sub.id}>
+                            {/* SUB-CATEGORY BAR */}
+                            <tr>
+                              <td colSpan="9" className="border border-[#B49B7E] px-3 py-1 text-[#B49B7E] text-[11px] uppercase" style={{ background: '#0f0a05' }}>
+                                {sub.name}
+                              </td>
+                            </tr>
+                            {(sub.items || []).map((item, idx) => {
                                 const o = overridesByItemId[item.id] || {};
                                 const qty = o.quantity ?? 1;
                                 const unit = o.unit ?? 'EA';
