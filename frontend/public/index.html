@@ -39,6 +39,10 @@
                     if (path.indexOf(PUBLIC_PREFIXES[p]) === 0) return;
                 }
                 var ua = navigator.userAgent;
+                // Windows desktops/laptops (incl. Microsoft Surface 2-in-1s with touchscreens)
+                // must always render the desktop app, even though they report touch + coarse
+                // pointer. Bail early on any Windows UA.
+                if (/Windows/i.test(ua)) return;
                 var isMobile = /iPad|iPhone|iPod|Android|webOS|BlackBerry/i.test(ua);
                 var isIPad = ua.indexOf('Macintosh') > -1 && navigator.maxTouchPoints > 1;
                 var isTouch = ('ontouchend' in document);
