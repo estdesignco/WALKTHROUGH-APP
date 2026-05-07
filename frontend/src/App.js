@@ -24,6 +24,7 @@ import QuestionnaireTestPage from './components/QuestionnaireTestPage';
 import AdvancedFeaturesDashboard from './components/AdvancedFeaturesDashboard';
 import EmailPreview from './components/EmailPreview';
 import BuilderPortal from './components/BuilderPortal';
+import TradePortal from './components/TradePortal';
 import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
 import FurnitureSearchPage from './components/FurnitureSearchPage';
 import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
@@ -272,6 +273,10 @@ const App = () => {
           <Route 
             path="/builder/:accessCode" 
             element={<BuilderPortal />}
+          />
+          <Route 
+            path="/trade/:accessCode" 
+            element={<TradePortal />}
           />
           
           {/* Protected Routes - Require Login */}

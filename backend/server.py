@@ -19407,6 +19407,9 @@ async def get_builder_portal_public(access_code: str):
     portal = await db.builder_portals.find_one({"access_code": access_code}, {"_id": 0})
     if not portal:
         raise HTTPException(status_code=404, detail="Invalid access code")
+    # Designer master kill-switch: if builder_link_enabled is False, treat as disabled.
+    if portal.get("builder_link_enabled") is False:
+        raise HTTPException(status_code=403, detail="This link has been disabled by the designer.")
     
     # Get project info
     project = await db.projects.find_one({"id": portal["project_id"]}, {"_id": 0})
@@ -19500,6 +19503,457 @@ async def delete_builder_portal(portal_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Portal not found")
     return {"status": "deleted"}
+
+
+
+# =============================================================================
+# PROPOSAL / QUOTE MODULE — Builder + Trade
+# =============================================================================
+# - Designer toggles whether a builder portal can see the read-only Proposal,
+#   and a separate toggle for whether builder can EDIT it.
+# - Builder accepts (typed-name signature) and starts entering pricing.
+# - Builder can spawn per-trade sub-portals — each filtered to a category/trade.
+# - Trade has the same accept → edit flow.
+# - Each tier's pricing is private from the tier(s) above:
+#       designer never sees builder's numbers, builder sees trade's TOTAL only
+#       (line items remain in the trade's own portal).
+# - White-label: builder/trade upload their own logo + company info; quote
+#   renders with their branding only.
+# - Disable toggles: designer can kill the builder link AND/OR all child trade
+#   links at any time. Builder can kill any of their trade links.
+
+class ProposalSettingsUpdate(BaseModel):
+    proposal_view_enabled: Optional[bool] = None
+    proposal_edit_enabled: Optional[bool] = None
+    builder_link_enabled: Optional[bool] = None
+    trade_link_enabled: Optional[bool] = None
+    tax_rate: Optional[float] = None
+    pm_fee_rate: Optional[float] = None
+
+class ProposalAccept(BaseModel):
+    signature: str  # typed full legal name
+
+class ProposalOverride(BaseModel):
+    item_id: str
+    quantity: Optional[float] = None
+    unit: Optional[str] = None
+    cost: Optional[float] = None
+    markup_percent: Optional[float] = None
+    notes: Optional[str] = None
+
+class ProposalExtraCreate(BaseModel):
+    parent_kind: str  # 'room' | 'category' | 'subcategory'
+    parent_id: str
+    name: str
+    quantity: float = 1
+    unit: str = "EA"
+    cost: float = 0
+    markup_percent: float = 0
+    notes: str = ""
+
+class ProposalExtraUpdate(BaseModel):
+    name: Optional[str] = None
+    quantity: Optional[float] = None
+    unit: Optional[str] = None
+    cost: Optional[float] = None
+    markup_percent: Optional[float] = None
+    notes: Optional[str] = None
+
+class CompanyProfile(BaseModel):
+    company_name: Optional[str] = ""
+    logo_data: Optional[str] = ""  # base64 data url
+    address: Optional[str] = ""
+    phone: Optional[str] = ""
+    email: Optional[str] = ""
+    license_number: Optional[str] = ""
+    payment_terms: Optional[str] = ""
+    deposit_percent: Optional[float] = 0
+    accent_color: Optional[str] = "#D4A574"
+
+class SnippetCreate(BaseModel):
+    owner_kind: str  # 'builder' or 'trade'
+    owner_id: str    # access code that owns the snippet library
+    name: str
+    default_quantity: float = 1
+    default_unit: str = "EA"
+    default_cost: float = 0
+    default_markup_percent: float = 0
+    category_hint: str = ""
+    notes: str = ""
+
+class SnippetUpdate(BaseModel):
+    name: Optional[str] = None
+    default_quantity: Optional[float] = None
+    default_unit: Optional[str] = None
+    default_cost: Optional[float] = None
+    default_markup_percent: Optional[float] = None
+    category_hint: Optional[str] = None
+    notes: Optional[str] = None
+
+class TradePortalCreate(BaseModel):
+    builder_access_code: str
+    trade_name: str  # e.g. "Plumbing"
+    contact_name: str = ""
+    contact_email: str = ""
+    category_filter: List[str] = []  # category IDs visible to this trade
+
+class TradePortalUpdate(BaseModel):
+    trade_name: Optional[str] = None
+    contact_name: Optional[str] = None
+    contact_email: Optional[str] = None
+    category_filter: Optional[List[str]] = None
+    enabled: Optional[bool] = None
+    proposal_edit_enabled: Optional[bool] = None
+    tax_rate: Optional[float] = None
+
+class GeneralFilesUpdate(BaseModel):
+    files: List[Dict[str, Any]]  # [{name, type, data, uploaded_at, uploaded_by}]
+
+# ----------------- Helper: load a portal (builder or trade) -----------------
+async def _get_portal_by_access(access_code: str):
+    portal = await db.builder_portals.find_one({"access_code": access_code}, {"_id": 0})
+    if portal:
+        if portal.get("builder_link_enabled") is False:
+            raise HTTPException(status_code=403, detail="This link has been disabled by the designer.")
+        return ("builder", portal)
+    trade = await db.trade_portals.find_one({"trade_access_code": access_code}, {"_id": 0})
+    if trade:
+        if trade.get("enabled") is False:
+            raise HTTPException(status_code=403, detail="This trade link has been disabled by the builder.")
+        # Cascade-disable from designer / builder master switches
+        parent = await db.builder_portals.find_one({"access_code": trade.get("builder_access_code")}, {"_id": 0})
+        if parent:
+            if parent.get("builder_link_enabled") is False or parent.get("trade_link_enabled") is False:
+                raise HTTPException(status_code=403, detail="Trade links are currently disabled by the designer.")
+        return ("trade", trade)
+    return (None, None)
+
+# ----------------- General Uploads (FIX) -----------------
+# Replaces the old "store-as-comments-array" approach which duplicated files
+# exponentially on every upload. Now each portal has a single canonical
+# `general_files` array we write/read directly.
+
+@api_router.get("/builder/{access_code}/general-files")
+async def get_general_files(access_code: str):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    return {"files": portal.get("general_files", [])}
+
+@api_router.put("/builder/{access_code}/general-files")
+async def set_general_files(access_code: str, payload: GeneralFilesUpdate):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    coll = db.builder_portals if kind == "builder" else db.trade_portals
+    key = "access_code" if kind == "builder" else "trade_access_code"
+    await coll.update_one({key: access_code}, {"$set": {"general_files": payload.files}})
+    return {"files": payload.files}
+
+# ----------------- Proposal: builder portal toggles + accept -----------------
+
+@api_router.put("/builder-portal/{portal_id}/proposal-settings")
+async def update_builder_proposal_settings(portal_id: str, payload: ProposalSettingsUpdate):
+    """Designer-only: toggle proposal view/edit + master link enable for a builder portal."""
+    update = {k: v for k, v in payload.dict().items() if v is not None}
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    res = await db.builder_portals.update_one({"id": portal_id}, {"$set": update})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Portal not found")
+    portal = await db.builder_portals.find_one({"id": portal_id}, {"_id": 0})
+    return portal
+
+@api_router.post("/builder/{access_code}/proposal/accept")
+async def builder_accept_proposal(access_code: str, payload: ProposalAccept):
+    portal = await db.builder_portals.find_one({"access_code": access_code}, {"_id": 0})
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if not portal.get("proposal_view_enabled"):
+        raise HTTPException(status_code=403, detail="Proposal not enabled by designer yet")
+    if not (payload.signature or "").strip():
+        raise HTTPException(status_code=400, detail="Signature required")
+    await db.builder_portals.update_one(
+        {"access_code": access_code},
+        {"$set": {
+            "proposal_accepted": True,
+            "proposal_accepted_at": datetime.now(timezone.utc).isoformat(),
+            "proposal_accepted_signature": payload.signature.strip(),
+            "proposal_edit_enabled": True,  # auto-unlock editing on accept
+        }},
+    )
+    return {"status": "accepted"}
+
+# ----------------- Proposal: read merged scope tree -----------------
+
+async def _build_proposal_payload(kind: str, portal: dict):
+    """Build the merged scope tree (rooms/cats/subs/items) for a portal,
+    layering in proposal overrides + extras + the portal's company profile."""
+    # Trade portals reference their parent builder portal via builder_access_code
+    if kind == "trade":
+        builder = await db.builder_portals.find_one({"access_code": portal["builder_access_code"]}, {"_id": 0})
+        if not builder:
+            raise HTTPException(status_code=404, detail="Parent builder portal missing")
+        selected_ids = builder.get("selected_room_ids", [])
+        cat_filter = portal.get("category_filter") or []
+        access_code = portal["trade_access_code"]
+        portal_id_for_filter = portal["id"]
+    else:
+        builder = portal
+        selected_ids = portal.get("selected_room_ids", [])
+        cat_filter = []
+        access_code = portal["access_code"]
+        portal_id_for_filter = portal["id"]
+
+    rooms = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).sort("order_index", 1).to_list(200)
+    for room in rooms:
+        room.setdefault("floor", "1ST FLOOR")
+        room.setdefault("notes", "")
+        cats = await db.categories.find({"room_id": room["id"]}, {"_id": 0}).sort("order_index", 1).to_list(200)
+        if cat_filter:
+            cats = [c for c in cats if c["id"] in cat_filter]
+        for cat in cats:
+            subs = await db.subcategories.find({"category_id": cat["id"]}, {"_id": 0}).sort("order_index", 1).to_list(200)
+            for sub in subs:
+                items = await db.items.find({"subcategory_id": sub["id"]}, {"_id": 0}).sort("order_index", 1).to_list(1000)
+                for it in items:
+                    # Strip designer pricing — proposal pricing is per-portal.
+                    for k in ("cost", "price", "budget", "total_cost"):
+                        it.pop(k, None)
+                sub["items"] = items
+            cat["subcategories"] = subs
+        room["categories"] = cats
+
+    overrides = await db.proposal_overrides.find({"portal_id": portal_id_for_filter}, {"_id": 0}).to_list(5000)
+    extras = await db.proposal_extras.find({"portal_id": portal_id_for_filter}, {"_id": 0}).sort("order_index", 1).to_list(5000)
+    company = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0}) or {}
+
+    return {
+        "kind": kind,
+        "portal": portal,
+        "rooms": rooms,
+        "overrides": overrides,
+        "extras": extras,
+        "company": company,
+        "project_name": (await db.projects.find_one({"id": builder["project_id"]}, {"_id": 0}) or {}).get("name", ""),
+    }
+
+@api_router.get("/builder/{access_code}/proposal")
+async def get_builder_proposal(access_code: str):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    return await _build_proposal_payload(kind, portal)
+
+# ----------------- Proposal: overrides (per-line edits) -----------------
+
+@api_router.put("/builder/{access_code}/proposal/override")
+async def upsert_proposal_override(access_code: str, payload: ProposalOverride):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if not portal.get("proposal_edit_enabled"):
+        raise HTTPException(status_code=403, detail="Editing not enabled")
+    update = {k: v for k, v in payload.dict().items() if v is not None and k != "item_id"}
+    update["portal_id"] = portal["id"]
+    update["item_id"] = payload.item_id
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.proposal_overrides.update_one(
+        {"portal_id": portal["id"], "item_id": payload.item_id},
+        {"$set": update},
+        upsert=True,
+    )
+    saved = await db.proposal_overrides.find_one(
+        {"portal_id": portal["id"], "item_id": payload.item_id}, {"_id": 0}
+    )
+    return saved
+
+# ----------------- Proposal: extras (builder-added line items) -----------------
+
+@api_router.post("/builder/{access_code}/proposal/extra")
+async def create_proposal_extra(access_code: str, payload: ProposalExtraCreate):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if not portal.get("proposal_edit_enabled"):
+        raise HTTPException(status_code=403, detail="Editing not enabled")
+    extra = {
+        "id": str(uuid.uuid4()),
+        "portal_id": portal["id"],
+        **payload.dict(),
+        "order_index": int(datetime.now(timezone.utc).timestamp() * 1000),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.proposal_extras.insert_one(extra)
+    extra.pop("_id", None)
+    return extra
+
+@api_router.put("/builder/{access_code}/proposal/extra/{extra_id}")
+async def update_proposal_extra(access_code: str, extra_id: str, payload: ProposalExtraUpdate):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if not portal.get("proposal_edit_enabled"):
+        raise HTTPException(status_code=403, detail="Editing not enabled")
+    update = {k: v for k, v in payload.dict().items() if v is not None}
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    res = await db.proposal_extras.update_one(
+        {"id": extra_id, "portal_id": portal["id"]}, {"$set": update}
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Extra not found")
+    return await db.proposal_extras.find_one({"id": extra_id}, {"_id": 0})
+
+@api_router.delete("/builder/{access_code}/proposal/extra/{extra_id}")
+async def delete_proposal_extra(access_code: str, extra_id: str):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if not portal.get("proposal_edit_enabled"):
+        raise HTTPException(status_code=403, detail="Editing not enabled")
+    res = await db.proposal_extras.delete_one({"id": extra_id, "portal_id": portal["id"]})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Extra not found")
+    return {"status": "deleted"}
+
+# ----------------- White-label company profile -----------------
+
+@api_router.get("/builder/{access_code}/company")
+async def get_company_profile(access_code: str):
+    profile = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0})
+    return profile or {"access_code": access_code}
+
+@api_router.put("/builder/{access_code}/company")
+async def upsert_company_profile(access_code: str, payload: CompanyProfile):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    update = {k: v for k, v in payload.dict().items() if v is not None}
+    update["access_code"] = access_code
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.company_profiles.update_one(
+        {"access_code": access_code}, {"$set": update}, upsert=True
+    )
+    saved = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0})
+    return saved
+
+# ----------------- Pre-made Snippets library -----------------
+
+@api_router.get("/proposal/snippets")
+async def list_snippets(owner_kind: str, owner_id: str):
+    snippets = await db.proposal_snippets.find(
+        {"owner_kind": owner_kind, "owner_id": owner_id}, {"_id": 0}
+    ).sort("name", 1).to_list(500)
+    return snippets
+
+@api_router.post("/proposal/snippets")
+async def create_snippet(payload: SnippetCreate):
+    snippet = {
+        "id": str(uuid.uuid4()),
+        **payload.dict(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.proposal_snippets.insert_one(snippet)
+    snippet.pop("_id", None)
+    return snippet
+
+@api_router.put("/proposal/snippets/{snippet_id}")
+async def update_snippet(snippet_id: str, payload: SnippetUpdate):
+    update = {k: v for k, v in payload.dict().items() if v is not None}
+    if not update:
+        return await db.proposal_snippets.find_one({"id": snippet_id}, {"_id": 0})
+    res = await db.proposal_snippets.update_one({"id": snippet_id}, {"$set": update})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Snippet not found")
+    return await db.proposal_snippets.find_one({"id": snippet_id}, {"_id": 0})
+
+@api_router.delete("/proposal/snippets/{snippet_id}")
+async def delete_snippet(snippet_id: str):
+    res = await db.proposal_snippets.delete_one({"id": snippet_id})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Snippet not found")
+    return {"status": "deleted"}
+
+# ----------------- Trade Sub-Portals -----------------
+
+@api_router.get("/builder/{access_code}/trades")
+async def list_trade_portals(access_code: str):
+    """Builder lists their trade sub-portals."""
+    builder = await db.builder_portals.find_one({"access_code": access_code}, {"_id": 0})
+    if not builder:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    trades = await db.trade_portals.find(
+        {"builder_access_code": access_code}, {"_id": 0}
+    ).sort("created_at", 1).to_list(500)
+    return trades
+
+@api_router.post("/builder/{access_code}/trades")
+async def create_trade_portal(access_code: str, payload: TradePortalCreate):
+    builder = await db.builder_portals.find_one({"access_code": access_code}, {"_id": 0})
+    if not builder:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    import random, string
+    code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    trade = {
+        "id": str(uuid.uuid4()),
+        "trade_access_code": code,
+        "builder_access_code": access_code,
+        "trade_name": payload.trade_name,
+        "contact_name": payload.contact_name,
+        "contact_email": payload.contact_email,
+        "category_filter": payload.category_filter or [],
+        "enabled": True,
+        "proposal_view_enabled": True,
+        "proposal_edit_enabled": False,
+        "proposal_accepted": False,
+        "tax_rate": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.trade_portals.insert_one(trade)
+    trade.pop("_id", None)
+    return trade
+
+@api_router.put("/builder/{access_code}/trades/{trade_id}")
+async def update_trade_portal(access_code: str, trade_id: str, payload: TradePortalUpdate):
+    update = {k: v for k, v in payload.dict().items() if v is not None}
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    res = await db.trade_portals.update_one(
+        {"id": trade_id, "builder_access_code": access_code}, {"$set": update}
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Trade portal not found")
+    return await db.trade_portals.find_one({"id": trade_id}, {"_id": 0})
+
+@api_router.delete("/builder/{access_code}/trades/{trade_id}")
+async def delete_trade_portal(access_code: str, trade_id: str):
+    res = await db.trade_portals.delete_one(
+        {"id": trade_id, "builder_access_code": access_code}
+    )
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Trade portal not found")
+    return {"status": "deleted"}
+
+@api_router.post("/trade/{trade_access_code}/proposal/accept")
+async def trade_accept_proposal(trade_access_code: str, payload: ProposalAccept):
+    trade = await db.trade_portals.find_one({"trade_access_code": trade_access_code}, {"_id": 0})
+    if not trade:
+        raise HTTPException(status_code=404, detail="Invalid trade access code")
+    if not trade.get("enabled", True):
+        raise HTTPException(status_code=403, detail="Link disabled")
+    if not (payload.signature or "").strip():
+        raise HTTPException(status_code=400, detail="Signature required")
+    await db.trade_portals.update_one(
+        {"trade_access_code": trade_access_code},
+        {"$set": {
+            "proposal_accepted": True,
+            "proposal_accepted_at": datetime.now(timezone.utc).isoformat(),
+            "proposal_accepted_signature": payload.signature.strip(),
+            "proposal_edit_enabled": True,
+        }},
+    )
+    return {"status": "accepted"}
+
+# Trade overrides/extras/company piggy-back on the same `/builder/{code}/...` endpoints
+# above (which use _get_portal_by_access to handle BOTH portal kinds).
 
 
 

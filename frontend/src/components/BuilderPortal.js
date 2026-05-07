@@ -5,6 +5,9 @@ import RichTextEditor from './RichTextEditor';
 import { parseScopeDocument } from './ScopeDocumentEditor';
 import FileLightbox from './FileLightbox';
 import { getRoomColor, getMutedRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
+import ProposalView from './ProposalView';
+import BuilderTradesManager from './BuilderTradesManager';
+import CompanyProfileForm from './CompanyProfileForm';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -53,6 +56,7 @@ export default function BuilderPortal() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showCompanyForm, setShowCompanyForm] = useState(false);
   const [lang, setLang] = useState(localStorage.getItem('builder_lang') || 'en');
   const [commentText, setCommentText] = useState('');
   const [commentAuthor, setCommentAuthor] = useState(localStorage.getItem('builder_name') || '');
@@ -142,6 +146,8 @@ export default function BuilderPortal() {
   const tabs = [
     { id: 'dashboard', label: t.dashboard },
     { id: 'scope', label: t.scopeOfWork },
+    { id: 'proposal', label: lang === 'en' ? 'Proposal / Quote' : 'Propuesta' },
+    { id: 'trades', label: lang === 'en' ? 'Trades' : 'Subcontratistas' },
     { id: 'ffe', label: t.ffeSchedule },
     { id: 'uploads', label: lang === 'en' ? 'Uploads' : 'Subidas' },
     { id: 'photos', label: lang === 'en' ? 'Room Photos' : 'Fotos por Hab.' },
@@ -183,6 +189,9 @@ export default function BuilderPortal() {
             <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>{project.client_info?.address}</p>
           </div>
           <div className="bp-header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <button onClick={() => setShowCompanyForm(true)} data-testid="builder-edit-company-btn" style={{ background: 'transparent', border: '1px solid #D4A574', padding: '6px 14px', borderRadius: 6, color: '#D4A574', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+              ✎ COMPANY INFO
+            </button>
             <button onClick={toggleLang} style={{ background: '#2a3040', border: '1px solid #D4A574', padding: '6px 14px', borderRadius: 6, color: '#D4A574', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
               {t.switchLang}
             </button>
@@ -268,6 +277,16 @@ export default function BuilderPortal() {
               ))}
             </div>
           </div>
+        )}
+
+        {/* ===== PROPOSAL / QUOTE (read-only or editable) ===== */}
+        {activeTab === 'proposal' && (
+          <ProposalView accessCode={accessCode} kind="builder" onPortalChange={() => loadPortal()} />
+        )}
+
+        {/* ===== TRADES (builder generates per-trade sub-links) ===== */}
+        {activeTab === 'trades' && (
+          <BuilderTradesManager accessCode={accessCode} portal={portal} rooms={rooms} />
         )}
 
         {/* ===== SCOPE OF WORK - WITH CHECKBOXES ===== */}
@@ -420,6 +439,10 @@ export default function BuilderPortal() {
       <footer style={{ borderTop: '1px solid #2a3040', padding: '16px 32px', textAlign: 'center', marginTop: 40 }}>
         <p style={{ color: '#4B5563', fontSize: 12 }}>ESTABLISHED DESIGN CO. — Builder Portal</p>
       </footer>
+
+      {showCompanyForm && (
+        <CompanyProfileForm accessCode={accessCode} onClose={() => setShowCompanyForm(false)} />
+      )}
     </div>
   );
 }
@@ -818,40 +841,79 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
   const [files, setFiles] = useState([]);
   const [lightbox, setLightbox] = useState(null);
 
-  useEffect(() => { loadFiles(); }, [accessCode]);
+  useEffect(() => { loadFiles(); /* eslint-disable-next-line */ }, [accessCode]);
 
+  // Use the new dedicated endpoint that stores a single canonical files array
+  // per portal (instead of the old approach which appended a JSON-encoded copy
+  // of the entire file list as a comment on every upload — that bug caused
+  // exponential duplication and eventual save failures from oversized payloads).
   const loadFiles = async () => {
-    const res = await fetch(`${API_URL}/api/builder/${accessCode}`);
-    if (res.ok) {
-      const data = await res.json();
-      // Pull general files from comments with section='general_file'
-      const fileComments = (data.portal?.comments || []).filter(c => c.section === 'general_file');
-      const allFiles = [];
-      fileComments.forEach(c => { try { const parsed = JSON.parse(c.text); if (Array.isArray(parsed)) allFiles.push(...parsed); } catch {} });
-      setFiles(allFiles);
+    try {
+      const res = await fetch(`${API_URL}/api/builder/${accessCode}/general-files`);
+      if (res.ok) {
+        const data = await res.json();
+        setFiles(Array.isArray(data.files) ? data.files : []);
+      }
+    } catch (e) { console.error('loadFiles failed', e); }
+  };
+
+  const persist = async (next) => {
+    try {
+      const res = await fetch(`${API_URL}/api/builder/${accessCode}/general-files`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files: next }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(`Upload failed: ${err.detail || res.status}`);
+        return false;
+      }
+      return true;
+    } catch (e) {
+      alert(`Upload failed: ${e.message}`);
+      return false;
     }
   };
 
   const handleUpload = async (inputFiles) => {
     if (!inputFiles || inputFiles.length === 0) return;
     setUploading(true);
-    const newFiles = [...files];
+    const next = [...files];
     for (const file of inputFiles) {
+      // Hard size guard — base64 inflates ~33%, MongoDB doc cap is 16MB total.
+      // Block files >8MB raw to keep room for everything else.
+      if (file.size > 8 * 1024 * 1024) {
+        alert(`"${file.name}" is too large (max 8MB). Compress it first.`);
+        continue;
+      }
       const reader = new FileReader();
+      // eslint-disable-next-line no-loop-func
       await new Promise((resolve) => {
         reader.onload = () => {
-          newFiles.push({ name: file.name, type: file.type, data: reader.result, uploaded_at: new Date().toISOString(), uploaded_by: localStorage.getItem('builder_name') || 'Builder' });
+          next.push({
+            id: `f_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            name: file.name,
+            type: file.type,
+            data: reader.result,
+            uploaded_at: new Date().toISOString(),
+            uploaded_by: localStorage.getItem('builder_name') || 'Builder',
+          });
           resolve();
         };
         reader.readAsDataURL(file);
       });
     }
-    await fetch(`${API_URL}/api/builder/${accessCode}/comment`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ section: 'general_file', author: localStorage.getItem('builder_name') || 'Builder', text: JSON.stringify(newFiles) }),
-    });
-    setFiles(newFiles);
+    const ok = await persist(next);
+    if (ok) setFiles(next);
     setUploading(false);
+  };
+
+  const handleDelete = async (idx) => {
+    if (!window.confirm('Delete this file?')) return;
+    const next = files.filter((_, i) => i !== idx);
+    const ok = await persist(next);
+    if (ok) setFiles(next);
   };
 
   const handleCamera = () => {
@@ -881,21 +943,27 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
         {files.map((file, idx) => (
           <div
-            key={idx}
-            onClick={() => setLightbox({ files, index: idx })}
-            title={lang === 'en' ? 'Click to open' : 'Clic para abrir'}
-            style={{ background: '#1a1f2e', borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040', cursor: 'pointer', transition: 'transform 0.1s, border-color 0.1s' }}
+            key={file.id || idx}
+            style={{ background: '#1a1f2e', borderRadius: 8, overflow: 'hidden', border: '1px solid #2a3040', position: 'relative', transition: 'transform 0.1s, border-color 0.1s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = '#D4A574'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a3040'; e.currentTarget.style.transform = 'translateY(0)'; }}
           >
-            {file.type?.startsWith('image/') || file.data?.startsWith('data:image') ? (
-              <div style={{ width: '100%', height: 150, overflow: 'hidden' }}><img src={file.data} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
-            ) : (
-              <div style={{ width: '100%', height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f1218' }}><span style={{ fontSize: 40 }}>📄</span></div>
-            )}
-            <div style={{ padding: '8px 12px' }}>
-              <p style={{ color: '#F5F5DC', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
-              <p style={{ color: '#6B7280', fontSize: 10 }}>{file.uploaded_by} • {file.uploaded_at ? new Date(file.uploaded_at).toLocaleDateString() : ''}</p>
+            <button
+              onClick={(e) => { e.stopPropagation(); handleDelete(idx); }}
+              data-testid={`general-upload-delete-${idx}`}
+              title={lang === 'en' ? 'Delete' : 'Eliminar'}
+              style={{ position: 'absolute', top: 4, right: 4, zIndex: 2, background: 'rgba(239,68,68,0.85)', color: '#fff', border: 'none', borderRadius: 4, width: 22, height: 22, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}
+            >✕</button>
+            <div onClick={() => setLightbox({ files, index: idx })} style={{ cursor: 'pointer' }} title={lang === 'en' ? 'Click to open' : 'Clic para abrir'}>
+              {file.type?.startsWith('image/') || file.data?.startsWith('data:image') ? (
+                <div style={{ width: '100%', height: 150, overflow: 'hidden' }}><img src={file.data} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
+              ) : (
+                <div style={{ width: '100%', height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f1218' }}><span style={{ fontSize: 40 }}>📄</span></div>
+              )}
+              <div style={{ padding: '8px 12px' }}>
+                <p style={{ color: '#F5F5DC', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
+                <p style={{ color: '#6B7280', fontSize: 10 }}>{file.uploaded_by} • {file.uploaded_at ? new Date(file.uploaded_at).toLocaleDateString() : ''}</p>
+              </div>
             </div>
           </div>
         ))}

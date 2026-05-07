@@ -247,6 +247,11 @@ export default function BuilderPortalManager({ project, onReload }) {
         </div>
       )}
 
+      {/* PROPOSAL / MASTER DISABLE TOGGLES (admin only) */}
+      {portal && (
+        <ProposalToggles portal={portal} onChange={loadPortal} />
+      )}
+
       {/* ROOM SELECTION */}
       <div className="p-4 rounded-lg bg-[#1a1f2e] border border-[#2a3040]">
         <div className="flex justify-between items-center mb-3">
@@ -746,6 +751,77 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
           startIndex={lightbox.index}
           onClose={() => setLightbox(null)}
         />
+      )}
+    </div>
+  );
+}
+
+// =====================================================================
+// PROPOSAL TOGGLES — designer's master switches per builder portal
+// =====================================================================
+function ProposalToggles({ portal, onChange }) {
+  const [local, setLocal] = React.useState(portal);
+  React.useEffect(() => { setLocal(portal); }, [portal?.id]);
+  const update = async (patch) => {
+    setLocal({ ...local, ...patch });
+    await fetch(`${API_URL}/api/builder-portal/${portal.id}/proposal-settings`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patch),
+    });
+    onChange?.();
+  };
+  const Toggle = ({ label, sub, value, onClick, color = '#D4A574', testId }) => (
+    <div onClick={onClick} data-testid={testId} style={{ cursor: 'pointer', padding: 12, borderRadius: 6, border: `1px solid ${value ? color : '#2a3040'}`, background: value ? `${color}15` : '#0f1218', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+      <div>
+        <p style={{ color: value ? color : '#9ca3af', fontSize: 13, fontWeight: 700, margin: 0 }}>{label}</p>
+        {sub && <p style={{ color: '#6b7280', fontSize: 11, margin: 0 }}>{sub}</p>}
+      </div>
+      <div style={{ width: 38, height: 22, background: value ? color : '#374151', borderRadius: 99, position: 'relative', flexShrink: 0 }}>
+        <div style={{ position: 'absolute', top: 2, left: value ? 18 : 2, width: 18, height: 18, background: '#fff', borderRadius: '50%', transition: 'left 0.15s' }} />
+      </div>
+    </div>
+  );
+  return (
+    <div className="p-4 rounded-lg bg-[#1a1f2e] border border-[#2a3040]">
+      <h3 className="text-[#D4A574] font-bold text-sm tracking-wider mb-3">PROPOSAL &amp; LINK CONTROLS</h3>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8 }}>
+        <Toggle
+          label="Builder Link"
+          sub="Master kill-switch for the builder portal URL"
+          value={local.builder_link_enabled !== false}
+          color="#10B981"
+          testId="toggle-builder-link"
+          onClick={() => update({ builder_link_enabled: !(local.builder_link_enabled !== false) })}
+        />
+        <Toggle
+          label="All Trade Sub-Links"
+          sub="Disables every trade link the builder spawned"
+          value={local.trade_link_enabled !== false}
+          color="#10B981"
+          testId="toggle-trade-link"
+          onClick={() => update({ trade_link_enabled: !(local.trade_link_enabled !== false) })}
+        />
+        <Toggle
+          label="Proposal View"
+          sub="Builder can see the read-only proposal"
+          value={!!local.proposal_view_enabled}
+          testId="toggle-proposal-view"
+          onClick={() => update({ proposal_view_enabled: !local.proposal_view_enabled })}
+        />
+        <Toggle
+          label="Proposal Editing"
+          sub="Builder can edit numbers (auto-on after they accept)"
+          value={!!local.proposal_edit_enabled}
+          testId="toggle-proposal-edit"
+          onClick={() => update({ proposal_edit_enabled: !local.proposal_edit_enabled })}
+        />
+      </div>
+      {local.proposal_accepted && (
+        <p style={{ color: '#10B981', fontSize: 11, marginTop: 10 }}>
+          ✓ Builder accepted proposal as <strong>{local.proposal_accepted_signature}</strong>
+          {local.proposal_accepted_at ? ` on ${new Date(local.proposal_accepted_at).toLocaleDateString()}` : ''}
+        </p>
       )}
     </div>
   );

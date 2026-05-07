@@ -5,6 +5,27 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
 ## Implemented
 
+### Proposal / Quote Module (May 7, 2026) — NEW (huge feature)
+**Builder + Trade end-to-end quote workflow with white-label, snippets, master kill-switches.**
+- New tabs in Builder Portal: **PROPOSAL / QUOTE** and **TRADES**.
+- New public route: `/trade/:accessCode` for sub-contractors (filtered scope).
+- **3-stage gating**: designer-toggled `proposal_view_enabled` → builder accepts (typed-name signature) → editing auto-unlocks (or designer can pre-unlock via `proposal_edit_enabled`).
+- **FFE-styled scope tree** in `ProposalView.js` — same gold borders, gradient room headers, dark green category bars, alternating-row recipe — extra columns: Qty / Unit / Cost / Markup % / Line Total. Live SUMS at bottom: Subtotal, Tax %, PM Fee %, **TOTAL DUE**, **Profit** (private to viewer).
+- **Editable everything when unlocked**: cells are inline-editable, builder/trade can rename, override qty/unit/cost/markup, **add their own line items** anywhere (room/category/sub-category level), or pull from a **Snippets Library** (saved templates with default qty/unit/cost/markup — Dumpster, Permit Fee, Demo, etc.).
+- **White-label**: `CompanyProfileForm.js` modal — logo upload (base64, ≤1.5MB), company name, address, phone, email, license #, payment terms, deposit %, accent color. Quote header swaps to viewer's branding only. **Designer name nowhere on the builder/trade quote.**
+- **Trade sub-portals** (`BuilderTradesManager.js`): builder spawns one link per trade, picks visible categories, copies share URL, toggles each link on/off, deletes when done. Trade pricing **never reaches the designer**.
+- **4 master kill-switches** in admin Builder Portal Manager (`ProposalToggles`):
+  - `Builder Link` — hard-disables `/builder/:code`
+  - `All Trade Sub-Links` — cascade-disables every trade link under this builder
+  - `Proposal View` — read-only release toggle
+  - `Proposal Editing` — pre-unlock without acceptance
+- **Print / Save PDF**: every Proposal view has a "🖨 PRINT / SAVE PDF" button → browser print dialog renders the styled quote (white-label header + scope + sums) for save-as-PDF or print.
+- **Privacy guarantees enforced server-side** (`_get_portal_by_access`):
+  - Designer's pricing stripped from every builder/trade scope payload (`cost / price / budget / total_cost`).
+  - Per-portal `proposal_overrides` + `proposal_extras` collections — each tier writes only into their own.
+  - `company_profiles` keyed by access_code so each portal's branding is isolated.
+- **General Uploads bug FIXED**: old code stored entire files array as a JSON-encoded "comment" on every upload, then concatenated all comments on load → exponential duplication + eventual MongoDB doc-size failures. Replaced with dedicated `GET/PUT /api/builder/{code}/general-files` endpoints that store a single canonical array per portal. Per-file 8MB hard cap; delete button on every tile.
+
 ### Builder Portal (Apr 17/May 4, 2026) — NEW
 - **Public builder page**: `/builder/{access_code}` — no login, unique link per project
 - **9 sections**: FF&E (no pricing), Photos, Scope of Work, To-Do, Schedule, Room Finishes, Change Orders, Contacts, Comments
@@ -22,7 +43,15 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
   - Copy shareable link
 - **Builder Portal scope views**: Overall / By Room (auto) / By Trade (auto)
 - **Price stripping**: cost, price, budget, total_cost all removed from builder view
-- **Reverse-lookup badge** (May 4, 2026): every Checklist/FFE item row that is referenced in the scope doc now shows a small `📋 N` badge next to the name. Hover → see every scope sentence that references this item (with room & trade chips). Click → jumps to the Builder Portal Scope editor via `jump-to-scope` custom event. Module-level cache keyed by project id; `invalidateScopeRefs()` fires after scope save so badges update without a page reload.
+- **Reverse-lookup badge** (May 4, 2026): every Checklist/FFE item row that is referenced in the scope doc now shows a small `📋 N` badge next to the name.
+
+### Mobile / Privacy / Color Parity (May 5/6, 2026)
+- Mobile redirect script in `index.html` whitelists `/mobile-app`, `/customer`, `/builder`, `/trade`, `/test-questionnaire` so public links never bounce to the admin app.
+- Microsoft Surface (Windows + touch) treated as desktop; iPad/iPhone/Android still go to `/mobile-app`.
+- Builder Portal FF&E + Photos + Manager rooms now use `getMutedRoomHeaderStyle()` — same 135° gradient + inset white-glow + heavy black inner-shadow as admin Checklist. Same `room.color` source = identical pixel render.
+
+### Transfer Logic Fix (May 6, 2026)
+- Checklist → FFE transfer now uses checkbox state ONLY (was previously also pulling items by status, causing unchecked items to leak through).
 
 ### Performance Optimization (Apr 17, 2026)
 - Default collapsed state for all rooms/categories across all views

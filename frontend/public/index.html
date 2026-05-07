@@ -34,7 +34,7 @@
             // builders/clients who must NOT see admin/pricing data.
             (function() {
                 var path = window.location.pathname;
-                var PUBLIC_PREFIXES = ['/mobile-app', '/customer', '/builder', '/test-questionnaire'];
+                var PUBLIC_PREFIXES = ['/mobile-app', '/customer', '/builder', '/trade', '/test-questionnaire'];
                 for (var p = 0; p < PUBLIC_PREFIXES.length; p++) {
                     if (path.indexOf(PUBLIC_PREFIXES[p]) === 0) return;
                 }
