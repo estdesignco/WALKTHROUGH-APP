@@ -42,13 +42,17 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
 
   const load = async () => {
     setLoading(true);
-    const res = await fetch(`${API_URL}/api/builder/${accessCode}/proposal`);
-    if (res.ok) {
-      const json = await res.json();
-      setData(json);
-      onPortalChange?.(json.portal);
+    try {
+      const res = await fetch(`${API_URL}/api/builder/${accessCode}/proposal`);
+      if (res.ok) {
+        const json = await res.json();
+        setData(json);
+      }
+    } catch (e) {
+      console.error('proposal load failed', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const loadSnippets = async () => {
@@ -177,6 +181,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       setShowAccept(false);
       setSignature('');
       load();
+      onPortalChange?.();  // Notify parent only on the actual accept event
     } else {
       const err = await res.json().catch(() => ({}));
       alert(err.detail || 'Accept failed');

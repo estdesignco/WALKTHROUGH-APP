@@ -661,12 +661,19 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
               <h3 style={{ color: tColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{label}</h3>
               <span style={{ color: '#6B7280', fontSize: 12 }}>{items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
             </div>
-            {Object.entries(roomGroups).map(([rName, group]) => (
-              <div key={rName} style={{ marginLeft: 12, marginBottom: 12 }}>
-                <p style={{ color: group.room?.color || '#D4A574', fontSize: 13, fontWeight: 700, marginBottom: 6, borderBottom: `1px solid ${group.room?.color || '#D4A574'}30`, paddingBottom: 4, letterSpacing: 1 }}>{rName}</p>
-                {renderBlockItems(group.items)}
-              </div>
-            ))}
+            {Object.entries(roomGroups).map(([rName, group]) => {
+              const rColor = group.room?.color || '#D4A574';
+              return (
+                <div key={rName} style={{ marginLeft: 12, marginBottom: 16 }}>
+                  {/* Room banner — full muted-gradient pill so the room is unmistakable
+                      under each trade (matches Checklist/FFE banner recipe). */}
+                  <div style={{ ...getMutedRoomHeaderStyle(rColor), display: 'inline-block', padding: '6px 16px', borderRadius: 4, marginBottom: 8, border: `1px solid ${rColor}` }}>
+                    <span style={{ color: '#fff', fontSize: 13, fontWeight: 800, letterSpacing: 2 }}>{rName?.toUpperCase()}</span>
+                  </div>
+                  {renderBlockItems(group.items)}
+                </div>
+              );
+            })}
           </div>
         );
       })}
