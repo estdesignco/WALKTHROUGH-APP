@@ -1706,24 +1706,34 @@ const ExactChecklistSpreadsheet = ({
     }
   };
 
-  // CHECKLIST → FFE TRANSFER: Transfer ONLY CHECKED items (like walkthrough)
+  // CHECKLIST → FFE TRANSFER: Transfer ONLY items whose checkbox is ticked.
+  // Status is intentionally IGNORED here — the checkbox is the single source
+  // of truth, exactly like the Walkthrough → Checklist transfer behaves.
   const handleTransferToFFE = async () => {
     try {
       console.log('🚀 TRANSFER TO FFE: ONLY CHECKED ITEMS');
-      
-      // Step 1: Collect checked items - INCLUDE manual checks AND items with PICKED/post-picked status
+
+      // Step 1: Validation — must have at least one ticked box
+      if (checkedItems.size === 0) {
+        alert('Please check the boxes (Column A) of the items you want to transfer to FF&E before clicking Transfer.');
+        return;
+      }
+
+      // Step 2: Collect ONLY checked items
       const checkedItemIds = Array.from(checkedItems);
       const itemsToTransfer = [];
-      
+
       // USE ORIGINAL PROJECT, NOT FILTERED!
       if (project?.rooms) {
         project.rooms.forEach(room => {
           room.categories?.forEach(category => {
             category.subcategories?.forEach(subcategory => {
               subcategory.items?.forEach(item => {
-                // Include if manually checked OR has PICKED/post-picked status
-                const isChecked = checkedItemIds.includes(item.id) || PICKED_OR_BEYOND_STATUSES.includes(item.status);
-                if (isChecked) {
+                // CRITICAL: ONLY include if the user has ticked the checkbox.
+                // Do NOT include items based on status — that previously
+                // pulled in unchecked items whose status was "GET QUOTE",
+                // "ON HOLD", "ASK NEIL", etc.
+                if (checkedItemIds.includes(item.id)) {
                   console.log(`✅ CHECKED ITEM: "${item.name}" (ID: ${item.id}, Status: ${item.status})`);
                   itemsToTransfer.push({
                     item,
