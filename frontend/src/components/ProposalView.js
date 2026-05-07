@@ -258,20 +258,20 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
               const roomExtras = extrasByParentId[`room:${room.id}`] || [];
               return (
                 <React.Fragment key={room.id}>
-                  {/* ROOM HEADER */}
-                  <tr>
-                    <td colSpan="9" className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold" style={roomBanner}>
-                      {room.name?.toUpperCase()} {room.floor ? <span style={{ opacity: 0.7, fontSize: 11, marginLeft: 8 }}>· {room.floor}</span> : null}
-                    </td>
-                  </tr>
                   {(room.categories || []).map(cat => {
                     const catExtras = extrasByParentId[`category:${cat.id}`] || [];
                     return (
                       <React.Fragment key={cat.id}>
-                        {/* CATEGORY BAR */}
+                        {/* CATEGORY BAR (green) */}
                         <tr>
                           <td colSpan="9" className="border border-[#D4A574] px-3 py-1.5 text-[#D4C5A9] text-xs font-bold uppercase tracking-wider" style={{ background: '#065F46' }}>
                             {cat.name}
+                          </td>
+                        </tr>
+                        {/* ROOM BANNER directly under each green category — assigned room color, never deviates */}
+                        <tr>
+                          <td colSpan="9" className="border border-[#D4A574] px-3 py-2 text-[#D4C5A9] text-sm font-bold" style={roomBanner}>
+                            {room.name?.toUpperCase()} {room.floor ? <span style={{ opacity: 0.7, fontSize: 11, marginLeft: 8 }}>· {room.floor}</span> : null}
                           </td>
                         </tr>
                         {(cat.subcategories || []).map(sub => {
