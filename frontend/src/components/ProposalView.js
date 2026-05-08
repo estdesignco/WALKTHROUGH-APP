@@ -196,7 +196,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
     return (
       <div style={{ padding: 60, textAlign: 'center', color: '#D4A574' }}>
         <h2 style={{ fontSize: 22, marginBottom: 12 }}>Proposal not yet released</h2>
-        <p style={{ color: '#9ca3af' }}>The designer hasn't enabled the proposal view yet. Check back soon.</p>
+        <p style={{ color: '#D4C5A9' }}>The designer hasn't enabled the proposal view yet. Check back soon.</p>
       </div>
     );
   }
@@ -373,7 +373,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
         <div onClick={() => setShowAccept(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div onClick={e => e.stopPropagation()} style={{ background: '#0f1218', border: '1px solid #D4A574', maxWidth: 520, width: '92%', padding: 24, borderRadius: 8 }}>
             <h2 style={{ color: '#D4A574', fontSize: 18, marginBottom: 8 }}>Accept Job</h2>
-            <p style={{ color: '#9ca3af', fontSize: 13, marginBottom: 16 }}>
+            <p style={{ color: '#D4C5A9', fontSize: 13, marginBottom: 16 }}>
               By typing your full legal name below and clicking Accept, you agree to the scope of work as presented and unlock editing for your quote.
             </p>
             <input
@@ -386,7 +386,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
               style={{ width: '100%', padding: '10px 12px', background: '#1a1f2e', border: '1px solid #D4A574', color: '#D4C5A9', borderRadius: 4, fontSize: 14, marginBottom: 16 }}
             />
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowAccept(false)} style={{ background: 'transparent', color: '#9ca3af', border: '1px solid #4b5563', padding: '8px 16px', borderRadius: 4, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+              <button onClick={() => setShowAccept(false)} style={{ background: 'transparent', color: '#D4C5A9', border: '1px solid #4b5563', padding: '8px 16px', borderRadius: 4, cursor: 'pointer', fontSize: 13 }}>Cancel</button>
               <button onClick={acceptProposal} data-testid="confirm-accept-btn" style={{ background: '#D4A574', color: '#000', padding: '8px 16px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>✓ Accept &amp; Sign</button>
             </div>
           </div>
@@ -413,7 +413,7 @@ function ProposalHeader({ company, projectName, portal }) {
             <h1 style={{ color: '#D4A574', fontSize: 22, fontWeight: 800, letterSpacing: 1, marginBottom: 2 }}>
               {company.company_name || 'YOUR COMPANY NAME'}
             </h1>
-            <p style={{ color: '#9ca3af', fontSize: 12, lineHeight: 1.4 }}>
+            <p style={{ color: '#D4C5A9', fontSize: 12, lineHeight: 1.4 }}>
               {company.address || ''}<br />
               {company.phone || ''} {company.email ? ` · ${company.email}` : ''}<br />
               {company.license_number ? `License # ${company.license_number}` : ''}
@@ -424,7 +424,7 @@ function ProposalHeader({ company, projectName, portal }) {
           <div style={{ color: '#D4A574', fontSize: 13, letterSpacing: 2 }}>PROPOSAL</div>
           <h2 style={{ color: '#D4C5A9', fontSize: 18, fontWeight: 600, marginTop: 4 }}>{projectName}</h2>
           {portal.proposal_accepted_at && (
-            <p style={{ color: '#9ca3af', fontSize: 11, marginTop: 6 }}>
+            <p style={{ color: '#D4C5A9', fontSize: 11, marginTop: 6 }}>
               Accepted {new Date(portal.proposal_accepted_at).toLocaleDateString()}
             </p>
           )}
@@ -625,7 +625,7 @@ function ProposalTotals({ totals, portal, editEnabled, accessCode, onSave, showP
 function Row({ label, value }) {
   return (
     <tr>
-      <td style={{ padding: '6px 12px', color: '#9ca3af', fontSize: 12, borderBottom: '1px solid #1a1f2e' }}>{label}</td>
+      <td style={{ padding: '6px 12px', color: '#D4C5A9', fontSize: 12, borderBottom: '1px solid #1a1f2e' }}>{label}</td>
       <td style={{ padding: '6px 12px', color: '#D4C5A9', fontSize: 12, borderBottom: '1px solid #1a1f2e', textAlign: 'right' }}>{value}</td>
     </tr>
   );
@@ -657,7 +657,7 @@ function SnippetsPanel({ snippets, ownerKind, ownerId, onChange }) {
     <div style={{ background: '#1a1f2e', border: '1px solid #D4A574', margin: 12, padding: 12, borderRadius: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div style={{ color: '#D4A574', fontSize: 13, fontWeight: 700 }}>📚 SNIPPET LIBRARY — reusable line items</div>
-        <button onClick={() => setAdding(!adding)} style={{ background: '#10B981', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>
+        <button onClick={() => setAdding(!adding)} style={{ background: '#10B981', color: '#D4C5A9', padding: '4px 12px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>
           {adding ? '✕ CANCEL' : '+ NEW SNIPPET'}
         </button>
       </div>
@@ -676,7 +676,7 @@ function SnippetsPanel({ snippets, ownerKind, ownerId, onChange }) {
         {snippets.map(s => (
           <div key={s.id} style={{ background: '#0f1218', border: '1px solid #B49B7E', padding: 8, borderRadius: 4, position: 'relative' }}>
             <div style={{ color: '#D4A574', fontSize: 12, fontWeight: 700 }}>{s.name}</div>
-            <div style={{ color: '#9ca3af', fontSize: 10 }}>{s.default_quantity} {s.default_unit} · {fmtUSD(s.default_cost)} · {s.default_markup_percent}%</div>
+            <div style={{ color: '#D4C5A9', fontSize: 10 }}>{s.default_quantity} {s.default_unit} · {fmtUSD(s.default_cost)} · {s.default_markup_percent}%</div>
             <button onClick={() => remove(s.id)} style={{ position: 'absolute', top: 4, right: 4, background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 11 }}>✕</button>
           </div>
         ))}

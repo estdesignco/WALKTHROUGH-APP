@@ -42,7 +42,7 @@ export default function TradePortal() {
     return (
       <div style={{ padding: 60, color: '#D4A574', textAlign: 'center', background: '#0f1218', minHeight: '100vh' }}>
         <h1 style={{ fontSize: 24, marginBottom: 12 }}>Link unavailable</h1>
-        <p style={{ color: '#9ca3af', fontSize: 14 }}>This trade portal is currently disabled by the builder. Please contact them for access.</p>
+        <p style={{ color: '#D4C5A9', fontSize: 14 }}>This trade portal is currently disabled by the builder. Please contact them for access.</p>
       </div>
     );
   }

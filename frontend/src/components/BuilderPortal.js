@@ -186,7 +186,7 @@ export default function BuilderPortal() {
           <div>
             <p style={{ color: '#D4A574', fontSize: 11, letterSpacing: 4, fontWeight: 700, marginBottom: 4 }}>{t.builderPortal}</p>
             <h1 className="bp-header-title" style={{ fontSize: 26, fontWeight: 900, color: '#D4C5A9', margin: 0 }}>{project.name}</h1>
-            <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>{project.client_info?.address}</p>
+            <p style={{ color: '#D4C5A9', fontSize: 13, marginTop: 4 }}>{project.client_info?.address}</p>
           </div>
           <div className="bp-header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <button onClick={() => setShowCompanyForm(true)} data-testid="builder-edit-company-btn" style={{ background: 'transparent', border: '1px solid #D4A574', padding: '6px 14px', borderRadius: 6, color: '#D4A574', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
@@ -197,7 +197,7 @@ export default function BuilderPortal() {
             </button>
             <div className="bp-header-firm-block" style={{ textAlign: 'right' }}>
               <p style={{ color: '#D4A574', fontSize: 12, fontWeight: 700 }}>ESTABLISHED DESIGN CO.</p>
-              <p style={{ color: '#6B7280', fontSize: 11 }}>{project.client_info?.full_name}</p>
+              <p style={{ color: '#D4C5A9', fontSize: 11 }}>{project.client_info?.full_name}</p>
             </div>
           </div>
         </div>
@@ -245,7 +245,7 @@ export default function BuilderPortal() {
               ].map((stat, i) => (
                 <div key={i} style={{ background: '#1a1f2e', borderRadius: 12, padding: '20px 16px', textAlign: 'center', border: `1px solid ${stat.color}30` }}>
                   <p style={{ color: stat.color, fontSize: 32, fontWeight: 900, margin: 0 }}>{stat.value}</p>
-                  <p style={{ color: '#9CA3AF', fontSize: 12, fontWeight: 600, marginTop: 4, letterSpacing: 1 }}>{stat.label.toUpperCase()}</p>
+                  <p style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 600, marginTop: 4, letterSpacing: 1 }}>{stat.label.toUpperCase()}</p>
                 </div>
               ))}
             </div>
@@ -272,7 +272,7 @@ export default function BuilderPortal() {
               ].map((link, i) => (
                 <div key={i} onClick={() => setActiveTab(link.tab)} style={{ background: '#1a1f2e', borderRadius: 12, padding: 20, border: `1px solid ${link.color}30`, cursor: 'pointer', transition: 'all 0.2s' }}>
                   <h4 style={{ color: link.color, fontSize: 14, fontWeight: 700, marginBottom: 4 }}>{link.label}</h4>
-                  <p style={{ color: '#6B7280', fontSize: 12 }}>{link.desc}</p>
+                  <p style={{ color: '#D4C5A9', fontSize: 12 }}>{link.desc}</p>
                 </div>
               ))}
             </div>
@@ -395,7 +395,7 @@ export default function BuilderPortal() {
               <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 12, borderLeft: '4px solid #F59E0B' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}><h3 style={{ color: '#D4C5A9', fontSize: 15, fontWeight: 700 }}>{co.title}</h3><span style={{ color: '#F59E0B', fontSize: 12 }}>{co.date}</span></div>
                 <p style={{ color: '#D4C5A9', fontSize: 13, marginTop: 8 }}>{co.description}</p>
-                {co.author && <p style={{ color: '#6B7280', fontSize: 11, marginTop: 4 }}>By: {co.author}</p>}
+                {co.author && <p style={{ color: '#D4C5A9', fontSize: 11, marginTop: 4 }}>By: {co.author}</p>}
               </div>
             ))}
           </div>
@@ -427,7 +427,7 @@ export default function BuilderPortal() {
               <div key={c.id} style={{ background: '#1a1f2e', padding: 12, borderRadius: 8, marginBottom: 8, borderLeft: '3px solid #D4A574' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                   <span style={{ color: '#D4A574', fontSize: 13, fontWeight: 700 }}>{c.author}</span>
-                  <span style={{ color: '#6B7280', fontSize: 11 }}>{c.section} • {new Date(c.created_at).toLocaleDateString()}</span>
+                  <span style={{ color: '#D4C5A9', fontSize: 11 }}>{c.section} • {new Date(c.created_at).toLocaleDateString()}</span>
                 </div>
                 <p style={{ color: '#D4C5A9', fontSize: 14 }}>{c.text}</p>
               </div>
@@ -437,7 +437,7 @@ export default function BuilderPortal() {
       </main>
 
       <footer style={{ borderTop: '1px solid #2a3040', padding: '16px 32px', textAlign: 'center', marginTop: 40 }}>
-        <p style={{ color: '#4B5563', fontSize: 12 }}>ESTABLISHED DESIGN CO. — Builder Portal</p>
+        <p style={{ color: '#D4C5A9', fontSize: 12 }}>ESTABLISHED DESIGN CO. — Builder Portal</p>
       </footer>
 
       {showCompanyForm && (
@@ -614,13 +614,13 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
 
       {tradeFilter && (
         <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 11, color: '#6B7280' }}>Filtered to trade:</span>
-          <span style={{ background: tradeColors[tradeFilter] || '#6B7280', color: '#fff', padding: '2px 10px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>#{tradeFilter}</span>
+          <span style={{ fontSize: 11, color: '#D4C5A9' }}>Filtered to trade:</span>
+          <span style={{ background: tradeColors[tradeFilter] || '#6B7280', color: '#D4C5A9', padding: '2px 10px', borderRadius: 4, fontSize: 11, fontWeight: 800, letterSpacing: 1 }}>#{tradeFilter}</span>
           <button onClick={() => setTradeFilter(null)} style={{ color: '#EF4444', fontSize: 11, background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer' }}>Clear filter</button>
         </div>
       )}
 
-      {!hasDoc && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope of work yet.' : 'No hay alcance del trabajo aún.'}</p>}
+      {!hasDoc && <p style={{ color: '#D4C5A9' }}>{lang === 'en' ? 'No scope of work yet.' : 'No hay alcance del trabajo aún.'}</p>}
 
       {viewMode === 'overall' && hasDoc && (
         <div data-testid="overall-scope-doc" className="scope-doc-readonly" style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 8, padding: '20px 28px', color: '#D4C5A9', fontSize: 15, lineHeight: 1.7 }}>
@@ -637,7 +637,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
           <div key={roomName} style={{ marginBottom: 24, background: `${headerColor}08`, borderRadius: 8, border: `1px solid ${headerColor}25`, overflow: 'hidden' }} data-testid={`by-room-${roomName}`}>
             <div style={{ background: `${headerColor}20`, borderLeft: `5px solid ${headerColor}`, padding: '12px 18px', display: 'flex', justifyContent: 'space-between' }}>
               <h3 style={{ color: headerColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{roomName}</h3>
-              <span style={{ color: '#6B7280', fontSize: 11 }}>{group.items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
+              <span style={{ color: '#D4C5A9', fontSize: 11 }}>{group.items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
             </div>
             <div style={{ padding: '12px 24px 16px 24px' }}>{renderBlockItems(group.items)}</div>
           </div>
@@ -659,7 +659,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
           <div key={trade} style={{ marginBottom: 24 }} data-testid={`by-trade-${trade}`}>
             <div style={{ background: `${tColor}15`, borderLeft: `5px solid ${tColor}`, padding: '12px 16px', borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ color: tColor, fontSize: 18, fontWeight: 900, letterSpacing: 2 }}>{label}</h3>
-              <span style={{ color: '#6B7280', fontSize: 12 }}>{items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
+              <span style={{ color: '#D4C5A9', fontSize: 12 }}>{items.length} {lang === 'en' ? 'items' : 'elementos'}</span>
             </div>
             {Object.entries(roomGroups).map(([rName, group]) => {
               const rColor = group.room?.color || '#D4A574';
@@ -768,15 +768,15 @@ function ProductHoverCard({ item, isChecklist, top, left }) {
       {item.image_url ? (
         <img src={item.image_url} alt={item.name} style={{ width: '100%', height: 180, objectFit: 'cover', background: '#0f1218' }} />
       ) : (
-        <div style={{ width: '100%', height: 80, background: '#1a1f2e', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563', fontSize: 11, fontStyle: 'italic' }}>No photo yet</div>
+        <div style={{ width: '100%', height: 80, background: '#1a1f2e', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D4C5A9', fontSize: 11, fontStyle: 'italic' }}>No photo yet</div>
       )}
       <div style={{ padding: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-          <span style={{ background: isChecklist ? '#10B981' : '#3B82F6', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 6px', borderRadius: 3, letterSpacing: 0.5 }}>{isChecklist ? 'CHK' : 'FFE'}</span>
+          <span style={{ background: isChecklist ? '#10B981' : '#3B82F6', color: '#D4C5A9', fontSize: 8, fontWeight: 800, padding: '1px 6px', borderRadius: 3, letterSpacing: 0.5 }}>{isChecklist ? 'CHK' : 'FFE'}</span>
           {item._room && <span style={{ color: item._roomColor || '#D4A574', fontSize: 10, fontWeight: 700, letterSpacing: 0.8 }}>{item._room}</span>}
         </div>
         <div style={{ color: '#D4C5A9', fontSize: 13, fontWeight: 800, marginBottom: 4, lineHeight: 1.25 }}>{item.name || '(unnamed)'}</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 10px', fontSize: 10, color: '#9CA3AF' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 10px', fontSize: 10, color: '#D4C5A9' }}>
           {item.vendor && <span>{item.vendor}</span>}
           {item.sku && <span>SKU: {item.sku}</span>}
           {item.size && <span>Size: {item.size}</span>}
@@ -811,7 +811,7 @@ function ProductDetailModal({ item, onClose, onGoToFFE, onGoToChecklist, lang })
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
         <div onClick={e => e.stopPropagation()} style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 12, padding: 24, maxWidth: 380 }}>
           <h3 style={{ color: '#EF4444', fontSize: 16, fontWeight: 800, marginBottom: 8 }}>Item not found</h3>
-          <p style={{ color: '#9CA3AF', fontSize: 13 }}>This item may have been deleted or hasn't been created yet. ID: <code style={{ color: '#6B7280' }}>{item.id}</code></p>
+          <p style={{ color: '#D4C5A9', fontSize: 13 }}>This item may have been deleted or hasn't been created yet. ID: <code style={{ color: '#D4C5A9' }}>{item.id}</code></p>
           <button onClick={onClose} style={{ marginTop: 16, padding: '8px 16px', background: '#D4A574', color: '#1a1f2e', border: 'none', borderRadius: 6, fontWeight: 800, cursor: 'pointer' }}>Close</button>
         </div>
       </div>
@@ -824,24 +824,24 @@ function ProductDetailModal({ item, onClose, onGoToFFE, onGoToChecklist, lang })
       <div onClick={e => e.stopPropagation()} style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 12, padding: 0, maxWidth: 480, width: '100%', maxHeight: '85vh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #2a3040' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ background: isChk ? '#10B981' : '#3B82F6', color: '#fff', fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 4, letterSpacing: 1 }}>{isChk ? 'CHECKLIST' : 'FF&E'}</span>
+            <span style={{ background: isChk ? '#10B981' : '#3B82F6', color: '#D4C5A9', fontSize: 9, fontWeight: 800, padding: '2px 8px', borderRadius: 4, letterSpacing: 1 }}>{isChk ? 'CHECKLIST' : 'FF&E'}</span>
             <span style={{ color: item._roomColor || '#D4A574', fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>{item._room}</span>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 20, cursor: 'pointer' }}>×</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#D4C5A9', fontSize: 20, cursor: 'pointer' }}>×</button>
         </div>
         {item.image_url && (
           <img src={item.image_url} alt={item.name} style={{ width: '100%', height: 280, objectFit: 'cover', background: '#0f1218' }} />
         )}
         <div style={{ padding: 20, overflowY: 'auto' }}>
           <h3 style={{ color: '#D4C5A9', fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{item.name || '(unnamed)'}</h3>
-          {item.vendor && <p style={{ color: '#9CA3AF', fontSize: 12, marginBottom: 12 }}>{item.vendor}</p>}
+          {item.vendor && <p style={{ color: '#D4C5A9', fontSize: 12, marginBottom: 12 }}>{item.vendor}</p>}
           <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '6px 14px', fontSize: 13, marginTop: 8 }}>
-            {item.sku && (<><span style={{ color: '#6B7280' }}>SKU</span><span style={{ color: '#D4C5A9' }}>{item.sku}</span></>)}
-            {item.size && (<><span style={{ color: '#6B7280' }}>Size</span><span style={{ color: '#D4C5A9' }}>{item.size}</span></>)}
-            {item.finish_color && (<><span style={{ color: '#6B7280' }}>Finish</span><span style={{ color: '#D4C5A9' }}>{item.finish_color}</span></>)}
-            {item.status && (<><span style={{ color: '#6B7280' }}>Status</span><span style={{ color: '#D4C5A9', fontWeight: 700 }}>{item.status}</span></>)}
-            {item.quantity && (<><span style={{ color: '#6B7280' }}>Qty</span><span style={{ color: '#D4C5A9' }}>{item.quantity}</span></>)}
-            {item.remarks && (<><span style={{ color: '#6B7280' }}>Notes</span><span style={{ color: '#D4C5A9' }}>{item.remarks}</span></>)}
+            {item.sku && (<><span style={{ color: '#D4C5A9' }}>SKU</span><span style={{ color: '#D4C5A9' }}>{item.sku}</span></>)}
+            {item.size && (<><span style={{ color: '#D4C5A9' }}>Size</span><span style={{ color: '#D4C5A9' }}>{item.size}</span></>)}
+            {item.finish_color && (<><span style={{ color: '#D4C5A9' }}>Finish</span><span style={{ color: '#D4C5A9' }}>{item.finish_color}</span></>)}
+            {item.status && (<><span style={{ color: '#D4C5A9' }}>Status</span><span style={{ color: '#D4C5A9', fontWeight: 700 }}>{item.status}</span></>)}
+            {item.quantity && (<><span style={{ color: '#D4C5A9' }}>Qty</span><span style={{ color: '#D4C5A9' }}>{item.quantity}</span></>)}
+            {item.remarks && (<><span style={{ color: '#D4C5A9' }}>Notes</span><span style={{ color: '#D4C5A9' }}>{item.remarks}</span></>)}
           </div>
         </div>
         <div style={{ padding: 12, borderTop: '1px solid #2a3040', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
@@ -955,7 +955,7 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
           </label>
         </div>
       </div>
-      <p style={{ color: '#6B7280', fontSize: 13, marginBottom: 16 }}>
+      <p style={{ color: '#D4C5A9', fontSize: 13, marginBottom: 16 }}>
         {lang === 'en' ? 'Upload general project documents — permits, plans, insurance, contracts, etc.' : 'Suba documentos generales — permisos, planos, seguros, contratos, etc.'}
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
@@ -970,7 +970,7 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
               onClick={(e) => { e.stopPropagation(); handleDelete(idx); }}
               data-testid={`general-upload-delete-${idx}`}
               title={lang === 'en' ? 'Delete' : 'Eliminar'}
-              style={{ position: 'absolute', top: 4, right: 4, zIndex: 2, background: 'rgba(239,68,68,0.85)', color: '#fff', border: 'none', borderRadius: 4, width: 22, height: 22, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}
+              style={{ position: 'absolute', top: 4, right: 4, zIndex: 2, background: 'rgba(239,68,68,0.85)', color: '#D4C5A9', border: 'none', borderRadius: 4, width: 22, height: 22, cursor: 'pointer', fontSize: 12, fontWeight: 700 }}
             >✕</button>
             <div onClick={() => setLightbox({ files, index: idx })} style={{ cursor: 'pointer' }} title={lang === 'en' ? 'Click to open' : 'Clic para abrir'}>
               {file.type?.startsWith('image/') || file.data?.startsWith('data:image') ? (
@@ -980,12 +980,12 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
               )}
               <div style={{ padding: '8px 12px' }}>
                 <p style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
-                <p style={{ color: '#6B7280', fontSize: 10 }}>{file.uploaded_by} • {file.uploaded_at ? new Date(file.uploaded_at).toLocaleDateString() : ''}</p>
+                <p style={{ color: '#D4C5A9', fontSize: 10 }}>{file.uploaded_by} • {file.uploaded_at ? new Date(file.uploaded_at).toLocaleDateString() : ''}</p>
               </div>
             </div>
           </div>
         ))}
-        {files.length === 0 && <p style={{ color: '#6B7280', fontSize: 13 }}>{lang === 'en' ? 'No files uploaded yet.' : 'No hay archivos.'}</p>}
+        {files.length === 0 && <p style={{ color: '#D4C5A9', fontSize: 13 }}>{lang === 'en' ? 'No files uploaded yet.' : 'No hay archivos.'}</p>}
       </div>
       {lightbox && <FileLightbox files={lightbox.files} startIndex={lightbox.index} onClose={() => setLightbox(null)} />}
     </div>
@@ -1088,14 +1088,14 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
                 >
                   <div style={{ width: '100%', height: 140, overflow: 'hidden' }}><img src={photo.url || photo.photo_data} alt={photo.file_name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
                   <div style={{ padding: '6px 10px' }}>
-                    <p style={{ color: '#9CA3AF', fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.file_name || `Photo ${idx + 1}`}</p>
+                    <p style={{ color: '#D4C5A9', fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.file_name || `Photo ${idx + 1}`}</p>
                   </div>
                 </div>
               );
             })}
           </div>
           {(!photos[room.id] || photos[room.id].length === 0) && (
-            <p style={{ color: '#6B7280', fontSize: 13, padding: '0 8px' }}>{lang === 'en' ? 'No photos yet' : 'Sin fotos'}</p>
+            <p style={{ color: '#D4C5A9', fontSize: 13, padding: '0 8px' }}>{lang === 'en' ? 'No photos yet' : 'Sin fotos'}</p>
           )}
         </div>
         );
@@ -1187,18 +1187,18 @@ function TodoSection({ projectId, todos, contacts, rooms, t, onReload }) {
           borderLeft: `4px solid ${todo.status === 'completed' ? '#10B981' : todo.priority === 'Urgent' ? '#EF4444' : todo.priority === 'High' ? '#F59E0B' : '#6B7280'}`,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <p style={{ color: '#fff', fontSize: 14, fontWeight: 600 }} dangerouslySetInnerHTML={{ __html: todo.text }} />
+            <p style={{ color: '#D4C5A9', fontSize: 14, fontWeight: 600 }} dangerouslySetInnerHTML={{ __html: todo.text }} />
             <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
               {todo.assigned_to && <span style={{ color: '#D4A574', fontSize: 11, fontWeight: 700 }}>@{todo.assigned_to}</span>}
-              {todo.deadline && <span style={{ color: '#9CA3AF', fontSize: 11 }}>Due: {todo.deadline}</span>}
+              {todo.deadline && <span style={{ color: '#D4C5A9', fontSize: 11 }}>Due: {todo.deadline}</span>}
             </div>
           </div>
           <span style={{ padding: '4px 10px', borderRadius: 12, fontSize: 11, fontWeight: 700,
-            background: todo.status === 'completed' ? '#065F46' : todo.status === 'in_progress' ? '#92400E' : '#374151', color: '#fff' }}>
+            background: todo.status === 'completed' ? '#065F46' : todo.status === 'in_progress' ? '#92400E' : '#374151', color: '#D4C5A9' }}>
             {(todo.status || 'pending').toUpperCase()}
           </span>
         </div>
-      )) : <p style={{ color: '#6B7280' }}>No tasks yet.</p>}
+      )) : <p style={{ color: '#D4C5A9' }}>No tasks yet.</p>}
     </div>
   );
 }
@@ -1284,7 +1284,7 @@ function ContactsSection({ portal, accessCode, comments, t, lang, onReload }) {
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <p style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>{c.name}</p>
+                    <p style={{ color: '#D4C5A9', fontSize: 16, fontWeight: 700 }}>{c.name}</p>
                     {c.username && <p style={{ color: '#D4A574', fontSize: 11, fontWeight: 700 }}>@{c.username}</p>}
                   </div>
                   <div style={{ display: 'flex', gap: 6 }}>
@@ -1293,8 +1293,8 @@ function ContactsSection({ portal, accessCode, comments, t, lang, onReload }) {
                   </div>
                 </div>
                 <p style={{ color: '#10B981', fontSize: 12, fontWeight: 600, marginTop: 4 }}>{c.role}</p>
-                {c.phone && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8 }}>{c.phone}</p>}
-                {c.email && <p style={{ color: '#9CA3AF', fontSize: 13 }}>{c.email}</p>}
+                {c.phone && <p style={{ color: '#D4C5A9', fontSize: 13, marginTop: 8 }}>{c.phone}</p>}
+                {c.email && <p style={{ color: '#D4C5A9', fontSize: 13 }}>{c.email}</p>}
               </div>
             )}
           </div>
@@ -1376,21 +1376,21 @@ function ScheduleSection({ portal, accessCode, rooms, contacts, t, lang, onReloa
         <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 12,
           borderLeft: `4px solid ${event.status === 'completed' ? '#10B981' : event.status === 'in_progress' ? '#F59E0B' : '#D4A574'}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{event.title}</h3>
+            <h3 style={{ color: '#D4C5A9', fontSize: 15, fontWeight: 700 }}>{event.title}</h3>
             <span style={{ color: '#D4A574', fontSize: 13, fontWeight: 600 }}>{event.date}</span>
           </div>
-          {event.notes && <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>{event.notes}</p>}
+          {event.notes && <p style={{ color: '#D4C5A9', fontSize: 13, marginTop: 4 }}>{event.notes}</p>}
           <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 10, fontWeight: 700, marginTop: 6, display: 'inline-block',
-            background: event.status === 'completed' ? '#065F46' : event.status === 'in_progress' ? '#92400E' : '#374151', color: '#fff' }}>
+            background: event.status === 'completed' ? '#065F46' : event.status === 'in_progress' ? '#92400E' : '#374151', color: '#D4C5A9' }}>
             {event.status?.toUpperCase() || 'PENDING'}
           </span>
         </div>
-      )) : <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No schedule items yet. Add one above.' : 'No hay elementos. Agregue uno arriba.'}</p>}
+      )) : <p style={{ color: '#D4C5A9' }}>{lang === 'en' ? 'No schedule items yet. Add one above.' : 'No hay elementos. Agregue uno arriba.'}</p>}
     </div>
   );
 }
 
 const sectionTitle = { color: '#D4A574', fontSize: 30, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18, paddingBottom: 8, borderBottom: '2px solid #D4A574' };
-const inputStyle = { width: '100%', background: '#0f1218', border: '1px solid #2a3040', borderRadius: 6, padding: '10px 12px', color: '#fff', fontSize: 14, marginBottom: 8, display: 'block', boxSizing: 'border-box' };
+const inputStyle = { width: '100%', background: '#0f1218', border: '1px solid #2a3040', borderRadius: 6, padding: '10px 12px', color: '#D4C5A9', fontSize: 14, marginBottom: 8, display: 'block', boxSizing: 'border-box' };
 const btnPrimary = { background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' };
-const btnSecondary = { background: '#374151', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: 8, cursor: 'pointer' };
+const btnSecondary = { background: '#374151', color: '#D4C5A9', border: 'none', padding: '10px 16px', borderRadius: 8, cursor: 'pointer' };

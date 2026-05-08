@@ -71,7 +71,7 @@ export default function BuilderTradesManager({ accessCode, portal, rooms }) {
     return (
       <div style={{ padding: 60, textAlign: 'center', color: '#D4A574' }}>
         <h2 style={{ fontSize: 20, marginBottom: 8 }}>Accept the Proposal first</h2>
-        <p style={{ color: '#9ca3af', fontSize: 13 }}>
+        <p style={{ color: '#D4C5A9', fontSize: 13 }}>
           Once you accept the proposal, you can spawn per-trade sub-links here so your subs can quote the work.
         </p>
       </div>
@@ -82,12 +82,12 @@ export default function BuilderTradesManager({ accessCode, portal, rooms }) {
     <div style={{ padding: 16 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ color: '#D4A574', fontSize: 20, fontWeight: 700 }}>Trade Sub-Portals</h2>
-        <button onClick={() => setShowCreate(!showCreate)} data-testid="add-trade-btn" style={{ background: '#10B981', color: '#fff', padding: '8px 16px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
+        <button onClick={() => setShowCreate(!showCreate)} data-testid="add-trade-btn" style={{ background: '#10B981', color: '#D4C5A9', padding: '8px 16px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
           {showCreate ? '✕ CANCEL' : '+ NEW TRADE LINK'}
         </button>
       </div>
 
-      <p style={{ color: '#6B7280', fontSize: 12, marginBottom: 16 }}>
+      <p style={{ color: '#D4C5A9', fontSize: 12, marginBottom: 16 }}>
         Generate a private link per sub. Each link can be toggled on/off any time. Subs only see the categories you give them; your numbers stay private.
       </p>
 
@@ -111,24 +111,24 @@ export default function BuilderTradesManager({ accessCode, portal, rooms }) {
                 {c.label}
               </label>
             ))}
-            {allCategories.length === 0 && <p style={{ color: '#6B7280', fontSize: 12 }}>No categories available yet.</p>}
+            {allCategories.length === 0 && <p style={{ color: '#D4C5A9', fontSize: 12 }}>No categories available yet.</p>}
           </div>
           <button onClick={create} style={{ background: '#D4A574', color: '#000', padding: '6px 16px', fontWeight: 700, fontSize: 12, border: 'none', borderRadius: 4, cursor: 'pointer' }}>CREATE LINK</button>
         </div>
       )}
 
-      {loading && <p style={{ color: '#9ca3af', fontSize: 12 }}>Loading…</p>}
+      {loading && <p style={{ color: '#D4C5A9', fontSize: 12 }}>Loading…</p>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 12 }}>
         {trades.map(t => (
           <div key={t.id} style={{ background: '#0f1218', border: '1px solid #2a3040', borderRadius: 4, padding: 16, opacity: t.enabled ? 1 : 0.5 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <h3 style={{ color: '#D4A574', fontSize: 14, fontWeight: 700 }}>{t.trade_name}</h3>
-              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99, background: t.enabled ? '#064e3b' : '#7f1d1d', color: '#fff' }}>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99, background: t.enabled ? '#064e3b' : '#7f1d1d', color: '#D4C5A9' }}>
                 {t.enabled ? 'ENABLED' : 'DISABLED'}
               </span>
             </div>
-            {t.contact_name && <p style={{ color: '#9ca3af', fontSize: 12 }}>{t.contact_name}{t.contact_email ? ` · ${t.contact_email}` : ''}</p>}
+            {t.contact_name && <p style={{ color: '#D4C5A9', fontSize: 12 }}>{t.contact_name}{t.contact_email ? ` · ${t.contact_email}` : ''}</p>}
             <div style={{ marginTop: 8, padding: 8, background: '#1a1f2e', borderRadius: 4, fontSize: 11, color: '#D4C5A9', wordBreak: 'break-all', cursor: 'pointer' }}
                  onClick={() => { navigator.clipboard?.writeText(tradeUrl(t.trade_access_code)); }}
                  title="Click to copy">
@@ -153,4 +153,4 @@ export default function BuilderTradesManager({ accessCode, portal, rooms }) {
 }
 
 const inp = { background: '#0f1218', color: '#D4C5A9', border: '1px solid #B49B7E', padding: '6px 8px', fontSize: 12, borderRadius: 4 };
-const btnSmall = (bg) => ({ background: bg, color: '#fff', padding: '4px 10px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 700 });
+const btnSmall = (bg) => ({ background: bg, color: '#D4C5A9', padding: '4px 10px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 10, fontWeight: 700 });

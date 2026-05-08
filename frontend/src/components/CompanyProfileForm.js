@@ -48,7 +48,7 @@ export default function CompanyProfileForm({ accessCode, onClose, onSaved }) {
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={e => e.stopPropagation()} style={{ background: '#0f1218', border: '1px solid #D4A574', maxWidth: 640, width: '100%', padding: 24, borderRadius: 8, maxHeight: '90vh', overflowY: 'auto' }} data-testid="company-profile-form">
         <h2 style={{ color: '#D4A574', fontSize: 18, marginBottom: 12 }}>Your Company Profile</h2>
-        <p style={{ color: '#9ca3af', fontSize: 12, marginBottom: 16 }}>This branding shows on every quote you send. The designer never sees your numbers.</p>
+        <p style={{ color: '#D4C5A9', fontSize: 12, marginBottom: 16 }}>This branding shows on every quote you send. The designer never sees your numbers.</p>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <Field label="Company name">
@@ -94,7 +94,7 @@ export default function CompanyProfileForm({ accessCode, onClose, onSaved }) {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
-          <button onClick={onClose} style={{ background: 'transparent', color: '#9ca3af', border: '1px solid #4b5563', padding: '8px 16px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Cancel</button>
+          <button onClick={onClose} style={{ background: 'transparent', color: '#D4C5A9', border: '1px solid #4b5563', padding: '8px 16px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Cancel</button>
           <button onClick={save} disabled={saving} data-testid="save-company-btn" style={{ background: '#D4A574', color: '#000', padding: '8px 16px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700 }}>
             {saving ? 'Saving…' : 'Save Profile'}
           </button>
