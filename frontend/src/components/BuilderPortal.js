@@ -569,9 +569,9 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
 
   // Render a block's items (used for By Room / By Trade lists)
   const renderBlockItems = (items) => items.map((item, idx) => (
-    <div key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', alignItems: 'flex-start' }}>
-      <span style={{ color: '#6B7280', fontWeight: 700, minWidth: 22, fontSize: 13 }}>{idx + 1}.</span>
-      <div style={{ color: '#E5E7EB', fontSize: 14, lineHeight: 1.5, flex: 1 }}>{renderScope(`<p>${item.html}</p>`)}</div>
+    <div key={idx} style={{ display: 'flex', gap: 10, padding: '6px 0', borderBottom: '1px solid rgba(212,165,116,0.08)', alignItems: 'flex-start' }}>
+      <span style={{ color: '#B49B7E', fontWeight: 700, minWidth: 22, fontSize: 13 }}>{idx + 1}.</span>
+      <div style={{ color: '#D4C5A9', fontSize: 14, lineHeight: 1.5, flex: 1 }}>{renderScope(`<p>${item.html}</p>`)}</div>
     </div>
   ));
 
@@ -664,13 +664,21 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
             {Object.entries(roomGroups).map(([rName, group]) => {
               const rColor = group.room?.color || '#D4A574';
               return (
-                <div key={rName} style={{ marginLeft: 12, marginBottom: 16 }}>
-                  {/* Room banner — full muted-gradient pill so the room is unmistakable
-                      under each trade (matches Checklist/FFE banner recipe). */}
-                  <div style={{ ...getMutedRoomHeaderStyle(rColor), display: 'inline-block', padding: '6px 16px', borderRadius: 4, marginBottom: 8, border: `1px solid ${rColor}` }}>
-                    <span style={{ color: '#fff', fontSize: 13, fontWeight: 800, letterSpacing: 2 }}>{rName?.toUpperCase()}</span>
+                <div key={rName} style={{ marginBottom: 16 }}>
+                  {/* Full-width muted-gradient room banner — same recipe as
+                      admin Checklist & FFE (135° gradient + inset white-glow +
+                      heavy black inner-shadow + textShadow). NEVER deviates. */}
+                  <div style={{
+                    ...getMutedRoomHeaderStyle(rColor),
+                    border: '1px solid #D4A574',
+                    padding: '8px 16px',
+                    marginBottom: 8,
+                  }}>
+                    <span style={{ color: '#D4C5A9', fontSize: 13, fontWeight: 800, letterSpacing: 2 }}>{rName?.toUpperCase()}</span>
                   </div>
-                  {renderBlockItems(group.items)}
+                  <div style={{ paddingLeft: 16 }}>
+                    {renderBlockItems(group.items)}
+                  </div>
                 </div>
               );
             })}
