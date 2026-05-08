@@ -19592,15 +19592,18 @@ class SnippetUpdate(BaseModel):
 
 class TradePortalCreate(BaseModel):
     builder_access_code: str
-    trade_name: str  # e.g. "Plumbing"
+    trade_name: str  # primary trade name shown in header (e.g. "Plumbing")
     contact_name: str = ""
     contact_email: str = ""
-    category_filter: List[str] = []  # category IDs visible to this trade
+    assigned_trades: List[str] = []  # trade tag names visible to this sub (e.g. ["PLUMBING","HVAC"])
+    # Legacy: kept for backward compat, no longer used for scope filtering.
+    category_filter: List[str] = []
 
 class TradePortalUpdate(BaseModel):
     trade_name: Optional[str] = None
     contact_name: Optional[str] = None
     contact_email: Optional[str] = None
+    assigned_trades: Optional[List[str]] = None
     category_filter: Optional[List[str]] = None
     enabled: Optional[bool] = None
     proposal_edit_enabled: Optional[bool] = None
@@ -19665,20 +19668,25 @@ async def update_builder_proposal_settings(portal_id: str, payload: ProposalSett
 
 @api_router.post("/builder/{access_code}/proposal/accept")
 async def builder_accept_proposal(access_code: str, payload: ProposalAccept):
-    portal = await db.builder_portals.find_one({"access_code": access_code}, {"_id": 0})
+    """Unified accept endpoint — works for builder portal AND trade portal.
+    Looks up which type via _get_portal_by_access then flips edit_enabled."""
+    kind, portal = await _get_portal_by_access(access_code)
     if not portal:
         raise HTTPException(status_code=404, detail="Invalid access code")
-    if not portal.get("proposal_view_enabled"):
-        raise HTTPException(status_code=403, detail="Proposal not enabled by designer yet")
+    if not portal.get("proposal_view_enabled", kind == "trade"):
+        # Trade portals default to view-enabled; builder portals require designer toggle.
+        raise HTTPException(status_code=403, detail="Proposal not enabled yet")
     if not (payload.signature or "").strip():
         raise HTTPException(status_code=400, detail="Signature required")
-    await db.builder_portals.update_one(
-        {"access_code": access_code},
+    coll = db.builder_portals if kind == "builder" else db.trade_portals
+    key = "access_code" if kind == "builder" else "trade_access_code"
+    await coll.update_one(
+        {key: access_code},
         {"$set": {
             "proposal_accepted": True,
             "proposal_accepted_at": datetime.now(timezone.utc).isoformat(),
             "proposal_accepted_signature": payload.signature.strip(),
-            "proposal_edit_enabled": True,  # auto-unlock editing on accept
+            "proposal_edit_enabled": True,
         }},
     )
     return {"status": "accepted"}
@@ -19686,55 +19694,97 @@ async def builder_accept_proposal(access_code: str, payload: ProposalAccept):
 # ----------------- Proposal: read merged scope tree -----------------
 
 async def _build_proposal_payload(kind: str, portal: dict):
-    """Build the merged scope tree (rooms/cats/subs/items) for a portal,
-    layering in proposal overrides + extras + the portal's company profile."""
-    # Trade portals reference their parent builder portal via builder_access_code
+    """Build the proposal payload — scope-document driven.
+
+    The Proposal mirrors the project's Scope of Work: each scope sentence
+    becomes one editable line item with Qty/Unit/Cost/Markup/Total fields.
+    The frontend parses `scope_document` HTML and groups items by Room → Trade
+    so the layout matches the admin Checklist/FFE visually.
+
+    Trade portals get the SAME scope but filtered to their `assigned_trades`.
+    Builder portals additionally receive `trade_quotes` — a map of
+    `line_id → {trade_name, cost, total}` — so the builder UI auto-prefills
+    the Cost column with whatever each sub already submitted.
+    """
     if kind == "trade":
         builder = await db.builder_portals.find_one({"access_code": portal["builder_access_code"]}, {"_id": 0})
         if not builder:
             raise HTTPException(status_code=404, detail="Parent builder portal missing")
-        selected_ids = builder.get("selected_room_ids", [])
-        cat_filter = portal.get("category_filter") or []
-        access_code = portal["trade_access_code"]
         portal_id_for_filter = portal["id"]
+        access_code = portal["trade_access_code"]
     else:
         builder = portal
-        selected_ids = portal.get("selected_room_ids", [])
-        cat_filter = []
-        access_code = portal["access_code"]
         portal_id_for_filter = portal["id"]
+        access_code = portal["access_code"]
 
-    rooms = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).sort("order_index", 1).to_list(200)
-    for room in rooms:
-        room.setdefault("floor", "1ST FLOOR")
-        room.setdefault("notes", "")
-        cats = await db.categories.find({"room_id": room["id"]}, {"_id": 0}).sort("order_index", 1).to_list(200)
-        if cat_filter:
-            cats = [c for c in cats if c["id"] in cat_filter]
-        for cat in cats:
-            subs = await db.subcategories.find({"category_id": cat["id"]}, {"_id": 0}).sort("order_index", 1).to_list(200)
-            for sub in subs:
-                items = await db.items.find({"subcategory_id": sub["id"]}, {"_id": 0}).sort("order_index", 1).to_list(1000)
-                for it in items:
-                    # Strip designer pricing — proposal pricing is per-portal.
-                    for k in ("cost", "price", "budget", "total_cost"):
-                        it.pop(k, None)
-                sub["items"] = items
-            cat["subcategories"] = subs
-        room["categories"] = cats
+    project = await db.projects.find_one({"id": builder["project_id"]}, {"_id": 0}) or {}
 
-    overrides = await db.proposal_overrides.find({"portal_id": portal_id_for_filter}, {"_id": 0}).to_list(5000)
-    extras = await db.proposal_extras.find({"portal_id": portal_id_for_filter}, {"_id": 0}).sort("order_index", 1).to_list(5000)
+    # Pull rooms (no nested cats/subs/items needed — proposal is scope-driven).
+    selected_ids = builder.get("selected_room_ids", [])
+    rooms_raw = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).sort("order_index", 1).to_list(200)
+    rooms = []
+    seen_names = set()
+    for r in rooms_raw:
+        # de-dupe by name (the same room exists per sheet_type)
+        key = (r.get("name") or "").strip().upper()
+        if not key or key in seen_names:
+            continue
+        seen_names.add(key)
+        rooms.append({
+            "id": r.get("id"),
+            "name": r.get("name"),
+            "color": r.get("color"),
+            "floor": r.get("floor"),
+            "order_index": r.get("order_index", 0),
+        })
+
+    overrides = await db.proposal_overrides.find(
+        {"portal_id": portal_id_for_filter}, {"_id": 0}
+    ).to_list(5000)
+    extras = await db.proposal_extras.find(
+        {"portal_id": portal_id_for_filter}, {"_id": 0}
+    ).sort("order_index", 1).to_list(5000)
     company = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0}) or {}
+
+    # Collect cross-portal trade quotes for the builder view: walk every
+    # trade sub-portal under this builder and return their cost overrides
+    # so the builder UI auto-prefills `Cost` for any line a trade has quoted.
+    trade_quotes = {}  # line_id -> {trade_name, cost, total}
+    if kind == "builder":
+        sub_trades = await db.trade_portals.find(
+            {"builder_access_code": builder.get("access_code")}, {"_id": 0}
+        ).to_list(500)
+        for tp in sub_trades:
+            trade_overrides = await db.proposal_overrides.find(
+                {"portal_id": tp["id"]}, {"_id": 0}
+            ).to_list(5000)
+            for ov in trade_overrides:
+                lid = ov.get("item_id")
+                if not lid:
+                    continue
+                cost = ov.get("cost")
+                qty = ov.get("quantity") or 1
+                if cost is None:
+                    continue
+                # Aggregate: a single line can be quoted by multiple trades —
+                # last-wins for now; the UI shows the trade name.
+                trade_quotes[lid] = {
+                    "trade_name": tp.get("trade_name"),
+                    "cost": cost,
+                    "quantity": qty,
+                    "total": float(qty) * float(cost),
+                }
 
     return {
         "kind": kind,
         "portal": portal,
+        "project_name": project.get("name", ""),
+        "scope_document": project.get("scope_document", ""),
         "rooms": rooms,
         "overrides": overrides,
         "extras": extras,
         "company": company,
-        "project_name": (await db.projects.find_one({"id": builder["project_id"]}, {"_id": 0}) or {}).get("name", ""),
+        "trade_quotes": trade_quotes,
     }
 
 @api_router.get("/builder/{access_code}/proposal")
@@ -19998,6 +20048,7 @@ async def create_trade_portal(access_code: str, payload: TradePortalCreate):
         "trade_name": payload.trade_name,
         "contact_name": payload.contact_name,
         "contact_email": payload.contact_email,
+        "assigned_trades": payload.assigned_trades or ([payload.trade_name.upper()] if payload.trade_name else []),
         "category_filter": payload.category_filter or [],
         "enabled": True,
         "proposal_view_enabled": True,
