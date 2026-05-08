@@ -19529,6 +19529,8 @@ class ProposalSettingsUpdate(BaseModel):
     trade_link_enabled: Optional[bool] = None
     tax_rate: Optional[float] = None
     pm_fee_rate: Optional[float] = None
+    proposal_notes: Optional[str] = None
+    proposal_less_payment: Optional[float] = None
 
 class ProposalAccept(BaseModel):
     signature: str  # typed full legal name
