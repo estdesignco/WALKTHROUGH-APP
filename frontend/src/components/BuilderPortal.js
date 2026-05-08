@@ -114,7 +114,7 @@ export default function BuilderPortal() {
     <div style={{ minHeight: '100vh', background: '#0f1218', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ textAlign: 'center', padding: 40, background: '#1a1f2e', borderRadius: 16, border: '2px solid #ef4444' }}>
         <p style={{ color: '#ef4444', fontSize: 20, fontWeight: 'bold' }}>Access Denied</p>
-        <p style={{ color: '#9CA3AF' }}>Invalid or expired portal link.</p>
+        <p style={{ color: '#D4C5A9' }}>Invalid or expired portal link.</p>
       </div>
     </div>
   );
@@ -159,7 +159,7 @@ export default function BuilderPortal() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f1218', color: '#F5F5DC' }}>
+    <div style={{ minHeight: '100vh', background: '#0f1218', color: '#D4C5A9' }}>
       {/* Global mobile-responsive styles */}
       <style>{`
         @media (max-width: 768px) {
@@ -185,7 +185,7 @@ export default function BuilderPortal() {
         <div className="bp-header-inner" style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <p style={{ color: '#D4A574', fontSize: 11, letterSpacing: 4, fontWeight: 700, marginBottom: 4 }}>{t.builderPortal}</p>
-            <h1 className="bp-header-title" style={{ fontSize: 26, fontWeight: 900, color: '#fff', margin: 0 }}>{project.name}</h1>
+            <h1 className="bp-header-title" style={{ fontSize: 26, fontWeight: 900, color: '#D4C5A9', margin: 0 }}>{project.name}</h1>
             <p style={{ color: '#9CA3AF', fontSize: 13, marginTop: 4 }}>{project.client_info?.address}</p>
           </div>
           <div className="bp-header-right" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -226,7 +226,7 @@ export default function BuilderPortal() {
               <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #D4A574 10px, #D4A574 11px)' }} />
               <div style={{ position: 'relative' }}>
                 <h2 style={{ fontSize: 28, fontWeight: 900, color: '#D4A574', marginBottom: 8 }}>{t.welcome}</h2>
-                <p style={{ color: '#E5E7EB', fontSize: 16, lineHeight: 1.6 }}>
+                <p style={{ color: '#D4C5A9', fontSize: 16, lineHeight: 1.6 }}>
                   {lang === 'en' 
                     ? `This is your project portal for ${project.name}. Here you'll find everything you need — materials, schedules, scope of work, and more.`
                     : `Este es su portal de proyecto para ${project.name}. Aquí encontrará todo lo que necesita — materiales, horarios, alcance del trabajo y más.`
@@ -257,7 +257,7 @@ export default function BuilderPortal() {
                 {[t.inst1, t.inst2, t.inst3, t.inst4, t.inst5, t.inst6].map((inst, i) => (
                   <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                     <span style={{ background: '#D4A574', color: '#000', width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, flexShrink: 0 }}>{i + 1}</span>
-                    <p style={{ color: '#E5E7EB', fontSize: 13, lineHeight: 1.5 }}>{inst}</p>
+                    <p style={{ color: '#D4C5A9', fontSize: 13, lineHeight: 1.5 }}>{inst}</p>
                   </div>
                 ))}
               </div>
@@ -393,8 +393,8 @@ export default function BuilderPortal() {
             )}
             {(portal.change_orders || []).concat(comments.filter(c => c.section === 'change_order').map(c => { try { return { ...JSON.parse(c.text), _fromComment: true, _date: c.created_at }; } catch { return null; } }).filter(Boolean)).map((co, idx) => (
               <div key={idx} style={{ background: '#1a1f2e', padding: 16, borderRadius: 8, marginBottom: 12, borderLeft: '4px solid #F59E0B' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}><h3 style={{ color: '#fff', fontSize: 15, fontWeight: 700 }}>{co.title}</h3><span style={{ color: '#F59E0B', fontSize: 12 }}>{co.date}</span></div>
-                <p style={{ color: '#E5E7EB', fontSize: 13, marginTop: 8 }}>{co.description}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><h3 style={{ color: '#D4C5A9', fontSize: 15, fontWeight: 700 }}>{co.title}</h3><span style={{ color: '#F59E0B', fontSize: 12 }}>{co.date}</span></div>
+                <p style={{ color: '#D4C5A9', fontSize: 13, marginTop: 8 }}>{co.description}</p>
                 {co.author && <p style={{ color: '#6B7280', fontSize: 11, marginTop: 4 }}>By: {co.author}</p>}
               </div>
             ))}
@@ -429,7 +429,7 @@ export default function BuilderPortal() {
                   <span style={{ color: '#D4A574', fontSize: 13, fontWeight: 700 }}>{c.author}</span>
                   <span style={{ color: '#6B7280', fontSize: 11 }}>{c.section} • {new Date(c.created_at).toLocaleDateString()}</span>
                 </div>
-                <p style={{ color: '#E5E7EB', fontSize: 14 }}>{c.text}</p>
+                <p style={{ color: '#D4C5A9', fontSize: 14 }}>{c.text}</p>
               </div>
             ))}
           </div>
@@ -623,7 +623,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
       {!hasDoc && <p style={{ color: '#6B7280' }}>{lang === 'en' ? 'No scope of work yet.' : 'No hay alcance del trabajo aún.'}</p>}
 
       {viewMode === 'overall' && hasDoc && (
-        <div data-testid="overall-scope-doc" className="scope-doc-readonly" style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 8, padding: '20px 28px', color: '#E5E7EB', fontSize: 15, lineHeight: 1.7 }}>
+        <div data-testid="overall-scope-doc" className="scope-doc-readonly" style={{ background: '#1a1f2e', border: '1px solid #2a3040', borderRadius: 8, padding: '20px 28px', color: '#D4C5A9', fontSize: 15, lineHeight: 1.7 }}>
           {renderScope(scopeDoc)}
         </div>
       )}
@@ -671,11 +671,14 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
                   <div style={{
                     ...getMutedRoomHeaderStyle(rColor),
                     border: '1px solid #D4A574',
+                    borderBottom: '2px solid #D4A574',
                     padding: '8px 16px',
-                    marginBottom: 8,
+                    marginBottom: 0,
                   }}>
                     <span style={{ color: '#D4C5A9', fontSize: 13, fontWeight: 800, letterSpacing: 2 }}>{rName?.toUpperCase()}</span>
                   </div>
+                  {/* Full-width gold separator under each room banner */}
+                  <div style={{ height: 1, background: 'linear-gradient(90deg, transparent 0%, #D4A574 30%, #D4A574 70%, transparent 100%)', marginBottom: 12 }} />
                   <div style={{ paddingLeft: 16 }}>
                     {renderBlockItems(group.items)}
                   </div>
@@ -772,7 +775,7 @@ function ProductHoverCard({ item, isChecklist, top, left }) {
           <span style={{ background: isChecklist ? '#10B981' : '#3B82F6', color: '#fff', fontSize: 8, fontWeight: 800, padding: '1px 6px', borderRadius: 3, letterSpacing: 0.5 }}>{isChecklist ? 'CHK' : 'FFE'}</span>
           {item._room && <span style={{ color: item._roomColor || '#D4A574', fontSize: 10, fontWeight: 700, letterSpacing: 0.8 }}>{item._room}</span>}
         </div>
-        <div style={{ color: '#F5F5DC', fontSize: 13, fontWeight: 800, marginBottom: 4, lineHeight: 1.25 }}>{item.name || '(unnamed)'}</div>
+        <div style={{ color: '#D4C5A9', fontSize: 13, fontWeight: 800, marginBottom: 4, lineHeight: 1.25 }}>{item.name || '(unnamed)'}</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 10px', fontSize: 10, color: '#9CA3AF' }}>
           {item.vendor && <span>{item.vendor}</span>}
           {item.sku && <span>SKU: {item.sku}</span>}
@@ -830,19 +833,19 @@ function ProductDetailModal({ item, onClose, onGoToFFE, onGoToChecklist, lang })
           <img src={item.image_url} alt={item.name} style={{ width: '100%', height: 280, objectFit: 'cover', background: '#0f1218' }} />
         )}
         <div style={{ padding: 20, overflowY: 'auto' }}>
-          <h3 style={{ color: '#F5F5DC', fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{item.name || '(unnamed)'}</h3>
+          <h3 style={{ color: '#D4C5A9', fontSize: 20, fontWeight: 800, marginBottom: 4 }}>{item.name || '(unnamed)'}</h3>
           {item.vendor && <p style={{ color: '#9CA3AF', fontSize: 12, marginBottom: 12 }}>{item.vendor}</p>}
           <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '6px 14px', fontSize: 13, marginTop: 8 }}>
-            {item.sku && (<><span style={{ color: '#6B7280' }}>SKU</span><span style={{ color: '#E5E7EB' }}>{item.sku}</span></>)}
-            {item.size && (<><span style={{ color: '#6B7280' }}>Size</span><span style={{ color: '#E5E7EB' }}>{item.size}</span></>)}
-            {item.finish_color && (<><span style={{ color: '#6B7280' }}>Finish</span><span style={{ color: '#E5E7EB' }}>{item.finish_color}</span></>)}
-            {item.status && (<><span style={{ color: '#6B7280' }}>Status</span><span style={{ color: '#E5E7EB', fontWeight: 700 }}>{item.status}</span></>)}
-            {item.quantity && (<><span style={{ color: '#6B7280' }}>Qty</span><span style={{ color: '#E5E7EB' }}>{item.quantity}</span></>)}
-            {item.remarks && (<><span style={{ color: '#6B7280' }}>Notes</span><span style={{ color: '#E5E7EB' }}>{item.remarks}</span></>)}
+            {item.sku && (<><span style={{ color: '#6B7280' }}>SKU</span><span style={{ color: '#D4C5A9' }}>{item.sku}</span></>)}
+            {item.size && (<><span style={{ color: '#6B7280' }}>Size</span><span style={{ color: '#D4C5A9' }}>{item.size}</span></>)}
+            {item.finish_color && (<><span style={{ color: '#6B7280' }}>Finish</span><span style={{ color: '#D4C5A9' }}>{item.finish_color}</span></>)}
+            {item.status && (<><span style={{ color: '#6B7280' }}>Status</span><span style={{ color: '#D4C5A9', fontWeight: 700 }}>{item.status}</span></>)}
+            {item.quantity && (<><span style={{ color: '#6B7280' }}>Qty</span><span style={{ color: '#D4C5A9' }}>{item.quantity}</span></>)}
+            {item.remarks && (<><span style={{ color: '#6B7280' }}>Notes</span><span style={{ color: '#D4C5A9' }}>{item.remarks}</span></>)}
           </div>
         </div>
         <div style={{ padding: 12, borderTop: '1px solid #2a3040', display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '8px 16px', background: '#374151', color: '#E5E7EB', border: 'none', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{lang === 'en' ? 'Close' : 'Cerrar'}</button>
+          <button onClick={onClose} style={{ padding: '8px 16px', background: '#374151', color: '#D4C5A9', border: 'none', borderRadius: 6, fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>{lang === 'en' ? 'Close' : 'Cerrar'}</button>
           <button onClick={onGoToFFE} style={{ padding: '8px 16px', background: '#D4A574', color: '#1a1f2e', border: 'none', borderRadius: 6, fontWeight: 800, fontSize: 12, cursor: 'pointer' }}>{lang === 'en' ? 'View in FF&E →' : 'Ver en FF&E →'}</button>
         </div>
       </div>
@@ -976,7 +979,7 @@ function GeneralUploadsSection({ projectId, accessCode, t, lang, onReload }) {
                 <div style={{ width: '100%', height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f1218' }}><span style={{ fontSize: 40 }}>📄</span></div>
               )}
               <div style={{ padding: '8px 12px' }}>
-                <p style={{ color: '#F5F5DC', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
+                <p style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
                 <p style={{ color: '#6B7280', fontSize: 10 }}>{file.uploaded_by} • {file.uploaded_at ? new Date(file.uploaded_at).toLocaleDateString() : ''}</p>
               </div>
             </div>
@@ -1065,7 +1068,7 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
               <button onClick={() => handleCamera(room.id)} style={{ background: '#D4A574', color: '#1a1f2e', padding: '6px 12px', borderRadius: 6, fontWeight: 700, fontSize: 11, cursor: 'pointer', border: 'none' }}>
                 📷 {lang === 'en' ? 'Camera' : 'Cámara'}
               </button>
-              <label style={{ background: '#374151', color: '#F5F5DC', padding: '6px 12px', borderRadius: 6, fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>
+              <label style={{ background: '#374151', color: '#D4C5A9', padding: '6px 12px', borderRadius: 6, fontWeight: 700, fontSize: 11, cursor: 'pointer' }}>
                 📁 {uploading ? '...' : (lang === 'en' ? 'Upload' : 'Subir')}
                 <input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.txt" onChange={e => handleUpload(room.id, Array.from(e.target.files))} style={{ display: 'none' }} />
               </label>
@@ -1387,7 +1390,7 @@ function ScheduleSection({ portal, accessCode, rooms, contacts, t, lang, onReloa
   );
 }
 
-const sectionTitle = { color: '#D4A574', fontSize: 20, fontWeight: 700, marginBottom: 16 };
+const sectionTitle = { color: '#D4A574', fontSize: 30, fontWeight: 900, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 18, paddingBottom: 8, borderBottom: '2px solid #D4A574' };
 const inputStyle = { width: '100%', background: '#0f1218', border: '1px solid #2a3040', borderRadius: 6, padding: '10px 12px', color: '#fff', fontSize: 14, marginBottom: 8, display: 'block', boxSizing: 'border-box' };
 const btnPrimary = { background: '#D4A574', color: '#1a1f2e', border: 'none', padding: '10px 20px', borderRadius: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer' };
 const btnSecondary = { background: '#374151', color: '#fff', border: 'none', padding: '10px 16px', borderRadius: 8, cursor: 'pointer' };
