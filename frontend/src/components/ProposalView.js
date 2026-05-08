@@ -15,7 +15,7 @@
  *     ┗ + ADD LINE / + FROM SNIPPET
  */
 import React, { useEffect, useState, useMemo } from 'react';
-import { getMutedRoomHeaderStyle } from '../utils/roomColors';
+import { getMutedRoomHeaderStyleStandalone } from '../utils/roomColors';
 import { parseScopeDocument, TRADE_COLORS } from './ScopeDocumentEditor';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
@@ -224,7 +224,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
         )}
         {grouped.map((rg) => {
           const roomColor = rg.room?.color || '#D4A574';
-          const roomBanner = getMutedRoomHeaderStyle(roomColor);
+          const roomBanner = getMutedRoomHeaderStyleStandalone(roomColor);
           return (
             <div key={rg.roomName} style={{ marginBottom: 24 }}>
               {/* ROOM BANNER — full width, muted-gradient (Checklist/FFE recipe) */}

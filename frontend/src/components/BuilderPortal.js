@@ -4,7 +4,7 @@ import ExactFFESpreadsheet from './FFEView';
 import RichTextEditor from './RichTextEditor';
 import { parseScopeDocument } from './ScopeDocumentEditor';
 import FileLightbox from './FileLightbox';
-import { getRoomColor, getMutedRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
+import { getRoomColor, getMutedRoomColor, getMutedRoomHeaderStyleStandalone } from '../utils/roomColors';
 import ProposalView from './ProposalView';
 import BuilderTradesManager from './BuilderTradesManager';
 import CompanyProfileForm from './CompanyProfileForm';
@@ -669,7 +669,7 @@ function ScopeSection({ portal, rooms, accessCode, lang, t, onReload, setActiveT
                       admin Checklist & FFE (135° gradient + inset white-glow +
                       heavy black inner-shadow + textShadow). NEVER deviates. */}
                   <div style={{
-                    ...getMutedRoomHeaderStyle(rColor),
+                    ...getMutedRoomHeaderStyleStandalone(rColor),
                     border: '1px solid #D4A574',
                     borderBottom: '2px solid #D4A574',
                     padding: '8px 16px',
@@ -1056,7 +1056,7 @@ function RoomPhotosSection({ rooms, photos, projectId, accessCode, t, lang, onRe
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 8,
-            ...getMutedRoomHeaderStyle(roomColor),
+            ...getMutedRoomHeaderStyleStandalone(roomColor),
             padding: '6px 12px',
             border: '1px solid #D4A574',
             borderRadius: 0,

@@ -3,7 +3,7 @@ import RichTextEditor from './RichTextEditor';
 import ScopeDocumentEditor from './ScopeDocumentEditor';
 import { invalidateScopeRefs } from './ScopeReferenceBadge';
 import FileLightbox from './FileLightbox';
-import { getRoomColor, getMutedRoomColor, getMutedRoomHeaderStyle } from '../utils/roomColors';
+import { getRoomColor, getMutedRoomColor, getMutedRoomHeaderStyleStandalone } from '../utils/roomColors';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -695,7 +695,7 @@ function PhotoUploadsSection({ portal, rooms, apiUrl, onReload }) {
               <div
                 onClick={() => setActiveRoomId(isOpen ? null : room.id)}
                 className="flex justify-between items-center px-3 py-1.5 cursor-pointer hover:opacity-90"
-                style={getMutedRoomHeaderStyle(roomColor)}
+                style={getMutedRoomHeaderStyleStandalone(roomColor)}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-[#D4C5A9]" style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1 }}>{room.name.toUpperCase()}</span>
