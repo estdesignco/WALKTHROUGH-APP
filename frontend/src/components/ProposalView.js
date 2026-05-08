@@ -1,53 +1,49 @@
 /**
- * ProposalView — Steve Cseplo Construction Estimate format
- * =========================================================
- * Single unified table that matches the user's reference xlsx exactly:
+ * ProposalView — Trade-first grouping + full CRUD
+ * =================================================
+ *   ┌──────────────────────────────────────────────────┐
+ *   │ COMPANY HEADER (logo, estimate no, date, project)│
+ *   ├──────────────────────────────────────────────────┤
+ *   │ TRADE: PLUMBING                                  │  green banner, click X to delete trade
+ *   │   ROOM: MASTER BATHROOM (room color)             │  click name to edit
+ *   │   #  Description       QTY  Unit  $  Amt  Tot  P │
+ *   │   1  Rough-in shower    1   LS   $.. ..   ..   ..│  X to delete line
+ *   │   + ADD LINE                                     │
+ *   │   ROOM: KITCHEN                                  │
+ *   │   1  Run gas line       ...                      │
+ *   │   + ADD LINE | + ADD ROOM TO PLUMBING            │
+ *   │ TRADE: TILE  [X delete trade]                    │
+ *   │   ...                                            │
+ *   │ + ADD TRADE                                      │
+ *   ├──────────────────────────────────────────────────┤
+ *   │ SUBTOTAL / Less Payment / PM Fee / Tax / TOTAL DUE│
+ *   ├──────────────────────────────────────────────────┤
+ *   │ Notes (free text) / Signature line               │
+ *   └──────────────────────────────────────────────────┘
  *
- *   ┌──────────────────────────────────────────────────────────────┐
- *   │ COMPANY HEADER (logo + estimate no + date + client info)    │
- *   ├──────────────────────────────────────────────────────────────┤
- *   │ DIV. │ DESCRIPTION │ QTY │ UNIT COST │ AMOUNT │ TOTAL │ Profit│
- *   ├──────────────────────────────────────────────────────────────┤
- *   │ ROOM NAME 1 (full-width banner row, muted gradient)         │
- *   │  1. scope sentence       1    $100      $100    $115   $15  │
- *   │  2. scope sentence       2    $50       $100    $115   $15  │
- *   │                            Section Subtotal:    $230        │
- *   │ ROOM NAME 2 (banner row)                                    │
- *   │  1. ...                                                      │
- *   ├──────────────────────────────────────────────────────────────┤
- *   │ SUB TOTAL                                            $X      │
- *   │ Less Payment (deposit)                               $X      │
- *   │ Project Management Fee   (X%)                        $X      │
- *   │ TAX                      (X%)                        $X      │
- *   │ TOTAL DUE                                            $X      │
- *   ├──────────────────────────────────────────────────────────────┤
- *   │ Notes (free text)                                            │
- *   │ Signature line                                               │
- *   └──────────────────────────────────────────────────────────────┘
- *
- * - Inline edits do NOT refetch the page (optimistic local state, debounced
- *   server PUT in background). No more flash on every keystroke.
- * - All <input type="number"> spinner arrows hidden via ::-webkit / Firefox.
- * - DIV column = first trade tag of each scope sentence (PLUMBING / TILE / etc.).
- * - For builder portals: trade subs' submitted Cost auto-prefills the line.
- * - Trade portals see only their assigned trades.
+ * - Inline edits do NOT refetch (optimistic local + 350ms debounced PUT).
+ * - Number inputs have spinner arrows hidden globally.
+ * - Scope-derived lines: editable Description/Qty/Unit/Cost/Markup, deletable
+ *   (delete = mark hidden in override).
+ * - Custom lines (extras): full CRUD per trade-room bucket.
+ * - "+ ADD TRADE" appends a custom trade group with no scope (extras only).
+ * - Trade portal filters automatically to assigned_trades.
  */
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { getMutedRoomHeaderStyleStandalone, getRoomColor } from '../utils/roomColors';
-import { parseScopeDocument, TRADE_COLORS } from './ScopeDocumentEditor';
+import { parseScopeDocument, TRADE_COLORS, DEFAULT_TRADES } from './ScopeDocumentEditor';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
-// CSS to hide number-input spinners (injected once)
 const NUM_INPUT_CSS = `
   .proposal-cell input::-webkit-outer-spin-button,
   .proposal-cell input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .proposal-cell input[type=number] { -moz-appearance: textfield; }
-  .proposal-cell input { background: transparent; outline: none; border: none; width: 100%; color: inherit; font: inherit; padding: 0; }
-  .proposal-cell input:focus { background: rgba(212,165,116,0.08); }
+  .proposal-cell input, .proposal-cell textarea { background: transparent; outline: none; border: none; width: 100%; color: inherit; font: inherit; padding: 0; resize: none; }
+  .proposal-cell input:focus, .proposal-cell textarea:focus { background: rgba(212,165,116,0.08); }
   @media print {
     .no-print { display: none !important; }
-    .proposal-cell input { color: #000 !important; }
+    .proposal-cell input, .proposal-cell textarea { color: #000 !important; }
   }
 `;
 
@@ -56,7 +52,6 @@ const fmtUSD = (n) => `$${fmt(n || 0)}`;
 const compute = (qty, cost, markup) => (Number(qty) || 0) * (Number(cost) || 0) * (1 + (Number(markup) || 0) / 100);
 const computeAmount = (qty, cost) => (Number(qty) || 0) * (Number(cost) || 0);
 
-// Stable line id from normalized text — survives unrelated scope edits
 const stableLineId = (room, trade, text) => {
   const norm = (s) => (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
   let h = 5381;
@@ -65,7 +60,6 @@ const stableLineId = (room, trade, text) => {
   return `sl_${(h >>> 0).toString(36)}`;
 };
 
-// Simple debounce ref-based hook
 const useDebounced = (fn, delay = 350) => {
   const timer = useRef(null);
   return (...args) => {
@@ -79,8 +73,8 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const [loading, setLoading] = useState(true);
   const [showAccept, setShowAccept] = useState(false);
   const [signature, setSignature] = useState('');
-  // Optimistic local state — applied immediately, server saves in background.
-  const [overrides, setOverrides] = useState({});  // { line_id: {...override} }
+  const [overrides, setOverrides] = useState({});  // { line_id: {...} }
+  const [extras, setExtras] = useState([]);
   const [snippets, setSnippets] = useState([]);
   const [showSnippets, setShowSnippets] = useState(false);
   const [notes, setNotes] = useState('');
@@ -93,10 +87,10 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       if (res.ok) {
         const json = await res.json();
         setData(json);
-        // Hydrate local overrides from server payload (only on full reload).
         const map = {};
         (json.overrides || []).forEach(o => { map[o.item_id] = o; });
         setOverrides(map);
+        setExtras(json.extras || []);
         setNotes(json.portal?.proposal_notes || '');
         setLessPayment(json.portal?.proposal_less_payment || 0);
       }
@@ -115,8 +109,14 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const accepted = !!portal.proposal_accepted;
   const tradeQuotes = data?.trade_quotes || {};
 
-  // Build flat ordered list of (room, trade, scope-line) tuples
-  const rooms = useMemo(() => {
+  // ========================= GROUP BY TRADE → ROOM =========================
+  const roomColorByName = useMemo(() => {
+    const m = {};
+    (data?.rooms || []).forEach(r => { m[(r.name || '').toUpperCase()] = r.color || getRoomColor(r.name); });
+    return m;
+  }, [data]);
+
+  const grouped = useMemo(() => {
     const html = data?.scope_document || '';
     const projectRooms = data?.rooms || [];
     const parsed = parseScopeDocument(html, projectRooms);
@@ -126,43 +126,178 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
           : [(portal.trade_name || '').toUpperCase()])
       : null;
 
-    const order = [];
-    const byRoom = {};
+    // tradeOrder = order in which trades first appear in the scope doc
+    const tradeOrder = [];
+    const byTrade = {};
+
     parsed.items.forEach(item => {
       const rName = (item.roomName || 'GENERAL').toUpperCase();
-      const tradeKeys = item.trades && item.trades.length ? item.trades : [];
-      const primaryTrade = (tradeKeys[0] || 'GENERAL').toUpperCase();
-      if (assigned && tradeKeys.length && !tradeKeys.some(t => assigned.includes(t.toUpperCase()))) return;
-      if (assigned && !tradeKeys.length) return;  // no-trade lines hidden from trades
-      if (!byRoom[rName]) { byRoom[rName] = { roomName: rName, room: item.room, lines: [] }; order.push(rName); }
-      byRoom[rName].lines.push({
-        line_id: stableLineId(rName, primaryTrade, item.text),
-        div: primaryTrade,
-        text: item.text,
-        html: item.html,
+      const tradeKeys = (item.trades && item.trades.length ? item.trades : []).map(t => (t || '').toUpperCase());
+      if (assigned && tradeKeys.length && !tradeKeys.some(t => assigned.includes(t))) return;
+      if (assigned && !tradeKeys.length) return;
+      const lineTrades = tradeKeys.length ? tradeKeys : ['GENERAL'];
+      lineTrades.forEach(T => {
+        if (!byTrade[T]) { byTrade[T] = { tradeName: T, rooms: {}, roomOrder: [] }; tradeOrder.push(T); }
+        if (!byTrade[T].rooms[rName]) { byTrade[T].rooms[rName] = []; byTrade[T].roomOrder.push(rName); }
+        byTrade[T].rooms[rName].push({
+          line_id: stableLineId(rName, T, item.text),
+          text: item.text,
+          html: item.html,
+          source: 'scope',
+        });
       });
     });
-    return order.map(rn => byRoom[rn]);
-  }, [data, kind, portal]);
 
-  // Server-save (debounced). Optimistic local update happens immediately
-  // inside saveOverride before this fires.
-  const debouncedPersist = useDebounced(async (lineId, fullOverride) => {
+    // Merge in extras (custom user-added lines), keyed by `${TRADE}::${ROOM}`
+    extras.forEach(e => {
+      if (e.parent_kind !== 'trade-room' && e.parent_kind !== 'trade-only') return;
+      const [T, R] = (e.parent_id || '').split('::');
+      const TT = (T || 'GENERAL').toUpperCase();
+      const RR = (R || 'GENERAL').toUpperCase();
+      if (assigned && !assigned.includes(TT)) return;
+      if (!byTrade[TT]) { byTrade[TT] = { tradeName: TT, rooms: {}, roomOrder: [] }; tradeOrder.push(TT); }
+      if (!byTrade[TT].rooms[RR]) { byTrade[TT].rooms[RR] = []; byTrade[TT].roomOrder.push(RR); }
+      byTrade[TT].rooms[RR].push({
+        line_id: e.id,
+        text: e.name,
+        html: e.name,
+        source: 'extra',
+        extra: e,
+      });
+    });
+
+    return tradeOrder.map(T => ({
+      tradeName: T,
+      roomGroups: byTrade[T].roomOrder.map(R => ({ roomName: R, lines: byTrade[T].rooms[R] })),
+    }));
+  }, [data, kind, portal, extras]);
+
+  // ========================= MUTATIONS =========================
+  const debouncedPersistOverride = useDebounced(async (lineId, payload) => {
     try {
       await fetch(`${API_URL}/api/builder/${accessCode}/proposal/override`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item_id: lineId, ...fullOverride }),
+        body: JSON.stringify({ item_id: lineId, ...payload }),
       });
-    } catch (e) { console.error('save override failed', e); }
+    } catch (e) { console.error('override save failed', e); }
   }, 350);
 
   const saveOverride = (lineId, patch) => {
     if (!editEnabled) return;
     setOverrides(prev => {
       const next = { ...prev, [lineId]: { ...(prev[lineId] || { item_id: lineId }), ...patch } };
-      debouncedPersist(lineId, next[lineId]);
+      debouncedPersistOverride(lineId, next[lineId]);
       return next;
     });
+  };
+
+  const debouncedExtraUpdate = useDebounced(async (id, patch) => {
+    await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra/${id}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patch),
+    }).catch(() => {});
+  }, 350);
+
+  const updateExtra = (id, patch) => {
+    if (!editEnabled) return;
+    setExtras(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
+    debouncedExtraUpdate(id, patch);
+  };
+
+  const addExtraLine = async (tradeName, roomName) => {
+    if (!editEnabled) return;
+    const body = {
+      parent_kind: 'trade-room',
+      parent_id: `${tradeName}::${roomName}`,
+      name: 'New line item',
+      quantity: 1,
+      unit: 'LS',
+      cost: 0,
+      markup_percent: 0,
+      notes: '',
+    };
+    const res = await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      const created = await res.json();
+      setExtras(prev => [...prev, created]);
+    }
+  };
+
+  const addCustomTrade = async () => {
+    const tradeName = (window.prompt('Custom trade name (e.g. DUMPSTER, SITE PROTECTION):') || '').trim().toUpperCase();
+    if (!tradeName) return;
+    // Adding a placeholder "GENERAL" room line keeps the trade visible
+    const body = {
+      parent_kind: 'trade-only',
+      parent_id: `${tradeName}::GENERAL`,
+      name: 'New line item',
+      quantity: 1,
+      unit: 'LS',
+      cost: 0,
+      markup_percent: 0,
+      notes: '',
+    };
+    const res = await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      const created = await res.json();
+      setExtras(prev => [...prev, created]);
+    }
+  };
+
+  const addRoomToTrade = async (tradeName) => {
+    const roomName = (window.prompt('Add room to this trade:') || '').trim().toUpperCase();
+    if (!roomName) return;
+    const body = {
+      parent_kind: 'trade-room',
+      parent_id: `${tradeName}::${roomName}`,
+      name: 'New line item',
+      quantity: 1,
+      unit: 'LS',
+      cost: 0,
+      markup_percent: 0,
+      notes: '',
+    };
+    const res = await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      const created = await res.json();
+      setExtras(prev => [...prev, created]);
+    }
+  };
+
+  const deleteLine = async (line) => {
+    if (!editEnabled) return;
+    if (line.source === 'extra') {
+      if (!window.confirm(`Delete "${line.text || 'this line'}"?`)) return;
+      await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra/${line.line_id}`, { method: 'DELETE' });
+      setExtras(prev => prev.filter(e => e.id !== line.line_id));
+    } else {
+      // Scope-derived line — mark hidden in override
+      if (!window.confirm('Hide this scope line from your proposal?')) return;
+      saveOverride(line.line_id, { hidden: true });
+    }
+  };
+
+  const deleteTrade = async (tradeName) => {
+    if (!editEnabled) return;
+    if (!window.confirm(`Delete entire ${tradeName} section? Scope lines will be hidden; custom lines deleted.`)) return;
+    // Hide all scope lines in this trade
+    grouped.find(g => g.tradeName === tradeName)?.roomGroups.forEach(rg => {
+      rg.lines.forEach(l => {
+        if (l.source === 'scope') saveOverride(l.line_id, { hidden: true });
+      });
+    });
+    // Delete all extras under this trade
+    const toDelete = extras.filter(e => (e.parent_id || '').startsWith(`${tradeName}::`));
+    for (const e of toDelete) {
+      await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra/${e.id}`, { method: 'DELETE' });
+    }
+    setExtras(prev => prev.filter(e => !(e.parent_id || '').startsWith(`${tradeName}::`)));
   };
 
   const debouncedNotes = useDebounced(async (val) => {
@@ -177,7 +312,6 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       body: JSON.stringify({ proposal_less_payment: parseFloat(val) || 0 }),
     }).catch(() => {});
   }, 600);
-
   const debouncedRate = useDebounced(async (patch) => {
     await fetch(`${API_URL}/api/builder-portal/${portal.id}/proposal-settings`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
@@ -185,34 +319,35 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
     }).catch(() => {});
   }, 350);
 
-  // Section subtotals + grand totals (live, recomputed from local overrides)
-  const { sectionSubtotals, grandTotals } = useMemo(() => {
-    const subtotals = [];
-    let amount = 0, total = 0, cost = 0;
-    rooms.forEach(rg => {
-      let secAmount = 0, secTotal = 0;
-      rg.lines.forEach(line => {
-        const o = overrides[line.line_id] || {};
-        const tq = (kind === 'builder' && tradeQuotes[line.line_id]) || null;
-        const qty = o.quantity ?? 1;
-        const c = (o.cost !== undefined && o.cost !== null) ? o.cost : (tq ? tq.cost : 0);
-        const m = o.markup_percent ?? 0;
-        const a = computeAmount(qty, c);
-        const t = compute(qty, c, m);
-        secAmount += a; secTotal += t; cost += a;
+  // ========================= TOTALS =========================
+  const grandTotals = useMemo(() => {
+    let total = 0, amount = 0;
+    grouped.forEach(tg => {
+      tg.roomGroups.forEach(rg => {
+        rg.lines.forEach(line => {
+          const o = overrides[line.line_id] || {};
+          if (o.hidden) return;
+          let qty, cost, markup;
+          if (line.source === 'extra') {
+            qty = (o.quantity ?? line.extra.quantity) || 0;
+            cost = (o.cost ?? line.extra.cost) || 0;
+            markup = (o.markup_percent ?? line.extra.markup_percent) || 0;
+          } else {
+            const tq = (kind === 'builder' && tradeQuotes[line.line_id]) || null;
+            qty = o.quantity ?? 1;
+            cost = (o.cost !== undefined && o.cost !== null) ? o.cost : (tq ? tq.cost : 0);
+            markup = o.markup_percent ?? 0;
+          }
+          amount += computeAmount(qty, cost);
+          total += compute(qty, cost, markup);
+        });
       });
-      subtotals.push({ amount: secAmount, total: secTotal });
-      amount += secAmount; total += secTotal;
     });
     const tax = total * (Number(portal.tax_rate || 0) / 100);
     const pmFee = total * (Number(portal.pm_fee_rate || 0) / 100);
     const less = Number(lessPayment || 0);
-    const totalDue = total + tax + pmFee - less;
-    return {
-      sectionSubtotals: subtotals,
-      grandTotals: { subtotal: total, amount, tax, pmFee, less, totalDue, profit: total - cost },
-    };
-  }, [rooms, overrides, tradeQuotes, kind, portal.tax_rate, portal.pm_fee_rate, lessPayment]);
+    return { subtotal: total, amount, tax, pmFee, less, totalDue: total + tax + pmFee - less, profit: total - amount };
+  }, [grouped, overrides, tradeQuotes, kind, portal.tax_rate, portal.pm_fee_rate, lessPayment]);
 
   const acceptProposal = async () => {
     if (!signature.trim()) return alert('Type your full legal name to accept.');
@@ -234,15 +369,13 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const company = data?.company || {};
   const projectName = data?.project_name || '';
   const showProfit = kind === 'builder' || kind === 'trade';
-  const colSpan = showProfit ? 7 : 6;
+  const colCount = showProfit ? 8 : 7;
 
   return (
     <div style={{ background: '#000', minHeight: '100vh', paddingBottom: 60 }} data-testid="proposal-view">
       <style>{NUM_INPUT_CSS}</style>
-
       <ProposalHeader company={company} projectName={projectName} portal={portal} />
 
-      {/* Accept bar (read-only / unlocked) */}
       {!accepted && (
         <div className="no-print" style={{ background: 'linear-gradient(135deg, #1a1f2e 0%, #2a3040 100%)', borderTop: '1px solid #D4A574', borderBottom: '1px solid #D4A574', padding: '12px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <div style={{ color: '#D4C5A9', fontSize: 13 }}>🔒 <strong>READ-ONLY</strong> — Accept this scope to start entering your numbers.</div>
@@ -257,111 +390,112 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       )}
       {showSnippets && <SnippetsPanel snippets={snippets} ownerKind={kind} ownerId={accessCode} onChange={loadSnippets} />}
 
-      {/* MAIN PROPOSAL TABLE */}
+      {/* MAIN PROPOSAL TABLE — TRADE first */}
       <div style={{ padding: 12 }}>
-        {rooms.length === 0 ? (
+        {grouped.length === 0 ? (
           <div style={{ background: '#1a1f2e', border: '1px solid #D4A574', padding: 24, borderRadius: 4, color: '#D4C5A9', textAlign: 'center' }}>
             {kind === 'trade'
               ? `No scope items assigned to ${(portal.assigned_trades || []).join(', ') || portal.trade_name || 'your trade'} yet.`
-              : 'The Scope of Work is empty. The designer needs to add scope items.'}
+              : 'The Scope of Work is empty. Add #trade tags in the Scope of Work editor — they\'ll group the proposal automatically.'}
           </div>
         ) : (
           <table className="proposal-cell w-full border-collapse" style={{ background: '#000', tableLayout: 'auto' }}>
             <thead>
               <tr>
-                <Th w="6%">DIV.</Th>
-                <Th w="42%" align="left">DESCRIPTION</Th>
-                <Th w="6%">QUANTITY</Th>
-                <Th w="11%">UNIT COST</Th>
-                <Th w="11%">AMOUNT</Th>
-                <Th w="11%">TOTAL</Th>
-                {showProfit && <Th w="9%">Profit</Th>}
+                <Th w="4%">#</Th>
+                <Th w="45%" align="left">DESCRIPTION</Th>
+                <Th w="6%">QTY</Th>
+                <Th w="5%">UNIT</Th>
+                <Th w="10%">UNIT COST</Th>
+                <Th w="10%">AMOUNT</Th>
+                <Th w="10%">TOTAL</Th>
+                {showProfit && <Th w="8%">PROFIT</Th>}
+                {editEnabled && <Th w="2%" /* delete X */></Th>}
               </tr>
             </thead>
             <tbody>
-              {rooms.map((rg, rIdx) => {
-                const roomColor = rg.room?.color || getRoomColor(rg.roomName);
-                const banner = getMutedRoomHeaderStyleStandalone(roomColor);
+              {grouped.map((tg) => {
+                const tradeColor = TRADE_COLORS[tg.tradeName] || '#065F46';
                 return (
-                  <React.Fragment key={rg.roomName}>
-                    {/* ROOM BANNER ROW (single row spanning the whole table) */}
+                  <React.Fragment key={tg.tradeName}>
+                    {/* TRADE HEADER */}
                     <tr>
-                      <td colSpan={colSpan} style={{ ...banner, padding: '8px 14px', border: '1px solid #B49B7E' }}>
-                        <span style={{ color: '#D4C5A9', fontSize: 13, fontWeight: 800, letterSpacing: 2 }}>{rg.roomName}</span>
+                      <td colSpan={colCount + (editEnabled ? 1 : 0)} style={{ background: tradeColor, padding: '10px 14px', border: '1px solid #B49B7E' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+                          <span style={{ color: '#fff', fontSize: 14, fontWeight: 800, letterSpacing: 3 }}>{tg.tradeName}</span>
+                          {editEnabled && (
+                            <button onClick={() => deleteTrade(tg.tradeName)} className="no-print" style={{ background: 'rgba(0,0,0,0.3)', color: '#fff', border: '1px solid rgba(255,255,255,0.5)', padding: '2px 10px', fontSize: 10, fontWeight: 700, borderRadius: 4, cursor: 'pointer', letterSpacing: 1 }}>✕ DELETE TRADE</button>
+                          )}
+                        </div>
                       </td>
                     </tr>
-                    {rg.lines.map((line, idx) => {
-                      const o = overrides[line.line_id] || {};
-                      const tq = (kind === 'builder' && tradeQuotes[line.line_id]) || null;
-                      const qty = o.quantity ?? 1;
-                      const cost = (o.cost !== undefined && o.cost !== null) ? o.cost : (tq ? tq.cost : 0);
-                      const markup = o.markup_percent ?? 0;
-                      const amount = computeAmount(qty, cost);
-                      const total = compute(qty, cost, markup);
-                      const profit = total - amount;
-                      const tradeColor = TRADE_COLORS[line.div] || '#B49B7E';
+                    {tg.roomGroups.map((rg) => {
+                      const roomColor = roomColorByName[rg.roomName] || getRoomColor(rg.roomName);
+                      const banner = getMutedRoomHeaderStyleStandalone(roomColor);
+                      const visibleLines = rg.lines.filter(l => !overrides[l.line_id]?.hidden);
                       return (
-                        <tr key={line.line_id} style={{ background: idx % 2 === 0 ? '#0a0a0a' : '#0f0e0e' }}>
-                          <td style={tdCell}>
-                            <span style={{ color: tradeColor, fontWeight: 700, fontSize: 10, letterSpacing: 1 }}>{line.div}</span>
-                          </td>
-                          <td style={{ ...tdCell, textAlign: 'left', padding: '6px 10px' }}>
-                            <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
-                              <span style={{ color: '#B49B7E', fontWeight: 700, minWidth: 16, fontSize: 12 }}>{idx + 1}.</span>
-                              <div style={{ flex: 1, color: '#D4C5A9', fontSize: 13, lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: line.html }} />
-                            </div>
-                            {tq && <div style={{ marginTop: 2, marginLeft: 22, color: '#10B981', fontSize: 10, letterSpacing: 1 }}>✓ Quoted by {tq.trade_name}: {fmtUSD(tq.cost)}</div>}
-                          </td>
-                          <NumCell value={qty} editable={editEnabled} onChange={v => saveOverride(line.line_id, { quantity: v })} />
-                          <NumCell value={cost} editable={editEnabled} onChange={v => saveOverride(line.line_id, { cost: v })} prefix="$" />
-                          <td style={{ ...tdCell, fontWeight: 600, color: '#D4C5A9' }}>{fmtUSD(amount)}</td>
-                          <td style={{ ...tdCell, fontWeight: 700, color: '#D4A574' }}>
-                            {fmtUSD(total)}
-                            {editEnabled && <span style={{ display: 'block', fontSize: 9, color: '#B49B7E', marginTop: 1 }}>+<NumInline value={markup} onChange={v => saveOverride(line.line_id, { markup_percent: v })} suffix="%" />markup</span>}
-                          </td>
-                          {showProfit && <td style={{ ...tdCell, color: '#10B981', fontWeight: 700 }}>{fmtUSD(profit)}</td>}
-                        </tr>
+                        <React.Fragment key={`${tg.tradeName}::${rg.roomName}`}>
+                          <tr>
+                            <td colSpan={colCount + (editEnabled ? 1 : 0)} style={{ ...banner, padding: '6px 14px', border: '1px solid #B49B7E' }}>
+                              <span style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 800, letterSpacing: 2 }}>{rg.roomName}</span>
+                            </td>
+                          </tr>
+                          {visibleLines.map((line, idx) => (
+                            <LineRow
+                              key={line.line_id}
+                              line={line}
+                              idx={idx}
+                              overrides={overrides}
+                              tradeQuotes={tradeQuotes}
+                              kind={kind}
+                              editEnabled={editEnabled}
+                              showProfit={showProfit}
+                              onChange={saveOverride}
+                              onUpdateExtra={updateExtra}
+                              onDelete={() => deleteLine(line)}
+                            />
+                          ))}
+                          {editEnabled && (
+                            <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '6px 14px', background: '#0a0a0a', border: '1px solid #2a3040' }}>
+                              <button onClick={() => addExtraLine(tg.tradeName, rg.roomName)} style={{ background: 'transparent', color: '#10B981', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: 1, padding: 0 }}>+ ADD LINE TO {rg.roomName}</button>
+                            </td></tr>
+                          )}
+                        </React.Fragment>
                       );
                     })}
-                    {/* Section Subtotal */}
-                    <tr style={{ background: '#1a1208' }}>
-                      <td colSpan={colSpan - 2} style={{ ...tdCell, textAlign: 'right', color: '#D4A574', fontWeight: 700, fontSize: 12, letterSpacing: 1 }}>SECTION SUBTOTAL</td>
-                      <td style={{ ...tdCell, color: '#D4C5A9', fontWeight: 700 }}>{fmtUSD(sectionSubtotals[rIdx]?.amount || 0)}</td>
-                      <td style={{ ...tdCell, color: '#D4A574', fontWeight: 800 }}>{fmtUSD(sectionSubtotals[rIdx]?.total || 0)}</td>
-                      {showProfit && <td style={{ ...tdCell, color: '#10B981', fontWeight: 700 }}>{fmtUSD((sectionSubtotals[rIdx]?.total || 0) - (sectionSubtotals[rIdx]?.amount || 0))}</td>}
-                    </tr>
+                    {editEnabled && (
+                      <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '8px 14px', background: '#0f1218', border: '1px solid #2a3040' }}>
+                        <button onClick={() => addRoomToTrade(tg.tradeName)} style={{ background: 'transparent', color: '#D4A574', border: '1px dashed #D4A574', padding: '4px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 700, borderRadius: 4, letterSpacing: 1 }}>+ ADD ROOM TO {tg.tradeName}</button>
+                      </td></tr>
+                    )}
                   </React.Fragment>
                 );
               })}
+              {editEnabled && (
+                <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '12px 14px', background: '#0a0a0a' }}>
+                  <button onClick={addCustomTrade} style={{ background: '#10B981', color: '#fff', border: 'none', padding: '6px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 700, borderRadius: 4, letterSpacing: 2 }}>+ ADD TRADE</button>
+                </td></tr>
+              )}
             </tbody>
           </table>
         )}
       </div>
 
-      {/* GRAND TOTALS — bottom of estimate */}
-      {rooms.length > 0 && (
+      {/* GRAND TOTALS */}
+      {grouped.length > 0 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 12px 8px' }}>
           <table style={{ minWidth: 380, borderCollapse: 'collapse' }}>
             <tbody>
               <TotalRow label="SUB TOTAL" value={fmtUSD(grandTotals.subtotal)} bold />
-              <TotalRow
-                label="Less Payment (deposit)"
-                value={editEnabled
-                  ? <NumInline value={lessPayment} onChange={v => { setLessPayment(v); debouncedLessPayment(v); }} prefix="$" />
-                  : fmtUSD(lessPayment)}
-              />
-              <TotalRow
-                label={editEnabled
-                  ? <span>Project Mgmt Fee &nbsp;<NumInline value={portal.pm_fee_rate || 0} onChange={v => debouncedRate({ pm_fee_rate: v })} suffix="%" /></span>
-                  : `Project Mgmt Fee (${portal.pm_fee_rate || 0}%)`}
-                value={fmtUSD(grandTotals.pmFee)}
-              />
-              <TotalRow
-                label={editEnabled
-                  ? <span>Tax &nbsp;<NumInline value={portal.tax_rate || 0} onChange={v => debouncedRate({ tax_rate: v })} suffix="%" /></span>
-                  : `Tax (${portal.tax_rate || 0}%)`}
-                value={fmtUSD(grandTotals.tax)}
-              />
+              <TotalRow label="Less Payment (deposit)" value={editEnabled
+                ? <NumInline value={lessPayment} onChange={v => { setLessPayment(v); debouncedLessPayment(v); }} prefix="$" />
+                : fmtUSD(lessPayment)} />
+              <TotalRow label={editEnabled
+                ? <span>Project Mgmt Fee &nbsp;<NumInline value={portal.pm_fee_rate || 0} onChange={v => debouncedRate({ pm_fee_rate: v })} suffix="%" /></span>
+                : `Project Mgmt Fee (${portal.pm_fee_rate || 0}%)`} value={fmtUSD(grandTotals.pmFee)} />
+              <TotalRow label={editEnabled
+                ? <span>Tax &nbsp;<NumInline value={portal.tax_rate || 0} onChange={v => debouncedRate({ tax_rate: v })} suffix="%" /></span>
+                : `Tax (${portal.tax_rate || 0}%)`} value={fmtUSD(grandTotals.tax)} />
               <tr><td style={{ padding: '10px 14px', background: '#D4A574', color: '#1a1f2e', fontWeight: 900, fontSize: 14, letterSpacing: 2 }}>TOTAL DUE</td><td style={{ padding: '10px 14px', background: '#D4A574', color: '#1a1f2e', fontWeight: 900, fontSize: 14, textAlign: 'right' }}>{fmtUSD(grandTotals.totalDue)}</td></tr>
               {showProfit && <tr><td style={{ padding: '6px 14px', background: '#064e3b', color: '#D4C5A9', fontSize: 11 }}>Profit (your eyes only)</td><td style={{ padding: '6px 14px', background: '#064e3b', color: '#D4C5A9', fontSize: 11, textAlign: 'right', fontWeight: 700 }}>{fmtUSD(grandTotals.profit)}</td></tr>}
             </tbody>
@@ -369,31 +503,19 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
         </div>
       )}
 
-      {/* NOTES + SIGNATURE LINE */}
-      {rooms.length > 0 && (
+      {/* NOTES + SIGNATURE */}
+      {grouped.length > 0 && (
         <div style={{ padding: '20px 24px', borderTop: '1px solid #2a3040', marginTop: 16 }}>
           <div style={{ color: '#D4A574', fontSize: 12, letterSpacing: 2, marginBottom: 6 }}>NOTES</div>
           {editEnabled ? (
-            <textarea
-              value={notes}
-              onChange={e => { setNotes(e.target.value); debouncedNotes(e.target.value); }}
-              rows={4}
-              placeholder="Add any notes for the customer here..."
-              style={{ width: '100%', background: '#0f1218', color: '#D4C5A9', border: '1px solid #B49B7E', borderRadius: 4, padding: 10, fontSize: 13, lineHeight: 1.5, resize: 'vertical' }}
-            />
+            <textarea value={notes} onChange={e => { setNotes(e.target.value); debouncedNotes(e.target.value); }} rows={4} placeholder="Add any notes for the customer here..." style={{ width: '100%', background: '#0f1218', color: '#D4C5A9', border: '1px solid #B49B7E', borderRadius: 4, padding: 10, fontSize: 13, lineHeight: 1.5, resize: 'vertical' }} />
           ) : (
             <p style={{ color: '#D4C5A9', fontSize: 13, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{notes || <span style={{ opacity: 0.5 }}>No notes.</span>}</p>
           )}
           <p style={{ color: '#D4A574', fontSize: 12, marginTop: 24, textAlign: 'center', letterSpacing: 1 }}>THANK YOU FOR YOUR CONSIDERATION!</p>
           <div style={{ marginTop: 32, display: 'flex', justifyContent: 'space-between', gap: 40, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1, minWidth: 240 }}>
-              <div style={{ borderBottom: '1px solid #D4A574', height: 32 }}></div>
-              <div style={{ color: '#D4C5A9', fontSize: 11, marginTop: 4 }}>Customer Signature</div>
-            </div>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ borderBottom: '1px solid #D4A574', height: 32 }}></div>
-              <div style={{ color: '#D4C5A9', fontSize: 11, marginTop: 4 }}>Date</div>
-            </div>
+            <div style={{ flex: 1, minWidth: 240 }}><div style={{ borderBottom: '1px solid #D4A574', height: 32 }}></div><div style={{ color: '#D4C5A9', fontSize: 11, marginTop: 4 }}>Customer Signature</div></div>
+            <div style={{ flex: 1, minWidth: 200 }}><div style={{ borderBottom: '1px solid #D4A574', height: 32 }}></div><div style={{ color: '#D4C5A9', fontSize: 11, marginTop: 4 }}>Date</div></div>
           </div>
         </div>
       )}
@@ -419,6 +541,60 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   );
 }
 
+// ====================================================================
+// LineRow — handles BOTH scope-derived lines and custom extras
+// ====================================================================
+function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showProfit, onChange, onUpdateExtra, onDelete }) {
+  const o = overrides[line.line_id] || {};
+  const isExtra = line.source === 'extra';
+  const tq = (kind === 'builder' && tradeQuotes[line.line_id]) || null;
+
+  const qty = isExtra ? (o.quantity ?? line.extra.quantity) : (o.quantity ?? 1);
+  const unit = isExtra ? (o.unit ?? line.extra.unit ?? 'LS') : (o.unit ?? 'LS');
+  const cost = isExtra ? (o.cost ?? line.extra.cost ?? 0)
+    : ((o.cost !== undefined && o.cost !== null) ? o.cost : (tq ? tq.cost : 0));
+  const markup = isExtra ? (o.markup_percent ?? line.extra.markup_percent ?? 0)
+    : (o.markup_percent ?? 0);
+  const description = isExtra ? (o.name ?? line.extra.name) : (o.description ?? null);
+
+  const amount = computeAmount(qty, cost);
+  const total = compute(qty, cost, markup);
+  const profit = total - amount;
+
+  const handlePatch = (patch) => {
+    if (isExtra) onUpdateExtra(line.line_id, patch);
+    else onChange(line.line_id, patch);
+  };
+
+  return (
+    <tr style={{ background: idx % 2 === 0 ? '#0a0a0a' : '#0f0e0e' }}>
+      <td style={{ ...tdCell, color: '#B49B7E', fontWeight: 700 }}>{idx + 1}</td>
+      <td style={{ ...tdCell, textAlign: 'left', padding: '6px 10px' }}>
+        {editEnabled ? (
+          <textarea
+            rows={1}
+            defaultValue={description ?? line.text}
+            onBlur={e => handlePatch(isExtra ? { name: e.target.value } : { description: e.target.value })}
+            style={{ color: '#D4C5A9', fontSize: 13, lineHeight: 1.5 }}
+          />
+        ) : (description ? <span style={{ color: '#D4C5A9' }}>{description}</span>
+          : <span style={{ color: '#D4C5A9' }} dangerouslySetInnerHTML={{ __html: line.html }} />)}
+        {tq && <div style={{ marginTop: 2, color: '#10B981', fontSize: 10, letterSpacing: 1 }}>✓ Quoted by {tq.trade_name}: {fmtUSD(tq.cost)}</div>}
+      </td>
+      <NumCell value={qty} editable={editEnabled} onChange={v => handlePatch({ quantity: v })} />
+      <TextCell value={unit} editable={editEnabled} onChange={v => handlePatch({ unit: v })} />
+      <NumCell value={cost} editable={editEnabled} onChange={v => handlePatch({ cost: v })} prefix="$" />
+      <td style={{ ...tdCell, fontWeight: 600 }}>{fmtUSD(amount)}</td>
+      <td style={{ ...tdCell, fontWeight: 700, color: '#D4A574' }}>
+        {fmtUSD(total)}
+        {editEnabled && <span style={{ display: 'block', fontSize: 9, color: '#B49B7E', marginTop: 1 }}>+<NumInline value={markup} onChange={v => handlePatch({ markup_percent: v })} suffix="%" />markup</span>}
+      </td>
+      {showProfit && <td style={{ ...tdCell, color: '#10B981', fontWeight: 700 }}>{fmtUSD(profit)}</td>}
+      {editEnabled && <td className="no-print" style={{ ...tdCell, padding: 4 }}><button onClick={onDelete} title="Delete line" style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, padding: 4 }}>✕</button></td>}
+    </tr>
+  );
+}
+
 const tdCell = { border: '1px solid #B49B7E', padding: '6px 10px', color: '#D4C5A9', fontSize: 13, textAlign: 'right', verticalAlign: 'top' };
 
 function Th({ children, w, align = 'right' }) {
@@ -426,41 +602,38 @@ function Th({ children, w, align = 'right' }) {
 }
 
 function NumCell({ value, editable, onChange, prefix = '', suffix = '' }) {
-  // Local state so typing doesn't fight with parent re-render. Parent's
-  // optimistic state is updated on each keystroke via onChange.
   const [v, setV] = useState(value ?? '');
   useEffect(() => { setV(value ?? ''); }, [value]);
   return (
     <td style={tdCell}>
       {editable ? (
-        <input
-          type="number"
-          value={v}
-          onChange={e => { setV(e.target.value); onChange(parseFloat(e.target.value) || 0); }}
-          style={{ textAlign: 'right' }}
-        />
+        <input type="number" value={v} onChange={e => { setV(e.target.value); onChange(parseFloat(e.target.value) || 0); }} style={{ textAlign: 'right' }} />
       ) : (<>{prefix}{fmt(value)}{suffix}</>)}
     </td>
   );
 }
-
+function TextCell({ value, editable, onChange }) {
+  const [v, setV] = useState(value ?? '');
+  useEffect(() => { setV(value ?? ''); }, [value]);
+  return (
+    <td style={tdCell}>
+      {editable ? (
+        <input value={v} onChange={e => { setV(e.target.value); onChange(e.target.value); }} style={{ textAlign: 'center' }} />
+      ) : (value || '')}
+    </td>
+  );
+}
 function NumInline({ value, onChange, prefix = '', suffix = '' }) {
   const [v, setV] = useState(value ?? '');
   useEffect(() => { setV(value ?? ''); }, [value]);
   return (
     <span style={{ display: 'inline-flex', alignItems: 'baseline' }}>
       {prefix}
-      <input
-        type="number"
-        value={v}
-        onChange={e => { setV(e.target.value); onChange(parseFloat(e.target.value) || 0); }}
-        style={{ width: 50, textAlign: 'right', color: '#D4A574', borderBottom: '1px dotted #D4A574', padding: '0 2px' }}
-      />
+      <input type="number" value={v} onChange={e => { setV(e.target.value); onChange(parseFloat(e.target.value) || 0); }} style={{ width: 50, textAlign: 'right', color: '#D4A574', borderBottom: '1px dotted #D4A574', padding: '0 2px' }} />
       {suffix}
     </span>
   );
 }
-
 function TotalRow({ label, value, bold }) {
   return <tr><td style={{ padding: '6px 14px', color: '#D4C5A9', fontSize: 13, borderBottom: '1px solid #1a1f2e', fontWeight: bold ? 700 : 400 }}>{label}</td><td style={{ padding: '6px 14px', color: '#D4C5A9', fontSize: 13, borderBottom: '1px solid #1a1f2e', textAlign: 'right', fontWeight: bold ? 700 : 400 }}>{value}</td></tr>;
 }
@@ -505,7 +678,7 @@ const hLbl = { padding: '2px 8px', color: '#D4A574', fontSize: 10, letterSpacing
 const hVal = { padding: '2px 8px', color: '#D4C5A9', fontSize: 12, textAlign: 'right' };
 
 // ====================================================================
-// Snippets panel (unchanged from prior version)
+// Snippets panel
 // ====================================================================
 function SnippetsPanel({ snippets, ownerKind, ownerId, onChange }) {
   const [adding, setAdding] = useState(false);
@@ -527,7 +700,7 @@ function SnippetsPanel({ snippets, ownerKind, ownerId, onChange }) {
     <div className="no-print" style={{ background: '#1a1f2e', border: '1px solid #D4A574', margin: 12, padding: 12, borderRadius: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div style={{ color: '#D4A574', fontSize: 13, fontWeight: 700 }}>📚 SNIPPET LIBRARY — reusable line items</div>
-        <button onClick={() => setAdding(!adding)} style={{ background: '#10B981', color: '#D4C5A9', padding: '4px 12px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{adding ? '✕ CANCEL' : '+ NEW SNIPPET'}</button>
+        <button onClick={() => setAdding(!adding)} style={{ background: '#10B981', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{adding ? '✕ CANCEL' : '+ NEW SNIPPET'}</button>
       </div>
       {adding && (
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr auto', gap: 6, marginBottom: 12 }}>

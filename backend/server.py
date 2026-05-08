@@ -19542,6 +19542,8 @@ class ProposalOverride(BaseModel):
     cost: Optional[float] = None
     markup_percent: Optional[float] = None
     notes: Optional[str] = None
+    description: Optional[str] = None  # builder/trade can rewrite the scope sentence
+    hidden: Optional[bool] = None      # True = hide from proposal (soft delete)
 
 class ProposalExtraCreate(BaseModel):
     parent_kind: str  # 'room' | 'category' | 'subcategory'
