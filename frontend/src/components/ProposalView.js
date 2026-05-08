@@ -267,20 +267,28 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
                           {cat.name}
                         </td>
                       </tr>
-                      {/* COLUMN HEADERS — repeated under EVERY green category bar (matches admin Checklist/FFE pattern) */}
+                      {/* COLUMN HEADERS — repeated under EVERY green category bar.
+                          Uses the EXACT same recipe as admin Checklist/FFE:
+                          135° #8B4444 dusty-red gradient, white bold text,
+                          #B49B7E gold border. NEVER deviates. */}
                       <tr>
                         {['#', 'Description', 'Vendor', 'SKU / Notes', 'Qty', 'Unit', 'Cost', 'Markup %', 'Line Total'].map((h, i) => (
-                          <th key={i} className="border border-[#D4A574] px-2 py-1 text-[10px] text-[#D4A574] uppercase font-semibold" style={{ background: '#1a1208' }}>{h}</th>
+                          <th
+                            key={i}
+                            className="border border-[#B49B7E] px-2 py-2 text-xs font-bold text-white uppercase tracking-wider"
+                            style={{ background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)' }}
+                          >{h}</th>
                         ))}
                       </tr>
                       {(cat.subcategories || []).map(sub => {
                         const subExtras = extrasByParentId[`subcategory:${sub.id}`] || [];
                         return (
                           <React.Fragment key={sub.id}>
-                            {/* SUB-CATEGORY BAR */}
-                            <tr>
-                              <td colSpan="9" className="border border-[#B49B7E] px-3 py-1 text-[#B49B7E] text-[11px] uppercase" style={{ background: '#0f0a05' }}>
-                                {sub.name}
+                            {/* SUB-CATEGORY BAR — exact same recipe as admin Checklist:
+                                tan/gold gradient, gold border, gold bold text. */}
+                            <tr style={{ background: 'linear-gradient(135deg, rgba(180, 155, 126, 0.3) 0%, rgba(212, 165, 116, 0.2) 100%)' }}>
+                              <td colSpan="9" className="border border-[#B49B7E] px-3 py-2">
+                                <span className="text-[#D4A574] font-bold text-sm">{sub.name?.toUpperCase()}</span>
                               </td>
                             </tr>
                             {(sub.items || []).map((item, idx) => {
