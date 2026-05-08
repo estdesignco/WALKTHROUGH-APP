@@ -19727,16 +19727,27 @@ async def _build_proposal_payload(kind: str, portal: dict):
     scope_doc = builder.get("scope_document") or project.get("scope_document", "")
 
     # Pull rooms (no nested cats/subs/items needed — proposal is scope-driven).
+    # When the same room name exists in multiple sheet_types (walkthrough +
+    # checklist + ffe), prefer the variant that actually has a color set so
+    # banners render with the user's assigned color (NOT a fallback).
     selected_ids = builder.get("selected_room_ids", [])
     rooms_raw = await db.rooms.find({"id": {"$in": selected_ids}}, {"_id": 0}).sort("order_index", 1).to_list(200)
-    rooms = []
-    seen_names = set()
+    by_name = {}
+    order = []
     for r in rooms_raw:
-        # de-dupe by name (the same room exists per sheet_type)
         key = (r.get("name") or "").strip().upper()
-        if not key or key in seen_names:
+        if not key:
             continue
-        seen_names.add(key)
+        existing = by_name.get(key)
+        # Prefer the version with a non-empty color; fall back to the first seen.
+        if existing is None:
+            by_name[key] = r
+            order.append(key)
+        elif not (existing.get("color") or "").strip() and (r.get("color") or "").strip():
+            by_name[key] = r
+    rooms = []
+    for key in order:
+        r = by_name[key]
         rooms.append({
             "id": r.get("id"),
             "name": r.get("name"),

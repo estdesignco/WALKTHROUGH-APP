@@ -33,7 +33,7 @@
  * - Trade portals see only their assigned trades.
  */
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { getMutedRoomHeaderStyleStandalone } from '../utils/roomColors';
+import { getMutedRoomHeaderStyleStandalone, getRoomColor } from '../utils/roomColors';
 import { parseScopeDocument, TRADE_COLORS } from './ScopeDocumentEditor';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
@@ -280,7 +280,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
             </thead>
             <tbody>
               {rooms.map((rg, rIdx) => {
-                const roomColor = rg.room?.color || '#D4A574';
+                const roomColor = rg.room?.color || getRoomColor(rg.roomName);
                 const banner = getMutedRoomHeaderStyleStandalone(roomColor);
                 return (
                   <React.Fragment key={rg.roomName}>
