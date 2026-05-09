@@ -36,14 +36,21 @@ import { parseScopeDocument, TRADE_COLORS, DEFAULT_TRADES } from './ScopeDocumen
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
 const NUM_INPUT_CSS = `
+  /* Spreadsheet-style cell editing — NO boxed inputs anywhere.
+     Cells are contentEditable divs that look like plain table cells. */
+  .proposal-cell .ce-cell { outline: none; min-height: 18px; cursor: text; }
+  .proposal-cell .ce-cell:focus { background: rgba(212,165,116,0.10); box-shadow: inset 0 0 0 1px #D4A574; }
+  .proposal-cell .ce-cell:hover { background: rgba(212,165,116,0.04); }
+  .proposal-cell .ce-cell:empty::before { content: attr(data-ph); color: #6b6157; }
+  /* Hide native number-input spinners just in case */
   .proposal-cell input::-webkit-outer-spin-button,
   .proposal-cell input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .proposal-cell input[type=number] { -moz-appearance: textfield; }
-  .proposal-cell input, .proposal-cell textarea { background: transparent; outline: none; border: none; width: 100%; color: inherit; font: inherit; padding: 0; resize: none; }
-  .proposal-cell input:focus, .proposal-cell textarea:focus { background: rgba(212,165,116,0.08); }
+  .proposal-cell input { background: transparent; outline: none; border: none; width: 100%; color: inherit; font: inherit; padding: 0; }
+  .proposal-cell input:focus { background: rgba(212,165,116,0.08); }
   @media print {
     .no-print { display: none !important; }
-    .proposal-cell input, .proposal-cell textarea { color: #000 !important; }
+    .proposal-cell .ce-cell { color: #000 !important; }
   }
 `;
 
@@ -51,6 +58,18 @@ const fmt = (n) => (n === null || n === undefined || n === '' || isNaN(n)) ? '' 
 const fmtUSD = (n) => `$${fmt(n || 0)}`;
 const compute = (qty, cost, markup) => (Number(qty) || 0) * (Number(cost) || 0) * (1 + (Number(markup) || 0) / 100);
 const computeAmount = (qty, cost) => (Number(qty) || 0) * (Number(cost) || 0);
+
+// Remove ONLY #trade pills from scope HTML — keep @person and @product pills
+// intact since they're meaningful content (e.g. "Hang light fixture @Jerome").
+// Trade tags are identifiers/groupers, not part of the prose.
+const stripTradePills = (html) => {
+  if (!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  div.querySelectorAll('[data-tag="trade"], .trade-pill').forEach(el => el.remove());
+  // Tidy up double spaces left by removed pills
+  return div.innerHTML.replace(/\s{2,}/g, ' ').replace(/\s+([.,;:])/g, '$1').trim();
+};
 
 const stableLineId = (room, trade, text) => {
   const norm = (s) => (s || '').toLowerCase().replace(/\s+/g, ' ').trim();
@@ -79,6 +98,11 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const [showSnippets, setShowSnippets] = useState(false);
   const [notes, setNotes] = useState('');
   const [lessPayment, setLessPayment] = useState(0);
+  // Collapse state — local to viewer (not persisted to server)
+  const [collapsedTrades, setCollapsedTrades] = useState(new Set());
+  const [collapsedRooms, setCollapsedRooms] = useState(new Set());
+  const toggleTrade = (t) => setCollapsedTrades(prev => { const n = new Set(prev); n.has(t) ? n.delete(t) : n.add(t); return n; });
+  const toggleRoom = (key) => setCollapsedRooms(prev => { const n = new Set(prev); n.has(key) ? n.delete(key) : n.add(key); return n; });
 
   const load = async () => {
     setLoading(true);
@@ -416,31 +440,51 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
             <tbody>
               {grouped.map((tg) => {
                 const tradeColor = TRADE_COLORS[tg.tradeName] || '#065F46';
+                const isTradeCollapsed = collapsedTrades.has(tg.tradeName);
+                // Quick stats so collapsed trade shows useful summary
+                let tradeLineCount = 0;
+                tg.roomGroups.forEach(rg => { rg.lines.forEach(l => { if (!overrides[l.line_id]?.hidden) tradeLineCount++; }); });
                 return (
                   <React.Fragment key={tg.tradeName}>
-                    {/* TRADE HEADER */}
+                    {/* TRADE HEADER — click chevron to collapse */}
                     <tr>
                       <td colSpan={colCount + (editEnabled ? 1 : 0)} style={{ background: tradeColor, padding: '10px 14px', border: '1px solid #B49B7E' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                          <span style={{ color: '#fff', fontSize: 14, fontWeight: 800, letterSpacing: 3 }}>{tg.tradeName}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <button onClick={() => toggleTrade(tg.tradeName)} className="no-print" title={isTradeCollapsed ? 'Expand' : 'Collapse'}
+                              style={{ background: 'rgba(0,0,0,0.25)', color: '#fff', border: 'none', width: 22, height: 22, borderRadius: 4, cursor: 'pointer', fontSize: 12, fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                              {isTradeCollapsed ? '▶' : '▼'}
+                            </button>
+                            <span style={{ color: '#fff', fontSize: 14, fontWeight: 800, letterSpacing: 3 }}>{tg.tradeName}</span>
+                            {isTradeCollapsed && <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 600, letterSpacing: 1 }}>· {tradeLineCount} line{tradeLineCount === 1 ? '' : 's'}</span>}
+                          </div>
                           {editEnabled && (
                             <button onClick={() => deleteTrade(tg.tradeName)} className="no-print" style={{ background: 'rgba(0,0,0,0.3)', color: '#fff', border: '1px solid rgba(255,255,255,0.5)', padding: '2px 10px', fontSize: 10, fontWeight: 700, borderRadius: 4, cursor: 'pointer', letterSpacing: 1 }}>✕ DELETE TRADE</button>
                           )}
                         </div>
                       </td>
                     </tr>
-                    {tg.roomGroups.map((rg) => {
+                    {!isTradeCollapsed && tg.roomGroups.map((rg) => {
                       const roomColor = roomColorByName[rg.roomName] || getRoomColor(rg.roomName);
                       const banner = getMutedRoomHeaderStyleStandalone(roomColor);
+                      const roomKey = `${tg.tradeName}::${rg.roomName}`;
+                      const isRoomCollapsed = collapsedRooms.has(roomKey);
                       const visibleLines = rg.lines.filter(l => !overrides[l.line_id]?.hidden);
                       return (
-                        <React.Fragment key={`${tg.tradeName}::${rg.roomName}`}>
+                        <React.Fragment key={roomKey}>
                           <tr>
                             <td colSpan={colCount + (editEnabled ? 1 : 0)} style={{ ...banner, padding: '6px 14px', border: '1px solid #B49B7E' }}>
-                              <span style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 800, letterSpacing: 2 }}>{rg.roomName}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <button onClick={() => toggleRoom(roomKey)} className="no-print" title={isRoomCollapsed ? 'Expand' : 'Collapse'}
+                                  style={{ background: 'rgba(0,0,0,0.3)', color: '#D4C5A9', border: 'none', width: 20, height: 20, borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  {isRoomCollapsed ? '▶' : '▼'}
+                                </button>
+                                <span style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 800, letterSpacing: 2 }}>{rg.roomName}</span>
+                                {isRoomCollapsed && <span style={{ color: '#D4C5A9', fontSize: 10, opacity: 0.75, letterSpacing: 1 }}>· {visibleLines.length} line{visibleLines.length === 1 ? '' : 's'}</span>}
+                              </div>
                             </td>
                           </tr>
-                          {visibleLines.map((line, idx) => (
+                          {!isRoomCollapsed && visibleLines.map((line, idx) => (
                             <LineRow
                               key={line.line_id}
                               line={line}
@@ -455,7 +499,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
                               onDelete={() => deleteLine(line)}
                             />
                           ))}
-                          {editEnabled && (
+                          {!isRoomCollapsed && editEnabled && (
                             <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '6px 14px', background: '#0a0a0a', border: '1px solid #2a3040' }}>
                               <button onClick={() => addExtraLine(tg.tradeName, rg.roomName)} style={{ background: 'transparent', color: '#10B981', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: 1, padding: 0 }}>+ ADD LINE TO {rg.roomName}</button>
                             </td></tr>
@@ -463,7 +507,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
                         </React.Fragment>
                       );
                     })}
-                    {editEnabled && (
+                    {!isTradeCollapsed && editEnabled && (
                       <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '8px 14px', background: '#0f1218', border: '1px solid #2a3040' }}>
                         <button onClick={() => addRoomToTrade(tg.tradeName)} style={{ background: 'transparent', color: '#D4A574', border: '1px dashed #D4A574', padding: '4px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 700, borderRadius: 4, letterSpacing: 1 }}>+ ADD ROOM TO {tg.tradeName}</button>
                       </td></tr>
@@ -542,7 +586,9 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
 }
 
 // ====================================================================
-// LineRow — handles BOTH scope-derived lines and custom extras
+// LineRow — handles BOTH scope-derived lines and custom extras.
+// All editable cells use contentEditable — looks like plain spreadsheet
+// cells, NO boxed inputs anywhere.
 // ====================================================================
 function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showProfit, onChange, onUpdateExtra, onDelete }) {
   const o = overrides[line.line_id] || {};
@@ -555,7 +601,10 @@ function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showPro
     : ((o.cost !== undefined && o.cost !== null) ? o.cost : (tq ? tq.cost : 0));
   const markup = isExtra ? (o.markup_percent ?? line.extra.markup_percent ?? 0)
     : (o.markup_percent ?? 0);
-  const description = isExtra ? (o.name ?? line.extra.name) : (o.description ?? null);
+  // Description: extras use override.name → extra.name; scope lines use override.description → line.html with #trade pills stripped
+  const descriptionHtml = isExtra
+    ? (o.name ?? line.extra.name)
+    : (o.description ?? stripTradePills(line.html));
 
   const amount = computeAmount(qty, cost);
   const total = compute(qty, cost, markup);
@@ -570,24 +619,25 @@ function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showPro
     <tr style={{ background: idx % 2 === 0 ? '#0a0a0a' : '#0f0e0e' }}>
       <td style={{ ...tdCell, color: '#B49B7E', fontWeight: 700 }}>{idx + 1}</td>
       <td style={{ ...tdCell, textAlign: 'left', padding: '6px 10px' }}>
-        {editEnabled ? (
-          <textarea
-            rows={1}
-            defaultValue={description ?? line.text}
-            onBlur={e => handlePatch(isExtra ? { name: e.target.value } : { description: e.target.value })}
-            style={{ color: '#D4C5A9', fontSize: 13, lineHeight: 1.5 }}
-          />
-        ) : (description ? <span style={{ color: '#D4C5A9' }}>{description}</span>
-          : <span style={{ color: '#D4C5A9' }} dangerouslySetInnerHTML={{ __html: line.html }} />)}
+        <CellEditableHTML
+          value={descriptionHtml}
+          editable={editEnabled}
+          placeholder="(empty)"
+          onChange={v => handlePatch(isExtra ? { name: v } : { description: v })}
+        />
         {tq && <div style={{ marginTop: 2, color: '#10B981', fontSize: 10, letterSpacing: 1 }}>✓ Quoted by {tq.trade_name}: {fmtUSD(tq.cost)}</div>}
       </td>
-      <NumCell value={qty} editable={editEnabled} onChange={v => handlePatch({ quantity: v })} />
-      <TextCell value={unit} editable={editEnabled} onChange={v => handlePatch({ unit: v })} />
-      <NumCell value={cost} editable={editEnabled} onChange={v => handlePatch({ cost: v })} prefix="$" />
+      <CellNum value={qty} editable={editEnabled} onChange={v => handlePatch({ quantity: v })} />
+      <CellText value={unit} editable={editEnabled} onChange={v => handlePatch({ unit: v })} />
+      <CellNum value={cost} editable={editEnabled} prefix="$" onChange={v => handlePatch({ cost: v })} />
       <td style={{ ...tdCell, fontWeight: 600 }}>{fmtUSD(amount)}</td>
       <td style={{ ...tdCell, fontWeight: 700, color: '#D4A574' }}>
         {fmtUSD(total)}
-        {editEnabled && <span style={{ display: 'block', fontSize: 9, color: '#B49B7E', marginTop: 1 }}>+<NumInline value={markup} onChange={v => handlePatch({ markup_percent: v })} suffix="%" />markup</span>}
+        {editEnabled && (
+          <span style={{ display: 'inline-flex', alignItems: 'baseline', fontSize: 9, color: '#B49B7E', marginTop: 1, marginLeft: 0 }}>
+            +<CellNumInline value={markup} onChange={v => handlePatch({ markup_percent: v })} />%
+          </span>
+        )}
       </td>
       {showProfit && <td style={{ ...tdCell, color: '#10B981', fontWeight: 700 }}>{fmtUSD(profit)}</td>}
       {editEnabled && <td className="no-print" style={{ ...tdCell, padding: 4 }}><button onClick={onDelete} title="Delete line" style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, padding: 4 }}>✕</button></td>}
@@ -601,35 +651,119 @@ function Th({ children, w, align = 'right' }) {
   return <th className="border border-[#B49B7E] px-2 py-2 text-[11px] font-bold uppercase tracking-wider" style={{ width: w, background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', color: '#D4C5A9', textAlign: align }}>{children}</th>;
 }
 
-function NumCell({ value, editable, onChange, prefix = '', suffix = '' }) {
-  const [v, setV] = useState(value ?? '');
-  useEffect(() => { setV(value ?? ''); }, [value]);
+// ContentEditable cell for HTML (description column — keeps @person / @product pills intact)
+function CellEditableHTML({ value, editable, placeholder, onChange }) {
+  const ref = useRef(null);
+  // Only set innerHTML when value changes from the OUTSIDE (not from user typing).
+  useEffect(() => {
+    if (ref.current && ref.current.innerHTML !== (value || '')) {
+      ref.current.innerHTML = value || '';
+    }
+  }, [value]);
+  if (!editable) {
+    return <div style={{ color: '#D4C5A9', fontSize: 13, lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: value || '' }} />;
+  }
+  return (
+    <div
+      ref={ref}
+      className="ce-cell"
+      contentEditable
+      suppressContentEditableWarning
+      data-ph={placeholder || ''}
+      onBlur={(e) => onChange(e.currentTarget.innerHTML)}
+      style={{ color: '#D4C5A9', fontSize: 13, lineHeight: 1.5, minHeight: 18 }}
+    />
+  );
+}
+
+// ContentEditable cell for plain numeric input — looks like a normal cell.
+function CellNum({ value, editable, prefix = '', onChange }) {
+  const ref = useRef(null);
+  const display = (value === null || value === undefined || value === '') ? '' : String(value);
+  useEffect(() => {
+    if (ref.current && ref.current.textContent !== display) ref.current.textContent = display;
+  }, [display]);
+  if (!editable) {
+    return <td style={tdCell}>{prefix}{fmt(value)}</td>;
+  }
   return (
     <td style={tdCell}>
-      {editable ? (
-        <input type="number" value={v} onChange={e => { setV(e.target.value); onChange(parseFloat(e.target.value) || 0); }} style={{ textAlign: 'right' }} />
-      ) : (<>{prefix}{fmt(value)}{suffix}</>)}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline', gap: 2 }}>
+        {prefix && <span style={{ color: '#B49B7E' }}>{prefix}</span>}
+        <span
+          ref={ref}
+          className="ce-cell"
+          contentEditable
+          suppressContentEditableWarning
+          inputMode="decimal"
+          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+          onBlur={(e) => {
+            const raw = e.currentTarget.textContent.replace(/[^0-9.\-]/g, '');
+            const num = parseFloat(raw);
+            onChange(isNaN(num) ? 0 : num);
+          }}
+          style={{ minWidth: 24, textAlign: 'right' }}
+        />
+      </div>
     </td>
   );
 }
-function TextCell({ value, editable, onChange }) {
-  const [v, setV] = useState(value ?? '');
-  useEffect(() => { setV(value ?? ''); }, [value]);
+
+// ContentEditable inline number (markup % under TOTAL column)
+function CellNumInline({ value, onChange }) {
+  const ref = useRef(null);
+  const display = (value === null || value === undefined || value === '') ? '0' : String(value);
+  useEffect(() => {
+    if (ref.current && ref.current.textContent !== display) ref.current.textContent = display;
+  }, [display]);
+  return (
+    <span
+      ref={ref}
+      className="ce-cell"
+      contentEditable
+      suppressContentEditableWarning
+      inputMode="decimal"
+      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+      onBlur={(e) => {
+        const raw = e.currentTarget.textContent.replace(/[^0-9.\-]/g, '');
+        const num = parseFloat(raw);
+        onChange(isNaN(num) ? 0 : num);
+      }}
+      style={{ minWidth: 18, padding: '0 2px', borderBottom: '1px dotted #D4A574', color: '#D4A574' }}
+    />
+  );
+}
+
+// ContentEditable cell for plain text (Unit column)
+function CellText({ value, editable, onChange }) {
+  const ref = useRef(null);
+  const display = value || '';
+  useEffect(() => {
+    if (ref.current && ref.current.textContent !== display) ref.current.textContent = display;
+  }, [display]);
+  if (!editable) return <td style={tdCell}>{display}</td>;
   return (
     <td style={tdCell}>
-      {editable ? (
-        <input value={v} onChange={e => { setV(e.target.value); onChange(e.target.value); }} style={{ textAlign: 'center' }} />
-      ) : (value || '')}
+      <span
+        ref={ref}
+        className="ce-cell"
+        contentEditable
+        suppressContentEditableWarning
+        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+        onBlur={(e) => onChange(e.currentTarget.textContent.trim())}
+        style={{ display: 'inline-block', minWidth: 28, textAlign: 'center' }}
+      />
     </td>
   );
 }
+
 function NumInline({ value, onChange, prefix = '', suffix = '' }) {
-  const [v, setV] = useState(value ?? '');
-  useEffect(() => { setV(value ?? ''); }, [value]);
+  // Used in the bottom totals row (Less Payment / PM Fee / Tax) — kept as
+  // compact contentEditable for consistency.
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'baseline' }}>
+    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
       {prefix}
-      <input type="number" value={v} onChange={e => { setV(e.target.value); onChange(parseFloat(e.target.value) || 0); }} style={{ width: 50, textAlign: 'right', color: '#D4A574', borderBottom: '1px dotted #D4A574', padding: '0 2px' }} />
+      <CellNumInline value={value} onChange={onChange} />
       {suffix}
     </span>
   );
