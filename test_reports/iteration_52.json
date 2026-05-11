@@ -1,0 +1,39 @@
+{
+  "summary": "Iteration 52 - Retest of SnippetDestinationPicker initial-state fix (line 1222: useState(tradeOptions[0] || '__NEW__')) on real portal JXQ8EYEQ (Wheeler Ridge Residence) which has scope_of_work=[]. Fix is verified working end-to-end: modal opens with NEW TRADE input visible immediately, ADD LINE enables after typing DUMPSTER/GENERAL, POST fires with correct payload (parent_id=DUMPSTER::GENERAL), modal closes, DUMPSTER trade + GENERAL room banner appears in proposal, 2nd modal defaults to DUMPSTER/GENERAL (not __NEW__), shift-click bypasses modal and posts to last destination, X-delete does NOT open modal. All 2 created extras cleaned up; portal ends with extras=[].",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/frontend/src/components/ProposalView.js"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "The one-line fix at ProposalView.js:1222 (`useState(tradeOptions[0] || '__NEW__')`) correctly resolves the iteration_51 bug. When grouped=[] (proposal has no trades), trade state initializes to '__NEW__', so `isNewTrade` is true on mount → both snippet-new-trade-input and snippet-new-room-input render immediately. After typing values, ADD LINE button transitions from disabled→enabled as expected.",
+    "POST payload format verified correct: {parent_kind:'trade-room', parent_id:'DUMPSTER::GENERAL', name:<snippet name>, quantity, unit, cost, markup_percent, notes:''}. (Note: actual first card alphabetically is 'Cabinets - Hardware Install' not 'Demo - Dumpster (per haul)' as named in spec — but payload format and destination are exactly right.)",
+    "Second-modal default behavior: after adding to DUMPSTER/GENERAL, opening the modal again defaults trade='DUMPSTER' and room='GENERAL' (not __NEW__) — confirms the useEffect reset logic and useState fallback both work correctly when trades exist.",
+    "Shift-click bypass: POSTs directly to last destination DUMPSTER::GENERAL without opening modal — confirmed.",
+    "Delete X span uses e.stopPropagation correctly — clicking ✕ does not open the destination picker.",
+    "Cleanup verified: DELETE /api/builder/JXQ8EYEQ/proposal/extra/{id} returned successfully for both extras; final GET shows extras=[]. No pollution on user's real portal."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "n/a (skipped)", "frontend": "100%" },
+  "test_credentials": "Builder Portal Access Code: JXQ8EYEQ (no login). proposal_view_enabled=true, proposal_edit_enabled=true.",
+  "seed_data_creation": "Created 2 extras during the test (Cabinets - Hardware Install + Cleanup - Final (labor) via shift-click), both under parent DUMPSTER::GENERAL. Both DELETEd at end of test; verified GET /api/builder/JXQ8EYEQ/proposal returns extras=[].",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iteration_51 bug is fully resolved. SnippetDestinationPicker correctly initializes to '__NEW__' when no trades exist, and to the first existing trade name when trades do exist. Full click-to-add, shift-click-repeat, cancel, and delete-isolation flows all work end-to-end on JXQ8EYEQ. No further action needed for this fix.",
+  "features_verified_passing": [
+    "Modal opens with snippet-new-trade-input VISIBLE IMMEDIATELY (regression fix)",
+    "Modal opens with snippet-new-room-input VISIBLE IMMEDIATELY (since NEW TRADE implies NEW ROOM)",
+    "ADD LINE button disabled before fill, enabled after typing DUMPSTER + GENERAL",
+    "POST /api/builder/JXQ8EYEQ/proposal/extra fires with parent_id=DUMPSTER::GENERAL",
+    "Modal closes on successful add",
+    "DUMPSTER trade banner with GENERAL room appears in proposal",
+    "2nd snippet card click defaults to DUMPSTER/GENERAL (not __NEW__) — proves useState fallback uses existing trades when present",
+    "Shift-click on 3rd card bypasses modal and POSTs to DUMPSTER::GENERAL",
+    "X delete span on snippet card does NOT open destination picker",
+    "Cleanup via DELETE /proposal/extra/{id} works; final extras=[]"
+  ],
+  "rca of the issue": "Already in iteration_51. This iteration confirms the one-line fix `useState(tradeOptions[0] || '__NEW__')` at ProposalView.js:1222 fully resolves the issue. When tradeOptions is empty (grouped=[]), the fallback is now '__NEW__' so isNewTrade=true from mount, immediately revealing the new-trade/new-room inputs. No further changes needed."
+}

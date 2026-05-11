@@ -1219,7 +1219,7 @@ function SnippetsPanel({ snippets, ownerKind, ownerId, onChange, grouped = [], e
 // Allows creating a brand-new Trade or Room on the fly.
 function SnippetDestinationPicker({ snippet, grouped, onCancel, onConfirm }) {
   const tradeOptions = grouped.map(g => g.tradeName);
-  const [trade, setTrade] = useState(tradeOptions[0] || '');
+  const [trade, setTrade] = useState(tradeOptions[0] || '__NEW__');
   const [newTrade, setNewTrade] = useState('');
   const [room, setRoom] = useState('');
   const [newRoom, setNewRoom] = useState('');
