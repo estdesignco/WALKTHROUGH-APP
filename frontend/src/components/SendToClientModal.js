@@ -13,31 +13,35 @@ import html2pdf from 'html2pdf.js';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
-export default function SendToClientModal({ accessCode, defaultTo = '', defaultName = '', companyName = '', projectName = '', onClose, onSent }) {
+export default function SendToClientModal({ accessCode, defaultTo = '', defaultName = '', defaultCc = '', defaultSubject = '', companyName = '', projectName = '', onClose, onSent }) {
   const [toEmail, setToEmail] = useState(defaultTo);
   const [toName, setToName] = useState(defaultName);
-  const [cc, setCc] = useState('');
-  const [subject, setSubject] = useState('');
+  const [cc, setCc] = useState(defaultCc);
+  const [subject, setSubject] = useState(defaultSubject || '');
   const [message, setMessage] = useState('');
   const [includeAccept, setIncludeAccept] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [progress, setProgress] = useState('');
+  const isResend = !!defaultSubject;  // when defaultSubject is provided, this is a re-send flow
   const mounted = useRef(true);
 
   useEffect(() => () => { mounted.current = false; }, []);
 
   useEffect(() => {
+    // When this is a RESEND, keep the prior subject; otherwise build a default.
     const proj = projectName || 'your project';
     const co = companyName || 'our team';
-    setSubject(`Your proposal for ${proj}`);
+    if (!defaultSubject) {
+      setSubject(`Your proposal for ${proj}`);
+    }
     setMessage(
-      `Hi${defaultName ? ' ' + defaultName.split(' ')[0] : ''},\n\n` +
-      `Please find the proposal for ${proj} attached as a PDF.\n\n` +
-      `Once you've reviewed it, you can accept the proposal online using the button below — or just reply to this email with any questions.\n\n` +
-      `Thank you,\n${co}`
+      (isResend
+        ? `Hi${defaultName ? ' ' + defaultName.split(' ')[0] : ''},\n\nFollowing up — re-sending the latest proposal for ${proj}. The previous accept link has been replaced with a fresh one below.\n\nThank you,\n${co}`
+        : `Hi${defaultName ? ' ' + defaultName.split(' ')[0] : ''},\n\nPlease find the proposal for ${proj} attached as a PDF.\n\nOnce you've reviewed it, you can accept the proposal online using the button below — or just reply to this email with any questions.\n\nThank you,\n${co}`
+      )
     );
-  }, [projectName, companyName, defaultName]);
+  }, [projectName, companyName, defaultName, defaultSubject, isResend]);
 
   const generatePdf = async () => {
     setProgress('Generating PDF…');
@@ -142,9 +146,13 @@ export default function SendToClientModal({ accessCode, defaultTo = '', defaultN
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={e => e.stopPropagation()} data-testid="send-to-client-modal"
         style={{ background: '#0f1218', border: '1px solid #D4A574', borderRadius: 8, maxWidth: 560, width: '100%', maxHeight: '92vh', overflowY: 'auto', padding: 24 }}>
-        <h2 style={{ color: '#D4A574', fontSize: 18, marginBottom: 4 }}>📨 Send Proposal to Client</h2>
+        <h2 style={{ color: '#D4A574', fontSize: 18, marginBottom: 4 }}>
+          {isResend ? '↻ Resend Proposal' : '📨 Send Proposal to Client'}
+        </h2>
         <p style={{ color: '#D4C5A9', fontSize: 12, marginBottom: 16, opacity: 0.85 }}>
-          The PDF will be attached and the email sent from your white-label address.
+          {isResend
+            ? 'This re-sends the latest proposal PDF and generates a fresh accept link (the previous link becomes inactive).'
+            : 'The PDF will be attached and the email sent from your white-label address.'}
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -188,7 +196,7 @@ export default function SendToClientModal({ accessCode, defaultTo = '', defaultN
             <button onClick={onClose} style={{ background: 'transparent', color: '#D4C5A9', border: '1px solid #4b5563', padding: '8px 16px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Cancel</button>
             <button onClick={sendNow} disabled={sending || !toEmail.trim()} data-testid="confirm-send-btn"
               style={{ background: sending ? '#4b5563' : '#D4A574', color: '#1a1f2e', padding: '8px 20px', borderRadius: 4, border: 'none', cursor: sending ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
-              {sending ? 'Sending…' : '✉ SEND TO CLIENT'}
+              {sending ? 'Sending…' : (isResend ? '↻ RESEND NOW' : '✉ SEND TO CLIENT')}
             </button>
           </div>
         </div>

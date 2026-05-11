@@ -113,6 +113,13 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const [loading, setLoading] = useState(true);
   const [showAccept, setShowAccept] = useState(false);
   const [showSendModal, setShowSendModal] = useState(false);
+  // Email send history — fetched on mount for builder portals so we can show
+  // "Last sent to X on Y · RESEND" and let the builder one-click resend.
+  const [emailLog, setEmailLog] = useState([]);
+  const [showEmailHistory, setShowEmailHistory] = useState(false);
+  // When the user clicks RESEND, we open the SendToClientModal pre-filled
+  // with the most recent send's recipient + subject + message. Null = fresh send.
+  const [resendPrefill, setResendPrefill] = useState(null);
   const [signature, setSignature] = useState('');
   const [overrides, setOverrides] = useState({});  // { line_id: {...} }
   const [extras, setExtras] = useState([]);
@@ -157,7 +164,17 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
     const res = await fetch(`${API_URL}/api/proposal/snippets?owner_kind=${kind}&owner_id=${accessCode}`);
     if (res.ok) setSnippets(await res.json());
   };
-  useEffect(() => { load(); loadSnippets(); /* eslint-disable-next-line */ }, [accessCode]);
+  const loadEmailLog = async () => {
+    if (kind !== 'builder') return;
+    try {
+      const res = await fetch(`${API_URL}/api/builder/${accessCode}/proposal/email-log`);
+      if (res.ok) {
+        const json = await res.json();
+        setEmailLog(json.emails || []);
+      }
+    } catch (e) { console.error('email log load failed', e); }
+  };
+  useEffect(() => { load(); loadSnippets(); loadEmailLog(); /* eslint-disable-next-line */ }, [accessCode]);
 
   const portal = data?.portal || {};
   const editEnabled = !!portal.proposal_edit_enabled;
@@ -827,15 +844,101 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
         </div>
       )}
 
-      <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 20px 24px' }}>
-        <button onClick={() => window.print()} data-testid="print-proposal-btn" style={{ background: 'transparent', color: '#D4A574', padding: '8px 16px', fontWeight: 700, borderRadius: 4, border: '1px solid #D4A574', cursor: 'pointer', fontSize: 12 }}>🖨 PRINT</button>
-        {kind === 'builder' && (
-          <button onClick={() => setShowSendModal(true)} disabled={!accepted} title={accepted ? 'Send the proposal PDF to your client' : 'Accept the job first to unlock sending'} data-testid="send-to-client-btn"
-            style={{ background: accepted ? '#D4A574' : '#4b5563', color: '#1a1f2e', padding: '8px 18px', fontWeight: 700, borderRadius: 4, border: 'none', cursor: accepted ? 'pointer' : 'not-allowed', fontSize: 12, letterSpacing: 1 }}>
-            ✉ SEND TO CLIENT
-          </button>
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '0 20px 24px', flexWrap: 'wrap' }}>
+        {/* LAST SENT strip — appears as soon as the builder has sent at least once.
+            One-click resend re-opens the modal pre-filled with the previous
+            recipient/subject/message and a FRESH accept token. */}
+        {kind === 'builder' && emailLog.length > 0 && (
+          <div data-testid="last-sent-strip" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', color: '#D4C5A9', fontSize: 12 }}>
+            <span style={{ color: '#10B981', letterSpacing: 1, fontWeight: 700 }}>✓ LAST SENT</span>
+            <span>to <strong style={{ color: '#D4A574' }}>{emailLog[0].to_email}</strong></span>
+            <span style={{ opacity: 0.7 }}>· {new Date(emailLog[0].sent_at).toLocaleString()}</span>
+            <button
+              onClick={() => {
+                setResendPrefill({
+                  to_email: emailLog[0].to_email,
+                  to_name: emailLog[0].to_name || '',
+                  cc_emails: (emailLog[0].cc_emails || []).join(', '),
+                  subject: emailLog[0].subject || '',
+                });
+                setShowSendModal(true);
+              }}
+              disabled={!accepted}
+              title={accepted ? 'Re-send the latest proposal to the same recipient (generates a fresh accept link)' : 'Accept the job first to unlock sending'}
+              data-testid="resend-last-btn"
+              style={{
+                background: accepted ? '#1a1f2e' : '#4b5563',
+                color: accepted ? '#D4A574' : '#9ca3af',
+                border: `1px solid ${accepted ? '#D4A574' : '#4b5563'}`,
+                padding: '4px 12px',
+                fontSize: 11,
+                fontWeight: 700,
+                borderRadius: 4,
+                cursor: accepted ? 'pointer' : 'not-allowed',
+                letterSpacing: 1,
+              }}>
+              ↻ RESEND
+            </button>
+            {emailLog.length > 1 && (
+              <button onClick={() => setShowEmailHistory(!showEmailHistory)} data-testid="toggle-email-history"
+                style={{ background: 'transparent', color: '#D4C5A9', border: '1px solid #4b5563', padding: '4px 10px', fontSize: 11, borderRadius: 4, cursor: 'pointer' }}>
+                {showEmailHistory ? '✕ Hide history' : `📜 ${emailLog.length} sends`}
+              </button>
+            )}
+          </div>
         )}
+        <div style={{ display: 'flex', gap: 8, marginLeft: 'auto' }}>
+          <button onClick={() => window.print()} data-testid="print-proposal-btn" style={{ background: 'transparent', color: '#D4A574', padding: '8px 16px', fontWeight: 700, borderRadius: 4, border: '1px solid #D4A574', cursor: 'pointer', fontSize: 12 }}>🖨 PRINT</button>
+          {kind === 'builder' && (
+            <button onClick={() => { setResendPrefill(null); setShowSendModal(true); }} disabled={!accepted} title={accepted ? 'Send the proposal PDF to your client' : 'Accept the job first to unlock sending'} data-testid="send-to-client-btn"
+              style={{ background: accepted ? '#D4A574' : '#4b5563', color: '#1a1f2e', padding: '8px 18px', fontWeight: 700, borderRadius: 4, border: 'none', cursor: accepted ? 'pointer' : 'not-allowed', fontSize: 12, letterSpacing: 1 }}>
+              ✉ {emailLog.length > 0 ? 'SEND AGAIN' : 'SEND TO CLIENT'}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Email history list — expanded on demand from the LAST SENT strip */}
+      {kind === 'builder' && showEmailHistory && emailLog.length > 0 && (
+        <div className="no-print" data-testid="email-history-list" style={{ margin: '0 20px 20px', background: '#0f1218', border: '1px solid #2a3040', borderRadius: 4, padding: 12 }}>
+          <div style={{ color: '#D4A574', fontSize: 11, letterSpacing: 2, fontWeight: 700, marginBottom: 8 }}>📜 SEND HISTORY</div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid #2a3040' }}>
+                <th style={hist}>WHEN</th>
+                <th style={hist}>TO</th>
+                <th style={hist}>SUBJECT</th>
+                <th style={hist}>ACCEPT LINK</th>
+                <th style={hist}>RESEND</th>
+              </tr>
+            </thead>
+            <tbody>
+              {emailLog.map(log => (
+                <tr key={log.id} style={{ borderBottom: '1px solid #1a1f2e' }}>
+                  <td style={histTd}>{new Date(log.sent_at).toLocaleString()}</td>
+                  <td style={histTd}>{log.to_email}{log.to_name ? ` (${log.to_name})` : ''}</td>
+                  <td style={histTd}>{log.subject}</td>
+                  <td style={histTd}>{log.accept_url ? <a href={log.accept_url} target="_blank" rel="noopener noreferrer" style={{ color: '#D4A574', fontSize: 11 }}>open</a> : <span style={{ opacity: 0.5 }}>—</span>}</td>
+                  <td style={histTd}>
+                    <button onClick={() => {
+                      setResendPrefill({
+                        to_email: log.to_email,
+                        to_name: log.to_name || '',
+                        cc_emails: (log.cc_emails || []).join(', '),
+                        subject: log.subject || '',
+                      });
+                      setShowSendModal(true);
+                    }} data-testid={`resend-history-${log.id}`}
+                      style={{ background: 'transparent', color: '#D4A574', border: '1px solid #D4A574', padding: '2px 8px', fontSize: 10, fontWeight: 700, borderRadius: 4, cursor: 'pointer' }}>
+                      ↻ RESEND
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {showAccept && (
         <div onClick={() => setShowAccept(false)} className="no-print" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -854,12 +957,14 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       {showSendModal && (
         <SendToClientModal
           accessCode={accessCode}
-          defaultTo={data?.project?.client_email || ''}
-          defaultName={data?.project?.client_name || ''}
+          defaultTo={resendPrefill?.to_email || data?.project?.client_email || ''}
+          defaultName={resendPrefill?.to_name || data?.project?.client_name || ''}
+          defaultCc={resendPrefill?.cc_emails || ''}
+          defaultSubject={resendPrefill?.subject || ''}
           companyName={company.company_name || ''}
           projectName={data?.project_name || ''}
-          onClose={() => setShowSendModal(false)}
-          onSent={() => { load?.(); }}
+          onClose={() => { setShowSendModal(false); setResendPrefill(null); }}
+          onSent={() => { setResendPrefill(null); load?.(); loadEmailLog(); }}
         />
       )}
     </div>
@@ -944,6 +1049,8 @@ function LineRow({ innerRef, draggableProps, dragHandleProps, isDragging, line, 
 }
 
 const tdCell = { border: '1px solid #B49B7E', padding: '6px 10px', color: '#D4C5A9', fontSize: 13, textAlign: 'right', verticalAlign: 'top' };
+const hist = { textAlign: 'left', color: '#D4A574', fontSize: 10, fontWeight: 700, letterSpacing: 1, padding: '4px 8px' };
+const histTd = { color: '#D4C5A9', fontSize: 12, padding: '6px 8px', verticalAlign: 'top' };
 
 function Th({ children, w, align = 'right' }) {
   return <th className="border border-[#B49B7E] px-2 py-2 text-[11px] font-bold uppercase tracking-wider" style={{ width: w, background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', color: '#D4C5A9', textAlign: align }}>{children}</th>;

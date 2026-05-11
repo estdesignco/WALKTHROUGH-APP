@@ -1,0 +1,31 @@
+{
+  "summary": "Frontend-only verification of the 'Resend last proposal' feature on /builder/JXQ8EYEQ Proposal/Quote tab. All 4 user-requested scenarios passed end-to-end against the live preview URL. Seed data (2 proposal_email_log rows) was cleaned up after testing.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verified_scenarios": [
+    "LAST SENT strip visible with data-testid='last-sent-strip' showing '✓ LAST SENT to jane.homeowner@example.com · 5/11/2026, 5:40:05 AM' + '↻ RESEND' (data-testid='resend-last-btn') + '📜 2 sends' (data-testid='toggle-email-history').",
+    "Main button label = '✉ SEND AGAIN' (because history.length > 0), data-testid='send-to-client-btn' still works and is enabled (accepted=True).",
+    "Click resend-last-btn → modal title = '↻ Resend Proposal', TO=jane.homeowner@example.com, TO name=Jane Homeowner, Subject='Re: Your proposal for Wheeler Ridge Residence' (latest row), Message contains 'Following up', Confirm button = '↻ RESEND NOW'.",
+    "toggle-email-history → email-history-list visible with exactly 2 rows; both rows expose data-testid='resend-history-<id>' RESEND buttons, plus WHEN, TO, SUBJECT, ACCEPT LINK (open) columns.",
+    "Click OLDER row's RESEND → modal pre-filled with that row's data: Subject='Your proposal for Wheeler Ridge Residence' (no 'Re:' prefix), CC='partner@wheelerco.com', confirm='↻ RESEND NOW'.",
+    "Main 'SEND AGAIN' button (data-testid='send-to-client-btn') → modal title='📨 Send Proposal to Client' (regular mode, isResend=false because defaultSubject is empty), TO=demo@test.com (project.client_email), Subject='Your proposal for Wheeler Ridge Residence' (auto-built default), Confirm='✉ SEND TO CLIENT'. setResendPrefill(null) before opening confirmed working.",
+    "GET /api/builder/JXQ8EYEQ/proposal/email-log returns 2 seeded rows initially; after cleanup returns emails=[]."
+  ],
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "ProposalView.js is large (1435 lines) — consider splitting LineRow and the totals/footer into separate modules to keep this maintainable.",
+    "Minor: the CC input in SendToClientModal lacks a data-testid; using positional indexing in tests is brittle. Suggest adding data-testid='send-cc'.",
+    "Minor: SendToClientModal infers isResend from defaultSubject being truthy. If a future flow ever passes a non-empty defaultSubject for a fresh send, mode detection would mis-classify. Consider an explicit isResend boolean prop."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100%"},
+  "seed_data_creation": "No seed created by tester. The 2 proposal_email_log rows for access_code=JXQ8EYEQ were seeded by the main agent and have been DELETED at end of run (verified emails=[]).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Resend-last-proposal flow is fully working. seeded proposal_email_log rows for JXQ8EYEQ have already been cleaned (emails=[]). If revisiting, main agent must reseed before testing."
+}
