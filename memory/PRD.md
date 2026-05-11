@@ -6,7 +6,10 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 ## Implemented
 
 ### Proposal/Quote — Checklist-style DnD + Inline Rename (Feb 2026) — NEW
-**ProposalView refactored to LOOK and OPERATE just like the admin Checklist.**
+**ProposalView refactored to LOOK and OPERATE just like the admin Checklist + Snippet Library is now CLICKABLE.**
+- **Snippet cards are now interactive**: click any snippet → small destination-picker modal (Trade + Room dropdowns, or "+ NEW TRADE…/+ NEW ROOM…" inline inputs) → ✓ ADD LINE creates a new extra under the chosen parent with the snippet's default qty/unit/cost/markup. Cards hover-lift + gold border. Green flash + "✓ ADDED" confirmation for ~700ms after add.
+- **Shift-click power-user mode**: hold Shift and click any other card → bypasses the modal and instantly adds to the last destination. Hint shows the last destination next to + NEW SNIPPET button.
+- Picker handles the empty-proposal case (no trades yet) by defaulting the trade state to `__NEW__` so the new-trade/new-room inputs render immediately.
 - **Three-level drag-and-drop** via @hello-pangea/dnd (matches `ExactChecklistSpreadsheet.js` exactly):
   - **Trade reorder** (top-level) — drop zone `trades`, type `TRADE`.
   - **Room reorder** within a Trade — drop zone `rooms-{TRADE}`, type `ROOM-{TRADE}`.
