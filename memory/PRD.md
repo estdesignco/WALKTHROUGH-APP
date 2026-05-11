@@ -5,6 +5,21 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
 ## Implemented
 
+### Proposal/Quote — Checklist-style DnD + Inline Rename (Feb 2026) — NEW
+**ProposalView refactored to LOOK and OPERATE just like the admin Checklist.**
+- **Three-level drag-and-drop** via @hello-pangea/dnd (matches `ExactChecklistSpreadsheet.js` exactly):
+  - **Trade reorder** (top-level) — drop zone `trades`, type `TRADE`.
+  - **Room reorder** within a Trade — drop zone `rooms-{TRADE}`, type `ROOM-{TRADE}`.
+  - **Line reorder** within a Room — drop zone `lines-{TRADE::ROOM}`, type `LINE-{TRADE::ROOM}`.
+  - `⋮⋮` drag handles on every banner + first column of every line row (matches Checklist's `cursor-move ⋮⋮` pattern).
+- **Inline rename**: Trade and Room names are now `contentEditable` (same pattern as Checklist room names). Blur → debounced PUT to `proposal_layout.trade_renames` / `room_renames`.
+- **Trade banner now uses Checklist Room-header recipe**: `getMutedRoomHeaderStyle(TRADE_COLORS[trade])` — full 135deg 5-stop gradient + halo glow + inset shadows + text-shadow. No more flat-colored bars.
+- **Room banner** (inside Trade): `getMutedRoomHeaderStyleStandalone(room.color)` (no halo) — same as Checklist category bar treatment, room's own color preserved.
+- **Line rows** use Checklist's alternating `linear-gradient(135deg, rgba(0,0,0,0.95)...)` recipe instead of solid `#0a0a0a`/`#0f0e0e`.
+- **Layout persistence**: All ordering + renames stored in `portal.proposal_layout = { trade_order, room_order, line_order, trade_renames, room_renames }` via new endpoint `PUT /api/builder/{access_code}/proposal/layout` (works for builder + trade portals, enforces `proposal_edit_enabled` gate).
+- All editable cells keep using `contentEditable` spans (not `<input>` boxes) — Excel-cell aesthetic preserved.
+- Tests: `/app/backend/tests/test_proposal_layout.py` (5 passing pytest cases).
+
 ### Proposal / Quote Module (May 7, 2026) — NEW (huge feature)
 **Builder + Trade end-to-end quote workflow with white-label, snippets, master kill-switches.**
 - New tabs in Builder Portal: **PROPOSAL / QUOTE** and **TRADES**.
