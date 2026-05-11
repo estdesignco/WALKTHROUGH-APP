@@ -1,0 +1,32 @@
+{
+  "summary": "Retest of the 2 fixes from iteration_53. BOTH FIXES VERIFIED. (1) CustomerProposalPage.js — the ACCEPT block now renders for empty-scope portals. Visited /customer-proposal/JXQ8EYEQ/RETESTTOKEN; data-testid='customer-signature-input' and data-testid='customer-accept-btn' both present and visible. Typed 'Final Acceptance Test', clicked ACCEPT, POST /api/customer-proposal/JXQ8EYEQ/RETESTTOKEN/accept returned 200, and data-testid='customer-accepted-banner' rendered with text '✓ PROPOSAL ACCEPTED — Accepted by Final Acceptance Test — Wheeler has been notified.' (2) server.py send_proposal_email — PUBLIC_APP_URL fallback now reads request.headers.get('origin') / 'referer'. Source inspected at lines 20246-20261 (FastAPI Request param + urlsplit on Origin), and live-tested by setting a sentinel customer_accept_token='PRE_CALL_MARKER' then POSTing /api/builder/JXQ8EYEQ/proposal/send-email with Origin='https://design-preview-131.preview.emergentagent.com' and a Fernet-encrypted fake Resend key. Result: response was 502 with clean detail 'Resend send failed: API key is invalid' (no stack trace leak), and the token in mongo was rotated to a fresh UUID with customer_accept_sent_to/sent_at populated — proving the token persistence + accept_url construction ran BEFORE the email send was attempted. Regression: CompanyProfileForm data-testid='email-setup-section' renders correctly on COMPANY INFO tab; data-testid='send-to-client-btn' renders on Proposal / Quote tab (visible, enabled, text '✉ SEND TO CLIENT'). Backend pytest suite test_proposal_email_white_label.py = 9/9 pass.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_proposal_email_white_label.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is now ~20,565 lines — STILL vastly over the 700-line guideline. The proposal-email / customer-proposal / company-profile routes (lines 19960-20340) are a self-contained vertical that should move into its own router module (e.g. routers/proposal_email.py). Same recommendation as iteration_53 — not blocking, but technical-debt is compounding.",
+    "Good: PUBLIC_APP_URL fallback chain is correct (env → Origin header → Referer header → request.url.netloc). One small nit — `urlsplit` is imported inside the function on line 20254; moving it to the module-level imports avoids the per-request import cost. Not a bug.",
+    "Token rotation happens BEFORE the email is dispatched, so a failed Resend/SMTP call still revokes the previous token. This is correct behaviour (the old link goes dead even on failure) but should be documented in the function docstring so future maintainers don't 'fix' it back to post-dispatch."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (9/9 pytest + live send-email 502 verification)",
+    "frontend": "100% (customer-proposal accept flow + 2/2 regressions)"
+  },
+  "test_credentials": "Builder Portal access_code=JXQ8EYEQ (Wheeler Ridge Residence). No login required.",
+  "seed_data_creation": "Temporarily set customer_accept_token='RETESTTOKEN' then 'PRE_CALL_MARKER' on builder_portals(access_code=JXQ8EYEQ). Temporarily set company_profiles email_provider='resend', email_from_address='noreply@wheeler.test', email_from_name='Wheeler Test', resend_api_key_enc=<fernet('re_test_fake_key_for_testing')>. ALL cleaned up at end of run — verified zero residual customer_accept*, customer_accepted*, email_*, smtp_*, resend_api_key_enc fields on either builder_portals or company_profiles. Note: pre-existing proposal_accepted_* (separate field family — the builder's internal 'accept the job to unlock sending' flag set by user 'fdas' on 5/11/2026) was left intact as it was not created by this test run.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Both fixes from iteration_53 are in production and verified. The portal JXQ8EYEQ is in clean state (no email creds, no customer accept token). If future tests need to exercise the customer-accept flow again, set customer_accept_token via mongo, hit /customer-proposal/{access_code}/{token}, sign + click ACCEPT, then unset customer_accept* + customer_accepted* fields at end of run. The 9-test pytest suite at /app/backend/tests/test_proposal_email_white_label.py is the backend regression baseline — keep it green.",
+  "rca of the issue": "Both bugs from iteration_53 are now resolved. RCA refresher: (1) UI gating bug was a stray `grouped.length > 0` guard preventing signature box from rendering when scope was empty — fixed by dropping the length check on line 195 of CustomerProposalPage.js. (2) Hardcoded production domain in the accept-link builder meant preview/staging environments emailed unreachable URLs — fixed by deriving public_base from request.headers.get('origin') / 'referer' / request.url.netloc before falling back to PUBLIC_APP_URL env. No further reproduction available."
+}

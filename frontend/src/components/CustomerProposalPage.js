@@ -192,7 +192,7 @@ export default function CustomerProposalPage() {
           </div>
         )}
 
-        {!accepted && grouped.length > 0 && (
+        {!accepted && (
           <div style={{ marginTop: 28, padding: 24, background: '#0f1218', border: '1px solid #D4A574', borderRadius: 8 }}>
             <h3 style={{ color: '#D4A574', fontSize: 16, marginBottom: 8, letterSpacing: 1 }}>ACCEPT THIS PROPOSAL</h3>
             <p style={{ color: '#D4C5A9', fontSize: 13, lineHeight: 1.5, marginBottom: 14 }}>

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks, Query
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks, Query, Request
 from fastapi.responses import Response, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -20221,7 +20221,7 @@ async def test_proposal_email(access_code: str, payload: ProposalEmailTest):
 
 
 @api_router.post("/builder/{access_code}/proposal/send-email")
-async def send_proposal_email(access_code: str, payload: ProposalEmailSend):
+async def send_proposal_email(access_code: str, payload: ProposalEmailSend, request: Request):
     """Send the proposal PDF to the homeowner from the builder's own white-label.
 
     Generates a one-time `customer_accept_token` if include_accept_link is True
@@ -20243,12 +20243,21 @@ async def send_proposal_email(access_code: str, payload: ProposalEmailSend):
                 "customer_accept_sent_at": datetime.now(timezone.utc).isoformat(),
             }},
         )
-        # Build the public URL. Frontend route: /customer-proposal/{code}/{token}
-        # CORS_ORIGINS may be * — use request host as fallback via env.
+        # Build the public URL. Prefer explicit PUBLIC_APP_URL env (production
+        # deploys), then fall back to the request's Origin / Host headers so
+        # preview/staging environments never email broken links.
         public_base = (os.environ.get("PUBLIC_APP_URL") or "").rstrip("/")
         if not public_base:
-            # Fall back to derive from existing config — production should set PUBLIC_APP_URL.
-            public_base = "https://app.estdesignco.com"
+            origin = request.headers.get("origin") or request.headers.get("referer") or ""
+            if origin:
+                # Strip any path component from the referer.
+                from urllib.parse import urlsplit
+                parts = urlsplit(origin)
+                if parts.scheme and parts.netloc:
+                    public_base = f"{parts.scheme}://{parts.netloc}"
+            if not public_base:
+                # Last resort — derive from request URL.
+                public_base = f"{request.url.scheme}://{request.url.netloc}"
         accept_url = f"{public_base}/customer-proposal/{access_code}/{token}"
 
     html = _wrap_email_html(profile, payload.message, accept_url)
