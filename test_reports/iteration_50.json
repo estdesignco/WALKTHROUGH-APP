@@ -1,0 +1,64 @@
+{
+  "summary": "Iteration 50 - Comprehensive testing of refactored ProposalView with Checklist-style DnD, contentEditable renames, and visual parity. All major flows (trade DnD, room rename, line DnD, persistence, override regression) working correctly. Backend layout endpoint persists and returns properly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "ProposalView - rooms from seeded scope",
+        "issues": [
+          "All trades show only a single 'GENERAL' room instead of the documented KITCHEN + MASTER BATHROOM rooms from the seeded scope. The 18 line items ARE present (verified PLUMBING has 5 lines: cooktop gas line, prep sink, free-standing tub, double vanity, steam shower) but they're all grouped under one 'GENERAL' room per trade. This means the room-reorder-within-trade test (test 2) cannot be exercised meaningfully via the seeded data. Frontend DnD code for room reorder is in place and verified for line reorder which uses identical pattern - so the room-reorder code path is sound, just no multi-room data to exercise it. May be a scope parser issue in parseScopeDocument or the seed scope text doesn't have per-room headers that the parser recognizes."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_proposal_layout.py",
+    "/app/test_reports/pytest/pytest_iter50.xml"
+  ],
+  "action_items": [
+    "(LOW PRIORITY / Optional) Investigate why parseScopeDocument is putting all 18 scope lines into a single 'GENERAL' room per trade instead of KITCHEN + MASTER BATHROOM. The seed scope text on this portal likely doesn't have parser-recognizable room headers. If the user expects per-room breakout, either re-seed the scope_document with proper room delimiters or adjust parser. This does NOT block any of the rename/DnD features built in this iteration.",
+    "(OPTIONAL) Consider adding visual confirmation toast/indicator after layout PUT succeeds (currently silent save)."
+  ],
+  "critical_code_review_comments": [
+    "ProposalView.js (1109 lines) is on the larger side - consider extracting LineRow, TradeBlock, RoomBlock into separate files for maintainability (>700 line file rule).",
+    "DnD onDragEnd correctly handles three droppable types (TRADE / ROOM-{trade} / LINE-{roomKey}) and immediately PUTs the updated proposal_layout - verified via network log.",
+    "All interactive elements have data-testid attributes as documented in the review request - excellent test coverage.",
+    "Trade banner correctly uses getMutedRoomHeaderStyle (with halo glow + inset shadows + 135deg gradient) - confirmed in DOM: boxShadow contains 'rgba(239,68,68,0.5) 0px 0px 35px 0px' halo + inset shadows, backgroundImage is the 5-stop 135deg gradient.",
+    "Line rows use the Checklist alternating gradient (verified: 'linear-gradient(135deg, rgba(0,0,0,0.95)...' on first row).",
+    "Backend endpoint /api/builder/{access_code}/proposal/layout properly enforces proposal_edit_enabled check (returns 403 if not unlocked) - good auth gating."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_proposal_layout.py (NEW pytest file - 5 tests, all passing)"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "95%"
+  },
+  "test_credentials": "Builder Portal Access Code: IL8X4FXJ (no login). Public URL: /builder/IL8X4FXJ",
+  "seed_data_creation": "None added. Used existing seeded scope on portal IL8X4FXJ. Cleaned up test mutations (renames/order) by PUTting empty layout at end of every UI test.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "ProposalView major refactor is verified working. All testids documented in the review request exist and respond correctly. Backend PUT /api/builder/{access_code}/proposal/layout works (5 pytest tests passing). UI flows tested: (1) Accept job via signature modal -> unlocks edit mode -> editing UNLOCKED banner shows; (2) Trade DnD via mouse-down + stepped move + up sequence on data-testid='trade-drag-{TRADE}' works with @hello-pangea/dnd (PLUMBING moved above DEMOLITION, layout PUT fired with trade_order); (3) contentEditable rename of trade name with triple-click+type+Tab blur fires PUT with trade_renames map; (4) Same for room rename (room_renames); (5) Line DnD within room reorders and PUTs line_order map; (6) After page reload, all renames + new order persist; (7) /proposal/override regression (cost edit) still works (PUT, not POST). Minor finding: all trades render only 1 'GENERAL' room (parser puts everything in default room) so room-DnD-within-trade cannot be exercised through seeded data, but the code path is implemented and verified by the analogous line-DnD-within-room test.",
+  "features_verified_passing": [
+    "Builder portal opens at /builder/IL8X4FXJ without login",
+    "Proposal / Quote tab mounts ProposalView (data-testid=proposal-view)",
+    "Accept job modal with signature input + confirm button unlocks editing",
+    "All 10 trade banners render with 135deg gradient + halo glow (TRADE_COLORS seed)",
+    "Room banners render with standalone muted gradient (no halo) inside trade",
+    "Line rows use alternating Checklist linear-gradient bg",
+    "trade-drag, trade-toggle, trade-name, trade-delete, trade-block testids all present",
+    "room-drag, room-toggle, room-name, room-block testids all present",
+    "TRADE DnD reorder: PLUMBING moved above DEMOLITION, layout PUT fired with new trade_order, order persists after reload",
+    "TRADE rename: PLUMBING -> 'ROUGH PLUMBING TEST' via contentEditable+blur fires PUT with trade_renames map, persists after reload",
+    "ROOM rename: contentEditable+Tab blur fires PUT with room_renames map (PLUMBING::GENERAL -> 'PLUMBING ROOM TEST')",
+    "LINE DnD reorder: row swap within room fires PUT with line_order[PLUMBING::GENERAL] = [...new ids...]",
+    "Override regression: editing unit cost cell fires PUT /proposal/override with {item_id, cost: 125}",
+    "Backend PUT /api/builder/{access_code}/proposal/layout returns 200 + persists to portal.proposal_layout",
+    "Backend PUT /api/builder/INVALIDCODE/proposal/layout returns 4xx (correct error handling)"
+  ]
+}

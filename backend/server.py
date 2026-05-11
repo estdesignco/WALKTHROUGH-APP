@@ -19531,6 +19531,11 @@ class ProposalSettingsUpdate(BaseModel):
     pm_fee_rate: Optional[float] = None
     proposal_notes: Optional[str] = None
     proposal_less_payment: Optional[float] = None
+    proposal_layout: Optional[Dict[str, Any]] = None  # {trade_order, room_order, line_order, trade_renames, room_renames}
+
+
+class ProposalLayoutUpdate(BaseModel):
+    proposal_layout: Dict[str, Any]
 
 class ProposalAccept(BaseModel):
     signature: str  # typed full legal name
@@ -19669,6 +19674,36 @@ async def update_builder_proposal_settings(portal_id: str, payload: ProposalSett
         raise HTTPException(status_code=404, detail="Portal not found")
     portal = await db.builder_portals.find_one({"id": portal_id}, {"_id": 0})
     return portal
+
+
+@api_router.put("/builder/{access_code}/proposal/layout")
+async def update_proposal_layout(access_code: str, payload: ProposalLayoutUpdate):
+    """Builder or trade can persist visual layout (DnD order + renames).
+
+    Stored under `proposal_layout` on the portal record:
+      {
+        trade_order: ["PLUMBING", ...],
+        room_order: { "PLUMBING": ["MASTER BATH", ...] },
+        line_order: { "PLUMBING::MASTER BATH": ["line_id_1", ...] },
+        trade_renames: { "PLUMBING": "ROUGH PLUMBING" },
+        room_renames: { "PLUMBING::MASTER BATH": "MAIN BATHROOM" }
+      }
+    """
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if not portal.get("proposal_edit_enabled"):
+        raise HTTPException(status_code=403, detail="Proposal editing not unlocked yet")
+    coll = db.builder_portals if kind == "builder" else db.trade_portals
+    key = "access_code" if kind == "builder" else "trade_access_code"
+    await coll.update_one(
+        {key: access_code},
+        {"$set": {
+            "proposal_layout": payload.proposal_layout,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }},
+    )
+    return {"status": "ok"}
 
 @api_router.post("/builder/{access_code}/proposal/accept")
 async def builder_accept_proposal(access_code: str, payload: ProposalAccept):

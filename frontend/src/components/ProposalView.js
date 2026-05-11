@@ -1,56 +1,70 @@
 /**
- * ProposalView — Trade-first grouping + full CRUD
- * =================================================
- *   ┌──────────────────────────────────────────────────┐
- *   │ COMPANY HEADER (logo, estimate no, date, project)│
- *   ├──────────────────────────────────────────────────┤
- *   │ TRADE: PLUMBING                                  │  green banner, click X to delete trade
- *   │   ROOM: MASTER BATHROOM (room color)             │  click name to edit
- *   │   #  Description       QTY  Unit  $  Amt  Tot  P │
- *   │   1  Rough-in shower    1   LS   $.. ..   ..   ..│  X to delete line
- *   │   + ADD LINE                                     │
- *   │   ROOM: KITCHEN                                  │
- *   │   1  Run gas line       ...                      │
- *   │   + ADD LINE | + ADD ROOM TO PLUMBING            │
- *   │ TRADE: TILE  [X delete trade]                    │
- *   │   ...                                            │
- *   │ + ADD TRADE                                      │
- *   ├──────────────────────────────────────────────────┤
- *   │ SUBTOTAL / Less Payment / PM Fee / Tax / TOTAL DUE│
- *   ├──────────────────────────────────────────────────┤
- *   │ Notes (free text) / Signature line               │
- *   └──────────────────────────────────────────────────┘
+ * ProposalView — Trade ▶ Room ▶ Items, Checklist-style DnD + inline rename.
+ * ==========================================================================
  *
- * - Inline edits do NOT refetch (optimistic local + 350ms debounced PUT).
- * - Number inputs have spinner arrows hidden globally.
- * - Scope-derived lines: editable Description/Qty/Unit/Cost/Markup, deletable
- *   (delete = mark hidden in override).
- * - Custom lines (extras): full CRUD per trade-room bucket.
- * - "+ ADD TRADE" appends a custom trade group with no scope (extras only).
- * - Trade portal filters automatically to assigned_trades.
+ *   ┌────────────────────────────────────────────────────────┐
+ *   │ COMPANY HEADER (logo, estimate no, date, project)      │
+ *   ├────────────────────────────────────────────────────────┤
+ *   │ ⋮⋮ ▼  PLUMBING (rename here)                  ✕ delete │  <- TRADE banner
+ *   │   ⋮⋮ ▼  MASTER BATHROOM                                │  <- ROOM banner (muted)
+ *   │   ┌──┬──┬──┬──┬──┬──┬──┬──┬──┬──┐                       │
+ *   │   │⋮⋮│# │DESC│QTY│UNIT│COST│AMT│TOTAL│PROF│X │           │
+ *   │   ├──┴──┴──┴──┴──┴──┴──┴──┴──┴──┤                       │
+ *   │   │drag row...                  │                       │
+ *   │   └─────────────────────────────┘                       │
+ *   │   + ADD LINE TO MASTER BATHROOM                         │
+ *   │   ⋮⋮ ▼  KITCHEN                                         │
+ *   │   ...                                                   │
+ *   │   + ADD ROOM TO PLUMBING                                │
+ *   │ ⋮⋮ ▼  TILE                                              │
+ *   │ ...                                                     │
+ *   │ + ADD TRADE                                             │
+ *   ├────────────────────────────────────────────────────────┤
+ *   │ SUBTOTAL / Less Payment / PM Fee / Tax / TOTAL DUE      │
+ *   └────────────────────────────────────────────────────────┘
+ *
+ * Look & feel parity with `ExactChecklistSpreadsheet.js`:
+ *   - Trade banner uses Checklist Room-header recipe (muted gradient + halo +
+ *     inset shadows, TRADE_COLORS as the color seed).
+ *   - Room banner uses `getMutedRoomHeaderStyleStandalone` (already in use).
+ *   - Item rows use Checklist's alternating linear-gradient cell strip.
+ *   - Drag handles `⋮⋮` on every banner + row.
+ *   - Header names are `contentEditable` for inline rename (Checklist-style).
+ *   - DnD via @hello-pangea/dnd at THREE levels: Trade / Room / Line.
+ *
+ * Persistence: layout (order + renames) saved to portal.proposal_layout via
+ * PUT /api/builder/{code}/proposal/layout (works for builder + trade portals).
  */
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { getMutedRoomHeaderStyleStandalone, getRoomColor } from '../utils/roomColors';
-import { parseScopeDocument, TRADE_COLORS, DEFAULT_TRADES } from './ScopeDocumentEditor';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { getMutedRoomHeaderStyle, getMutedRoomHeaderStyleStandalone, getRoomColor } from '../utils/roomColors';
+import { parseScopeDocument, TRADE_COLORS } from './ScopeDocumentEditor';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
-const NUM_INPUT_CSS = `
+const PROPOSAL_CSS = `
   /* Spreadsheet-style cell editing — NO boxed inputs anywhere.
-     Cells are contentEditable divs that look like plain table cells. */
+     Cells are contentEditable spans that look like plain table cells. */
   .proposal-cell .ce-cell { outline: none; min-height: 18px; cursor: text; }
   .proposal-cell .ce-cell:focus { background: rgba(212,165,116,0.10); box-shadow: inset 0 0 0 1px #D4A574; }
   .proposal-cell .ce-cell:hover { background: rgba(212,165,116,0.04); }
   .proposal-cell .ce-cell:empty::before { content: attr(data-ph); color: #6b6157; }
-  /* Hide native number-input spinners just in case */
   .proposal-cell input::-webkit-outer-spin-button,
   .proposal-cell input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .proposal-cell input[type=number] { -moz-appearance: textfield; }
   .proposal-cell input { background: transparent; outline: none; border: none; width: 100%; color: inherit; font: inherit; padding: 0; }
   .proposal-cell input:focus { background: rgba(212,165,116,0.08); }
+  .proposal-drag-handle { cursor: grab; user-select: none; }
+  .proposal-drag-handle:active { cursor: grabbing; }
+  .proposal-banner-name { outline: none; }
+  .proposal-banner-name:focus { background: rgba(0,0,0,0.25); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4); }
+  /* Make sure dragging trades doesn't break inline tables width */
+  .proposal-trade-block { background: transparent; }
+  .proposal-room-block { background: transparent; }
   @media print {
     .no-print { display: none !important; }
     .proposal-cell .ce-cell { color: #000 !important; }
+    .proposal-drag-handle { display: none !important; }
   }
 `;
 
@@ -59,15 +73,13 @@ const fmtUSD = (n) => `$${fmt(n || 0)}`;
 const compute = (qty, cost, markup) => (Number(qty) || 0) * (Number(cost) || 0) * (1 + (Number(markup) || 0) / 100);
 const computeAmount = (qty, cost) => (Number(qty) || 0) * (Number(cost) || 0);
 
-// Remove ONLY #trade pills from scope HTML — keep @person and @product pills
-// intact since they're meaningful content (e.g. "Hang light fixture @Jerome").
-// Trade tags are identifiers/groupers, not part of the prose.
+// Strip ONLY #trade pills from scope HTML — keep @person / @product pills
+// because they're meaningful content (e.g. "Hang light fixture @Jerome").
 const stripTradePills = (html) => {
   if (!html) return '';
   const div = document.createElement('div');
   div.innerHTML = html;
   div.querySelectorAll('[data-tag="trade"], .trade-pill').forEach(el => el.remove());
-  // Tidy up double spaces left by removed pills
   return div.innerHTML.replace(/\s{2,}/g, ' ').replace(/\s+([.,;:])/g, '$1').trim();
 };
 
@@ -87,6 +99,14 @@ const useDebounced = (fn, delay = 350) => {
   };
 };
 
+// Reorder helper for DnD
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
+
 export default function ProposalView({ accessCode, kind = 'builder', onPortalChange }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,6 +118,8 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const [showSnippets, setShowSnippets] = useState(false);
   const [notes, setNotes] = useState('');
   const [lessPayment, setLessPayment] = useState(0);
+  // Local layout state — mirrors portal.proposal_layout but updated optimistically.
+  const [layout, setLayout] = useState({ trade_order: [], room_order: {}, line_order: {}, trade_renames: {}, room_renames: {} });
   // Collapse state — local to viewer (not persisted to server)
   const [collapsedTrades, setCollapsedTrades] = useState(new Set());
   const [collapsedRooms, setCollapsedRooms] = useState(new Set());
@@ -117,6 +139,14 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
         setExtras(json.extras || []);
         setNotes(json.portal?.proposal_notes || '');
         setLessPayment(json.portal?.proposal_less_payment || 0);
+        const lay = json.portal?.proposal_layout || {};
+        setLayout({
+          trade_order: lay.trade_order || [],
+          room_order: lay.room_order || {},
+          line_order: lay.line_order || {},
+          trade_renames: lay.trade_renames || {},
+          room_renames: lay.room_renames || {},
+        });
       }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
@@ -132,6 +162,23 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const viewEnabled = !!portal.proposal_view_enabled;
   const accepted = !!portal.proposal_accepted;
   const tradeQuotes = data?.trade_quotes || {};
+
+  // ========================= LAYOUT PERSISTENCE =========================
+  const debouncedPersistLayout = useDebounced(async (lay) => {
+    try {
+      await fetch(`${API_URL}/api/builder/${accessCode}/proposal/layout`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proposal_layout: lay }),
+      });
+    } catch (e) { console.error('layout save failed', e); }
+  }, 350);
+  const updateLayout = (patch) => {
+    setLayout(prev => {
+      const next = { ...prev, ...patch };
+      debouncedPersistLayout(next);
+      return next;
+    });
+  };
 
   // ========================= GROUP BY TRADE → ROOM =========================
   const roomColorByName = useMemo(() => {
@@ -150,8 +197,8 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
           : [(portal.trade_name || '').toUpperCase()])
       : null;
 
-    // tradeOrder = order in which trades first appear in the scope doc
-    const tradeOrder = [];
+    // First-pass: gather trades & rooms from scope in DOC order
+    const scopeTradeOrder = [];
     const byTrade = {};
 
     parsed.items.forEach(item => {
@@ -161,7 +208,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       if (assigned && !tradeKeys.length) return;
       const lineTrades = tradeKeys.length ? tradeKeys : ['GENERAL'];
       lineTrades.forEach(T => {
-        if (!byTrade[T]) { byTrade[T] = { tradeName: T, rooms: {}, roomOrder: [] }; tradeOrder.push(T); }
+        if (!byTrade[T]) { byTrade[T] = { tradeName: T, rooms: {}, roomOrder: [] }; scopeTradeOrder.push(T); }
         if (!byTrade[T].rooms[rName]) { byTrade[T].rooms[rName] = []; byTrade[T].roomOrder.push(rName); }
         byTrade[T].rooms[rName].push({
           line_id: stableLineId(rName, T, item.text),
@@ -172,14 +219,14 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       });
     });
 
-    // Merge in extras (custom user-added lines), keyed by `${TRADE}::${ROOM}`
+    // Merge extras (custom user-added lines)
     extras.forEach(e => {
       if (e.parent_kind !== 'trade-room' && e.parent_kind !== 'trade-only') return;
       const [T, R] = (e.parent_id || '').split('::');
       const TT = (T || 'GENERAL').toUpperCase();
       const RR = (R || 'GENERAL').toUpperCase();
       if (assigned && !assigned.includes(TT)) return;
-      if (!byTrade[TT]) { byTrade[TT] = { tradeName: TT, rooms: {}, roomOrder: [] }; tradeOrder.push(TT); }
+      if (!byTrade[TT]) { byTrade[TT] = { tradeName: TT, rooms: {}, roomOrder: [] }; scopeTradeOrder.push(TT); }
       if (!byTrade[TT].rooms[RR]) { byTrade[TT].rooms[RR] = []; byTrade[TT].roomOrder.push(RR); }
       byTrade[TT].rooms[RR].push({
         line_id: e.id,
@@ -190,11 +237,48 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       });
     });
 
-    return tradeOrder.map(T => ({
-      tradeName: T,
-      roomGroups: byTrade[T].roomOrder.map(R => ({ roomName: R, lines: byTrade[T].rooms[R] })),
-    }));
-  }, [data, kind, portal, extras]);
+    // Apply layout: trade_order overrides doc order (with unseen trades appended)
+    const persistedTrades = (layout.trade_order || []).filter(t => byTrade[t]);
+    const persistedSet = new Set(persistedTrades);
+    const finalTradeOrder = [
+      ...persistedTrades,
+      ...scopeTradeOrder.filter(t => !persistedSet.has(t)),
+    ];
+
+    return finalTradeOrder.map(T => {
+      const tg = byTrade[T];
+      const persistedRooms = (layout.room_order?.[T] || []).filter(r => tg.rooms[r]);
+      const persistedRoomSet = new Set(persistedRooms);
+      const finalRoomOrder = [
+        ...persistedRooms,
+        ...tg.roomOrder.filter(r => !persistedRoomSet.has(r)),
+      ];
+
+      const roomGroups = finalRoomOrder.map(R => {
+        const allLines = tg.rooms[R];
+        const orderKey = `${T}::${R}`;
+        const persistedLineOrder = layout.line_order?.[orderKey] || [];
+        const idToIdx = new Map(persistedLineOrder.map((id, i) => [id, i]));
+        const ordered = [...allLines].sort((a, b) => {
+          const ai = idToIdx.has(a.line_id) ? idToIdx.get(a.line_id) : 1e9;
+          const bi = idToIdx.has(b.line_id) ? idToIdx.get(b.line_id) : 1e9;
+          if (ai !== bi) return ai - bi;
+          return 0; // preserve natural order
+        });
+        return {
+          roomName: R,
+          displayName: layout.room_renames?.[orderKey] || R,
+          lines: ordered,
+        };
+      });
+
+      return {
+        tradeName: T,
+        displayName: layout.trade_renames?.[T] || T,
+        roomGroups,
+      };
+    });
+  }, [data, kind, portal, extras, layout]);
 
   // ========================= MUTATIONS =========================
   const debouncedPersistOverride = useDebounced(async (lineId, payload) => {
@@ -252,7 +336,6 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const addCustomTrade = async () => {
     const tradeName = (window.prompt('Custom trade name (e.g. DUMPSTER, SITE PROTECTION):') || '').trim().toUpperCase();
     if (!tradeName) return;
-    // Adding a placeholder "GENERAL" room line keeps the trade visible
     const body = {
       parent_kind: 'trade-only',
       parent_id: `${tradeName}::GENERAL`,
@@ -301,7 +384,6 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra/${line.line_id}`, { method: 'DELETE' });
       setExtras(prev => prev.filter(e => e.id !== line.line_id));
     } else {
-      // Scope-derived line — mark hidden in override
       if (!window.confirm('Hide this scope line from your proposal?')) return;
       saveOverride(line.line_id, { hidden: true });
     }
@@ -310,18 +392,69 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const deleteTrade = async (tradeName) => {
     if (!editEnabled) return;
     if (!window.confirm(`Delete entire ${tradeName} section? Scope lines will be hidden; custom lines deleted.`)) return;
-    // Hide all scope lines in this trade
     grouped.find(g => g.tradeName === tradeName)?.roomGroups.forEach(rg => {
       rg.lines.forEach(l => {
         if (l.source === 'scope') saveOverride(l.line_id, { hidden: true });
       });
     });
-    // Delete all extras under this trade
     const toDelete = extras.filter(e => (e.parent_id || '').startsWith(`${tradeName}::`));
     for (const e of toDelete) {
       await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra/${e.id}`, { method: 'DELETE' });
     }
     setExtras(prev => prev.filter(e => !(e.parent_id || '').startsWith(`${tradeName}::`)));
+  };
+
+  // ========================= RENAMES =========================
+  const renameTrade = (oldName, newName) => {
+    if (!editEnabled) return;
+    const n = (newName || '').trim().toUpperCase();
+    if (!n || n === oldName) return;
+    updateLayout({ trade_renames: { ...layout.trade_renames, [oldName]: n } });
+  };
+  const renameRoom = (tradeName, oldRoom, newName) => {
+    if (!editEnabled) return;
+    const n = (newName || '').trim().toUpperCase();
+    if (!n || n === oldRoom) return;
+    const key = `${tradeName}::${oldRoom}`;
+    updateLayout({ room_renames: { ...layout.room_renames, [key]: n } });
+  };
+
+  // ========================= DnD HANDLER =========================
+  const handleDragEnd = (result) => {
+    const { source, destination, type } = result;
+    if (!destination) return;
+    if (source.droppableId === destination.droppableId && source.index === destination.index) return;
+
+    if (type === 'TRADE') {
+      // Reorder trades using the CURRENT visible order
+      const currentTrades = grouped.map(g => g.tradeName);
+      const next = reorder(currentTrades, source.index, destination.index);
+      updateLayout({ trade_order: next });
+      return;
+    }
+
+    if (type && type.startsWith('ROOM-')) {
+      const tradeName = type.replace('ROOM-', '');
+      const tg = grouped.find(g => g.tradeName === tradeName);
+      if (!tg) return;
+      const currentRooms = tg.roomGroups.map(rg => rg.roomName);
+      const next = reorder(currentRooms, source.index, destination.index);
+      updateLayout({ room_order: { ...layout.room_order, [tradeName]: next } });
+      return;
+    }
+
+    if (type && type.startsWith('LINE-')) {
+      const orderKey = type.replace('LINE-', '');  // "TRADE::ROOM"
+      const [tradeName, roomName] = orderKey.split('::');
+      const tg = grouped.find(g => g.tradeName === tradeName);
+      const rg = tg?.roomGroups.find(r => r.roomName === roomName);
+      if (!rg) return;
+      const visibleLines = rg.lines.filter(l => !overrides[l.line_id]?.hidden);
+      const currentIds = visibleLines.map(l => l.line_id);
+      const next = reorder(currentIds, source.index, destination.index);
+      updateLayout({ line_order: { ...layout.line_order, [orderKey]: next } });
+      return;
+    }
   };
 
   const debouncedNotes = useDebounced(async (val) => {
@@ -393,11 +526,12 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const company = data?.company || {};
   const projectName = data?.project_name || '';
   const showProfit = kind === 'builder' || kind === 'trade';
-  const colCount = showProfit ? 8 : 7;
+  // table column count for line items: ⋮⋮ # DESC QTY UNIT COST AMT TOTAL [PROFIT] [X]
+  const colCount = showProfit ? 9 : 8;
 
   return (
     <div style={{ background: '#000', minHeight: '100vh', paddingBottom: 60 }} data-testid="proposal-view">
-      <style>{NUM_INPUT_CSS}</style>
+      <style>{PROPOSAL_CSS}</style>
       <ProposalHeader company={company} projectName={projectName} portal={portal} />
 
       {!accepted && (
@@ -408,14 +542,14 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
       )}
       {accepted && editEnabled && (
         <div className="no-print" style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065F46 100%)', borderTop: '1px solid #D4A574', borderBottom: '1px solid #D4A574', padding: '8px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <div style={{ color: '#D4C5A9', fontSize: 12 }}>✓ Accepted by <strong>{portal.proposal_accepted_signature}</strong>{portal.proposal_accepted_at ? ` on ${new Date(portal.proposal_accepted_at).toLocaleDateString()}` : ''} — editing UNLOCKED</div>
+          <div style={{ color: '#D4C5A9', fontSize: 12 }}>✓ Accepted by <strong>{portal.proposal_accepted_signature}</strong>{portal.proposal_accepted_at ? ` on ${new Date(portal.proposal_accepted_at).toLocaleDateString()}` : ''} — editing UNLOCKED · Drag <span style={{ color: '#D4A574' }}>⋮⋮</span> to reorder, click name to rename</div>
           <button onClick={() => setShowSnippets(!showSnippets)} style={{ background: '#0f1218', color: '#D4A574', border: '1px solid #D4A574', padding: '6px 14px', fontSize: 12, fontWeight: 700, borderRadius: 4, cursor: 'pointer' }}>{showSnippets ? '✕ CLOSE LIBRARY' : '📚 SNIPPET LIBRARY'}</button>
         </div>
       )}
       {showSnippets && <SnippetsPanel snippets={snippets} ownerKind={kind} ownerId={accessCode} onChange={loadSnippets} />}
 
-      {/* MAIN PROPOSAL TABLE — TRADE first */}
-      <div style={{ padding: 12 }}>
+      {/* MAIN PROPOSAL — Checklist-style draggable blocks */}
+      <div className="proposal-cell" style={{ padding: 12 }} data-testid="proposal-body">
         {grouped.length === 0 ? (
           <div style={{ background: '#1a1f2e', border: '1px solid #D4A574', padding: 24, borderRadius: 4, color: '#D4C5A9', textAlign: 'center' }}>
             {kind === 'trade'
@@ -423,112 +557,212 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
               : 'The Scope of Work is empty. Add #trade tags in the Scope of Work editor — they\'ll group the proposal automatically.'}
           </div>
         ) : (
-          <table className="proposal-cell w-full border-collapse" style={{ background: '#000', tableLayout: 'auto' }}>
-            <thead>
-              <tr>
-                <Th w="4%">#</Th>
-                <Th w="45%" align="left">DESCRIPTION</Th>
-                <Th w="6%">QTY</Th>
-                <Th w="5%">UNIT</Th>
-                <Th w="10%">UNIT COST</Th>
-                <Th w="10%">AMOUNT</Th>
-                <Th w="10%">TOTAL</Th>
-                {showProfit && <Th w="8%">PROFIT</Th>}
-                {editEnabled && <Th w="2%" /* delete X */></Th>}
-              </tr>
-            </thead>
-            <tbody>
-              {grouped.map((tg) => {
-                const tradeColor = TRADE_COLORS[tg.tradeName] || '#065F46';
-                const isTradeCollapsed = collapsedTrades.has(tg.tradeName);
-                // Quick stats so collapsed trade shows useful summary
-                let tradeLineCount = 0;
-                tg.roomGroups.forEach(rg => { rg.lines.forEach(l => { if (!overrides[l.line_id]?.hidden) tradeLineCount++; }); });
-                return (
-                  <React.Fragment key={tg.tradeName}>
-                    {/* TRADE HEADER — click chevron to collapse */}
-                    <tr>
-                      <td colSpan={colCount + (editEnabled ? 1 : 0)} style={{ background: tradeColor, padding: '10px 14px', border: '1px solid #B49B7E' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <button onClick={() => toggleTrade(tg.tradeName)} className="no-print" title={isTradeCollapsed ? 'Expand' : 'Collapse'}
-                              style={{ background: 'rgba(0,0,0,0.25)', color: '#fff', border: 'none', width: 22, height: 22, borderRadius: 4, cursor: 'pointer', fontSize: 12, fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                              {isTradeCollapsed ? '▶' : '▼'}
-                            </button>
-                            <span style={{ color: '#fff', fontSize: 14, fontWeight: 800, letterSpacing: 3 }}>{tg.tradeName}</span>
-                            {isTradeCollapsed && <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 600, letterSpacing: 1 }}>· {tradeLineCount} line{tradeLineCount === 1 ? '' : 's'}</span>}
-                          </div>
-                          {editEnabled && (
-                            <button onClick={() => deleteTrade(tg.tradeName)} className="no-print" style={{ background: 'rgba(0,0,0,0.3)', color: '#fff', border: '1px solid rgba(255,255,255,0.5)', padding: '2px 10px', fontSize: 10, fontWeight: 700, borderRadius: 4, cursor: 'pointer', letterSpacing: 1 }}>✕ DELETE TRADE</button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                    {!isTradeCollapsed && tg.roomGroups.map((rg) => {
-                      const roomColor = roomColorByName[rg.roomName] || getRoomColor(rg.roomName);
-                      const banner = getMutedRoomHeaderStyleStandalone(roomColor);
-                      const roomKey = `${tg.tradeName}::${rg.roomName}`;
-                      const isRoomCollapsed = collapsedRooms.has(roomKey);
-                      const visibleLines = rg.lines.filter(l => !overrides[l.line_id]?.hidden);
-                      return (
-                        <React.Fragment key={roomKey}>
-                          <tr>
-                            <td colSpan={colCount + (editEnabled ? 1 : 0)} style={{ ...banner, padding: '6px 14px', border: '1px solid #B49B7E' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <button onClick={() => toggleRoom(roomKey)} className="no-print" title={isRoomCollapsed ? 'Expand' : 'Collapse'}
-                                  style={{ background: 'rgba(0,0,0,0.3)', color: '#D4C5A9', border: 'none', width: 20, height: 20, borderRadius: 4, cursor: 'pointer', fontSize: 11, fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  {isRoomCollapsed ? '▶' : '▼'}
-                                </button>
-                                <span style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 800, letterSpacing: 2 }}>{rg.roomName}</span>
-                                {isRoomCollapsed && <span style={{ color: '#D4C5A9', fontSize: 10, opacity: 0.75, letterSpacing: 1 }}>· {visibleLines.length} line{visibleLines.length === 1 ? '' : 's'}</span>}
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="trades" type="TRADE">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {grouped.map((tg, tIdx) => {
+                    const tradeColor = TRADE_COLORS[tg.tradeName] || '#065F46';
+                    const isTradeCollapsed = collapsedTrades.has(tg.tradeName);
+                    let tradeLineCount = 0;
+                    tg.roomGroups.forEach(rg => { rg.lines.forEach(l => { if (!overrides[l.line_id]?.hidden) tradeLineCount++; }); });
+                    return (
+                      <Draggable key={tg.tradeName} draggableId={`trade-${tg.tradeName}`} index={tIdx} isDragDisabled={!editEnabled}>
+                        {(prov, snap) => (
+                          <div
+                            ref={prov.innerRef}
+                            {...prov.draggableProps}
+                            className="proposal-trade-block mb-6"
+                            style={{
+                              ...prov.draggableProps.style,
+                              opacity: snap.isDragging ? 0.85 : 1,
+                            }}
+                            data-testid={`trade-block-${tg.tradeName}`}
+                          >
+                            {/* TRADE BANNER — Checklist Room-header recipe */}
+                            <div
+                              className="px-4 py-2 text-white font-bold mb-2 border border-[#B49B7E]"
+                              style={getMutedRoomHeaderStyle(tradeColor)}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <div {...prov.dragHandleProps} className="proposal-drag-handle text-[#B49B7E] hover:text-white px-2" title="Drag to reorder trade" data-testid={`trade-drag-${tg.tradeName}`}>
+                                    ⋮⋮
+                                  </div>
+                                  <button onClick={() => toggleTrade(tg.tradeName)} className="text-[#B49B7E] hover:text-white" data-testid={`trade-toggle-${tg.tradeName}`}>
+                                    {isTradeCollapsed ? '▶' : '▼'}
+                                  </button>
+                                  <span
+                                    contentEditable={editEnabled}
+                                    suppressContentEditableWarning
+                                    className="proposal-banner-name px-1"
+                                    style={{ fontSize: 14, fontWeight: 800, letterSpacing: 3, color: '#fff' }}
+                                    onBlur={(e) => renameTrade(tg.tradeName, e.currentTarget.textContent)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+                                    data-testid={`trade-name-${tg.tradeName}`}
+                                  >{tg.displayName}</span>
+                                  {isTradeCollapsed && <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: 600, letterSpacing: 1, marginLeft: 8 }}>· {tradeLineCount} line{tradeLineCount === 1 ? '' : 's'}</span>}
+                                </div>
+                                {editEnabled && (
+                                  <button onClick={() => deleteTrade(tg.tradeName)} className="no-print" title="Delete trade"
+                                    style={{ background: 'rgba(0,0,0,0.35)', color: '#fff', border: '1px solid rgba(255,255,255,0.5)', padding: '2px 10px', fontSize: 10, fontWeight: 700, borderRadius: 4, cursor: 'pointer', letterSpacing: 1 }}
+                                    data-testid={`trade-delete-${tg.tradeName}`}>
+                                    ✕ DELETE TRADE
+                                  </button>
+                                )}
                               </div>
-                            </td>
-                          </tr>
-                          {!isRoomCollapsed && visibleLines.map((line, idx) => (
-                            <LineRow
-                              key={line.line_id}
-                              line={line}
-                              idx={idx}
-                              overrides={overrides}
-                              tradeQuotes={tradeQuotes}
-                              kind={kind}
-                              editEnabled={editEnabled}
-                              showProfit={showProfit}
-                              onChange={saveOverride}
-                              onUpdateExtra={updateExtra}
-                              onDelete={() => deleteLine(line)}
-                            />
-                          ))}
-                          {!isRoomCollapsed && editEnabled && (
-                            <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '6px 14px', background: '#0a0a0a', border: '1px solid #2a3040' }}>
-                              <button onClick={() => addExtraLine(tg.tradeName, rg.roomName)} style={{ background: 'transparent', color: '#10B981', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: 1, padding: 0 }}>+ ADD LINE TO {rg.roomName}</button>
-                            </td></tr>
-                          )}
-                        </React.Fragment>
-                      );
-                    })}
-                    {!isTradeCollapsed && editEnabled && (
-                      <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '8px 14px', background: '#0f1218', border: '1px solid #2a3040' }}>
-                        <button onClick={() => addRoomToTrade(tg.tradeName)} style={{ background: 'transparent', color: '#D4A574', border: '1px dashed #D4A574', padding: '4px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 700, borderRadius: 4, letterSpacing: 1 }}>+ ADD ROOM TO {tg.tradeName}</button>
-                      </td></tr>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-              {editEnabled && (
-                <tr className="no-print"><td colSpan={colCount + 1} style={{ padding: '12px 14px', background: '#0a0a0a' }}>
-                  <button onClick={addCustomTrade} style={{ background: '#10B981', color: '#fff', border: 'none', padding: '6px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 700, borderRadius: 4, letterSpacing: 2 }}>+ ADD TRADE</button>
-                </td></tr>
+                            </div>
+
+                            {/* ROOMS (each is its own Draggable inside a per-trade Droppable) */}
+                            {!isTradeCollapsed && (
+                              <Droppable droppableId={`rooms-${tg.tradeName}`} type={`ROOM-${tg.tradeName}`}>
+                                {(rProv) => (
+                                  <div ref={rProv.innerRef} {...rProv.droppableProps}>
+                                    {tg.roomGroups.map((rg, rIdx) => {
+                                      const roomColor = roomColorByName[rg.roomName] || getRoomColor(rg.roomName);
+                                      const banner = getMutedRoomHeaderStyleStandalone(roomColor);
+                                      const roomKey = `${tg.tradeName}::${rg.roomName}`;
+                                      const isRoomCollapsed = collapsedRooms.has(roomKey);
+                                      const visibleLines = rg.lines.filter(l => !overrides[l.line_id]?.hidden);
+                                      return (
+                                        <Draggable key={roomKey} draggableId={`room-${roomKey}`} index={rIdx} isDragDisabled={!editEnabled}>
+                                          {(rdProv, rdSnap) => (
+                                            <div
+                                              ref={rdProv.innerRef}
+                                              {...rdProv.draggableProps}
+                                              className="proposal-room-block mb-3"
+                                              style={{
+                                                ...rdProv.draggableProps.style,
+                                                opacity: rdSnap.isDragging ? 0.85 : 1,
+                                              }}
+                                              data-testid={`room-block-${roomKey}`}
+                                            >
+                                              <div style={{ ...banner, padding: '6px 14px', border: '1px solid #B49B7E', marginBottom: 4 }}>
+                                                <div className="flex items-center gap-2">
+                                                  <div {...rdProv.dragHandleProps} className="proposal-drag-handle text-[#B49B7E] hover:text-white px-1" title="Drag to reorder room" data-testid={`room-drag-${roomKey}`}>
+                                                    ⋮⋮
+                                                  </div>
+                                                  <button onClick={() => toggleRoom(roomKey)} className="text-[#B49B7E] hover:text-white" data-testid={`room-toggle-${roomKey}`}>
+                                                    {isRoomCollapsed ? '▶' : '▼'}
+                                                  </button>
+                                                  <span
+                                                    contentEditable={editEnabled}
+                                                    suppressContentEditableWarning
+                                                    className="proposal-banner-name px-1"
+                                                    style={{ color: '#D4C5A9', fontSize: 12, fontWeight: 800, letterSpacing: 2 }}
+                                                    onBlur={(e) => renameRoom(tg.tradeName, rg.roomName, e.currentTarget.textContent)}
+                                                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+                                                    data-testid={`room-name-${roomKey}`}
+                                                  >{rg.displayName}</span>
+                                                  {isRoomCollapsed && <span style={{ color: '#D4C5A9', fontSize: 10, opacity: 0.75, letterSpacing: 1, marginLeft: 6 }}>· {visibleLines.length} line{visibleLines.length === 1 ? '' : 's'}</span>}
+                                                </div>
+                                              </div>
+
+                                              {!isRoomCollapsed && (
+                                                <>
+                                                  <table className="w-full border-collapse" style={{ background: '#000', tableLayout: 'auto' }}>
+                                                    <thead>
+                                                      <tr>
+                                                        <Th w="3%" />
+                                                        <Th w="4%">#</Th>
+                                                        <Th w="42%" align="left">DESCRIPTION</Th>
+                                                        <Th w="6%">QTY</Th>
+                                                        <Th w="5%">UNIT</Th>
+                                                        <Th w="10%">UNIT COST</Th>
+                                                        <Th w="10%">AMOUNT</Th>
+                                                        <Th w="10%">TOTAL</Th>
+                                                        {showProfit && <Th w="8%">PROFIT</Th>}
+                                                        {editEnabled && <Th w="2%" />}
+                                                      </tr>
+                                                    </thead>
+                                                    <Droppable droppableId={`lines-${roomKey}`} type={`LINE-${roomKey}`}>
+                                                      {(lProv) => (
+                                                        <tbody ref={lProv.innerRef} {...lProv.droppableProps}>
+                                                          {visibleLines.map((line, idx) => (
+                                                            <Draggable key={line.line_id} draggableId={`line-${line.line_id}`} index={idx} isDragDisabled={!editEnabled}>
+                                                              {(liProv, liSnap) => (
+                                                                <LineRow
+                                                                  innerRef={liProv.innerRef}
+                                                                  draggableProps={liProv.draggableProps}
+                                                                  dragHandleProps={liProv.dragHandleProps}
+                                                                  isDragging={liSnap.isDragging}
+                                                                  line={line}
+                                                                  idx={idx}
+                                                                  overrides={overrides}
+                                                                  tradeQuotes={tradeQuotes}
+                                                                  kind={kind}
+                                                                  editEnabled={editEnabled}
+                                                                  showProfit={showProfit}
+                                                                  onChange={saveOverride}
+                                                                  onUpdateExtra={updateExtra}
+                                                                  onDelete={() => deleteLine(line)}
+                                                                />
+                                                              )}
+                                                            </Draggable>
+                                                          ))}
+                                                          {lProv.placeholder}
+                                                        </tbody>
+                                                      )}
+                                                    </Droppable>
+                                                  </table>
+
+                                                  {editEnabled && (
+                                                    <div className="no-print" style={{ padding: '6px 14px', background: '#0a0a0a', border: '1px solid #2a3040' }}>
+                                                      <button onClick={() => addExtraLine(tg.tradeName, rg.roomName)}
+                                                        style={{ background: 'transparent', color: '#10B981', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700, letterSpacing: 1, padding: 0 }}
+                                                        data-testid={`add-line-${roomKey}`}>
+                                                        + ADD LINE TO {rg.displayName}
+                                                      </button>
+                                                    </div>
+                                                  )}
+                                                </>
+                                              )}
+                                            </div>
+                                          )}
+                                        </Draggable>
+                                      );
+                                    })}
+                                    {rProv.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            )}
+
+                            {!isTradeCollapsed && editEnabled && (
+                              <div className="no-print" style={{ padding: '8px 14px', background: '#0f1218', border: '1px solid #2a3040' }}>
+                                <button onClick={() => addRoomToTrade(tg.tradeName)}
+                                  style={{ background: 'transparent', color: '#D4A574', border: '1px dashed #D4A574', padding: '4px 12px', cursor: 'pointer', fontSize: 11, fontWeight: 700, borderRadius: 4, letterSpacing: 1 }}
+                                  data-testid={`add-room-${tg.tradeName}`}>
+                                  + ADD ROOM TO {tg.displayName}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
+                  {editEnabled && (
+                    <div className="no-print" style={{ padding: '12px 14px' }}>
+                      <button onClick={addCustomTrade}
+                        style={{ background: '#10B981', color: '#fff', border: 'none', padding: '8px 18px', cursor: 'pointer', fontSize: 12, fontWeight: 700, borderRadius: 4, letterSpacing: 2 }}
+                        data-testid="add-trade-btn">
+                        + ADD TRADE
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
-            </tbody>
-          </table>
+            </Droppable>
+          </DragDropContext>
         )}
       </div>
 
       {/* GRAND TOTALS */}
       {grouped.length > 0 && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 12px 8px' }}>
-          <table style={{ minWidth: 380, borderCollapse: 'collapse' }}>
+          <table style={{ minWidth: 380, borderCollapse: 'collapse' }} className="proposal-cell">
             <tbody>
               <TotalRow label="SUB TOTAL" value={fmtUSD(grandTotals.subtotal)} bold />
               <TotalRow label="Less Payment (deposit)" value={editEnabled
@@ -586,11 +820,11 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
 }
 
 // ====================================================================
-// LineRow — handles BOTH scope-derived lines and custom extras.
-// All editable cells use contentEditable — looks like plain spreadsheet
-// cells, NO boxed inputs anywhere.
+// LineRow — Checklist-style alternating gradient row + ⋮⋮ drag handle.
+// All editable cells use contentEditable (looks like plain spreadsheet
+// cells, NO boxed inputs anywhere).
 // ====================================================================
-function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showProfit, onChange, onUpdateExtra, onDelete }) {
+function LineRow({ innerRef, draggableProps, dragHandleProps, isDragging, line, idx, overrides, tradeQuotes, kind, editEnabled, showProfit, onChange, onUpdateExtra, onDelete }) {
   const o = overrides[line.line_id] || {};
   const isExtra = line.source === 'extra';
   const tq = (kind === 'builder' && tradeQuotes[line.line_id]) || null;
@@ -601,7 +835,6 @@ function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showPro
     : ((o.cost !== undefined && o.cost !== null) ? o.cost : (tq ? tq.cost : 0));
   const markup = isExtra ? (o.markup_percent ?? line.extra.markup_percent ?? 0)
     : (o.markup_percent ?? 0);
-  // Description: extras use override.name → extra.name; scope lines use override.description → line.html with #trade pills stripped
   const descriptionHtml = isExtra
     ? (o.name ?? line.extra.name)
     : (o.description ?? stripTradePills(line.html));
@@ -615,8 +848,26 @@ function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showPro
     else onChange(line.line_id, patch);
   };
 
+  // Checklist alternating gradient (matches ExactChecklistSpreadsheet.js item rows)
+  const rowBg = idx % 2 === 0
+    ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(30, 30, 30, 0.9) 30%, rgba(15, 15, 25, 0.95) 70%, rgba(0, 0, 0, 0.95) 100%)'
+    : 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(45, 45, 55, 0.9) 30%, rgba(25, 25, 35, 0.95) 70%, rgba(15, 15, 25, 0.95) 100%)';
+
   return (
-    <tr style={{ background: idx % 2 === 0 ? '#0a0a0a' : '#0f0e0e' }}>
+    <tr
+      ref={innerRef}
+      {...draggableProps}
+      style={{
+        ...draggableProps?.style,
+        background: rowBg,
+        opacity: isDragging ? 0.9 : 1,
+        boxShadow: isDragging ? '0 4px 18px rgba(212,165,116,0.45)' : undefined,
+      }}
+      data-testid={`line-row-${line.line_id}`}
+    >
+      <td className="no-print" {...(editEnabled ? dragHandleProps : {})} style={{ ...tdCell, padding: '4px 6px', textAlign: 'center', cursor: editEnabled ? 'grab' : 'default', color: '#B49B7E' }} title="Drag to reorder">
+        {editEnabled ? '⋮⋮' : ''}
+      </td>
       <td style={{ ...tdCell, color: '#B49B7E', fontWeight: 700 }}>{idx + 1}</td>
       <td style={{ ...tdCell, textAlign: 'left', padding: '6px 10px' }}>
         <CellEditableHTML
@@ -640,7 +891,7 @@ function LineRow({ line, idx, overrides, tradeQuotes, kind, editEnabled, showPro
         )}
       </td>
       {showProfit && <td style={{ ...tdCell, color: '#10B981', fontWeight: 700 }}>{fmtUSD(profit)}</td>}
-      {editEnabled && <td className="no-print" style={{ ...tdCell, padding: 4 }}><button onClick={onDelete} title="Delete line" style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, padding: 4 }}>✕</button></td>}
+      {editEnabled && <td className="no-print" style={{ ...tdCell, padding: 4 }}><button onClick={onDelete} title="Delete line" style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700, padding: 4 }} data-testid={`line-delete-${line.line_id}`}>✕</button></td>}
     </tr>
   );
 }
@@ -651,10 +902,9 @@ function Th({ children, w, align = 'right' }) {
   return <th className="border border-[#B49B7E] px-2 py-2 text-[11px] font-bold uppercase tracking-wider" style={{ width: w, background: 'linear-gradient(135deg, #8B4444EE 0%, #8B4444 50%, #8B4444EE 100%)', color: '#D4C5A9', textAlign: align }}>{children}</th>;
 }
 
-// ContentEditable cell for HTML (description column — keeps @person / @product pills intact)
+// ContentEditable cell for HTML (keeps @person / @product pills intact)
 function CellEditableHTML({ value, editable, placeholder, onChange }) {
   const ref = useRef(null);
-  // Only set innerHTML when value changes from the OUTSIDE (not from user typing).
   useEffect(() => {
     if (ref.current && ref.current.innerHTML !== (value || '')) {
       ref.current.innerHTML = value || '';
@@ -676,7 +926,7 @@ function CellEditableHTML({ value, editable, placeholder, onChange }) {
   );
 }
 
-// ContentEditable cell for plain numeric input — looks like a normal cell.
+// ContentEditable cell for plain numeric input
 function CellNum({ value, editable, prefix = '', onChange }) {
   const ref = useRef(null);
   const display = (value === null || value === undefined || value === '') ? '' : String(value);
@@ -758,8 +1008,6 @@ function CellText({ value, editable, onChange }) {
 }
 
 function NumInline({ value, onChange, prefix = '', suffix = '' }) {
-  // Used in the bottom totals row (Less Payment / PM Fee / Tax) — kept as
-  // compact contentEditable for consistency.
   return (
     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
       {prefix}
