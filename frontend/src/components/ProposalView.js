@@ -39,6 +39,7 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { getMutedRoomHeaderStyle, getMutedRoomHeaderStyleStandalone, getRoomColor } from '../utils/roomColors';
 import { parseScopeDocument, TRADE_COLORS } from './ScopeDocumentEditor';
+import SendToClientModal from './SendToClientModal';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
@@ -111,6 +112,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAccept, setShowAccept] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
   const [signature, setSignature] = useState('');
   const [overrides, setOverrides] = useState({});  // { line_id: {...} }
   const [extras, setExtras] = useState([]);
@@ -825,8 +827,14 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
         </div>
       )}
 
-      <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 20px 24px' }}>
-        <button onClick={() => window.print()} style={{ background: '#D4A574', color: '#1a1f2e', padding: '8px 16px', fontWeight: 700, borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 12 }}>🖨 PRINT / SAVE PDF</button>
+      <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 20px 24px' }}>
+        <button onClick={() => window.print()} data-testid="print-proposal-btn" style={{ background: 'transparent', color: '#D4A574', padding: '8px 16px', fontWeight: 700, borderRadius: 4, border: '1px solid #D4A574', cursor: 'pointer', fontSize: 12 }}>🖨 PRINT</button>
+        {kind === 'builder' && (
+          <button onClick={() => setShowSendModal(true)} disabled={!accepted} title={accepted ? 'Send the proposal PDF to your client' : 'Accept the job first to unlock sending'} data-testid="send-to-client-btn"
+            style={{ background: accepted ? '#D4A574' : '#4b5563', color: '#1a1f2e', padding: '8px 18px', fontWeight: 700, borderRadius: 4, border: 'none', cursor: accepted ? 'pointer' : 'not-allowed', fontSize: 12, letterSpacing: 1 }}>
+            ✉ SEND TO CLIENT
+          </button>
+        )}
       </div>
 
       {showAccept && (
@@ -841,6 +849,18 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
             </div>
           </div>
         </div>
+      )}
+
+      {showSendModal && (
+        <SendToClientModal
+          accessCode={accessCode}
+          defaultTo={data?.project?.client_email || ''}
+          defaultName={data?.project?.client_name || ''}
+          companyName={company.company_name || ''}
+          projectName={data?.project_name || ''}
+          onClose={() => setShowSendModal(false)}
+          onSent={() => { load?.(); }}
+        />
       )}
     </div>
   );

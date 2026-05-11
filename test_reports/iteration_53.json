@@ -1,0 +1,48 @@
+{
+  "summary": "End-to-end testing of the launch feature: PDF export + white-label proposal email + customer acceptance page. 9/9 backend tests passed. Frontend tests 1-8 all passed (provider switching, save+encrypt, test-email graceful failure, send-to-client modal pre-fill, PDF download, send graceful failure, bad-token rejection). TEST 9/10 (customer accept page with valid token) revealed one real UI bug: the ACCEPT PROPOSAL section is gated by `grouped.length > 0`, so when the proposal scope is empty (as on JXQ8EYEQ) the homeowner cannot sign — only a 'being prepared' card renders. Backend API for /accept itself works correctly (verified directly via API in pytest).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "CustomerProposalPage.js",
+        "issue": "ACCEPT PROPOSAL section (signature input + accept button) only renders when `grouped.length > 0`. When the builder portal has an empty scope_document (which is true for JXQ8EYEQ), the customer sees only 'This proposal is being prepared. Please check back shortly.' and has NO way to type a signature or click accept. Per the review request, the accept section must show even when scope is empty (signature input, email input, accept button must be present).",
+        "selector": "[data-testid='customer-signature-input'], [data-testid='customer-accept-btn']",
+        "priority": "HIGH",
+        "file": "/app/frontend/src/components/CustomerProposalPage.js",
+        "line": 195,
+        "fix_hint": "Change `{!accepted && grouped.length > 0 && (` to `{!accepted && (` so the ACCEPT section is unconditionally rendered while not yet accepted."
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_proposal_email_white_label.py",
+    "/app/test_reports/pytest/proposal_email.xml"
+  ],
+  "action_items": [
+    "Remove the `grouped.length > 0` guard from the ACCEPT PROPOSAL section render in CustomerProposalPage.js (line 195) so customers can still sign even when the scope is empty — or, alternatively, replace the 'being prepared' message logic so the accept block is appended regardless."
+  ],
+  "critical_code_review_comments": [
+    "server.py is ~20,556 lines — vastly exceeds the 700-line guideline. Strongly recommend splitting into routers (proposal_email, customer_proposal, snippets, builder_portal, etc.).",
+    "PUBLIC_APP_URL fallback in send_proposal_email is hardcoded to https://app.estdesignco.com — fine for production but the preview env (design-preview-131.preview.emergentagent.com) will email customers a broken link. Should derive from request.headers.get('origin') or a per-env env var.",
+    "_email_decrypt uses FERNET_KEY from .env — good. Confirmed smtp_password_enc never leaks in GET /company (verified by test_get_company_profile_hides_cipher and test_save_email_config).",
+    "Test-email and send-email correctly translate SMTP/Resend exceptions into 502 with `detail`, no stack traces leak to the client — confirmed in both pytest and live UI testing."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_proposal_email_white_label.py (NEW)"
+  ],
+  "success_rate": {
+    "backend": "100% (9/9)",
+    "frontend": "~90% (Tests 1-8 pass; TEST 9/10 customer accept UI blocked by empty-scope guard, backend API path works)"
+  },
+  "test_credentials": "Builder portal access code JXQ8EYEQ (Wheeler Ridge Residence). No login required. Fake SMTP creds used for test (Gmail SMTP returns 535 Bad Credentials — the expected/correct test path).",
+  "seed_data_creation": "Temporarily set customer_accept_token='TESTTOKEN' on builder_portals(access_code=JXQ8EYEQ) for TEST 9/10. Cleaned up at end of run — verified no residuals remain in portal or company_profiles documents.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend white-label email + customer-accept flow is solid (9/9 pytest). The single open UI bug is CustomerProposalPage.js line 195: the ACCEPT section is gated by `grouped.length > 0`. After the main agent removes that guard, re-test by setting customer_accept_token='TESTTOKEN' on JXQ8EYEQ, visiting /customer-proposal/JXQ8EYEQ/TESTTOKEN, typing a name in [data-testid='customer-signature-input'], clicking [data-testid='customer-accept-btn'], and asserting [data-testid='customer-accepted-banner'] appears. Don't forget to clean up token + customer_accepted_* fields after.",
+  "rca of the issue": "RCA — UI rendering condition for the ACCEPT block uses `!accepted && grouped.length > 0`. `grouped` is built from the portal's scope_document (HTML) + rooms; if the builder hasn't published any proposal scope yet, grouped is []. Net effect: the homeowner reaches the page, sees only the 'being prepared' card, and has no input affordance. Reproduction: any portal where scope_document is empty/whitespace will reproduce. Mitigation: drop the length check OR show an empty-state 'No itemized scope yet — your contractor will email an updated version' alongside the ACCEPT section so the customer can still sign by name."
+}

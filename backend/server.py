@@ -19578,6 +19578,39 @@ class CompanyProfile(BaseModel):
     payment_terms: Optional[str] = ""
     deposit_percent: Optional[float] = 0
     accent_color: Optional[str] = "#D4A574"
+    # ---- BYO email config (per-builder white-label sending) ----
+    email_provider: Optional[str] = ""        # 'resend' | 'smtp' | 'gmail' | 'outlook' | ''
+    email_from_name: Optional[str] = ""       # display name on outbound emails
+    email_from_address: Optional[str] = ""    # verified sender address
+    email_reply_to: Optional[str] = ""        # optional override
+    # Resend
+    resend_api_key_enc: Optional[str] = ""    # encrypted at rest
+    # SMTP (Gmail / Outlook / custom)
+    smtp_host: Optional[str] = ""
+    smtp_port: Optional[int] = 587
+    smtp_username: Optional[str] = ""
+    smtp_password_enc: Optional[str] = ""     # encrypted at rest
+    smtp_use_tls: Optional[bool] = True
+
+
+class ProposalEmailSend(BaseModel):
+    to_email: EmailStr
+    to_name: Optional[str] = ""
+    cc_emails: Optional[List[EmailStr]] = []
+    subject: str
+    message: str  # plain text or simple HTML; gets wrapped in template
+    pdf_base64: str  # data URL or raw base64 of the proposal PDF
+    pdf_filename: Optional[str] = "proposal.pdf"
+    include_accept_link: Optional[bool] = True
+
+
+class ProposalEmailTest(BaseModel):
+    to_email: EmailStr  # usually builder's own email
+
+
+class ProposalCustomerAccept(BaseModel):
+    signature: str
+    accepted_by_email: Optional[EmailStr] = None
 
 class SnippetCreate(BaseModel):
     owner_kind: str  # 'builder' or 'trade'
@@ -19800,6 +19833,9 @@ async def _build_proposal_payload(kind: str, portal: dict):
         {"portal_id": portal_id_for_filter}, {"_id": 0}
     ).sort("order_index", 1).to_list(5000)
     company = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0}) or {}
+    # Never leak encrypted secrets into the payload — those are server-side only.
+    company.pop("resend_api_key_enc", None)
+    company.pop("smtp_password_enc", None)
 
     # Collect cross-portal trade quotes for the builder view: walk every
     # trade sub-portal under this builder and return their cost overrides
@@ -19834,6 +19870,12 @@ async def _build_proposal_payload(kind: str, portal: dict):
         "kind": kind,
         "portal": portal,
         "project_name": project.get("name", ""),
+        "project": {
+            "id": project.get("id"),
+            "name": project.get("name", ""),
+            "client_name": project.get("client_name") or project.get("client_info", {}).get("full_name", ""),
+            "client_email": project.get("client_email") or project.get("client_info", {}).get("email", ""),
+        },
         "scope_document": scope_doc,
         "rooms": rooms,
         "overrides": overrides,
@@ -19925,7 +19967,15 @@ async def delete_proposal_extra(access_code: str, extra_id: str):
 @api_router.get("/builder/{access_code}/company")
 async def get_company_profile(access_code: str):
     profile = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0})
+    if profile:
+        # Never return raw credential ciphertext to the client. Just report
+        # whether they're set so the form can show "saved / change…" hints.
+        profile["resend_api_key_set"] = bool(profile.get("resend_api_key_enc"))
+        profile["smtp_password_set"] = bool(profile.get("smtp_password_enc"))
+        profile.pop("resend_api_key_enc", None)
+        profile.pop("smtp_password_enc", None)
     return profile or {"access_code": access_code}
+
 
 @api_router.put("/builder/{access_code}/company")
 async def upsert_company_profile(access_code: str, payload: CompanyProfile):
@@ -19933,13 +19983,353 @@ async def upsert_company_profile(access_code: str, payload: CompanyProfile):
     if not portal:
         raise HTTPException(status_code=404, detail="Invalid access code")
     update = {k: v for k, v in payload.dict().items() if v is not None}
+    # Encrypt-on-save: if a fresh raw secret was submitted (starts with re_ or
+    # is non-empty SMTP password), encrypt and store in the *_enc field. The
+    # cleartext key never lives on disk.
+    raw_resend = update.pop("resend_api_key_enc", "")
+    if raw_resend and not raw_resend.startswith("__keep__"):
+        update["resend_api_key_enc"] = _email_encrypt(raw_resend)
+    elif raw_resend == "":
+        # Don't overwrite an existing key with empty — keep what's there.
+        update.pop("resend_api_key_enc", None)
+    raw_smtp = update.pop("smtp_password_enc", "")
+    if raw_smtp and not raw_smtp.startswith("__keep__"):
+        update["smtp_password_enc"] = _email_encrypt(raw_smtp)
+    elif raw_smtp == "":
+        update.pop("smtp_password_enc", None)
+
     update["access_code"] = access_code
     update["updated_at"] = datetime.now(timezone.utc).isoformat()
     await db.company_profiles.update_one(
         {"access_code": access_code}, {"$set": update}, upsert=True
     )
     saved = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0})
+    if saved:
+        saved["resend_api_key_set"] = bool(saved.get("resend_api_key_enc"))
+        saved["smtp_password_set"] = bool(saved.get("smtp_password_enc"))
+        saved.pop("resend_api_key_enc", None)
+        saved.pop("smtp_password_enc", None)
     return saved
+
+
+# =============================================================================
+# Proposal email delivery — true white-label BYO (per-builder credentials)
+# =============================================================================
+# Each builder/trade enters their OWN email provider credentials in the
+# Company Profile form. We encrypt secrets at rest (Fernet, FERNET_KEY env)
+# and call the configured provider per request. The platform never appears
+# as the sender — homeowners receive the email from the builder's own brand.
+
+from cryptography.fernet import Fernet as _Fernet
+import resend as _resend_sdk
+
+_FERNET_KEY_ENV = os.environ.get("FERNET_KEY")
+_fernet = _Fernet(_FERNET_KEY_ENV.encode()) if _FERNET_KEY_ENV else None
+
+
+def _email_encrypt(plain: str) -> str:
+    if not plain:
+        return ""
+    if not _fernet:
+        # Falling back to plaintext would leak — better to fail loudly.
+        raise HTTPException(status_code=500, detail="FERNET_KEY not configured on server")
+    return _fernet.encrypt(plain.encode()).decode()
+
+
+def _email_decrypt(cipher: str) -> str:
+    if not cipher:
+        return ""
+    if not _fernet:
+        raise HTTPException(status_code=500, detail="FERNET_KEY not configured on server")
+    try:
+        return _fernet.decrypt(cipher.encode()).decode()
+    except Exception:
+        # Wrong key / corrupted ciphertext — surface as a config error so the
+        # builder can re-enter the credential.
+        raise HTTPException(status_code=400, detail="Stored credential could not be decrypted — please re-enter your email credentials")
+
+
+def _wrap_email_html(profile: dict, message: str, accept_url: str = "") -> str:
+    """Build a simple, brand-aware HTML wrapper around the builder's message."""
+    company = (profile.get("company_name") or "").strip() or "Your Proposal"
+    accent = (profile.get("accent_color") or "#D4A574").strip()
+    logo = profile.get("logo_data") or ""
+    addr = profile.get("address") or ""
+    phone = profile.get("phone") or ""
+    email_addr = profile.get("email") or profile.get("email_from_address") or ""
+    cta = (
+        f'<a href="{accept_url}" style="display:inline-block;background:{accent};color:#1a1f2e;'
+        f'padding:12px 28px;border-radius:6px;font-weight:700;text-decoration:none;letter-spacing:1px;">'
+        f'REVIEW &amp; ACCEPT PROPOSAL</a>'
+    ) if accept_url else ""
+    logo_block = (
+        f'<img src="{logo}" alt="logo" style="max-height:64px;max-width:240px;object-fit:contain;margin-bottom:12px;" />'
+        if logo else f'<h1 style="margin:0;color:{accent};font-size:22px;letter-spacing:1px;">{company}</h1>'
+    )
+    msg_html = (message or "").replace("\n", "<br/>")
+    return f"""<!doctype html><html><body style="font-family:Helvetica,Arial,sans-serif;background:#f4f4f4;margin:0;padding:24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e5e5e5;">
+  <tr><td style="background:#0f1218;padding:24px;text-align:left;">
+    {logo_block}
+    {f'<p style="color:#D4C5A9;font-size:12px;margin:6px 0 0;">{company}</p>' if logo else ''}
+  </td></tr>
+  <tr><td style="padding:24px;color:#111;font-size:14px;line-height:1.6;">
+    {msg_html}
+    {f'<p style="text-align:center;margin:28px 0;">{cta}</p>' if cta else ''}
+    <p style="color:#666;font-size:12px;margin-top:24px;">Your detailed proposal is attached as a PDF.</p>
+  </td></tr>
+  <tr><td style="background:#fafafa;padding:16px 24px;color:#666;font-size:11px;border-top:1px solid #e5e5e5;">
+    <strong>{company}</strong><br/>
+    {addr}<br/>
+    {phone}{' · ' if phone and email_addr else ''}{email_addr}
+  </td></tr>
+</table>
+</body></html>"""
+
+
+async def _send_via_resend(api_key: str, from_addr: str, to: List[str], cc: List[str], subject: str, html: str, attachments: List[Dict[str, Any]], reply_to: str = "") -> str:
+    """Send through Resend using the builder's own API key.
+
+    Returns the Resend message id on success; raises HTTPException on failure.
+    Resend SDK is synchronous → run in a thread to keep the event loop free.
+    """
+    _resend_sdk.api_key = api_key
+    params: Dict[str, Any] = {
+        "from": from_addr,
+        "to": to,
+        "subject": subject,
+        "html": html,
+    }
+    if cc:
+        params["cc"] = cc
+    if reply_to:
+        params["reply_to"] = reply_to
+    if attachments:
+        params["attachments"] = attachments
+    try:
+        result = await asyncio.to_thread(_resend_sdk.Emails.send, params)
+        return (result or {}).get("id", "")
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Resend send failed: {exc}")
+
+
+async def _send_via_smtp(host: str, port: int, username: str, password: str, use_tls: bool,
+                         from_addr: str, from_name: str, to: List[str], cc: List[str],
+                         subject: str, html: str, attachments: List[Dict[str, Any]],
+                         reply_to: str = "") -> str:
+    """Send via aiosmtplib using the builder's own SMTP creds (Gmail / Outlook / custom)."""
+    msg = MIMEMultipart("mixed")
+    msg["From"] = email.utils.formataddr((from_name or "", from_addr))
+    msg["To"] = ", ".join(to)
+    if cc:
+        msg["Cc"] = ", ".join(cc)
+    if reply_to:
+        msg["Reply-To"] = reply_to
+    msg["Subject"] = subject
+    msg["Message-ID"] = email.utils.make_msgid()
+    msg["Date"] = email.utils.formatdate(localtime=True)
+    msg.attach(MIMEText(html, "html"))
+    for att in (attachments or []):
+        from email.mime.base import MIMEBase
+        from email import encoders as _enc
+        part = MIMEBase("application", "octet-stream")
+        try:
+            part.set_payload(base64.b64decode(att["content"]))
+        except Exception:
+            part.set_payload(att["content"].encode() if isinstance(att.get("content"), str) else att.get("content", b""))
+        _enc.encode_base64(part)
+        part.add_header("Content-Disposition", f'attachment; filename="{att.get("filename", "attachment.pdf")}"')
+        msg.attach(part)
+
+    recipients = list(to) + list(cc or [])
+    try:
+        await aiosmtplib.send(
+            msg,
+            hostname=host,
+            port=int(port or 587),
+            username=username,
+            password=password,
+            start_tls=bool(use_tls),
+            recipients=recipients,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"SMTP send failed: {exc}")
+    return msg["Message-ID"]
+
+
+def _strip_pdf_base64(pdf_b64: str) -> str:
+    """Accept either a raw base64 string or a data URL — return just the b64 body."""
+    if not pdf_b64:
+        return ""
+    if pdf_b64.startswith("data:"):
+        try:
+            return pdf_b64.split(",", 1)[1]
+        except Exception:
+            return ""
+    return pdf_b64
+
+
+def _build_attachments(pdf_b64: str, filename: str) -> List[Dict[str, Any]]:
+    body = _strip_pdf_base64(pdf_b64)
+    if not body:
+        return []
+    return [{"filename": filename or "proposal.pdf", "content": body}]
+
+
+async def _dispatch_email(profile: dict, to: List[str], cc: List[str], subject: str, html: str,
+                          attachments: List[Dict[str, Any]]) -> str:
+    """Route the email through the builder's configured provider."""
+    provider = (profile.get("email_provider") or "").lower()
+    from_addr = (profile.get("email_from_address") or profile.get("email") or "").strip()
+    from_name = (profile.get("email_from_name") or profile.get("company_name") or "").strip()
+    reply_to = (profile.get("email_reply_to") or "").strip()
+    if not from_addr:
+        raise HTTPException(status_code=400, detail="Email is not set up yet — open Company Info and add your sending email under EMAIL SETUP.")
+    formatted_from = f'{from_name} <{from_addr}>' if from_name else from_addr
+
+    if provider == "resend":
+        cipher = profile.get("resend_api_key_enc") or ""
+        if not cipher:
+            raise HTTPException(status_code=400, detail="Resend API key missing — add it in Company Info → EMAIL SETUP.")
+        api_key = _email_decrypt(cipher)
+        return await _send_via_resend(api_key, formatted_from, to, cc, subject, html, attachments, reply_to)
+
+    if provider in ("smtp", "gmail", "outlook"):
+        host = profile.get("smtp_host") or ""
+        port = profile.get("smtp_port") or 587
+        user = profile.get("smtp_username") or from_addr
+        cipher = profile.get("smtp_password_enc") or ""
+        if not host or not cipher:
+            raise HTTPException(status_code=400, detail="SMTP credentials incomplete — open Company Info → EMAIL SETUP and finish the form.")
+        password = _email_decrypt(cipher)
+        use_tls = profile.get("smtp_use_tls", True)
+        return await _send_via_smtp(host, int(port), user, password, use_tls, from_addr, from_name, to, cc, subject, html, attachments, reply_to)
+
+    raise HTTPException(status_code=400, detail="Email provider not selected. Pick Resend or SMTP under Company Info → EMAIL SETUP.")
+
+
+@api_router.post("/builder/{access_code}/proposal/test-email")
+async def test_proposal_email(access_code: str, payload: ProposalEmailTest):
+    """Send a small test email to the builder's own address to verify the config."""
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    profile = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0}) or {}
+    html = _wrap_email_html(profile, "This is a test email — your white-label proposal delivery is configured correctly. Reply to this email to confirm round-trip works.")
+    msg_id = await _dispatch_email(profile, [str(payload.to_email)], [], "Test email from your Proposal portal", html, [])
+    return {"status": "sent", "message_id": msg_id}
+
+
+@api_router.post("/builder/{access_code}/proposal/send-email")
+async def send_proposal_email(access_code: str, payload: ProposalEmailSend):
+    """Send the proposal PDF to the homeowner from the builder's own white-label.
+
+    Generates a one-time `customer_accept_token` if include_accept_link is True
+    and embeds the accept URL in the email body."""
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    profile = await db.company_profiles.find_one({"access_code": access_code}, {"_id": 0}) or {}
+
+    accept_url = ""
+    if payload.include_accept_link:
+        token = str(uuid.uuid4())
+        # Record token on portal so the public accept page can validate it.
+        await (db.builder_portals if kind == "builder" else db.trade_portals).update_one(
+            {"access_code" if kind == "builder" else "trade_access_code": access_code},
+            {"$set": {
+                "customer_accept_token": token,
+                "customer_accept_sent_to": str(payload.to_email),
+                "customer_accept_sent_at": datetime.now(timezone.utc).isoformat(),
+            }},
+        )
+        # Build the public URL. Frontend route: /customer-proposal/{code}/{token}
+        # CORS_ORIGINS may be * — use request host as fallback via env.
+        public_base = (os.environ.get("PUBLIC_APP_URL") or "").rstrip("/")
+        if not public_base:
+            # Fall back to derive from existing config — production should set PUBLIC_APP_URL.
+            public_base = "https://app.estdesignco.com"
+        accept_url = f"{public_base}/customer-proposal/{access_code}/{token}"
+
+    html = _wrap_email_html(profile, payload.message, accept_url)
+    attachments = _build_attachments(payload.pdf_base64, payload.pdf_filename or "proposal.pdf")
+    msg_id = await _dispatch_email(
+        profile,
+        [str(payload.to_email)],
+        [str(c) for c in (payload.cc_emails or [])],
+        payload.subject,
+        html,
+        attachments,
+    )
+
+    # Audit log per portal for the "Sent" history view in the Proposal tab.
+    await db.proposal_email_log.insert_one({
+        "id": str(uuid.uuid4()),
+        "access_code": access_code,
+        "portal_id": portal.get("id"),
+        "kind": kind,
+        "to_email": str(payload.to_email),
+        "to_name": payload.to_name,
+        "subject": payload.subject,
+        "cc_emails": [str(c) for c in (payload.cc_emails or [])],
+        "message_id": msg_id,
+        "accept_url": accept_url,
+        "sent_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"status": "sent", "message_id": msg_id, "accept_url": accept_url}
+
+
+@api_router.get("/builder/{access_code}/proposal/email-log")
+async def list_proposal_email_log(access_code: str):
+    docs = await db.proposal_email_log.find(
+        {"access_code": access_code}, {"_id": 0}
+    ).sort("sent_at", -1).to_list(200)
+    return {"emails": docs}
+
+
+# ----------------- Customer-facing accept link (homeowner) -----------------
+
+@api_router.get("/customer-proposal/{access_code}/{token}")
+async def get_customer_proposal(access_code: str, token: str):
+    """Public read-only proposal view for the homeowner — validates the token,
+    then returns the same payload as /proposal so the frontend can render the
+    quote with a signature box."""
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if portal.get("customer_accept_token") != token:
+        raise HTTPException(status_code=403, detail="This acceptance link is invalid or has been revoked.")
+    payload = await _build_proposal_payload(kind, portal)
+    # Strip sensitive credential ciphertext if present in company
+    company = payload.get("company") or {}
+    company.pop("resend_api_key_enc", None)
+    company.pop("smtp_password_enc", None)
+    payload["company"] = company
+    return payload
+
+
+@api_router.post("/customer-proposal/{access_code}/{token}/accept")
+async def customer_accept_proposal(access_code: str, token: str, payload: ProposalCustomerAccept):
+    kind, portal = await _get_portal_by_access(access_code)
+    if not portal:
+        raise HTTPException(status_code=404, detail="Invalid access code")
+    if portal.get("customer_accept_token") != token:
+        raise HTTPException(status_code=403, detail="This acceptance link is invalid or has been revoked.")
+    if not (payload.signature or "").strip():
+        raise HTTPException(status_code=400, detail="Signature required")
+    coll = db.builder_portals if kind == "builder" else db.trade_portals
+    key = "access_code" if kind == "builder" else "trade_access_code"
+    await coll.update_one(
+        {key: access_code},
+        {"$set": {
+            "customer_accepted": True,
+            "customer_accepted_at": datetime.now(timezone.utc).isoformat(),
+            "customer_accepted_signature": payload.signature.strip(),
+            "customer_accepted_email": str(payload.accepted_by_email) if payload.accepted_by_email else None,
+        }},
+    )
+    return {"status": "accepted"}
+
 
 # ----------------- Pre-made Snippets library -----------------
 
