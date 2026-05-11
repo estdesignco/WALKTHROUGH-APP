@@ -1,0 +1,59 @@
+{
+  "summary": "Iteration 51 - End-to-end UI testing of the new Snippet Library 'click-to-add' flow on real portal JXQ8EYEQ (Wheeler Ridge Residence). Cards are now clickable, modal opens, POST /proposal/extra fires with the correct payload, shift-click repeats last destination, Cancel/Delete-X don't trigger adds, new trade banner appears in proposal. Found 1 small UX bug in initial state of the destination picker when no trades exist on the proposal yet.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "SnippetDestinationPicker (ProposalView.js line 1222)",
+        "issue": "When the proposal has ZERO existing trades (grouped is empty — which is THE CURRENT STATE of JXQ8EYEQ since scope_of_work=[]), the picker initializes `trade` state to '' via `useState(tradeOptions[0] || '')`. The browser visually renders the only option '+ NEW TRADE…' as selected, BUT React state is still '', so `isNewTrade = trade === '__NEW__'` is false, so the snippet-new-trade-input field is NEVER rendered. The user is trapped: TRADE dropdown looks selected, but no input appears, ADD LINE button is disabled (canConfirm=false), and clicking the dropdown to re-pick '+ NEW TRADE…' is the only escape. This is exactly the 'cards don't work' user complaint coming back in a slightly different form. Repro: open SNIPPET LIBRARY on JXQ8EYEQ → click any card → modal opens with TRADE='+ NEW TRADE…' but no input below it → ADD LINE button is greyed out. Fix: change `useState(tradeOptions[0] || '')` to `useState(tradeOptions[0] || '__NEW__')` so the new-trade input appears immediately when there are no trades.",
+        "selector": "[data-testid='snippet-trade-select']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/frontend/src/components/ProposalView.js"],
+  "action_items": [
+    "FIX: SnippetDestinationPicker initial trade state — change line 1222 from `useState(tradeOptions[0] || '')` to `useState(tradeOptions[0] || '__NEW__')` so when the proposal has no trades yet (like JXQ8EYEQ today), the NEW TRADE input is visible immediately on modal open. Without this fix, users on a fresh/empty proposal still cannot add a snippet without realising they have to re-click the dropdown."
+  ],
+  "critical_code_review_comments": [
+    "Workaround proved the rest of the flow is solid: after explicitly re-selecting '+ NEW TRADE…' from the dropdown, the entire add path works (POST 200, line item created, banner rendered, shift-click repeats last destination correctly).",
+    "POST payload to /api/builder/JXQ8EYEQ/proposal/extra is correct: {parent_kind:'trade-room', parent_id:'TEST_QA_TRADE::TEST_QA_ROOM', name:'Demo - Dumpster (per haul)', quantity:1, unit:'EA', cost:650, markup_percent:15}. Matches the spec in the review request exactly.",
+    "Shift-click power-user flow works: bypasses modal, fires POST with parent_id=last destination (TEST_QA_TRADE::TEST_QA_ROOM), no modal appears.",
+    "Hint text 'Shift-click to repeat last → TEST_QA_TRADE / TEST_QA_ROOM' renders next to the +NEW SNIPPET button after first successful add — confirmed visually.",
+    "Delete (✕) span uses e.stopPropagation in `remove()` and does NOT open the destination picker — confirmed.",
+    "Cancel button closes modal without firing any POST — confirmed.",
+    "Hover effect: translateY(-1px) + box-shadow + gold border (#D4A574) all applied on mouseenter — confirmed via element.style inspection.",
+    "Green flash ('✓ ADDED') for 700ms: timing-sensitive; my evaluate() check at +50ms missed it once but the state machine (setFlashId + setTimeout 700ms clear) is correct in code review and the hint-text proof shows lastDest was set (which only happens inside the same `if (ok)` block that sets flashId).",
+    "DELETE /api/builder/JXQ8EYEQ/proposal/extra/{id} returned 200 for both test extras — cleanup confirmed, portal extras=0 after cleanup.",
+    "Did NOT exercise DnD/rename regressions in this iteration (those were verified in iteration_50 on IL8X4FXJ); since the underlying ProposalView component is the same, no regression expected — but main agent may want to spot-check."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "100%", "frontend": "92%" },
+  "test_credentials": "Builder Portal Access Code: JXQ8EYEQ (Wheeler Ridge Residence, no login). proposal_view_enabled=true, proposal_edit_enabled=true, proposal_accepted=true (already accepted by 'fdas' on 5/11/2026).",
+  "seed_data_creation": "Created 2 test extras during the flow (Demo - Dumpster + 2nd snippet via shift-click) under parent_id TEST_QA_TRADE::TEST_QA_ROOM. BOTH were deleted via DELETE /api/builder/JXQ8EYEQ/proposal/extra/{id} at end of test — confirmed extras=0 in final GET. No pollution remains on user's real portal.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "On JXQ8EYEQ the scope_of_work=[] so the proposal has NO existing trades — this surfaces the initial-state bug in SnippetDestinationPicker. After main agent fixes line 1222 (`useState(tradeOptions[0] || '__NEW__')`), re-test by opening SNIPPET LIBRARY → click any card → the NEW TRADE input should be visible IMMEDIATELY (no need to re-click the dropdown). Then verify the ADD LINE button is enabled as soon as user types a trade name + room name. Snippet IDs (for cleanup if needed): the test created 2 extras and successfully DELETEd both. All other parts of the click-to-add flow are verified working: modal open, payload, shift-click repeat, cancel, delete-X isolation, hover styling, hint text, new-trade-banner-in-proposal.",
+  "features_verified_passing": [
+    "Snippet cards (55 total) are rendered as <button> elements with data-testid=snippet-card-{id}",
+    "Hover effect: translateY(-1px) + gold border (#D4A574) + box-shadow on mouseenter",
+    "Click on card opens SnippetDestinationPicker modal (data-testid=snippet-dest-picker)",
+    "Modal shows snippet name + qty/unit/cost/markup summary",
+    "TRADE select has data-testid=snippet-trade-select with '+ NEW TRADE…' option",
+    "ROOM select has data-testid=snippet-room-select with '+ NEW ROOM…' option (visible when trade has rooms; hidden when NEW TRADE mode auto-forces new room input)",
+    "Selecting '+ NEW TRADE…' reveals data-testid=snippet-new-trade-input (works once user explicitly re-selects)",
+    "Selecting '+ NEW ROOM…' (or auto when NEW TRADE) reveals data-testid=snippet-new-room-input",
+    "✓ ADD LINE button (data-testid=snippet-confirm-add-btn) fires POST /api/builder/JXQ8EYEQ/proposal/extra with correct payload {parent_kind:'trade-room', parent_id:'TRADE::ROOM', name, quantity, unit, cost, markup_percent}",
+    "Modal closes after successful confirm",
+    "New trade banner (TEST_QA_TRADE) appears in proposal after add",
+    "Line rows appear under the new trade",
+    "Shift-click on another card bypasses modal and immediately POSTs to last destination (parent_id matches)",
+    "Hint text 'Shift-click to repeat last → TRADE / ROOM' appears next to +NEW SNIPPET button after first successful add",
+    "Cancel button closes modal without firing POST",
+    "Delete (✕) span on snippet card does NOT open destination picker and does NOT fire POST (e.stopPropagation working)",
+    "Cleanup: DELETE /api/builder/JXQ8EYEQ/proposal/extra/{id} returns 200 and removes extras from portal"
+  ],
+  "rca of the issue": "RCA of initial-state UX bug: SnippetDestinationPicker (line 1222) initializes `trade` state with `useState(tradeOptions[0] || '')`. tradeOptions comes from `grouped.map(g => g.tradeName)` and grouped is empty when the proposal has no scope_of_work yet (current state of JXQ8EYEQ). Empty array yields empty string fallback. The <select> shows '+ NEW TRADE…' visually as first option, but React state is '', which doesn't match '__NEW__', so the conditional render `{isNewTrade && <input data-testid=snippet-new-trade-input/>}` evaluates to false. User sees a select pre-filled with '+ NEW TRADE…' but no input below it and a disabled ADD LINE button (canConfirm requires non-empty finalTrade). Mitigation: change fallback to `'__NEW__'` so isNewTrade becomes true from mount on an empty-trades proposal."
+}

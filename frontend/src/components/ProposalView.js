@@ -333,6 +333,33 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
     }
   };
 
+  // Add a snippet as a new line item under a chosen trade + room. Used by the
+  // Snippet Library cards (click card → pick destination → instant add).
+  const addSnippetToProposal = async (snippet, tradeName, roomName) => {
+    if (!editEnabled) return null;
+    const T = (tradeName || 'GENERAL').trim().toUpperCase();
+    const R = (roomName || 'GENERAL').trim().toUpperCase();
+    const body = {
+      parent_kind: 'trade-room',
+      parent_id: `${T}::${R}`,
+      name: snippet.name || 'New line item',
+      quantity: Number(snippet.default_quantity) || 1,
+      unit: snippet.default_unit || 'EA',
+      cost: Number(snippet.default_cost) || 0,
+      markup_percent: Number(snippet.default_markup_percent) || 0,
+      notes: snippet.notes || '',
+    };
+    const res = await fetch(`${API_URL}/api/builder/${accessCode}/proposal/extra`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (res.ok) {
+      const created = await res.json();
+      setExtras(prev => [...prev, created]);
+      return created;
+    }
+    return null;
+  };
+
   const addCustomTrade = async () => {
     const tradeName = (window.prompt('Custom trade name (e.g. DUMPSTER, SITE PROTECTION):') || '').trim().toUpperCase();
     if (!tradeName) return;
@@ -546,7 +573,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
           <button onClick={() => setShowSnippets(!showSnippets)} style={{ background: '#0f1218', color: '#D4A574', border: '1px solid #D4A574', padding: '6px 14px', fontSize: 12, fontWeight: 700, borderRadius: 4, cursor: 'pointer' }}>{showSnippets ? '✕ CLOSE LIBRARY' : '📚 SNIPPET LIBRARY'}</button>
         </div>
       )}
-      {showSnippets && <SnippetsPanel snippets={snippets} ownerKind={kind} ownerId={accessCode} onChange={loadSnippets} />}
+      {showSnippets && <SnippetsPanel snippets={snippets} ownerKind={kind} ownerId={accessCode} onChange={loadSnippets} grouped={grouped} editEnabled={editEnabled} onAddToProposal={addSnippetToProposal} />}
 
       {/* MAIN PROPOSAL — Checklist-style draggable blocks */}
       <div className="proposal-cell" style={{ padding: 12 }} data-testid="proposal-body">
@@ -1060,11 +1087,19 @@ const hLbl = { padding: '2px 8px', color: '#D4A574', fontSize: 10, letterSpacing
 const hVal = { padding: '2px 8px', color: '#D4C5A9', fontSize: 12, textAlign: 'right' };
 
 // ====================================================================
-// Snippets panel
+// Snippets panel — clickable cards that ADD to the proposal.
+// Click a card → tiny destination picker (Trade + Room) appears →
+// pick destination → instantly adds a new line item with the snippet's
+// default qty/unit/cost/markup. Power-user: hold Shift while clicking
+// to re-use the last destination ("repeat add").
 // ====================================================================
-function SnippetsPanel({ snippets, ownerKind, ownerId, onChange }) {
+function SnippetsPanel({ snippets, ownerKind, ownerId, onChange, grouped = [], editEnabled = true, onAddToProposal }) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState({ name: '', default_quantity: 1, default_unit: 'EA', default_cost: 0, default_markup_percent: 0, notes: '' });
+  const [pickerFor, setPickerFor] = useState(null);  // snippet currently choosing destination
+  const [lastDest, setLastDest] = useState(null);    // {trade, room} — last successful add
+  const [flashId, setFlashId] = useState(null);      // snippet that just got added (green flash)
+
   const create = async () => {
     if (!draft.name.trim()) return;
     await fetch(`${API_URL}/api/proposal/snippets`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ owner_kind: ownerKind, owner_id: ownerId, ...draft, default_quantity: Number(draft.default_quantity), default_cost: Number(draft.default_cost), default_markup_percent: Number(draft.default_markup_percent) }) });
@@ -1072,17 +1107,49 @@ function SnippetsPanel({ snippets, ownerKind, ownerId, onChange }) {
     setAdding(false);
     onChange?.();
   };
-  const remove = async (id) => {
+  const remove = async (id, e) => {
+    e?.stopPropagation?.();
     if (!window.confirm('Delete snippet?')) return;
     await fetch(`${API_URL}/api/proposal/snippets/${id}`, { method: 'DELETE' });
     onChange?.();
   };
+
+  const handleCardClick = async (s, e) => {
+    if (!editEnabled || !onAddToProposal) return;
+    // Shift-click = repeat add to last destination (super-fast power-user mode)
+    if (e?.shiftKey && lastDest) {
+      const ok = await onAddToProposal(s, lastDest.trade, lastDest.room);
+      if (ok) { setFlashId(s.id); setTimeout(() => setFlashId(null), 700); }
+      return;
+    }
+    setPickerFor(s);
+  };
+
+  const confirmAdd = async (trade, room) => {
+    if (!pickerFor) return;
+    const ok = await onAddToProposal(pickerFor, trade, room);
+    if (ok) {
+      setLastDest({ trade, room });
+      setFlashId(pickerFor.id);
+      setTimeout(() => setFlashId(null), 700);
+    }
+    setPickerFor(null);
+  };
+
   const inp = { background: '#0f1218', color: '#D4C5A9', border: '1px solid #B49B7E', padding: '6px 8px', fontSize: 12, borderRadius: 4 };
+
   return (
-    <div className="no-print" style={{ background: '#1a1f2e', border: '1px solid #D4A574', margin: 12, padding: 12, borderRadius: 4 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+    <div className="no-print" style={{ background: '#1a1f2e', border: '1px solid #D4A574', margin: 12, padding: 12, borderRadius: 4 }} data-testid="snippet-library">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, gap: 12, flexWrap: 'wrap' }}>
         <div style={{ color: '#D4A574', fontSize: 13, fontWeight: 700 }}>📚 SNIPPET LIBRARY — reusable line items</div>
-        <button onClick={() => setAdding(!adding)} style={{ background: '#10B981', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{adding ? '✕ CANCEL' : '+ NEW SNIPPET'}</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {editEnabled && (
+            <span style={{ color: '#D4C5A9', fontSize: 10, letterSpacing: 1, opacity: 0.85 }}>
+              ← Click any card to add it to your quote {lastDest && <em style={{ color: '#10B981' }}>· Shift-click to repeat last → {lastDest.trade} / {lastDest.room}</em>}
+            </span>
+          )}
+          <button onClick={() => setAdding(!adding)} data-testid="new-snippet-btn" style={{ background: '#10B981', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700 }}>{adding ? '✕ CANCEL' : '+ NEW SNIPPET'}</button>
+        </div>
       </div>
       {adding && (
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr auto', gap: 6, marginBottom: 12 }}>
@@ -1096,13 +1163,144 @@ function SnippetsPanel({ snippets, ownerKind, ownerId, onChange }) {
       )}
       {snippets.length === 0 && <p style={{ color: '#D4C5A9', fontSize: 12 }}>No snippets yet.</p>}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 8 }}>
-        {snippets.map(s => (
-          <div key={s.id} style={{ background: '#0f1218', border: '1px solid #B49B7E', padding: 8, borderRadius: 4, position: 'relative' }}>
-            <div style={{ color: '#D4A574', fontSize: 12, fontWeight: 700 }}>{s.name}</div>
-            <div style={{ color: '#D4C5A9', fontSize: 10, opacity: 0.7 }}>{s.default_quantity} {s.default_unit} · {fmtUSD(s.default_cost)} · {s.default_markup_percent}%</div>
-            <button onClick={() => remove(s.id)} style={{ position: 'absolute', top: 4, right: 4, background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 11 }}>✕</button>
+        {snippets.map(s => {
+          const isFlashing = flashId === s.id;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={(e) => handleCardClick(s, e)}
+              disabled={!editEnabled}
+              data-testid={`snippet-card-${s.id}`}
+              title={editEnabled ? 'Click to add to your quote · Shift-click to repeat last destination' : 'Accept the job to unlock snippet adds'}
+              style={{
+                textAlign: 'left',
+                background: isFlashing ? 'linear-gradient(135deg, #10B981 0%, #065F46 100%)' : '#0f1218',
+                border: `1px solid ${isFlashing ? '#10B981' : '#B49B7E'}`,
+                padding: 8,
+                borderRadius: 4,
+                position: 'relative',
+                cursor: editEnabled ? 'pointer' : 'not-allowed',
+                color: 'inherit',
+                font: 'inherit',
+                transition: 'transform 120ms ease, box-shadow 120ms ease, background 200ms ease, border-color 200ms ease',
+                outline: 'none',
+              }}
+              onMouseEnter={e => { if (editEnabled) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(212,165,116,0.25)'; e.currentTarget.style.borderColor = '#D4A574'; } }}
+              onMouseLeave={e => { if (!isFlashing) { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#B49B7E'; } }}
+            >
+              <div style={{ color: isFlashing ? '#fff' : '#D4A574', fontSize: 12, fontWeight: 700, paddingRight: 18 }}>{s.name}</div>
+              <div style={{ color: isFlashing ? '#fff' : '#D4C5A9', fontSize: 10, opacity: 0.85, marginTop: 2 }}>{s.default_quantity} {s.default_unit} · {fmtUSD(s.default_cost)} · {s.default_markup_percent}%</div>
+              {isFlashing && <div style={{ color: '#fff', fontSize: 10, fontWeight: 700, letterSpacing: 1, marginTop: 4 }}>✓ ADDED</div>}
+              <span
+                onClick={(e) => remove(s.id, e)}
+                role="button"
+                title="Delete snippet"
+                style={{ position: 'absolute', top: 4, right: 4, background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: 11, padding: '2px 4px' }}
+              >✕</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {pickerFor && (
+        <SnippetDestinationPicker
+          snippet={pickerFor}
+          grouped={grouped}
+          onCancel={() => setPickerFor(null)}
+          onConfirm={confirmAdd}
+        />
+      )}
+    </div>
+  );
+}
+
+// Small modal to pick which Trade + Room the snippet should land in.
+// Allows creating a brand-new Trade or Room on the fly.
+function SnippetDestinationPicker({ snippet, grouped, onCancel, onConfirm }) {
+  const tradeOptions = grouped.map(g => g.tradeName);
+  const [trade, setTrade] = useState(tradeOptions[0] || '');
+  const [newTrade, setNewTrade] = useState('');
+  const [room, setRoom] = useState('');
+  const [newRoom, setNewRoom] = useState('');
+
+  const isNewTrade = trade === '__NEW__';
+  const finalTrade = (isNewTrade ? newTrade : trade).trim().toUpperCase();
+
+  const roomsForTrade = useMemo(() => {
+    if (isNewTrade) return [];
+    const tg = grouped.find(g => g.tradeName === trade);
+    return tg ? tg.roomGroups.map(r => r.roomName) : [];
+  }, [grouped, trade, isNewTrade]);
+
+  const isNewRoom = room === '__NEW__' || isNewTrade;
+  const finalRoom = (isNewRoom ? newRoom : room).trim().toUpperCase();
+
+  useEffect(() => {
+    // Reset room when trade changes (so we don't carry over a stale room)
+    if (isNewTrade) setRoom('__NEW__');
+    else if (roomsForTrade.length) setRoom(roomsForTrade[0]);
+    else setRoom('__NEW__');
+  }, [trade, isNewTrade, roomsForTrade]);
+
+  const canConfirm = !!finalTrade && !!finalRoom;
+  const handleConfirm = () => { if (canConfirm) onConfirm(finalTrade, finalRoom); };
+
+  const inp = { background: '#0f1218', color: '#D4C5A9', border: '1px solid #B49B7E', padding: '8px 10px', fontSize: 13, borderRadius: 4, width: '100%' };
+  const lbl = { color: '#D4A574', fontSize: 11, letterSpacing: 2, fontWeight: 700, marginBottom: 4, display: 'block' };
+
+  return (
+    <div onClick={onCancel} className="no-print" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div onClick={e => e.stopPropagation()} data-testid="snippet-dest-picker" style={{ background: '#0f1218', border: '1px solid #D4A574', borderRadius: 8, padding: 20, width: '92%', maxWidth: 480 }}>
+        <h3 style={{ color: '#D4A574', fontSize: 16, letterSpacing: 1, marginBottom: 4 }}>ADD TO QUOTE</h3>
+        <p style={{ color: '#D4C5A9', fontSize: 12, opacity: 0.85, marginBottom: 14 }}>{snippet.name} — {snippet.default_quantity} {snippet.default_unit} · {fmtUSD(snippet.default_cost)} · {snippet.default_markup_percent}%</p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div>
+            <label style={lbl}>TRADE</label>
+            <select value={trade} onChange={e => setTrade(e.target.value)} data-testid="snippet-trade-select" style={inp}>
+              {tradeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+              <option value="__NEW__">+ NEW TRADE…</option>
+            </select>
+            {isNewTrade && (
+              <input
+                autoFocus
+                value={newTrade}
+                onChange={e => setNewTrade(e.target.value.toUpperCase())}
+                placeholder="e.g. DUMPSTER"
+                data-testid="snippet-new-trade-input"
+                style={{ ...inp, marginTop: 8 }}
+              />
+            )}
           </div>
-        ))}
+          <div>
+            <label style={lbl}>ROOM</label>
+            {!isNewTrade && (
+              <select value={room} onChange={e => setRoom(e.target.value)} data-testid="snippet-room-select" style={inp}>
+                {roomsForTrade.map(r => <option key={r} value={r}>{r}</option>)}
+                <option value="__NEW__">+ NEW ROOM…</option>
+              </select>
+            )}
+            {isNewRoom && (
+              <input
+                autoFocus={!isNewTrade}
+                value={newRoom}
+                onChange={e => setNewRoom(e.target.value.toUpperCase())}
+                placeholder="e.g. MASTER BATH"
+                data-testid="snippet-new-room-input"
+                style={{ ...inp, marginTop: isNewTrade ? 0 : 8 }}
+              />
+            )}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
+          <button onClick={onCancel} style={{ background: 'transparent', color: '#D4C5A9', border: '1px solid #4b5563', padding: '8px 16px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}>Cancel</button>
+          <button onClick={handleConfirm} disabled={!canConfirm} data-testid="snippet-confirm-add-btn"
+            style={{ background: canConfirm ? '#D4A574' : '#4b5563', color: '#1a1f2e', padding: '8px 18px', borderRadius: 4, border: 'none', cursor: canConfirm ? 'pointer' : 'not-allowed', fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>
+            ✓ ADD LINE
+          </button>
+        </div>
       </div>
     </div>
   );
