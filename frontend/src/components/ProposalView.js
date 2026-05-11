@@ -961,6 +961,7 @@ export default function ProposalView({ accessCode, kind = 'builder', onPortalCha
           defaultName={resendPrefill?.to_name || data?.project?.client_name || ''}
           defaultCc={resendPrefill?.cc_emails || ''}
           defaultSubject={resendPrefill?.subject || ''}
+          isResend={!!resendPrefill}
           companyName={company.company_name || ''}
           projectName={data?.project_name || ''}
           onClose={() => { setShowSendModal(false); setResendPrefill(null); }}

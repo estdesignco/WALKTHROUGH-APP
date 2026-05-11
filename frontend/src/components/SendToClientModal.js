@@ -13,7 +13,7 @@ import html2pdf from 'html2pdf.js';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
 
-export default function SendToClientModal({ accessCode, defaultTo = '', defaultName = '', defaultCc = '', defaultSubject = '', companyName = '', projectName = '', onClose, onSent }) {
+export default function SendToClientModal({ accessCode, defaultTo = '', defaultName = '', defaultCc = '', defaultSubject = '', isResend = false, companyName = '', projectName = '', onClose, onSent }) {
   const [toEmail, setToEmail] = useState(defaultTo);
   const [toName, setToName] = useState(defaultName);
   const [cc, setCc] = useState(defaultCc);
@@ -23,7 +23,6 @@ export default function SendToClientModal({ accessCode, defaultTo = '', defaultN
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [progress, setProgress] = useState('');
-  const isResend = !!defaultSubject;  // when defaultSubject is provided, this is a re-send flow
   const mounted = useRef(true);
 
   useEffect(() => () => { mounted.current = false; }, []);
@@ -168,7 +167,7 @@ export default function SendToClientModal({ accessCode, defaultTo = '', defaultN
           </div>
           <div>
             <label style={lbl}>CC (comma-separated, optional)</label>
-            <input value={cc} onChange={e => setCc(e.target.value)} placeholder="builder@yourco.com, partner@yourco.com" style={inp} />
+            <input value={cc} onChange={e => setCc(e.target.value)} placeholder="builder@yourco.com, partner@yourco.com" data-testid="send-cc" style={inp} />
           </div>
           <div>
             <label style={lbl}>SUBJECT</label>
