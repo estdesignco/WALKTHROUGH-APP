@@ -5,6 +5,26 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
 ## Implemented
 
+### Proposal/Quote — PDF Export + White-Label Email + Customer Accept (Feb 2026, launch-ready)
+
+**Builders/Trades send proposals from THEIR OWN brand. Platform never appears as sender.**
+
+- **BYO email** per portal — Company Profile now has an "EMAIL SETUP" section. Each builder picks their own provider (Resend / Gmail / Outlook / Custom SMTP), enters their own credentials, owns their own deliverability.
+- **Credentials encrypted at rest** with Fernet (`FERNET_KEY` env). Cleartext keys/passwords NEVER returned in any API response (GET /company strips `*_enc` fields and adds `*_set: true/false` flags so the form can show "saved · paste new to replace").
+- **SEND TEST EMAIL** button in the form — verifies provider connectivity before going live. Real SMTP/Resend errors surface cleanly (502 + `detail`), no stack-trace leaks.
+- **PDF generation client-side** via `html2pdf.js` — captures the on-screen ProposalView DOM so the homeowner PDF is pixel-identical to what the builder sees (gradients, banners, totals).
+- **SEND TO CLIENT modal** in ProposalView: pre-fills `to_email`/`to_name` from `project.client_email`/`client_name`, default subject + message templates per project + company, optional CC, "Include Accept & Sign Online button" checkbox (default ON), "Download PDF only" escape hatch.
+- **Customer accept link** — when SEND fires with `include_accept_link=true`, backend generates a one-time UUID token, persists it on the portal (`customer_accept_token` + `customer_accept_sent_to` + `customer_accept_sent_at`), and embeds `https://{origin}/customer-proposal/{access_code}/{token}` in the email body.
+- **Public customer page** `/customer-proposal/:accessCode/:token` (CustomerProposalPage.js) — public read-only proposal rendered in the same Checklist-style layout, with a signature box at the bottom. Token validates server-side; bad tokens → graceful "Link unavailable" page. Once signed, portal record gets `customer_accepted=true`, `customer_accepted_signature`, `customer_accepted_at`.
+- **Backend endpoints** (all in `server.py`):
+  - `POST /api/builder/{code}/proposal/test-email`
+  - `POST /api/builder/{code}/proposal/send-email`  ← uses `Request` to derive accept URL from `Origin` header (works in preview, staging, prod without code changes)
+  - `GET /api/builder/{code}/proposal/email-log` — audit history of sent proposals per portal
+  - `GET /api/customer-proposal/{code}/{token}` — public read-only proposal payload
+  - `POST /api/customer-proposal/{code}/{token}/accept` — homeowner signature capture
+- **Tests**: `/app/backend/tests/test_proposal_email_white_label.py` (9/9 passing pytest cases).
+- **Verified end-to-end** (iteration_53 + iteration_54 testing reports): provider switching, encryption, test-email, send-modal pre-fill, PDF download, send failure handling, bad-token rejection, valid-token customer accept, regression on existing flows. 100% pass.
+
 ### Proposal/Quote — Checklist-style DnD + Inline Rename (Feb 2026) — NEW
 **ProposalView refactored to LOOK and OPERATE just like the admin Checklist + Snippet Library is now CLICKABLE.**
 - **Snippet cards are now interactive**: click any snippet → small destination-picker modal (Trade + Room dropdowns, or "+ NEW TRADE…/+ NEW ROOM…" inline inputs) → ✓ ADD LINE creates a new extra under the chosen parent with the snippet's default qty/unit/cost/markup. Cards hover-lift + gold border. Green flash + "✓ ADDED" confirmation for ~700ms after add.
