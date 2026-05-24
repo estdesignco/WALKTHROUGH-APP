@@ -670,6 +670,7 @@ export default function ToDoList({ projectId, roomId = null }) {
                     <div className="mt-2 p-3 rounded-lg bg-black/40 border border-[#B49B7E]/30">
                       <ItemPicker
                         items={ffeItems}
+                        autoFocusSearch={false}
                         onSelect={(ffeItem) => { linkTodoToFfe(item.id, ffeItem); setLinkingItemId(null); }}
                         onCancel={() => { setLinkingItemId(null); setFfeSearchQuery(''); }}
                         testIdPrefix={`todo-link-${item.id}`}

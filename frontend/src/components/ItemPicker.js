@@ -87,6 +87,15 @@ export default function ItemPicker({
 
   return (
     <div className="space-y-3" data-testid={`${testIdPrefix}-root`}>
+      {/* When the project has zero indexed items, skip the toggle/room/search
+          row entirely — showing dead controls above an empty-state is confusing.
+          Just surface the empty-state directly. */}
+      {items.length === 0 ? (
+        <div className="px-4 py-6 text-yellow-400 text-sm text-center bg-yellow-900/15 border border-yellow-600/30 rounded-lg" data-testid={`${testIdPrefix}-empty`}>
+          ⚠ No items in this project's Checklist or FF&amp;E yet. Add items there first, then come back to tag them.
+        </div>
+      ) : (
+        <>
       {/* Doc-type segmented toggle */}
       <div className="flex gap-1 p-1 rounded-lg bg-black/40 border border-[#B49B7E]/30 w-fit" data-testid={`${testIdPrefix}-doc-toggle`}>
         {SOURCE_OPTIONS.map(opt => {
@@ -145,11 +154,7 @@ export default function ItemPicker({
 
       {/* Results */}
       <div className="bg-black/30 border border-[#B49B7E]/20 rounded-lg max-h-72 overflow-y-auto" data-testid={`${testIdPrefix}-results`}>
-        {items.length === 0 ? (
-          <div className="px-4 py-6 text-yellow-400 text-sm text-center">
-            ⚠ No project items loaded yet. Add items to Checklist or FF&amp;E first.
-          </div>
-        ) : filtered.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="px-4 py-6 text-gray-400 text-sm text-center">
             {roomName
               ? `No ${sourceType === 'all' ? '' : sourceType + ' '}items in ${roomName}${search ? ` matching "${search}"` : ''}.`
@@ -192,6 +197,8 @@ export default function ItemPicker({
             Cancel
           </button>
         </div>
+      )}
+        </>
       )}
     </div>
   );
