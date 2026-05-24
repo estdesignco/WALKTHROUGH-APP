@@ -26,6 +26,7 @@ import EmailPreview from './components/EmailPreview';
 import BuilderPortal from './components/BuilderPortal';
 import TradePortal from './components/TradePortal';
 import CustomerProposalPage from './components/CustomerProposalPage';
+import PickerPreview from './components/PickerPreview';
 import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
 import FurnitureSearchPage from './components/FurnitureSearchPage';
 import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
@@ -159,7 +160,8 @@ const App = () => {
       (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
     const isOnMobilePage = window.location.pathname.startsWith('/mobile-app');
     const isCustomerPage = window.location.pathname.startsWith('/customer');
-    if (isMobile && !isOnMobilePage && !isCustomerPage) {
+    const isPreviewPage = window.location.pathname.startsWith('/picker-preview');
+    if (isMobile && !isOnMobilePage && !isCustomerPage && !isPreviewPage) {
       window.location.href = '/mobile-app';
     }
   }, [authenticated]);
@@ -282,6 +284,10 @@ const App = () => {
           <Route
             path="/customer-proposal/:accessCode/:token"
             element={<CustomerProposalPage />}
+          />
+          <Route
+            path="/picker-preview"
+            element={<PickerPreview />}
           />
           
           {/* Protected Routes - Require Login */}
