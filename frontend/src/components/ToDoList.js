@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ItemPicker from './ItemPicker';
 
 const API_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
@@ -426,84 +427,40 @@ export default function ToDoList({ projectId, roomId = null }) {
               className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none resize-none"
             />
             
-            {/* FFE Linking Section */}
+            {/* FFE/Checklist Linking — narrow-by-room, doc-toggle picker */}
             <div className="relative">
               <label className="text-xs text-[#D4A574] font-medium mb-1 block">
                 🔗 Link to FFE/Checklist Item (Optional)
               </label>
               {selectedFfeItem ? (
-                <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/50">
+                <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-[#D4A574]/10 border border-[#D4A574]/50" data-testid="selected-ffe-pill">
                   <span className={`text-xs font-bold px-2 py-0.5 rounded ${selectedFfeItem.sourceType === 'CHECKLIST' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
-                    {selectedFfeItem.sourceType}
+                    {selectedFfeItem.sourceType === 'CHECKLIST' ? 'CHECKLIST' : 'FF&E'}
                   </span>
                   <div className="flex-1">
                     <div className="text-white font-medium text-sm">{selectedFfeItem.name}</div>
                     <div className="text-gray-400 text-xs">
-                      {selectedFfeItem.roomName} • {selectedFfeItem.vendor} • SKU: {selectedFfeItem.sku}
+                      {selectedFfeItem.roomName}
+                      {selectedFfeItem.categoryName && ` • ${selectedFfeItem.categoryName}`}
+                      {selectedFfeItem.vendor && ` • ${selectedFfeItem.vendor}`}
+                      {selectedFfeItem.sku && ` • SKU: ${selectedFfeItem.sku}`}
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      setSelectedFfeItem(null);
-                      setFfeSearchQuery('');
-                    }}
+                    onClick={() => { setSelectedFfeItem(null); setFfeSearchQuery(''); }}
+                    data-testid="clear-selected-ffe"
                     className="text-red-400 hover:text-red-300 text-lg"
                   >
                     ✕
                   </button>
                 </div>
-              ) : ffeItems.length === 0 ? (
-                <div className="px-4 py-3 rounded-lg bg-yellow-900/20 border border-yellow-600/30 text-yellow-400 text-sm">
-                  ⚠️ No FFE items available. Add items to FFE spreadsheet or Checklist first.
-                </div>
               ) : (
-                <>
-                  <input
-                    type="text"
-                    value={ffeSearchQuery}
-                    onChange={(e) => {
-                      setFfeSearchQuery(e.target.value);
-                      setShowFfeDropdown(true);
-                    }}
-                    onFocus={() => setShowFfeDropdown(true)}
-                    placeholder={`Search ${ffeItems.length} items by name, SKU, vendor...`}
-                    data-testid="ffe-search-input"
-                    className="w-full px-4 py-3 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
-                  />
-                  {showFfeDropdown && (
-                    <div className="absolute z-10 w-full mt-1 bg-gray-900 border border-[#B49B7E]/30 rounded-lg max-h-60 overflow-y-auto shadow-xl">
-                      {filteredFfeItems.length > 0 ? (
-                        filteredFfeItems.map(item => (
-                          <button
-                            key={item.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedFfeItem(item);
-                              setShowFfeDropdown(false);
-                              setFfeSearchQuery('');
-                            }}
-                            className="w-full px-4 py-3 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className={`text-xs font-bold px-2 py-0.5 rounded ${item.sourceType === 'CHECKLIST' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
-                                {item.sourceType}
-                              </span>
-                              <span className="text-white font-medium text-sm">{item.name}</span>
-                            </div>
-                            <div className="text-gray-400 text-xs mt-1">
-                              {item.roomName} • {item.vendor || 'No vendor'} • SKU: {item.sku || 'N/A'}
-                            </div>
-                          </button>
-                        ))
-                      ) : (
-                        <div className="px-4 py-3 text-gray-400 text-sm">
-                          {ffeSearchQuery ? 'No matching items found' : 'Type to search Checklist & FFE items...'}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
+                <ItemPicker
+                  items={ffeItems}
+                  onSelect={(item) => { setSelectedFfeItem(item); setFfeSearchQuery(''); }}
+                  testIdPrefix="todo-add"
+                />
               )}
             </div>
 
@@ -710,49 +667,13 @@ export default function ToDoList({ projectId, roomId = null }) {
                       </button>
                     </div>
                   ) : linkingItemId === item.id ? (
-                    <div className="mt-2 relative">
-                      <input
-                        type="text"
-                        value={ffeSearchQuery}
-                        onChange={(e) => {
-                          setFfeSearchQuery(e.target.value);
-                          setShowFfeDropdown(true);
-                        }}
-                        onFocus={() => setShowFfeDropdown(true)}
-                        placeholder="Search FFE items..."
-                        className="w-full px-3 py-2 rounded-lg bg-black/50 border border-[#B49B7E]/30 text-white text-sm placeholder-gray-500 focus:border-[#D4A574] focus:outline-none"
-                        autoFocus
+                    <div className="mt-2 p-3 rounded-lg bg-black/40 border border-[#B49B7E]/30">
+                      <ItemPicker
+                        items={ffeItems}
+                        onSelect={(ffeItem) => { linkTodoToFfe(item.id, ffeItem); setLinkingItemId(null); }}
+                        onCancel={() => { setLinkingItemId(null); setFfeSearchQuery(''); }}
+                        testIdPrefix={`todo-link-${item.id}`}
                       />
-                      {showFfeDropdown && filteredFfeItems.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 bg-gray-900 border border-[#B49B7E]/30 rounded-lg max-h-40 overflow-y-auto shadow-xl">
-                          {filteredFfeItems.map(ffeItem => (
-                            <button
-                              key={ffeItem.id}
-                              onClick={() => linkTodoToFfe(item.id, ffeItem)}
-                              className="w-full px-3 py-2 text-left hover:bg-[#D4A574]/20 border-b border-[#B49B7E]/10 last:border-b-0"
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className={`text-xs font-bold px-2 py-0.5 rounded ${ffeItem.sourceType === 'CHECKLIST' ? 'bg-blue-600 text-white' : 'bg-green-600 text-white'}`}>
-                                  {ffeItem.sourceType}
-                                </span>
-                                <span className="text-white text-sm">{ffeItem.name}</span>
-                              </div>
-                              <div className="text-gray-400 text-xs mt-1">
-                                {ffeItem.roomName} • {ffeItem.vendor || 'No vendor'}
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      <button
-                        onClick={() => {
-                          setLinkingItemId(null);
-                          setFfeSearchQuery('');
-                        }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-400"
-                      >
-                        ✕
-                      </button>
                     </div>
                   ) : (
                     <button

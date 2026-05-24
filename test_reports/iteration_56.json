@@ -1,0 +1,37 @@
+{
+  "summary": "Frontend-only test of the new ItemPicker UX in ToDoList (Add form + Link-existing flow). Picker structure, doc-toggle, room dropdown, search, results container, cancel, and selected-item pill code paths verified. All required data-testids are present in the DOM. CRITICAL BLOCKER: the test project (4d4a56dc... Wheeler Ridge Residence) returns zero rooms/items for sheet_type=ffe AND sheet_type=checklist — its 4 real items live under sheet_type=walkthrough. Therefore the end-to-end happy path (pick room → search → select → linked_ffe_item persisted) could NOT be verified against real data. The picker UX renders, but for this project it always shows the empty-state '⚠ No project items loaded yet'.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/projects/4d4a56dc-2f79-4269-93a9-bea4d3e85109?sheet_type=ffe", "issue": "Returns 200 with rooms:[] — preview project has NO ffe data. Same for sheet_type=checklist. Real items exist only under sheet_type=walkthrough (Master Bathroom > Tile & Stone > Shower Tile: 4 items). Picker therefore has nothing to show."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "ItemPicker in Add form + Link-existing on Wheeler Ridge project", "issue": "Picker correctly fires GET ?sheet_type=ffe and ?sheet_type=checklist (both 200) but they return empty rooms. Console logs: '📦 ToDoList: Loaded 0 unique items (FFE priority)'. End-result: doc-toggle badges all show count 0, room dropdown shows only 'All rooms (0)', no result rows render, and the user's 4 real items (in walkthrough sheet) are invisible to the picker.", "affected_selectors": ["todo-add-results", "todo-add-room-select", "todo-add-doc-all", "todo-add-doc-checklist", "todo-add-doc-ffe"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [],
+  "action_items": [
+    "DATA/INTEGRATION FIX (high priority): Decide product behavior — should the To-Do picker also include sheet_type=walkthrough items? If yes, extend ToDoList.loadAllItems() (lines ~47-75) to also fetch '?sheet_type=walkthrough' and merge. The user explicitly said 'actual data in documents' and right now Wheeler Ridge has all its real data in walkthrough, none in FF&E/Checklist — so the picker looks broken even though the UX code is correct.",
+    "Alternatively: seed real FF&E + Checklist rooms/items into the Wheeler Ridge preview DB so the user (and future tests) can verify the room-filter/doc-toggle/search interaction against actual data.",
+    "After data fix, re-test the full happy path: room dropdown shows 'Master Bathroom'/'Kitchen', counts populate, selecting an item shows the green selected-ffe-pill and ✕ clears it, and link-existing PUT persists linked_ffe_item across reload."
+  ],
+  "critical_code_review_comments": [
+    "ItemPicker.js (199 lines) is clean, focused, well-commented. Good separation of concerns; counts and filtered lists use useMemo correctly.",
+    "ToDoList.loadAllItems() only fetches sheet_type=ffe and sheet_type=checklist — for the preview project this is the root cause of the empty picker. Consider also fetching walkthrough OR add a single unified items endpoint.",
+    "Minor: when items=[] (zero loaded), the picker still shows the room dropdown ('All rooms (0)') and doc-toggle with zero counts. The empty-state inside results is good ('⚠ No project items loaded yet') but the toggle/dropdown above it is dead UI — consider hiding them when items.length===0 so users aren't confused into thinking the project just has no matches in this room/doc.",
+    "Auto-focus on the search input fires every time the picker mounts (autoFocus prop). When the inline link-existing picker opens, it scrolls the page; non-blocking but slightly disorienting. Consider only auto-focusing in the modal-style add-form, not the inline list-row variant.",
+    "Selected-item pill uses data-testid='selected-ffe-pill' only in the Add form. The link-existing flow does NOT show a pill (it just links and closes) — that's by design but worth documenting; the request statement mentioned the pill for the add flow only."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (not tested)", "frontend": "60% — UX shell verified, real-data filtering NOT verifiable due to missing FF&E/Checklist seed data"},
+  "test_credentials": "App password DesignReady2026!. Preview URL: https://design-preview-131.preview.emergentagent.com. Project: 4d4a56dc-2f79-4269-93a9-bea4d3e85109 (Wheeler Ridge Residence).",
+  "seed_data_creation": "Created and then deleted one TEST_todo_for_link_picker to-do item in order to validate the link-existing inline picker (testid prefix todo-link-<id>-*). Cleaned up afterward.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Picker UX shell is wired correctly — all data-testids present (todo-add-root, todo-add-doc-{toggle,all,checklist,ffe}, todo-add-room-select, todo-add-search, todo-add-results, selected-ffe-pill, clear-selected-ffe; and todo-link-<todoId>-* equivalents on the inline link-existing flow). What was NOT verifiable: room dropdown populated with project rooms, doc-toggle counts non-zero, search narrowing, item selection persisting linked_ffe_item — because the test project returns rooms:[] for both sheet_type=ffe and sheet_type=checklist. After the data/integration fix, re-run the happy path described in the original request.",
+  "rca of the issue": "ROOT CAUSE: Mismatch between requestor's stated test data ('Wheeler Ridge has 2 rooms Master Bathroom/Kitchen with ~4 items in Checklist/FFE') and the actual DB state. curl GET /api/projects/4d4a56dc-2f79-4269-93a9-bea4d3e85109?sheet_type=ffe -> rooms:[]; ?sheet_type=checklist -> rooms:[]; ?sheet_type=walkthrough -> rooms:[Master Bathroom(4 items), Kitchen(0)]. The picker code is correct; data placement is the issue. REPRODUCTION: open /project/4d4a56dc-2f79-4269-93a9-bea4d3e85109?tab=To+Do, click + Add Item, observe console 'Loaded 0 unique items', all toggle badges show 0, room dropdown is empty. MITIGATION (pick one): (a) modify ToDoList.loadAllItems to also pull sheet_type=walkthrough; (b) re-seed Wheeler Ridge to have real Checklist/FFE rooms+items; (c) backend adds a single ?include_all=true mode that merges all sheet types."
+}
