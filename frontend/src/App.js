@@ -298,6 +298,10 @@ const App = () => {
                 <SimpleLogin onLogin={() => setAuthenticated(true)} />
               ) : (
                 <Routes>
+                  <Route
+                    path="/picker-preview"
+                    element={<PickerPreview />}
+                  />
                   <Route 
                     path="/mobile-app" 
                     element={<MobileAppSimulator />}
