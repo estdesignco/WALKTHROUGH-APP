@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks, Query, Request
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks, Query, Request, Depends
 from fastapi.responses import Response, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -20558,6 +20558,481 @@ async def trade_accept_proposal(trade_access_code: str, payload: ProposalAccept)
 # Trade overrides/extras/company piggy-back on the same `/builder/{code}/...` endpoints
 # above (which use _get_portal_by_access to handle BOTH portal kinds).
 
+
+
+# =============================================================================
+# AGENT API — ChatGPT / MCP / external automation integration surface
+# =============================================================================
+# Stable, versioned endpoints under /api/agent/v1/* designed for autonomous
+# agents (ChatGPT Custom GPT Actions, MCP clients, Zapier, n8n, etc.).
+#
+# Authentication: per-request API key in `X-API-Key` header. Keys are minted
+# by an authenticated app user and stored hashed (SHA-256) in the
+# `api_keys` collection. Each key is optionally scoped to a single project.
+#
+# The agent doesn't need to know about the internal room → category →
+# subcategory hierarchy: it can pass `room_name`, `category_name`,
+# `subcategory_name`, `sheet_type` and the server will find-or-create the
+# matching scaffolding on the fly.
+
+import hashlib
+import secrets as _secrets
+from fastapi import Header
+
+AGENT_KEY_PREFIX = "edk_"  # established design key
+
+class AgentApiKeyCreate(BaseModel):
+    name: str
+    project_id: Optional[str] = None  # None = workspace-wide
+    expires_at: Optional[str] = None  # ISO datetime; None = never
+
+
+class AgentApiKey(BaseModel):
+    id: str
+    name: str
+    prefix: str
+    project_id: Optional[str] = None
+    created_at: str
+    last_used_at: Optional[str] = None
+    expires_at: Optional[str] = None
+    revoked: bool = False
+
+
+class AgentItemCreate(BaseModel):
+    """Agent-friendly item creation payload.
+
+    The agent doesn't need to know UUIDs — it passes human-readable names.
+    The server resolves (or creates) the room → category → subcategory
+    scaffolding for `sheet_type` (checklist | ffe | walkthrough).
+    """
+    project_id: str
+    room_name: str
+    category_name: str = "Furniture"
+    subcategory_name: str = "Items"
+    sheet_type: str = "checklist"  # checklist | ffe | walkthrough
+
+    # The actual product row
+    name: str
+    vendor: Optional[str] = None
+    sku: Optional[str] = None
+    link: Optional[str] = None             # vendor / product URL
+    image_url: Optional[str] = None        # http(s) URL OR data:image/... base64 URL
+    cost: Optional[float] = None
+    price: Optional[float] = None
+    quantity: Optional[int] = 1
+    size: Optional[str] = None
+    finish_color: Optional[str] = None
+    fabric_code: Optional[str] = None
+    colorway: Optional[str] = None
+    status: Optional[str] = None           # one of ItemStatus enum values
+    remarks: Optional[str] = None
+    notes: Optional[str] = None
+    placement: Optional[str] = None
+    priority: Optional[str] = None
+    # Idempotency — if provided, the server will NOT create a duplicate row
+    # for the same key under the same subcategory.
+    external_id: Optional[str] = None
+
+
+class AgentItemUpdate(BaseModel):
+    """Patch body for /agent/v1/items/{item_id}."""
+    name: Optional[str] = None
+    vendor: Optional[str] = None
+    sku: Optional[str] = None
+    link: Optional[str] = None
+    image_url: Optional[str] = None
+    cost: Optional[float] = None
+    price: Optional[float] = None
+    quantity: Optional[int] = None
+    size: Optional[str] = None
+    finish_color: Optional[str] = None
+    fabric_code: Optional[str] = None
+    colorway: Optional[str] = None
+    status: Optional[str] = None
+    remarks: Optional[str] = None
+    notes: Optional[str] = None
+    placement: Optional[str] = None
+    priority: Optional[str] = None
+
+
+class AgentImageAttach(BaseModel):
+    """Attach an image to an existing item. Either url or base64 must be set."""
+    url: Optional[str] = None            # remote http(s) URL — server fetches
+    base64: Optional[str] = None         # data URL or raw base64
+    mime_type: Optional[str] = "image/png"
+    image_type: Optional[str] = "main"   # 'main' | 'finish'
+
+
+def _hash_key(raw: str) -> str:
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _mint_key() -> str:
+    """Generate a fresh API key. Prefix lets users recognize it; suffix is 32B of entropy."""
+    return AGENT_KEY_PREFIX + _secrets.token_urlsafe(32)
+
+
+async def _verify_api_key(x_api_key: Optional[str] = Header(default=None, alias="X-API-Key")) -> dict:
+    """FastAPI dependency. Returns the key record. Raises 401 / 403 on failure."""
+    if not x_api_key:
+        raise HTTPException(status_code=401, detail="Missing X-API-Key header")
+    h = _hash_key(x_api_key.strip())
+    record = await db.api_keys.find_one({"key_hash": h}, {"_id": 0})
+    if not record:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    if record.get("revoked"):
+        raise HTTPException(status_code=403, detail="API key has been revoked")
+    exp = record.get("expires_at")
+    if exp and datetime.now(timezone.utc).isoformat() > exp:
+        raise HTTPException(status_code=403, detail="API key has expired")
+    # Touch last_used_at without blocking the request.
+    async def _touch():
+        await db.api_keys.update_one(
+            {"id": record["id"]},
+            {"$set": {"last_used_at": datetime.now(timezone.utc).isoformat()}},
+        )
+    asyncio.create_task(_touch())
+    return record
+
+
+def _key_scoped_to(record: dict, project_id: str) -> bool:
+    """True if the key is workspace-wide OR scoped exactly to project_id."""
+    scope = record.get("project_id")
+    return (not scope) or (scope == project_id)
+
+
+# ---------- Admin: mint / list / revoke API keys ----------
+# These are not agent-callable; they live under /api/agent/admin/* and are
+# protected by the app's normal authentication (i.e., the user has to be
+# logged into the app to create or revoke keys).
+
+@api_router.post("/agent/admin/api-keys")
+async def admin_create_api_key(payload: AgentApiKeyCreate):
+    raw = _mint_key()
+    record = {
+        "id": str(uuid.uuid4()),
+        "name": payload.name,
+        "key_hash": _hash_key(raw),
+        "prefix": raw[:12],  # first 12 chars shown in UI for recognition
+        "project_id": payload.project_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_used_at": None,
+        "expires_at": payload.expires_at,
+        "revoked": False,
+    }
+    await db.api_keys.insert_one(record)
+    # Return the RAW key ONCE — the user must save it now; we only store the hash.
+    return {
+        "id": record["id"],
+        "name": record["name"],
+        "prefix": record["prefix"],
+        "project_id": record["project_id"],
+        "created_at": record["created_at"],
+        "api_key": raw,
+        "warning": "Save this key now — it will not be shown again.",
+    }
+
+
+@api_router.get("/agent/admin/api-keys")
+async def admin_list_api_keys():
+    keys = await db.api_keys.find({}, {"_id": 0, "key_hash": 0}).sort("created_at", -1).to_list(200)
+    return {"keys": keys}
+
+
+@api_router.delete("/agent/admin/api-keys/{key_id}")
+async def admin_revoke_api_key(key_id: str):
+    res = await db.api_keys.update_one({"id": key_id}, {"$set": {"revoked": True}})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Key not found")
+    return {"status": "revoked"}
+
+
+# ---------- Agent-facing endpoints ----------
+
+async def _find_or_create_scaffolding(
+    project_id: str,
+    room_name: str,
+    category_name: str,
+    subcategory_name: str,
+    sheet_type: str,
+) -> dict:
+    """Return {room, category, subcategory} dicts. Creates any missing pieces."""
+    project = await db.projects.find_one({"id": project_id}, {"_id": 0, "id": 1})
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project '{project_id}' not found")
+
+    norm = lambda s: (s or "").strip()
+    sheet_type = (sheet_type or "checklist").lower()
+    if sheet_type not in ("checklist", "ffe", "walkthrough"):
+        raise HTTPException(status_code=400, detail=f"sheet_type must be checklist | ffe | walkthrough (got '{sheet_type}')")
+
+    now = datetime.now(timezone.utc).isoformat()
+    # ROOM
+    room = await db.rooms.find_one(
+        {"project_id": project_id, "name": {"$regex": f"^{norm(room_name)}$", "$options": "i"}, "sheet_type": sheet_type},
+        {"_id": 0},
+    )
+    if not room:
+        room = {
+            "id": str(uuid.uuid4()),
+            "project_id": project_id,
+            "name": norm(room_name),
+            "color": "#8B4444",
+            "sheet_type": sheet_type,
+            "order_index": 0,
+            "created_at": now,
+            "updated_at": now,
+        }
+        await db.rooms.insert_one(room.copy())
+    # CATEGORY
+    category = await db.categories.find_one(
+        {"room_id": room["id"], "name": {"$regex": f"^{norm(category_name)}$", "$options": "i"}, "sheet_type": sheet_type},
+        {"_id": 0},
+    )
+    if not category:
+        category = {
+            "id": str(uuid.uuid4()),
+            "room_id": room["id"],
+            "name": norm(category_name),
+            "sheet_type": sheet_type,
+            "order_index": 0,
+            "created_at": now,
+            "updated_at": now,
+        }
+        await db.categories.insert_one(category.copy())
+    # SUBCATEGORY
+    subcategory = await db.subcategories.find_one(
+        {"category_id": category["id"], "name": {"$regex": f"^{norm(subcategory_name)}$", "$options": "i"}},
+        {"_id": 0},
+    )
+    if not subcategory:
+        subcategory = {
+            "id": str(uuid.uuid4()),
+            "category_id": category["id"],
+            "name": norm(subcategory_name),
+            "order_index": 0,
+            "created_at": now,
+            "updated_at": now,
+        }
+        await db.subcategories.insert_one(subcategory.copy())
+    return {"room": room, "category": category, "subcategory": subcategory}
+
+
+async def _resolve_image(url: Optional[str], base64_data: Optional[str], mime: str = "image/png") -> str:
+    """Normalize an image input to a stored value. Remote URLs are kept as-is
+    (the app already handles remote URLs in <img src>); base64 is wrapped as
+    a data URL. Empty input returns "".
+    """
+    if base64_data:
+        s = base64_data.strip()
+        if s.startswith("data:"):
+            return s
+        return f"data:{mime or 'image/png'};base64,{s}"
+    return (url or "").strip()
+
+
+@api_router.post("/agent/v1/items")
+async def agent_create_item(payload: AgentItemCreate, key=Depends(_verify_api_key)):
+    """Create a checklist/FFE/walkthrough row.
+
+    If the room/category/subcategory don't exist yet they are created.
+    Pass `external_id` to make the call idempotent — re-posting the same
+    external_id under the same subcategory returns the existing row.
+    """
+    if not _key_scoped_to(key, payload.project_id):
+        raise HTTPException(status_code=403, detail="API key is not scoped to this project")
+    scaffold = await _find_or_create_scaffolding(
+        payload.project_id, payload.room_name, payload.category_name,
+        payload.subcategory_name, payload.sheet_type,
+    )
+    sub_id = scaffold["subcategory"]["id"]
+
+    # Idempotency check
+    if payload.external_id:
+        existing = await db.items.find_one(
+            {"subcategory_id": sub_id, "external_id": payload.external_id},
+            {"_id": 0},
+        )
+        if existing:
+            return {"status": "exists", "item": existing, "scaffolding": scaffold}
+
+    image_url = await _resolve_image(payload.image_url, None)
+
+    # Build item using the existing Item model so we inherit defaults / validation.
+    base = {
+        "subcategory_id": sub_id,
+        "name": payload.name,
+        "quantity": payload.quantity or 1,
+        "size": payload.size or "",
+        "remarks": payload.remarks or "",
+        "vendor": payload.vendor or "",
+        "sku": payload.sku or "",
+        "link": payload.link or "",
+        "image_url": image_url,
+        "cost": payload.cost,
+        "price": payload.price or 0.0,
+        "finish_color": payload.finish_color or "",
+        "fabric_code": payload.fabric_code or "",
+        "colorway": payload.colorway or "",
+        "placement": payload.placement or "",
+        "notes": payload.notes or "",
+        "priority": payload.priority or "Medium",
+    }
+    if payload.status:
+        # Validate against the enum so agents can't write garbage.
+        try:
+            base["status"] = ItemStatus(payload.status)
+        except ValueError:
+            valid = [s.value for s in ItemStatus]
+            raise HTTPException(status_code=400, detail=f"status must be one of: {valid}")
+    item_obj = Item(**base)
+    doc = item_obj.dict()
+    if payload.external_id:
+        doc["external_id"] = payload.external_id
+    doc["created_by_api_key"] = key.get("id")
+    await db.items.insert_one(doc.copy())
+    # Strip Mongo internals if any
+    doc.pop("_id", None)
+    return {"status": "created", "item": doc, "scaffolding": {
+        "room_id": scaffold["room"]["id"],
+        "category_id": scaffold["category"]["id"],
+        "subcategory_id": sub_id,
+    }}
+
+
+@api_router.patch("/agent/v1/items/{item_id}")
+async def agent_update_item(item_id: str, payload: AgentItemUpdate, key=Depends(_verify_api_key)):
+    item = await db.items.find_one({"id": item_id}, {"_id": 0})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    # Scope check via project lookup
+    if key.get("project_id"):
+        sub = await db.subcategories.find_one({"id": item["subcategory_id"]}, {"_id": 0, "category_id": 1})
+        cat = await db.categories.find_one({"id": sub["category_id"]}, {"_id": 0, "room_id": 1}) if sub else None
+        room = await db.rooms.find_one({"id": cat["room_id"]}, {"_id": 0, "project_id": 1}) if cat else None
+        if not room or room["project_id"] != key["project_id"]:
+            raise HTTPException(status_code=403, detail="API key is not scoped to this project")
+
+    update: Dict[str, Any] = {k: v for k, v in payload.dict(exclude_unset=True).items() if v is not None}
+    if "image_url" in update:
+        update["image_url"] = await _resolve_image(update["image_url"], None)
+    if "status" in update:
+        try:
+            update["status"] = ItemStatus(update["status"]).value
+        except ValueError:
+            valid = [s.value for s in ItemStatus]
+            raise HTTPException(status_code=400, detail=f"status must be one of: {valid}")
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.items.update_one({"id": item_id}, {"$set": update})
+    updated = await db.items.find_one({"id": item_id}, {"_id": 0})
+    return {"status": "updated", "item": updated}
+
+
+@api_router.post("/agent/v1/items/{item_id}/image")
+async def agent_attach_image(item_id: str, payload: AgentImageAttach, key=Depends(_verify_api_key)):
+    item = await db.items.find_one({"id": item_id}, {"_id": 0, "subcategory_id": 1})
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    val = await _resolve_image(payload.url, payload.base64, payload.mime_type or "image/png")
+    if not val:
+        raise HTTPException(status_code=400, detail="Either `url` or `base64` is required")
+    field = "finish_image" if (payload.image_type or "main") == "finish" else "image_url"
+    await db.items.update_one(
+        {"id": item_id},
+        {"$set": {field: val, "updated_at": datetime.now(timezone.utc).isoformat()}},
+    )
+    return {"status": "attached", "field": field}
+
+
+@api_router.get("/agent/v1/items")
+async def agent_search_items(
+    project_id: str,
+    sheet_type: Optional[str] = None,
+    room: Optional[str] = None,
+    q: Optional[str] = None,
+    limit: int = 100,
+    key=Depends(_verify_api_key),
+):
+    """Flat search across a project's items. Useful for an agent to check
+    whether an item already exists before creating."""
+    if not _key_scoped_to(key, project_id):
+        raise HTTPException(status_code=403, detail="API key is not scoped to this project")
+    room_filter = {"project_id": project_id}
+    if sheet_type:
+        room_filter["sheet_type"] = sheet_type.lower()
+    if room:
+        room_filter["name"] = {"$regex": f"^{room}$", "$options": "i"}
+    rooms = await db.rooms.find(room_filter, {"_id": 0, "id": 1, "name": 1, "sheet_type": 1}).to_list(500)
+    rid_to_room = {r["id"]: r for r in rooms}
+    if not rooms:
+        return {"items": [], "total": 0}
+    cats = await db.categories.find(
+        {"room_id": {"$in": list(rid_to_room.keys())}},
+        {"_id": 0, "id": 1, "room_id": 1, "name": 1},
+    ).to_list(2000)
+    cid_to_cat = {c["id"]: c for c in cats}
+    subs = await db.subcategories.find(
+        {"category_id": {"$in": list(cid_to_cat.keys())}},
+        {"_id": 0, "id": 1, "category_id": 1, "name": 1},
+    ).to_list(5000)
+    sid_to_sub = {s["id"]: s for s in subs}
+    item_filter: Dict[str, Any] = {"subcategory_id": {"$in": list(sid_to_sub.keys())}}
+    if q:
+        item_filter["$or"] = [
+            {"name": {"$regex": q, "$options": "i"}},
+            {"sku": {"$regex": q, "$options": "i"}},
+            {"vendor": {"$regex": q, "$options": "i"}},
+        ]
+    items = await db.items.find(item_filter, {"_id": 0}).limit(max(1, min(limit, 500))).to_list(limit)
+    results = []
+    for it in items:
+        sub = sid_to_sub.get(it.get("subcategory_id"), {})
+        cat = cid_to_cat.get(sub.get("category_id"), {})
+        room = rid_to_room.get(cat.get("room_id"), {})
+        results.append({
+            **it,
+            "room_name": room.get("name"),
+            "category_name": cat.get("name"),
+            "subcategory_name": sub.get("name"),
+            "sheet_type": room.get("sheet_type"),
+        })
+    return {"items": results, "total": len(results)}
+
+
+@api_router.get("/agent/v1/projects/{project_id}")
+async def agent_get_project_summary(project_id: str, key=Depends(_verify_api_key)):
+    """Return enough metadata for an agent to know what's in the project
+    (rooms by sheet_type, item counts)."""
+    if not _key_scoped_to(key, project_id):
+        raise HTTPException(status_code=403, detail="API key is not scoped to this project")
+    project = await db.projects.find_one({"id": project_id}, {"_id": 0, "id": 1, "name": 1, "client_info": 1})
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    rooms = await db.rooms.find({"project_id": project_id}, {"_id": 0}).to_list(500)
+    cats = await db.categories.find({"room_id": {"$in": [r["id"] for r in rooms]}}, {"_id": 0}).to_list(2000) if rooms else []
+    subs = await db.subcategories.find({"category_id": {"$in": [c["id"] for c in cats]}}, {"_id": 0}).to_list(5000) if cats else []
+    item_count = await db.items.count_documents({"subcategory_id": {"$in": [s["id"] for s in subs]}}) if subs else 0
+    return {
+        "project": project,
+        "rooms": [{"id": r["id"], "name": r["name"], "sheet_type": r.get("sheet_type", "checklist")} for r in rooms],
+        "categories": len(cats),
+        "subcategories": len(subs),
+        "item_count": item_count,
+        "valid_statuses": [s.value for s in ItemStatus],
+        "valid_sheet_types": ["checklist", "ffe", "walkthrough"],
+    }
+
+
+@api_router.get("/agent/v1/ping")
+async def agent_ping(key=Depends(_verify_api_key)):
+    """Cheap auth-check endpoint for agents — returns key metadata if valid."""
+    return {
+        "ok": True,
+        "key_id": key["id"],
+        "key_name": key.get("name"),
+        "project_id": key.get("project_id"),
+        "server_time": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 # Include all routers

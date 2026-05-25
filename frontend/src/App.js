@@ -27,6 +27,7 @@ import BuilderPortal from './components/BuilderPortal';
 import TradePortal from './components/TradePortal';
 import CustomerProposalPage from './components/CustomerProposalPage';
 import PickerPreview from './components/PickerPreview';
+import AgentApiKeysPage from './components/AgentApiKeysPage';
 import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
 import FurnitureSearchPage from './components/FurnitureSearchPage';
 import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
@@ -301,6 +302,10 @@ const App = () => {
                   <Route
                     path="/picker-preview"
                     element={<PickerPreview />}
+                  />
+                  <Route
+                    path="/admin/agent-keys"
+                    element={<AgentApiKeysPage />}
                   />
                   <Route 
                     path="/mobile-app" 
