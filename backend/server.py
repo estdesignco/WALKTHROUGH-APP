@@ -20634,6 +20634,15 @@ class AgentItemCreate(BaseModel):
     external_id: Optional[str] = None
 
 
+class AgentBulkCreate(BaseModel):
+    """Bulk-create payload — used when an agent extracts many items from
+    one Canva board in a single pass. All items in a single call may target
+    the same OR different rooms / sheet_types.
+    """
+    items: List[AgentItemCreate]
+    stop_on_error: Optional[bool] = False  # if True, abort the batch on first failure
+
+
 class AgentItemUpdate(BaseModel):
     """Patch body for /agent/v1/items/{item_id}."""
     name: Optional[str] = None
@@ -20831,13 +20840,11 @@ async def _resolve_image(url: Optional[str], base64_data: Optional[str], mime: s
     return (url or "").strip()
 
 
-@api_router.post("/agent/v1/items")
-async def agent_create_item(payload: AgentItemCreate, key=Depends(_verify_api_key)):
-    """Create a checklist/FFE/walkthrough row.
+async def _agent_create_one(payload: AgentItemCreate, key: dict) -> Dict[str, Any]:
+    """Shared core for single + bulk item creation.
 
-    If the room/category/subcategory don't exist yet they are created.
-    Pass `external_id` to make the call idempotent — re-posting the same
-    external_id under the same subcategory returns the existing row.
+    Returns the same envelope as the single endpoint (`status`, `item`,
+    `scaffolding`). Idempotent on `external_id` per subcategory.
     """
     if not _key_scoped_to(key, payload.project_id):
         raise HTTPException(status_code=403, detail="API key is not scoped to this project")
@@ -20847,18 +20854,19 @@ async def agent_create_item(payload: AgentItemCreate, key=Depends(_verify_api_ke
     )
     sub_id = scaffold["subcategory"]["id"]
 
-    # Idempotency check
     if payload.external_id:
         existing = await db.items.find_one(
             {"subcategory_id": sub_id, "external_id": payload.external_id},
             {"_id": 0},
         )
         if existing:
-            return {"status": "exists", "item": existing, "scaffolding": scaffold}
+            return {"status": "exists", "item": existing, "scaffolding": {
+                "room_id": scaffold["room"]["id"],
+                "category_id": scaffold["category"]["id"],
+                "subcategory_id": sub_id,
+            }}
 
     image_url = await _resolve_image(payload.image_url, None)
-
-    # Build item using the existing Item model so we inherit defaults / validation.
     base = {
         "subcategory_id": sub_id,
         "name": payload.name,
@@ -20879,7 +20887,6 @@ async def agent_create_item(payload: AgentItemCreate, key=Depends(_verify_api_ke
         "priority": payload.priority or "Medium",
     }
     if payload.status:
-        # Validate against the enum so agents can't write garbage.
         try:
             base["status"] = ItemStatus(payload.status)
         except ValueError:
@@ -20891,13 +20898,79 @@ async def agent_create_item(payload: AgentItemCreate, key=Depends(_verify_api_ke
         doc["external_id"] = payload.external_id
     doc["created_by_api_key"] = key.get("id")
     await db.items.insert_one(doc.copy())
-    # Strip Mongo internals if any
     doc.pop("_id", None)
     return {"status": "created", "item": doc, "scaffolding": {
         "room_id": scaffold["room"]["id"],
         "category_id": scaffold["category"]["id"],
         "subcategory_id": sub_id,
     }}
+
+
+@api_router.post("/agent/v1/items")
+async def agent_create_item(payload: AgentItemCreate, key=Depends(_verify_api_key)):
+    """Create a single checklist/FFE/walkthrough row.
+
+    If the room/category/subcategory don't exist yet they are created.
+    Pass `external_id` to make the call idempotent — re-posting the same
+    external_id under the same subcategory returns the existing row.
+    """
+    return await _agent_create_one(payload, key)
+
+
+@api_router.post("/agent/v1/items/bulk")
+async def agent_create_items_bulk(payload: AgentBulkCreate, key=Depends(_verify_api_key)):
+    """Bulk-create endpoint — purpose-built for "Canva board → all items at once".
+
+    Returns one result entry per submitted item (same envelope as the single
+    endpoint, with `status` = "created" / "exists" / "error"). The batch
+    NEVER aborts midway unless `stop_on_error=true` is set explicitly, so a
+    single bad row doesn't lose the good ones.
+    """
+    if not payload.items:
+        raise HTTPException(status_code=400, detail="`items` array is required and must not be empty")
+    if len(payload.items) > 500:
+        raise HTTPException(status_code=413, detail="Max 500 items per bulk request — split larger batches into multiple calls")
+
+    results: List[Dict[str, Any]] = []
+    counts = {"created": 0, "exists": 0, "error": 0}
+    for idx, item_in in enumerate(payload.items):
+        try:
+            r = await _agent_create_one(item_in, key)
+            r["index"] = idx
+            r["external_id"] = item_in.external_id
+            results.append(r)
+            counts[r["status"]] = counts.get(r["status"], 0) + 1
+        except HTTPException as exc:
+            entry = {
+                "index": idx,
+                "external_id": item_in.external_id,
+                "status": "error",
+                "error": {"code": exc.status_code, "detail": exc.detail},
+                "input_name": item_in.name,
+            }
+            results.append(entry)
+            counts["error"] += 1
+            if payload.stop_on_error:
+                break
+        except Exception as exc:
+            entry = {
+                "index": idx,
+                "external_id": item_in.external_id,
+                "status": "error",
+                "error": {"code": 500, "detail": str(exc)},
+                "input_name": item_in.name,
+            }
+            results.append(entry)
+            counts["error"] += 1
+            if payload.stop_on_error:
+                break
+    return {
+        "total_submitted": len(payload.items),
+        "created": counts["created"],
+        "exists": counts["exists"],
+        "errors": counts["error"],
+        "results": results,
+    }
 
 
 @api_router.patch("/agent/v1/items/{item_id}")
