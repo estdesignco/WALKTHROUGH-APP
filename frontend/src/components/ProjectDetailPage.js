@@ -19,6 +19,7 @@ import DesignToolsDashboard from './DesignToolsDashboard';
 import DesignToolsHub from './DesignToolsHub';
 import AutomationDashboard from './AutomationDashboard';
 import ExportsDashboard from './ExportsDashboard';
+import AIAssistantFAB from './AIAssistantFAB';
 import CalculatorDashboard from './CalculatorDashboard';
 import BudgetTracker from './BudgetTracker';
 import PDFReportGenerator from './PDFReportGenerator';
@@ -1194,6 +1195,7 @@ export default function ProjectDetailPage() {
                     onClose={() => setShowPDFReport(false)} 
                 />
             )}
+            <AIAssistantFAB projectId={projectId} projectName={project?.name} />
         </div>
     );
 }

@@ -21108,5 +21108,303 @@ async def agent_ping(key=Depends(_verify_api_key)):
     }
 
 
+# =============================================================================
+# AI DESIGN ASSISTANT — in-app vision LLM panel
+# =============================================================================
+# Hosts the user's Canva refinement / vendor-matching agent INSIDE the Emergent
+# app. Same brain that lived in their ChatGPT GPT, now driven by Gemini 3.1
+# Pro Preview via the Emergent Universal Key (no extra signup).
+#
+# Endpoints:
+#   POST /api/ai-assist/chat                   -> chat (with optional images)
+#   GET  /api/ai-assist/conversations/{pid}    -> load thread for project
+#   DELETE /api/ai-assist/conversations/{pid}  -> reset thread
+#   GET  /api/ai-assist/prompt                 -> read editable system prompt
+#   PUT  /api/ai-assist/prompt                 -> override system prompt
+#   POST /api/ai-assist/push-items             -> bulk write detected items
+#
+# Memory: full conversation persisted in `ai_assist_messages`; per-project
+# room continuity record in `ai_assist_memory` (so the agent's "memory"
+# survives reloads).
+
+from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+from design_agent_prompt import DEFAULT_DESIGN_AGENT_PROMPT
+import json as _json
+import re as _re
+
+AI_ASSIST_DEFAULT_MODEL = ("gemini", "gemini-3.1-pro-preview")
+
+
+class AIAssistChat(BaseModel):
+    project_id: str
+    message: str = ""
+    # Each image: { "base64": "...", "mime_type": "image/png" }
+    images: Optional[List[Dict[str, str]]] = None
+    # If True, server creates a fresh conversation and discards prior history.
+    reset: Optional[bool] = False
+
+
+class AIAssistPushItems(BaseModel):
+    project_id: str
+    items: List[Dict[str, Any]]  # AgentItemCreate-shaped objects from the assistant
+    api_key_id: Optional[str] = None  # optional — agent panel bypasses API key,
+                                       # but we still log who pushed.
+
+
+class AIAssistPromptUpdate(BaseModel):
+    prompt: str
+    project_id: Optional[str] = None  # None = workspace default
+
+
+def _get_emergent_llm_key() -> str:
+    key = os.environ.get("EMERGENT_LLM_KEY") or os.environ.get("OPENAI_API_KEY")
+    if not key:
+        raise HTTPException(status_code=500, detail="EMERGENT_LLM_KEY not configured on the server")
+    return key
+
+
+async def _get_system_prompt(project_id: Optional[str]) -> str:
+    """Per-project prompt > workspace prompt > built-in default."""
+    if project_id:
+        proj = await db.ai_assist_prompts.find_one({"scope_id": project_id}, {"_id": 0, "prompt": 1})
+        if proj and proj.get("prompt"):
+            return proj["prompt"]
+    workspace = await db.ai_assist_prompts.find_one({"scope_id": "__workspace__"}, {"_id": 0, "prompt": 1})
+    if workspace and workspace.get("prompt"):
+        return workspace["prompt"]
+    return DEFAULT_DESIGN_AGENT_PROMPT
+
+
+def _extract_json(text: str) -> Dict[str, Any]:
+    """The model returns a JSON-only payload, but defend against the occasional
+    code-fence or trailing prose. Returns a parsed dict or a graceful fallback.
+    """
+    if not text:
+        return {"assistant_message": "(empty response)", "design_notes": "", "detected_items": [], "memory_updates": {}, "clarification_needed": None}
+    s = text.strip()
+    # Strip ```json fences
+    if s.startswith("```"):
+        s = _re.sub(r"^```[a-zA-Z]*\s*", "", s)
+        s = _re.sub(r"\s*```$", "", s)
+    # First JSON object in the string
+    first_brace = s.find("{")
+    last_brace = s.rfind("}")
+    if first_brace >= 0 and last_brace > first_brace:
+        s = s[first_brace:last_brace + 1]
+    try:
+        return _json.loads(s)
+    except Exception:
+        # Last-resort: return the raw text in assistant_message so the user sees something
+        return {"assistant_message": text.strip()[:2000], "design_notes": "", "detected_items": [], "memory_updates": {}, "clarification_needed": None}
+
+
+def _merge_memory(existing: Dict[str, Any], updates: Dict[str, Any]) -> Dict[str, Any]:
+    """Continuity-memory merge: lists are appended (deduped), dicts merged,
+    scalars replaced if the new value is truthy. Empty updates are no-ops.
+    """
+    if not updates:
+        return existing or {}
+    out = dict(existing or {})
+    for k, v in updates.items():
+        if v in (None, "", [], {}):
+            continue
+        existing_v = out.get(k)
+        if isinstance(v, list):
+            base = existing_v if isinstance(existing_v, list) else []
+            # Dedupe preserving order; for dict items use json equality
+            seen = []
+            merged = []
+            for it in list(base) + list(v):
+                key_repr = _json.dumps(it, sort_keys=True) if isinstance(it, (dict, list)) else str(it)
+                if key_repr in seen:
+                    continue
+                seen.append(key_repr)
+                merged.append(it)
+            out[k] = merged
+        elif isinstance(v, dict):
+            base = existing_v if isinstance(existing_v, dict) else {}
+            out[k] = {**base, **v}
+        else:
+            out[k] = v
+    return out
+
+
+@api_router.post("/ai-assist/chat")
+async def ai_assist_chat(payload: AIAssistChat):
+    # Validate the project up front so we fail fast.
+    project = await db.projects.find_one({"id": payload.project_id}, {"_id": 0, "id": 1, "name": 1})
+    if not project:
+        raise HTTPException(status_code=404, detail=f"Project '{payload.project_id}' not found")
+
+    session_id = f"design-agent::{payload.project_id}"
+    if payload.reset:
+        await db.ai_assist_messages.delete_many({"project_id": payload.project_id})
+
+    system_prompt = await _get_system_prompt(payload.project_id)
+
+    # Build context-aware system prompt by appending current memory so the
+    # agent knows what it remembered about this project.
+    memory_doc = await db.ai_assist_memory.find_one({"project_id": payload.project_id}, {"_id": 0, "memory": 1})
+    memory_blob = memory_doc.get("memory", {}) if memory_doc else {}
+    if memory_blob:
+        system_prompt += f"\n\n## CURRENT PROJECT MEMORY (read-only context)\n{_json.dumps(memory_blob, indent=2)}"
+
+    # New LlmChat instance per turn per the playbook.
+    api_key = _get_emergent_llm_key()
+    provider, model = AI_ASSIST_DEFAULT_MODEL
+    chat = LlmChat(api_key=api_key, session_id=session_id, system_message=system_prompt).with_model(provider, model)
+
+    # Build the user message. Images use ImageContent (base64).
+    file_contents = []
+    for img in (payload.images or []):
+        b64 = img.get("base64", "").strip()
+        if not b64:
+            continue
+        if b64.startswith("data:"):
+            try:
+                b64 = b64.split(",", 1)[1]
+            except Exception:
+                continue
+        file_contents.append(ImageContent(image_base64=b64))
+
+    user_text = payload.message or "(image only)"
+    user_msg = UserMessage(text=user_text, file_contents=file_contents or None)
+
+    try:
+        raw_reply = await chat.send_message(user_msg)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"AI provider error: {exc}")
+
+    parsed = _extract_json(raw_reply if isinstance(raw_reply, str) else str(raw_reply))
+
+    # Persist both messages in our DB so the panel can reload conversation.
+    now = datetime.now(timezone.utc).isoformat()
+    user_record = {
+        "id": str(uuid.uuid4()),
+        "project_id": payload.project_id,
+        "role": "user",
+        "content": payload.message or "",
+        "image_count": len(file_contents),
+        "created_at": now,
+    }
+    assistant_record = {
+        "id": str(uuid.uuid4()),
+        "project_id": payload.project_id,
+        "role": "assistant",
+        "content": parsed.get("assistant_message") or "",
+        "design_notes": parsed.get("design_notes") or "",
+        "detected_items": parsed.get("detected_items") or [],
+        "clarification_needed": parsed.get("clarification_needed"),
+        "created_at": now,
+    }
+    await db.ai_assist_messages.insert_many([user_record, assistant_record])
+
+    # Merge memory updates.
+    if parsed.get("memory_updates"):
+        merged = _merge_memory(memory_blob, parsed["memory_updates"])
+        await db.ai_assist_memory.update_one(
+            {"project_id": payload.project_id},
+            {"$set": {"memory": merged, "updated_at": now}},
+            upsert=True,
+        )
+
+    # Strip mongo internals before returning.
+    user_record.pop("_id", None)
+    assistant_record.pop("_id", None)
+    return {
+        "user_message": user_record,
+        "assistant_message": assistant_record,
+        "design_notes": parsed.get("design_notes") or "",
+        "detected_items": parsed.get("detected_items") or [],
+        "memory_updates": parsed.get("memory_updates") or {},
+        "clarification_needed": parsed.get("clarification_needed"),
+    }
+
+
+@api_router.get("/ai-assist/conversations/{project_id}")
+async def ai_assist_get_conversation(project_id: str):
+    msgs = await db.ai_assist_messages.find(
+        {"project_id": project_id}, {"_id": 0}
+    ).sort("created_at", 1).to_list(500)
+    memory = await db.ai_assist_memory.find_one({"project_id": project_id}, {"_id": 0, "memory": 1})
+    return {"messages": msgs, "memory": (memory or {}).get("memory", {})}
+
+
+@api_router.delete("/ai-assist/conversations/{project_id}")
+async def ai_assist_reset(project_id: str):
+    await db.ai_assist_messages.delete_many({"project_id": project_id})
+    await db.ai_assist_memory.delete_many({"project_id": project_id})
+    return {"status": "reset"}
+
+
+@api_router.get("/ai-assist/prompt")
+async def ai_assist_get_prompt(project_id: Optional[str] = None):
+    if project_id:
+        proj = await db.ai_assist_prompts.find_one({"scope_id": project_id}, {"_id": 0})
+        if proj:
+            return {"scope": "project", "prompt": proj["prompt"], "updated_at": proj.get("updated_at")}
+    workspace = await db.ai_assist_prompts.find_one({"scope_id": "__workspace__"}, {"_id": 0})
+    if workspace:
+        return {"scope": "workspace", "prompt": workspace["prompt"], "updated_at": workspace.get("updated_at")}
+    return {"scope": "default", "prompt": DEFAULT_DESIGN_AGENT_PROMPT, "updated_at": None}
+
+
+@api_router.put("/ai-assist/prompt")
+async def ai_assist_set_prompt(payload: AIAssistPromptUpdate):
+    scope_id = payload.project_id or "__workspace__"
+    await db.ai_assist_prompts.update_one(
+        {"scope_id": scope_id},
+        {"$set": {"scope_id": scope_id, "prompt": payload.prompt, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True,
+    )
+    return {"status": "saved", "scope": "project" if payload.project_id else "workspace"}
+
+
+@api_router.post("/ai-assist/push-items")
+async def ai_assist_push_items(payload: AIAssistPushItems):
+    """One-click push from the panel to the existing bulk-create endpoint.
+
+    Reuses _agent_create_one so behavior is identical to the public API.
+    We synthesize an internal "key" record so scope checks pass.
+    """
+    if not payload.items:
+        raise HTTPException(status_code=400, detail="`items` array is required")
+    internal_key = {"id": "ai-assist-panel", "name": "AI Assist Panel", "project_id": None}
+    results = []
+    created = exists = errors = 0
+    for idx, raw in enumerate(payload.items):
+        # Coerce the dict into AgentItemCreate. Force project_id from the
+        # request so the agent can't accidentally write to a different project.
+        try:
+            raw_copy = dict(raw)
+            raw_copy["project_id"] = payload.project_id
+            # Strip fields that aren't in the model
+            for k in list(raw_copy.keys()):
+                if k not in AgentItemCreate.__fields__:
+                    raw_copy.pop(k, None)
+            item_in = AgentItemCreate(**raw_copy)
+            r = await _agent_create_one(item_in, internal_key)
+            r["index"] = idx
+            r["external_id"] = item_in.external_id
+            results.append(r)
+            if r["status"] == "created":
+                created += 1
+            elif r["status"] == "exists":
+                exists += 1
+        except HTTPException as exc:
+            results.append({"index": idx, "status": "error", "error": {"code": exc.status_code, "detail": exc.detail}, "input_name": raw.get("name", "")})
+            errors += 1
+        except Exception as exc:
+            results.append({"index": idx, "status": "error", "error": {"code": 500, "detail": str(exc)}, "input_name": raw.get("name", "")})
+            errors += 1
+    return {
+        "total_submitted": len(payload.items),
+        "created": created,
+        "exists": exists,
+        "errors": errors,
+        "results": results,
+    }
+
+
 # Include all routers
 app.include_router(api_router)
