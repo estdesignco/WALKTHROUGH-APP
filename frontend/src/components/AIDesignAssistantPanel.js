@@ -18,6 +18,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   const [draft, setDraft] = useState('');
   const [pendingImages, setPendingImages] = useState([]);   // [{base64, mime_type, name, preview}]
   const [pendingPdf, setPendingPdf] = useState(null);       // {base64, name, page_count}
+  const [pendingFloorPlan, setPendingFloorPlan] = useState(null); // {base64, mime_type, name, preview}
   const [pdfRoom, setPdfRoom] = useState('');
   const [pdfSheet, setPdfSheet] = useState('checklist');
   const [pdfIngestStatus, setPdfIngestStatus] = useState('');
@@ -91,6 +92,22 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
 
   const removeImage = (idx) => setPendingImages(prev => prev.filter((_, i) => i !== idx));
 
+  // Dedicated floor-plan attach (separate from regular room images so the
+  // agent knows which image is the spatial plan vs. which is the room
+  // character/finish reference). Only one floor plan per turn.
+  const handleFloorPlanFile = (files) => {
+    const f = Array.from(files || [])[0];
+    if (!f || !f.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const base64 = String(dataUrl).split(',')[1];
+      setPendingFloorPlan({ base64, mime_type: f.type, name: f.name, preview: dataUrl });
+    };
+    reader.readAsDataURL(f);
+  };
+  const clearFloorPlan = () => setPendingFloorPlan(null);
+
   const ingestPdf = async () => {
     if (!pendingPdf) return;
     if (!pdfRoom.trim()) { setError('Pick a room for this PDF (one PDF = one room).'); return; }
@@ -104,6 +121,9 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
           sheet_type: pdfSheet,
           pdf_base64: pendingPdf.base64,
           extra_message: draft || '',
+          floor_plan: pendingFloorPlan
+            ? { base64: pendingFloorPlan.base64, mime_type: pendingFloorPlan.mime_type }
+            : null,
         }),
       });
       if (!res.ok) {
@@ -126,6 +146,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
       data.detected_items.forEach((_, idx) => { next[`${fakeId}-${idx}`] = true; });
       setSelectedForPush(next);
       setPendingPdf(null); setPdfRoom(''); setDraft('');
+      setPendingFloorPlan(null);
       setPdfIngestStatus('');
       loadConversation();
     } catch (e) {
@@ -152,6 +173,9 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
           project_id: projectId,
           message: draft,
           images: pendingImages.map(p => ({ base64: p.base64, mime_type: p.mime_type })),
+          floor_plan: pendingFloorPlan
+            ? { base64: pendingFloorPlan.base64, mime_type: pendingFloorPlan.mime_type }
+            : null,
         }),
       });
       if (!res.ok) {
@@ -162,6 +186,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
       // Optimistically append both messages; loadConversation would also work.
       setMessages(prev => [...prev, data.user_message, data.assistant_message]);
       setDraft(''); setPendingImages([]);
+      setPendingFloorPlan(null);
       setPushStatus(null);
       // Refresh memory snapshot
       loadConversation();
@@ -337,6 +362,18 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
             </div>
           </div>
         )}
+        {pendingFloorPlan && (
+          <div data-testid="aiassist-floorplan-chip" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderBottom: '1px solid #2a3040', background: 'rgba(20,184,166,0.06)' }}>
+            <img src={pendingFloorPlan.preview} alt="floor plan" style={{ height: 56, borderRadius: 4, border: '1px solid #14b8a6' }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ color: '#14b8a6', fontSize: 11, letterSpacing: 2, fontWeight: 800 }}>📐 FLOOR PLAN ATTACHED</div>
+              <div style={{ color: '#D4C5A9', fontSize: 11, opacity: 0.85, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pendingFloorPlan.name}</div>
+              <div style={{ color: '#D4C5A9', fontSize: 10, opacity: 0.55 }}>Agent will use this for spatial fit (sizing + placement).</div>
+            </div>
+            <button onClick={clearFloorPlan} data-testid="aiassist-floorplan-remove"
+              style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+          </div>
+        )}
         {pendingImages.length > 0 && (
           <div style={{ display: 'flex', gap: 6, padding: '8px 10px', overflowX: 'auto', borderBottom: '1px solid #2a3040' }}>
             {pendingImages.map((img, idx) => (
@@ -364,6 +401,10 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
             <label style={attachBtn} data-testid="aiassist-attach">
               📎 Attach
               <input type="file" multiple accept="image/*,application/pdf" onChange={e => handleFiles(e.target.files)} style={{ display: 'none' }} />
+            </label>
+            <label style={{ ...attachBtn, borderColor: pendingFloorPlan ? '#14b8a6' : attachBtn.borderColor, color: pendingFloorPlan ? '#14b8a6' : attachBtn.color }} data-testid="aiassist-attach-floorplan" title="Attach a dedicated floor plan (room dimensions + circulation)">
+              📐 {pendingFloorPlan ? 'Plan attached' : 'Floor plan'}
+              <input type="file" accept="image/*" onChange={e => handleFloorPlanFile(e.target.files)} style={{ display: 'none' }} />
             </label>
             {error && <span data-testid="aiassist-error" style={{ color: '#ef4444', fontSize: 11 }}>{error}</span>}
           </div>

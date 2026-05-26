@@ -21335,6 +21335,11 @@ class AIAssistChat(BaseModel):
     message: str = ""
     # Each image: { "base64": "...", "mime_type": "image/png" }
     images: Optional[List[Dict[str, str]]] = None
+    # Optional dedicated floor-plan image. The agent treats this as a
+    # spatial-fit input (room dimensions, openings, circulation), separate
+    # from the regular room/board images which are used for character +
+    # finish context. Same shape as `images[i]`.
+    floor_plan: Optional[Dict[str, str]] = None
     # If True, server creates a fresh conversation and discards prior history.
     reset: Optional[bool] = False
 
@@ -21357,6 +21362,10 @@ class AIAssistPdfIngest(BaseModel):
     sheet_type: str = "checklist"     # checklist | ffe | walkthrough
     pdf_base64: str                    # data URL or raw base64
     extra_message: Optional[str] = ""  # optional refinement instructions
+    # Optional floor-plan image (same shape as AIAssistChat.floor_plan).
+    # If supplied alongside the PDF, the agent uses it for spatial-fit
+    # decisions (scale, placement, circulation).
+    floor_plan: Optional[Dict[str, str]] = None
 
 
 class AIAssistPromptUpdate(BaseModel):
@@ -21475,7 +21484,34 @@ async def ai_assist_chat(payload: AIAssistChat):
                 continue
         file_contents.append(ImageContent(image_base64=b64))
 
+    # Floor plan, if provided, gets appended last so the agent reads it as a
+    # separate spatial-fit input. We label it explicitly in the user text so
+    # the agent knows which image is the plan vs. which is the room/board.
+    floor_plan_attached = False
+    if payload.floor_plan and payload.floor_plan.get("base64"):
+        fp_b64 = payload.floor_plan["base64"].strip()
+        if fp_b64.startswith("data:"):
+            try:
+                fp_b64 = fp_b64.split(",", 1)[1]
+            except Exception:
+                fp_b64 = ""
+        if fp_b64:
+            file_contents.append(ImageContent(image_base64=fp_b64))
+            floor_plan_attached = True
+
     user_text = payload.message or "(image only)"
+    if floor_plan_attached:
+        # The plan is always the LAST attached image. Tell the agent so it
+        # uses the plan for spatial fit (Floor Plan Interpretation rule) and
+        # the other images for finish/character context.
+        room_image_count = len(file_contents) - 1
+        user_text = (
+            f"[FLOOR PLAN ATTACHED — image #{len(file_contents)} of {len(file_contents)} is the floor plan, "
+            f"the first {room_image_count} {'image is' if room_image_count == 1 else 'images are'} the room/board. "
+            f"Use the plan for spatial fit (room shape, wall lengths, openings, circulation) and the room image(s) "
+            f"for architectural character and finish context.]\n\n"
+            + user_text
+        )
     user_msg = UserMessage(text=user_text, file_contents=file_contents or None)
 
     try:
@@ -21888,11 +21924,18 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
     if payload.extra_message:
         msg_lines += ["", f"Additional instructions: {payload.extra_message}"]
 
+    if payload.floor_plan and payload.floor_plan.get("base64"):
+        msg_lines += [
+            "",
+            "A floor plan is attached separately (the last image) — use it for spatial fit (room dimensions, wall lengths, openings, circulation) and the PDF pages for the design intent / vendor selections.",
+        ]
+
     # Reuse the chat endpoint logic so we get strict JSON + memory + history.
     inner_payload = AIAssistChat(
         project_id=payload.project_id,
         message="\n".join(msg_lines),
         images=page_images_b64,
+        floor_plan=payload.floor_plan,
         reset=False,
     )
     chat_response = await ai_assist_chat(inner_payload)

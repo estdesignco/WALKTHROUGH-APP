@@ -152,6 +152,13 @@ App Password: `DesignReady2026!`
 - Refactor SimpleWalkthroughSpreadsheet.js
 - Refactor server.py (>21k lines) into separate route modules
 
+### Floor-Plan Upload (Feb 26, 2026) — VERIFIED
+- New dedicated **📐 Floor plan** attach button in the AI Assistant panel (`/app/frontend/src/components/AIDesignAssistantPanel.js`, next to the regular 📎 Attach).
+- New backend field `floor_plan: { base64, mime_type }` on **both** `/api/ai-assist/chat` and `/api/ai-assist/ingest-pdf`.
+- Server appends the floor plan as the **last image** in the Gemini request and prepends a one-line label in the user message: *"[FLOOR PLAN ATTACHED — image #N is the floor plan, image(s) #1..N-1 are the room/board. Use the plan for spatial fit and the room image(s) for character + finish."]* This lets the agent obey the "Floor Plan Interpretation" prompt section without guessing which image is which.
+- A teal-bordered floor-plan chip renders above the textarea showing the thumbnail + filename. Persists until either the user removes it (✕) or the message/PDF is submitted (auto-clears).
+- E2E test (Feb 26, 2026): sent a 200x200 grey JPEG as `floor_plan` with the message *"Confirm you see the floor plan attached as the LAST image and acknowledge by quoting back the FLOOR PLAN label."* The agent replied: *"I confirm I see the FLOOR PLAN attached as the last image. I will use it to guide spatial fit, room shape, wall lengths, openings, and circulation."* `user_message.image_count = 1` as expected.
+
 ### MASTER AGENT INSTRUCTIONS (Feb 26, 2026) — VERIFIED
 - Replaced the agent's system prompt with the verbatim **MASTER AGENT INSTRUCTIONS** the user supplied. Now ~20.7 KB / 2,800+ words covering: Core Rule, Default Operating Mode, Canva/Board Input, Canva Workflow, Realism Standards, Instruction Fidelity, Do Not Change Items, Full-Room Image Input, Product Extraction, Multi-Angle Consistency, Perspective & Straightening, Scale & Proportion, Room Shape & Space Corrections (incl. room clearing), Empty Room Concepting, Theater/Media Room Guidance, Furniture-Line Priority, Vendor Item Identification, Vendor Fabric Matching, Wallpaper Pattern & Scale, Independent Wall Treatments, Paint Color Matching, Structured Project Continuity / Memory, Correction Priority Order, Response Behavior, Safety, OUTPUT FORMAT (strict JSON).
 - Live-editable at `/api/ai-assist/prompt` (Settings → Prompt) per project, no redeploy.
