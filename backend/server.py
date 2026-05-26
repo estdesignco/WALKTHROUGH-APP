@@ -146,6 +146,17 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"Index creation skipped: {e}")
 
+    # Auto-restore vendor credentials from /app/memory/vendor_credentials_backup.json
+    # if the DB collection is empty. Prevents user re-typing passwords every
+    # time the preview DB resets.
+    try:
+        from vendor_portals import VendorCredentialManager as _VCM
+        n = await _VCM(db).restore_from_backup_if_empty()
+        if n:
+            logger.info(f"✅ Auto-restored {n} vendor credentials from backup")
+    except Exception as e:
+        logger.warning(f"vendor credential auto-restore skipped: {e}")
+
     # Auto-seed demo project with tile items if DB is empty (preview env)
     try:
         project_count = await db.projects.count_documents({})

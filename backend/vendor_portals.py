@@ -48,29 +48,43 @@ VENDOR_PORTALS = {
     },
     "uttermost": {
         "name": "Uttermost",
-        "login_url": "https://uttermost.com/customer/account/login/",
+        # Uttermost uses a slide-out drawer login on every page (no /login URL).
+        # Scraper navigates here, then clicks a "Login" trigger to open the drawer.
+        "login_url": "https://uttermost.com/",
         "base_url": "https://uttermost.com",
         "search_url": "https://uttermost.com/catalogsearch/result/?q={query}",
         "login_type": "email",
+        "modal_trigger_selectors": [
+            'a:has-text("LOGIN")', 'a:has-text("Login")', 'a:has-text("Sign In")',
+            'button:has-text("LOGIN")', 'button:has-text("Login")',
+            'a[href*="login" i]', 'a[href*="account" i]',
+        ],
         "selectors": {
-            "username_field": "input[name='login[username]'], input#email",
-            "password_field": "input[name='login[password]'], input#pass",
-            "login_button": "button#send2, button[type='submit']",
+            "username_field": "input[type='email'], input[name='email'], input#email-* , input[id^='email-']",
+            "password_field": "input[type='password'], input#login-password, input[name='password']",
+            "login_button": "button:has-text('SIGN IN'), button:has-text('Sign In'), button[type='submit']",
             "product_image": "img.product-image-photo",
             "product_link": "a.product-item-link",
         }
     },
     "bernhardt": {
         "name": "Bernhardt",
-        "login_url": "https://www.bernhardt.com/customer/account/login/",
+        # Bernhardt uses a modal login on every page (no dedicated /login URL).
+        # Scraper navigates here, then clicks a "Login" link to open the modal.
+        "login_url": "https://www.bernhardt.com/",
         "base_url": "https://www.bernhardt.com",
         "search_url": "https://www.bernhardt.com/catalogsearch/result/?q={query}",
         "login_type": "email",
+        "modal_trigger_selectors": [
+            'a:has-text("LOG IN")', 'a:has-text("Log In")', 'a:has-text("Sign In")',
+            'button:has-text("LOG IN")', 'button:has-text("Login")',
+            'a[href*="login" i]', 'a[href*="account" i]',
+        ],
         "selectors": {
-            "username_field": "input[name='login[username]'], input#email",
-            "password_field": "input[name='login[password]'], input#pass",
-            "login_button": "button#send2, button[type='submit']",
-            "product_image": "img.product-image-photo",
+            "username_field": "input[name='username'], input#username, input[name='login[username]']",
+            "password_field": "input[name='password'], input#password, input[name='login[password]']",
+            "login_button": "button:has-text('LOG IN'), button:has-text('Log In'), button[type='submit']",
+            "product_image": "img.product-image-photo, img[class*='product']",
             "product_link": "a.product-item-link",
         }
     },
@@ -317,8 +331,63 @@ class VendorCredentialManager:
             {"$set": credential},
             upsert=True
         )
-        
+
+        # Mirror every save to /app/memory/vendor_credentials_backup.json
+        # (ciphertext only — same Fernet ENCRYPTION_KEY needed to decrypt).
+        # This survives DB resets so credentials can be auto-restored on
+        # next boot by `restore_from_backup_if_empty()` (called at startup).
+        try:
+            await self._mirror_to_backup()
+        except Exception as e:
+            logger.warning(f"credential backup mirror failed: {e}")
+
         return {"success": True, "vendor": vendor_key}
+
+    async def _mirror_to_backup(self):
+        """Write all encrypted credentials to a local JSON backup file."""
+        import json as _json
+        docs = await self.collection.find({}, {"_id": 0}).to_list(500)
+        path = "/app/memory/vendor_credentials_backup.json"
+        with open(path, "w") as f:
+            _json.dump({"version": 1, "credentials": docs}, f, indent=2, default=str)
+
+    async def restore_from_backup_if_empty(self):
+        """If the DB has zero saved credentials but a backup file exists,
+        restore from it. Called at backend startup."""
+        import json as _json, os as _os
+        try:
+            count = await self.collection.count_documents({})
+            if count > 0:
+                return 0
+            path = "/app/memory/vendor_credentials_backup.json"
+            if not _os.path.exists(path):
+                return 0
+            with open(path) as f:
+                data = _json.load(f) or {}
+            docs = data.get("credentials", [])
+            if not docs:
+                return 0
+            for d in docs:
+                vk = d.get("vendor_key")
+                if not vk:
+                    continue
+                d.pop("_id", None)
+                # Verify ciphertext is decryptable with current key.
+                try:
+                    decrypt_password(d.get("password_encrypted", ""))
+                except Exception:
+                    logger.warning(f"backup ciphertext for {vk} not decryptable with current key; skipping")
+                    continue
+                await self.collection.update_one(
+                    {"vendor_key": vk},
+                    {"$set": d},
+                    upsert=True,
+                )
+            logger.info(f"Restored {len(docs)} vendor credentials from backup")
+            return len(docs)
+        except Exception as e:
+            logger.warning(f"restore_from_backup failed: {e}")
+            return 0
     
     async def get_credential(self, vendor_key: str) -> Optional[Dict]:
         """Get decrypted credentials for a vendor"""

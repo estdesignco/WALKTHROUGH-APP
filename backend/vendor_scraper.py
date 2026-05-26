@@ -55,6 +55,22 @@ class VendorPortalScraper:
             logger.info(f"Navigating to {portal_config['login_url']}")
             await page.goto(portal_config['login_url'], wait_until='domcontentloaded', timeout=30000)
             await asyncio.sleep(2)
+
+            # If the vendor uses a modal/drawer-triggered login (no
+            # dedicated /login URL — e.g. Uttermost, Bernhardt), click the
+            # configured "Login" link/button first to reveal the form.
+            modal_triggers = portal_config.get('modal_trigger_selectors') or []
+            if modal_triggers:
+                for sel in modal_triggers:
+                    try:
+                        el = await page.query_selector(sel)
+                        if el and await el.is_visible():
+                            await el.click()
+                            logger.info(f"Opened login modal via: {sel}")
+                            await asyncio.sleep(2)
+                            break
+                    except Exception:
+                        continue
             
             selectors = portal_config.get('selectors', {})
             
