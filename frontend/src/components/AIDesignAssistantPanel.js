@@ -56,9 +56,17 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
 
   const connectCanva = async () => {
     try {
-      const r = await fetch(`${API}/canva/auth`);
-      const d = await r.json();
-      if (!d.authorization_url || d.authorization_url.includes('client_id=None')) {
+      const r = await fetch(`${API}/canva/auth`, { cache: 'no-store' });
+      const text = await r.text();
+      let d;
+      try {
+        d = JSON.parse(text);
+      } catch (parseErr) {
+        // Surface the raw body so we can see what came back instead of JSON
+        alert('Canva connect failed: response was not JSON.\n\nStatus: ' + r.status + '\nBody:\n' + text.slice(0, 400));
+        return;
+      }
+      if (!d.authorization_url || d.authorization_url.includes('client_id=&') || d.authorization_url.includes('client_id=None')) {
         alert(
           'Canva not yet configured.\n\n' +
           'Add these 2 values to backend/.env from developers.canva.com:\n\n' +
@@ -75,7 +83,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
       const poll = setInterval(async () => {
         if (popup && popup.closed) {
           clearInterval(poll);
-          const s = await fetch(`${API}/canva/status`).then(r => r.json()).catch(() => ({}));
+          const s = await fetch(`${API}/canva/status`, { cache: 'no-store' }).then(r => r.json()).catch(() => ({}));
           setCanvaStatus(s);
         }
       }, 1000);
