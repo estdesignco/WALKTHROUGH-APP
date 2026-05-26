@@ -21614,6 +21614,119 @@ async def ai_assist_push_items(payload: AIAssistPushItems):
     }
 
 
+class AIAssistCanvaIngest(BaseModel):
+    project_id: str
+    room_name: str
+    sheet_type: str = "checklist"
+    canva_url: str
+    extra_message: Optional[str] = None
+
+
+@api_router.post("/ai-assist/ingest-canva-url")
+async def ai_assist_ingest_canva_url(payload: AIAssistCanvaIngest):
+    """Canva direct-read path.
+
+    User pastes a Canva design URL (e.g. https://www.canva.com/design/DAG.../view).
+    Pipeline:
+      1) Parse design_id out of the URL.
+      2) Call Canva Connect API `GET /v1/designs/{design_id}` for title + thumbnail (auth check + identify the design).
+      3) Kick off `POST /v1/exports` with `format.type='pdf'` to get a
+         server-side high-fidelity PDF export of the live design.
+      4) Poll `GET /v1/exports/{job_id}` until done; download the PDF bytes.
+      5) Hand the PDF bytes off to the same 3-stage `/ai-assist/ingest-pdf`
+         flow so the user gets the SAME response shape regardless of
+         which entry point was used.
+
+    Why this path beats user-uploading-a-PDF:
+      - Canva's server-side export preserves embedded hyperlink annotations
+        consistently (manual "Download → PDF" sometimes flattens them).
+      - We can fetch design metadata for UX (board name → suggested room).
+      - Removes a manual step (no Save → Download → Drag).
+
+    Note: Canva's Connect API does NOT publicly expose per-element
+    hyperlinks in the design-content response as of Feb 2026, so we still
+    rely on the PDF for link extraction. If/when Canva ships an
+    element-level URL field, swap step 3-5 for a direct read.
+    """
+    from canva_integration import canva_integration as _canva
+
+    design_id = _canva.extract_design_id_from_url(payload.canva_url)
+    if not design_id:
+        raise HTTPException(status_code=400, detail="Could not parse design_id from Canva URL — expected `https://www.canva.com/design/DAG.../...`")
+
+    # Step 2 — design metadata (also serves as auth check)
+    try:
+        design = await _canva.get_design(design_id)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Canva GET design failed: {exc}")
+    design_obj = design.get("design") or design
+    design_title = design_obj.get("title") or design_obj.get("name") or ""
+
+    # Step 3 — kick off PDF export
+    try:
+        export_resp = await _canva.export_design_as_pdf(design_id)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Canva export start failed: {exc}")
+    job = export_resp.get("job") or export_resp
+    job_id = (job or {}).get("id")
+    if not job_id:
+        raise HTTPException(status_code=502, detail=f"Canva export did not return a job id: {export_resp}")
+
+    # Step 4 — poll until done
+    try:
+        final_job = await _canva.poll_export_until_done(job_id, max_wait_s=90)
+    except Exception as exc:
+        raise HTTPException(status_code=504, detail=f"Canva export poll: {exc}")
+    if (final_job or {}).get("status") != "success":
+        raise HTTPException(status_code=502, detail=f"Canva export failed: {final_job}")
+
+    # Download the PDF(s) — Canva returns a list of URLs (one per page bundle)
+    urls = final_job.get("urls") or []
+    if not urls:
+        raise HTTPException(status_code=502, detail="Canva export reported success but returned no urls")
+
+    pdf_bytes_parts: List[bytes] = []
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        for u in urls:
+            r = await client.get(u)
+            if r.status_code != 200:
+                raise HTTPException(status_code=502, detail=f"Canva PDF download failed ({r.status_code}) for {u}")
+            pdf_bytes_parts.append(r.content)
+
+    # If multiple parts came back, glue them together with pypdf
+    if len(pdf_bytes_parts) == 1:
+        pdf_bytes = pdf_bytes_parts[0]
+    else:
+        from pypdf import PdfReader as _PR, PdfWriter as _PW
+        w = _PW()
+        for b in pdf_bytes_parts:
+            r = _PR(io.BytesIO(b))
+            for p in r.pages:
+                w.add_page(p)
+        out = io.BytesIO()
+        w.write(out)
+        pdf_bytes = out.getvalue()
+
+    # Step 5 — re-enter the existing PDF pipeline
+    pdf_b64 = base64.b64encode(pdf_bytes).decode()
+    inner = AIAssistPdfIngest(
+        project_id=payload.project_id,
+        room_name=payload.room_name,
+        sheet_type=payload.sheet_type,
+        pdf_base64=pdf_b64,
+        extra_message=payload.extra_message or (f"Source: Canva design '{design_title}' ({design_id})" if design_title else None),
+    )
+    result = await ai_assist_ingest_pdf(inner)
+    # Add Canva-specific telemetry so the UI knows this came from a live design
+    result["source"] = "canva_url"
+    result["canva_design_id"] = design_id
+    result["canva_design_title"] = design_title
+    return result
+
+
+import httpx  # local import to avoid moving the global import block
+
+
 @api_router.post("/ai-assist/ingest-pdf")
 async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
     """Single-room PDF ingest.

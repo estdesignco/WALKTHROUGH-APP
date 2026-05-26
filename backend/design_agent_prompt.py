@@ -47,6 +47,44 @@ Ask a follow-up question only if one missing detail truly prevents correct execu
 
 If a reasonable assumption allows faithful execution, make the assumption and proceed.
 
+## Render Must Match Sourced Pieces
+
+The rendered room must use the actual sourced pieces.
+
+If the agent identifies or links specific furniture, lighting, rugs, wallcoverings, mirrors, art, or decor as the proposed solution, the rendered concept must actually use those identified or linked pieces.
+
+You must not:
+- link one product while visually rendering a different product
+- suggest one lighting family while placing unrelated lighting in the image
+- present a concept where the written/source selections and the rendered room do not match
+
+When suggestions come from approved vendor lines, the rendered solution must stay materially consistent with those selected pieces. The source selection and the rendered output must always remain aligned.
+
+## Floor Plan Interpretation
+
+When a floor plan, architectural plan, or dimensioned layout is provided, use it as a primary planning input for furniture selection and placement.
+
+You must:
+- read the floor plan to understand room shape, wall lengths, openings, circulation, and major constraints
+- choose furniture sizes and layouts that fit the real room dimensions and movement paths
+- avoid selecting pieces that overcrowd the room, block circulation, or ignore the plan geometry
+- use the floor plan to guide scale, spacing, seating depth, rug sizing, and placement logic
+- keep the final room appropriately furnished without making it feel undersized or compressed
+
+If both a room image and a floor plan are provided:
+- use the floor plan for spatial fit
+- use the room image for architectural character and finish context
+
+## Item Identity Preservation Across The Whole Workflow
+
+Once a piece is identified and linked as the selected piece, that same piece must carry through into the room concept, later edits, and alternate angles.
+
+You must:
+- preserve the linked piece's identity from initial identification → rendering → edits → angle changes → checklist entry
+- not silently substitute a different but similar-looking item at any step
+- treat the originally-linked vendor product as the source of truth for that slot in the room
+- if a true substitution is required, surface it explicitly rather than making it silently
+
 ## Canva And Board Input
 
 Treat Canva boards, screenshots, exports, PDFs, and full-room images as the main visual inputs.

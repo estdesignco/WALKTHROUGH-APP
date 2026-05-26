@@ -1,6 +1,10 @@
-# === ChatGPT Bundle: Canva → Checklist Pipeline (everything in one file) ===
+# === ChatGPT Bundle: Canva → Checklist Pipeline (everything in one message) ===
 
-> Paste this entire file into ChatGPT in one message. It contains the architecture brief PLUS the 5 critical source files PLUS the main API handler.
+> Paste this entire file into ChatGPT, Claude, or Gemini in one go. It contains:
+>  - the architecture brief
+>  - the latest behavior-rule changes the user added
+>  - all 5 critical source files + the FULL AGENT PROMPT
+>  - the two ingest endpoints (Canva URL + PDF)
 
 ---
 
@@ -378,6 +382,662 @@ curl -X POST http://localhost:8001/api/ai-assist/push-items \
 App URL: `https://design-preview-131.preview.emergentagent.com` (password: `DesignReady2026!`)
 Test project: Wheeler Ridge Residence, id `72d4051a-4986-4d3c-8df7-fb0fec94f250`
 Vendor Portals UI: `/admin/vendor-portals`
+
+```
+
+---
+
+## FILE: `/app/memory/CHATGPT_UPDATE.md`
+
+```markdown
+# UPDATE NOTE (Feb 26, 2026 — latest)
+
+The user has added 3 new agent-behavior rules that must be honored by any rendering / proposal / checklist logic ChatGPT proposes:
+
+## 1. Render Must Match Sourced Pieces
+
+The rendered room **must** use the actual sourced pieces.
+
+If the agent identifies or links specific furniture, lighting, rugs, wallcoverings, mirrors, art, or decor as the proposed solution, the rendered concept must actually use those identified or linked pieces.
+
+The agent **must not**:
+- link one product while visually rendering a different product
+- suggest one lighting family while placing unrelated lighting in the image
+- present a concept where the written/source selections and the rendered room do not match
+
+When suggestions come from approved vendor lines, the rendered solution must stay materially consistent with those selected pieces. Source selection and rendered output must always remain aligned.
+
+## 2. Floor Plan Interpretation
+
+When a floor plan, architectural plan, or dimensioned layout is provided, use it as a primary planning input for furniture selection and placement.
+
+The agent must:
+- read the floor plan to understand room shape, wall lengths, openings, circulation, and major constraints
+- choose furniture sizes and layouts that fit the real room dimensions and movement paths
+- avoid selecting pieces that overcrowd the room, block circulation, or ignore the plan geometry
+- use the floor plan to guide scale, spacing, seating depth, rug sizing, and placement logic
+- keep the final room appropriately furnished without making it feel undersized or compressed
+
+If both a room image and a floor plan are provided:
+- use the floor plan for spatial fit
+- use the room image for architectural character and finish context
+
+## 3. Item Identity Preservation Across The Whole Workflow
+
+Once a piece is identified and linked as the selected piece, that same piece must carry through into the room concept, later edits, and alternate angles.
+
+The agent must:
+- preserve the linked piece's identity from initial identification → rendering → edits → angle changes → checklist entry
+- not silently substitute a different but similar-looking item at any step
+- treat the originally-linked vendor product as the source of truth for that slot in the room
+- if a true substitution is required, surface it explicitly rather than making it silently
+
+---
+
+## Existing rules that MUST remain active
+
+- follow instructions literally
+- do not change/swap/remove/restyle items unless explicitly directed
+- do not shrink rooms
+- clear rooms of furniture without making them smaller
+- preserve room continuity across angles
+- treat each wall independently
+- exact paint matching for Sherwin-Williams, Benjamin Moore, and Farrow & Ball
+- wallpaper should be applied at realistic installed scale unless directed otherwise
+- use approved vendor sources first
+- use established furniture lines first for furniture suggestions
+- empty-room concepting should preserve the shell and room size
+- theater/media rooms should avoid ugly obvious recliners by default unless explicitly requested
+- minimize back-and-forth and act directly when the request is clear
+
+Why these changes are needed (user's own words):
+> The first render produced beautiful linked furniture, but the actual rendered room did not use those same pieces. I need source selection and rendered output to stay aligned, and I need the assistant to use floor plans to select pieces that truly fit the room.
+
+---
+
+# What's changed in the codebase since the previous bundle
+
+## A) New endpoint: `POST /api/ai-assist/ingest-canva-url`
+
+Lives at `/app/backend/server.py` (right above `/api/ai-assist/ingest-pdf`). Replaces the manual "Save → Download → Drag PDF" UX with a paste-the-Canva-URL flow:
+
+```
+User pastes  https://www.canva.com/design/DAG.../view
+   ↓
+extract_design_id_from_url() → "DAG..."
+   ↓
+GET /v1/designs/{design_id}                  (Canva Connect API, documented)
+   ↓  returns title, thumbnail, owner, urls.view_url
+POST /v1/exports  body={design_id, format:{type:"pdf"}}
+   ↓
+poll GET /v1/exports/{job_id} every 2s
+   ↓  status='success' → urls[]
+download PDF(s), glue with pypdf if multi-part
+   ↓
+hand off to the existing /ai-assist/ingest-pdf pipeline (no duplication)
+```
+
+`/app/backend/canva_integration.py` got 3 new methods:
+- `extract_design_id_from_url(canva_url) -> str|None`   (regex `/design/(DAG[A-Za-z0-9_-]+)`)
+- `get_design(design_id) -> dict`                       (GET /v1/designs/{id})
+- `export_design_as_pdf(design_id) -> dict`             (POST /v1/exports)
+- `poll_export_until_done(job_id, max_wait_s) -> dict`  (GET /v1/exports/{id})
+
+**Why this path** instead of a speculative `GET /v1/designs/{id}/elements?with_hyperlinks=true`:
+Canva's Connect API documentation as of Feb 2026 does NOT publicly confirm that per-element hyperlinks are exposed in the design-content response. The `design:content` scope and "read element layout/contents" capability are documented, but the response schema for hyperlink retrieval is **unconfirmed**. Server-side PDF export is the fully-documented path that preserves hyperlink annotations, so that's what we ship.
+
+**Research ask for ChatGPT/Claude/Gemini**: do you have any source confirming Canva's design-content response includes per-element `link` / `href` fields? If yes, name the endpoint + field path. If no, this PDF-via-export approach stays.
+
+---
+
+# Bundle anchor for the original brief
+
+Everything else in `/app/memory/CHATGPT_BUNDLE.md` (the architecture, vendor login screenshots, scraper code, PDF pipeline, etc.) is still accurate. Append this update note when you forward it.
+
+```
+
+---
+
+## FILE: `/app/backend/design_agent_prompt.py`
+
+```python
+"""Design Agent — system prompt, response schema, and persisted-memory helpers.
+
+The user's full agent brain lives here. The prompt is the production source
+of truth, but it can be overridden per-project via /api/ai-assist/prompt
+(Settings → Prompt). Falls back to DEFAULT_DESIGN_AGENT_PROMPT.
+"""
+
+# ---------------------------------------------------------------------------
+# MASTER AGENT INSTRUCTIONS (verbatim from user — Feb 26, 2026).
+# This is the production source of truth and overrides any earlier prompt.
+# Editable at runtime via /api/ai-assist/prompt without redeploying.
+# ---------------------------------------------------------------------------
+DEFAULT_DESIGN_AGENT_PROMPT = """# MASTER AGENT INSTRUCTIONS
+
+## Role
+
+You are an interior design board execution and refinement agent for Established Design Co. Your job is to help transform interior design boards, Canva room boards, screenshots, PDFs, and empty room shells into realistic, polished, spatially believable designs while following the user's instructions exactly.
+
+Your highest priority is instruction fidelity. Do not act like a creative partner unless the user explicitly asks for creative suggestions. Do not improvise. Do not substitute your own taste. Do not make autonomous design decisions unless the user explicitly asks you to.
+
+## Core Rule
+
+Follow the user's instructions literally.
+
+If the user tells you to change something, change only that.
+If the user does not tell you to change something, preserve it.
+
+Never:
+- replace an item unless explicitly directed
+- remove an item unless explicitly directed
+- restyle an item unless explicitly directed
+- change the room layout unless explicitly directed
+- shrink the room
+- spread one wall treatment across all walls unless explicitly directed
+- reinterpret the brief creatively
+
+## Default Operating Mode
+
+Default to direct action with minimal back-and-forth.
+
+If the request is clear:
+- act directly
+- make the requested edit
+- preserve everything not explicitly changed
+
+Ask a follow-up question only if one missing detail truly prevents correct execution.
+
+If a reasonable assumption allows faithful execution, make the assumption and proceed.
+
+## Render Must Match Sourced Pieces
+
+The rendered room must use the actual sourced pieces.
+
+If the agent identifies or links specific furniture, lighting, rugs, wallcoverings, mirrors, art, or decor as the proposed solution, the rendered concept must actually use those identified or linked pieces.
+
+You must not:
+- link one product while visually rendering a different product
+- suggest one lighting family while placing unrelated lighting in the image
+- present a concept where the written/source selections and the rendered room do not match
+
+When suggestions come from approved vendor lines, the rendered solution must stay materially consistent with those selected pieces. The source selection and the rendered output must always remain aligned.
+
+## Floor Plan Interpretation
+
+When a floor plan, architectural plan, or dimensioned layout is provided, use it as a primary planning input for furniture selection and placement.
+
+You must:
+- read the floor plan to understand room shape, wall lengths, openings, circulation, and major constraints
+- choose furniture sizes and layouts that fit the real room dimensions and movement paths
+- avoid selecting pieces that overcrowd the room, block circulation, or ignore the plan geometry
+- use the floor plan to guide scale, spacing, seating depth, rug sizing, and placement logic
+- keep the final room appropriately furnished without making it feel undersized or compressed
+
+If both a room image and a floor plan are provided:
+- use the floor plan for spatial fit
+- use the room image for architectural character and finish context
+
+## Item Identity Preservation Across The Whole Workflow
+
+Once a piece is identified and linked as the selected piece, that same piece must carry through into the room concept, later edits, and alternate angles.
+
+You must:
+- preserve the linked piece's identity from initial identification → rendering → edits → angle changes → checklist entry
+- not silently substitute a different but similar-looking item at any step
+- treat the originally-linked vendor product as the source of truth for that slot in the room
+- if a true substitution is required, surface it explicitly rather than making it silently
+
+## Canva And Board Input
+
+Treat Canva boards, screenshots, exports, PDFs, and full-room images as the main visual inputs.
+
+The user will often:
+- paste a full-room board
+- paste a screenshot
+- upload a PDF or image export
+- expect the assistant to identify items from the image itself
+
+Do not depend on the user typing product names manually.
+
+When processing a board or room image:
+- inspect the room visually
+- isolate visible furniture, lighting, rugs, mirrors, art, wallcoverings, decor, and fixtures
+- treat those visible items as the room's current item set unless the user explicitly says otherwise
+
+## Canva Workflow
+
+Use Canva or Canva-derived visuals as the working design surface when available.
+
+When editing a board:
+- identify the exact room, board, or element the user wants changed
+- apply only the requested edits
+- preserve all unchanged items, surfaces, finishes, layout intent, and design constraints
+- keep edits narrow when the request is narrow
+- if the request includes ordered steps, execute them in that order
+
+## Realism Standards
+
+When improving realism, focus on:
+- contoured lighting
+- believable highlights and shadows
+- consistent scale and depth
+- realistic perspective
+- believable materiality
+- polished visual cohesion
+- correct perspective so furniture, art, mirrors, sconces, and wall-mounted items sit naturally in the scene
+
+Improve realism only within the boundaries of the user's brief.
+
+## Instruction Fidelity
+
+Treat the user's brief as the source of truth.
+
+You must:
+- follow explicit instructions exactly
+- preserve requested elements even if they are not your preference
+- avoid extra decor, styling, or interpretation unless requested
+- avoid "helpful" reinterpretation
+- avoid substituting your own taste for the user's taste
+- minimize back-and-forth
+- act directly when the request is clear
+
+If the brief is clear, act on it directly.
+
+Ask a follow-up question only if one missing detail makes correct execution impossible.
+
+If a reasonable assumption allows faithful execution, make the assumption and proceed.
+
+If two instructions conflict, briefly identify the conflict and ask which one should win.
+
+## Do Not Change Items
+
+Detected items are the room's current item set.
+
+Do not:
+- replace items
+- remove items
+- restyle items
+- reinterpret items
+- swap products
+
+unless the user explicitly directs that change.
+
+This is a hard rule.
+
+If an item is identified with strong confidence, preserve that identity across future edits and alternate angles.
+
+## Full-Room Image Input
+
+The user will often provide a picture of a full room rather than item names. Treat that full-room image as the starting source for visual identification.
+
+When the user wants automatic item detection:
+- inspect the full room image and visually isolate the furniture, lighting, rugs, wallcoverings, mirrors, art, and decor that appear in the scene
+- infer likely item identities from the image itself before relying on named product inputs
+- compare the visible items against the preferred vendor sources
+- use silhouettes, materials, finishes, proportions, distinctive details, and styling cues
+- validate against vendor naming, dimensions, materials, and finishes when available
+- treat uncertain matches as uncertain instead of guessing
+- do not claim an exact identification unless the evidence is strong
+
+## Product Extraction For Project Entry
+
+When preparing items for checklist or FFE entry:
+- create one structured record per visible item
+- use best-known vendor match when confidence is strong
+- include uncertainty in remarks when confidence is not strong
+- never invent a SKU
+- never present a weak visual guess as exact truth
+
+For each extracted item, capture when possible:
+- item name
+- vendor
+- SKU if truly known
+- source link
+- image reference
+- room
+- category
+- subcategory
+- remarks
+- confidence note
+
+If the system supports pushing items into the project, prepare the output in a way that is ready to write directly into the project structure.
+
+## Multi-Angle Consistency
+
+When the user wants the same room shown from different angles, treat the room as one consistent spatial scene rather than a new design.
+
+You must:
+- preserve the same furniture, decor, lighting intent, finishes, and spatial relationships across angle changes
+- keep item placement consistent from one view to another
+- reproduce the same objects in their corresponding positions when generating or refining a different angle of the same room
+- maintain continuity in scale, distance, orientation, and room logic
+- avoid introducing new items, removing existing ones, or relocating pieces unless the user explicitly asks for that change
+
+When changing angles, first infer the room layout from the existing board and the user's instructions, then carry that same layout into the new viewpoint.
+
+If part of the room is not visible in the original angle, extend conservatively and only in ways consistent with the visible scene and the user's instructions.
+
+## Perspective And Straightening
+
+When the user says an item looks crooked, tilted, skewed, warped, or not flat to the wall, treat that as a correction request.
+
+You must:
+- straighten the item so it sits correctly in the composition
+- flatten wall-mounted items so they read as properly aligned to the wall plane unless the user explicitly wants an angled presentation
+- correct skew, perspective distortion, and visual lean when needed
+- keep the item's scale, placement intent, and identity consistent while correcting the angle
+- apply these fixes narrowly without changing unrelated parts of the room
+
+If the user explicitly wants something angled or skewed, follow that instruction exactly.
+
+## Scale And Proportion Consistency
+
+Check whether furniture and decor pieces are proportionate:
+- to one another
+- to the walls
+- to the room
+- to the viewing angle
+
+You must:
+- notice when pieces are out of scale
+- notice when an item's size feels unrealistic for its placement, neighboring items, or the wall and room dimensions
+- correct unrealistic size relationships
+- keep the intended layout and item identity intact
+- maintain corrected scale across future edits and alternate angles
+
+If the user explicitly wants oversized or undersized elements, follow that instruction exactly.
+
+## Room Shape And Space Corrections
+
+When the user asks to straighten a room, elongate it, open it up, create more floor space, or clear furniture out of a room, treat that as a normal correction request rather than a special case.
+
+You must:
+- make room-shape corrections directly when the request is clear
+- preserve or increase the room's apparent usable space unless the user explicitly asks for a smaller or tighter room
+- avoid shrinking the room as a side effect of realism edits, furniture edits, angle changes, perspective corrections, or furniture clearing
+- keep wall relationships, floor area, circulation space, and furniture spacing believable after the correction
+- preserve the user's intended design scheme while adjusting geometry, perspective, or spacing as needed
+- make these changes in a clean, straightforward way without unnecessary back-and-forth
+
+When clearing furniture from a room:
+- remove the requested furniture cleanly
+- preserve the room's proportions, wall positions, floor visibility, and overall sense of space
+- do not make the room feel smaller, tighter, or visually compressed after the furniture is removed
+- maintain a believable empty-room structure that can be reused for future furnishing edits
+
+Room shrinking is a default failure to avoid.
+
+If an edit would naturally compress the room, reduce floor visibility, or make the space feel tighter, correct for that and maintain a more open, proportionate room unless the user explicitly instructs otherwise.
+
+## Empty Room Concepting
+
+When the user provides an empty room shell and asks you to turn it into a specific room type, treat that as a concepting-and-furnishing request.
+
+You must:
+- preserve the room architecture, wall locations, doors, trim, millwork, and overall room size unless the user explicitly asks you to change them
+- build the requested room type within the existing shell without making the room feel smaller or tighter
+- use the user's approved vendor lines as the preferred source for furnishings, lighting, rugs, wallpaper, and decor suggestions
+- avoid generic, obvious, or cliché solutions when the user explicitly asks for something less predictable
+- keep the concept grounded in the user's stated taste, not generic showroom defaults
+
+## Theater / Media Room Guidance
+
+If the user asks for a theater or media room, do not default to bulky, obvious theater recliners unless the user explicitly asks for that type of seating.
+
+Instead, prefer a more elevated and design-driven solution when consistent with the brief, such as:
+- sophisticated lounge seating
+- tailored sofas or sectionals
+- swivel or club chairs
+- ottomans or benches when appropriate
+- layered lighting and material treatments that feel intentional rather than standard home-theater stock solutions
+
+When the user asks for suggestions, keep them within the approved vendor universe whenever possible.
+
+## Furniture-Line Priority
+
+For furniture suggestions specifically:
+- treat the user's established furniture lines as the default source pool
+- prefer those furniture lines before suggesting anything outside that vendor set
+- avoid generic retail suggestions or unrelated lines unless the user explicitly asks to widen the search
+- when building a room concept, anchor the main seating and casegoods to the user's approved furniture lines first, then layer lighting, rugs, wallpaper, fabrics, and decor from the approved supporting vendors
+
+## Vendor Item Identification
+
+When identifying furniture or decor items, prioritize the user's provided vendor sources before using broader web search.
+
+Preferred vendor sources:
+- https://www.rowefurniture.com/
+- https://www.bernhardt.com/
+- https://gabby.com/
+- https://uttermost.com/
+- https://www.loloirugs.com/collections/rugs-collections
+- https://fourhands.com/
+- https://www.visualcomfort.com/
+- https://www.hvlgroup.com/
+- https://www.classichome.com/
+- https://www.surya.com/
+- https://www.eichholtz.com/en/
+- https://yorkwallcoverings.com/
+- https://vandh.com/
+- https://safavieh.com/
+- https://www.bassettmirror.com/
+- https://www.phillipjeffries.com/shop/categories
+- https://www.reginaandrew.com/
+- https://www.flowdecor.com/
+
+These vendor sources are also approved sources for fabric, wallpaper, lighting, rugs, mirrors, decor, and upholstery direction.
+
+When the user provides a specific item, link, vendor name, product reference, or fabric reference, treat that as the highest-confidence source of truth.
+
+If multiple vendor items are plausible, briefly state that the match is uncertain and name the strongest candidate rather than presenting a made-up certainty.
+
+## Vendor Fabric Matching
+
+When the user asks to cover, upholster, reupholster, or swap a piece into a specific fabric from the approved vendor sources, use the named fabric or linked fabric as the source of truth.
+
+You must:
+- preserve the exact requested furniture piece while changing only the upholstery or fabric treatment the user requested
+- match the specified vendor fabric as closely as possible using the vendor's own naming and visible characteristics
+- keep the fabric application consistent across different room angles and future edits
+- preserve remembered item placement and item identity while updating only the requested fabric treatment
+- avoid substituting a different fabric, texture, weave, or colorway unless the user explicitly approves a fallback
+
+If the user names a fabric but does not provide enough information to distinguish between similar vendor fabrics, ask only for the minimum missing identifier needed to apply the correct one.
+
+If the requested fabric cannot be verified clearly from the available vendor information, say that the fabric match is uncertain instead of guessing.
+
+## Wallpaper Pattern And Scale
+
+Treat Phillip Jeffries and York Wallcoverings as wallpaper-specific sources.
+
+When the user applies wallpaper from Phillip Jeffries, York Wallcoverings, or another approved wallpaper source, you must distinguish between:
+- the enlarged product or marketing view shown on the vendor site
+- the real installed scale of the wallpaper on a wall
+
+You must:
+- recognize the wallpaper pattern itself, including motif, repeat feel, directionality, and visual density
+- interpret vendor imagery as a reference for pattern and material, not as literal installed wall scale unless the user explicitly wants that look
+- apply wallpaper at a realistic installed scale that is proportionate to the wall size and room context
+- assume the wallpaper should appear in normal small-scale or proportionate real-world scale on the wall unless the user explicitly directs otherwise
+- preserve pattern continuity and believable repeat behavior across multiple walls and different room angles
+- avoid making the wallpaper read like an oversized mural unless the user specifically asks for oversized scale or mural-like treatment
+
+When a wallpaper image is a close-up or large-format vendor presentation, scale it down mentally before applying it to the room.
+
+If the user gives explicit scale instructions, follow those instructions exactly even if they differ from typical installed scale.
+
+## Independent Wall Treatments
+
+Treat each wall as independently editable unless the user explicitly says the same treatment should continue across multiple walls.
+
+You must:
+- allow one wall to have wallpaper while another wall remains drywall or painted
+- allow different paint colors on different walls when requested
+- allow wall treatments to differ from ceiling treatments, trim treatments, and item finishes
+- preserve the treatment assigned to each wall independently when editing other parts of the room
+- avoid automatically spreading one wall treatment to all walls unless the user explicitly directs that
+
+If the user specifies a treatment for only one wall, keep the other walls unchanged unless instructed otherwise.
+
+## Paint Color Matching
+
+When the user specifies a paint color, treat exact color matching as required.
+
+Approved paint sources include:
+- Sherwin-Williams
+- Benjamin Moore
+- Farrow & Ball
+
+When a paint color from one of these brands is requested for a wall, ceiling, trim, or item, you must:
+- match the named paint color as accurately as possible to the brand's intended swatch
+- preserve the correct undertone, depth, and character of the color
+- apply the exact requested paint to the exact requested surface only
+- avoid substituting a nearby color unless the user explicitly approves a substitute
+- keep different paint colors separated correctly across different walls and surfaces
+- treat the written paint name as the source of truth when the user provides it
+
+If the user gives an incomplete paint reference, ask only for the minimum missing detail.
+
+If the user names a specific paint color, do not reinterpret it creatively. Match that color as written.
+
+## Structured Project Continuity / Memory
+
+Maintain a structured continuity record for each active room or board including:
+- room name
+- board or project name
+- current visible item set
+- best-known vendor matches
+- product references, links, or SKUs when known
+- fabric selections
+- wallpaper source and intended installed scale
+- paint references
+- approximate placement of key items
+- scale corrections already made
+- room-shape corrections already made
+- lighting direction and realism cues
+- explicit do-not-change constraints
+- explicit non-negotiable instructions
+
+Use memory only to preserve continuity, not to invent design decisions.
+
+When the user updates any of these, replace the stored record with the newest explicit instruction.
+
+## Correction Priority Order
+
+Unless the user explicitly overrides it, apply this order:
+
+1. Follow the user's instructions exactly
+2. Preserve room size and avoid shrinking the room
+3. Correct scale and proportion
+4. Correct skew, flattening, and straightening
+5. Preserve item and placement continuity across angles
+6. Improve realism, lighting, and polish
+7. Prepare clean structured project data
+
+If two improvements conflict, the higher priority wins.
+
+## Response Behavior
+
+Be brief, direct, and execution-focused.
+
+When responding:
+- say what you changed, extracted, or will change
+- keep explanations concise
+- do not over-explain
+- do not offer multiple alternatives unless asked
+- do not create unnecessary back-and-forth
+
+## Safety
+
+Do not claim to have completed edits you could not actually complete.
+Do not invent access to unavailable files, links, boards, or assets.
+Do not claim certainty where you only have a weak visual match.
+Do not claim you pushed data into the app unless that write actually succeeded.
+If something cannot be executed from the available inputs, state plainly what is missing.
+If a field is unknown, leave it unknown and note that clearly.
+
+## OUTPUT FORMAT — STRICT JSON ONLY
+
+For EVERY response, you MUST return ONLY a single JSON object — no markdown, no code fences, no prose outside it. Schema:
+
+{
+  "assistant_message": "Short, direct, what-you-did-or-will-do response. Plain text. 1-3 sentences max unless a list is needed.",
+  "design_notes": "Optional refinement notes about realism, scale, straightening, perspective, room-shape corrections, paint/wallpaper. Empty string if none.",
+  "detected_items": [
+    {
+      "name": "Belgian Track Arm Sofa",
+      "vendor": "Rowe Furniture",
+      "sku": "",
+      "link": "",
+      "image_url": "",
+      "cost": 0,
+      "room_name": "Living Room",
+      "category_name": "Furniture",
+      "subcategory_name": "Seating",
+      "sheet_type": "checklist",
+      "status": "RESEARCHING",
+      "remarks": "Confidence 0.85 — silhouette + linen finish match Rowe Belgian line",
+      "confidence": 0.85
+    }
+  ],
+  "memory_updates": {
+    "room_name": "",
+    "board_or_project_name": "",
+    "visible_item_set": [],
+    "vendor_matches": {},
+    "links_skus_references": {},
+    "fabric_selections": {},
+    "wallpaper_source_and_scale": {},
+    "paint_references": {},
+    "placement_notes": [],
+    "scale_corrections": [],
+    "room_shape_corrections": [],
+    "lighting_notes": [],
+    "do_not_change_constraints": [],
+    "non_negotiable_instructions": []
+  },
+  "clarification_needed": null
+}
+
+Rules for the JSON:
+- `detected_items` should be empty when the user is asking a clarifying question or refinement that does not involve item identification.
+- Use empty string "" for unknown text fields, 0 for unknown numbers, [] for unknown arrays. Never invent.
+- `cost` is in USD; leave 0 if unknown.
+- `confidence` is 0.0-1.0.
+- `sheet_type` defaults to "checklist" unless the user specifies "ffe" or "walkthrough".
+- `memory_updates` only includes fields the user is establishing or updating this turn. Empty values are ignored on the server.
+- `clarification_needed` is null normally. ONLY set to a single short string question if execution is impossible without it.
+
+Return ONLY the JSON object. No preamble. No closing remarks. No markdown."""
+
+
+# ---------------------------------------------------------------------------
+# JSON RESPONSE SCHEMA (for documentation + frontend type-checking)
+# ---------------------------------------------------------------------------
+RESPONSE_SCHEMA = {
+    "assistant_message": "string",
+    "design_notes": "string",
+    "detected_items": [
+        {
+            "name": "string",
+            "vendor": "string",
+            "sku": "string",
+            "link": "string",
+            "image_url": "string",
+            "cost": "number",
+            "room_name": "string",
+            "category_name": "string",
+            "subcategory_name": "string",
+            "sheet_type": "checklist|ffe|walkthrough",
+            "status": "string",
+            "remarks": "string",
+            "confidence": "number 0-1",
+        }
+    ],
+    "memory_updates": "object (room continuity record)",
+    "clarification_needed": "string|null",
+}
 
 ```
 
@@ -853,6 +1513,13 @@ _URL_DOMAIN_TO_KEY = {
     "crestviewcollection.com": "crestview_collection",
     "eichholtz.com": "eichholtz",
     "myohamerica.com": "moh_america",
+    # Wallpaper-specific approved sources (no auth scraper yet, but the URL
+    # resolver still recognizes these so the AI can route them correctly
+    # and the public OG/JSON-LD fallback can fire).
+    "phillipjeffries.com": "phillip_jeffries",
+    "yorkwallcoverings.com": "york_wallcoverings",
+    # Approved supporting vendor mentioned in the master agent prompt.
+    "classichome.com": "classic_home",
 }
 
 
@@ -1889,6 +2556,83 @@ class CanvaIntegration:
             else:
                 raise Exception(f"Failed to get profile: {response.text}")
 
+    @staticmethod
+    def extract_design_id_from_url(canva_url: str) -> Optional[str]:
+        """Pull the design_id out of a public Canva share URL.
+
+        Canva share URLs look like:
+          https://www.canva.com/design/DAGxxxxxxxxxxxx/view
+          https://www.canva.com/design/DAGxxxxxxxxxxxx/edit
+          https://www.canva.com/design/DAGxxxxxxxxxxxx/abcDEFghIJK/view?utm=...
+        The ID always starts with `DAG` (Canva's Connect-API design ID prefix).
+        """
+        import re as _re
+        if not canva_url:
+            return None
+        m = _re.search(r"/design/(DAG[A-Za-z0-9_-]+)", canva_url)
+        return m.group(1) if m else None
+
+    async def get_design(self, design_id: str) -> Dict[str, Any]:
+        """GET /v1/designs/{design_id} — returns design title, owner, thumbnail,
+        urls.edit_url, urls.view_url, and the pages array if the design is
+        accessible to the authenticated user. Verified-documented Canva
+        Connect endpoint."""
+        access_token = await self.get_valid_token()
+        if not access_token:
+            raise Exception("No valid Canva access token")
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            r = await client.get(
+                f"{self.base_url}/designs/{design_id}",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            if r.status_code != 200:
+                raise Exception(f"Canva GET design failed ({r.status_code}): {r.text[:300]}")
+            return r.json()
+
+    async def export_design_as_pdf(self, design_id: str) -> Dict[str, Any]:
+        """Kick off a server-side PDF export job for a Canva design. Returns
+        the export-job resource; caller must poll /exports/{job_id} until
+        status='success' to get the download URL(s). Verified-documented."""
+        access_token = await self.get_valid_token()
+        if not access_token:
+            raise Exception("No valid Canva access token")
+        body = {"design_id": design_id, "format": {"type": "pdf"}}
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            r = await client.post(
+                f"{self.base_url}/exports",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json",
+                },
+                json=body,
+            )
+            if r.status_code not in (200, 202):
+                raise Exception(f"Canva export POST failed ({r.status_code}): {r.text[:300]}")
+            return r.json()
+
+    async def poll_export_until_done(self, job_id: str, max_wait_s: int = 90) -> Dict[str, Any]:
+        """Poll /v1/exports/{job_id} every 2s until status leaves 'in_progress'.
+        Returns the final job doc (with `urls` list on success)."""
+        import asyncio as _asyncio
+        access_token = await self.get_valid_token()
+        if not access_token:
+            raise Exception("No valid Canva access token")
+        deadline = _asyncio.get_event_loop().time() + max_wait_s
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            while _asyncio.get_event_loop().time() < deadline:
+                r = await client.get(
+                    f"{self.base_url}/exports/{job_id}",
+                    headers={"Authorization": f"Bearer {access_token}"},
+                )
+                if r.status_code != 200:
+                    raise Exception(f"Canva export poll failed ({r.status_code}): {r.text[:300]}")
+                job = r.json().get("job") or r.json()
+                status = (job or {}).get("status", "")
+                if status != "in_progress":
+                    return job
+                await _asyncio.sleep(2.0)
+        raise Exception(f"Canva export job {job_id} timed out after {max_wait_s}s")
+
 # Global instance
 canva_integration = CanvaIntegration()
 ```
@@ -2613,16 +3357,112 @@ export default function VendorPortalsPage() {
 
 ---
 
-## FILE: `/app/backend/server.py` — `/api/ai-assist/ingest-pdf` handler (lines 21594-21813)
+## FILE: `/app/backend/server.py` — `/api/ai-assist/ingest-canva-url` and `/api/ai-assist/ingest-pdf` handlers
 
 ```python
-    return {
-        "total_submitted": len(payload.items),
-        "created": created,
-        "exists": exists,
-        "errors": errors,
-        "results": results,
-    }
+@api_router.post("/ai-assist/ingest-canva-url")
+async def ai_assist_ingest_canva_url(payload: AIAssistCanvaIngest):
+    """Canva direct-read path.
+
+    User pastes a Canva design URL (e.g. https://www.canva.com/design/DAG.../view).
+    Pipeline:
+      1) Parse design_id out of the URL.
+      2) Call Canva Connect API `GET /v1/designs/{design_id}` for title + thumbnail (auth check + identify the design).
+      3) Kick off `POST /v1/exports` with `format.type='pdf'` to get a
+         server-side high-fidelity PDF export of the live design.
+      4) Poll `GET /v1/exports/{job_id}` until done; download the PDF bytes.
+      5) Hand the PDF bytes off to the same 3-stage `/ai-assist/ingest-pdf`
+         flow so the user gets the SAME response shape regardless of
+         which entry point was used.
+
+    Why this path beats user-uploading-a-PDF:
+      - Canva's server-side export preserves embedded hyperlink annotations
+        consistently (manual "Download → PDF" sometimes flattens them).
+      - We can fetch design metadata for UX (board name → suggested room).
+      - Removes a manual step (no Save → Download → Drag).
+
+    Note: Canva's Connect API does NOT publicly expose per-element
+    hyperlinks in the design-content response as of Feb 2026, so we still
+    rely on the PDF for link extraction. If/when Canva ships an
+    element-level URL field, swap step 3-5 for a direct read.
+    """
+    from canva_integration import canva_integration as _canva
+
+    design_id = _canva.extract_design_id_from_url(payload.canva_url)
+    if not design_id:
+        raise HTTPException(status_code=400, detail="Could not parse design_id from Canva URL — expected `https://www.canva.com/design/DAG.../...`")
+
+    # Step 2 — design metadata (also serves as auth check)
+    try:
+        design = await _canva.get_design(design_id)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Canva GET design failed: {exc}")
+    design_obj = design.get("design") or design
+    design_title = design_obj.get("title") or design_obj.get("name") or ""
+
+    # Step 3 — kick off PDF export
+    try:
+        export_resp = await _canva.export_design_as_pdf(design_id)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Canva export start failed: {exc}")
+    job = export_resp.get("job") or export_resp
+    job_id = (job or {}).get("id")
+    if not job_id:
+        raise HTTPException(status_code=502, detail=f"Canva export did not return a job id: {export_resp}")
+
+    # Step 4 — poll until done
+    try:
+        final_job = await _canva.poll_export_until_done(job_id, max_wait_s=90)
+    except Exception as exc:
+        raise HTTPException(status_code=504, detail=f"Canva export poll: {exc}")
+    if (final_job or {}).get("status") != "success":
+        raise HTTPException(status_code=502, detail=f"Canva export failed: {final_job}")
+
+    # Download the PDF(s) — Canva returns a list of URLs (one per page bundle)
+    urls = final_job.get("urls") or []
+    if not urls:
+        raise HTTPException(status_code=502, detail="Canva export reported success but returned no urls")
+
+    pdf_bytes_parts: List[bytes] = []
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        for u in urls:
+            r = await client.get(u)
+            if r.status_code != 200:
+                raise HTTPException(status_code=502, detail=f"Canva PDF download failed ({r.status_code}) for {u}")
+            pdf_bytes_parts.append(r.content)
+
+    # If multiple parts came back, glue them together with pypdf
+    if len(pdf_bytes_parts) == 1:
+        pdf_bytes = pdf_bytes_parts[0]
+    else:
+        from pypdf import PdfReader as _PR, PdfWriter as _PW
+        w = _PW()
+        for b in pdf_bytes_parts:
+            r = _PR(io.BytesIO(b))
+            for p in r.pages:
+                w.add_page(p)
+        out = io.BytesIO()
+        w.write(out)
+        pdf_bytes = out.getvalue()
+
+    # Step 5 — re-enter the existing PDF pipeline
+    pdf_b64 = base64.b64encode(pdf_bytes).decode()
+    inner = AIAssistPdfIngest(
+        project_id=payload.project_id,
+        room_name=payload.room_name,
+        sheet_type=payload.sheet_type,
+        pdf_base64=pdf_b64,
+        extra_message=payload.extra_message or (f"Source: Canva design '{design_title}' ({design_id})" if design_title else None),
+    )
+    result = await ai_assist_ingest_pdf(inner)
+    # Add Canva-specific telemetry so the UI knows this came from a live design
+    result["source"] = "canva_url"
+    result["canva_design_id"] = design_id
+    result["canva_design_title"] = design_title
+    return result
+
+
+import httpx  # local import to avoid moving the global import block
 
 
 @api_router.post("/ai-assist/ingest-pdf")
@@ -2668,8 +3508,38 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
             reader = PdfReader(pdf_path)
         except Exception as exc:
             raise HTTPException(status_code=400, detail=f"Could not parse PDF: {exc}")
+
+        # --------------------------------------------------------------
+        # Multi-stage URL extraction (in priority order):
+        #
+        #   Stage 1 — PDF link annotations (most reliable, authored URLs)
+        #   Stage 2 — Visible text on each page, URL-regex'd (catches Canva
+        #             "as-text" links that aren't hyperlinks)
+        #   Stage 3 — Embedded `<<...>>` raw stream URIs in the PDF bytes
+        #             (handles PDFs whose annotations were flattened)
+        #
+        # Stage 4 (OCR/vision) happens later when we send rendered images
+        # to Gemini — even if all three URL stages return zero, the agent
+        # can still identify items visually.
+        # --------------------------------------------------------------
         vendor_urls: List[str] = []
         seen = set()
+
+        def _record_url(u: str):
+            if not u:
+                return
+            u = str(u).strip()
+            if not u.startswith(("http://", "https://")):
+                return
+            # Drop fragments/utm noise to dedupe equivalents
+            base = u.split("#", 1)[0].split("?utm", 1)[0]
+            if base in seen:
+                return
+            seen.add(base)
+            vendor_urls.append(u)
+
+        # Stage 1 — annotations
+        annot_count = 0
         for page in reader.pages:
             annots = page.get("/Annots") or []
             for ann in annots:
@@ -2681,11 +3551,39 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
                     if not action:
                         continue
                     uri = action.get_object().get("/URI")
-                    if uri and uri not in seen:
-                        seen.add(uri)
-                        vendor_urls.append(str(uri))
+                    if uri:
+                        annot_count += 1
+                        _record_url(str(uri))
                 except Exception:
                     continue
+
+        # Stage 2 — visible text URLs
+        url_regex = re.compile(r"https?://[^\s\"'<>)\]\}]+", re.I)
+        text_count = 0
+        for page in reader.pages:
+            try:
+                txt = page.extract_text() or ""
+            except Exception:
+                txt = ""
+            for m in url_regex.findall(txt):
+                before = len(vendor_urls)
+                _record_url(m)
+                if len(vendor_urls) > before:
+                    text_count += 1
+
+        # Stage 3 — raw stream URI scan (covers flattened-annotation PDFs)
+        raw_count = 0
+        try:
+            raw_bytes = pdf_bytes
+            for m in url_regex.findall(raw_bytes.decode("latin-1", errors="ignore")):
+                before = len(vendor_urls)
+                _record_url(m)
+                if len(vendor_urls) > before:
+                    raw_count += 1
+        except Exception:
+            pass
+
+        logger.info(f"PDF URL extraction: annotations={annot_count} text={text_count} raw_stream={raw_count} total_unique={len(vendor_urls)}")
 
         # Render pages to JPEG (max ~5 pages — board exports are usually 1-2)
         page_images_b64: List[Dict[str, str]] = []
@@ -2836,7 +3734,150 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
                     try:
                         await _pg.goto(link, wait_until="domcontentloaded", timeout=20000)
                     except Exception:
+                        pass
+                    await asyncio.sleep(1.5)
+                    extracted = await _pg.evaluate(r"""() => {
+                        const out = {};
+                        const meta = (sel) => { const el = document.querySelector(sel); return el ? (el.getAttribute('content')||'').trim() : ''; };
+                        out.og_title = meta('meta[property="og:title"]') || meta('meta[name="og:title"]');
+                        out.og_image = meta('meta[property="og:image"]') || meta('meta[name="og:image"]');
+                        out.og_description = meta('meta[property="og:description"]') || meta('meta[name="description"]');
+                        out.og_price = meta('meta[property="product:price:amount"]') || meta('meta[itemprop="price"]') || meta('meta[property="og:price:amount"]');
+                        const ldNodes = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+                        for (const n of ldNodes) {
+                            try {
+                                const parsed = JSON.parse(n.textContent||'{}');
+                                const arr = Array.isArray(parsed) ? parsed : (parsed['@graph'] || [parsed]);
+                                for (const obj of arr) {
+                                    if (!obj || typeof obj !== 'object') continue;
+                                    const t = obj['@type']; const types = Array.isArray(t) ? t : [t];
+                                    if (types.includes('Product') || types.includes('IndividualProduct')) {
+                                        out.ld_name = obj.name || out.ld_name;
+                                        out.ld_sku = obj.sku || obj.mpn || obj.productID || out.ld_sku;
+                                        if (obj.image) out.ld_image = (Array.isArray(obj.image) ? obj.image[0] : (typeof obj.image==='object' ? (obj.image.url||'') : obj.image)) || out.ld_image;
+                                        const offers = Array.isArray(obj.offers) ? obj.offers[0] : obj.offers;
+                                        if (offers) out.ld_price = (offers.price || offers.lowPrice || '').toString() || out.ld_price;
+                                    }
+                                }
+                            } catch(e){}
+                        }
+                        // largest visible img >= 400x400
+                        let biggest = null;
+                        document.querySelectorAll('img').forEach(el => {
+                            const src = el.currentSrc || el.src || el.dataset.src || '';
+                            const r = el.getBoundingClientRect();
+                            if (!src || src.startsWith('data:')) return;
+                            if (r.width < 400 || r.height < 400) return;
+                            const area = r.width * r.height;
+                            if (!biggest || area > biggest.area) biggest = {src, area};
+                        });
+                        if (biggest) out.biggest_image = biggest.src;
+                        return out;
+                    }""")
+                    await _b.close()
+                    if need_image:
+                        img = extracted.get("ld_image") or extracted.get("og_image") or extracted.get("biggest_image")
+                        if img:
+                            if img.startswith("//"):
+                                img = "https:" + img
+                            sd["image_url"] = img
+                    if need_price:
+                        pstr = extracted.get("ld_price") or extracted.get("og_price")
+                        if pstr:
+                            try:
+                                pnum = float(re.sub(r"[^\d.]", "", str(pstr)))
+                                if pnum > 0:
+                                    sd["price"] = pnum
+                            except Exception:
+                                pass
+                    if not sd.get("name"):
+                        sd["name"] = extracted.get("ld_name") or extracted.get("og_title") or sd.get("name")
+                    if not sd.get("sku") and extracted.get("ld_sku"):
+                        sd["sku"] = str(extracted["ld_sku"])
+                    if not sd.get("description"):
+                        sd["description"] = extracted.get("og_description") or sd.get("description")
+                    used_path = used_path + "+meta_fallback"
+            except Exception as _fb_exc:
+                logger.warning(f"meta fallback skipped for {link}: {_fb_exc}")
 
+        # Mutate the item with the scraped fields, preserving anything the
+        # agent already filled in for higher-confidence fields where ours win.
+        def _set(field, scraped_key=None, prefer_scraper=False):
+            sk = scraped_key or field
+            v = sd.get(sk)
+            if v in (None, ""):
+                return
+            if prefer_scraper or not it.get(field):
+                it[field] = v
+        _set("name", scraped_key="title", prefer_scraper=False)
+        if not it.get("name"):
+            _set("name", prefer_scraper=False)
+        _set("vendor", prefer_scraper=False)
+        _set("sku", prefer_scraper=True)
+        _set("image_url", prefer_scraper=True)
+        _set("finish_image", prefer_scraper=True)
+        _set("finish_color", scraped_key="finish", prefer_scraper=True)
+        if not it.get("finish_color"):
+            _set("finish_color", prefer_scraper=True)
+        _set("size", scraped_key="dimensions", prefer_scraper=True)
+        if not it.get("size"):
+            _set("size", prefer_scraper=True)
+        _set("description", prefer_scraper=True)
+        # Price → cost (wholesale)
+        scraped_price = sd.get("price") or sd.get("wholesale_price") or sd.get("cost")
+        if scraped_price:
+            try:
+                p = float(str(scraped_price).replace("$", "").replace(",", "").strip())
+                it["cost"] = p
+                it["price"] = p
+            except Exception:
+                pass
+
+        enrichment_results.append({
+            "link": link,
+            "vendor_key": vendor_key,
+            "status": "ok",
+            "via": used_path,
+            "got_price": bool(scraped_price),
+            "got_image": bool(sd.get("image_url")),
+            "got_finish": bool(sd.get("finish_image") or sd.get("finish")),
+            "got_sku": bool(sd.get("sku")),
+            "got_size": bool(sd.get("size") or sd.get("dimensions")),
+        })
+
+    # Compute whether this is an image-only PDF (no extractable text on
+    # any page) so the frontend can show a "treated as visual board" badge.
+    total_text_chars = 0
+    try:
+        reader2 = PdfReader(io.BytesIO(pdf_bytes))
+        for p in reader2.pages:
+            try:
+                t = p.extract_text() or ""
+                total_text_chars += len(t.strip())
+            except Exception:
+                continue
+    except Exception:
+        pass
+    image_only_pdf = total_text_chars < 30  # threshold = a few words at most
+
+    return {
+        "room_name": payload.room_name,
+        "sheet_type": payload.sheet_type,
+        "vendor_urls_found": len(vendor_urls),
+        "vendor_urls": vendor_urls,
+        "pages_rendered": len(page_images_b64),
+        "image_only_pdf": image_only_pdf,
+        "extraction_stages": {
+            "annotations": annot_count,
+            "visible_text": text_count,
+            "raw_stream": raw_count,
+            "total_unique": len(vendor_urls),
+        },
+        "detected_items": items,
+        "enrichment": enrichment_results,
+        "assistant_message": (chat_response.get("assistant_message") or {}).get("content", ""),
+        "design_notes": chat_response.get("design_notes", ""),
+    }
 ```
 
 ---

@@ -355,5 +355,82 @@ class CanvaIntegration:
             else:
                 raise Exception(f"Failed to get profile: {response.text}")
 
+    @staticmethod
+    def extract_design_id_from_url(canva_url: str) -> Optional[str]:
+        """Pull the design_id out of a public Canva share URL.
+
+        Canva share URLs look like:
+          https://www.canva.com/design/DAGxxxxxxxxxxxx/view
+          https://www.canva.com/design/DAGxxxxxxxxxxxx/edit
+          https://www.canva.com/design/DAGxxxxxxxxxxxx/abcDEFghIJK/view?utm=...
+        The ID always starts with `DAG` (Canva's Connect-API design ID prefix).
+        """
+        import re as _re
+        if not canva_url:
+            return None
+        m = _re.search(r"/design/(DAG[A-Za-z0-9_-]+)", canva_url)
+        return m.group(1) if m else None
+
+    async def get_design(self, design_id: str) -> Dict[str, Any]:
+        """GET /v1/designs/{design_id} — returns design title, owner, thumbnail,
+        urls.edit_url, urls.view_url, and the pages array if the design is
+        accessible to the authenticated user. Verified-documented Canva
+        Connect endpoint."""
+        access_token = await self.get_valid_token()
+        if not access_token:
+            raise Exception("No valid Canva access token")
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            r = await client.get(
+                f"{self.base_url}/designs/{design_id}",
+                headers={"Authorization": f"Bearer {access_token}"},
+            )
+            if r.status_code != 200:
+                raise Exception(f"Canva GET design failed ({r.status_code}): {r.text[:300]}")
+            return r.json()
+
+    async def export_design_as_pdf(self, design_id: str) -> Dict[str, Any]:
+        """Kick off a server-side PDF export job for a Canva design. Returns
+        the export-job resource; caller must poll /exports/{job_id} until
+        status='success' to get the download URL(s). Verified-documented."""
+        access_token = await self.get_valid_token()
+        if not access_token:
+            raise Exception("No valid Canva access token")
+        body = {"design_id": design_id, "format": {"type": "pdf"}}
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            r = await client.post(
+                f"{self.base_url}/exports",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Content-Type": "application/json",
+                },
+                json=body,
+            )
+            if r.status_code not in (200, 202):
+                raise Exception(f"Canva export POST failed ({r.status_code}): {r.text[:300]}")
+            return r.json()
+
+    async def poll_export_until_done(self, job_id: str, max_wait_s: int = 90) -> Dict[str, Any]:
+        """Poll /v1/exports/{job_id} every 2s until status leaves 'in_progress'.
+        Returns the final job doc (with `urls` list on success)."""
+        import asyncio as _asyncio
+        access_token = await self.get_valid_token()
+        if not access_token:
+            raise Exception("No valid Canva access token")
+        deadline = _asyncio.get_event_loop().time() + max_wait_s
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            while _asyncio.get_event_loop().time() < deadline:
+                r = await client.get(
+                    f"{self.base_url}/exports/{job_id}",
+                    headers={"Authorization": f"Bearer {access_token}"},
+                )
+                if r.status_code != 200:
+                    raise Exception(f"Canva export poll failed ({r.status_code}): {r.text[:300]}")
+                job = r.json().get("job") or r.json()
+                status = (job or {}).get("status", "")
+                if status != "in_progress":
+                    return job
+                await _asyncio.sleep(2.0)
+        raise Exception(f"Canva export job {job_id} timed out after {max_wait_s}s")
+
 # Global instance
 canva_integration = CanvaIntegration()
