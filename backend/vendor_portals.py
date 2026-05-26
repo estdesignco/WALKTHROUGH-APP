@@ -214,6 +214,76 @@ VENDOR_PORTALS = {
             "product_link": "a.product-item-link",
         }
     },
+    "vandh": {
+        "name": "V & H (Vanguard / Hickory)",
+        "login_url": "https://vandh.com/account/login",
+        "base_url": "https://vandh.com",
+        "search_url": "https://vandh.com/search?q={query}",
+        "login_type": "email",
+        "selectors": {
+            "username_field": "input[type='email'], input[name*='email' i], input[name='customer[email]']",
+            "password_field": "input[type='password'], input[name='customer[password]']",
+            "login_button": "button[type='submit']",
+            "product_image": "img.product-image, img.product-featured-image",
+            "product_link": "a.product-card__link, a[href*='/products/']",
+        }
+    },
+    "flow_decor": {
+        "name": "Flow Decor",
+        "login_url": "https://www.flowdecor.com/sign-in/",
+        "base_url": "https://www.flowdecor.com",
+        "search_url": "https://www.flowdecor.com/?s={query}",
+        "login_type": "email",
+        "selectors": {
+            "username_field": "input[type='email'], input[name*='email' i], input[name*='log' i]",
+            "password_field": "input[type='password'], input[name*='pwd' i], input[name*='pass' i]",
+            "login_button": "button[type='submit'], input[type='submit']",
+            "product_image": "img.wp-post-image, img.attachment-shop_catalog",
+            "product_link": "a.woocommerce-LoopProduct-link",
+        }
+    },
+    "crestview_collection": {
+        "name": "Crestview Collection",
+        "login_url": "https://www.crestviewcollection.com/customer/account/login/",
+        "base_url": "https://www.crestviewcollection.com",
+        "search_url": "https://www.crestviewcollection.com/catalogsearch/result/?q={query}",
+        "login_type": "email",
+        "selectors": {
+            "username_field": "input[name='login[username]'], input#email",
+            "password_field": "input[name='login[password]'], input#pass",
+            "login_button": "button#send2, button[type='submit']",
+            "product_image": "img.product-image-photo",
+            "product_link": "a.product-item-link",
+        }
+    },
+    "eichholtz": {
+        "name": "Eichholtz",
+        "login_url": "https://www.eichholtz.com/en/customer/account/login/",
+        "base_url": "https://www.eichholtz.com",
+        "search_url": "https://www.eichholtz.com/en/catalogsearch/result/?q={query}",
+        "login_type": "email",
+        "selectors": {
+            "username_field": "input[name='login[username]'], input#email",
+            "password_field": "input[name='login[password]'], input#pass",
+            "login_button": "button#send2, button[type='submit']",
+            "product_image": "img.product-image-photo",
+            "product_link": "a.product-item-link",
+        }
+    },
+    "moh_america": {
+        "name": "MOH America",
+        "login_url": "https://myohamerica.com/customer/account/login/",
+        "base_url": "https://myohamerica.com",
+        "search_url": "https://myohamerica.com/catalogsearch/result/?q={query}",
+        "login_type": "email",
+        "selectors": {
+            "username_field": "input[name='login[username]'], input#email",
+            "password_field": "input[name='login[password]'], input#pass",
+            "login_button": "button#send2, button[type='submit']",
+            "product_image": "img.product-image-photo",
+            "product_link": "a.product-item-link",
+        }
+    },
 }
 
 class VendorCredentialManager:
@@ -321,6 +391,11 @@ _URL_DOMAIN_TO_KEY = {
     "safavieh.com": "safavieh",
     "reginaandrew.com": "regina_andrew",
     "globalviews.com": "global_views",
+    "vandh.com": "vandh",
+    "flowdecor.com": "flow_decor",
+    "crestviewcollection.com": "crestview_collection",
+    "eichholtz.com": "eichholtz",
+    "myohamerica.com": "moh_america",
 }
 
 
