@@ -144,8 +144,16 @@ App Password: `DesignReady2026!`
 ## Remaining / Backlog
 ### P1
 - Auto-populate plumbing fixtures from FFE/checklist into 3D palette
+- Tune per-vendor login form selectors in `vendor_scraper.py` / `vendor_portals.py` (Loloi, Bernhardt, Visual Comfort etc.) so TEST LOGIN succeeds when real B2B credentials are entered. The infrastructure (Chromium + Playwright) is fully working now; site-specific selector adjustments are all that remain.
 
 ### P2
 - Glass door panel / shower enclosure in 3D view
 - Refactor ExactChecklistSpreadsheet.js (4000+ lines)
 - Refactor SimpleWalkthroughSpreadsheet.js
+- Refactor server.py (>21k lines) into separate route modules
+
+### AI Design Assistant — Canva PDF → Checklist (Feb 26, 2026) — VERIFIED
+- `/admin/vendor-portals` page renders all 13 supported B2B vendors with SAVE / TEST LOGIN per card. Credentials encrypted at rest with Fernet (`VENDOR_ENCRYPTION_KEY`).
+- AIDesignAssistantPanel (✨ FAB on every project page) accepts Canva PDFs. Pipeline: parse PDF → extract embedded vendor URLs → render pages → Gemini 3.1 Pro Vision detects items → for each item with a vendor link try authenticated portal scraper first, fall back to public `/scrape-product` → return enriched items to the panel → user PUSHes to Checklist.
+- 7/7 backend pytest cases pass (`/app/backend/tests/test_vendor_portals_and_ai.py`). Frontend E2E (iteration_57) confirms page rendering, SAVED badge persistence, panel→portals deep-link, real PDF (`/tmp/diehl.pdf`) ingested with 10 items detected.
+- **CRITICAL infra fix (May 26, 2026)**: backend was missing Playwright's full Chromium binary (only `chromium_headless_shell-1208` shipped; playwright 1.40 expects `chromium-1091`). Result: every TEST LOGIN + every Canva PDF vendor-link enrichment crashed with `Executable doesn't exist`. Fix: ran `playwright install chromium` (writes `/pw-browsers/chromium-1091/`) and added a self-heal block at top of `server.py` so any fresh deploy re-installs automatically on backend boot.

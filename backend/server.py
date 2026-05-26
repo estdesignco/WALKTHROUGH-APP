@@ -78,6 +78,27 @@ logger = logging.getLogger(__name__)
 # Set Playwright browser path
 os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/pw-browsers'
 
+# Self-heal: ensure the Chromium binary Playwright expects is actually
+# present on disk. Without this, vendor portal logins + AI Canva PDF
+# vendor enrichment all crash with "Executable doesn't exist" on any
+# fresh deploy. Runs once at import; harmless no-op if already installed.
+try:
+    import subprocess as _pw_subprocess
+    _pw_chromium = '/pw-browsers/chromium-1091/chrome-linux/chrome'
+    if not os.path.exists(_pw_chromium):
+        logger.info("Playwright Chromium missing — running `playwright install chromium` (one-time)...")
+        _pw_subprocess.run(
+            ['python', '-m', 'playwright', 'install', 'chromium'],
+            check=False, capture_output=True, timeout=300,
+            env={**os.environ, 'PLAYWRIGHT_BROWSERS_PATH': '/pw-browsers'},
+        )
+        if os.path.exists(_pw_chromium):
+            logger.info("Playwright Chromium installed at %s", _pw_chromium)
+        else:
+            logger.warning("Playwright Chromium install did not produce expected binary")
+except Exception as _pw_exc:
+    logger.warning("Playwright self-heal skipped: %s", _pw_exc)
+
 # MongoDB connection - with fallback for missing env var
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 db_name = os.environ.get('DB_NAME', 'interior_design_db')
