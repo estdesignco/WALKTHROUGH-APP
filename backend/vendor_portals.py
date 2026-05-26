@@ -465,6 +465,13 @@ _URL_DOMAIN_TO_KEY = {
     "crestviewcollection.com": "crestview_collection",
     "eichholtz.com": "eichholtz",
     "myohamerica.com": "moh_america",
+    # Wallpaper-specific approved sources (no auth scraper yet, but the URL
+    # resolver still recognizes these so the AI can route them correctly
+    # and the public OG/JSON-LD fallback can fire).
+    "phillipjeffries.com": "phillip_jeffries",
+    "yorkwallcoverings.com": "york_wallcoverings",
+    # Approved supporting vendor mentioned in the master agent prompt.
+    "classichome.com": "classic_home",
 }
 
 

@@ -152,7 +152,29 @@ App Password: `DesignReady2026!`
 - Refactor SimpleWalkthroughSpreadsheet.js
 - Refactor server.py (>21k lines) into separate route modules
 
-### AI Design Assistant — Canva PDF → Checklist (Feb 26, 2026) — VERIFIED
+### MASTER AGENT INSTRUCTIONS (Feb 26, 2026) — VERIFIED
+- Replaced the agent's system prompt with the verbatim **MASTER AGENT INSTRUCTIONS** the user supplied. Now ~20.7 KB / 2,800+ words covering: Core Rule, Default Operating Mode, Canva/Board Input, Canva Workflow, Realism Standards, Instruction Fidelity, Do Not Change Items, Full-Room Image Input, Product Extraction, Multi-Angle Consistency, Perspective & Straightening, Scale & Proportion, Room Shape & Space Corrections (incl. room clearing), Empty Room Concepting, Theater/Media Room Guidance, Furniture-Line Priority, Vendor Item Identification, Vendor Fabric Matching, Wallpaper Pattern & Scale, Independent Wall Treatments, Paint Color Matching, Structured Project Continuity / Memory, Correction Priority Order, Response Behavior, Safety, OUTPUT FORMAT (strict JSON).
+- Live-editable at `/api/ai-assist/prompt` (Settings → Prompt) per project, no redeploy.
+- File: `/app/backend/design_agent_prompt.py`. Default constant: `DEFAULT_DESIGN_AGENT_PROMPT`.
+
+### PDF Pipeline Hardening (Feb 26, 2026) — VERIFIED
+- Replaced single-stage URL extraction with **3-stage extraction in priority order**:
+  1. **Annotation links** (`pypdf.PdfReader.pages[].Annots` → `/A/URI`) — authored hyperlinks from Canva
+  2. **Visible text URLs** (`page.extract_text()` → `re.compile(r"https?://[^\s\"'<>)\]\}]+")`) — catches Canva "as-text" links that aren't annotations
+  3. **Raw stream URI scan** (`pdf_bytes.decode('latin-1') → URL regex`) — catches PDFs whose annotations have been flattened
+- **Image-only PDF detection**: if total extracted text < 30 chars across all pages, flag `image_only_pdf: true` in the response so the frontend can show a "treated as visual board" badge. Even with zero URLs, the AI vision pipeline still runs and detects items (Gemini 3.1 Pro Vision read 3/3 items from a synthetic image-only board in testing).
+- Response now includes `extraction_stages: { annotations, visible_text, raw_stream, total_unique }` so the frontend / debugger can see exactly which stage produced URLs.
+- **Self-heal for missing system binaries** (`pdftoppm` + Playwright Chromium) at backend boot. Both auto-install on first run if missing. File: `/app/backend/server.py` lines ~110-145.
+- Added wallpaper-specific vendor keys to the URL→key resolver: `phillipjeffries.com → phillip_jeffries`, `yorkwallcoverings.com → york_wallcoverings`, `classichome.com → classic_home`. AI-detected wallpaper links now route to the correct vendor for the public-fallback / future-auth scrape path.
+- File: `/app/backend/vendor_portals.py` (added 3 keys to `_URL_DOMAIN_TO_KEY`).
+
+### E2E test results (Feb 26, 2026)
+| Scenario | annotations | visible_text | raw_stream | total | image_only_pdf | items |
+|----------|-------------|--------------|------------|-------|----------------|-------|
+| Synthetic 2-URL PDF (annotation + visible text) | 1 | 1 | 0 | 2 | False | 2 |
+| Image-only flattened PDF (no text, no links) | 0 | 0 | 0 | 0 | **True** | 3 (via AI vision) |
+
+
 - `/admin/vendor-portals` page renders all **18** supported B2B vendors with SAVE / TEST LOGIN per card. Credentials encrypted at rest with Fernet (`VENDOR_ENCRYPTION_KEY`).
 - AIDesignAssistantPanel (✨ FAB on every project page) accepts Canva PDFs. Pipeline: parse PDF → extract embedded vendor URLs → render pages → Gemini 3.1 Pro Vision detects items → for each item with a vendor link try authenticated portal scraper first, fall back to public `/scrape-product`, then a third lightweight OG/JSON-LD meta extractor → return enriched items to the panel → user PUSHes to Checklist.
 - 17 vendor credentials seeded encrypted. Three sessions live and verified: **Four Hands, Visual Comfort, Rowe**. Loloi/Uttermost/Bernhardt could not authenticate from the cloud preview (Uttermost & Bernhardt B2B login URLs need to be supplied by the user; their public `/customer/account/login/` endpoints either 404 or are decoys).

@@ -13,6 +13,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 import requests
+import io
 from bs4 import BeautifulSoup
 import asyncio
 import re
@@ -78,26 +79,39 @@ logger = logging.getLogger(__name__)
 # Set Playwright browser path
 os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/pw-browsers'
 
-# Self-heal: ensure the Chromium binary Playwright expects is actually
-# present on disk. Without this, vendor portal logins + AI Canva PDF
-# vendor enrichment all crash with "Executable doesn't exist" on any
-# fresh deploy. Runs once at import; harmless no-op if already installed.
+# Self-heal: ensure required system binaries are present. Without these,
+# the PDF ingestion + vendor portal login features break on any fresh
+# deploy. Runs once at import; harmless no-op if already installed.
 try:
-    import subprocess as _pw_subprocess
+    import subprocess as _subprocess
+    import shutil as _shutil
+
+    # 1) Playwright Chromium for vendor portal login + product scraping
     _pw_chromium = '/pw-browsers/chromium-1091/chrome-linux/chrome'
     if not os.path.exists(_pw_chromium):
         logger.info("Playwright Chromium missing — running `playwright install chromium` (one-time)...")
-        _pw_subprocess.run(
+        _subprocess.run(
             ['python', '-m', 'playwright', 'install', 'chromium'],
             check=False, capture_output=True, timeout=300,
             env={**os.environ, 'PLAYWRIGHT_BROWSERS_PATH': '/pw-browsers'},
         )
         if os.path.exists(_pw_chromium):
             logger.info("Playwright Chromium installed at %s", _pw_chromium)
+
+    # 2) poppler-utils (pdftoppm) for the Canva PDF → JPEG render step
+    if _shutil.which('pdftoppm') is None:
+        logger.info("pdftoppm missing — installing poppler-utils (one-time)...")
+        _subprocess.run(['apt-get', 'update', '-qq'], check=False, capture_output=True, timeout=120)
+        _subprocess.run(
+            ['apt-get', 'install', '-y', '-qq', 'poppler-utils'],
+            check=False, capture_output=True, timeout=300,
+        )
+        if _shutil.which('pdftoppm') is not None:
+            logger.info("pdftoppm installed at %s", _shutil.which('pdftoppm'))
         else:
-            logger.warning("Playwright Chromium install did not produce expected binary")
+            logger.warning("pdftoppm install did not produce expected binary")
 except Exception as _pw_exc:
-    logger.warning("Playwright self-heal skipped: %s", _pw_exc)
+    logger.warning("Self-heal skipped: %s", _pw_exc)
 
 # MongoDB connection - with fallback for missing env var
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
@@ -21643,8 +21657,38 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
             reader = PdfReader(pdf_path)
         except Exception as exc:
             raise HTTPException(status_code=400, detail=f"Could not parse PDF: {exc}")
+
+        # --------------------------------------------------------------
+        # Multi-stage URL extraction (in priority order):
+        #
+        #   Stage 1 — PDF link annotations (most reliable, authored URLs)
+        #   Stage 2 — Visible text on each page, URL-regex'd (catches Canva
+        #             "as-text" links that aren't hyperlinks)
+        #   Stage 3 — Embedded `<<...>>` raw stream URIs in the PDF bytes
+        #             (handles PDFs whose annotations were flattened)
+        #
+        # Stage 4 (OCR/vision) happens later when we send rendered images
+        # to Gemini — even if all three URL stages return zero, the agent
+        # can still identify items visually.
+        # --------------------------------------------------------------
         vendor_urls: List[str] = []
         seen = set()
+
+        def _record_url(u: str):
+            if not u:
+                return
+            u = str(u).strip()
+            if not u.startswith(("http://", "https://")):
+                return
+            # Drop fragments/utm noise to dedupe equivalents
+            base = u.split("#", 1)[0].split("?utm", 1)[0]
+            if base in seen:
+                return
+            seen.add(base)
+            vendor_urls.append(u)
+
+        # Stage 1 — annotations
+        annot_count = 0
         for page in reader.pages:
             annots = page.get("/Annots") or []
             for ann in annots:
@@ -21656,11 +21700,39 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
                     if not action:
                         continue
                     uri = action.get_object().get("/URI")
-                    if uri and uri not in seen:
-                        seen.add(uri)
-                        vendor_urls.append(str(uri))
+                    if uri:
+                        annot_count += 1
+                        _record_url(str(uri))
                 except Exception:
                     continue
+
+        # Stage 2 — visible text URLs
+        url_regex = re.compile(r"https?://[^\s\"'<>)\]\}]+", re.I)
+        text_count = 0
+        for page in reader.pages:
+            try:
+                txt = page.extract_text() or ""
+            except Exception:
+                txt = ""
+            for m in url_regex.findall(txt):
+                before = len(vendor_urls)
+                _record_url(m)
+                if len(vendor_urls) > before:
+                    text_count += 1
+
+        # Stage 3 — raw stream URI scan (covers flattened-annotation PDFs)
+        raw_count = 0
+        try:
+            raw_bytes = pdf_bytes
+            for m in url_regex.findall(raw_bytes.decode("latin-1", errors="ignore")):
+                before = len(vendor_urls)
+                _record_url(m)
+                if len(vendor_urls) > before:
+                    raw_count += 1
+        except Exception:
+            pass
+
+        logger.info(f"PDF URL extraction: annotations={annot_count} text={text_count} raw_stream={raw_count} total_unique={len(vendor_urls)}")
 
         # Render pages to JPEG (max ~5 pages — board exports are usually 1-2)
         page_images_b64: List[Dict[str, str]] = []
@@ -21922,11 +21994,34 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
             "got_size": bool(sd.get("size") or sd.get("dimensions")),
         })
 
+    # Compute whether this is an image-only PDF (no extractable text on
+    # any page) so the frontend can show a "treated as visual board" badge.
+    total_text_chars = 0
+    try:
+        reader2 = PdfReader(io.BytesIO(pdf_bytes))
+        for p in reader2.pages:
+            try:
+                t = p.extract_text() or ""
+                total_text_chars += len(t.strip())
+            except Exception:
+                continue
+    except Exception:
+        pass
+    image_only_pdf = total_text_chars < 30  # threshold = a few words at most
+
     return {
         "room_name": payload.room_name,
         "sheet_type": payload.sheet_type,
         "vendor_urls_found": len(vendor_urls),
+        "vendor_urls": vendor_urls,
         "pages_rendered": len(page_images_b64),
+        "image_only_pdf": image_only_pdf,
+        "extraction_stages": {
+            "annotations": annot_count,
+            "visible_text": text_count,
+            "raw_stream": raw_count,
+            "total_unique": len(vendor_urls),
+        },
         "detected_items": items,
         "enrichment": enrichment_results,
         "assistant_message": (chat_response.get("assistant_message") or {}).get("content", ""),
