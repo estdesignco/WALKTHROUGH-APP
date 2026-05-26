@@ -26,6 +26,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [showPromptEditor, setShowPromptEditor] = useState(false);
+  const [canvaStatus, setCanvaStatus] = useState(null); // {connected:bool, configured:bool}
   const [selectedForPush, setSelectedForPush] = useState({});  // {messageId-itemIdx: true}
   const [pushStatus, setPushStatus] = useState(null);
   const scrollRef = useRef(null);
@@ -43,6 +44,45 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   }, [projectId]);
 
   useEffect(() => { if (open) loadConversation(); }, [open, loadConversation]);
+
+  // Canva connection status — drives the header chip (connect button vs ✅).
+  useEffect(() => {
+    if (!open) return;
+    fetch(`${API}/canva/status`)
+      .then(r => r.json())
+      .then(d => setCanvaStatus(d))
+      .catch(() => setCanvaStatus({ connected: false }));
+  }, [open]);
+
+  const connectCanva = async () => {
+    try {
+      const r = await fetch(`${API}/canva/auth`);
+      const d = await r.json();
+      if (!d.authorization_url || d.authorization_url.includes('client_id=None')) {
+        alert(
+          'Canva not yet configured.\n\n' +
+          'Add these 2 values to backend/.env from developers.canva.com:\n\n' +
+          'CANVA_CLIENT_ID=...\n' +
+          'CANVA_CLIENT_SECRET=...\n\n' +
+          'Then restart the backend. The redirect URI to register on Canva is already set:\n' +
+          window.location.origin + '/canva/callback'
+        );
+        return;
+      }
+      const w = 600, h = 700;
+      const left = window.screen.width / 2 - w / 2, top = window.screen.height / 2 - h / 2;
+      const popup = window.open(d.authorization_url, 'Canva', `width=${w},height=${h},left=${left},top=${top}`);
+      const poll = setInterval(async () => {
+        if (popup && popup.closed) {
+          clearInterval(poll);
+          const s = await fetch(`${API}/canva/status`).then(r => r.json()).catch(() => ({}));
+          setCanvaStatus(s);
+        }
+      }, 1000);
+    } catch (e) {
+      alert('Canva connect failed: ' + e.message);
+    }
+  };
 
   // Pre-load the project's rooms so the PDF room dropdown has real options.
   useEffect(() => {
@@ -259,7 +299,17 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
             <div style={{ color: '#D4C5A9', fontSize: 10, opacity: 0.7 }}>{projectName || projectId}</div>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {canvaStatus && !canvaStatus.connected && (
+            <button data-testid="aiassist-connect-canva" onClick={connectCanva} title="Connect your Canva account so you can paste design URLs instead of uploading PDFs"
+              style={{ background: 'transparent', color: '#14b8a6', border: '1px solid #14b8a6', padding: '3px 8px', fontSize: 10, fontWeight: 800, letterSpacing: 1, borderRadius: 3, cursor: 'pointer' }}>
+              📐 CONNECT CANVA
+            </button>
+          )}
+          {canvaStatus && canvaStatus.connected && (
+            <span data-testid="aiassist-canva-connected" title="Canva connected"
+              style={{ color: '#10B981', fontSize: 10, fontWeight: 800, letterSpacing: 1 }}>✅ CANVA</span>
+          )}
           <a data-testid="aiassist-download-bundle" href={`${API}/ai-assist/chatgpt-bundle`} download="CHATGPT_BUNDLE.md" title="Download the ChatGPT/Claude/Gemini handoff bundle" style={{ ...iconBtn, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>⤓</a>
           <button data-testid="aiassist-edit-prompt" onClick={() => setShowPromptEditor(true)} title="Edit agent brain" style={iconBtn}>⚙</button>
           <button data-testid="aiassist-reset" onClick={reset} title="Clear conversation + memory" style={iconBtn}>🗑</button>
