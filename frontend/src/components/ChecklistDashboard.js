@@ -9,6 +9,7 @@ import AddItemModal from './AddItemModal';
 import CompletePageLayout from './CompletePageLayout';
 import RoomSpecificCanvaImporter from './RoomSpecificCanvaImporter';
 import PhotoManagerModal from './PhotoManagerModal';
+import AIAssistantFAB from './AIAssistantFAB';
 import { getColorByIndex } from '../utils/roomColors';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
@@ -624,6 +625,9 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
     </CompletePageLayout>
 
     {/* No more floating action buttons - each room will have its own import button */}
+
+    {/* Floating ✨ AI Assistant — opens the side panel with CONNECT CANVA button */}
+    <AIAssistantFAB projectId={projectId} projectName={project?.name} />
   </div>
   );
 };
