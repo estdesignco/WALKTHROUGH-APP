@@ -17307,6 +17307,102 @@ async def list_saved_vendor_credentials():
         raise HTTPException(status_code=500, detail=str(exc))
 
 
+@api_router.get("/vendor-portals/credentials/export")
+async def export_vendor_credentials():
+    """Download an encrypted backup of all vendor credentials.
+
+    The payload contains ENCRYPTED ciphertext only — the actual passwords
+    NEVER leave the server in plaintext. To restore on a fresh DB you'll
+    need the matching VENDOR_ENCRYPTION_KEY env var (the same one used
+    when the credentials were saved). The env var is on the server, NOT
+    in the DB, so it survives DB resets. Keep this backup file private.
+    """
+    docs = await db.vendor_credentials.find({}, {"_id": 0}).to_list(500)
+    if not docs:
+        return {
+            "version": 1,
+            "exported_at": datetime.now(timezone.utc).isoformat(),
+            "credentials": [],
+            "warning": "No vendor credentials saved yet."
+        }
+    return {
+        "version": 1,
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "fingerprint": hashlib.sha256((os.environ.get("VENDOR_ENCRYPTION_KEY", "") or "").encode()).hexdigest()[:16],
+        "credentials": docs,
+        "note": (
+            "ENCRYPTED BACKUP — restore via POST /api/vendor-portals/credentials/import. "
+            "Requires the matching VENDOR_ENCRYPTION_KEY env var on the target server."
+        ),
+    }
+
+
+class VendorCredentialImport(BaseModel):
+    credentials: List[Dict[str, Any]]
+    overwrite: Optional[bool] = False  # when True, REPLACE existing entries
+
+
+@api_router.post("/vendor-portals/credentials/import")
+async def import_vendor_credentials(payload: VendorCredentialImport):
+    """Restore an exported backup.
+
+    Returns per-row status. Refuses to overwrite existing entries unless
+    `overwrite=true` is set. Also verifies each restored ciphertext can be
+    decrypted with the current VENDOR_ENCRYPTION_KEY — if not, that row is
+    flagged so you know your env var doesn't match the export."""
+    results = []
+    restored = skipped = failed = 0
+
+    for entry in payload.credentials:
+        vk = entry.get("vendor_key") or entry.get("domain")
+        if not vk:
+            results.append({"vendor_key": None, "status": "error", "detail": "missing vendor_key"})
+            failed += 1
+            continue
+        cipher = entry.get("password_encrypted") or entry.get("encrypted_password")
+        if not cipher:
+            results.append({"vendor_key": vk, "status": "error", "detail": "missing password ciphertext"})
+            failed += 1
+            continue
+
+        # Validate the ciphertext is decryptable with the current key.
+        try:
+            from vendor_portals import decrypt_password as _dec
+            _ = _dec(cipher)
+        except Exception as exc:
+            results.append({
+                "vendor_key": vk,
+                "status": "key_mismatch",
+                "detail": "Ciphertext cannot be decrypted — VENDOR_ENCRYPTION_KEY does not match the one used to create the backup.",
+            })
+            failed += 1
+            continue
+
+        existing = await db.vendor_credentials.find_one({"vendor_key": vk}, {"_id": 0, "vendor_key": 1})
+        if existing and not payload.overwrite:
+            results.append({"vendor_key": vk, "status": "skipped", "detail": "already exists; set overwrite=true to replace"})
+            skipped += 1
+            continue
+
+        doc = {**entry}
+        doc["vendor_key"] = vk
+        doc["password_encrypted"] = cipher
+        doc["restored_at"] = datetime.now(timezone.utc).isoformat()
+        doc.pop("_id", None)
+        await db.vendor_credentials.update_one(
+            {"vendor_key": vk}, {"$set": doc}, upsert=True
+        )
+        results.append({"vendor_key": vk, "status": "restored"})
+        restored += 1
+
+    return {
+        "restored": restored,
+        "skipped": skipped,
+        "failed": failed,
+        "results": results,
+    }
+
+
 @api_router.get("/vendor-portals/{vendor_key}")
 async def get_vendor_portal(vendor_key: str):
     """Get configuration for a specific vendor portal"""
