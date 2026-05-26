@@ -21783,6 +21783,89 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
         if not sd.get("image_url") and isinstance(sd.get("images"), list) and sd["images"]:
             sd["image_url"] = sd["images"][0]
 
+        # 4c) Light-weight OG/JSON-LD fallback. Works for vendors we couldn't
+        # log into (Gabby, Uttermost, Bernhardt, Loloi) because most modern
+        # e-com sites embed product metadata in <meta property="og:..."> tags
+        # and a JSON-LD <script> regardless of auth state. We only run this
+        # if EITHER image OR price is still missing AND we haven't already
+        # gotten them from the portal path.
+        need_image = not sd.get("image_url")
+        need_price = not (sd.get("price") or sd.get("cost") or sd.get("wholesale_price"))
+        if (need_image or need_price) and PLAYWRIGHT_AVAILABLE and async_playwright is not None:
+            try:
+                async with async_playwright() as _ap:
+                    _b = await _ap.chromium.launch(headless=True, args=["--no-sandbox", "--disable-setuid-sandbox"])
+                    _ctx = await _b.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    _pg = await _ctx.new_page()
+                    try:
+                        await _pg.goto(link, wait_until="domcontentloaded", timeout=20000)
+                    except Exception:
+                        pass
+                    await asyncio.sleep(1.5)
+                    extracted = await _pg.evaluate(r"""() => {
+                        const out = {};
+                        const meta = (sel) => { const el = document.querySelector(sel); return el ? (el.getAttribute('content')||'').trim() : ''; };
+                        out.og_title = meta('meta[property="og:title"]') || meta('meta[name="og:title"]');
+                        out.og_image = meta('meta[property="og:image"]') || meta('meta[name="og:image"]');
+                        out.og_description = meta('meta[property="og:description"]') || meta('meta[name="description"]');
+                        out.og_price = meta('meta[property="product:price:amount"]') || meta('meta[itemprop="price"]') || meta('meta[property="og:price:amount"]');
+                        const ldNodes = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+                        for (const n of ldNodes) {
+                            try {
+                                const parsed = JSON.parse(n.textContent||'{}');
+                                const arr = Array.isArray(parsed) ? parsed : (parsed['@graph'] || [parsed]);
+                                for (const obj of arr) {
+                                    if (!obj || typeof obj !== 'object') continue;
+                                    const t = obj['@type']; const types = Array.isArray(t) ? t : [t];
+                                    if (types.includes('Product') || types.includes('IndividualProduct')) {
+                                        out.ld_name = obj.name || out.ld_name;
+                                        out.ld_sku = obj.sku || obj.mpn || obj.productID || out.ld_sku;
+                                        if (obj.image) out.ld_image = (Array.isArray(obj.image) ? obj.image[0] : (typeof obj.image==='object' ? (obj.image.url||'') : obj.image)) || out.ld_image;
+                                        const offers = Array.isArray(obj.offers) ? obj.offers[0] : obj.offers;
+                                        if (offers) out.ld_price = (offers.price || offers.lowPrice || '').toString() || out.ld_price;
+                                    }
+                                }
+                            } catch(e){}
+                        }
+                        // largest visible img >= 400x400
+                        let biggest = null;
+                        document.querySelectorAll('img').forEach(el => {
+                            const src = el.currentSrc || el.src || el.dataset.src || '';
+                            const r = el.getBoundingClientRect();
+                            if (!src || src.startsWith('data:')) return;
+                            if (r.width < 400 || r.height < 400) return;
+                            const area = r.width * r.height;
+                            if (!biggest || area > biggest.area) biggest = {src, area};
+                        });
+                        if (biggest) out.biggest_image = biggest.src;
+                        return out;
+                    }""")
+                    await _b.close()
+                    if need_image:
+                        img = extracted.get("ld_image") or extracted.get("og_image") or extracted.get("biggest_image")
+                        if img:
+                            if img.startswith("//"):
+                                img = "https:" + img
+                            sd["image_url"] = img
+                    if need_price:
+                        pstr = extracted.get("ld_price") or extracted.get("og_price")
+                        if pstr:
+                            try:
+                                pnum = float(re.sub(r"[^\d.]", "", str(pstr)))
+                                if pnum > 0:
+                                    sd["price"] = pnum
+                            except Exception:
+                                pass
+                    if not sd.get("name"):
+                        sd["name"] = extracted.get("ld_name") or extracted.get("og_title") or sd.get("name")
+                    if not sd.get("sku") and extracted.get("ld_sku"):
+                        sd["sku"] = str(extracted["ld_sku"])
+                    if not sd.get("description"):
+                        sd["description"] = extracted.get("og_description") or sd.get("description")
+                    used_path = used_path + "+meta_fallback"
+            except Exception as _fb_exc:
+                logger.warning(f"meta fallback skipped for {link}: {_fb_exc}")
+
         # Mutate the item with the scraped fields, preserving anything the
         # agent already filled in for higher-confidence fields where ours win.
         def _set(field, scraped_key=None, prefer_scraper=False):

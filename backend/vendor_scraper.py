@@ -184,31 +184,73 @@ class VendorPortalScraper:
                 logger.info("Pressed Enter as login fallback")
             
             # Wait for navigation/login to complete
+            initial_url = portal_config['login_url']
             await asyncio.sleep(3)
             try:
                 await page.wait_for_load_state('networkidle', timeout=15000)
             except:
                 pass  # Some sites don't fully settle
             
-            # Check if login was successful
+            # Check if login was successful using STRUCTURAL signals (much
+            # more reliable than scanning page text for the word "error",
+            # which appears in footers/help links on plenty of successful
+            # post-login pages):
+            #
+            #   1. Auth cookie set (Shopify: secure_customer_sig, Magento:
+            #      PHPSESSID + customer_section_data_clean, generic: any
+            #      session/auth cookie)
+            #   2. URL changed away from the /login page (most redirect
+            #      either to /account or /home on success and stay on
+            #      /login on failure)
+            #   3. A logout / "sign out" / "my account" link is visible
             current_url = page.url
-            page_content = await page.content()
-            
+            cookies = await context.cookies()
+            cookie_names = {c['name'].lower() for c in cookies}
             logger.info(f"Post-login URL: {current_url}")
-            
-            # Check for login failure indicators
-            failure_indicators = ['invalid', 'incorrect', 'error', 'failed', 'wrong password', 'try again']
-            if any(x in page_content.lower() for x in failure_indicators):
-                # Check if we're still on login page
-                if 'login' in current_url.lower():
-                    logger.error(f"Login failed for {vendor_key} - still on login page")
-                    await context.close()
-                    return False
-            
-            # Check for success indicators
-            success_indicators = ['account', 'dashboard', 'welcome', 'home', 'catalog', 'products', 'logout', 'sign out']
-            is_success = any(x in page_content.lower() for x in success_indicators) or 'login' not in current_url.lower()
-            
+            logger.info(f"Cookies set: {sorted(list(cookie_names))[:30]}")
+
+            # 1) auth cookies
+            auth_cookie_signals = {
+                'secure_customer_sig',          # Shopify customer logged in
+                '_shopify_customer_authorization',
+                'customer_authorization',
+                'persistent_shopping_cart',     # Magento logged in
+                'mage-cache-sessid',
+                'private_content_version',
+                'auth_token', 'authtoken', 'auth', 'access_token',
+                'sessionid', 'session_id', 'session', 'jsessionid',
+                'customer_id', 'user_id',
+            }
+            has_auth_cookie = any(n in cookie_names for n in auth_cookie_signals)
+
+            # 2) URL changed away from login (host or path)
+            from urllib.parse import urlparse
+            initial_path = (urlparse(initial_url).path or '').rstrip('/').lower()
+            current_path = (urlparse(current_url).path or '').rstrip('/').lower()
+            url_changed = (current_path != initial_path) or ('login' not in current_path and 'sign-in' not in current_path and 'auth' not in current_path)
+
+            # 3) logout / "my account" link visible
+            logout_visible = False
+            try:
+                for sel in [
+                    'a[href*="logout" i]', 'a[href*="signout" i]', 'a[href*="sign-out" i]',
+                    'a:has-text("Logout")', 'a:has-text("Log out")', 'a:has-text("Sign out")',
+                    'a:has-text("Sign Out")', 'a:has-text("My Account")',
+                    'button:has-text("Logout")',
+                ]:
+                    try:
+                        el = await page.query_selector(sel)
+                        if el and await el.is_visible():
+                            logout_visible = True
+                            break
+                    except Exception:
+                        continue
+            except Exception:
+                pass
+
+            is_success = has_auth_cookie or logout_visible or url_changed
+            logger.info(f"Login signals: auth_cookie={has_auth_cookie} url_changed={url_changed} logout_visible={logout_visible} => success={is_success}")
+
             if is_success:
                 # Store the authenticated context
                 self.contexts[vendor_key] = context
@@ -400,67 +442,163 @@ class VendorPortalScraper:
         return products
     
     async def get_product_details(self, vendor_key: str, product_url: str, portal_config: Dict) -> Dict:
-        """Get detailed product information from a product page"""
+        """Get detailed product information from a product page using a mix
+        of OpenGraph meta tags, JSON-LD Product schema, and vendor-specific
+        selectors as a last resort. This works across most e-com platforms
+        (Shopify, Magento, WooCommerce, custom) without site-specific tuning.
+        """
         if vendor_key not in self.contexts:
             return {}
-        
+
         try:
             context = self.contexts[vendor_key]
             page = await context.new_page()
-            
-            await page.goto(product_url, wait_until='networkidle', timeout=30000)
+
+            try:
+                await page.goto(product_url, wait_until='domcontentloaded', timeout=30000)
+            except Exception:
+                # Some pages never reach domcontentloaded due to long-running
+                # analytics scripts; we still try to read meta tags.
+                pass
             await asyncio.sleep(2)
-            
-            # Extract product details
+            try:
+                await page.wait_for_load_state('networkidle', timeout=10000)
+            except Exception:
+                pass
+
             details = {
                 'url': product_url,
                 'vendor': portal_config.get('name', ''),
-                'scraped_at': datetime.now(timezone.utc).isoformat()
+                'scraped_at': datetime.now(timezone.utc).isoformat(),
             }
-            
-            # Try to get product name
-            for selector in ['h1.product-name', 'h1.product-title', 'h1', '.product-name', '[data-product-name]']:
-                try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        details['name'] = await element.inner_text()
-                        break
-                except:
-                    continue
-            
-            # Try to get price
-            for selector in ['.product-price', '.price', '[data-price]', '.product-info-price']:
-                try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        price_text = await element.inner_text()
-                        # Extract numeric price
-                        price_match = re.search(r'\$?([\d,]+\.?\d*)', price_text)
-                        if price_match:
-                            details['price'] = float(price_match.group(1).replace(',', ''))
-                        break
-                except:
-                    continue
-            
-            # Get all images
-            images = []
-            for img in await page.query_selector_all('img.product-image, img.gallery-image, .product-gallery img'):
-                src = await img.get_attribute('src') or await img.get_attribute('data-src')
-                if src:
-                    if not src.startswith('http'):
-                        src = portal_config.get('base_url', '') + src
-                    images.append(src)
-            details['images'] = images[:10]  # Limit to 10 images
-            
-            # Try to get SKU
-            page_content = await page.content()
-            sku_match = re.search(r'(?:SKU|Item|Style)[:\s#]*([A-Z0-9-]+)', page_content, re.I)
-            if sku_match:
-                details['sku'] = sku_match.group(1)
-            
+
+            # 1) OpenGraph + Product JSON-LD via a single page.evaluate() call.
+            extracted = await page.evaluate(r"""() => {
+                const out = {};
+                const meta = (sel) => {
+                    const el = document.querySelector(sel);
+                    return el ? (el.getAttribute('content') || el.getAttribute('value') || '').trim() : '';
+                };
+                out.og_title = meta('meta[property="og:title"]') || meta('meta[name="og:title"]');
+                out.og_image = meta('meta[property="og:image"]') || meta('meta[name="og:image"]');
+                out.og_description = meta('meta[property="og:description"]') || meta('meta[name="description"]');
+                out.og_price = meta('meta[property="product:price:amount"]') || meta('meta[property="og:price:amount"]') || meta('meta[itemprop="price"]');
+                out.og_currency = meta('meta[property="product:price:currency"]') || meta('meta[property="og:price:currency"]');
+                out.og_sku = meta('meta[property="product:retailer_item_id"]') || meta('meta[itemprop="sku"]');
+
+                // JSON-LD Product schema (most modern e-com sites embed this)
+                const ldNodes = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+                const products = [];
+                for (const n of ldNodes) {
+                    try {
+                        const parsed = JSON.parse(n.textContent || '{}');
+                        const arr = Array.isArray(parsed) ? parsed : (parsed['@graph'] || [parsed]);
+                        for (const obj of arr) {
+                            if (!obj || typeof obj !== 'object') continue;
+                            const t = obj['@type'];
+                            const types = Array.isArray(t) ? t : [t];
+                            if (types.includes('Product') || types.includes('IndividualProduct')) {
+                                products.push(obj);
+                            }
+                        }
+                    } catch (e) {}
+                }
+                if (products.length) {
+                    const p = products[0];
+                    out.ld_name = p.name || '';
+                    out.ld_sku = p.sku || p.mpn || p.productID || '';
+                    out.ld_description = p.description || '';
+                    const offers = Array.isArray(p.offers) ? p.offers[0] : p.offers;
+                    if (offers) {
+                        out.ld_price = (offers.price || offers.lowPrice || offers.highPrice || '').toString();
+                        out.ld_currency = offers.priceCurrency || '';
+                        out.ld_availability = offers.availability || '';
+                    }
+                    if (p.image) {
+                        out.ld_image = Array.isArray(p.image) ? p.image[0] : p.image;
+                        if (typeof out.ld_image === 'object' && out.ld_image && out.ld_image.url) out.ld_image = out.ld_image.url;
+                    }
+                    if (p.brand) {
+                        out.ld_brand = (typeof p.brand === 'object' ? (p.brand.name || '') : p.brand);
+                    }
+                    if (p.color) out.ld_color = p.color;
+                    if (p.material) out.ld_material = Array.isArray(p.material) ? p.material.join(', ') : p.material;
+                    // additional dimension fields
+                    const props = (p.additionalProperty || []).reduce((acc, x) => {
+                        if (x && x.name && x.value !== undefined) acc[String(x.name).toLowerCase()] = x.value;
+                        return acc;
+                    }, {});
+                    out.ld_props = props;
+                }
+
+                // Largest visible img as fallback image (>= 300x300).
+                let biggest = null;
+                document.querySelectorAll('img').forEach(el => {
+                    const src = el.currentSrc || el.src || el.dataset.src || '';
+                    const r = el.getBoundingClientRect();
+                    if (!src || src.startsWith('data:')) return;
+                    if (r.width < 300 || r.height < 300) return;
+                    const area = r.width * r.height;
+                    if (!biggest || area > biggest.area) biggest = {src, area};
+                });
+                if (biggest) out.biggest_image = biggest.src;
+
+                return out;
+            }""")
+
+            # Pick best name
+            name = extracted.get('ld_name') or extracted.get('og_title')
+            if name:
+                details['name'] = name
+                details['title'] = name
+
+            # Pick best image
+            image = extracted.get('ld_image') or extracted.get('og_image') or extracted.get('biggest_image')
+            if image:
+                if image.startswith('//'):
+                    image = 'https:' + image
+                elif not image.startswith('http'):
+                    image = portal_config.get('base_url', '').rstrip('/') + '/' + image.lstrip('/')
+                details['image_url'] = image
+
+            # Pick best SKU
+            sku = extracted.get('ld_sku') or extracted.get('og_sku')
+            if sku:
+                details['sku'] = str(sku)
+
+            # Pick best price
+            price_str = extracted.get('ld_price') or extracted.get('og_price') or ''
+            try:
+                if price_str:
+                    p = float(re.sub(r'[^\d.]', '', str(price_str)))
+                    if p > 0:
+                        details['price'] = p
+            except Exception:
+                pass
+
+            # Description / extras
+            if extracted.get('ld_description') or extracted.get('og_description'):
+                details['description'] = extracted.get('ld_description') or extracted.get('og_description')
+            if extracted.get('ld_color'):
+                details['finish'] = extracted['ld_color']
+                details['finish_color'] = extracted['ld_color']
+            if extracted.get('ld_brand'):
+                details['brand'] = extracted['ld_brand']
+
+            # Dimensions from additionalProperty (best-effort)
+            props = extracted.get('ld_props') or {}
+            for k, v in props.items():
+                kl = k.lower()
+                if any(x in kl for x in ('width', 'height', 'depth', 'length', 'dimension', 'size')):
+                    details.setdefault('dimensions', []).append(f"{k}: {v}")
+            if isinstance(details.get('dimensions'), list):
+                details['dimensions'] = ', '.join(details['dimensions'])
+                details['size'] = details['dimensions']
+
             await page.close()
+            logger.info(f"Got product details for {vendor_key}: name={'Y' if details.get('name') else '.'} price={details.get('price')} img={'Y' if details.get('image_url') else '.'} sku={details.get('sku')}")
             return details
-            
+
         except Exception as e:
             logger.error(f"Error getting product details: {e}")
             return {}
