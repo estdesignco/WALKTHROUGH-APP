@@ -1,0 +1,56 @@
+{
+  "summary": "Full E2E test of vendor-portals + AI Canva ingestion pipeline. ALL 7 backend pytest tests PASSED (vendor portals list, save+encrypt, login-status, export/import, ingest-pdf with real diehl.pdf via Gemini, push-items, delete cleanup). ALL frontend flows PASSED (login, /admin/vendor-portals renders 13 cards, save loloi credential -> SAVED badge persists after reload, TEST LOGIN reaches endpoint, AI FAB on project page opens panel, PDF picker shows 'Manage vendor logins ->' link with correct href). Gemini returned 10 detected items from diehl.pdf and they were successfully pushed to the project.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "POST /api/vendor-portals/{vendor_key}/test-login (vendor_scraper.py)",
+        "issue": "Playwright Chromium binary mismatch on backend. playwright==1.40.0 expects chromium-1091 at /pw-browsers/chromium-1091/chrome-linux/chrome but only /pw-browsers/chromium_headless_shell-1208 exists. Result: every vendor TEST LOGIN and every PDF ingest vendor-URL scrape returns 'Executable doesn't exist'. The plumbing works (request reaches endpoint, error JSON returned) but NO real vendor scraping will EVER succeed until this is fixed. enrichment[].status is always 'error' for browser reason, not vendor blocking.",
+        "priority": "CRITICAL"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "test_credentials.md project id",
+        "issue": "Documented project_id 'bc8c27ce-85dc-4e9f-9bde-73a3e959d74f' does NOT exist in DB. Actual Wheeler Ridge id is '72d4051a-4986-4d3c-8df7-fb0fec94f250'. Update /app/memory/test_credentials.md."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "/admin/vendor-portals",
+        "issues": ["Page renders cleanly with all 13 vendor cards, clear SAVE/TEST LOGIN buttons, encrypted-at-rest disclaimer. No design issues found."]
+      },
+      {
+        "screen": "Project detail AI panel",
+        "issues": ["AIDesignAssistantPanel slides in correctly. PDF picker (data-testid='aiassist-pdf-picker') shows Room/Sheet selectors and the 'Manage vendor logins ->' deep link with target=_blank. Looks polished."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_vendor_portals_and_ai.py",
+    "/app/test_reports/pytest/iter57.xml"
+  ],
+  "action_items": [
+    "CRITICAL: Install matching Playwright browsers on backend. Run `python -m playwright install chromium` inside the backend container (NOT headless_shell). Without this, the entire 'AI uses authenticated vendor logins to scrape real prices/images' value-prop is non-functional. Consider also bumping playwright>=1.48 to match the chromium-1208 binary already present.",
+    "Update /app/memory/test_credentials.md: replace project_id 'bc8c27ce-...' with actual '72d4051a-4986-4d3c-8df7-fb0fec94f250'.",
+    "Optional: add a one-time backend health-check that ensures the playwright browser path resolves at startup and logs a loud warning if missing, so this regression is caught immediately next deploy."
+  ],
+  "critical_code_review_comments": [
+    "vendor_scraper.py launches headed Chromium (channel default). On cloud preview this needs --no-sandbox; verify launch args include that. Currently failure is at binary discovery so the sandbox issue is downstream.",
+    "/api/vendor-portals/{key}/credentials accepts save without verifying the key against VENDOR_PORTALS_CONFIG (works fine for known keys but no 404 guard for unknown - low priority).",
+    "Saved-credentials endpoint correctly omits plaintext (verified) and DB doc stores Fernet ciphertext starting 'gAAAAA' (verified in mongo)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_vendor_portals_and_ai.py (new)"
+  ],
+  "success_rate": {"backend": "100% (7/7 pytest)", "frontend": "100% (steps 8-12 all passed)"},
+  "test_credentials": "App password DesignReady2026! works. Real project_id=72d4051a-4986-4d3c-8df7-fb0fec94f250.",
+  "seed_data_creation": "Created and deleted dummy loloi credential (test@example.com / TestPass123!). DB confirmed clean (delete cleanup ran). AI push-items added 10 detected checklist items to Wheeler Ridge / Master Bathroom — those persist (intended; main agent / user can decide to keep or wipe).",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All backend endpoints + UI plumbing work end-to-end. Only blocker: backend playwright Chromium binary missing -> vendor login test + URL enrichment will fail with 'Executable doesnt exist'. Once main agent runs `python -m playwright install chromium` in backend and restarts, retest /api/vendor-portals/{key}/test-login with a real vendor credential and watch enrichment[].status flip from 'error' to 'success' on a few ingest-pdf URLs. Pytest file at /app/backend/tests/test_vendor_portals_and_ai.py is reusable.",
+  "rca of the issue": "Vendor portal/scraper feature: playwright python package pinned to 1.40.0 (in requirements.txt) which auto-downloads chromium revision 1091. The container image only ships /pw-browsers/chromium_headless_shell-1208 (likely from a newer playwright installed earlier and pruned, or installed as headless-shell only). When async_playwright().chromium.launch() runs, playwright looks for full chromium 1091 and fails. Two fixes: (a) run `playwright install chromium` to fetch 1091, OR (b) upgrade playwright to 1.48+ to use the existing 1208 binary. Option (a) is safer (no regressions in other code paths)."
+}
