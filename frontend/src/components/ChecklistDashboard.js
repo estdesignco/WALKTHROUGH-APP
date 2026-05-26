@@ -105,13 +105,14 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   // This prevents disruptive re-renders while working
 
   const loadSimpleProject = async () => {
+    let projectData = null;
     try {
       console.log('🚀 Loading CHECKLIST project data for:', projectId);
       
       const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/projects/${projectId}?sheet_type=checklist`);
       
       if (response.ok) {
-        const projectData = await response.json();
+        projectData = await response.json();
         console.log('✅ Project loaded successfully:', projectData.name);
         setProject(projectData);
         setError(null);
@@ -147,7 +148,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
       
       // Dynamically extract all unique vendors from project items
       const vendors = new Set();
-      (projectData.rooms || []).forEach(room => {
+      ((projectData && projectData.rooms) || []).forEach(room => {
         (room.categories || []).forEach(cat => {
           (cat.subcategories || []).forEach(sub => {
             (sub.items || []).forEach(item => {
