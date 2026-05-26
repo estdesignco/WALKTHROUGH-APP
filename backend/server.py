@@ -17294,6 +17294,19 @@ async def get_vendor_login_status():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@api_router.get("/vendor-portals/saved-credentials")
+async def list_saved_vendor_credentials():
+    """Return saved vendor credentials (usernames only — passwords are
+    decrypted server-side when needed and NEVER returned over the wire)."""
+    try:
+        manager = VendorCredentialManager(db)
+        creds = await manager.get_all_credentials()
+        return {"credentials": creds}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
 @api_router.get("/vendor-portals/{vendor_key}")
 async def get_vendor_portal(vendor_key: str):
     """Get configuration for a specific vendor portal"""
@@ -17351,6 +17364,46 @@ async def delete_vendor_credentials(vendor_key: str):
         return {"success": True, "message": f"Credentials deleted for {vendor_key}"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+class VendorCredentialUpsert(BaseModel):
+    username: str
+    password: str
+    account_number: Optional[str] = None
+    dealer_code: Optional[str] = None
+
+
+@api_router.post("/vendor-portals/{vendor_key}/credentials")
+async def save_vendor_credentials(vendor_key: str, payload: VendorCredentialUpsert):
+    """Save (or replace) vendor portal credentials. Password is encrypted at
+    rest with VENDOR_ENCRYPTION_KEY before being stored."""
+    portal = get_vendor_portal_info(vendor_key)
+    if not portal:
+        raise HTTPException(status_code=404, detail=f"Unknown vendor_key '{vendor_key}'")
+    if not payload.username.strip() or not payload.password:
+        raise HTTPException(status_code=400, detail="username and password are required")
+    try:
+        manager = VendorCredentialManager(db)
+        result = await manager.save_credential(
+            vendor_key=vendor_key,
+            username=payload.username.strip(),
+            password=payload.password,
+            account_number=payload.account_number,
+            dealer_code=payload.dealer_code,
+        )
+        return result
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@api_router.delete("/vendor-portals/{vendor_key}/credentials")
+async def delete_vendor_credentials(vendor_key: str):
+    try:
+        manager = VendorCredentialManager(db)
+        await manager.delete_credential(vendor_key)
+        return {"status": "deleted"}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
 
 @api_router.post("/vendor-portals/{vendor_key}/login")
 async def login_to_vendor_portal(vendor_key: str):
@@ -21151,6 +21204,19 @@ class AIAssistPushItems(BaseModel):
                                        # but we still log who pushed.
 
 
+class AIAssistPdfIngest(BaseModel):
+    """One-room PDF ingest. The user picks the target room + sheet_type; every
+    detected item lands in that room. Embedded vendor URLs are extracted from
+    the PDF and enriched via the existing /scrape-product pipeline so prices,
+    images, finishes, and SKUs are populated automatically.
+    """
+    project_id: str
+    room_name: str
+    sheet_type: str = "checklist"     # checklist | ffe | walkthrough
+    pdf_base64: str                    # data URL or raw base64
+    extra_message: Optional[str] = ""  # optional refinement instructions
+
+
 class AIAssistPromptUpdate(BaseModel):
     prompt: str
     project_id: Optional[str] = None  # None = workspace default
@@ -21403,6 +21469,251 @@ async def ai_assist_push_items(payload: AIAssistPushItems):
         "exists": exists,
         "errors": errors,
         "results": results,
+    }
+
+
+@api_router.post("/ai-assist/ingest-pdf")
+async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
+    """Single-room PDF ingest.
+
+    Pipeline:
+      1. Decode the PDF, extract embedded vendor URLs (hyperlinks).
+      2. Render each page to a JPEG image.
+      3. Send images + URL list to the design agent → returns detected_items
+         mapped to the user's chosen room/sheet_type.
+      4. For each detected item with a vendor link, enrich via the existing
+         /scrape-product pipeline → fills price, image_url, finish_image,
+         SKU, size, description, finish_color, fabric_code, etc.
+      5. Return enriched items (NOT auto-pushed — the user reviews + clicks
+         PUSH in the panel).
+    """
+    project = await db.projects.find_one({"id": payload.project_id}, {"_id": 0, "id": 1, "name": 1})
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    if not payload.room_name.strip():
+        raise HTTPException(status_code=400, detail="room_name is required (one PDF = one room)")
+
+    # ---- 1) Decode PDF + extract links + render pages ----
+    raw_b64 = payload.pdf_base64.strip()
+    if raw_b64.startswith("data:"):
+        raw_b64 = raw_b64.split(",", 1)[1]
+    try:
+        pdf_bytes = base64.b64decode(raw_b64)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid base64 PDF")
+
+    import tempfile, subprocess
+    from pypdf import PdfReader
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        pdf_path = os.path.join(tmpdir, "input.pdf")
+        with open(pdf_path, "wb") as f:
+            f.write(pdf_bytes)
+
+        # Extract embedded vendor URLs (preserve doc order, dedupe)
+        try:
+            reader = PdfReader(pdf_path)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Could not parse PDF: {exc}")
+        vendor_urls: List[str] = []
+        seen = set()
+        for page in reader.pages:
+            annots = page.get("/Annots") or []
+            for ann in annots:
+                try:
+                    obj = ann.get_object()
+                    if obj.get("/Subtype") != "/Link":
+                        continue
+                    action = obj.get("/A")
+                    if not action:
+                        continue
+                    uri = action.get_object().get("/URI")
+                    if uri and uri not in seen:
+                        seen.add(uri)
+                        vendor_urls.append(str(uri))
+                except Exception:
+                    continue
+
+        # Render pages to JPEG (max ~5 pages — board exports are usually 1-2)
+        page_images_b64: List[Dict[str, str]] = []
+        try:
+            subprocess.run(
+                ["pdftoppm", "-jpeg", "-r", "110", "-l", "5", pdf_path, os.path.join(tmpdir, "page")],
+                check=True, capture_output=True, timeout=60,
+            )
+        except Exception as exc:
+            raise HTTPException(status_code=500, detail=f"PDF render failed: {exc}")
+        for fname in sorted(os.listdir(tmpdir)):
+            if fname.startswith("page-") and fname.endswith(".jpg"):
+                with open(os.path.join(tmpdir, fname), "rb") as f:
+                    page_images_b64.append({
+                        "base64": base64.b64encode(f.read()).decode(),
+                        "mime_type": "image/jpeg",
+                    })
+
+    if not page_images_b64:
+        raise HTTPException(status_code=400, detail="No pages could be rendered from the PDF")
+
+    # ---- 2) Build the agent message that LOCKS items to one room ----
+    msg_lines = [
+        f"This PDF is a moodboard for ONE ROOM ONLY: **{payload.room_name}**.",
+        f"Target sheet type: **{payload.sheet_type}**.",
+        "Every visible item in this PDF belongs to that room — do not split across multiple rooms.",
+        "Identify each visible item (furniture, lighting, rugs, mirrors, art, fixtures, wallcoverings, decor) and prepare records ready to push.",
+    ]
+    if vendor_urls:
+        msg_lines += [
+            "",
+            "The board has these embedded vendor links (authoritative — these are the EXACT items in the scene):",
+        ]
+        for u in vendor_urls:
+            msg_lines.append(f"- {u}")
+        msg_lines += [
+            "",
+            "Match each visible item to the closest vendor link. Put the link in `link`. Leave price/image/finish blank — the server will enrich those next.",
+        ]
+    if payload.extra_message:
+        msg_lines += ["", f"Additional instructions: {payload.extra_message}"]
+
+    # Reuse the chat endpoint logic so we get strict JSON + memory + history.
+    inner_payload = AIAssistChat(
+        project_id=payload.project_id,
+        message="\n".join(msg_lines),
+        images=page_images_b64,
+        reset=False,
+    )
+    chat_response = await ai_assist_chat(inner_payload)
+    items = chat_response.get("detected_items") or []
+
+    # ---- 3) Force room_name + sheet_type on every detected item ----
+    for it in items:
+        it["room_name"] = payload.room_name
+        it["sheet_type"] = payload.sheet_type
+        if not it.get("category_name"):
+            it["category_name"] = "Furniture"
+        if not it.get("subcategory_name"):
+            it["subcategory_name"] = "Items"
+
+    # ---- 4) Enrich each item with the authenticated vendor portal scraper
+    # if creds are saved + we recognize the domain. Otherwise fall back to
+    # the public /scrape-product (which is hit-or-miss because vendors block
+    # bots and gate prices behind login). ----
+    from vendor_portals import resolve_vendor_key_from_url, get_vendor_portal_info as _portal_info
+
+    try:
+        from vendor_scraper import get_scraper as _get_scraper
+    except Exception:
+        _get_scraper = None
+
+    enrichment_results = []
+    portal_scraper = None
+    if _get_scraper is not None:
+        try:
+            portal_scraper = await _get_scraper()
+        except Exception:
+            portal_scraper = None
+
+    for it in items:
+        link = (it.get("link") or "").strip()
+        if not link or not link.startswith("http"):
+            enrichment_results.append({"link": link, "status": "skipped", "reason": "no link"})
+            continue
+
+        scraped_data = None
+        used_path = ""
+
+        # 4a) Try the authenticated portal first.
+        vendor_key = resolve_vendor_key_from_url(link)
+        portal = _portal_info(vendor_key) if vendor_key else None
+        logged_in = (
+            portal_scraper is not None
+            and vendor_key
+            and vendor_key in getattr(portal_scraper, "contexts", {})
+        )
+        if portal and logged_in:
+            try:
+                details = await portal_scraper.get_product_details(vendor_key, link, portal)
+                if isinstance(details, dict):
+                    scraped_data = details
+                    used_path = "portal_authenticated"
+            except Exception as exc:
+                enrichment_results.append({"link": link, "vendor_key": vendor_key, "status": "portal_error", "detail": str(exc)[:160]})
+                # fall through to public scrape
+
+        # 4b) Fall back to public scraper.
+        if scraped_data is None:
+            try:
+                public_resp = await scrape_product_advanced({"url": link, "vendor": it.get("vendor", "")})
+                sd_root = public_resp if isinstance(public_resp, dict) else {}
+                # /scrape-product wraps real data under sd_root['data']
+                if isinstance(sd_root.get("data"), dict):
+                    scraped_data = {**(sd_root.get("data") or {}), **{k: v for k, v in sd_root.items() if k not in ("data",)}}
+                else:
+                    scraped_data = sd_root
+                used_path = "public"
+            except HTTPException as exc:
+                enrichment_results.append({"link": link, "status": "error", "detail": str(exc.detail)[:200]})
+                continue
+            except Exception as exc:
+                enrichment_results.append({"link": link, "status": "error", "detail": str(exc)[:200]})
+                continue
+
+        sd = scraped_data or {}
+
+        # Mutate the item with the scraped fields, preserving anything the
+        # agent already filled in for higher-confidence fields where ours win.
+        def _set(field, scraped_key=None, prefer_scraper=False):
+            sk = scraped_key or field
+            v = sd.get(sk)
+            if v in (None, ""):
+                return
+            if prefer_scraper or not it.get(field):
+                it[field] = v
+        _set("name", scraped_key="title", prefer_scraper=False)
+        if not it.get("name"):
+            _set("name", prefer_scraper=False)
+        _set("vendor", prefer_scraper=False)
+        _set("sku", prefer_scraper=True)
+        _set("image_url", prefer_scraper=True)
+        _set("finish_image", prefer_scraper=True)
+        _set("finish_color", scraped_key="finish", prefer_scraper=True)
+        if not it.get("finish_color"):
+            _set("finish_color", prefer_scraper=True)
+        _set("size", scraped_key="dimensions", prefer_scraper=True)
+        if not it.get("size"):
+            _set("size", prefer_scraper=True)
+        _set("description", prefer_scraper=True)
+        # Price → cost (wholesale)
+        scraped_price = sd.get("price") or sd.get("wholesale_price") or sd.get("cost")
+        if scraped_price:
+            try:
+                p = float(str(scraped_price).replace("$", "").replace(",", "").strip())
+                it["cost"] = p
+                it["price"] = p
+            except Exception:
+                pass
+
+        enrichment_results.append({
+            "link": link,
+            "vendor_key": vendor_key,
+            "status": "ok",
+            "via": used_path,
+            "got_price": bool(scraped_price),
+            "got_image": bool(sd.get("image_url")),
+            "got_finish": bool(sd.get("finish_image") or sd.get("finish")),
+            "got_sku": bool(sd.get("sku")),
+            "got_size": bool(sd.get("size") or sd.get("dimensions")),
+        })
+
+    return {
+        "room_name": payload.room_name,
+        "sheet_type": payload.sheet_type,
+        "vendor_urls_found": len(vendor_urls),
+        "pages_rendered": len(page_images_b64),
+        "detected_items": items,
+        "enrichment": enrichment_results,
+        "assistant_message": (chat_response.get("assistant_message") or {}).get("content", ""),
+        "design_notes": chat_response.get("design_notes", ""),
     }
 
 

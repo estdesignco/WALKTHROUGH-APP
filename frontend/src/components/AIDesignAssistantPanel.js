@@ -17,6 +17,11 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   const [memory, setMemory] = useState({});
   const [draft, setDraft] = useState('');
   const [pendingImages, setPendingImages] = useState([]);   // [{base64, mime_type, name, preview}]
+  const [pendingPdf, setPendingPdf] = useState(null);       // {base64, name, page_count}
+  const [pdfRoom, setPdfRoom] = useState('');
+  const [pdfSheet, setPdfSheet] = useState('checklist');
+  const [pdfIngestStatus, setPdfIngestStatus] = useState('');
+  const [projectRooms, setProjectRooms] = useState([]);     // suggestions for the room dropdown
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [showPromptEditor, setShowPromptEditor] = useState(false);
@@ -37,10 +42,32 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   }, [projectId]);
 
   useEffect(() => { if (open) loadConversation(); }, [open, loadConversation]);
+
+  // Pre-load the project's rooms so the PDF room dropdown has real options.
+  useEffect(() => {
+    if (!open || !projectId) return;
+    fetch(`${API}/projects/${projectId}?sheet_type=checklist`)
+      .then(r => r.json())
+      .then(d => {
+        const names = Array.from(new Set((d.rooms || []).map(r => r.name).filter(Boolean)));
+        setProjectRooms(names);
+      })
+      .catch(() => {});
+  }, [open, projectId]);
   useEffect(() => { setTimeout(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }); }, 50); }, [messages, sending]);
 
   const handleFiles = (files) => {
     Array.from(files).slice(0, 5).forEach(f => {
+      // PDFs take a separate path — they're one-room ingests.
+      if (f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = String(reader.result).split(',')[1];
+          setPendingPdf({ base64, name: f.name, size: f.size });
+        };
+        reader.readAsDataURL(f);
+        return;
+      }
       if (!f.type.startsWith('image/')) return;
       const reader = new FileReader();
       reader.onload = () => {
@@ -63,6 +90,53 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   };
 
   const removeImage = (idx) => setPendingImages(prev => prev.filter((_, i) => i !== idx));
+
+  const ingestPdf = async () => {
+    if (!pendingPdf) return;
+    if (!pdfRoom.trim()) { setError('Pick a room for this PDF (one PDF = one room).'); return; }
+    setError(''); setSending(true); setPdfIngestStatus('Reading PDF + extracting embedded links…');
+    try {
+      const res = await fetch(`${API}/ai-assist/ingest-pdf`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: projectId,
+          room_name: pdfRoom.trim(),
+          sheet_type: pdfSheet,
+          pdf_base64: pendingPdf.base64,
+          extra_message: draft || '',
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.detail || 'PDF ingest failed');
+      }
+      const data = await res.json();
+      // Synthesize a fake assistant message so the items show in the thread.
+      const fakeId = `pdf-${Date.now()}`;
+      const summary = `Imported ${data.pages_rendered} page(s) from "${pendingPdf.name}". Found ${data.vendor_urls_found} vendor links and detected ${data.detected_items.length} items in ${data.room_name}. Enrichment: ${data.enrichment.filter(e => e.status === 'ok').length}/${data.enrichment.length} links scraped.`;
+      const assistantMsg = {
+        id: fakeId, role: 'assistant',
+        content: summary + (data.assistant_message ? '\n\n' + data.assistant_message : ''),
+        design_notes: data.design_notes || '',
+        detected_items: data.detected_items,
+      };
+      setMessages(prev => [...prev, assistantMsg]);
+      // Pre-select all items so the user can push in one click.
+      const next = { ...selectedForPush };
+      data.detected_items.forEach((_, idx) => { next[`${fakeId}-${idx}`] = true; });
+      setSelectedForPush(next);
+      setPendingPdf(null); setPdfRoom(''); setDraft('');
+      setPdfIngestStatus('');
+      loadConversation();
+    } catch (e) {
+      setError(e.message);
+      setPdfIngestStatus('');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const cancelPdf = () => { setPendingPdf(null); setPdfRoom(''); setPdfIngestStatus(''); };
 
   const send = async () => {
     if (sending) return;
@@ -220,6 +294,49 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
 
       {/* Composer */}
       <div style={composer}>
+        {pendingPdf && (
+          <div data-testid="aiassist-pdf-picker" style={{ padding: 12, background: 'linear-gradient(135deg, #1a1f2e 0%, #2a3040 100%)', borderBottom: '1px solid #D4A574' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+              <div>
+                <div style={{ color: '#D4A574', fontSize: 11, letterSpacing: 2, fontWeight: 800 }}>📄 PDF READY — ONE ROOM ONLY</div>
+                <div style={{ color: '#D4C5A9', fontSize: 11, marginTop: 2, opacity: 0.85 }}>{pendingPdf.name} · {(pendingPdf.size / 1024).toFixed(0)} KB</div>
+              </div>
+              <button onClick={cancelPdf} style={{ background: 'transparent', color: '#ef4444', border: 'none', cursor: 'pointer', fontSize: 16 }}>✕</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 6, marginBottom: 8 }}>
+              <div>
+                <label style={{ color: '#D4A574', fontSize: 10, letterSpacing: 1, fontWeight: 700, display: 'block', marginBottom: 2 }}>ROOM</label>
+                <input
+                  list="ai-pdf-rooms"
+                  value={pdfRoom}
+                  onChange={e => setPdfRoom(e.target.value)}
+                  placeholder="e.g. Great Room, Master Bath…"
+                  data-testid="aiassist-pdf-room"
+                  style={{ width: '100%', background: '#0a0a0a', color: '#D4C5A9', border: '1px solid #B49B7E', padding: '6px 8px', fontSize: 12, borderRadius: 3 }}
+                />
+                <datalist id="ai-pdf-rooms">
+                  {projectRooms.map(r => <option key={r} value={r} />)}
+                </datalist>
+              </div>
+              <div>
+                <label style={{ color: '#D4A574', fontSize: 10, letterSpacing: 1, fontWeight: 700, display: 'block', marginBottom: 2 }}>SHEET</label>
+                <select value={pdfSheet} onChange={e => setPdfSheet(e.target.value)} data-testid="aiassist-pdf-sheet"
+                  style={{ width: '100%', background: '#0a0a0a', color: '#D4C5A9', border: '1px solid #B49B7E', padding: '6px 8px', fontSize: 12, borderRadius: 3 }}>
+                  <option value="checklist">Checklist</option>
+                  <option value="ffe">FF&E</option>
+                  <option value="walkthrough">Walkthrough</option>
+                </select>
+              </div>
+            </div>
+            <button onClick={ingestPdf} disabled={sending || !pdfRoom.trim()} data-testid="aiassist-pdf-ingest"
+              style={{ width: '100%', background: sending ? '#4b5563' : '#10B981', color: '#fff', border: 'none', padding: '8px 12px', fontSize: 12, fontWeight: 800, letterSpacing: 1, borderRadius: 4, cursor: sending ? 'not-allowed' : 'pointer' }}>
+              {sending ? (pdfIngestStatus || 'Working…') : `↑ INGEST PDF INTO ${pdfRoom || 'ROOM'}`}
+            </button>
+            <div style={{ marginTop: 6, fontSize: 10, color: '#D4C5A9', opacity: 0.65 }}>
+              Vendor links in the PDF will be auto-scraped for prices, images &amp; finishes. <a href="/admin/vendor-portals" target="_blank" rel="noreferrer" style={{ color: '#D4A574' }}>Manage vendor logins →</a>
+            </div>
+          </div>
+        )}
         {pendingImages.length > 0 && (
           <div style={{ display: 'flex', gap: 6, padding: '8px 10px', overflowX: 'auto', borderBottom: '1px solid #2a3040' }}>
             {pendingImages.map((img, idx) => (
@@ -235,7 +352,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
             value={draft}
             onChange={e => setDraft(e.target.value)}
             onPaste={onPaste}
-            placeholder="Drop a Canva board, paste an image (⌘V), or type instructions…"
+            placeholder="Drop a Canva PDF (one room) or image, paste (⌘V), or type instructions…"
             data-testid="aiassist-input"
             rows={3}
             style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#D4C5A9', padding: '10px 12px', fontSize: 13, resize: 'none', fontFamily: 'inherit' }}
@@ -246,7 +363,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
           <div style={{ display: 'flex', gap: 6 }}>
             <label style={attachBtn} data-testid="aiassist-attach">
               📎 Attach
-              <input type="file" multiple accept="image/*" onChange={e => handleFiles(e.target.files)} style={{ display: 'none' }} />
+              <input type="file" multiple accept="image/*,application/pdf" onChange={e => handleFiles(e.target.files)} style={{ display: 'none' }} />
             </label>
             {error && <span data-testid="aiassist-error" style={{ color: '#ef4444', fontSize: 11 }}>{error}</span>}
           </div>

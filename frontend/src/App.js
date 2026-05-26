@@ -28,6 +28,7 @@ import TradePortal from './components/TradePortal';
 import CustomerProposalPage from './components/CustomerProposalPage';
 import PickerPreview from './components/PickerPreview';
 import AgentApiKeysPage from './components/AgentApiKeysPage';
+import VendorPortalsPage from './components/VendorPortalsPage';
 import CompleteFurnitureSearch from './components/CompleteFurnitureSearch';
 import FurnitureSearchPage from './components/FurnitureSearchPage';
 import UnifiedFurnitureSearch from './components/UnifiedFurnitureSearch';
@@ -306,6 +307,10 @@ const App = () => {
                   <Route
                     path="/admin/agent-keys"
                     element={<AgentApiKeysPage />}
+                  />
+                  <Route
+                    path="/admin/vendor-portals"
+                    element={<VendorPortalsPage />}
                   />
                   <Route 
                     path="/mobile-app" 

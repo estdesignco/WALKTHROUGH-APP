@@ -300,6 +300,48 @@ def get_vendor_portal_info(vendor_key: str) -> Optional[Dict]:
     """Get portal configuration for a vendor"""
     return VENDOR_PORTALS.get(vendor_key)
 
+
+# ---------------------------------------------------------------------------
+# URL → vendor_key resolver. Used by the AI assistant's enrichment pipeline
+# to map a vendor product link (e.g. https://uttermost.com/...) to the
+# corresponding pre-configured portal so we can call the authenticated
+# scraper instead of the public one.
+# ---------------------------------------------------------------------------
+_URL_DOMAIN_TO_KEY = {
+    "fourhands.com": "four_hands",
+    "uttermost.com": "uttermost",
+    "bernhardt.com": "bernhardt",
+    "rowefurniture.com": "rowe",
+    "loloirugs.com": "loloi",
+    "visualcomfort.com": "visual_comfort",
+    "hvlgroup.com": "hvl_group",
+    "gabby.com": "gabby",
+    "bassettmirror.com": "bassett_mirror",
+    "surya.com": "surya",
+    "safavieh.com": "safavieh",
+    "reginaandrew.com": "regina_andrew",
+    "globalviews.com": "global_views",
+}
+
+
+def resolve_vendor_key_from_url(url: str) -> Optional[str]:
+    """Given a product URL, return the matching vendor_key or None."""
+    if not url:
+        return None
+    try:
+        from urllib.parse import urlparse
+        host = (urlparse(url).hostname or "").lower().lstrip("www.")
+        # strip leading 'www.'
+        if host.startswith("www."):
+            host = host[4:]
+        for domain, key in _URL_DOMAIN_TO_KEY.items():
+            if host == domain or host.endswith("." + domain):
+                return key
+    except Exception:
+        pass
+    return None
+
+
 def get_all_vendor_portals() -> List[Dict]:
     """Get list of all supported vendor portals"""
     return [
