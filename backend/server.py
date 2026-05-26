@@ -21565,6 +21565,27 @@ async def ai_assist_chat(payload: AIAssistChat):
     }
 
 
+@api_router.get("/ai-assist/chatgpt-bundle")
+async def ai_assist_download_chatgpt_bundle():
+    """One-click download of the ChatGPT/Claude/Gemini handoff bundle.
+
+    The user is meant to paste this whole file into an external LLM and ask
+    for help with the items the in-app agent can't crack alone (per-vendor
+    login selectors, wholesale-price element selectors, Canva direct-read
+    research, etc.). Built + refreshed automatically by the scripts under
+    /app/memory/. We just stream it as a download.
+    """
+    from fastapi.responses import FileResponse
+    bundle_path = "/app/memory/CHATGPT_BUNDLE.md"
+    if not os.path.exists(bundle_path):
+        raise HTTPException(status_code=404, detail="ChatGPT bundle not yet generated")
+    return FileResponse(
+        bundle_path,
+        media_type="text/markdown",
+        filename="CHATGPT_BUNDLE.md",
+    )
+
+
 @api_router.get("/ai-assist/conversations/{project_id}")
 async def ai_assist_get_conversation(project_id: str):
     msgs = await db.ai_assist_messages.find(

@@ -260,6 +260,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
           </div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
+          <a data-testid="aiassist-download-bundle" href={`${API}/ai-assist/chatgpt-bundle`} download="CHATGPT_BUNDLE.md" title="Download the ChatGPT/Claude/Gemini handoff bundle" style={{ ...iconBtn, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>⤓</a>
           <button data-testid="aiassist-edit-prompt" onClick={() => setShowPromptEditor(true)} title="Edit agent brain" style={iconBtn}>⚙</button>
           <button data-testid="aiassist-reset" onClick={reset} title="Clear conversation + memory" style={iconBtn}>🗑</button>
           <button data-testid="aiassist-close" onClick={onClose} title="Close" style={iconBtn}>✕</button>
