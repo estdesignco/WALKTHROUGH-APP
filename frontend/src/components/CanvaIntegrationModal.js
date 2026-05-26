@@ -4,7 +4,7 @@ import axios from 'axios';
 const BACKEND_URL = (window.ENV?.REACT_APP_BACKEND_URL || window.location.origin);
 const API = `${BACKEND_URL}/api`;
 
-const CanvaIntegrationModal = ({ isOpen, onClose, onItemsExtracted, projectId }) => {
+const CanvaIntegrationModal = ({ isOpen, onClose, onItemsExtracted, projectId, roomName }) => {
   const [activeTab, setActiveTab] = useState('manual');
   const [canvaUrl, setCanvaUrl] = useState('');
   const [manualLinks, setManualLinks] = useState('');
@@ -81,23 +81,30 @@ const CanvaIntegrationModal = ({ isOpen, onClose, onItemsExtracted, projectId })
     }
 
     setLoading(true);
-    setStatus('🔄 Extracting products from Canva board...');
+    setStatus('🔄 Reading design from Canva (OAuth + export)…');
 
     try {
-      const response = await axios.post(`${API}/canva/extract-board`, {
-        canva_url: canvaUrl.trim()
+      // Use the new server-side direct-read endpoint that pulls a fresh
+      // PDF straight from Canva using OAuth + Connect API exports, then
+      // runs the same 3-stage extraction + Gemini vision + enrichment.
+      const response = await axios.post(`${API}/ai-assist/ingest-canva-url`, {
+        project_id: projectId,
+        room_name: roomName || 'Imported from Canva',
+        sheet_type: 'checklist',
+        canva_url: canvaUrl.trim(),
       });
-
-      if (response.data.success) {
-        const extractedItems = response.data.products || [];
-        setStatus(`✅ Found ${extractedItems.length} products on Canva board`);
-        onItemsExtracted(extractedItems);
-        setCanvaUrl('');
-      } else {
-        setStatus('❌ Failed to extract from Canva: ' + response.data.error);
-      }
+      const items = response.data?.detected_items || [];
+      setStatus(`✅ Found ${items.length} product${items.length === 1 ? '' : 's'} on Canva board`);
+      onItemsExtracted(items);
+      setCanvaUrl('');
     } catch (error) {
-      setStatus('❌ Canva extraction failed: ' + error.message);
+      const detail = error?.response?.data?.detail || error.message;
+      // Hint the user if Canva OAuth isn't done yet
+      if (String(detail).toLowerCase().includes('canva') && String(detail).toLowerCase().includes('token')) {
+        setStatus('❌ Connect Canva first. Open the ✨ AI panel → 📐 CONNECT CANVA.');
+      } else {
+        setStatus('❌ Canva extraction failed: ' + detail);
+      }
     } finally {
       setLoading(false);
     }
@@ -110,29 +117,35 @@ const CanvaIntegrationModal = ({ isOpen, onClose, onItemsExtracted, projectId })
     }
 
     setLoading(true);
-    setStatus('🔄 Processing PDF file...');
+    setStatus('🔄 Processing PDF file…');
 
     try {
-      const formData = new FormData();
-      formData.append('pdf', pdfFile);
-      formData.append('project_id', projectId);
+      // Read PDF as base64 and route to the working AI ingest endpoint
+      // (the old /api/canva/extract-pdf-links route was removed; the
+      // AI-assist pipeline is the single source of truth now and runs
+      // the 3-stage URL extraction + Gemini vision + vendor enrichment).
+      const reader = new FileReader();
+      const dataUrl = await new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(pdfFile);
+      });
+      const base64 = String(dataUrl).split(',')[1];
 
-      const response = await axios.post(`${API}/canva/extract-pdf-links`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+      const response = await axios.post(`${API}/ai-assist/ingest-pdf`, {
+        project_id: projectId,
+        room_name: roomName || 'Imported from Canva',
+        sheet_type: 'checklist',
+        pdf_base64: base64,
       });
 
-      if (response.data.success) {
-        const extractedItems = response.data.products || [];
-        setStatus(`✅ Extracted ${extractedItems.length} items from PDF`);
-        onItemsExtracted(extractedItems);
-        setPdfFile(null);
-      } else {
-        setStatus('❌ PDF processing failed: ' + response.data.error);
-      }
+      const items = response.data?.detected_items || [];
+      setStatus(`✅ Extracted ${items.length} item${items.length === 1 ? '' : 's'} from PDF`);
+      onItemsExtracted(items);
+      setPdfFile(null);
     } catch (error) {
-      setStatus('❌ PDF upload failed: ' + error.message);
+      const detail = error?.response?.data?.detail || error.message;
+      setStatus('❌ PDF upload failed: ' + detail);
     } finally {
       setLoading(false);
     }
