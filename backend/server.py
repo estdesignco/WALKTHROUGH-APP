@@ -21777,6 +21777,12 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
 
         sd = scraped_data or {}
 
+        # Authenticated portal scraper returns `images: [...]` array; the
+        # public scraper returns a single `image_url`. Normalize so the
+        # downstream `_set("image_url")` works regardless of source.
+        if not sd.get("image_url") and isinstance(sd.get("images"), list) and sd["images"]:
+            sd["image_url"] = sd["images"][0]
+
         # Mutate the item with the scraped fields, preserving anything the
         # agent already filled in for higher-confidence fields where ours win.
         def _set(field, scraped_key=None, prefer_scraper=False):

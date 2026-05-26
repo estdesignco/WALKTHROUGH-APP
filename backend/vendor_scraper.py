@@ -75,6 +75,32 @@ class VendorPortalScraper:
             
             logger.info(f"Attempting login with username type: {login_type}")
             
+            # Helper: query all matches for a selector and try to fill each
+            # one until one succeeds. Many vendor sites (Shopify storefronts
+            # especially) ship duplicate hidden+visible inputs for responsive
+            # layouts. Filling a hidden field raises a timeout/strict-mode
+            # error, so we just try each match in order.
+            async def _try_fill(sel: str, value: str) -> bool:
+                if not sel:
+                    return False
+                try:
+                    els = await page.query_selector_all(sel)
+                except Exception:
+                    return False
+                for el in els:
+                    try:
+                        # Skip elements that report non-visible (Shopify duplicates).
+                        try:
+                            if not await el.is_visible():
+                                continue
+                        except Exception:
+                            pass
+                        await el.fill(value, timeout=3000)
+                        return True
+                    except Exception:
+                        continue
+                return False
+
             # Try to find and fill username field - use multiple strategies
             username_filled = False
             username_selectors = [
@@ -92,15 +118,10 @@ class VendorPortalScraper:
             for selector in username_selectors:
                 if not selector:
                     continue
-                try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        await element.fill(username_value)
-                        logger.info(f"Filled username with selector: {selector}")
-                        username_filled = True
-                        break
-                except Exception as e:
-                    continue
+                if await _try_fill(selector, username_value):
+                    logger.info(f"Filled username with selector: {selector}")
+                    username_filled = True
+                    break
             
             if not username_filled:
                 logger.error("Could not find username field with any selector")
@@ -119,15 +140,10 @@ class VendorPortalScraper:
             for selector in password_selectors:
                 if not selector:
                     continue
-                try:
-                    element = await page.query_selector(selector)
-                    if element:
-                        await element.fill(password_value)
-                        logger.info(f"Filled password with selector: {selector}")
-                        password_filled = True
-                        break
-                except Exception as e:
-                    continue
+                if await _try_fill(selector, password_value):
+                    logger.info(f"Filled password with selector: {selector}")
+                    password_filled = True
+                    break
             
             if not password_filled:
                 logger.error("Could not find password field")
