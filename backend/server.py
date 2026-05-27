@@ -21565,6 +21565,207 @@ async def ai_assist_chat(payload: AIAssistChat):
     }
 
 
+class ReEnrichRequest(BaseModel):
+    item_ids: Optional[List[str]] = None   # specific items, or None = all missing
+    project_id: Optional[str] = None       # scope to one project (recommended)
+    only_missing: bool = True              # skip rows that already have image+price
+
+
+@api_router.post("/ai-assist/re-enrich")
+async def ai_assist_re_enrich(payload: ReEnrichRequest):
+    """Backfill empty image_url / finish / size / price / name on existing
+    items by re-running the vendor scraper + OG/JSON-LD fallback against
+    each item's `link`. Use this when you ingested a Canva board before
+    you were logged into a vendor portal, or when enrichment was flaky.
+
+    Returns per-item what fields were updated.
+    """
+    if not PLAYWRIGHT_AVAILABLE or async_playwright is None:
+        raise HTTPException(status_code=503, detail="Playwright not available")
+
+    # Build the candidate item list
+    query = {}
+    if payload.project_id:
+        # Items live under rooms; we need to scope by project via the
+        # room → category → subcategory mapping (rooms have project_id,
+        # categories have room_id, subcategories have category_id, items
+        # have subcategory_id).
+        room_docs = await db.rooms.find({"project_id": payload.project_id}, {"id": 1, "_id": 0}).to_list(500)
+        room_ids = [r["id"] for r in room_docs]
+        cat_docs = await db.categories.find({"room_id": {"$in": room_ids}}, {"id": 1, "_id": 0}).to_list(2000)
+        cat_ids = [c["id"] for c in cat_docs]
+        subcat_docs = await db.subcategories.find({"category_id": {"$in": cat_ids}}, {"id": 1, "_id": 0}).to_list(4000)
+        subcat_ids = [s["id"] for s in subcat_docs]
+        logger.info(f"re-enrich scope: project={payload.project_id} rooms={len(room_ids)} categories={len(cat_ids)} subcategories={len(subcat_ids)}")
+        query["subcategory_id"] = {"$in": subcat_ids}
+    if payload.item_ids:
+        query["id"] = {"$in": payload.item_ids}
+    if payload.only_missing:
+        # Only target rows that are actually missing visual/finish/size data.
+        query["$or"] = [
+            {"image_url": {"$in": [None, ""]}},
+            {"finish_color": {"$in": [None, ""]}},
+            {"size": {"$in": [None, ""]}},
+            {"price": {"$in": [None, 0, 0.0]}},
+        ]
+    # Must have a link to enrich from
+    query["link"] = {"$exists": True, "$nin": [None, ""]}
+
+    items = await db.items.find(query, {"_id": 0}).limit(200).to_list(200)
+    logger.info(f"re-enrich: targeting {len(items)} items")
+
+    from vendor_portals import resolve_vendor_key_from_url, VENDOR_PORTALS, get_vendor_portal_info as _portal_info
+    from vendor_scraper import get_scraper
+
+    scraper = await get_scraper()
+    results = []
+    for it in items:
+        link = it.get("link") or ""
+        item_id = it.get("id")
+        updates = {}
+        diagnostics = {"link": link, "tried": []}
+        try:
+            # 1) Try authenticated portal first if we have a live session
+            scraped = None
+            vk = resolve_vendor_key_from_url(link)
+            if vk:
+                diagnostics["vendor_key"] = vk
+                if vk in scraper.contexts:
+                    diagnostics["tried"].append("portal_authenticated")
+                    cfg = VENDOR_PORTALS.get(vk, {})
+                    scraped = await scraper.get_product_details(vk, link, cfg) or {}
+
+            # 2) Public OG/JSON-LD fallback (works for many vendors without auth)
+            if not scraped or (not scraped.get("image_url") and not (scraped.get("images") or [])):
+                diagnostics["tried"].append("og_jsonld")
+                async with async_playwright() as _ap:
+                    _b = await _ap.chromium.launch(headless=True, args=["--no-sandbox"])
+                    _ctx = await _b.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    _pg = await _ctx.new_page()
+                    try:
+                        await _pg.goto(link, wait_until="domcontentloaded", timeout=20000)
+                    except Exception:
+                        pass
+                    await asyncio.sleep(1.5)
+                    ex = await _pg.evaluate(r"""() => {
+                        const out = {};
+                        const meta = (sel) => { const el = document.querySelector(sel); return el ? (el.getAttribute('content')||'').trim() : ''; };
+                        out.og_title = meta('meta[property="og:title"]') || meta('meta[name="og:title"]');
+                        out.og_image = meta('meta[property="og:image"]');
+                        out.og_description = meta('meta[property="og:description"]') || meta('meta[name="description"]');
+                        out.og_price = meta('meta[property="product:price:amount"]') || meta('meta[itemprop="price"]');
+                        // JSON-LD Product
+                        const nodes = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
+                        for (const n of nodes) {
+                            try {
+                                const parsed = JSON.parse(n.textContent||'{}');
+                                const arr = Array.isArray(parsed) ? parsed : (parsed['@graph']||[parsed]);
+                                for (const obj of arr) {
+                                    if (!obj || typeof obj !== 'object') continue;
+                                    const t = obj['@type']; const types = Array.isArray(t)?t:[t];
+                                    if (types.includes('Product') || types.includes('IndividualProduct')) {
+                                        out.ld_name = obj.name || out.ld_name;
+                                        out.ld_sku = obj.sku || obj.mpn || out.ld_sku;
+                                        if (obj.image) out.ld_image = (Array.isArray(obj.image)?obj.image[0]:(typeof obj.image==='object'?(obj.image.url||''):obj.image)) || out.ld_image;
+                                        const offers = Array.isArray(obj.offers)?obj.offers[0]:obj.offers;
+                                        if (offers) out.ld_price = (offers.price||offers.lowPrice||'').toString() || out.ld_price;
+                                        if (obj.color) out.ld_color = obj.color;
+                                        if (obj.material) out.ld_material = Array.isArray(obj.material)?obj.material.join(', '):obj.material;
+                                        // Dimension fields can live in `additionalProperty`
+                                        const props = (obj.additionalProperty||[]).reduce((acc,x)=>{ if(x&&x.name) acc[String(x.name).toLowerCase()] = x.value; return acc;}, {});
+                                        if (Object.keys(props).length) out.ld_props = props;
+                                    }
+                                }
+                            } catch(e){}
+                        }
+                        // Largest visible image >= 400x400
+                        let biggest = null;
+                        document.querySelectorAll('img').forEach(el => {
+                            const src = el.currentSrc || el.src || el.dataset.src || '';
+                            const r = el.getBoundingClientRect();
+                            if (!src || src.startsWith('data:')) return;
+                            if (r.width < 400 || r.height < 400) return;
+                            const area = r.width * r.height;
+                            if (!biggest || area > biggest.area) biggest = {src, area};
+                        });
+                        if (biggest) out.biggest_image = biggest.src;
+                        // dimension text from body — Width: N", Depth: N", Height: N" patterns
+                        const body = document.body.innerText || '';
+                        const dims = [];
+                        const re = /(Width|W|Height|H|Depth|D|Diameter|Dia|Length|L)\s*[:=]?\s*(\d+(?:\.\d+)?(?:\s*\d*\/\d+)?\s*(?:\"|in|inch(?:es)?|cm)?)/gi;
+                        let m;
+                        while ((m = re.exec(body)) !== null && dims.length < 4) {
+                            dims.push(`${m[1]}: ${m[2].trim()}`);
+                        }
+                        if (dims.length) out.dim_text = dims.join(' x ');
+                        return out;
+                    }""")
+                    await _b.close()
+                    scraped = scraped or {}
+                    img = ex.get("ld_image") or ex.get("og_image") or ex.get("biggest_image")
+                    if img and img.startswith("//"): img = "https:" + img
+                    if img: scraped["image_url"] = img
+                    if ex.get("ld_name") or ex.get("og_title"):
+                        scraped["name"] = ex.get("ld_name") or ex.get("og_title")
+                    if ex.get("ld_sku"): scraped["sku"] = str(ex["ld_sku"])
+                    pstr = ex.get("ld_price") or ex.get("og_price")
+                    if pstr:
+                        try:
+                            p = float(re.sub(r"[^\d.]", "", str(pstr)))
+                            if p > 0: scraped["price"] = p
+                        except Exception:
+                            pass
+                    if ex.get("ld_color"): scraped["finish_color"] = ex["ld_color"]
+                    if ex.get("ld_material") and not scraped.get("finish_color"):
+                        scraped["finish_color"] = ex["ld_material"]
+                    if ex.get("dim_text"): scraped["size"] = ex["dim_text"]
+                    elif ex.get("ld_props"):
+                        # Build dims from JSON-LD additionalProperty
+                        props = ex["ld_props"]
+                        dims = []
+                        for k, v in props.items():
+                            kl = k.lower()
+                            if any(x in kl for x in ("width","height","depth","length","diameter","size")):
+                                dims.append(f"{k}: {v}")
+                        if dims: scraped["size"] = " x ".join(dims)
+
+            # Apply only fields that are currently empty (don't overwrite user edits)
+            if scraped:
+                if scraped.get("name") and not it.get("name", "").strip().lower().startswith(scraped.get("name", "").strip().lower()[:6]):
+                    # Replace generic Canva labels with real vendor product names
+                    # only when the vendor name is meaningfully different
+                    updates["name"] = scraped["name"][:120]
+                if not it.get("image_url") and scraped.get("image_url"):
+                    updates["image_url"] = scraped["image_url"]
+                if not it.get("finish_color") and scraped.get("finish_color"):
+                    updates["finish_color"] = scraped["finish_color"][:80]
+                if not it.get("size") and scraped.get("size"):
+                    updates["size"] = scraped["size"][:120]
+                if (not it.get("price") or it.get("price") == 0) and scraped.get("price"):
+                    updates["price"] = float(scraped["price"])
+                    updates["cost"] = float(scraped["price"])
+                if not it.get("sku") and scraped.get("sku"):
+                    updates["sku"] = str(scraped["sku"])[:40]
+
+            if updates:
+                updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+                await db.items.update_one({"id": item_id}, {"$set": updates})
+            diagnostics["updates"] = updates
+            results.append({"item_id": item_id, "status": "updated" if updates else "no_change",
+                            "fields_updated": list(updates.keys()),
+                            **diagnostics})
+        except Exception as exc:
+            results.append({"item_id": item_id, "status": "error", "error": str(exc), **diagnostics})
+
+    summary = {
+        "scanned": len(items),
+        "updated": sum(1 for r in results if r["status"] == "updated"),
+        "no_change": sum(1 for r in results if r["status"] == "no_change"),
+        "errors": sum(1 for r in results if r["status"] == "error"),
+    }
+    return {"summary": summary, "results": results[:50]}
+
+
 @api_router.get("/ai-assist/chatgpt-bundle")
 async def ai_assist_download_chatgpt_bundle():
     """One-click download of the ChatGPT/Claude/Gemini handoff bundle.

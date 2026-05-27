@@ -27,6 +27,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   const [error, setError] = useState('');
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [canvaStatus, setCanvaStatus] = useState(null); // {connected:bool, configured:bool}
+  const [reEnrichStatus, setReEnrichStatus] = useState(null); // {scanning:bool, summary:obj}
   const [selectedForPush, setSelectedForPush] = useState({});  // {messageId-itemIdx: true}
   const [pushStatus, setPushStatus] = useState(null);
   const scrollRef = useRef(null);
@@ -53,6 +54,22 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
       .then(d => setCanvaStatus(d))
       .catch(() => setCanvaStatus({ connected: false }));
   }, [open]);
+
+  const reEnrichMissing = async () => {
+    setReEnrichStatus({ scanning: true });
+    try {
+      const r = await fetch(`${API}/ai-assist/re-enrich`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project_id: projectId, only_missing: true }),
+      });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.detail || 'Re-enrich failed');
+      setReEnrichStatus({ scanning: false, summary: j.summary });
+    } catch (e) {
+      setReEnrichStatus({ scanning: false, error: e.message });
+    }
+  };
+
 
   const connectCanva = async () => {
     try {
@@ -336,6 +353,11 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
             <span data-testid="aiassist-canva-connected" title="Canva connected"
               style={{ color: '#10B981', fontSize: 10, fontWeight: 800, letterSpacing: 1 }}>✅ CANVA</span>
           )}
+          <button data-testid="aiassist-re-enrich" onClick={reEnrichMissing} title="Backfill empty image / size / finish / price on existing checklist items"
+            disabled={reEnrichStatus?.scanning}
+            style={{ background: 'transparent', color: '#D4A574', border: '1px solid #D4A574', padding: '3px 8px', fontSize: 10, fontWeight: 800, letterSpacing: 1, borderRadius: 3, cursor: reEnrichStatus?.scanning ? 'wait' : 'pointer' }}>
+            {reEnrichStatus?.scanning ? '⏳ ENRICHING…' : (reEnrichStatus?.summary ? `✓ ${reEnrichStatus.summary.updated} UPDATED` : '🔄 BACKFILL')}
+          </button>
           <a data-testid="aiassist-download-bundle" href={`${API}/ai-assist/chatgpt-bundle`} download="CHATGPT_BUNDLE.md" title="Download the ChatGPT/Claude/Gemini handoff bundle" style={{ ...iconBtn, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>⤓</a>
           <button data-testid="aiassist-edit-prompt" onClick={() => setShowPromptEditor(true)} title="Edit agent brain" style={iconBtn}>⚙</button>
           <button data-testid="aiassist-reset" onClick={reset} title="Clear conversation + memory" style={iconBtn}>🗑</button>
