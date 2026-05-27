@@ -21746,6 +21746,8 @@ async def ai_assist_re_enrich(payload: ReEnrichRequest):
                     updates["cost"] = float(scraped["price"])
                 if not it.get("sku") and scraped.get("sku"):
                     updates["sku"] = str(scraped["sku"])[:40]
+                if not it.get("finish_image") and scraped.get("finish_image"):
+                    updates["finish_image"] = scraped["finish_image"]
 
             if updates:
                 updates["updated_at"] = datetime.now(timezone.utc).isoformat()

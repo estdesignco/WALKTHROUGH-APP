@@ -611,6 +611,210 @@ class VendorPortalScraper:
                 details['dimensions'] = ', '.join(details['dimensions'])
                 details['size'] = details['dimensions']
 
+            # 2) Extended-selector pass for dealer-only fields that don't
+            # appear in OG/JSON-LD (per ChatGPT's vendor selector map for
+            # Uttermost / Gabby / HVL Group). We run this in ONE page.evaluate
+            # so it's a single DOM trip. Each vendor gets its own selector
+            # arrays — falls back to generic [class*=...] queries that work
+            # across most Magento / Shopify / custom dealer platforms.
+            extended_selectors = {
+                'uttermost': {
+                    'price': ['[data-testid*="price"]', '.dealer-price', '.customer-price',
+                              '.net-price', '.trade-price', '.product-price', '.price',
+                              '.pricing .value', '.pricing-value', '[class*="price"]'],
+                    'dimensions': ['.specifications', '.product-specifications',
+                                   '.product-details', '.details-specs', '.accordion-content',
+                                   '[class*="dimension"]', '[class*="spec"]'],
+                    'finish_color': ['[class*="finish"]', '[class*="color"]',
+                                     '.product-finishes', '.finish-name',
+                                     '.attribute-finish', '.attribute-color',
+                                     '[data-option-name*="Finish"]', '[data-option-name*="Color"]'],
+                    'finish_swatch': ['.swatch img', '.finish-swatch img',
+                                      '[class*="swatch"] img', '[class*="finish"] img',
+                                      '[data-option-name*="Finish"] img',
+                                      '[data-option-name*="Color"] img',
+                                      '.product-finishes img'],
+                },
+                'gabby': {
+                    'price': ['.price-item--regular', '.price__regular .price-item',
+                              '.price .price-item', '[data-product-price]',
+                              '.product__price', '.product-price', '[class*="price"]'],
+                    'dimensions': ['.product__accordion', '.accordion__content',
+                                   '.product__description', '.product__info-container',
+                                   '.product-single__description',
+                                   '[class*="dimension"]', '[class*="spec"]', 'table'],
+                    'finish_color': ['.product-form__input input:checked + label',
+                                     '.product-form__input .swatch-input__input:checked + label',
+                                     '.product-form__input [data-option-value]',
+                                     '[data-option-name*="Finish"] [aria-checked="true"]',
+                                     '[data-option-name*="Color"] [aria-checked="true"]',
+                                     '.product-form__input [class*="swatch"]'],
+                    'finish_swatch': ['.product-form__input input:checked + label img',
+                                      '.product-form__input .swatch-input__input:checked + label img',
+                                      '[data-option-name*="Finish"] img',
+                                      '[data-option-name*="Color"] img',
+                                      '.swatch img', '.color-swatch img'],
+                },
+                'hvl_group': {
+                    'price': ['[class*="price"]', '.price', '.product-price',
+                              '.net-price', '.trade-price', '.customer-price',
+                              '.pricing .value', '[data-bind*="price"]', '[data-price]'],
+                    'dimensions': ['.specifications', '.product-specifications',
+                                   '.details', '.product-details', '.tab-content',
+                                   '.accordion-content', '[class*="dimension"]',
+                                   '[class*="spec"]', 'table'],
+                    'finish_color': ['[class*="finish"]', '[class*="color"]',
+                                     '.finish', '.finish-name',
+                                     '.attribute-finish', '.attribute-color',
+                                     '[data-option-name*="Finish"]', '[data-option-name*="Color"]'],
+                    'finish_swatch': ['.swatch img', '.finish-swatch img',
+                                      '[class*="swatch"] img', '[class*="finish"] img',
+                                      '[data-option-name*="Finish"] img',
+                                      '[data-option-name*="Color"] img'],
+                },
+            }
+            # Use vendor-specific selectors if available, else fall back to a
+            # union of all 3 (covers ~80% of generic e-com sites)
+            sel_cfg = extended_selectors.get(vendor_key)
+            if not sel_cfg:
+                # Build a generic merge of all 3 vendor configs
+                merged = {'price': [], 'dimensions': [], 'finish_color': [], 'finish_swatch': []}
+                for v in extended_selectors.values():
+                    for k in merged:
+                        for s in v[k]:
+                            if s not in merged[k]:
+                                merged[k].append(s)
+                sel_cfg = merged
+
+            ext = await page.evaluate(r"""(selectors) => {
+              const clean = (s) => (s || '').replace(/\s+/g, ' ').trim();
+
+              const firstText = (selList) => {
+                for (const sel of selList || []) {
+                  let nodes;
+                  try { nodes = Array.from(document.querySelectorAll(sel)); }
+                  catch(e) { continue; }
+                  for (const el of nodes) {
+                    const txt = clean(el.innerText || el.textContent || '');
+                    if (txt && txt.length < 400) return { selector: sel, value: txt };
+                  }
+                }
+                return null;
+              };
+
+              const firstImage = (selList) => {
+                for (const sel of selList || []) {
+                  let nodes;
+                  try { nodes = Array.from(document.querySelectorAll(sel)); }
+                  catch(e) { continue; }
+                  for (const el of nodes) {
+                    let src = el.getAttribute('src') || el.getAttribute('data-src') || el.getAttribute('srcset') || '';
+                    if (src.includes(',')) src = src.split(',')[0].trim().split(' ')[0];
+                    if (src && !src.startsWith('data:')) return { selector: sel, value: src };
+                  }
+                }
+                return null;
+              };
+
+              const parseDimensions = (raw) => {
+                const text = clean(raw);
+                const combined = text.match(/Width[:\s]+([\d.\/\s]+)\s*(?:in|")?.*?Depth[:\s]+([\d.\/\s]+)\s*(?:in|")?.*?Height[:\s]+([\d.\/\s]+)\s*(?:in|")?/i);
+                if (combined) return { width: combined[1].trim(), depth: combined[2].trim(), height: combined[3].trim() };
+                const w = text.match(/Width[:\s]+([\d.\/\s]+)\s*(?:in|")/i) || text.match(/\bW[:\s]+([\d.\/\s]+)\s*(?:in|")/i);
+                const d = text.match(/Depth[:\s]+([\d.\/\s]+)\s*(?:in|")/i) || text.match(/\bD[:\s]+([\d.\/\s]+)\s*(?:in|")/i);
+                const h = text.match(/Height[:\s]+([\d.\/\s]+)\s*(?:in|")/i) || text.match(/\bH[:\s]+([\d.\/\s]+)\s*(?:in|")/i);
+                if (w || d || h) return { width: w ? w[1].trim() : null, depth: d ? d[1].trim() : null, height: h ? h[1].trim() : null };
+                // fallback: NN" x NN" x NN" pattern
+                const m = text.match(/(\d+(?:\.\d+)?)\s*(?:\"|in|inches?)\s*[xX×]\s*(\d+(?:\.\d+)?)\s*(?:\"|in|inches?)\s*[xX×]\s*(\d+(?:\.\d+)?)/);
+                if (m) return { width: m[1], depth: m[2], height: m[3] };
+                return null;
+              };
+
+              const firstDimensionBlock = (selList) => {
+                for (const sel of selList || []) {
+                  let nodes;
+                  try { nodes = Array.from(document.querySelectorAll(sel)); }
+                  catch(e) { continue; }
+                  for (const el of nodes) {
+                    const txt = clean(el.innerText || el.textContent || '');
+                    if (!txt || txt.length > 4000) continue;
+                    if (/width|depth|height|\bW\b|\bD\b|\bH\b/i.test(txt)) {
+                      const dims = parseDimensions(txt);
+                      if (dims) return { selector: sel, value: dims, raw_snippet: txt.slice(0, 200) };
+                    }
+                  }
+                }
+                return null;
+              };
+
+              return {
+                price: firstText(selectors.price),
+                dimensions: firstDimensionBlock(selectors.dimensions),
+                finish_color: firstText(selectors.finish_color),
+                finish_swatch: firstImage(selectors.finish_swatch),
+              };
+            }""", sel_cfg)
+
+            # Merge extended findings into details, ONLY filling fields that
+            # the OG/JSON-LD pass didn't already populate.
+            if ext:
+                logger.info(f"extended-selector hits for {vendor_key}: price={'Y' if ext.get('price') else '.'} dims={'Y' if ext.get('dimensions') else '.'} finish={'Y' if ext.get('finish_color') else '.'} swatch={'Y' if ext.get('finish_swatch') else '.'}")
+
+                # Validation: reject obvious form-label false positives.
+                # Selectors like `[class*="finish"]` can match unrelated UI
+                # elements like "Finish your subscription" forms. A real
+                # furniture finish name is: short, no email/form markers,
+                # no question marks, no instructional verbs.
+                BAD_HINTS = {'email', 'phone', 'submit', 'sign up', 'sign in', 'subscribe',
+                             'newsletter', 'address', 'name *', 'finish your',
+                             'continue', 'register', 'log in', 'login', 'password',
+                             'first name', 'last name', '?', 'select your', 'enter your'}
+                def _looks_like_label(v: str) -> bool:
+                    vl = (v or '').lower()
+                    if len(vl) < 2 or len(vl) > 80:
+                        return True
+                    if any(h in vl for h in BAD_HINTS):
+                        return True
+                    # Lots of asterisks = form field
+                    if vl.count('*') >= 1:
+                        return True
+                    return False
+
+                # Price
+                if not details.get('price') and ext.get('price'):
+                    raw = ext['price'].get('value', '')
+                    m = re.search(r'\$?\s*([\d,]+\.?\d{0,2})', raw)
+                    if m:
+                        try:
+                            p = float(m.group(1).replace(',', ''))
+                            if p > 0:
+                                details['price'] = p
+                        except Exception:
+                            pass
+                # Dimensions / size — build "W x D x H" string
+                if not details.get('size') and ext.get('dimensions'):
+                    dv = ext['dimensions'].get('value') or {}
+                    parts = []
+                    if dv.get('width'):  parts.append(f"W: {dv['width']}\"")
+                    if dv.get('depth'):  parts.append(f"D: {dv['depth']}\"")
+                    if dv.get('height'): parts.append(f"H: {dv['height']}\"")
+                    if parts:
+                        details['size'] = ' x '.join(parts)
+                        details['dimensions'] = details['size']
+                # Finish color — guarded against form-label false positives
+                if not details.get('finish_color') and ext.get('finish_color'):
+                    val = (ext['finish_color'].get('value') or '').strip()
+                    if val and not _looks_like_label(val):
+                        details['finish_color'] = val
+                        details['finish'] = val
+                # Finish swatch image
+                if ext.get('finish_swatch'):
+                    sw = ext['finish_swatch'].get('value', '')
+                    if sw.startswith('//'):
+                        sw = 'https:' + sw
+                    if sw and sw.startswith('http'):
+                        details['finish_image'] = sw
+
             await page.close()
             logger.info(f"Got product details for {vendor_key}: name={'Y' if details.get('name') else '.'} price={details.get('price')} img={'Y' if details.get('image_url') else '.'} sku={details.get('sku')}")
             return details
