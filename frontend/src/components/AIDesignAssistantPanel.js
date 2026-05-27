@@ -275,6 +275,24 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.detail || 'Push failed');
+      // Surface per-item errors that the bulk endpoint silently swallows.
+      // The most common cause is "Project not found" when the URL's project id
+      // got wiped from the DB; before this fix the panel just said "Pushed: 0
+      // new, 0 errors" and the user had no idea what went wrong.
+      if (j.errors > 0) {
+        const firstErr = (j.results || []).find(r => r.status === 'error');
+        const code = firstErr?.error?.code;
+        const detail = firstErr?.error?.detail || firstErr?.error?.message || 'unknown error';
+        let msg = `Pushed ${j.created} item${j.created === 1 ? '' : 's'}, but ${j.errors} failed.`;
+        if (code === 404 && String(detail).toLowerCase().includes('project')) {
+          msg = `❌ Push failed: this project (${projectId}) no longer exists in the database. Navigate to a real project from the home page and try again.`;
+        } else if (code) {
+          msg += `\n\nFirst error (${code}): ${detail}`;
+        } else {
+          msg += `\n\nFirst error: ${detail}`;
+        }
+        setError(msg);
+      }
       setPushStatus({ status: 'done', summary: j });
       setSelectedForPush({});
     } catch (e) {
