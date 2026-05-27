@@ -1,10 +1,23 @@
-// Design Ready Product Scraper v7.26.0
+// Design Ready Product Scraper v7.38.0
 // VENDOR-SPECIFIC SCRAPING for 26+ vendors
 // MULTI-IMAGE SUPPORT FIXED, HIGH-RES IMAGES, IMPROVED TAB REUSE - Jan 2026
 // Debug logging enabled in console
+// v7.38 — configurable backend URL via chrome.storage so the extension can
+//         talk to the preview environment, not just production.
 
-const APP_URL = 'https://app.estdesignco.com';
-const BACKEND_URL = 'https://app.estdesignco.com';
+// Default to production but allow override via chrome.storage.local.
+// Set with: chrome.storage.local.set({backend_url: 'https://design-preview-131.preview.emergentagent.com'})
+let APP_URL = 'https://app.estdesignco.com';
+let BACKEND_URL = 'https://app.estdesignco.com';
+try {
+  chrome.storage.local.get(['backend_url'], (res) => {
+    if (res && res.backend_url) {
+      APP_URL = res.backend_url;
+      BACKEND_URL = res.backend_url;
+      console.log('[v7.38] Backend URL overridden via storage:', BACKEND_URL);
+    }
+  });
+} catch (e) { console.warn('[v7.38] chrome.storage not available, using default backend'); }
 let scrapedData = null;
 let selectedProjectId = null;
 let clickToSelectActive = false;

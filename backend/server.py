@@ -8260,6 +8260,7 @@ async def receive_extension_scrape(data: dict):
                 "sku": data.get('sku'),
                 "size": data.get('size'),
                 "finish_color": data.get('finish_color'),
+                "finish_image": data.get('finish_image'),
                 "image_url": data.get('image_url'),
                 "vendor": data.get('vendor'),
                 "scraped_at": datetime.utcnow().isoformat()
@@ -21605,6 +21606,7 @@ async def ai_assist_re_enrich(payload: ReEnrichRequest):
         query["$or"] = [
             {"image_url": {"$in": [None, ""]}},
             {"finish_color": {"$in": [None, ""]}},
+            {"finish_image": {"$in": [None, ""]}},
             {"size": {"$in": [None, ""]}},
             {"price": {"$in": [None, 0, 0.0]}},
         ]
@@ -21613,6 +21615,16 @@ async def ai_assist_re_enrich(payload: ReEnrichRequest):
 
     items = await db.items.find(query, {"_id": 0}).limit(200).to_list(200)
     logger.info(f"re-enrich: targeting {len(items)} items")
+
+    # Preload the extension-scrape cache. Whenever the user has clipped a
+    # product from their real authenticated browser (Design Ready Scraper
+    # Chrome extension v7.38+), the clipped fields (price, finish_color,
+    # finish_image, size, image_url) are the highest-confidence source —
+    # they come from the user's real session and bypass anti-bot detection
+    # that blocks our cloud Playwright.
+    ext_cache_docs = await db.extension_scrape_cache.find({}, {"_id": 0}).to_list(2000)
+    ext_by_url = {(d.get("url") or "").split("?")[0]: d for d in ext_cache_docs if d.get("url")}
+    logger.info(f"re-enrich: loaded {len(ext_by_url)} extension-clipped URLs from cache")
 
     from vendor_portals import resolve_vendor_key_from_url, VENDOR_PORTALS, get_vendor_portal_info as _portal_info
     from vendor_scraper import get_scraper
@@ -21625,15 +21637,53 @@ async def ai_assist_re_enrich(payload: ReEnrichRequest):
         updates = {}
         diagnostics = {"link": link, "tried": []}
         try:
-            # 1) Try authenticated portal first if we have a live session
-            scraped = None
-            vk = resolve_vendor_key_from_url(link)
-            if vk:
-                diagnostics["vendor_key"] = vk
-                if vk in scraper.contexts:
-                    diagnostics["tried"].append("portal_authenticated")
-                    cfg = VENDOR_PORTALS.get(vk, {})
-                    scraped = await scraper.get_product_details(vk, link, cfg) or {}
+            # 0) Highest-confidence source: the user's Chrome extension
+            # clip from their real authenticated browser. If they've ever
+            # clipped this product URL, those fields override everything
+            # below.
+            clip = ext_by_url.get(link.split("?")[0]) if link else None
+            if clip:
+                diagnostics["tried"].append("extension_clip")
+                scraped = {
+                    "name": clip.get("name"),
+                    "sku": clip.get("sku"),
+                    "price": clip.get("price"),
+                    "image_url": clip.get("image_url"),
+                    "finish_color": clip.get("finish_color"),
+                    "finish_image": clip.get("finish_image"),
+                    "size": clip.get("size"),
+                }
+                # Parse price if it's a string like "$2,470.00"
+                if isinstance(scraped.get("price"), str):
+                    m = re.search(r"([\d,]+\.?\d{0,2})", scraped["price"].replace("$", ""))
+                    if m:
+                        try: scraped["price"] = float(m.group(1).replace(",", ""))
+                        except: scraped["price"] = None
+            else:
+                scraped = None
+
+            # 1) Try authenticated portal first if we have a live session.
+            # Skip if the extension clip ALREADY gave us everything we need
+            # (price + finish_color + size + image_url) — the user's real
+            # browser session is higher confidence than our cloud scrape.
+            ext_complete = bool(scraped) and all(
+                scraped.get(k) for k in ("price", "finish_color", "size", "image_url")
+            )
+            if not ext_complete:
+                vk = resolve_vendor_key_from_url(link)
+                if vk:
+                    diagnostics["vendor_key"] = vk
+                    if vk in scraper.contexts:
+                        diagnostics["tried"].append("portal_authenticated")
+                        cfg = VENDOR_PORTALS.get(vk, {})
+                        portal_scraped = await scraper.get_product_details(vk, link, cfg) or {}
+                        # Merge: extension wins, portal fills the gaps
+                        if scraped:
+                            for k, v in portal_scraped.items():
+                                if v and not scraped.get(k):
+                                    scraped[k] = v
+                        else:
+                            scraped = portal_scraped
 
             # 2) Public OG/JSON-LD fallback (works for many vendors without auth)
             if not scraped or (not scraped.get("image_url") and not (scraped.get("images") or [])):
