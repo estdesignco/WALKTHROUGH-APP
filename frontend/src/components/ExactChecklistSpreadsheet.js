@@ -3222,8 +3222,45 @@ const ExactChecklistSpreadsheet = ({
                                     
                                     return (
                                       <tr key={item.id} style={rowStyle}>
-                                        {/* CHECKBOX - Independent of status dropdown */}
-                                        <td className="border border-[#B49B7E] px-1 py-1 text-center w-8">
+                                        {/* CHECKBOX + MISSING-FIELDS BADGE */}
+                                        <td className="border border-[#B49B7E] px-1 py-1 text-center w-8" style={{ position: 'relative' }}>
+                                          {(() => {
+                                            // Surface every field the user explicitly cares about so
+                                            // they can run the Clipper for that item. Order matters —
+                                            // most-important first.
+                                            const missing = [];
+                                            if (!item.image_url) missing.push('IMG');
+                                            if (!item.size) missing.push('SIZE');
+                                            if (!item.finish_color) missing.push('FINISH');
+                                            if (!item.finish_image) missing.push('SWATCH');
+                                            if (!item.price && !item.cost) missing.push('PRICE');
+                                            if (!item.sku) missing.push('SKU');
+                                            // Skip vendor/name on purpose — usually present from Canva.
+                                            if (missing.length === 0) return null;
+                                            const tooltip = `Missing: ${missing.join(', ')}${item.link ? '\n\nClick to open in a new tab → use the Design Ready Scraper extension to clip → click 🔄 BACKFILL in the AI panel.' : '\n\nNo product link saved — paste a vendor URL into the Link cell first.'}`;
+                                            const handleClick = (e) => {
+                                              e.stopPropagation();
+                                              if (item.link) window.open(item.link, '_blank', 'noopener');
+                                              else alert('This item has no product link yet. Paste a vendor URL into the Link cell first, then re-clip via the extension.');
+                                            };
+                                            return (
+                                              <button
+                                                data-testid={`missing-fields-badge-${item.id}`}
+                                                onClick={handleClick}
+                                                title={tooltip}
+                                                style={{
+                                                  position: 'absolute', top: 2, right: 2,
+                                                  fontSize: 8, fontWeight: 900, letterSpacing: 0.4,
+                                                  padding: '1px 4px', borderRadius: 2,
+                                                  background: missing.length >= 3 ? '#ef4444' : '#f59e0b',
+                                                  color: '#fff', border: 'none', cursor: 'pointer',
+                                                  lineHeight: 1.1, minWidth: 18,
+                                                }}
+                                              >
+                                                {missing.length}
+                                              </button>
+                                            );
+                                          })()}
                                           <input 
                                             type="checkbox" 
                                             className="w-4 h-4 cursor-pointer" 
