@@ -79,39 +79,61 @@ logger = logging.getLogger(__name__)
 # Set Playwright browser path
 os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/pw-browsers'
 
-# Self-heal: ensure required system binaries are present. Without these,
-# the PDF ingestion + vendor portal login features break on any fresh
-# deploy. Runs once at import; harmless no-op if already installed.
-try:
-    import subprocess as _subprocess
+# Self-heal flags — kicked off in @app.on_event("startup") as a background
+# task so the FastAPI process can start serving /health immediately. Without
+# this, fresh production containers would spend 1-2 minutes downloading
+# Chromium (~400MB) + apt-installing poppler-utils at import time and the
+# Kubernetes liveness probe would time out, failing the deployment.
+_self_heal_status = {"chromium": "pending", "pdftoppm": "pending"}
+
+async def _run_self_heal_async():
+    """Background task: ensure Playwright Chromium + poppler-utils are present.
+    Runs once at startup AFTER the FastAPI server is already accepting
+    /health requests, so it never blocks the deployment health check."""
+    import asyncio as _asyncio
     import shutil as _shutil
-
-    # 1) Playwright Chromium for vendor portal login + product scraping
-    _pw_chromium = '/pw-browsers/chromium-1091/chrome-linux/chrome'
-    if not os.path.exists(_pw_chromium):
-        logger.info("Playwright Chromium missing — running `playwright install chromium` (one-time)...")
-        _subprocess.run(
-            ['python', '-m', 'playwright', 'install', 'chromium'],
-            check=False, capture_output=True, timeout=300,
-            env={**os.environ, 'PLAYWRIGHT_BROWSERS_PATH': '/pw-browsers'},
-        )
+    try:
+        # 1) Playwright Chromium for vendor portal login + product scraping
+        _pw_chromium = '/pw-browsers/chromium-1091/chrome-linux/chrome'
         if os.path.exists(_pw_chromium):
-            logger.info("Playwright Chromium installed at %s", _pw_chromium)
-
-    # 2) poppler-utils (pdftoppm) for the Canva PDF → JPEG render step
-    if _shutil.which('pdftoppm') is None:
-        logger.info("pdftoppm missing — installing poppler-utils (one-time)...")
-        _subprocess.run(['apt-get', 'update', '-qq'], check=False, capture_output=True, timeout=120)
-        _subprocess.run(
-            ['apt-get', 'install', '-y', '-qq', 'poppler-utils'],
-            check=False, capture_output=True, timeout=300,
-        )
-        if _shutil.which('pdftoppm') is not None:
-            logger.info("pdftoppm installed at %s", _shutil.which('pdftoppm'))
+            _self_heal_status["chromium"] = "ready"
         else:
-            logger.warning("pdftoppm install did not produce expected binary")
-except Exception as _pw_exc:
-    logger.warning("Self-heal skipped: %s", _pw_exc)
+            logger.info("[self-heal] Playwright Chromium missing — installing in background...")
+            proc = await _asyncio.create_subprocess_exec(
+                'python', '-m', 'playwright', 'install', 'chromium',
+                stdout=_asyncio.subprocess.DEVNULL, stderr=_asyncio.subprocess.PIPE,
+                env={**os.environ, 'PLAYWRIGHT_BROWSERS_PATH': '/pw-browsers'},
+            )
+            try:
+                await _asyncio.wait_for(proc.wait(), timeout=600)
+                _self_heal_status["chromium"] = "ready" if os.path.exists(_pw_chromium) else "failed"
+                logger.info(f"[self-heal] Chromium status: {_self_heal_status['chromium']}")
+            except _asyncio.TimeoutError:
+                proc.kill()
+                _self_heal_status["chromium"] = "timeout"
+                logger.warning("[self-heal] Chromium install timed out after 10min")
+
+        # 2) poppler-utils (pdftoppm) for the Canva PDF → JPEG render step
+        if _shutil.which('pdftoppm'):
+            _self_heal_status["pdftoppm"] = "ready"
+        else:
+            logger.info("[self-heal] pdftoppm missing — apt-installing in background...")
+            for cmd in (
+                ['apt-get', 'update', '-qq'],
+                ['apt-get', 'install', '-y', '-qq', 'poppler-utils'],
+            ):
+                proc = await _asyncio.create_subprocess_exec(
+                    *cmd,
+                    stdout=_asyncio.subprocess.DEVNULL, stderr=_asyncio.subprocess.PIPE,
+                )
+                try:
+                    await _asyncio.wait_for(proc.wait(), timeout=300)
+                except _asyncio.TimeoutError:
+                    proc.kill()
+            _self_heal_status["pdftoppm"] = "ready" if _shutil.which('pdftoppm') else "failed"
+            logger.info(f"[self-heal] pdftoppm status: {_self_heal_status['pdftoppm']}")
+    except Exception as _exc:
+        logger.warning(f"[self-heal] background task crashed: {_exc}")
 
 # MongoDB connection - with fallback for missing env var
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
@@ -170,6 +192,17 @@ async def startup_event():
             logger.info(f"✅ Auto-restored {n} vendor credentials from backup")
     except Exception as e:
         logger.warning(f"vendor credential auto-restore skipped: {e}")
+
+    # Kick off the binary-install self-heal in the background. This used to
+    # run at import time, which blocked uvicorn startup for 1-2 minutes on
+    # fresh production containers (downloading Chromium + apt-installing
+    # poppler-utils) and made the Kubernetes /health probe time out before
+    # the app could respond — failing every deploy. By scheduling it here
+    # as a fire-and-forget task, the app accepts /health immediately and
+    # Playwright-dependent endpoints (vendor logins, PDF→JPEG render) come
+    # online a minute or two later.
+    import asyncio as _asyncio_startup
+    _asyncio_startup.create_task(_run_self_heal_async())
 
     # Auto-seed demo project with tile items if DB is empty (preview env)
     try:
