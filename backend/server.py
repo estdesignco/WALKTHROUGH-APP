@@ -21599,6 +21599,101 @@ async def ai_assist_chat(payload: AIAssistChat):
     }
 
 
+class DedupeRequest(BaseModel):
+    project_id: str
+    dry_run: bool = True
+
+
+@api_router.post("/ai-assist/dedupe-empties")
+async def ai_assist_dedupe_empties(payload: DedupeRequest):
+    """Clean up the visual mess of duplicate rows the broken push-items
+    logic created BEFORE the placeholder-fill fix. Strategy:
+
+    Within each (room, category, subcategory) bucket:
+      - If a row has data (vendor/sku/link) AND another row in the same
+        bucket is empty AND has a shorter or similar name → delete the
+        EMPTY duplicate.
+      - If two rows have identical or near-identical names AND both have
+        data → keep the older one, mark the newer one for deletion.
+
+    Run with dry_run=true first to preview what would be removed.
+    """
+    rooms = await db.rooms.find({"project_id": payload.project_id}, {"_id": 0}).to_list(500)
+    room_ids = [r["id"] for r in rooms]
+    cats = await db.categories.find({"room_id": {"$in": room_ids}}, {"_id": 0}).to_list(2000)
+    cat_ids = [c["id"] for c in cats]
+    subcats = await db.subcategories.find({"category_id": {"$in": cat_ids}}, {"_id": 0}).to_list(5000)
+    sub_ids = [s["id"] for s in subcats]
+    all_items = await db.items.find({"subcategory_id": {"$in": sub_ids}}, {"_id": 0}).to_list(8000)
+
+    # Group items by (room, category) — NOT subcategory — so we catch the
+    # duplicate-across-subcategories case (e.g. the broken push created
+    # `Furniture > Tables > Console Table` AND `Furniture > Console Tables
+    # > Console Table` AND `Furniture > FURNITURE > Console Table`, when
+    # we should have just one).
+    sub_to_cat_room = {}
+    for s in subcats:
+        cat = next((c for c in cats if c["id"] == s.get("category_id")), None)
+        if not cat:
+            continue
+        sub_to_cat_room[s["id"]] = (cat.get("room_id"), cat.get("id"))
+
+    by_bucket = {}
+    for it in all_items:
+        key = sub_to_cat_room.get(it.get("subcategory_id"))
+        if not key:
+            continue
+        by_bucket.setdefault(key, []).append(it)
+
+    to_delete = []
+    for bucket, items in by_bucket.items():
+        filled = [i for i in items if (i.get("vendor") or i.get("sku") or i.get("link"))]
+        empty = [i for i in items if not (i.get("vendor") or i.get("sku") or i.get("link"))]
+
+        # 1) Remove empties that look like the placeholder for a filled row
+        for f in filled:
+            f_name = (f.get("name") or "").lower().strip()
+            f_words = set(f_name.split()) - {"a","the","of","on","in","with","and","for","to","by"}
+            for e in empty:
+                e_name = (e.get("name") or "").lower().strip()
+                if not e_name:
+                    continue
+                e_words = set(e_name.split()) - {"a","the","of","on","in","with","and","for","to","by"}
+                if (
+                    e_name in f_name
+                    or f_name in e_name
+                    or (e_words and f_words and len(e_words & f_words) >= max(1, len(e_words) - 1))
+                ):
+                    if (e["id"], "dup") not in [(t[0], "dup") for t in to_delete]:
+                        to_delete.append((e["id"], f"empty duplicate of filled '{f.get('name')}'"))
+
+        # 2) Remove duplicate FILLED rows (same vendor + same sku → keep oldest)
+        by_sig = {}
+        for f in filled:
+            sig = ((f.get("vendor") or "").lower().strip(), (f.get("sku") or "").lower().strip())
+            if not all(sig):
+                continue
+            by_sig.setdefault(sig, []).append(f)
+        for sig, dupes in by_sig.items():
+            if len(dupes) < 2:
+                continue
+            dupes.sort(key=lambda x: x.get("created_at") or "")
+            # Keep the first, delete the rest
+            for d in dupes[1:]:
+                if not any(t[0] == d["id"] for t in to_delete):
+                    to_delete.append((d["id"], f"duplicate SKU {sig[1]} in same room+category"))
+
+    if not payload.dry_run:
+        for item_id, _ in to_delete:
+            await db.items.delete_one({"id": item_id})
+
+    return {
+        "dry_run": payload.dry_run,
+        "would_delete": len(to_delete),
+        "items": [{"item_id": iid, "reason": reason} for iid, reason in to_delete[:50]],
+    }
+
+
 class ReEnrichRequest(BaseModel):
     item_ids: Optional[List[str]] = None   # specific items, or None = all missing
     project_id: Optional[str] = None       # scope to one project (recommended)
@@ -21913,23 +22008,194 @@ async def ai_assist_set_prompt(payload: AIAssistPromptUpdate):
 
 @api_router.post("/ai-assist/push-items")
 async def ai_assist_push_items(payload: AIAssistPushItems):
-    """One-click push from the panel to the existing bulk-create endpoint.
+    """One-click push from the panel.
 
-    Reuses _agent_create_one so behavior is identical to the public API.
-    We synthesize an internal "key" record so scope checks pass.
+    For each detected item, try to FILL an existing empty placeholder row
+    in the same room+subcategory first. Only create a new row if no empty
+    placeholder exists. This is the fix for the "duplicate rows" complaint —
+    when the room template has 6 empty Lighting rows (Chandelier, Pendant
+    Light, Recessed Lighting, Sconces, Ceiling Light, Table Lamp), and the
+    agent finds 1 chandelier + 1 table lamp, we update those 2 placeholders
+    in place rather than creating "Ring Chandelier" + "Seton Lamp" as
+    additional rows next to the empty ones.
+
+    Matching strategy (per detected item):
+      1. Same project_id
+      2. Same room_name (case-insensitive)
+      3. Same subcategory_name (case-insensitive) — falls back to category_name
+      4. Row is EMPTY: vendor + sku + link all blank
+      5. If multiple candidates, prefer one whose existing `name` is a
+         substring/superset of the detected item's name (e.g. "Chandelier"
+         placeholder is a superset of "Ring Chandelier" detection).
+      6. If still no match, create new (current behavior).
     """
     if not payload.items:
         raise HTTPException(status_code=400, detail="`items` array is required")
+
     internal_key = {"id": "ai-assist-panel", "name": "AI Assist Panel", "project_id": None}
+
+    # Preload the project's room/category/subcategory structure ONCE so we
+    # don't hit Mongo on every item.
+    rooms = await db.rooms.find({"project_id": payload.project_id}, {"_id": 0}).to_list(500)
+    room_ids = [r["id"] for r in rooms]
+    cats = await db.categories.find({"room_id": {"$in": room_ids}}, {"_id": 0}).to_list(2000)
+    cat_ids = [c["id"] for c in cats]
+    subcats = await db.subcategories.find({"category_id": {"$in": cat_ids}}, {"_id": 0}).to_list(5000)
+    items_existing = await db.items.find({"subcategory_id": {"$in": [s["id"] for s in subcats]}}, {"_id": 0}).to_list(8000)
+
+    # Build lookup indices
+    room_by_name = {(r.get("name") or "").strip().lower(): r for r in rooms}
+    cat_by_room_and_name = {}
+    for c in cats:
+        key = (c.get("room_id"), (c.get("name") or "").strip().lower())
+        cat_by_room_and_name[key] = c
+    sub_by_cat_and_name = {}
+    for s in subcats:
+        key = (s.get("category_id"), (s.get("name") or "").strip().lower())
+        sub_by_cat_and_name[key] = s
+
+    def _is_empty(row):
+        return (
+            not (row.get("vendor") or "").strip()
+            and not (row.get("sku") or "").strip()
+            and not (row.get("link") or "").strip()
+        )
+
+    def _find_empty_placeholder(detected):
+        """Return the best empty existing row to fill, or None.
+
+        Real-world templates have inconsistent subcategory names (the Foyer
+        template uses `INSTALLED` / `PORTABLE` whereas the agent says
+        `Chandeliers` / `Table Lamps`). So we match on:
+          1. same room_name (required)
+          2. same category_name (required-ish — try without if it doesn't match)
+          3. existing row's name is a substring or close-match of the
+             detected item's name (this is how "Chandelier" placeholder
+             gets filled by "Ring Chandelier" detection regardless of
+             subcategory naming)
+        """
+        d_room = (detected.get("room_name") or "").strip().lower()
+        d_cat = (detected.get("category_name") or "").strip().lower()
+        d_name = (detected.get("name") or "").strip().lower()
+        if not (d_room and d_name):
+            return None
+        room = room_by_name.get(d_room)
+        if not room:
+            return None
+
+        candidates = []
+        for it in items_existing:
+            if not _is_empty(it):
+                continue
+            sub = next((s for s in subcats if s["id"] == it.get("subcategory_id")), None)
+            if not sub:
+                continue
+            cat = next((c for c in cats if c["id"] == sub.get("category_id")), None)
+            if not cat or cat.get("room_id") != room["id"]:
+                continue
+            existing_name = (it.get("name") or "").strip().lower()
+            if not existing_name:
+                continue
+
+            cat_name = (cat.get("name") or "").strip().lower()
+            cat_match = (d_cat and cat_name == d_cat)
+
+            # Name overlap is the key signal. "Chandelier" placeholder vs
+            # "Ring Chandelier" detection → existing_name fully contained
+            # in d_name (substring), and vice versa for short detections.
+            name_score = 0
+            if existing_name in d_name:
+                name_score += 5  # placeholder is subset of detected (most common)
+            if d_name in existing_name:
+                name_score += 3
+            # Word overlap as a fallback
+            existing_words = set(existing_name.split())
+            detected_words = set(d_name.split())
+            common = existing_words & detected_words
+            # ignore noise words
+            common -= {"a","the","of","on","in","with","and","for","by","to","is","at","or"}
+            if len(common) >= 1:
+                name_score += len(common)
+
+            if name_score == 0:
+                continue  # no useful overlap, skip
+
+            total_score = name_score + (3 if cat_match else 0)
+            candidates.append((total_score, it))
+
+        if not candidates:
+            return None
+        candidates.sort(key=lambda x: x[0], reverse=True)
+        # Require a minimum score so we don't fill the wrong row on weak matches
+        if candidates[0][0] < 2:
+            return None
+        return candidates[0][1]
+
     results = []
-    created = exists = errors = 0
+    created = exists = updated = errors = 0
     for idx, raw in enumerate(payload.items):
-        # Coerce the dict into AgentItemCreate. Force project_id from the
-        # request so the agent can't accidentally write to a different project.
         try:
             raw_copy = dict(raw)
             raw_copy["project_id"] = payload.project_id
-            # Strip fields that aren't in the model
+
+            # NEW: try to fill an existing empty placeholder before creating
+            placeholder = _find_empty_placeholder(raw)
+            if placeholder:
+                # Preserve the placeholder's original name unless it was a
+                # truly generic stub like "Chandelier" and the agent gave us
+                # a richer one like "Ring Chandelier". Default: keep the
+                # placeholder's name (the user typed it deliberately).
+                old_name = (placeholder.get("name") or "").strip()
+                new_name = (raw_copy.get("name") or "").strip()
+                # Keep the agent's richer name only when the placeholder was
+                # a single generic word AND the agent name CONTAINS it.
+                if (
+                    old_name
+                    and new_name
+                    and old_name.lower() in new_name.lower()
+                    and len(old_name.split()) <= 2
+                    and len(new_name) > len(old_name)
+                ):
+                    keep_name = new_name  # agent's "Ring Chandelier" replaces "Chandelier"
+                else:
+                    keep_name = old_name or new_name
+
+                update_fields = {
+                    "name": keep_name,
+                    "vendor": raw_copy.get("vendor") or "",
+                    "sku": raw_copy.get("sku") or "",
+                    "link": raw_copy.get("link") or "",
+                    "image_url": raw_copy.get("image_url") or "",
+                    "remarks": raw_copy.get("remarks") or placeholder.get("remarks") or "",
+                    "status": raw_copy.get("status") or placeholder.get("status") or "RESEARCHING",
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }
+                if raw_copy.get("cost") or raw_copy.get("price"):
+                    p = float(raw_copy.get("cost") or raw_copy.get("price") or 0)
+                    if p > 0:
+                        update_fields["cost"] = p
+                        update_fields["price"] = p
+                await db.items.update_one(
+                    {"id": placeholder["id"]},
+                    {"$set": update_fields},
+                )
+                # Reflect in local cache so a second detected item doesn't
+                # try to refill the same placeholder we just took.
+                for it in items_existing:
+                    if it.get("id") == placeholder["id"]:
+                        it.update(update_fields)
+                        break
+                results.append({
+                    "index": idx, "status": "updated",
+                    "item_id": placeholder["id"],
+                    "external_id": raw_copy.get("external_id"),
+                    "input_name": raw_copy.get("name", ""),
+                    "filled_placeholder": placeholder.get("name", ""),
+                })
+                updated += 1
+                continue
+
+            # No empty placeholder — create a new row.
             for k in list(raw_copy.keys()):
                 if k not in AgentItemCreate.__fields__:
                     raw_copy.pop(k, None)
@@ -21937,6 +22203,9 @@ async def ai_assist_push_items(payload: AIAssistPushItems):
             r = await _agent_create_one(item_in, internal_key)
             r["index"] = idx
             r["external_id"] = item_in.external_id
+            # Lift the new item's id so auto-enrichment can target it
+            if r.get("status") == "created" and isinstance(r.get("item"), dict):
+                r["item_id"] = r["item"].get("id")
             results.append(r)
             if r["status"] == "created":
                 created += 1
@@ -21948,9 +22217,30 @@ async def ai_assist_push_items(payload: AIAssistPushItems):
         except Exception as exc:
             results.append({"index": idx, "status": "error", "error": {"code": 500, "detail": str(exc)}, "input_name": raw.get("name", "")})
             errors += 1
+
+    # Auto-trigger enrichment on every newly-created or newly-updated item
+    # so the user gets images/sizes/prices without having to click BACKFILL
+    # as a second step. We schedule it as a background task so the response
+    # returns immediately.
+    try:
+        touched_ids = [r.get("item_id") for r in results if r.get("status") in ("created", "updated") and r.get("item_id")]
+        if touched_ids:
+            import asyncio as _asyncio_enrich
+            _asyncio_enrich.create_task(
+                ai_assist_re_enrich(ReEnrichRequest(
+                    item_ids=touched_ids,
+                    project_id=payload.project_id,
+                    only_missing=True,
+                ))
+            )
+            logger.info(f"push-items: scheduled background enrichment for {len(touched_ids)} items")
+    except Exception as e:
+        logger.warning(f"push-items: could not schedule enrichment: {e}")
+
     return {
         "total_submitted": len(payload.items),
         "created": created,
+        "updated": updated,
         "exists": exists,
         "errors": errors,
         "results": results,

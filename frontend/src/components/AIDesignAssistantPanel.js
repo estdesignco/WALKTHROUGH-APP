@@ -93,6 +93,24 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
     }
   };
 
+  const dedupeRows = async () => {
+    if (!window.confirm('Remove duplicate rows the AI created in this project?\n\nThis only deletes:\n  • Empty rows that look like a placeholder for a filled row\n  • Duplicates with identical SKUs in the same room/category')) return;
+    try {
+      const dry = await fetch(`${API}/ai-assist/dedupe-empties`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project_id: projectId, dry_run: true }),
+      }).then(r => r.json());
+      if (!dry.would_delete) { alert('No duplicates found — nothing to clean up.'); return; }
+      const proceed = window.confirm(`Found ${dry.would_delete} duplicate row(s). Delete them now?`);
+      if (!proceed) return;
+      const real = await fetch(`${API}/ai-assist/dedupe-empties`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ project_id: projectId, dry_run: false }),
+      }).then(r => r.json());
+      alert(`✓ Deleted ${real.would_delete} duplicate row(s). Refresh the checklist to see the clean view.`);
+    } catch (e) { alert('Dedupe failed: ' + e.message); }
+  };
+
 
   const connectCanva = async () => {
     try {
@@ -385,6 +403,10 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
             <span data-testid="aiassist-canva-connected" title="Canva connected"
               style={{ color: '#10B981', fontSize: 10, fontWeight: 800, letterSpacing: 1 }}>✅ CANVA</span>
           )}
+          <button data-testid="aiassist-dedupe" onClick={dedupeRows} title="Remove duplicate rows the AI created (keeps the filled one, deletes the empty placeholder and SKU duplicates)"
+            style={{ background: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '3px 8px', fontSize: 10, fontWeight: 800, letterSpacing: 1, borderRadius: 3, cursor: 'pointer' }}>
+            🧹 DEDUPE
+          </button>
           <button data-testid="aiassist-re-enrich" onClick={reEnrichMissing} title="Backfill empty image / size / finish / price on existing checklist items"
             disabled={reEnrichStatus?.scanning}
             style={{ background: 'transparent', color: '#D4A574', border: '1px solid #D4A574', padding: '3px 8px', fontSize: 10, fontWeight: 800, letterSpacing: 1, borderRadius: 3, cursor: reEnrichStatus?.scanning ? 'wait' : 'pointer' }}>

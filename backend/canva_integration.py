@@ -361,14 +361,16 @@ class CanvaIntegration:
 
         Canva share URLs look like:
           https://www.canva.com/design/DAGxxxxxxxxxxxx/view
-          https://www.canva.com/design/DAGxxxxxxxxxxxx/edit
-          https://www.canva.com/design/DAGxxxxxxxxxxxx/abcDEFghIJK/view?utm=...
-        The ID always starts with `DAG` (Canva's Connect-API design ID prefix).
+          https://www.canva.com/design/DAHHDMW7Jcxxx/edit
+          https://www.canva.com/design/DAFxxxxxxxxxxxx/...
+        Different prefixes (`DAG`, `DAH`, `DAF`, etc.) correspond to
+        different Canva design types. Match any `DA[A-Z]` prefix so we
+        don't reject legitimate URLs.
         """
         import re as _re
         if not canva_url:
             return None
-        m = _re.search(r"/design/(DAG[A-Za-z0-9_-]+)", canva_url)
+        m = _re.search(r"/design/(DA[A-Z][A-Za-z0-9_-]+)", canva_url)
         return m.group(1) if m else None
 
     async def get_design(self, design_id: str) -> Dict[str, Any]:
