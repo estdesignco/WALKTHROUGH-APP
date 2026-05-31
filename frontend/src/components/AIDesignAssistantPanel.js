@@ -46,6 +46,29 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
 
   useEffect(() => { if (open) loadConversation(); }, [open, loadConversation]);
 
+  // Whenever the message list changes, auto-select every detected item that
+  // hasn't been explicitly toggled off. Without this, items loaded from a
+  // prior session (or a chat response) sit unchecked in the panel and the
+  // push button never appears — which is the single most common "nothing
+  // happens after the agent finds items" complaint.
+  useEffect(() => {
+    if (!messages.length) return;
+    setSelectedForPush(prev => {
+      const next = { ...prev };
+      let changed = false;
+      messages.forEach(m => {
+        (m.detected_items || []).forEach((_, idx) => {
+          const k = `${m.id}-${idx}`;
+          if (next[k] === undefined) {  // never toggled — opt-in by default
+            next[k] = true;
+            changed = true;
+          }
+        });
+      });
+      return changed ? next : prev;
+    });
+  }, [messages]);
+
   // Canva connection status — drives the header chip (connect button vs ✅).
   useEffect(() => {
     if (!open) return;
@@ -250,6 +273,15 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
       const data = await res.json();
       // Optimistically append both messages; loadConversation would also work.
       setMessages(prev => [...prev, data.user_message, data.assistant_message]);
+      // Auto-select every newly-detected item so the PUSH TO CHECKLIST bar
+      // appears immediately (without this, items sit in the panel and the
+      // user has no idea they need to check boxes to enable the push).
+      const am = data.assistant_message || {};
+      if ((am.detected_items || []).length) {
+        const next = { ...selectedForPush };
+        am.detected_items.forEach((_, idx) => { next[`${am.id}-${idx}`] = true; });
+        setSelectedForPush(next);
+      }
       setDraft(''); setPendingImages([]);
       setPendingFloorPlan(null);
       setPushStatus(null);
