@@ -97,18 +97,17 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
       
       console.log(`🎨 IMPORTING FROM CANVA - Room: ${roomName}, Page: ${pageNumber}`);
       
-      const response = await fetch(`${backendUrl}/api/import-canva-board`, {
+      const response = await fetch(`${backendUrl}/api/ai-assist/ingest-canva-url`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          board_url: canvaUrl,
+          canva_url: canvaUrl,
           project_id: projectId,
           room_name: roomName,
-          room_id: roomId,
-          auto_clip_to_houzz: autoClipToHouzz,
-          page_number: pageNumber
+          sheet_type: 'checklist',
+          extra_message: `Page ${pageNumber}${autoClipToHouzz ? ' — auto-clip-to-Houzz requested' : ''}`,
         })
       });
       
@@ -117,7 +116,40 @@ const RoomSpecificCanvaImporter = ({ isOpen, onClose, onImportComplete, projectI
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
       
-      const results = await response.json();
+      const raw = await response.json();
+      // Reshape the AI-assist response into what this modal expects.
+      const items = raw.detected_items || [];
+      const results = {
+        success: true,
+        successful_imports: items.length,
+        total_links_found: raw.vendor_urls_found || 0,
+        room_name: roomName,
+        items,
+        image_only_pdf: !!raw.image_only_pdf,
+        canva_design_title: raw.canva_design_title || '',
+        detail: items.length === 0 ? 'No items detected — check that the Canva design has product links or visible item images.' : `Detected ${items.length} item(s) from Canva.`,
+      };
+
+      // Auto-push the detected items into the room's checklist immediately
+      // so the user sees results without an extra click.
+      if (items.length) {
+        try {
+          const pushRes = await fetch(`${backendUrl}/api/ai-assist/push-items`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ project_id: projectId, items }),
+          });
+          if (pushRes.ok) {
+            const pushJ = await pushRes.json();
+            results.successful_imports = pushJ.created;
+            results.duplicate_skipped = pushJ.exists;
+            results.failed_imports = pushJ.errors;
+            results.detail = `Imported ${pushJ.created} new item(s) into ${roomName}${pushJ.exists ? ` (${pushJ.exists} already existed)` : ''}.`;
+          }
+        } catch (pushErr) {
+          console.warn('Auto-push to checklist failed:', pushErr);
+        }
+      }
       console.log(`🎨 CANVA IMPORT RESULTS for ${roomName}:`, results);
       
       setImportResults(results);
