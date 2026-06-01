@@ -21828,6 +21828,138 @@ async def ai_assist_chat(payload: AIAssistChat):
     }
 
 
+# ============================================
+# BURST BACKFILL — list items missing data and orchestrate browser-side auto-scrape
+# ============================================
+class BackfillQueueRequest(BaseModel):
+    project_id: str
+    only_missing_image_or_price: bool = True
+
+
+@api_router.get("/ai-assist/backfill-queue")
+async def ai_assist_backfill_queue(project_id: str):
+    """List every item in `project_id` that has a vendor link but is missing
+    one of image_url / price / size / finish_color / finish_image. The
+    frontend's BURST BACKFILL button uses this to open each URL as a tab
+    so the user's authenticated browser session (with the Chrome extension
+    in auto-scrape mode) can scrape what cloud Playwright can't.
+    """
+    room_docs = await db.rooms.find({"project_id": project_id}, {"id": 1, "_id": 0}).to_list(500)
+    room_ids = [r["id"] for r in room_docs]
+    if not room_ids:
+        return {"items": [], "count": 0}
+    cat_docs = await db.categories.find({"room_id": {"$in": room_ids}}, {"id": 1, "_id": 0}).to_list(2000)
+    cat_ids = [c["id"] for c in cat_docs]
+    subcat_docs = await db.subcategories.find({"category_id": {"$in": cat_ids}}, {"id": 1, "_id": 0}).to_list(4000)
+    subcat_ids = [s["id"] for s in subcat_docs]
+
+    cur = db.items.find({
+        "subcategory_id": {"$in": subcat_ids},
+        "link": {"$exists": True, "$nin": [None, ""]},
+        "$or": [
+            {"image_url": {"$in": [None, ""]}},
+            {"finish_color": {"$in": [None, ""]}},
+            {"finish_image": {"$in": [None, ""]}},
+            {"size": {"$in": [None, ""]}},
+            {"price": {"$in": [None, 0, 0.0]}},
+        ],
+    }, {"_id": 0, "id": 1, "name": 1, "vendor": 1, "sku": 1, "link": 1,
+         "image_url": 1, "price": 1, "cost": 1, "size": 1,
+         "finish_color": 1, "finish_image": 1})
+    items = await cur.to_list(500)
+
+    queue = []
+    for it in items:
+        missing = []
+        if not it.get("image_url"): missing.append("image")
+        if not (it.get("price") or it.get("cost")): missing.append("price")
+        if not it.get("size"): missing.append("size")
+        if not it.get("finish_color"): missing.append("finish")
+        if not it.get("finish_image"): missing.append("finish_image")
+        queue.append({
+            "item_id": it.get("id"),
+            "name": it.get("name") or "",
+            "vendor": it.get("vendor") or "",
+            "sku": it.get("sku") or "",
+            "link": it.get("link"),
+            "missing": missing,
+        })
+    return {"items": queue, "count": len(queue)}
+
+
+@api_router.post("/ai-assist/merge-cache")
+async def ai_assist_merge_cache(payload: BackfillQueueRequest):
+    """After the user's browser has auto-scraped vendor URLs (via the
+    Chrome extension's autoscrape hash), the extension_scrape_cache holds
+    the fresh price/size/finish/image data. This endpoint walks the
+    project's items, matches them to cache entries by URL, and merges
+    every newly-populated field into the item — WITHOUT touching anything
+    the user already filled.
+
+    Returns per-item what was updated.
+    """
+    room_docs = await db.rooms.find({"project_id": payload.project_id}, {"id": 1, "_id": 0}).to_list(500)
+    room_ids = [r["id"] for r in room_docs]
+    cat_docs = await db.categories.find({"room_id": {"$in": room_ids}}, {"id": 1, "_id": 0}).to_list(2000)
+    cat_ids = [c["id"] for c in cat_docs]
+    subcat_docs = await db.subcategories.find({"category_id": {"$in": cat_ids}}, {"id": 1, "_id": 0}).to_list(4000)
+    subcat_ids = [s["id"] for s in subcat_docs]
+
+    items = await db.items.find({"subcategory_id": {"$in": subcat_ids},
+                                 "link": {"$exists": True, "$nin": [None, ""]}},
+                                {"_id": 0}).to_list(500)
+    cache_docs = await db.extension_scrape_cache.find({}, {"_id": 0}).to_list(2000)
+    cache_by_url = {(d.get("url") or "").split("?")[0].split("#")[0]: d for d in cache_docs if d.get("url")}
+
+    results = []
+    for it in items:
+        link = (it.get("link") or "").split("?")[0].split("#")[0]
+        clip = cache_by_url.get(link)
+        if not clip:
+            continue
+        updates = {}
+        if not it.get("image_url") and clip.get("image_url"):
+            updates["image_url"] = clip["image_url"]
+        if not it.get("sku") and clip.get("sku"):
+            updates["sku"] = str(clip["sku"])[:40]
+        if not it.get("name") and clip.get("name"):
+            updates["name"] = str(clip["name"])[:120]
+        if not it.get("vendor") and clip.get("vendor"):
+            updates["vendor"] = str(clip["vendor"])[:60]
+        if not it.get("size") and clip.get("size"):
+            updates["size"] = str(clip["size"])[:120]
+        if not it.get("finish_color") and clip.get("finish_color"):
+            updates["finish_color"] = str(clip["finish_color"])[:80]
+        if not it.get("finish_image") and clip.get("finish_image"):
+            updates["finish_image"] = clip["finish_image"]
+        if not (it.get("price") or it.get("cost")) and clip.get("price"):
+            try:
+                p_raw = clip["price"]
+                if isinstance(p_raw, str):
+                    p_clean = re.sub(r"[^\d.]", "", p_raw)
+                    if p_clean:
+                        p_raw = float(p_clean)
+                if p_raw and float(p_raw) > 0:
+                    updates["price"] = float(p_raw)
+                    updates["cost"] = float(p_raw)
+            except Exception:
+                pass
+
+        if updates:
+            updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+            await db.items.update_one({"id": it["id"]}, {"$set": updates})
+            results.append({"item_id": it["id"], "name": it.get("name"), "fields_updated": list(updates.keys())})
+
+    return {
+        "scanned": len(items),
+        "with_cache_match": sum(1 for it in items if cache_by_url.get((it.get("link") or "").split("?")[0].split("#")[0])),
+        "updated_items": len(results),
+        "results": results[:100],
+    }
+
+
+
+
 class DedupeRequest(BaseModel):
     project_id: str
     dry_run: bool = True

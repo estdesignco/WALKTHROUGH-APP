@@ -3080,3 +3080,84 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
     chrome.storage.local.set({ lastProjectUrl: window.location.href, lastProjectTime: Date.now() });
   }
 }
+
+// =============================================================================
+// AUTO-SCRAPE TRIGGER (v7.39+)
+// Lets the Design Ready app open a vendor URL in a new tab with
+// `#design-ready-autoscrape` in the hash, automatically run the page scraper
+// in the user's authenticated browser session, POST the result to the
+// /api/extension-scrape cache, and (optionally) close the tab when done.
+//
+// This bypasses bot detection on Uttermost, Four Hands, Gabby, Bernhardt etc.
+// because the scrape runs inside the user's real logged-in browser, not the
+// headless cloud Playwright.
+//
+// Trigger URL examples:
+//   https://uttermost.com/foo#design-ready-autoscrape           (scrape, leave tab open)
+//   https://uttermost.com/foo#design-ready-autoscrape&close=1   (scrape, close tab after)
+// =============================================================================
+(function setupAutoScrape() {
+  try {
+    if (!/design-ready-autoscrape/.test(window.location.hash || '')) return;
+    const wantClose = /close=1/.test(window.location.hash || '');
+
+    // Build a banner so the user knows what's happening
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;background:linear-gradient(135deg,#D4A574 0%,#B49B7E 100%);color:#0a0a0a;font:bold 13px -apple-system,sans-serif;text-align:center;padding:10px 20px;letter-spacing:1px;box-shadow:0 2px 8px rgba(0,0,0,0.4)';
+    banner.textContent = '⏳ DESIGN READY — auto-scraping this page…';
+    document.documentElement.appendChild(banner);
+
+    // Resolve backend URL: prefer chrome.storage override, fall back to default
+    const resolveBackend = () => new Promise((resolve) => {
+      try {
+        chrome.storage.local.get('backend_url', (res) => {
+          resolve((res && res.backend_url) || (typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'https://app.estdesignco.com'));
+        });
+      } catch (e) {
+        resolve(typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'https://app.estdesignco.com');
+      }
+    });
+
+    // Give the page ~3s after load to render lazy product fields (Shopify, etc.)
+    const startScrape = async () => {
+      try {
+        const data = scrapePageData ? scrapePageData() : null;
+        if (!data) {
+          banner.textContent = '❌ DESIGN READY — scraper helper not available on this page';
+          banner.style.background = '#ef4444';
+          banner.style.color = '#fff';
+          return;
+        }
+        // Strip the autoscrape hash from the URL we cache (so it dedupes with manual scrapes)
+        const cleanUrl = (window.location.origin + window.location.pathname + window.location.search) || data.url;
+        const payload = { ...data, url: cleanUrl };
+        const backend = await resolveBackend();
+        const r = await fetch(backend.replace(/\/$/, '') + '/api/extension-scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!r.ok) throw new Error('Backend rejected: HTTP ' + r.status);
+        const fields = ['name', 'sku', 'price', 'size', 'finish_color', 'image_url'].filter(k => payload[k]);
+        banner.style.background = 'linear-gradient(135deg,#10B981 0%,#059669 100%)';
+        banner.style.color = '#fff';
+        banner.textContent = '✓ DESIGN READY — scraped ' + fields.length + ' fields (' + fields.join(', ') + ')' + (wantClose ? '. Closing in 2s…' : '');
+        if (wantClose) {
+          setTimeout(() => { try { window.close(); } catch (e) {} }, 2000);
+        }
+      } catch (exc) {
+        banner.style.background = '#ef4444';
+        banner.style.color = '#fff';
+        banner.textContent = '❌ DESIGN READY — auto-scrape failed: ' + (exc && exc.message ? exc.message : exc);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      setTimeout(startScrape, 3000);
+    } else {
+      window.addEventListener('load', () => setTimeout(startScrape, 3000), { once: true });
+    }
+  } catch (outerExc) {
+    console.error('[DR auto-scrape] setup failed', outerExc);
+  }
+})();

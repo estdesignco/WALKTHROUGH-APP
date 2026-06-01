@@ -152,6 +152,18 @@ App Password: `DesignReady2026!`
 - Refactor SimpleWalkthroughSpreadsheet.js
 - Refactor server.py (>21k lines) into separate route modules
 
+### BURST BACKFILL — Browser-side scraper popup (June 1, 2026) — NEW
+**The "use the user's authenticated browser session" pattern the user demanded.**
+
+Cloud Playwright is permanently locked out of Uttermost, Four Hands, Gabby — they hard-detect headless. Re-running the same broken cloud scrape via the existing 🔄 BACKFILL button was pointless. New mechanism:
+
+- **Chrome extension v7.39 (`/app/chrome-extension-scraper/`)**: appended a tiny auto-scrape handler to `content.js` that triggers when a page loads with `#design-ready-autoscrape` in the URL hash. Runs `scrapePageData()` in the user's logged-in browser, POSTs result to `/api/extension-scrape`, optionally closes the tab via `&close=1`. Shows a gold→green banner so the user knows what's happening.
+- **Backend**:
+  - `GET /api/ai-assist/backfill-queue?project_id=…` returns every item with a vendor link but missing image/price/size/finish/finish_image.
+  - `POST /api/ai-assist/merge-cache` walks the project's items, matches each to `extension_scrape_cache` by URL, merges any newly-populated fields. Verified end-to-end: simulated extension POST → merge → Rally Mirror updated with price/size/finish/finish_image, queue dropped from 4 to 3.
+- **Frontend (`BurstBackfillModal.js`)**: new modal launched from a `🚀 BURST` button in the AI panel header (purple, next to 🔄 BACKFILL). Lists missing-data items with vendor + URL + which fields are blank. One click opens all URLs as tabs (600ms stagger to dodge popup blocker), polls the cache every 3s, ticks each row ✓ as data arrives, then a `↓ MERGE INTO CHECKLIST` button writes everything back to items in one shot.
+- **Why this beats the OG BACKFILL**: the user is logged into all their vendor portals in Chrome. The extension was already loaded on every page. We now use the URL hash as a one-way trigger so the cloud app can orchestrate scrapes that physically happen inside the user's browser — no extra clicks, no auth setup, no cloud scraper getting bot-blocked.
+
 ### JSON-LD Parsing Fix (June 1, 2026) — CRITICAL
 **Why every HVL Group / Bernhardt / similar item came back without price, finish, or correct image.**
 - **Root cause**: HVL ships valid product schema in `<script type="application/ld+json">` containing the price (`$5,410.00`), correct image, SKU, brand — but the JSON is technically INVALID (JS-style `//` line comments + trailing commas). Browsers tolerate it, `json.loads`/`JSON.parse` choke. The scraper's `try / except: continue` swallowed every failure silently, so price/finish/size always came back blank for these vendors.
