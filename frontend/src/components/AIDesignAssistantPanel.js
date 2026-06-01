@@ -12,7 +12,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const API = ((window.ENV?.REACT_APP_BACKEND_URL) || (process.env.REACT_APP_BACKEND_URL) || window.location.origin) + '/api';
 
-export default function AIDesignAssistantPanel({ projectId, projectName = '', open, onClose }) {
+export default function AIDesignAssistantPanel({ projectId, projectName = '', preselectedRoom = '', open, onClose }) {
   const [messages, setMessages] = useState([]);
   const [memory, setMemory] = useState({});
   const [draft, setDraft] = useState('');
@@ -20,6 +20,12 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', op
   const [pendingPdf, setPendingPdf] = useState(null);       // {base64, name, page_count}
   const [pendingFloorPlan, setPendingFloorPlan] = useState(null); // {base64, mime_type, name, preview}
   const [pdfRoom, setPdfRoom] = useState('');
+
+  // When the panel is opened with a specific room preselected (via the
+  // consolidated ✨ AI IMPORT button on each room header), prefill that.
+  useEffect(() => {
+    if (preselectedRoom && open) setPdfRoom(preselectedRoom);
+  }, [preselectedRoom, open]);
   const [pdfSheet, setPdfSheet] = useState('checklist');
   const [pdfIngestStatus, setPdfIngestStatus] = useState('');
   const [projectRooms, setProjectRooms] = useState([]);     // suggestions for the room dropdown

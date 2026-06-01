@@ -7,6 +7,7 @@ import AIDesignAssistantPanel from './AIDesignAssistantPanel';
 
 export default function AIAssistantFAB({ projectId, projectName }) {
   const [open, setOpen] = useState(false);
+  const [preselectedRoom, setPreselectedRoom] = useState('');
 
   useEffect(() => {
     const onKey = (e) => {
@@ -16,7 +17,25 @@ export default function AIAssistantFAB({ projectId, projectName }) {
       }
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+
+    // Any component in the tree can call window.openAIPanel(roomName) to
+    // open the panel pre-configured for a specific room. Used by the
+    // consolidated "✨ AI IMPORT" button on each room header.
+    const handleOpenEvent = (e) => {
+      const roomName = e?.detail?.roomName || '';
+      setPreselectedRoom(roomName);
+      setOpen(true);
+    };
+    window.addEventListener('aiassist:open', handleOpenEvent);
+    window.openAIPanel = (roomName) => {
+      window.dispatchEvent(new CustomEvent('aiassist:open', { detail: { roomName } }));
+    };
+
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('aiassist:open', handleOpenEvent);
+      delete window.openAIPanel;
+    };
   }, []);
 
   if (!projectId) return null;
@@ -43,8 +62,9 @@ export default function AIAssistantFAB({ projectId, projectName }) {
       <AIDesignAssistantPanel
         projectId={projectId}
         projectName={projectName}
+        preselectedRoom={preselectedRoom}
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => { setOpen(false); setPreselectedRoom(''); }}
       />
     </>
   );

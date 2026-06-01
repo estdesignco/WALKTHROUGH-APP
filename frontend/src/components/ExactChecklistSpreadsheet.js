@@ -2504,316 +2504,27 @@ const ExactChecklistSpreadsheet = ({
                     >
                       ➕ ADD ITEM
                     </button>
-                    {/* CONNECT TO CANVA BUTTON */}
+                    {/* ✨ AI IMPORT — single consolidated button that
+                     opens the AI panel pre-configured for this room.
+                     Replaces the old CONNECT-TO-CANVA / IMPORT-FROM-PDF /
+                     UPLOAD-TO-CANVA / Import-Page buttons (those endpoints
+                     were a mix of working / broken / redundant). The AI
+                     panel handles all 4 use cases: paste a Canva URL,
+                     drag a PDF, drop a room image, or just chat. */}
                     <button
                       onClick={() => {
-                        const projectId = project.id;
-                        const roomId = room.id;
-                        
-                        // Show modal with connection info
-                        const modal = document.createElement('div');
-                        modal.style.cssText = `
-                          position: fixed;
-                          top: 0;
-                          left: 0;
-                          width: 100%;
-                          height: 100%;
-                          background: rgba(0,0,0,0.9);
-                          display: flex;
-                          align-items: center;
-                          justify-content: center;
-                          z-index: 9999;
-                        `;
-                        
-                        modal.innerHTML = `
-                          <div style="background: linear-gradient(135deg, #000 0%, #1e293b 50%, #000 100%); padding: 40px; border-radius: 16px; max-width: 600px; border: 3px solid #D4A574;">
-                            <h2 style="color: #D4A574; font-size: 24px; margin-bottom: 20px; text-align: center;">🎨 Connect "${room.name}" to Canva</h2>
-                            
-                            <div style="background: rgba(30, 41, 59, 0.8); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #B49B7E;">
-                              <p style="color: #B49B7E; margin-bottom: 10px; font-size: 14px;"><strong>Step 1: Copy Project ID</strong></p>
-                              <input type="text" readonly value="${projectId}" style="width: 100%; padding: 12px; background: #0f172a; border: 2px solid #D4A574; border-radius: 8px; color: #D4A574; font-family: monospace; font-size: 13px; margin-bottom: 10px;" onclick="this.select();">
-                              
-                              <p style="color: #B49B7E; margin-bottom: 10px; font-size: 14px; margin-top: 16px;"><strong>Step 2: Then select "${room.name}" from list</strong></p>
-                            </div>
-                            
-                            <div style="background: rgba(139, 68, 68, 0.3); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #D4A574;">
-                              <p style="color: #D4C5A9; font-size: 13px; line-height: 1.6;">
-                                <strong>📋 Instructions:</strong><br>
-                                1. Open Canva.com → Open any design<br>
-                                2. Open "Live Checklist" app from sidebar<br>
-                                3. Paste the Project ID<br>
-                                4. Click "Load Checklist"<br>
-                                5. Select "${room.name}" from the room list<br>
-                                6. Done! It will remember your choice!
-                              </p>
-                            </div>
-                            
-                            <button onclick="
-                              navigator.clipboard.writeText('${projectId}');
-                              alert('✅ Project ID copied! Now open Canva and paste it.');
-                            " style="width: 100%; padding: 14px; background: #D4A574; color: #1E293B; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-size: 14px;">
-                              📋 COPY PROJECT ID
-                            </button>
-                            
-                            <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; padding: 14px; background: rgba(30, 41, 59, 0.8); color: #B49B7E; border: 2px solid #B49B7E; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
-                              ✖ CLOSE
-                            </button>
-                          </div>
-                        `;
-                        
-                        document.body.appendChild(modal);
-                      }}
-                      className="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700 transition-colors font-bold"
-                      title={`Connect ${room.name} to Canva`}
-                    >
-                      🔗 CONNECT TO CANVA
-                    </button>
-                    
-                    {/* IMPORT FROM PDF */}
-                    <button
-                      onClick={async () => {
-                        const input = document.createElement('input');
-                        input.type = 'file';
-                        input.accept = '.pdf';
-                        input.onchange = async (e) => {
-                          const file = e.target.files[0];
-                          if (!file) return;
-                          
-                          if (!confirm(`Import products from "${file.name}" to "${room.name}"?\n\nThis will:\n• Extract all product links from PDF\n• Scrape product details\n• Add to ${room.name}\n\nMake sure the PDF is exported from Canva with links!`)) {
-                            return;
-                          }
-                          
-                          try {
-                            const formData = new FormData();
-                            formData.append('file', file);
-                            
-                            const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/import/pdf-links?project_id=${project.id}&room_id=${room.id}`, {
-                              method: 'POST',
-                              body: formData
-                            });
-                            
-                            if (response.ok) {
-                              const result = await response.json();
-                              alert(`✅ PDF import started!\n\nJob ID: ${result.job_id}\n\nProcessing links in background...`);
-                              
-                              // Show progress modal
-                              const modal = document.createElement('div');
-                              modal.style.cssText = `
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                width: 100%;
-                                height: 100%;
-                                background: rgba(0,0,0,0.9);
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                z-index: 9999;
-                              `;
-                              
-                              modal.innerHTML = `
-                                <div style="background: linear-gradient(135deg, #000 0%, #1e293b 50%, #000 100%); padding: 40px; border-radius: 16px; max-width: 500px; border: 3px solid #D4A574;">
-                                  <h2 style="color: #D4A574; font-size: 24px; margin-bottom: 20px; text-align: center;">📄 Importing from PDF</h2>
-                                  
-                                  <div id="pdf-progress-${result.job_id}" style="background: rgba(30, 41, 59, 0.8); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #B49B7E;">
-                                    <p style="color: #B49B7E; margin-bottom: 10px; text-align: center;">⏳ Extracting links...</p>
-                                    <div style="background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; height: 30px;">
-                                      <div id="pdf-bar-${result.job_id}" style="background: linear-gradient(90deg, #D4A574, #B49B7E); height: 100%; width: 0%; transition: width 0.5s; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 12px;"></div>
-                                    </div>
-                                    <p id="pdf-status-${result.job_id}" style="color: #D4A574; margin-top: 10px; text-align: center; font-size: 14px;">Starting...</p>
-                                  </div>
-                                  
-                                  <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; padding: 14px; background: rgba(30, 41, 59, 0.8); color: #B49B7E; border: 2px solid #B49B7E; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
-                                    ✖ CLOSE (Import continues)
-                                  </button>
-                                </div>
-                              `;
-                              
-                              document.body.appendChild(modal);
-                              
-                              // Poll for progress
-                              const pollProgress = setInterval(async () => {
-                                try {
-                                  const progressRes = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/import/pdf-job/${result.job_id}`);
-                                  if (progressRes.ok) {
-                                    const job = await progressRes.json();
-                                    const progress = job.total_links > 0 ? (job.imported_items / job.total_links * 100).toFixed(0) : 0;
-                                    
-                                    const progressBar = document.getElementById(`pdf-bar-${result.job_id}`);
-                                    const statusText = document.getElementById(`pdf-status-${result.job_id}`);
-                                    
-                                    if (progressBar) {
-                                      progressBar.style.width = progress + '%';
-                                      progressBar.textContent = progress + '%';
-                                    }
-                                    
-                                    if (statusText) {
-                                      if (job.status === 'processing') {
-                                        statusText.textContent = `Found ${job.total_links} links • Imported ${job.imported_items}/${job.total_links}`;
-                                      } else if (job.status === 'completed') {
-                                        statusText.textContent = `✅ Complete! ${job.imported_items} products imported`;
-                                        if (job.failed_items > 0) {
-                                          statusText.textContent += ` (${job.failed_items} failed)`;
-                                        }
-                                        statusText.style.color = '#9ACD32';
-                                        clearInterval(pollProgress);
-                                        
-                                        // Refresh the page to show new items
-                                        setTimeout(() => {
-                                          if (onReload) {
-                                            onReload();
-                                          }
-                                        }, 3000);
-                                      } else if (job.status === 'failed') {
-                                        statusText.textContent = '❌ Import failed';
-                                        statusText.style.color = '#ff6b6b';
-                                        clearInterval(pollProgress);
-                                      }
-                                    }
-                                  }
-                                } catch (e) {
-                                  console.error('Progress poll error:', e);
-                                }
-                              }, 2000);
-                              
-                              setTimeout(() => clearInterval(pollProgress), 300000);
-                              
-                            } else {
-                              const error = await response.json();
-                              alert(`❌ PDF import failed: ${error.detail || 'Unknown error'}`);
-                            }
-                          } catch (error) {
-                            alert(`❌ Error: ${error.message}`);
-                          }
-                        };
-                        input.click();
-                      }}
-                      className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs px-3 py-1 rounded transition-colors font-bold"
-                      title={`Import products from Canva PDF to ${room.name}`}
-                    >
-                      📄 IMPORT FROM PDF
-                    </button>
-                    
-                    {/* UPLOAD IMAGES TO CANVA */}
-                    <button
-                      onClick={async () => {
-                        if (!confirm(`Upload all images from "${room.name}" to Canva?\n\nThis will upload:\n• Item images\n• Walkthrough photos\n• Product images\n\nThey will be tagged with the project and room name in Canva.`)) {
-                          return;
-                        }
-                        
-                        try {
-                          const response = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/canva/upload-room-images?project_id=${project.id}&room_id=${room.id}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' }
-                          });
-                          
-                          if (response.ok) {
-                            const result = await response.json();
-                            alert(`✅ Upload started!\n\nJob ID: ${result.job_id}\n\nImages will be uploaded to your Canva account in the background. Check your Canva uploads folder.`);
-                            
-                            // Show progress modal
-                            const modal = document.createElement('div');
-                            modal.style.cssText = `
-                              position: fixed;
-                              top: 0;
-                              left: 0;
-                              width: 100%;
-                              height: 100%;
-                              background: rgba(0,0,0,0.9);
-                              display: flex;
-                              align-items: center;
-                              justify-content: center;
-                              z-index: 9999;
-                            `;
-                            
-                            modal.innerHTML = `
-                              <div style="background: linear-gradient(135deg, #000 0%, #1e293b 50%, #000 100%); padding: 40px; border-radius: 16px; max-width: 500px; border: 3px solid #D4A574;">
-                                <h2 style="color: #D4A574; font-size: 24px; margin-bottom: 20px; text-align: center;">📤 Uploading to Canva</h2>
-                                
-                                <div id="upload-progress-${result.job_id}" style="background: rgba(30, 41, 59, 0.8); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid #B49B7E;">
-                                  <p style="color: #B49B7E; margin-bottom: 10px; text-align: center;">⏳ Processing...</p>
-                                  <div style="background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; height: 30px;">
-                                    <div id="progress-bar-${result.job_id}" style="background: linear-gradient(90deg, #D4A574, #B49B7E); height: 100%; width: 0%; transition: width 0.5s; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 12px;"></div>
-                                  </div>
-                                  <p id="status-text-${result.job_id}" style="color: #D4A574; margin-top: 10px; text-align: center; font-size: 14px;">Starting upload...</p>
-                                </div>
-                                
-                                <button onclick="this.parentElement.parentElement.remove()" style="width: 100%; padding: 14px; background: rgba(30, 41, 59, 0.8); color: #B49B7E; border: 2px solid #B49B7E; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">
-                                  ✖ CLOSE (Upload continues in background)
-                                </button>
-                              </div>
-                            `;
-                            
-                            document.body.appendChild(modal);
-                            
-                            // Poll for progress
-                            const pollProgress = setInterval(async () => {
-                              try {
-                                const progressRes = await fetch(`${(window.ENV?.REACT_APP_BACKEND_URL || window.location.origin) || window.location.origin}/api/canva/upload-job/${result.job_id}`);
-                                if (progressRes.ok) {
-                                  const job = await progressRes.json();
-                                  const progress = job.total_images > 0 ? (job.uploaded_images / job.total_images * 100).toFixed(0) : 0;
-                                  
-                                  const progressBar = document.getElementById(`progress-bar-${result.job_id}`);
-                                  const statusText = document.getElementById(`status-text-${result.job_id}`);
-                                  
-                                  if (progressBar) {
-                                    progressBar.style.width = progress + '%';
-                                    progressBar.textContent = progress + '%';
-                                  }
-                                  
-                                  if (statusText) {
-                                    statusText.textContent = `${job.uploaded_images} / ${job.total_images} images uploaded`;
-                                    
-                                    if (job.status === 'completed') {
-                                      statusText.textContent = `✅ Complete! ${job.uploaded_images} images uploaded`;
-                                      if (job.failed_images > 0) {
-                                        statusText.textContent += ` (${job.failed_images} failed)`;
-                                      }
-                                      clearInterval(pollProgress);
-                                    } else if (job.status === 'failed') {
-                                      statusText.textContent = '❌ Upload failed';
-                                      statusText.style.color = '#ff6b6b';
-                                      clearInterval(pollProgress);
-                                    }
-                                  }
-                                }
-                              } catch (e) {
-                                console.error('Progress poll error:', e);
-                              }
-                            }, 2000);
-                            
-                            // Stop polling after 5 minutes
-                            setTimeout(() => clearInterval(pollProgress), 300000);
-                            
-                          } else {
-                            const error = await response.json();
-                            alert(`❌ Upload failed: ${error.detail || 'Unknown error'}`);
-                          }
-                        } catch (error) {
-                          alert(`❌ Upload error: ${error.message}`);
-                        }
-                      }}
-                      className="bg-gradient-to-r from-[#D4A574] to-[#B49B7E] text-black text-xs px-3 py-1 rounded hover:from-[#E8D4B8] hover:to-[#D4A574] transition-colors font-bold"
-                      title={`Upload all images from ${room.name} to Canva`}
-                    >
-                      📤 UPLOAD TO CANVA
-                    </button>
-                    
-                    {/* CANVA PAGE-SPECIFIC IMPORT BUTTON */}
-                    <button
-                      onClick={() => {
-                        console.log(`🎨 Canva import clicked for room: ${room.name}`);
-                        if (onRoomCanvaImport) {
-                          onRoomCanvaImport(room.name);
+                        if (typeof window.openAIPanel === 'function') {
+                          window.openAIPanel(room.name);
                         } else {
-                          alert(`Canva import for ${room.name} - Function not connected yet`);
+                          alert('AI panel not ready — refresh the page.');
                         }
                       }}
-                      className="bg-purple-600 text-white text-xs px-3 py-1 rounded hover:bg-purple-700 transition-colors"
-                      title={`Import from Canva Page for ${room.name}`}
+                      className="text-black text-xs px-3 py-1 rounded transition-colors font-bold"
+                      style={{ background: 'linear-gradient(135deg, #D4A574 0%, #B8895C 100%)', border: '1px solid #D4A574' }}
+                      title={`Open AI panel — paste a Canva URL, drop a PDF, or chat to populate ${room.name}`}
+                      data-testid={`ai-import-btn-${room.id}`}
                     >
-                      🎨 Import Page
+                      ✨ AI IMPORT
                     </button>
                     <button
                       onClick={async () => {
@@ -3244,21 +2955,38 @@ const ExactChecklistSpreadsheet = ({
                                               else alert('This item has no product link yet. Paste a vendor URL into the Link cell first, then re-clip via the extension.');
                                             };
                                             return (
-                                              <button
-                                                data-testid={`missing-fields-badge-${item.id}`}
-                                                onClick={handleClick}
-                                                title={tooltip}
-                                                style={{
-                                                  position: 'absolute', top: 2, right: 2,
-                                                  fontSize: 8, fontWeight: 900, letterSpacing: 0.4,
-                                                  padding: '1px 4px', borderRadius: 2,
-                                                  background: missing.length >= 3 ? '#ef4444' : '#f59e0b',
-                                                  color: '#fff', border: 'none', cursor: 'pointer',
-                                                  lineHeight: 1.1, minWidth: 18,
-                                                }}
-                                              >
-                                                {missing.length}
-                                              </button>
+                                              <>
+                                                <button
+                                                  data-testid={`missing-fields-badge-${item.id}`}
+                                                  onClick={handleClick}
+                                                  title={tooltip}
+                                                  style={{
+                                                    position: 'absolute', top: 2, right: 2,
+                                                    fontSize: 8, fontWeight: 900, letterSpacing: 0.4,
+                                                    padding: '1px 4px', borderRadius: 2,
+                                                    background: missing.length >= 3 ? '#ef4444' : '#f59e0b',
+                                                    color: '#fff', border: 'none', cursor: 'pointer',
+                                                    lineHeight: 1.1, minWidth: 18,
+                                                  }}
+                                                >
+                                                  {missing.length}
+                                                </button>
+                                                {item.link && (
+                                                  <button
+                                                    data-testid={`clip-btn-${item.id}`}
+                                                    onClick={(e) => { e.stopPropagation(); window.open(item.link, '_blank', 'noopener'); }}
+                                                    title="Open product page in a new tab — then click the Design Ready Scraper Chrome extension to clip price/finish/size/swatch into this row."
+                                                    style={{
+                                                      position: 'absolute', top: 2, left: 2,
+                                                      fontSize: 9, padding: '1px 3px', borderRadius: 2,
+                                                      background: '#0ea5e9', color: '#fff', border: 'none',
+                                                      cursor: 'pointer', lineHeight: 1.1,
+                                                    }}
+                                                  >
+                                                    📋
+                                                  </button>
+                                                )}
+                                              </>
                                             );
                                           })()}
                                           <input 

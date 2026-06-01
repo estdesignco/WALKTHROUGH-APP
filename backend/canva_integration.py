@@ -46,14 +46,15 @@ class CanvaIntegration:
     
     def get_authorization_url(self, state: str, code_challenge: str) -> str:
         """Generate Canva OAuth authorization URL with PKCE."""
+        # ONLY request the scopes we actually use. Requesting scopes that
+        # the user's Canva integration page hasn't ticked returns
+        # `invalid_scope` on the callback and kills the whole OAuth flow.
+        # If/when we add features that write back to Canva (upload assets,
+        # create folders, edit designs), add those scopes here AND tick
+        # them on developers.canva.com/your-integrations/.
         scopes = [
-            "asset:read",
-            "asset:write",
-            "design:content:read",
-            "design:content:write",
-            "folder:read",
-            "folder:write",
-            "profile:read"
+            "design:content:read",   # GET /v1/designs/{id} + POST /v1/exports
+            "profile:read",          # identify the user
         ]
         
         params = {
