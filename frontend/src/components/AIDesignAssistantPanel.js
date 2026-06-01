@@ -34,6 +34,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', pr
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [canvaStatus, setCanvaStatus] = useState(null); // {connected:bool, configured:bool}
   const [reEnrichStatus, setReEnrichStatus] = useState(null); // {scanning:bool, summary:obj}
+  const [canvaQuickUrl, setCanvaQuickUrl] = useState('');
   const [selectedForPush, setSelectedForPush] = useState({});  // {messageId-itemIdx: true}
   const [pushStatus, setPushStatus] = useState(null);
   const scrollRef = useRef(null);
@@ -98,6 +99,43 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', pr
       setReEnrichStatus({ scanning: false, error: e.message });
     }
   };
+
+  const ingestCanvaUrl = async () => {
+    const url = canvaQuickUrl.trim();
+    if (!url) { setError('Paste a Canva design URL first.'); return; }
+    const room = (preselectedRoom || pdfRoom || '').trim();
+    if (!room) { setError('Pick a room first.'); return; }
+    setError(''); setSending(true); setPushStatus(null);
+    try {
+      const res = await fetch(`${API}/ai-assist/ingest-canva-url`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: projectId,
+          room_name: room,
+          sheet_type: pdfSheet || 'checklist',
+          canva_url: url,
+        }),
+      });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.detail || 'Canva ingest failed');
+      await loadConversation();
+      setCanvaQuickUrl('');
+      setPushStatus({
+        status: 'done',
+        summary: { created: (j.detected_items || []).length, errors: 0, exists: 0, updated: 0 },
+      });
+    } catch (e) {
+      const m = String(e.message || '');
+      if (m.toLowerCase().includes('canva') && m.toLowerCase().includes('token')) {
+        setError('❌ Not connected to Canva yet. Click CONNECT CANVA in the panel header.');
+      } else {
+        setError('Canva ingest failed: ' + m);
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
 
   const dedupeRows = async () => {
     if (!window.confirm('Remove duplicate rows the AI created in this project?\n\nThis only deletes:\n  • Empty rows that look like a placeholder for a filled row\n  • Duplicates with identical SKUs in the same room/category')) return;
@@ -518,6 +556,38 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', pr
             </button>
             <div style={{ marginTop: 6, fontSize: 10, color: '#D4C5A9', opacity: 0.65 }}>
               Vendor links in the PDF will be auto-scraped for prices, images &amp; finishes. <a href="/admin/vendor-portals" target="_blank" rel="noreferrer" style={{ color: '#D4A574' }}>Manage vendor logins →</a>
+            </div>
+          </div>
+        )}
+        {/* TARGET ROOM banner + Canva URL quick-paste — shown when the
+         panel was opened from a per-room ✨ AI IMPORT button OR whenever
+         the user picks a target room. Lets the user paste a Canva URL
+         (no drag/drop) and ingest directly into that room without touching
+         the PDF picker UI. */}
+        {(preselectedRoom || pdfRoom) && (
+          <div style={{ padding: '10px 12px', borderBottom: '1px solid #2a3040', background: 'rgba(212,165,116,0.08)' }}>
+            <div style={{ color: '#D4A574', fontSize: 11, letterSpacing: 1.5, fontWeight: 800, marginBottom: 6 }}>
+              🎯 IMPORTING INTO: <span style={{ color: '#fff' }}>{preselectedRoom || pdfRoom}</span>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <input
+                type="text"
+                placeholder="Paste a Canva design URL here…"
+                value={canvaQuickUrl}
+                onChange={e => setCanvaQuickUrl(e.target.value)}
+                data-testid="aiassist-canva-quick-url"
+                style={{ flex: 1, background: '#0a0a0a', color: '#D4C5A9', border: '1px solid #B49B7E', padding: '6px 8px', fontSize: 12, borderRadius: 3 }}
+              />
+              <button
+                onClick={ingestCanvaUrl}
+                disabled={!canvaQuickUrl.trim() || sending}
+                data-testid="aiassist-canva-quick-ingest"
+                style={{ background: '#a855f7', color: '#fff', border: 'none', padding: '6px 12px', fontSize: 11, fontWeight: 800, letterSpacing: 1, borderRadius: 3, cursor: !canvaQuickUrl.trim() || sending ? 'not-allowed' : 'pointer', opacity: !canvaQuickUrl.trim() || sending ? 0.5 : 1 }}>
+                {sending ? '…' : '↑ INGEST'}
+              </button>
+            </div>
+            <div style={{ marginTop: 4, fontSize: 10, color: '#D4C5A9', opacity: 0.65 }}>
+              Or drop a PDF / image / paste a screenshot (Cmd+V) below — same room target applies.
             </div>
           </div>
         )}
