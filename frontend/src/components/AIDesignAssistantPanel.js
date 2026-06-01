@@ -687,15 +687,45 @@ function MessageBubble({ msg, onToggleItem, onSelectAll, selected }) {
                   border: `1px solid ${chosen ? '#D4A574' : '#2a3040'}`, borderRadius: 4, cursor: 'pointer'
                 }}>
                 <input type="checkbox" checked={chosen} onChange={() => onToggleItem(msg.id, idx)} style={{ marginTop: 2 }} />
+                {it.image_url ? (
+                  <img src={it.image_url} alt={it.name || ''} loading="lazy"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 3, border: '1px solid #2a3040', background: '#000', flex: '0 0 auto' }} />
+                ) : (
+                  <div title="No product image yet — BACKFILL after pushing to pull from vendor page"
+                    style={{ width: 56, height: 56, borderRadius: 3, border: '1px dashed #2a3040', background: '#0f1421', color: '#86807a', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto' }}>
+                    no img
+                  </div>
+                )}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ color: '#fff', fontSize: 12, fontWeight: 600, lineHeight: 1.3 }}>{it.name || '(unnamed)'}</div>
                   <div style={{ color: '#D4C5A9', fontSize: 10, marginTop: 2, opacity: 0.85 }}>
                     {it.vendor || '—'}
                     {it.sku && <> · SKU {it.sku}</>}
-                    {it.cost > 0 && <> · ${Number(it.cost).toLocaleString()}</>}
+                    {(it.cost > 0 || it.price > 0) && <> · <span style={{ color: '#10B981', fontWeight: 700 }}>${Number(it.cost || it.price).toLocaleString()}</span></>}
                     {' · '}{it.room_name || '—'} › {it.category_name || '—'} › {it.subcategory_name || '—'}
                     {it.sheet_type && it.sheet_type !== 'checklist' && <> · {it.sheet_type.toUpperCase()}</>}
                   </div>
+                  {(it.size || it.finish_color || it.finish_image) && (
+                    <div style={{ color: '#D4A574', fontSize: 10, marginTop: 2, display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                      {it.size && <span title="Dimensions">📏 {it.size}</span>}
+                      {it.finish_color && <span title="Finish / color">🎨 {it.finish_color}</span>}
+                      {it.finish_image && (
+                        <img src={it.finish_image} alt="finish" title="Finish swatch"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          style={{ width: 14, height: 14, borderRadius: 2, border: '1px solid #D4A574', objectFit: 'cover' }} />
+                      )}
+                    </div>
+                  )}
+                  {it.link && (
+                    <div style={{ marginTop: 2 }}>
+                      <a href={it.link} target="_blank" rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ color: '#14b8a6', fontSize: 10, textDecoration: 'none' }}>
+                        🔗 view on {it.vendor || 'vendor'} →
+                      </a>
+                    </div>
+                  )}
                   {it.remarks && <div style={{ color: '#10B981', fontSize: 10, marginTop: 2, opacity: 0.85 }}>{it.remarks}</div>}
                   {typeof it.confidence === 'number' && (
                     <div style={{ marginTop: 4, height: 3, background: '#1a1f2e', borderRadius: 2, overflow: 'hidden' }}>

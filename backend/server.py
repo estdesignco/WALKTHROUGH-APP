@@ -287,6 +287,38 @@ app.add_middleware(
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+
+def _safe_jsonld_parse(text: str):
+    """Parse JSON-LD payloads that may contain JS-style `//` line comments,
+    `/* */` block comments, or trailing commas — both of which break the
+    standard json.loads. Vendor sites like HVL Group ship JSON-LD that
+    looks fine to a browser (which is lax) but is technically invalid
+    JSON. Without this cleaner we silently lose price/sku/finish for
+    every such vendor.
+
+    Returns the parsed object on success, None on failure.
+    """
+    import json as _json
+    import re as _re
+    if not text or not isinstance(text, str):
+        return None
+    try:
+        return _json.loads(text)
+    except Exception:
+        pass
+    cleaned = text
+    # Strip /* block comments */
+    cleaned = _re.sub(r"/\*[\s\S]*?\*/", "", cleaned)
+    # Strip // line comments at start of line (not inside URLs like https://)
+    cleaned = _re.sub(r"(^|\n)\s*//[^\n]*", r"\1", cleaned)
+    # Strip trailing commas before ] or }
+    cleaned = _re.sub(r",(\s*[\]}])", r"\1", cleaned)
+    try:
+        return _json.loads(cleaned)
+    except Exception:
+        return None
+
+
 # ====================================
 # SCRAPER DOWNLOAD ENDPOINT
 # ====================================
@@ -6367,18 +6399,18 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
             json_ld_price = None
             try:
                 json_ld_scripts = await page.locator('script[type="application/ld+json"]').all_text_contents()
-                import json
                 for script_content in json_ld_scripts:
                     try:
-                        data = json.loads(script_content)
+                        data = _safe_jsonld_parse(script_content)
+                        if data is None:
+                            continue
                         if isinstance(data, dict):
                             # Check for direct price
                             if 'offers' in data and isinstance(data['offers'], dict):
                                 price_val = data['offers'].get('price')
                                 if price_val:
-                                    json_ld_price = float(price_val)
+                                    json_ld_price = float(str(price_val).replace(',', '').replace('$', '').strip())
                                     print(f"📌 JSON-LD has price: ${json_ld_price} (will check visible prices first)")
-                            
                             # Also extract image if not already found
                             if not result['image_url'] and 'image' in data:
                                 img = data['image']
@@ -6386,7 +6418,34 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                                 if img_url and not img_url.endswith('.svg'):
                                     result['image_url'] = img_url
                                     print(f"✅ JSON-LD IMAGE FOUND: {img_url[:60]}...")
-                    except:
+                            # Extract SKU
+                            if not result.get('sku'):
+                                sku = data.get('sku') or data.get('mpn') or data.get('productID')
+                                if sku:
+                                    result['sku'] = str(sku)
+                                    print(f"📌 JSON-LD SKU: {sku}")
+                            # Extract name
+                            if not result.get('name') and data.get('name'):
+                                result['name'] = data['name']
+                                result['title'] = data['name']
+                                print(f"📌 JSON-LD name: {data['name'][:60]}")
+                            # Extract finish/color
+                            if not result.get('finish_color') and data.get('color'):
+                                result['finish_color'] = data['color']
+                                result['finish'] = data['color']
+                            # Extract dimensions from additionalProperty
+                            if not result.get('size') and isinstance(data.get('additionalProperty'), list):
+                                dims = []
+                                for prop in data['additionalProperty']:
+                                    if not isinstance(prop, dict): continue
+                                    pname = str(prop.get('name', '')).lower()
+                                    pval = prop.get('value')
+                                    if pval and any(k in pname for k in ('width', 'height', 'depth', 'length', 'diameter', 'size')):
+                                        dims.append(f"{prop.get('name')}: {pval}")
+                                if dims:
+                                    result['size'] = ' x '.join(dims)
+                                    result['dimensions'] = result['size']
+                    except Exception:
                         continue
             except Exception as e:
                 print(f"⚠️ JSON-LD extraction error: {e}")
@@ -6631,10 +6690,11 @@ async def scrape_product_with_playwright(url: str) -> Dict[str, Optional[str]]:
                 print("📌 Strategy 3: Checking JSON-LD structured data...")
                 try:
                     json_ld = await page.locator('script[type="application/ld+json"]').all_text_contents()
-                    import json
                     for script_content in json_ld:
                         try:
-                            data = json.loads(script_content)
+                            data = _safe_jsonld_parse(script_content)
+                            if data is None:
+                                continue
                             if isinstance(data, dict) and 'image' in data:
                                 img_url = data['image'] if isinstance(data['image'], str) else data['image'][0]
                                 if img_url and not img_url.endswith('.svg'):
@@ -8098,63 +8158,167 @@ async def scrape_product_advanced(data: dict):
                 response.raise_for_status()
                 
                 soup = BeautifulSoup(response.text, 'html.parser')
+
+                # ===== JSON-LD FIRST (most reliable). Many vendors (HVL Group,
+                # Bernhardt, Loloi, etc.) ship full product schema in
+                # <script type="application/ld+json">. Use the safe parser
+                # so JS-style // comments and trailing commas don't kill it.
+                try:
+                    for ld_tag in soup.select('script[type="application/ld+json"]'):
+                        ld_text = ld_tag.string or ld_tag.get_text() or ''
+                        ld_data = _safe_jsonld_parse(ld_text)
+                        if ld_data is None:
+                            continue
+                        # JSON-LD can be a single object, a list, or @graph
+                        candidates = []
+                        if isinstance(ld_data, list):
+                            candidates = ld_data
+                        elif isinstance(ld_data, dict):
+                            if isinstance(ld_data.get('@graph'), list):
+                                candidates = ld_data['@graph']
+                            else:
+                                candidates = [ld_data]
+                        for obj in candidates:
+                            if not isinstance(obj, dict):
+                                continue
+                            t = obj.get('@type')
+                            types = t if isinstance(t, list) else [t]
+                            if not any(x in ('Product', 'IndividualProduct') for x in (types or []) if x):
+                                continue
+                            # Name
+                            if not scraped_data.get('name') and obj.get('name'):
+                                scraped_data['name'] = obj['name']
+                                scraped_data['title'] = obj['name']
+                            # SKU
+                            if not scraped_data.get('sku'):
+                                sku = obj.get('sku') or obj.get('mpn') or obj.get('productID')
+                                if sku:
+                                    scraped_data['sku'] = str(sku)
+                            # Image
+                            if not scraped_data.get('image_url'):
+                                img = obj.get('image')
+                                if isinstance(img, list) and img:
+                                    img = img[0]
+                                if isinstance(img, dict):
+                                    img = img.get('url')
+                                if isinstance(img, str) and not img.endswith('.svg'):
+                                    if img.startswith('//'):
+                                        img = 'https:' + img
+                                    scraped_data['image_url'] = img
+                            # Price (from offers)
+                            offers = obj.get('offers')
+                            if isinstance(offers, list) and offers:
+                                offers = offers[0]
+                            if isinstance(offers, dict):
+                                pval = offers.get('price') or offers.get('lowPrice') or offers.get('highPrice')
+                                if pval and not scraped_data.get('price'):
+                                    try:
+                                        cleaned = re.sub(r'[^\d.]', '', str(pval))
+                                        if cleaned:
+                                            p = float(cleaned)
+                                            if p > 0:
+                                                scraped_data['price'] = p
+                                                scraped_data['cost'] = p
+                                    except Exception:
+                                        pass
+                            # Color / finish
+                            if not scraped_data.get('finish_color') and obj.get('color'):
+                                scraped_data['finish_color'] = obj['color']
+                                scraped_data['finish'] = obj['color']
+                                scraped_data['color'] = obj['color']
+                            # Material → finish_color fallback
+                            if not scraped_data.get('finish_color') and obj.get('material'):
+                                mat = obj['material']
+                                if isinstance(mat, list):
+                                    mat = ', '.join(str(x) for x in mat)
+                                scraped_data['finish_color'] = str(mat)
+                            # Description
+                            if not scraped_data.get('description') and obj.get('description'):
+                                scraped_data['description'] = obj['description']
+                            # Dimensions from additionalProperty
+                            if not scraped_data.get('size') and isinstance(obj.get('additionalProperty'), list):
+                                dims = []
+                                for prop in obj['additionalProperty']:
+                                    if not isinstance(prop, dict): continue
+                                    pname = str(prop.get('name', '')).lower()
+                                    pval = prop.get('value')
+                                    if pval and any(k in pname for k in ('width', 'height', 'depth', 'length', 'diameter', 'size')):
+                                        dims.append(f"{prop.get('name')}: {pval}")
+                                if dims:
+                                    scraped_data['size'] = ' x '.join(dims)
+                                    scraped_data['dimensions'] = scraped_data['size']
+                            # Brand → vendor fallback
+                            if not scraped_data.get('vendor') and obj.get('brand'):
+                                brand = obj['brand']
+                                if isinstance(brand, dict):
+                                    brand = brand.get('name')
+                                if isinstance(brand, str):
+                                    scraped_data['vendor'] = brand
+                except Exception as ld_err:
+                    print(f"⚠️ JSON-LD (BS) parse error: {ld_err}")
                 
-                # Try multiple selectors for title
-                title_selectors = [
-                    'h1[class*="product"]', 'h1[class*="title"]', 'h1[itemprop="name"]',
-                    '[class*="product-title"]', '[class*="product-name"]', 'h1'
-                ]
-                for selector in title_selectors:
-                    el = soup.select_one(selector)
-                    if el and el.get_text(strip=True):
-                        scraped_data["name"] = el.get_text(strip=True)
-                        scraped_data["title"] = el.get_text(strip=True)
-                        break
-                
-                # Try multiple selectors for price (from website - may be retail)
-                price_selectors = [
-                    '[class*="price"]', '[itemprop="price"]', '[data-price]',
-                    '.price', '#price', '[class*="cost"]'
-                ]
-                for selector in price_selectors:
-                    el = soup.select_one(selector)
-                    if el:
-                        price_text = el.get_text(strip=True)
-                        price_match = re.search(r'\$?([\d,]+\.?\d*)', price_text)
-                        if price_match:
-                            scraped_data["price"] = float(price_match.group(1).replace(',', ''))
+                # Try multiple selectors for title (skip if JSON-LD already populated name)
+                if not scraped_data.get("name"):
+                    title_selectors = [
+                        'h1[class*="product"]', 'h1[class*="title"]', 'h1[itemprop="name"]',
+                        '[class*="product-title"]', '[class*="product-name"]', 'h1'
+                    ]
+                    for selector in title_selectors:
+                        el = soup.select_one(selector)
+                        if el and el.get_text(strip=True):
+                            scraped_data["name"] = el.get_text(strip=True)
+                            scraped_data["title"] = el.get_text(strip=True)
                             break
                 
-                # Try to find product image
-                img_selectors = [
-                    '[class*="product"] img', '[class*="gallery"] img',
-                    '[itemprop="image"]', 'img[class*="main"]', 'img[class*="product"]'
-                ]
-                for selector in img_selectors:
-                    el = soup.select_one(selector)
-                    if el and el.get('src'):
-                        img_src = el.get('src')
-                        if img_src.startswith('//'):
-                            img_src = 'https:' + img_src
-                        elif img_src.startswith('/'):
-                            parsed = urlparse(url)
-                            img_src = f"{parsed.scheme}://{parsed.netloc}{img_src}"
-                        scraped_data["image_url"] = img_src
-                        break
+                # Try multiple selectors for price (skip if JSON-LD already populated)
+                if not scraped_data.get("price"):
+                    price_selectors = [
+                        '[class*="price"]', '[itemprop="price"]', '[data-price]',
+                        '.price', '#price', '[class*="cost"]'
+                    ]
+                    for selector in price_selectors:
+                        el = soup.select_one(selector)
+                        if el:
+                            price_text = el.get_text(strip=True)
+                            price_match = re.search(r'\$?([\d,]+\.?\d*)', price_text)
+                            if price_match:
+                                scraped_data["price"] = float(price_match.group(1).replace(',', ''))
+                                scraped_data["cost"] = scraped_data["price"]
+                                break
                 
-                # Try to find SKU
-                sku_selectors = [
-                    '[class*="sku"]', '[itemprop="sku"]', '[data-sku]',
-                    '[class*="product-id"]', '[class*="item-number"]'
-                ]
-                for selector in sku_selectors:
-                    el = soup.select_one(selector)
-                    if el and el.get_text(strip=True):
-                        scraped_data["sku"] = el.get_text(strip=True)
-                        break
+                # Try to find product image (skip if JSON-LD already populated)
+                if not scraped_data.get("image_url"):
+                    img_selectors = [
+                        '[class*="product"] img', '[class*="gallery"] img',
+                        '[itemprop="image"]', 'img[class*="main"]', 'img[class*="product"]'
+                    ]
+                    for selector in img_selectors:
+                        el = soup.select_one(selector)
+                        if el and el.get('src'):
+                            img_src = el.get('src')
+                            if img_src.startswith('//'):
+                                img_src = 'https:' + img_src
+                            elif img_src.startswith('/'):
+                                parsed = urlparse(url)
+                                img_src = f"{parsed.scheme}://{parsed.netloc}{img_src}"
+                            scraped_data["image_url"] = img_src
+                            break
                 
-                # Extract vendor from domain
-                scraped_data["vendor"] = domain.split('.')[0].title()
+                # Try to find SKU (skip if JSON-LD already populated)
+                if not scraped_data.get("sku"):
+                    sku_selectors = [
+                        '[class*="sku"]', '[itemprop="sku"]', '[data-sku]',
+                        '[class*="product-id"]', '[class*="item-number"]'
+                    ]
+                    for selector in sku_selectors:
+                        el = soup.select_one(selector)
+                        if el and el.get_text(strip=True):
+                            scraped_data["sku"] = el.get_text(strip=True)
+                            break
+                
+                # Vendor: only set from domain if JSON-LD brand didn't already
+                if not scraped_data.get("vendor"):
+                    scraped_data["vendor"] = domain.split('.')[0].title()
                 
                 # Try meta tags for missing info
                 if not scraped_data["name"]:
@@ -21897,11 +22061,17 @@ async def ai_assist_re_enrich(payload: ReEnrichRequest):
                         out.og_image = meta('meta[property="og:image"]');
                         out.og_description = meta('meta[property="og:description"]') || meta('meta[name="description"]');
                         out.og_price = meta('meta[property="product:price:amount"]') || meta('meta[itemprop="price"]');
-                        // JSON-LD Product
+                        // JSON-LD Product. Many vendor sites (HVL Group, etc.)
+                        // ship invalid JSON-LD with // comments + trailing commas,
+                        // so we sanitize before JSON.parse.
+                        const _cleanLd = (s) => s
+                            .replace(/\/\*[\s\S]*?\*\//g, '')
+                            .replace(/(^|\n)\s*\/\/[^\n]*/g, '$1')
+                            .replace(/,(\s*[\]}])/g, '$1');
                         const nodes = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
                         for (const n of nodes) {
                             try {
-                                const parsed = JSON.parse(n.textContent||'{}');
+                                const parsed = JSON.parse(_cleanLd(n.textContent||'{}'));
                                 const arr = Array.isArray(parsed) ? parsed : (parsed['@graph']||[parsed]);
                                 for (const obj of arr) {
                                     if (!obj || typeof obj !== 'object') continue;
@@ -22710,10 +22880,17 @@ async def ai_assist_ingest_pdf(payload: AIAssistPdfIngest):
                         out.og_image = meta('meta[property="og:image"]') || meta('meta[name="og:image"]');
                         out.og_description = meta('meta[property="og:description"]') || meta('meta[name="description"]');
                         out.og_price = meta('meta[property="product:price:amount"]') || meta('meta[itemprop="price"]') || meta('meta[property="og:price:amount"]');
+                        // JSON-LD Product. Sanitize JS-style comments + trailing
+                        // commas before parse (HVL Group / Bernhardt etc. ship
+                        // invalid JSON-LD that breaks standard parse).
+                        const _cleanLd = (s) => s
+                            .replace(/\/\*[\s\S]*?\*\//g, '')
+                            .replace(/(^|\n)\s*\/\/[^\n]*/g, '$1')
+                            .replace(/,(\s*[\]}])/g, '$1');
                         const ldNodes = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
                         for (const n of ldNodes) {
                             try {
-                                const parsed = JSON.parse(n.textContent||'{}');
+                                const parsed = JSON.parse(_cleanLd(n.textContent||'{}'));
                                 const arr = Array.isArray(parsed) ? parsed : (parsed['@graph'] || [parsed]);
                                 for (const obj of arr) {
                                     if (!obj || typeof obj !== 'object') continue;

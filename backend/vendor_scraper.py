@@ -502,12 +502,19 @@ class VendorPortalScraper:
                 out.og_currency = meta('meta[property="product:price:currency"]') || meta('meta[property="og:price:currency"]');
                 out.og_sku = meta('meta[property="product:retailer_item_id"]') || meta('meta[itemprop="sku"]');
 
-                // JSON-LD Product schema (most modern e-com sites embed this)
+                // JSON-LD Product schema (most modern e-com sites embed this).
+                // CAUTION: many sites (HVL Group, Bernhardt, etc.) ship invalid
+                // JSON-LD with `// line comments` and trailing commas. We strip
+                // those before JSON.parse, otherwise we silently lose price/sku.
+                const _cleanLd = (s) => s
+                    .replace(/\/\*[\s\S]*?\*\//g, '')           // /* block comments */
+                    .replace(/(^|\n)\s*\/\/[^\n]*/g, '$1')       // // line comments at line start
+                    .replace(/,(\s*[\]}])/g, '$1');             // trailing commas before ] or }
                 const ldNodes = Array.from(document.querySelectorAll('script[type="application/ld+json"]'));
                 const products = [];
                 for (const n of ldNodes) {
                     try {
-                        const parsed = JSON.parse(n.textContent || '{}');
+                        const parsed = JSON.parse(_cleanLd(n.textContent || '{}'));
                         const arr = Array.isArray(parsed) ? parsed : (parsed['@graph'] || [parsed]);
                         for (const obj of arr) {
                             if (!obj || typeof obj !== 'object') continue;

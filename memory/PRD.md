@@ -152,7 +152,24 @@ App Password: `DesignReady2026!`
 - Refactor SimpleWalkthroughSpreadsheet.js
 - Refactor server.py (>21k lines) into separate route modules
 
-### Floor-Plan Upload (Feb 26, 2026) — VERIFIED
+### JSON-LD Parsing Fix (June 1, 2026) — CRITICAL
+**Why every HVL Group / Bernhardt / similar item came back without price, finish, or correct image.**
+- **Root cause**: HVL ships valid product schema in `<script type="application/ld+json">` containing the price (`$5,410.00`), correct image, SKU, brand — but the JSON is technically INVALID (JS-style `//` line comments + trailing commas). Browsers tolerate it, `json.loads`/`JSON.parse` choke. The scraper's `try / except: continue` swallowed every failure silently, so price/finish/size always came back blank for these vendors.
+- **Fix in 4 places**:
+  1. New `_safe_jsonld_parse()` helper in `server.py` (strips `/* */`, `//` line comments, trailing commas → retries `json.loads`).
+  2. `vendor_scraper.py` Playwright-side `page.evaluate()` JSON-LD blocks now sanitize before `JSON.parse`.
+  3. `server.py` `scrape_product_advanced` BeautifulSoup fallback now extracts FROM JSON-LD FIRST (name, sku, image, price, color, dimensions, brand) and only falls back to CSS selectors / og:image when JSON-LD didn't fill that field.
+  4. `server.py` `ai-assist/re-enrich` and `ai-assist/ingest-pdf` meta-fallback Playwright evals also strip JS-style comments before `JSON.parse`.
+- **Frontend (`AIDesignAssistantPanel.js` → `MessageBubble`)**: detected-item cards now render a 56×56 thumbnail of `image_url`, the size (📏), finish color (🎨), finish swatch image, a `🔗 view on vendor →` link, and price in green. Before, even when enrichment succeeded the panel never displayed image/size/finish, so the user thought enrichment was broken.
+- **End-to-end verified**: HVL Chambers Chandelier (`2758-AOB`) now returns `name=Chambers Chandelier`, `image_url=2758-AOB.png` (correct product image, not the banner), `sku=2758-AOB`, `vendor=Hudson Valley Lighting`, `price=$5,410.00`. Existing Foyer item backfilled to $5,410.00 via the BACKFILL button.
+- **Tests**: `/app/backend/tests/test_safe_jsonld.py` — 5/5 passing covering HVL real-world payload, trailing commas, URL preservation, block comments, garbage input.
+
+### Canva Redirect URI Fix (June 1, 2026)
+- Backend `api_router` mounts at `/api`, so the OAuth callback URL is `/api/canva/callback` — not `/canva/callback` (which hits the frontend and 404s).
+- Updated `CANVA_REDIRECT_URI` in `backend/.env` and `CANVA_CLIENT_ID`/`CANVA_CLIENT_SECRET` to the new integration `OC-AZ5ixiAhK2Eq`.
+- User must register `https://design-preview-131.preview.emergentagent.com/api/canva/callback` exactly under Canva developer console → Authentication tab for the connect flow to complete.
+
+
 - New dedicated **📐 Floor plan** attach button in the AI Assistant panel (`/app/frontend/src/components/AIDesignAssistantPanel.js`, next to the regular 📎 Attach).
 - New backend field `floor_plan: { base64, mime_type }` on **both** `/api/ai-assist/chat` and `/api/ai-assist/ingest-pdf`.
 - Server appends the floor plan as the **last image** in the Gemini request and prepends a one-line label in the user message: *"[FLOOR PLAN ATTACHED — image #N is the floor plan, image(s) #1..N-1 are the room/board. Use the plan for spatial fit and the room image(s) for character + finish."]* This lets the agent obey the "Floor Plan Interpretation" prompt section without guessing which image is which.
