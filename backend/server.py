@@ -12856,24 +12856,89 @@ async def canva_auth():
     }
 
 @api_router.get("/canva/callback")
-async def canva_callback(code: str, state: str = None):
-    """Handle Canva OAuth callback."""
-    try:
-        # Exchange code for token
-        token_data = await canva_integration.exchange_code_for_token(code)
-        
-        # Get user profile to confirm connection
-        profile = await canva_integration.get_user_profile()
-        
-        return {
-            "success": True,
-            "message": "Successfully connected to Canva!",
-            "canva_user": profile.get("display_name", "User")
-        }
-    
-    except Exception as e:
-        logger.error(f"Canva callback error: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+async def canva_callback(
+    code: Optional[str] = None,
+    state: Optional[str] = None,
+    error: Optional[str] = None,
+    error_description: Optional[str] = None,
+):
+    """Handle Canva OAuth callback. Renders an HTML page (this is the URL
+    the Canva popup lands on, so it must be human-readable in the popup).
+
+    Handles 3 outcomes:
+      1. Canva sent an error → render a RED page that shows the exact error
+         (this was the silent failure mode — Canva sends ?error=invalid_scope
+         without a `code` param, FastAPI returned 422, and the user saw
+         a blank popup or "doesn't work").
+      2. Code + state present → exchange code → store token → render GREEN.
+      3. Neither → render YELLOW (probably hit the URL directly).
+
+    The popup uses window.opener.postMessage to ping the parent app, then
+    auto-closes after 2s on success.
+    """
+    from fastapi.responses import HTMLResponse
+
+    def _html(color, title, body, success=False):
+        return HTMLResponse(f"""<!doctype html><html><head><title>{title}</title>
+<style>
+  body{{font-family:-apple-system,sans-serif;background:#1a1f2e;color:#E5DCC9;margin:0;padding:40px;display:flex;align-items:center;justify-content:center;min-height:100vh}}
+  .card{{background:#22293a;border:2px solid {color};border-radius:8px;padding:32px;max-width:540px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,0.35)}}
+  h1{{color:{color};margin:0 0 16px 0;font-size:20px;letter-spacing:1px}}
+  .body{{color:#D4C5A9;font-size:14px;line-height:1.6}}
+  code{{background:#0f1421;padding:2px 6px;border-radius:3px;color:#D4A574;font-size:12px}}
+  .small{{color:#86807a;font-size:12px;margin-top:24px}}
+</style></head><body><div class="card">
+<h1>{title}</h1><div class="body">{body}</div>
+<div class="small">You can close this window.</div>
+</div>
+<script>
+try {{ if (window.opener) window.opener.postMessage({{ source:'canva-callback', success:{str(success).lower()} }}, '*'); }} catch(e) {{}}
+{f"setTimeout(()=>window.close(), 2000);" if success else ""}
+</script></body></html>""")
+
+    # 1) Canva returned an error
+    if error:
+        msg = error_description or "(no description provided)"
+        logger.warning(f"Canva OAuth error: {error} — {msg}")
+        body = f"""
+            Canva rejected the authorization with: <code>{error}</code><br><br>
+            <strong>Reason:</strong> {msg}<br><br>
+            {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Scopes tab → tick BOTH <code>design:content:read</code> AND <code>profile:read</code> → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_scope' else ''}
+            {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Authentication tab → make sure the Redirect URL <code>https://design-preview-131.preview.emergentagent.com/canva/callback</code> is listed → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_request' or 'redirect' in (error_description or '').lower() else ''}
+        """
+        return _html("#ef4444", "❌ CANVA AUTHORIZATION FAILED", body, success=False)
+
+    # 2) Code + state present — happy path
+    if code and state:
+        try:
+            # Get the stored code_verifier
+            auth_session = await db.canva_auth_sessions.find_one({"state": state})
+            if not auth_session:
+                return _html("#ef4444", "❌ SESSION EXPIRED",
+                             "We couldn't find your authorization session. Please click CONNECT CANVA again from the app.",
+                             success=False)
+            code_verifier = auth_session["code_verifier"]
+            token_data = await canva_integration.exchange_code_for_token(code, code_verifier)
+            # Store token (single-user model on the integration)
+            await canva_integration.store_token(token_data)
+            try:
+                profile = await canva_integration.get_user_profile()
+                name = profile.get("display_name") or profile.get("name") or "Canva user"
+            except Exception:
+                name = "Canva user"
+            return _html("#10B981", "✅ CONNECTED TO CANVA",
+                         f"Welcome, <strong>{name}</strong>. You can now paste Canva URLs into the AI panel.",
+                         success=True)
+        except Exception as exc:
+            logger.error(f"Canva callback exchange error: {exc}")
+            return _html("#ef4444", "❌ TOKEN EXCHANGE FAILED",
+                         f"Canva accepted your authorization but the token exchange failed: <code>{str(exc)[:200]}</code>",
+                         success=False)
+
+    # 3) Direct hit
+    return _html("#f59e0b", "⚠ INCOMPLETE CALLBACK",
+                 "This page is the Canva OAuth callback. It's not meant to be opened directly — start from CONNECT CANVA in the AI panel.",
+                 success=False)
 
 @api_router.get("/canva/get-verifier")
 async def get_canva_verifier(state: str):

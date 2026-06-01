@@ -67,8 +67,22 @@ class CanvaIntegration:
             "code_challenge_method": "S256"
         }
         
-        from urllib.parse import urlencode
-        return f"{self.auth_url}?{urlencode(params)}"
+        from urllib.parse import quote
+        # Canva's docs example uses %20 to separate scopes, not + (Python's
+        # default urlencode uses quote_plus which turns spaces into +).
+        # Some OAuth providers accept both, but Canva has been observed
+        # rejecting the + form with `invalid_scope`. We build the query
+        # string manually with quote() so spaces become %20 everywhere.
+        query_parts = [
+            f"response_type=code",
+            f"client_id={quote(self.client_id, safe='')}",
+            f"redirect_uri={quote(self.redirect_uri, safe='')}",
+            f"scope={quote(' '.join(scopes), safe='')}",   # %20 not +
+            f"state={quote(state, safe='')}",
+            f"code_challenge={quote(code_challenge, safe='')}",
+            f"code_challenge_method=S256",
+        ]
+        return f"{self.auth_url}?" + "&".join(query_parts)
     
     async def exchange_code_for_token(self, code: str, code_verifier: str) -> Dict[str, Any]:
         """Exchange authorization code for access token with PKCE."""
