@@ -2974,8 +2974,22 @@ const ExactChecklistSpreadsheet = ({
                                                 {item.link && (
                                                   <button
                                                     data-testid={`clip-btn-${item.id}`}
-                                                    onClick={(e) => { e.stopPropagation(); window.open(item.link, '_blank', 'noopener'); }}
-                                                    title="Open product page in a new tab — then click the Design Ready Scraper Chrome extension to clip price/finish/size/swatch into this row."
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      // Open as a popup window (not a new tab) so it floats
+                                                      // ON TOP of the app — user clicks Design Ready Scraper
+                                                      // extension in the popup, the scrape posts back to
+                                                      // /api/extension-scrape, and the row auto-updates.
+                                                      const w = 1200, h = 800;
+                                                      const left = Math.max(0, (window.screen.width  - w) / 2);
+                                                      const top  = Math.max(0, (window.screen.height - h) / 2);
+                                                      window.open(
+                                                        item.link,
+                                                        `clipper_${item.id}`,
+                                                        `popup=1,width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes,toolbar=no,location=yes,menubar=no`
+                                                      );
+                                                    }}
+                                                    title="Open product page in a popup window — click the Design Ready Scraper extension to clip missing fields. The row auto-updates."
                                                     style={{
                                                       position: 'absolute', top: 2, left: 2,
                                                       fontSize: 9, padding: '1px 3px', borderRadius: 2,

@@ -12904,7 +12904,7 @@ try {{ if (window.opener) window.opener.postMessage({{ source:'canva-callback', 
             Canva rejected the authorization with: <code>{error}</code><br><br>
             <strong>Reason:</strong> {msg}<br><br>
             {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Scopes tab → tick BOTH <code>design:content:read</code> AND <code>profile:read</code> → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_scope' else ''}
-            {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Authentication tab → make sure the Redirect URL <code>https://design-preview-131.preview.emergentagent.com/canva/callback</code> is listed → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_request' or 'redirect' in (error_description or '').lower() else ''}
+            {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Authentication tab → make sure the Redirect URL <code>https://design-preview-131.preview.emergentagent.com/api/canva/callback</code> is listed → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_request' or 'redirect' in (error_description or '').lower() else ''}
         """
         return _html("#ef4444", "❌ CANVA AUTHORIZATION FAILED", body, success=False)
 

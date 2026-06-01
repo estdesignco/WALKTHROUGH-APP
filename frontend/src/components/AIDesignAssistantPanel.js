@@ -175,7 +175,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', pr
           'CANVA_CLIENT_ID=...\n' +
           'CANVA_CLIENT_SECRET=...\n\n' +
           'Then restart the backend. The redirect URI to register on Canva is already set:\n' +
-          window.location.origin + '/canva/callback'
+          window.location.origin + '/api/canva/callback'
         );
         return;
       }
