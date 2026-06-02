@@ -46,30 +46,148 @@ export default function BurstBackfillModal({ projectId, onClose }) {
     return `${base}#design-ready-autoscrape&close=1`;
   };
 
-  // Open ONE item's URL in a new tab
+  // Build the HTML for the COORDINATOR window. The coordinator is a single
+  // popup the user explicitly approves. Once it's open, IT spawns child
+  // windows for each vendor URL — Chrome allows window.open() from inside
+  // an already-approved popup, so all N URLs come through. This bypasses
+  // the popup-blocker policy that kills bulk window.open() from the parent.
+  const buildCoordinatorHtml = (items) => {
+    const itemsJson = JSON.stringify(items.map(it => ({
+      id: it.item_id,
+      name: it.name || '',
+      vendor: it.vendor || '',
+      url: buildAutoscrapeUrl(it.link),
+      missing: (it.missing || []).join(', '),
+    })));
+    return `<!doctype html><html><head><title>🚀 Design Ready — Burst Scrape</title>
+<style>
+  body { font-family:-apple-system,sans-serif; background:#1a1f2e; color:#E5DCC9; margin:0; padding:24px; min-height:100vh }
+  h1 { color:#D4A574; font-size:18px; letter-spacing:2px; margin:0 0 8px 0 }
+  .sub { color:#D4C5A9; font-size:12px; opacity:0.75; margin-bottom:18px }
+  .bar { background:#22293a; border:1px solid #2a3040; border-radius:6px; padding:16px; margin-bottom:14px }
+  .row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #2a3040; font-size:12px }
+  .row:last-child { border-bottom:none }
+  .mark { width:22px; text-align:center; font-size:16px }
+  .meta { flex:1; min-width:0 }
+  .meta b { color:#fff; font-size:13px }
+  .meta i { color:#D4A574; font-style:normal; margin-left:6px; font-weight:400 }
+  .miss { color:#ef4444; font-size:11px }
+  .ok { color:#10B981 }
+  .pending { color:#86807a }
+  .running { color:#f59e0b }
+  button { background:#10B981; color:#fff; border:none; padding:10px 18px; font-size:13px; font-weight:800; letter-spacing:1; border-radius:4px; cursor:pointer }
+  button.stop { background:#ef4444; margin-left:10px }
+  button:disabled { background:#4b5563; cursor:not-allowed }
+  .progress { color:#10B981; font-weight:700; margin-left:8px }
+</style></head><body>
+<h1>🚀 BURST SCRAPER — RUNNING</h1>
+<div class="sub">DO NOT CLOSE THIS WINDOW until "ALL DONE" shows. It's spawning vendor tabs in your authenticated browser — the Chrome extension auto-scrapes each one.</div>
+<div class="bar">
+  <button id="startBtn">▶ START — open ${items.length} vendor tabs</button>
+  <button id="stopBtn" class="stop" disabled>■ STOP</button>
+  <span class="progress" id="prog"></span>
+</div>
+<div class="bar" id="rows"></div>
+<script>
+  const items = ${itemsJson};
+  const rowsEl = document.getElementById('rows');
+  const progEl = document.getElementById('prog');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  let stopped = false;
+  let done = 0;
+
+  // Render rows
+  items.forEach((it, i) => {
+    const r = document.createElement('div');
+    r.className = 'row';
+    r.id = 'row-' + i;
+    r.innerHTML = '<div class="mark pending">○</div>' +
+      '<div class="meta"><b>' + (it.name || 'item ' + (i+1)) + '</b><i>· ' + (it.vendor || '—') + '</i><br><span class="miss">missing: ' + it.missing + '</span></div>';
+    rowsEl.appendChild(r);
+  });
+
+  const markRow = (i, status) => {
+    const r = document.getElementById('row-' + i);
+    if (!r) return;
+    const m = r.querySelector('.mark');
+    if (status === 'running') { m.textContent = '⏳'; m.className = 'mark running'; }
+    else if (status === 'done') { m.textContent = '✓'; m.className = 'mark ok'; }
+    else if (status === 'fail') { m.textContent = '✕'; m.className = 'mark miss'; }
+  };
+
+  const updateProg = () => { progEl.textContent = done + ' of ' + items.length + ' opened'; };
+  updateProg();
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  startBtn.addEventListener('click', async () => {
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    for (let i = 0; i < items.length; i++) {
+      if (stopped) break;
+      markRow(i, 'running');
+      // Spawn the vendor tab. Because THIS window was opened by an explicit
+      // user gesture in the parent, Chrome lets it open child popups.
+      let w = null;
+      try { w = window.open(items[i].url, '_blank'); } catch (e) {}
+      if (!w) { markRow(i, 'fail'); }
+      else { markRow(i, 'done'); }
+      done = i + 1;
+      updateProg();
+      // 1.5s stagger so the extension's auto-scrape banner has time to run
+      // and so Chrome doesn't rate-limit
+      await sleep(1500);
+    }
+    progEl.textContent = stopped ? '⏸ STOPPED at ' + done + ' of ' + items.length : '✅ ALL DONE — ' + done + ' tabs opened. You can close this window.';
+    stopBtn.disabled = true;
+    startBtn.disabled = false;
+    startBtn.textContent = '↻ RUN AGAIN';
+  });
+
+  stopBtn.addEventListener('click', () => { stopped = true; });
+
+  // Tell parent we're up
+  try { if (window.opener) window.opener.postMessage({ source:'design-ready-burst', status:'ready' }, '*'); } catch(e) {}
+</script></body></html>`;
+  };
+
+  // Open ONE item — single user click = single window.open = always allowed by Chrome
   const openOne = (item) => {
     const url = buildAutoscrapeUrl(item.link);
-    const win = window.open(url, '_blank', 'noopener');
-    if (!win) {
+    const w = window.open(url, '_blank');
+    if (!w) {
       // eslint-disable-next-line no-alert
-      alert('Popup blocked. Please allow popups for this site and try again.');
+      alert('Popup blocked. Click the popup icon in your address bar → "Always allow popups from this site" → click OPEN again.');
       return false;
     }
     setOpened(prev => ({ ...prev, [item.item_id]: true }));
+    if (!polling) startPolling();
     return true;
   };
 
-  // Open ALL queue items in tabs, staggered so Chrome doesn't kill them
-  const openAll = async () => {
-    let blocked = false;
-    for (let i = 0; i < queue.length; i++) {
-      const it = queue[i];
-      const ok = openOne(it);
-      if (!ok) { blocked = true; break; }
-      // 600ms stagger so the browser allows the burst
-      await new Promise(r => setTimeout(r, 600));
+  // Open the COORDINATOR window. ONE user-gesture popup, then THAT popup
+  // spawns the rest of the vendor tabs from its own context (which Chrome
+  // allows because the coordinator itself is user-approved). This is the
+  // pattern that bypasses Chrome's "block N popups" policy.
+  const openCoordinator = () => {
+    if (queue.length === 0) return;
+    const html = buildCoordinatorHtml(queue);
+    const blob = new Blob([html], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+    const w = window.open(blobUrl, 'design-ready-burst', 'width=720,height=720');
+    if (!w) {
+      // eslint-disable-next-line no-alert
+      alert('Popup blocked. Allow popups for this site once and click again.\n\nIn Chrome: click the popup icon (right side of address bar) → Always allow popups from this site → click OPEN AGAIN.');
+      return;
     }
-    if (!blocked) startPolling();
+    // Mark every item as "opened" so the polling watcher starts immediately
+    const allOpened = {};
+    queue.forEach(it => { allOpened[it.item_id] = true; });
+    setOpened(allOpened);
+    startPolling();
+    // Release the blob URL after the popup finished loading
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 30000);
   };
 
   // Poll cache + merge endpoint every 3s
@@ -170,11 +288,11 @@ export default function BurstBackfillModal({ projectId, onClose }) {
               <div style={{ background: 'rgba(212,165,116,0.08)', border: '1px solid #B49B7E', borderRadius: 4, padding: 10, marginBottom: 12, fontSize: 12, color: '#D4C5A9', lineHeight: 1.5 }}>
                 <strong style={{ color: '#D4A574' }}>How this works:</strong>
                 <ol style={{ margin: '6px 0 0 18px', padding: 0 }}>
-                  <li>Click <strong>OPEN ALL & AUTO-SCRAPE</strong> below. {queue.length} tabs will open.</li>
-                  <li>Each tab loads the vendor page in YOUR browser (where you're logged in) and the Chrome extension auto-scrapes it.</li>
-                  <li>Each tab shows a gold banner → green when done → closes itself.</li>
-                  <li>Watch the rows below tick to ✓ as data arrives.</li>
-                  <li>Click <strong>MERGE INTO CHECKLIST</strong> when you're done.</li>
+                  <li>Click <strong>OPEN COORDINATOR</strong> below. <em>ONE</em> popup opens (you only have to approve popups once).</li>
+                  <li>In the coordinator popup, click <strong>▶ START</strong> — it opens each vendor URL as a tab from inside the coordinator (Chrome allows this because you already approved the coordinator).</li>
+                  <li>Each vendor tab loads in YOUR browser (where you're logged in), the Chrome extension auto-scrapes it, and the tab closes itself.</li>
+                  <li>This window (the backfill modal) ticks each row to ✓ as data lands.</li>
+                  <li>Click <strong>MERGE INTO CHECKLIST</strong> when done.</li>
                 </ol>
                 <div style={{ marginTop: 6, fontSize: 11, opacity: 0.8 }}>
                   ⚠ Requires <strong>Design Ready Scraper extension v7.39+</strong> installed and logged into your vendor sites.
@@ -183,9 +301,9 @@ export default function BurstBackfillModal({ projectId, onClose }) {
               </div>
 
               <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                <button data-testid="burst-backfill-open-all" onClick={openAll}
+                <button data-testid="burst-backfill-open-all" onClick={openCoordinator}
                   style={{ flex: 1, background: '#10B981', color: '#fff', border: 'none', padding: '10px 14px', fontSize: 13, fontWeight: 800, letterSpacing: 1, borderRadius: 4, cursor: 'pointer' }}>
-                  🚀 OPEN ALL {queue.length} & AUTO-SCRAPE
+                  🚀 OPEN COORDINATOR → AUTO-SCRAPE {queue.length}
                 </button>
                 {!polling && Object.keys(opened).length > 0 && (
                   <button onClick={startPolling}
