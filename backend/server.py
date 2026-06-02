@@ -13121,7 +13121,9 @@ try {{ if (window.opener) window.opener.postMessage({{ source:'canva-callback', 
         except Exception as exc:
             logger.error(f"Canva callback exchange error: {exc}")
             return _html("#ef4444", "❌ TOKEN EXCHANGE FAILED",
-                         f"Canva accepted your authorization but the token exchange failed: <code>{str(exc)[:200]}</code>",
+                         f"Canva accepted your authorization but the token exchange failed: <code>{str(exc)[:300]}</code><br><br>"
+                         f"<strong>Redirect URI used:</strong> <code>{stored_redirect}</code><br>"
+                         f"This URL must be registered EXACTLY in Canva developer console → Authentication tab.",
                          success=False)
 
     # 3) Direct hit

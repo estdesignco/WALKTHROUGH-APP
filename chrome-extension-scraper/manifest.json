@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.39.0",
-  "description": "Scrape product data from wholesale vendors. v7.39 — AUTO-SCRAPE: opens vendor URLs in your authenticated browser and scrapes automatically, no clicks needed.",
+  "version": "7.40.0",
+  "description": "Scrape product data from wholesale vendors. v7.40 — auto-scrape with per-URL backend override (preview/prod aware), postMessage signaling to coordinator, no more cross-environment cache pollution.",
   "permissions": [
     "activeTab",
     "scripting",

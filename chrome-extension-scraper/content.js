@@ -3082,24 +3082,35 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
 }
 
 // =============================================================================
-// AUTO-SCRAPE TRIGGER (v7.39+)
+// AUTO-SCRAPE TRIGGER (v7.40+)
 // Lets the Design Ready app open a vendor URL in a new tab with
 // `#design-ready-autoscrape` in the hash, automatically run the page scraper
 // in the user's authenticated browser session, POST the result to the
 // /api/extension-scrape cache, and (optionally) close the tab when done.
 //
-// This bypasses bot detection on Uttermost, Four Hands, Gabby, Bernhardt etc.
-// because the scrape runs inside the user's real logged-in browser, not the
-// headless cloud Playwright.
+// Hash params (& separated, like a query string):
+//   design-ready-autoscrape  — flag (presence triggers auto-scrape)
+//   backend=https%3A%2F%2F...  — explicit backend URL (preferred — preview vs prod)
+//   close=1                  — close the tab after successful post
 //
-// Trigger URL examples:
-//   https://uttermost.com/foo#design-ready-autoscrape           (scrape, leave tab open)
-//   https://uttermost.com/foo#design-ready-autoscrape&close=1   (scrape, close tab after)
+// Backend URL resolution order:
+//   1. `backend=` in the hash (the app passes this — always current preview)
+//   2. chrome.storage.local.backend_url (set via the extension popup)
+//   3. fallback: https://app.estdesignco.com
 // =============================================================================
 (function setupAutoScrape() {
   try {
     if (!/design-ready-autoscrape/.test(window.location.hash || '')) return;
-    const wantClose = /close=1/.test(window.location.hash || '');
+
+    // Parse the hash (strip leading #, split on &, build a map)
+    const rawHash = (window.location.hash || '').replace(/^#/, '');
+    const hashParams = {};
+    rawHash.split('&').forEach(p => {
+      const idx = p.indexOf('=');
+      if (idx > 0) hashParams[p.slice(0, idx)] = decodeURIComponent(p.slice(idx + 1));
+    });
+    const wantClose = hashParams.close === '1';
+    const explicitBackend = hashParams.backend || null;
 
     // Build a banner so the user knows what's happening
     const banner = document.createElement('div');
@@ -3107,8 +3118,11 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
     banner.textContent = '⏳ DESIGN READY — auto-scraping this page…';
     document.documentElement.appendChild(banner);
 
-    // Resolve backend URL: prefer chrome.storage override, fall back to default
     const resolveBackend = () => new Promise((resolve) => {
+      if (explicitBackend) {
+        resolve(explicitBackend);
+        return;
+      }
       try {
         chrome.storage.local.get('backend_url', (res) => {
           resolve((res && res.backend_url) || (typeof BACKEND_URL !== 'undefined' ? BACKEND_URL : 'https://app.estdesignco.com'));
@@ -3132,23 +3146,44 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
         const cleanUrl = (window.location.origin + window.location.pathname + window.location.search) || data.url;
         const payload = { ...data, url: cleanUrl };
         const backend = await resolveBackend();
-        const r = await fetch(backend.replace(/\/$/, '') + '/api/extension-scrape', {
+        const endpoint = backend.replace(/\/$/, '') + '/api/extension-scrape';
+        const r = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (!r.ok) throw new Error('Backend rejected: HTTP ' + r.status);
+        if (!r.ok) throw new Error('Backend ' + endpoint + ' rejected: HTTP ' + r.status);
         const fields = ['name', 'sku', 'price', 'size', 'finish_color', 'image_url'].filter(k => payload[k]);
         banner.style.background = 'linear-gradient(135deg,#10B981 0%,#059669 100%)';
         banner.style.color = '#fff';
-        banner.textContent = '✓ DESIGN READY — scraped ' + fields.length + ' fields (' + fields.join(', ') + ')' + (wantClose ? '. Closing in 2s…' : '');
+        banner.textContent = '✓ DESIGN READY — scraped ' + fields.length + ' fields (' + fields.join(', ') + ') → ' + backend.replace(/^https?:\/\//, '');
+        // Also notify the opener (coordinator) so it can advance to next URL
+        try {
+          if (window.opener) {
+            window.opener.postMessage({
+              source: 'design-ready-autoscrape',
+              status: 'done',
+              url: cleanUrl,
+              fields: fields,
+            }, '*');
+          }
+        } catch (e) {}
         if (wantClose) {
-          setTimeout(() => { try { window.close(); } catch (e) {} }, 2000);
+          setTimeout(() => { try { window.close(); } catch (e) {} }, 1500);
         }
       } catch (exc) {
         banner.style.background = '#ef4444';
         banner.style.color = '#fff';
         banner.textContent = '❌ DESIGN READY — auto-scrape failed: ' + (exc && exc.message ? exc.message : exc);
+        try {
+          if (window.opener) {
+            window.opener.postMessage({
+              source: 'design-ready-autoscrape',
+              status: 'error',
+              error: String(exc),
+            }, '*');
+          }
+        } catch (e) {}
       }
     };
 

@@ -40,23 +40,30 @@ export default function BurstBackfillModal({ projectId, onClose }) {
 
   useEffect(() => { loadQueue(); }, [loadQueue]);
 
-  // Build the auto-scrape URL for a given link
+  // Build the auto-scrape URL for a given link. We embed the LIVE backend
+  // URL in the hash so the extension posts the scrape to the SAME backend
+  // the user is currently looking at — not the production fallback. This
+  // fixes the "browser scraped fine but my checklist still shows nothing"
+  // bug (data was landing in production cache instead of preview cache).
   const buildAutoscrapeUrl = (link) => {
     const base = link.split('#')[0];
-    return `${base}#design-ready-autoscrape&close=1`;
+    const backendOrigin = (window.ENV?.REACT_APP_BACKEND_URL) || (process.env.REACT_APP_BACKEND_URL) || window.location.origin;
+    return `${base}#design-ready-autoscrape&backend=${encodeURIComponent(backendOrigin)}&close=1`;
   };
 
   // Build the HTML for the COORDINATOR window. The coordinator is a single
-  // popup the user explicitly approves. Once it's open, IT spawns child
-  // windows for each vendor URL — Chrome allows window.open() from inside
-  // an already-approved popup, so all N URLs come through. This bypasses
-  // the popup-blocker policy that kills bulk window.open() from the parent.
+  // popup the user explicitly approves. Once it's open, IT advances ONE
+  // shared scrape tab through every vendor URL — Chrome treats `window.open`
+  // calls that reuse the same target name as navigations of an existing tab,
+  // not new popups. This is the only pattern that reliably gets past Chrome's
+  // popup-blocker rate limit, even with the site whitelisted.
   const buildCoordinatorHtml = (items) => {
     const itemsJson = JSON.stringify(items.map(it => ({
       id: it.item_id,
       name: it.name || '',
       vendor: it.vendor || '',
       url: buildAutoscrapeUrl(it.link),
+      cleanUrl: it.link.split('#')[0],
       missing: (it.missing || []).join(', '),
     })));
     return `<!doctype html><html><head><title>🚀 Design Ready — Burst Scrape</title>
@@ -80,10 +87,10 @@ export default function BurstBackfillModal({ projectId, onClose }) {
   button:disabled { background:#4b5563; cursor:not-allowed }
   .progress { color:#10B981; font-weight:700; margin-left:8px }
 </style></head><body>
-<h1>🚀 BURST SCRAPER — RUNNING</h1>
-<div class="sub">DO NOT CLOSE THIS WINDOW until "ALL DONE" shows. It's spawning vendor tabs in your authenticated browser — the Chrome extension auto-scrapes each one.</div>
+<h1>🚀 BURST SCRAPER — READY</h1>
+<div class="sub">DO NOT CLOSE THIS WINDOW until "ALL DONE" shows. ONE scrape tab opens and walks through every vendor URL — the Chrome extension auto-scrapes each as it loads.</div>
 <div class="bar">
-  <button id="startBtn">▶ START — open ${items.length} vendor tabs</button>
+  <button id="startBtn">▶ START — walk through ${items.length} vendor URLs</button>
   <button id="stopBtn" class="stop" disabled>■ STOP</button>
   <span class="progress" id="prog"></span>
 </div>
@@ -95,9 +102,11 @@ export default function BurstBackfillModal({ projectId, onClose }) {
   const startBtn = document.getElementById('startBtn');
   const stopBtn = document.getElementById('stopBtn');
   let stopped = false;
-  let done = 0;
+  let doneCount = 0;
+  let scrapeWin = null;
+  let waitingFor = null;
+  let resolveWait = null;
 
-  // Render rows
   items.forEach((it, i) => {
     const r = document.createElement('div');
     r.className = 'row';
@@ -107,39 +116,83 @@ export default function BurstBackfillModal({ projectId, onClose }) {
     rowsEl.appendChild(r);
   });
 
-  const markRow = (i, status) => {
+  const markRow = (i, status, extra) => {
     const r = document.getElementById('row-' + i);
     if (!r) return;
     const m = r.querySelector('.mark');
     if (status === 'running') { m.textContent = '⏳'; m.className = 'mark running'; }
-    else if (status === 'done') { m.textContent = '✓'; m.className = 'mark ok'; }
-    else if (status === 'fail') { m.textContent = '✕'; m.className = 'mark miss'; }
+    else if (status === 'done')    { m.textContent = '✓'; m.className = 'mark ok'; }
+    else if (status === 'fail')    { m.textContent = '✕'; m.className = 'mark miss'; }
+    else if (status === 'timeout') { m.textContent = '⏱'; m.className = 'mark miss'; }
+    if (extra) {
+      const miss = r.querySelector('.miss');
+      if (miss) miss.textContent = extra;
+    }
   };
 
-  const updateProg = () => { progEl.textContent = done + ' of ' + items.length + ' opened'; };
+  const updateProg = () => { progEl.textContent = doneCount + ' of ' + items.length + ' processed'; };
   updateProg();
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
+  // Listen for the extension's "I'm done scraping THIS URL" signal so we
+  // don't have to use a fixed sleep. Each scrape posts a message back.
+  window.addEventListener('message', (e) => {
+    const d = e.data || {};
+    if (d.source !== 'design-ready-autoscrape') return;
+    if (waitingFor && d.url && d.url.split('#')[0].split('?')[0] === waitingFor.split('#')[0].split('?')[0]) {
+      if (resolveWait) resolveWait({ status: d.status || 'done', fields: d.fields || [] });
+    }
+  });
+
   startBtn.addEventListener('click', async () => {
     startBtn.disabled = true;
     stopBtn.disabled = false;
+    progEl.textContent = 'opening scrape tab…';
+
+    // Open ONE scrape tab. Reuse the same window name so subsequent
+    // window.open() calls NAVIGATE it instead of opening N popups.
+    scrapeWin = window.open(items[0].url, 'design-ready-scrape-tab');
+    if (!scrapeWin) {
+      progEl.textContent = '✕ Popup blocked. Click the popup icon in this window\\'s address bar → Always allow → click START again.';
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      return;
+    }
+    markRow(0, 'running');
+
     for (let i = 0; i < items.length; i++) {
       if (stopped) break;
-      markRow(i, 'running');
-      // Spawn the vendor tab. Because THIS window was opened by an explicit
-      // user gesture in the parent, Chrome lets it open child popups.
-      let w = null;
-      try { w = window.open(items[i].url, '_blank'); } catch (e) {}
-      if (!w) { markRow(i, 'fail'); }
-      else { markRow(i, 'done'); }
-      done = i + 1;
+      if (i > 0) {
+        // Navigate the SAME tab to the next URL — no new popup created
+        try { scrapeWin.location.href = items[i].url; } catch (e) {
+          markRow(i, 'fail', 'tab closed unexpectedly');
+          break;
+        }
+        markRow(i, 'running');
+      }
+      waitingFor = items[i].cleanUrl;
+      // Wait up to 20s for the autoscrape signal; otherwise time out and move on
+      const result = await new Promise((resolve) => {
+        let timer = null;
+        resolveWait = (r) => { if (timer) clearTimeout(timer); resolveWait = null; resolve(r); };
+        timer = setTimeout(() => { if (resolveWait) resolveWait({ status: 'timeout' }); }, 20000);
+      });
+      if (result.status === 'done') {
+        markRow(i, 'done', '✓ scraped ' + (result.fields ? result.fields.join(', ') : '(no fields)'));
+      } else if (result.status === 'error') {
+        markRow(i, 'fail', '✕ ' + (result.error || 'scrape failed'));
+      } else {
+        markRow(i, 'timeout', '⏱ no response in 20s');
+      }
+      doneCount = i + 1;
       updateProg();
-      // 1.5s stagger so the extension's auto-scrape banner has time to run
-      // and so Chrome doesn't rate-limit
-      await sleep(1500);
+      // Small breather between URLs so the page can stabilize
+      await sleep(800);
     }
-    progEl.textContent = stopped ? '⏸ STOPPED at ' + done + ' of ' + items.length : '✅ ALL DONE — ' + done + ' tabs opened. You can close this window.';
+
+    try { if (scrapeWin && !scrapeWin.closed) scrapeWin.close(); } catch (e) {}
+    progEl.textContent = stopped ? '⏸ STOPPED at ' + doneCount + ' of ' + items.length : '✅ ALL DONE — ' + doneCount + ' of ' + items.length + '. Click MERGE INTO CHECKLIST in the main app, then close this window.';
     stopBtn.disabled = true;
     startBtn.disabled = false;
     startBtn.textContent = '↻ RUN AGAIN';
@@ -147,7 +200,6 @@ export default function BurstBackfillModal({ projectId, onClose }) {
 
   stopBtn.addEventListener('click', () => { stopped = true; });
 
-  // Tell parent we're up
   try { if (window.opener) window.opener.postMessage({ source:'design-ready-burst', status:'ready' }, '*'); } catch(e) {}
 </script></body></html>`;
   };

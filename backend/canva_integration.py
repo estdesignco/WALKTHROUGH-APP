@@ -24,7 +24,10 @@ class CanvaIntegration:
         self.redirect_uri = os.getenv("CANVA_REDIRECT_URI")
         self.base_url = os.getenv("CANVA_API_BASE_URL", "https://api.canva.com/rest/v1")
         self.auth_url = "https://www.canva.com/api/oauth/authorize"
-        self.token_url = "https://www.canva.com/api/oauth/token"
+        # Canva's TOKEN endpoint lives on api.canva.com, NOT www.canva.com.
+        # The old www.canva.com/api/oauth/token URL returns 403 because that
+        # host is Cloudflare-fronted and rejects API POSTs from non-browsers.
+        self.token_url = "https://api.canva.com/rest/v1/oauth/token"
         
         # MongoDB for storing tokens
         mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
@@ -90,21 +93,25 @@ class CanvaIntegration:
         to the .env value.
         """
         effective_redirect = redirect_uri or self.redirect_uri
-        # Use form-encoded data as per OAuth spec
+        # Canva's token endpoint REQUIRES HTTP Basic auth with client credentials.
+        # Passing client_id/client_secret in the form body returns 403 — even
+        # when the credentials are correct. Per https://www.canva.dev/docs/connect/authentication/
+        # ("Canva recommends using basic access authentication for the token request").
+        import base64
+        basic = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
+
         from urllib.parse import urlencode
         data = urlencode({
             "grant_type": "authorization_code",
             "code": code,
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
             "redirect_uri": effective_redirect,
-            "code_verifier": code_verifier
+            "code_verifier": code_verifier,
         })
-        
-        # Minimal headers - just what's required
+
         headers = {
+            "Authorization": f"Basic {basic}",
             "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
         
         logger.info(f"Attempting token exchange to {self.token_url}")
@@ -191,19 +198,22 @@ class CanvaIntegration:
         return None
     
     async def refresh_token(self, refresh_token: str) -> Dict[str, Any]:
-        """Refresh access token."""
+        """Refresh access token. Same Basic-auth requirement as exchange."""
+        import base64
+        basic = base64.b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
         data = {
             "grant_type": "refresh_token",
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "refresh_token": refresh_token
+            "refresh_token": refresh_token,
         }
-        
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 self.token_url,
                 data=data,
-                headers={"Content-Type": "application/x-www-form-urlencoded"}
+                headers={
+                    "Authorization": f"Basic {basic}",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Accept": "application/json",
+                },
             )
             
             if response.status_code != 200:
