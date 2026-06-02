@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.40.0",
-  "description": "Scrape product data from wholesale vendors. v7.40 — auto-scrape with per-URL backend override (preview/prod aware), postMessage signaling to coordinator, no more cross-environment cache pollution.",
+  "version": "7.42.0",
+  "description": "Scrape product data from wholesale vendors. v7.42 — auto-scrape with per-URL backend override (preview/prod aware) + postMessage to BURST coordinator, fixes scraped-data-going-to-wrong-environment bug.",
   "permissions": [
     "activeTab",
     "scripting",
