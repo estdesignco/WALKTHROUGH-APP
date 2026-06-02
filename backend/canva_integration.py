@@ -44,23 +44,24 @@ class CanvaIntegration:
         
         return code_verifier, code_challenge
     
-    def get_authorization_url(self, state: str, code_challenge: str) -> str:
-        """Generate Canva OAuth authorization URL with PKCE."""
-        # ONLY request the scopes we actually use. Requesting scopes that
-        # the user's Canva integration page hasn't ticked returns
-        # `invalid_scope` on the callback and kills the whole OAuth flow.
-        # If/when we add features that write back to Canva (upload assets,
-        # create folders, edit designs), add those scopes here AND tick
-        # them on developers.canva.com/your-integrations/.
+    def get_authorization_url(self, state: str, code_challenge: str, redirect_uri: Optional[str] = None) -> str:
+        """Generate Canva OAuth authorization URL with PKCE.
+
+        If `redirect_uri` is supplied it overrides the one from .env — this
+        lets the FastAPI handler build the URL from the LIVE request host,
+        so preview-URL churn doesn't constantly break OAuth.
+        """
+        # ONLY request the scopes we actually use.
         scopes = [
             "design:content:read",   # GET /v1/designs/{id} + POST /v1/exports
             "profile:read",          # identify the user
         ]
+        effective_redirect = redirect_uri or self.redirect_uri
         
         params = {
             "response_type": "code",
             "client_id": self.client_id,
-            "redirect_uri": self.redirect_uri,
+            "redirect_uri": effective_redirect,
             "scope": " ".join(scopes),
             "state": state,
             "code_challenge": code_challenge,
@@ -70,13 +71,10 @@ class CanvaIntegration:
         from urllib.parse import quote
         # Canva's docs example uses %20 to separate scopes, not + (Python's
         # default urlencode uses quote_plus which turns spaces into +).
-        # Some OAuth providers accept both, but Canva has been observed
-        # rejecting the + form with `invalid_scope`. We build the query
-        # string manually with quote() so spaces become %20 everywhere.
         query_parts = [
             f"response_type=code",
             f"client_id={quote(self.client_id, safe='')}",
-            f"redirect_uri={quote(self.redirect_uri, safe='')}",
+            f"redirect_uri={quote(effective_redirect, safe='')}",
             f"scope={quote(' '.join(scopes), safe='')}",   # %20 not +
             f"state={quote(state, safe='')}",
             f"code_challenge={quote(code_challenge, safe='')}",
@@ -84,9 +82,14 @@ class CanvaIntegration:
         ]
         return f"{self.auth_url}?" + "&".join(query_parts)
     
-    async def exchange_code_for_token(self, code: str, code_verifier: str) -> Dict[str, Any]:
-        """Exchange authorization code for access token with PKCE."""
-        
+    async def exchange_code_for_token(self, code: str, code_verifier: str, redirect_uri: Optional[str] = None) -> Dict[str, Any]:
+        """Exchange authorization code for access token with PKCE.
+
+        `redirect_uri` MUST match the value used in get_authorization_url
+        for this exchange — OAuth spec requirement. If omitted, falls back
+        to the .env value.
+        """
+        effective_redirect = redirect_uri or self.redirect_uri
         # Use form-encoded data as per OAuth spec
         from urllib.parse import urlencode
         data = urlencode({
@@ -94,7 +97,7 @@ class CanvaIntegration:
             "code": code,
             "client_id": self.client_id,
             "client_secret": self.client_secret,
-            "redirect_uri": self.redirect_uri,
+            "redirect_uri": effective_redirect,
             "code_verifier": code_verifier
         })
         

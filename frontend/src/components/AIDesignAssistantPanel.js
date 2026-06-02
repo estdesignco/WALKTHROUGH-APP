@@ -176,11 +176,35 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', pr
           'Add these 2 values to backend/.env from developers.canva.com:\n\n' +
           'CANVA_CLIENT_ID=...\n' +
           'CANVA_CLIENT_SECRET=...\n\n' +
-          'Then restart the backend. The redirect URI to register on Canva is already set:\n' +
-          window.location.origin + '/api/canva/callback'
+          'Then restart the backend. The redirect URI to register on Canva is:\n' +
+          (d.redirect_uri_used || (window.location.origin + '/api/canva/callback'))
         );
         return;
       }
+
+      // Confirm with the user that this EXACT URL is registered in Canva before we open the popup.
+      // Saves the round-trip through a failed authorization when the preview URL has rotated.
+      const liveRedirect = d.redirect_uri_used || (window.location.origin + '/api/canva/callback');
+      const confirmed = window.confirm(
+        '📐 BEFORE WE CONNECT — confirm this URL is registered in your Canva integration:\n\n' +
+        liveRedirect + '\n\n' +
+        '• Go to https://www.canva.com/developers/integrations/connect-api/OC-AZ5ixiAhK2Eq/configuration\n' +
+        '• Open the Authentication tab\n' +
+        '• Paste the URL above into "Authentication URLs" (you can keep multiple)\n' +
+        '• Click Save\n\n' +
+        'Click OK if it\'s registered (or you want to try anyway).\nClick Cancel to copy the URL and register it first.'
+      );
+      if (!confirmed) {
+        // Copy to clipboard for them
+        try {
+          await navigator.clipboard.writeText(liveRedirect);
+          alert('✓ Copied to clipboard:\n' + liveRedirect + '\n\nPaste this into Canva → Authentication → Save → then click CONNECT CANVA again.');
+        } catch (e) {
+          alert('Copy this URL into Canva → Authentication → Save:\n\n' + liveRedirect);
+        }
+        return;
+      }
+
       const w = 600, h = 700;
       const left = window.screen.width / 2 - w / 2, top = window.screen.height / 2 - h / 2;
       const popup = window.open(d.authorization_url, 'Canva', `width=${w},height=${h},left=${left},top=${top}`);

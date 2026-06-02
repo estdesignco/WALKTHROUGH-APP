@@ -12995,8 +12995,23 @@ async def get_measurements(project_id: str, room_id: str):
 # CANVA INTEGRATION ENDPOINTS
 # ============================================
 
+def _build_canva_redirect_uri(request: Request) -> str:
+    """Build the redirect URI from the live request URL so the URL ALWAYS
+    matches whatever preview/prod domain the user is currently on. Emergent
+    rotates preview hostnames between sessions, which causes the OAuth
+    redirect_uri to permanently drift out of sync with whatever .env was
+    set when the integration was last touched. Building it from the request
+    eliminates that whole class of failure — the user just needs to register
+    THIS exact URL once in Canva console.
+    """
+    # Honor X-Forwarded-* set by the Kubernetes ingress
+    proto = request.headers.get("x-forwarded-proto") or request.url.scheme or "https"
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.hostname
+    return f"{proto}://{host}/api/canva/callback"
+
+
 @api_router.get("/canva/auth")
-async def canva_auth():
+async def canva_auth(request: Request):
     """Initiate Canva OAuth flow with PKCE."""
     import secrets
     state = secrets.token_urlsafe(32)
@@ -13004,23 +13019,29 @@ async def canva_auth():
     # Generate PKCE parameters
     code_verifier, code_challenge = canva_integration.generate_pkce_pair()
     
-    # Store state and code_verifier in database for later use
+    # Build redirect URI from the live request so preview-URL churn doesn't break it
+    redirect_uri = _build_canva_redirect_uri(request)
+    
+    # Store state, code_verifier AND redirect_uri so the callback can use the same one
     await db.canva_auth_sessions.insert_one({
         "state": state,
         "code_verifier": code_verifier,
+        "redirect_uri": redirect_uri,
         "created_at": datetime.utcnow()
     })
     
-    auth_url = canva_integration.get_authorization_url(state, code_challenge)
+    auth_url = canva_integration.get_authorization_url(state, code_challenge, redirect_uri=redirect_uri)
     
     return {
         "authorization_url": auth_url,
         "state": state,
+        "redirect_uri_used": redirect_uri,  # surfaced so the frontend can show the user EXACTLY what to register in Canva
         "message": "Redirect user to authorization_url"
     }
 
 @api_router.get("/canva/callback")
 async def canva_callback(
+    request: Request,
     code: Optional[str] = None,
     state: Optional[str] = None,
     error: Optional[str] = None,
@@ -13041,6 +13062,9 @@ async def canva_callback(
     auto-closes after 2s on success.
     """
     from fastapi.responses import HTMLResponse
+    
+    # The actual URL Canva would need to have registered to make THIS callback work.
+    live_redirect_uri = _build_canva_redirect_uri(request)
 
     def _html(color, title, body, success=False):
         return HTMLResponse(f"""<!doctype html><html><head><title>{title}</title>
@@ -13068,21 +13092,22 @@ try {{ if (window.opener) window.opener.postMessage({{ source:'canva-callback', 
             Canva rejected the authorization with: <code>{error}</code><br><br>
             <strong>Reason:</strong> {msg}<br><br>
             {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Scopes tab → tick BOTH <code>design:content:read</code> AND <code>profile:read</code> → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_scope' else ''}
-            {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Authentication tab → make sure the Redirect URL <code>https://design-preview-131.preview.emergentagent.com/api/canva/callback</code> is listed → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_request' or 'redirect' in (error_description or '').lower() else ''}
+            {"<strong>Fix:</strong> open <a href='https://www.canva.com/developers/integrations/' style='color:#D4A574' target='_blank'>your Canva integration</a> → Authentication tab → make sure the Redirect URL <code>" + live_redirect_uri + "</code> is listed → click Save. Then close this popup and click CONNECT CANVA again." if error == 'invalid_request' or 'redirect' in (error_description or '').lower() else ''}
         """
         return _html("#ef4444", "❌ CANVA AUTHORIZATION FAILED", body, success=False)
 
     # 2) Code + state present — happy path
     if code and state:
         try:
-            # Get the stored code_verifier
+            # Get the stored code_verifier AND the same redirect_uri that was sent during /auth
             auth_session = await db.canva_auth_sessions.find_one({"state": state})
             if not auth_session:
                 return _html("#ef4444", "❌ SESSION EXPIRED",
                              "We couldn't find your authorization session. Please click CONNECT CANVA again from the app.",
                              success=False)
             code_verifier = auth_session["code_verifier"]
-            token_data = await canva_integration.exchange_code_for_token(code, code_verifier)
+            stored_redirect = auth_session.get("redirect_uri") or live_redirect_uri
+            token_data = await canva_integration.exchange_code_for_token(code, code_verifier, redirect_uri=stored_redirect)
             # Store token (single-user model on the integration)
             await canva_integration.store_token(token_data)
             try:
