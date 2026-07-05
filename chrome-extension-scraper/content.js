@@ -3196,3 +3196,329 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
     console.error('[DR auto-scrape] setup failed', outerExc);
   }
 })();
+
+
+// =============================================================================
+// HOUZZ PROPOSAL / ESTIMATE / PO IMPORTER  (v7.43)
+// =============================================================================
+// Lets the Design Ready app open ANY Houzz Pro URL — proposal, estimate,
+// or purchase-order — with `#design-ready-houzz-scrape` in the hash and this
+// script will scrape every line item and POST the whole payload to
+// /api/houzz/proposal-import so the app can review + resolve manufacturer
+// links + commit to spreadsheet or a Purchase Order.
+//
+// Hash params (& separated):
+//   design-ready-houzz-scrape  — flag (presence triggers auto-scrape)
+//   backend=https%3A%2F%2F...  — explicit backend URL (recommended)
+//   session=hz_...             — pre-generated session id (frontend can poll)
+//   project=...                — project id to associate the import with
+//   kind=proposal|estimate|po  — defaults to auto-detect from URL path
+//   close=1                    — auto-close the tab after successful post
+// =============================================================================
+(function setupHouzzScrape() {
+  try {
+    if (!/design-ready-houzz-scrape/.test(window.location.hash || '')) return;
+
+    const rawHash = (window.location.hash || '').replace(/^#/, '');
+    const hashParams = {};
+    rawHash.split('&').forEach(p => {
+      const idx = p.indexOf('=');
+      if (idx > 0) hashParams[p.slice(0, idx)] = decodeURIComponent(p.slice(idx + 1));
+    });
+
+    const wantClose = hashParams.close === '1';
+    const explicitBackend = hashParams.backend || null;
+    const sessionId = hashParams.session || null;
+    const projectId = hashParams.project || null;
+
+    // Auto-detect kind from path (/estimates/ /proposals/ /purchase-orders/)
+    let kind = hashParams.kind || null;
+    if (!kind) {
+      const p = window.location.pathname.toLowerCase();
+      if (p.includes('purchase-order') || p.includes('purchaseorder')) kind = 'po';
+      else if (p.includes('estimate')) kind = 'estimate';
+      else kind = 'proposal';
+    }
+
+    // Only run on Houzz Pro
+    if (!/(^|\.)houzz\.com$/.test(window.location.hostname)) {
+      console.warn('[DR Houzz] not on houzz.com; skipping.');
+      return;
+    }
+
+    // Progress banner
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:2147483647;background:linear-gradient(135deg,#00c853 0%,#009624 100%);color:#fff;font:bold 13px -apple-system,sans-serif;text-align:center;padding:10px 20px;letter-spacing:1px;box-shadow:0 2px 8px rgba(0,0,0,0.4)';
+    banner.textContent = '⏳ DESIGN READY — reading your Houzz ' + kind + '…';
+    document.documentElement.appendChild(banner);
+
+    const resolveBackend = () => new Promise((resolve) => {
+      if (explicitBackend) return resolve(explicitBackend);
+      try {
+        chrome.storage.local.get('backend_url', (res) => {
+          resolve((res && res.backend_url) || 'https://app.estdesignco.com');
+        });
+      } catch (e) {
+        resolve('https://app.estdesignco.com');
+      }
+    });
+
+    // ------------------------------------------------------------------
+    // DOM-scraping helpers  (Houzz Pro is React — selectors change often;
+    // we use multiple fallbacks + generic text-node heuristics.)
+    // ------------------------------------------------------------------
+    function txt(el) { return (el && (el.innerText || el.textContent || '')).replace(/\s+/g, ' ').trim(); }
+    function money(s) {
+      if (!s) return null;
+      const m = String(s).match(/\$?\s*(-?[0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)/);
+      return m ? parseFloat(m[1].replace(/,/g, '')) : null;
+    }
+    function attr(el, ...names) {
+      if (!el) return null;
+      for (const n of names) { const v = el.getAttribute && el.getAttribute(n); if (v) return v; }
+      return null;
+    }
+
+    function metaText() {
+      const meta = {};
+      // Proposal / estimate number often shown as "Estimate #12345"
+      const bodyText = document.body ? document.body.innerText : '';
+      const numMatch = bodyText.match(/(?:estimate|proposal|purchase\s*order|invoice)\s*#\s*([A-Z0-9\-]{2,})/i);
+      if (numMatch) meta.proposal_number = numMatch[1];
+      // Client name — look for common labels
+      const clientMatch = bodyText.match(/(?:client|customer|billed\s*to)\s*[:\-]?\s*([A-Z][A-Za-z\'\.\s\-,]{2,60})/i);
+      if (clientMatch) meta.client_name = clientMatch[1].trim();
+      // Totals — try more targeted selectors first
+      const totalEl = document.querySelector('[data-testid*="total"], [class*="total-row"], [class*="TotalRow"], [class*="grand-total"]');
+      if (totalEl) meta.total = money(txt(totalEl));
+      const subEl = document.querySelector('[data-testid*="subtotal"], [class*="subtotal"], [class*="Subtotal"]');
+      if (subEl) meta.subtotal = money(txt(subEl));
+      const taxEl = document.querySelector('[data-testid*="tax"], [class*="tax-row"], [class*="TaxRow"]');
+      if (taxEl) meta.tax = money(txt(taxEl));
+      // Fallback regex against body
+      if (!meta.subtotal) { const m = bodyText.match(/subtotal[^\$\n]*\$?\s*([\d,\.]+)/i); if (m) meta.subtotal = money(m[0]); }
+      if (!meta.tax)      { const m = bodyText.match(/^\s*tax[^\$\n]*\$?\s*([\d,\.]+)/im); if (m) meta.tax = money(m[0]); }
+      if (!meta.total)    { const m = bodyText.match(/(?:grand\s+)?total[^\$\n]*\$?\s*([\d,\.]+)/i); if (m) meta.total = money(m[0]); }
+      return meta;
+    }
+
+    // Try well-known Houzz selectors first, then fall back to generic
+    // "row that contains a $ price + qty + text" heuristics.
+    function findLineItemRows() {
+      const selectorCandidates = [
+        '[data-testid*="line-item"]',
+        '[data-testid*="LineItem"]',
+        '[data-testid*="ProposalItem"]',
+        '[data-testid*="EstimateItem"]',
+        '[data-testid*="item-row"]',
+        '[class*="line-item"]:not(header):not(nav)',
+        '[class*="LineItem"]:not(header):not(nav)',
+        '[class*="ProposalItem"]',
+        '[class*="EstimateItem"]',
+        '[class*="ItemRow"]',
+        'tr[data-item-id], tr[data-line-id]',
+        'div[role="row"]',
+      ];
+      for (const sel of selectorCandidates) {
+        const els = Array.from(document.querySelectorAll(sel));
+        if (els.length >= 1) {
+          // sanity check: at least one has a $ price string
+          const withMoney = els.filter(el => /\$\s?[\d,]/.test(el.innerText || ''));
+          if (withMoney.length) return withMoney;
+        }
+      }
+      // Generic fallback: any node with a qty column + $ price + description
+      const all = Array.from(document.querySelectorAll('div, tr'));
+      return all.filter(el => {
+        const t = (el.innerText || '');
+        if (t.length < 8 || t.length > 800) return false;
+        if (!/\$\s?[\d,]/.test(t)) return false;
+        if (!/\b(\d+(?:\.\d+)?)\s+/.test(t)) return false;
+        return el.querySelectorAll('div,td,span').length >= 3;
+      });
+    }
+
+    function extractOne(row) {
+      const rowText = txt(row);
+      const out = {};
+
+      // Image
+      const img = row.querySelector('img[src]');
+      if (img) out.image_url = img.currentSrc || img.src;
+
+      // Anchor / source link — prefer a href that leaves houzz
+      const anchors = Array.from(row.querySelectorAll('a[href]'));
+      let sourceAnchor = anchors.find(a => a.href && !/houzz\.com/.test(a.href));
+      if (!sourceAnchor) sourceAnchor = anchors.find(a => /product|item|shop|catalog/.test((a.href || '') + ' ' + txt(a)));
+      if (sourceAnchor) out.source_url = sourceAnchor.href;
+      // Some Houzz components use data attributes
+      if (!out.source_url) {
+        const holder = row.querySelector('[data-external-url],[data-source-url],[data-vendor-url]');
+        if (holder) out.source_url = attr(holder, 'data-external-url', 'data-source-url', 'data-vendor-url');
+      }
+
+      // Try dedicated cell selectors first — these are what Houzz Pro tends to use
+      const nameEl = row.querySelector('[data-testid*="name"], [class*="ItemName"], [class*="item-name"], [class*="ProductName"], [class*="product-name"]');
+      const brandEl = row.querySelector('[data-testid*="brand"], [class*="Brand"], [class*="Manufacturer"], [class*="manufacturer"]');
+      const skuEl = row.querySelector('[data-testid*="sku"], [class*="SKU"], [class*="ModelNumber"], [class*="model-number"]');
+      const descEl = row.querySelector('[data-testid*="desc"], [class*="Description"], [class*="description"]');
+      const qtyEl = row.querySelector('[data-testid*="qty"], [data-testid*="quantity"], [class*="Qty"], [class*="Quantity"] input, [class*="qty-input"]');
+      const unitPriceEl = row.querySelector('[data-testid*="unit-price"], [data-testid*="unitPrice"], [class*="UnitPrice"], [class*="unit-price"]');
+      const extEl = row.querySelector('[data-testid*="extended"], [data-testid*="line-total"], [class*="ExtendedPrice"], [class*="LineTotal"], [class*="line-total"]');
+      const dimEl = row.querySelector('[data-testid*="dimension"], [class*="Dimensions"], [class*="dimensions"]');
+      const finishEl = row.querySelector('[data-testid*="finish"], [class*="Finish"], [class*="finish"]');
+
+      out.name = nameEl ? txt(nameEl) : null;
+      out.brand = brandEl ? txt(brandEl) : null;
+      out.sku = skuEl ? txt(skuEl) : null;
+      out.description = descEl ? txt(descEl) : null;
+      out.dimensions = dimEl ? txt(dimEl) : null;
+      out.finish_color = finishEl ? txt(finishEl) : null;
+
+      if (qtyEl) {
+        const v = qtyEl.value || txt(qtyEl);
+        const n = parseFloat(String(v).replace(/[^0-9\.]/g, ''));
+        if (!isNaN(n) && n > 0) out.quantity = n;
+      }
+      if (unitPriceEl) out.unit_price = money(txt(unitPriceEl));
+      if (extEl) out.extended_price = money(txt(extEl));
+
+      // Fallback text-based extraction for whatever we didn't find via selectors
+      // Prices — pick the last two $ amounts as unit+ext (Houzz convention)
+      const prices = (rowText.match(/\$\s?[\d,]+(?:\.\d+)?/g) || []).map(money).filter(v => v !== null);
+      if (out.unit_price === undefined && prices.length >= 1) out.unit_price = prices[0];
+      if (out.extended_price === undefined && prices.length >= 2) out.extended_price = prices[prices.length - 1];
+      // Quantity fallback — first standalone number
+      if (!out.quantity) {
+        const qm = rowText.match(/(?:^|\s)(\d+(?:\.\d+)?)\s+/);
+        if (qm) out.quantity = parseFloat(qm[1]);
+      }
+      // Name fallback — first long text segment
+      if (!out.name) {
+        // strip prices + qty
+        let s = rowText.replace(/\$\s?[\d,]+(?:\.\d+)?/g, '').replace(/^\s*\d+(?:\.\d+)?\s+/, '');
+        s = s.split('\n')[0].trim();
+        if (s.length > 3) out.name = s.slice(0, 200);
+      }
+      // Brand fallback — "Brand: X" pattern in row text
+      if (!out.brand) {
+        const bm = rowText.match(/\b(?:brand|manufacturer|mfr|maker)\s*[:\-]?\s*([A-Z][A-Za-z&\.\-\s']{2,40})/i);
+        if (bm) out.brand = bm[1].trim();
+      }
+      // SKU fallback
+      if (!out.sku) {
+        const sm = rowText.match(/\b(?:sku|model|item|mfr\s*#|item\s*#)\s*[:\-]?\s*([A-Z0-9][A-Z0-9\-\.\/]{2,})/i);
+        if (sm) out.sku = sm[1];
+      }
+      // Dimensions fallback — "48\"W x 24\"D x 30\"H" pattern
+      if (!out.dimensions) {
+        const dm = rowText.match(/(\d+(?:\.\d+)?["'\s]*(?:W|D|H|L)?\s*[xX×]\s*\d+(?:\.\d+)?["'\s]*(?:W|D|H|L)?(?:\s*[xX×]\s*\d+(?:\.\d+)?["'\s]*(?:W|D|H|L)?)?)/);
+        if (dm) out.dimensions = dm[1].trim();
+      }
+      // Cleanup empty
+      Object.keys(out).forEach(k => {
+        if (out[k] === undefined || out[k] === null || out[k] === '') delete out[k];
+      });
+      // Reject rows that look like headers or totals
+      if (!out.name && !out.unit_price && !out.extended_price) return null;
+      if (out.name && /^(subtotal|total|tax|shipping|grand\s*total|deposit|balance)$/i.test(out.name)) return null;
+      return out;
+    }
+
+    // Wait for React to render — poll every 500ms for up to ~15s
+    async function waitForItems(maxMs = 15000) {
+      const startedAt = Date.now();
+      while (Date.now() - startedAt < maxMs) {
+        const rows = findLineItemRows();
+        if (rows.length >= 1) return rows;
+        await new Promise(r => setTimeout(r, 500));
+      }
+      return findLineItemRows();
+    }
+
+    // ------------------------------------------------------------------
+    // MAIN
+    // ------------------------------------------------------------------
+    (async () => {
+      try {
+        const rows = await waitForItems();
+        const items = [];
+        for (const r of rows) {
+          const li = extractOne(r);
+          if (li) items.push(li);
+        }
+        const meta = metaText();
+
+        if (!items.length) {
+          banner.style.background = '#ef4444';
+          banner.style.color = '#fff';
+          banner.textContent = '❌ DESIGN READY — no line items found on this Houzz page. Are you logged in and viewing the estimate/proposal edit page?';
+          return;
+        }
+
+        const payload = {
+          project_id: projectId,
+          houzz_url: window.location.origin + window.location.pathname + window.location.search,
+          proposal_number: meta.proposal_number || null,
+          client_name: meta.client_name || null,
+          subtotal: meta.subtotal || null,
+          tax: meta.tax || null,
+          total: meta.total || null,
+          items: items,
+          kind: kind,
+          scraped_at: new Date().toISOString(),
+          session_id: sessionId,
+        };
+
+        const backend = await resolveBackend();
+        const endpoint = backend.replace(/\/$/, '') + '/api/houzz/proposal-import';
+        const r = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!r.ok) {
+          const t = await r.text();
+          throw new Error('Backend rejected import: HTTP ' + r.status + ' — ' + t.slice(0, 200));
+        }
+        const resp = await r.json();
+
+        banner.style.background = 'linear-gradient(135deg,#10B981 0%,#059669 100%)';
+        banner.textContent = '✓ DESIGN READY — imported ' + items.length + ' items (' + (resp.resolved_item_count || 0) + ' matched to manufacturer) → ' + backend.replace(/^https?:\/\//, '');
+
+        // Notify coordinator window if opened via one
+        try {
+          if (window.opener) {
+            window.opener.postMessage({
+              source: 'design-ready-houzz-scrape',
+              status: 'done',
+              session_id: resp.session_id,
+              item_count: resp.item_count,
+              resolved_item_count: resp.resolved_item_count,
+              houzz_url: payload.houzz_url,
+            }, '*');
+          }
+        } catch (e) {}
+
+        if (wantClose) {
+          setTimeout(() => { try { window.close(); } catch (e) {} }, 1800);
+        }
+      } catch (exc) {
+        banner.style.background = '#ef4444';
+        banner.style.color = '#fff';
+        banner.textContent = '❌ DESIGN READY — Houzz import failed: ' + (exc && exc.message ? exc.message : exc);
+        try {
+          if (window.opener) {
+            window.opener.postMessage({
+              source: 'design-ready-houzz-scrape',
+              status: 'error',
+              error: String(exc),
+            }, '*');
+          }
+        } catch (e) {}
+      }
+    })();
+  } catch (outerExc) {
+    console.error('[DR Houzz scrape] setup failed', outerExc);
+  }
+})();

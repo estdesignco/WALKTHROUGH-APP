@@ -35,6 +35,7 @@ import TradeDiscountManager from './TradeDiscountManager';
 import SampleTracker from './SampleTracker';
 import WholeHomeFinishes from './WholeHomeFinishes';
 import ProjectFinishSchedules from './ProjectFinishSchedules';
+import PurchaseOrdersDashboard from './PurchaseOrdersDashboard';
 
 import EditableQuestionnaireView from './EditableQuestionnaireView';
 
@@ -71,6 +72,7 @@ const DropdownNavigation = ({ tabs, activeTab, onTabChange }) => {
         { type: 'single', name: 'Walkthrough' },
         { type: 'single', name: 'Checklist' },
         { type: 'single', name: 'FF&E' },
+        { type: 'single', name: 'Purchase Orders' },
         { type: 'single', name: 'Whole Home Finishes' },
         { type: 'single', name: 'Room Finishes' },
         { type: 'dropdown', label: 'Tasks', items: ['To Do', 'Punch List'] },
@@ -982,6 +984,11 @@ export default function ProjectDetailPage() {
                 <FFEDashboard isOffline={false} hideNavigation={true} projectId={projectId} />
             </div>
         ) : <div className="text-center text-stone-300 py-8">Loading FF&E...</div> },
+        { name: "Purchase Orders", icon: DollarSign, component: project ? (
+            <div className="purchase-orders-content">
+                <PurchaseOrdersDashboard projectId={projectId} />
+            </div>
+        ) : <div className="text-center text-stone-300 py-8">Loading Purchase Orders...</div> },
         { name: "Whole Home Finishes", icon: Home, component: project ? (
             <div className="whole-home-finishes-content">
                 <WholeHomeFinishes projectId={projectId} />

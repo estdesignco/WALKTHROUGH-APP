@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.42.0",
-  "description": "Scrape product data from wholesale vendors. v7.42 — auto-scrape with per-URL backend override (preview/prod aware) + postMessage to BURST coordinator, fixes scraped-data-going-to-wrong-environment bug.",
+  "version": "7.43.0",
+  "description": "Scrape product data from wholesale vendors + import Houzz Pro proposals/estimates/POs. v7.43 — adds #design-ready-houzz-scrape trigger, scrapes line items with brand/SKU/qty/price/dimensions/images from pro.houzz.com/manage/d/estimates/* and /proposals/*, POSTs to /api/houzz/proposal-import.",
   "permissions": [
     "activeTab",
     "scripting",

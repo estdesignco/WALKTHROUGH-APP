@@ -63,6 +63,8 @@ import contacts_api
 from ai_design_assistant import router as ai_router
 from moodboard_api import router as moodboard_router
 from master_database_api import router as master_database_router
+import houzz_import
+import purchase_orders as purchase_orders_module
 
 import aiosmtplib
 import email.utils
@@ -18964,6 +18966,10 @@ app.include_router(power_features_router)
 app.include_router(ai_router)
 app.include_router(moodboard_router)
 app.include_router(master_database_router)
+app.include_router(houzz_import.router)
+houzz_import.set_db(db)
+app.include_router(purchase_orders_module.router)
+purchase_orders_module.set_db(db)
 
 # HOUZZ CLIPPER WEBHOOK - Intercepts data on its way to Houzz
 # REMOVED HOUZZ FUNCTION: @app.post("/api/houzz-clipper-webhook")

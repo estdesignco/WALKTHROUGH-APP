@@ -49,6 +49,7 @@ import MasterContactsPage from './components/MasterContactsPage';
 import MasterMaterialsPage from './components/MasterMaterialsPage';
 import MasterToDoList from './components/MasterToDoList';
 import GlobalToDoModal from './components/GlobalToDoModal';
+import PurchaseOrdersDashboard from './components/PurchaseOrdersDashboard';
 import CalculatorsPage from './components/CalculatorsPage';
 // REMOVED: SourcingCatalog - too many missing images
 import VendorMirror from './components/VendorMirror';
@@ -430,6 +431,10 @@ const App = () => {
                     <Route 
                       path="/master-todo" 
                       element={<MasterToDoList />}
+                    />
+                    <Route
+                      path="/purchase-orders"
+                      element={<PurchaseOrdersDashboard />}
                     />
                     {/* Generic project detail route - MUST be AFTER specific routes */}
                     <Route 
