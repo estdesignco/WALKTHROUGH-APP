@@ -46,8 +46,16 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
   const startScrape = () => {
     setError(null);
     const trimmed = houzzUrl.trim();
-    if (!trimmed) { setError('Paste a pro.houzz.com URL'); return; }
-    if (!/houzz\.com/.test(trimmed)) { setError('Only pro.houzz.com URLs are supported here.'); return; }
+    if (!trimmed) { setError('Paste a pro.houzz.com URL first.'); return; }
+    if (!/^https?:\/\//i.test(trimmed)) { setError('URL must start with https:// (paste the full URL from your browser address bar).'); return; }
+    if (!/\bpro\.houzz\.com\b/i.test(trimmed)) {
+      setError('Only pro.houzz.com URLs are supported. The URL should look like https://pro.houzz.com/manage/d/estimates/…/edit');
+      return;
+    }
+    if (!/(estimates|proposals|purchase-orders?|invoices?)\//i.test(trimmed)) {
+      setError('URL must point at an estimate, proposal, purchase-order, or invoice page (path should include /estimates/, /proposals/, /purchase-orders/, or /invoices/).');
+      return;
+    }
 
     const backend = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin);
     const params = new URLSearchParams({
@@ -173,9 +181,9 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
                   className="w-full bg-black/40 border border-stone-700 rounded-lg px-3 py-2 text-white"
                   value={houzzUrl} onChange={(e) => setHouzzUrl(e.target.value)} />
                 <div className="text-xs text-stone-400">
-                  You must be logged into Houzz Pro in this browser. We'll open the URL in a small window,
-                  the extension will read every line item, and we'll swap any retailer links (Wayfair,
-                  Amazon, etc.) for the manufacturer's own product page.
+                  You must be logged into Houzz Pro in this browser. We&apos;ll open the URL in a small window,
+                  the extension will read every line item, and we&apos;ll swap any retailer links (Wayfair,
+                  Amazon, etc.) for the manufacturer&apos;s own product page.
                 </div>
               </div>
 
@@ -200,9 +208,9 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
             <div className="py-12 text-center">
               <Loader2 className="animate-spin mx-auto mb-4 text-[#B49B7E]" size={36}/>
               <div className="text-lg text-[#F5F5DC] font-bold">Reading your Houzz page…</div>
-              <div className="text-sm text-stone-400 mt-2">Keep the popup window open until it says "imported N items".</div>
+              <div className="text-sm text-stone-400 mt-2">Keep the popup window open until it says &ldquo;imported N items&rdquo;.</div>
               {coordinator && (
-                <button onClick={() => { try { coordinator.focus(); } catch {} }}
+                <button onClick={() => { try { coordinator.focus(); } catch (e) { /* ignore */ } }}
                   className="mt-3 text-xs underline text-stone-400 hover:text-stone-200">Bring coordinator window forward</button>
               )}
             </div>

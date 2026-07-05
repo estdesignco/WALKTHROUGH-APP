@@ -5,6 +5,36 @@ React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
 ## Implemented
 
+### Houzz Proposal Import + Purchase Orders (Jul 5, 2026) — NEW
+**Two P0 features shipped in one drop. 18/18 backend pytest PASS. UI verified end-to-end.**
+
+**Houzz Proposal Import** (`/api/houzz/*`):
+- New router `/app/backend/houzz_import.py` — POST `/api/houzz/proposal-import` receives scraped line items from Chrome Extension v7.43. POST `/api/houzz/proposal-import-pdf` parses a text-based Houzz PDF via PyPDF2 + pdfplumber fallback.
+- Session-based review flow: POST `/api/houzz/commit` sends items to either the project's item spreadsheet (`target: items`) or a brand-new Purchase Order (`target: purchase_order`).
+- Chrome Extension v7.43 (`/app/chrome-extension-scraper/content.js` line 3200+): `#design-ready-houzz-scrape` hash triggers auto-scraping of `pro.houzz.com/manage/d/estimates/*`, `/proposals/*`, `/purchase-orders/*`. Uses selector cascade + generic text-node heuristics because Houzz Pro is React with rotating class names. Posts payload to `/api/houzz/proposal-import`, notifies coordinator via `postMessage`.
+- Frontend: `HouzzProposalImporter.js` — modal with URL input (opens coordinator popup), PDF fallback upload, session polling every 1.5s + `postMessage` listener, review table with manufacturer_link column, target picker (Purchase Order or Spreadsheet), initial PO status selector.
+
+**Manufacturer Link Resolver** (`/app/backend/manufacturer_resolver.py`) — non-negotiable user rule:
+- `BRAND_MANUFACTURERS` maps **75+ brands** (furniture / lighting / rugs / plumbing / appliances / hardware) to their canonical manufacturer domain + search URL.
+- `FORBIDDEN_RETAILER_DOMAINS` set (33 entries: wayfair, amazon, ballard, west elm, cb2, crateandbarrel, potterybarn, williams-sonoma, overstock, perigold, onekingslane, chairish, 1stdibs, houzz.com marketplace, target, walmart, homedepot, lowes, etsy, ebay, worldmarket, anthropologie, lumens, ylighting, buildwithferguson, livingspaces, raymourflanigan, shopstyle, google, bing, pinterest, instagram, facebook).
+- Rules: (1) source URL on brand's own domain → keep; (2) source URL on retailer → auto-swap to brand search URL; (3) unknown 3rd party + known brand → build brand search URL; (4) unknown brand + retailer → return null + warning.
+- Verified: Wayfair Uttermost lamp → uttermost.com search; Amazon Four Hands table → fourhands.com search; direct Visual Comfort URL kept as-is. Zero retailer link leaks in production output.
+
+**Purchase Orders** (`/api/purchase-orders/*`):
+- New router `/app/backend/purchase_orders.py` — full CRUD, filtering by project_id and status, `/summary` aggregation.
+- Deposit + balance payment tracking: POST `/{id}/payments` with `kind: deposit | balance | payment` + `method` (credit_card, ach, check, wire, cash) + `reference` (check#, last-4) + `note`. Status auto-advances: `pending → deposit_paid → paid` based on cumulative payments vs. total (tolerance 0.005). DELETE on payment rolls status back.
+- Receipt attachments: POST `/{id}/receipts` with base64 file up to 5MB stored as data URL (fine for receipts; larger uploads should use hosted storage).
+- PO PDF import: POST `/import-from-pdf` parses vendor confirmation PDFs (extracts po_number, vendor, subtotal, tax, shipping, total, line items with brand/SKU/qty/unit/ext).
+- Statuses: draft, pending, deposit_paid, paid, shipped, received, cancelled.
+- Frontend: `PurchaseOrdersDashboard.js` (both global at `/purchase-orders` AND per-project tab inside ProjectDetailPage between FF&E and Whole Home Finishes) + `PurchaseOrderDetailModal.js` (line items with manufacturer_link column, payment history, add-payment form, receipt upload, status pill grid, deposit/balance timestamps).
+- Global nav: MainDashboard sidebar now has 💳 POs link → `/purchase-orders`.
+
+**Files added**: `/app/backend/manufacturer_resolver.py`, `/app/backend/houzz_import.py`, `/app/backend/purchase_orders.py`, `/app/backend/tests/test_houzz_po.py`, `/app/frontend/src/components/PurchaseOrdersDashboard.js`, `/app/frontend/src/components/PurchaseOrderDetailModal.js`, `/app/frontend/src/components/HouzzProposalImporter.js`. Extension repackaged as v7.43.0 at `/app/backend/static/design-ready-scraper-v7.43.0.zip` and `/app/chrome-extension-scraper.zip`.
+
+**Testing status**: iteration_58 — Backend 18/18 pytest PASS, frontend 95% (one LOW polish: Houzz URL validation — now fixed with stricter regex requiring `pro.houzz.com` + estimates/proposals/purchase-orders/invoices in path).
+
+
+
 ### Proposal/Quote — PDF Export + White-Label Email + Customer Accept (Feb 2026, launch-ready)
 
 **Builders/Trades send proposals from THEIR OWN brand. Platform never appears as sender.**
