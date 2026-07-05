@@ -3231,11 +3231,13 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
     const sessionId = hashParams.session || null;
     const projectId = hashParams.project || null;
 
-    // Auto-detect kind from path (/estimates/ /proposals/ /purchase-orders/)
+    // Auto-detect kind from path (/estimates/ /proposals/ /purchase-documents/ /purchase-orders/)
     let kind = hashParams.kind || null;
     if (!kind) {
       const p = window.location.pathname.toLowerCase();
-      if (p.includes('purchase-order') || p.includes('purchaseorder')) kind = 'po';
+      if (p.includes('purchase-document') || p.includes('purchasedocument')) kind = 'po';
+      else if (p.includes('purchase-order') || p.includes('purchaseorder')) kind = 'po';
+      else if (p.includes('invoice')) kind = 'po';
       else if (p.includes('estimate')) kind = 'estimate';
       else kind = 'proposal';
     }

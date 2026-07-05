@@ -52,8 +52,8 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
       setError('Only pro.houzz.com URLs are supported. The URL should look like https://pro.houzz.com/manage/d/estimates/…/edit');
       return;
     }
-    if (!/(estimates|proposals|purchase-orders?|invoices?)\//i.test(trimmed)) {
-      setError('URL must point at an estimate, proposal, purchase-order, or invoice page (path should include /estimates/, /proposals/, /purchase-orders/, or /invoices/).');
+    if (!/(estimates?|proposals?|purchase-orders?|purchase-documents?|invoices?|orders?)\//i.test(trimmed)) {
+      setError('URL must point at a Houzz estimate, proposal, purchase-document, purchase-order, or invoice page.');
       return;
     }
 
