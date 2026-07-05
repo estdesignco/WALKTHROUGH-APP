@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.45.0",
-  "description": "v7.45 — Houzz import: ancestor-exclusion + content-hash dedup + math-validation. Kills the 59-copies-of-5-items bug.",
+  "version": "7.46.0",
+  "description": "v7.46 — Houzz import switches to server-side parsing: extension captures page HTML, backend parses with BeautifulSoup. Parser fixes never require an extension reinstall.",
   "permissions": [
     "activeTab",
     "scripting",

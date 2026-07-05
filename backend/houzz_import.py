@@ -326,6 +326,380 @@ def _build_response(session_doc: Dict[str, Any]) -> HouzzImportSessionResponse:
 
 
 # ============================================================================
+# SERVER-SIDE HTML PARSER FOR HOUZZ PRO PAGES
+# ============================================================================
+# The extension posts the raw outerHTML of the main content region. We use
+# BeautifulSoup to find the line-item table/rows and extract fields. Because
+# Houzz frequently changes their React class names, we go by STRUCTURE
+# (semantic tags + $-price patterns) instead of class names.
+
+class HouzzRawCapture(BaseModel):
+    session_id: Optional[str] = None
+    project_id: Optional[str] = None
+    houzz_url: str
+    kind: str = "proposal"
+    html: str
+    scraped_at: Optional[str] = None
+    extension_version: Optional[str] = None
+
+
+def _parse_money(s: Optional[str]) -> Optional[float]:
+    if not s:
+        return None
+    m = re.search(r"\$?\s*(-?[0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)", str(s))
+    if not m:
+        return None
+    try:
+        return float(m.group(1).replace(",", ""))
+    except ValueError:
+        return None
+
+
+def _parse_qty(s: Optional[str]) -> Optional[float]:
+    if not s:
+        return None
+    m = re.search(r"(\d+(?:\.\d+)?)", str(s))
+    if not m:
+        return None
+    try:
+        return float(m.group(1))
+    except ValueError:
+        return None
+
+
+def _text(el) -> str:
+    if el is None:
+        return ""
+    return re.sub(r"\s+", " ", el.get_text(" ", strip=True)).strip()
+
+
+def _first_a(el, external_only: bool = True) -> Optional[str]:
+    if el is None:
+        return None
+    for a in el.find_all("a", href=True):
+        href = a["href"]
+        if not href.startswith("http"):
+            continue
+        if external_only and "houzz.com" in href:
+            continue
+        return href
+    return None
+
+
+def _first_img(el) -> Optional[str]:
+    if el is None:
+        return None
+    img = el.find("img")
+    if img:
+        return img.get("src") or img.get("data-src") or None
+    return None
+
+
+def _extract_headers(header_row) -> Dict[str, int]:
+    """Given a header row element, map column name -> index."""
+    if header_row is None:
+        return {}
+    cells = header_row.find_all(["th", "td"])
+    if not cells:
+        cells = header_row.find_all(recursive=False)
+    idx: Dict[str, int] = {}
+    for i, c in enumerate(cells):
+        label = _text(c).lower()
+        if not label:
+            continue
+        # normalize typical column names
+        if re.search(r"\b(qty|quantity)\b", label): idx["qty"] = i
+        elif re.search(r"\b(item|product|description|name)\b", label) and "unit" not in label: idx.setdefault("name", i)
+        elif re.search(r"\b(unit|each|price\s*each|cost)\b", label): idx["unit"] = i
+        elif re.search(r"\b(total|extended|amount|line\s*total|subtotal)\b", label): idx["total"] = i
+        elif re.search(r"\b(sku|item\s*#|model|mpn)\b", label): idx["sku"] = i
+        elif re.search(r"\b(brand|manufacturer|vendor)\b", label): idx["brand"] = i
+        elif re.search(r"\b(dim|size)\b", label): idx["dim"] = i
+        elif re.search(r"\b(finish|color)\b", label): idx["finish"] = i
+    return idx
+
+
+def _extract_from_table(table) -> List[Dict[str, Any]]:
+    """Extract line items from a semantic <table> element."""
+    rows = table.find_all("tr")
+    if len(rows) < 2:
+        return []
+    # Detect header
+    header_row = rows[0]
+    header_map = _extract_headers(header_row)
+    items: List[Dict[str, Any]] = []
+    for tr in rows[1:]:
+        cells = tr.find_all(["td", "th"])
+        if not cells:
+            continue
+        text_all = _text(tr)
+        # skip totals rows
+        if re.match(r"^\s*(subtotal|total|tax|shipping|grand\s*total|deposit|balance|amount\s*(due|paid))\b", text_all, re.I):
+            continue
+        cell_texts = [_text(c) for c in cells]
+        # Skip empty rows
+        if not any(t for t in cell_texts):
+            continue
+
+        def cell(key):
+            i = header_map.get(key)
+            return cells[i] if i is not None and i < len(cells) else None
+
+        name_cell = cell("name")
+        item = {
+            "name": _text(name_cell) if name_cell is not None else None,
+            "sku": _text(cell("sku")) if cell("sku") is not None else None,
+            "brand": _text(cell("brand")) if cell("brand") is not None else None,
+            "dimensions": _text(cell("dim")) if cell("dim") is not None else None,
+            "finish_color": _text(cell("finish")) if cell("finish") is not None else None,
+            "quantity": _parse_qty(_text(cell("qty"))),
+            "unit_price": _parse_money(_text(cell("unit"))),
+            "extended_price": _parse_money(_text(cell("total"))),
+            "image_url": _first_img(name_cell if name_cell is not None else tr),
+            "source_url": _first_a(name_cell if name_cell is not None else tr),
+        }
+        # Positional fallback when there was no clear header row
+        if not header_map:
+            money_cells = [(i, _parse_money(t)) for i, t in enumerate(cell_texts)]
+            money_cells = [(i, v) for i, v in money_cells if v is not None]
+            if len(money_cells) >= 2:
+                item["unit_price"] = money_cells[-2][1] if item["unit_price"] is None else item["unit_price"]
+                item["extended_price"] = money_cells[-1][1] if item["extended_price"] is None else item["extended_price"]
+            if item["quantity"] is None:
+                for t in cell_texts:
+                    q = _parse_qty(t)
+                    if q is not None and 0 < q < 1000 and "$" not in t:
+                        item["quantity"] = q; break
+            if not item["name"]:
+                # pick the longest text cell that isn't a money value
+                cand = [t for t in cell_texts if t and "$" not in t and not re.match(r"^\d+(\.\d+)?$", t)]
+                if cand:
+                    item["name"] = max(cand, key=len)[:200]
+
+        # Skip if we have nothing meaningful
+        if not any([item.get("name"), item.get("sku"), item.get("brand")]):
+            continue
+        if item.get("name") and re.match(r"^\s*item(?:\s*\d+)?\s*$", item["name"], re.I):
+            continue
+
+        # Try to extract brand from name if not already set (e.g. "Uttermost Anmer …")
+        if not item.get("brand") and item.get("name"):
+            for candidate in ["Uttermost", "Four Hands", "Bernhardt", "Rowe", "Loloi",
+                              "Visual Comfort", "HVL", "Hudson Valley", "Gabby", "Bassett",
+                              "Surya", "Safavieh", "Regina Andrew", "Global Views", "V and H",
+                              "Flow Decor", "Crestview", "Eichholtz", "MOH", "Phillip Jeffries",
+                              "York", "Classic Home"]:
+                if candidate.lower() in item["name"].lower():
+                    item["brand"] = candidate
+                    break
+
+        items.append(item)
+    return items
+
+
+def _extract_from_grid_divs(soup) -> List[Dict[str, Any]]:
+    """
+    Fallback when Houzz doesn't render an actual <table>: look for repeated
+    div structures with role='row'. Also try 'ul > li' patterns commonly used
+    by Houzz to render line items.
+    """
+    candidates = []
+    # role=row
+    role_rows = soup.select('[role="row"]')
+    if role_rows and len(role_rows) >= 2:
+        candidates.append(role_rows)
+    # ul > li line items
+    for ul in soup.find_all("ul"):
+        lis = [li for li in ul.find_all("li", recursive=False) if _parse_money(_text(li))]
+        if len(lis) >= 2:
+            candidates.append(lis)
+    # repeated sibling divs each holding a $ amount
+    for parent in soup.find_all(["div", "section"]):
+        kids = [c for c in parent.find_all("div", recursive=False)]
+        moneyed = [c for c in kids if _parse_money(_text(c))]
+        if len(moneyed) >= 2 and len(moneyed) == len(kids):
+            candidates.append(moneyed)
+
+    # Pick the candidate group with 2-25 items (typical proposal size)
+    candidates = [c for c in candidates if 2 <= len(c) <= 40]
+    if not candidates:
+        return []
+    # Prefer the group closest to size 5-15 (usually the real line items)
+    candidates.sort(key=lambda c: abs(len(c) - 8))
+    rows = candidates[0]
+
+    items: List[Dict[str, Any]] = []
+    for r in rows:
+        t = _text(r)
+        if re.match(r"^\s*(subtotal|total|tax|shipping|grand\s*total|deposit|balance)\b", t, re.I):
+            continue
+        moneys = re.findall(r"\$\s?[\d,]+(?:\.\d+)?", t)
+        prices = [_parse_money(m) for m in moneys if _parse_money(m) is not None]
+        # Quantity: first bare integer/float NOT inside a $
+        qty_m = re.search(r"(?<!\$)(?<!\d)(\d{1,3}(?:\.\d+)?)\b(?!\s*%)", t.replace("$", " $ "))
+        qty = float(qty_m.group(1)) if qty_m else None
+        # Name: strip prices + qty + trailing whitespace
+        stripped = re.sub(r"\$\s?[\d,]+(?:\.\d+)?", " ", t)
+        stripped = re.sub(r"\s+", " ", stripped).strip()
+        name = stripped[:200]
+        item = {
+            "name": name,
+            "quantity": qty,
+            "unit_price": prices[0] if len(prices) >= 1 else None,
+            "extended_price": prices[-1] if len(prices) >= 2 else (prices[0] if prices else None),
+            "image_url": _first_img(r),
+            "source_url": _first_a(r),
+        }
+        # Extract brand mention
+        for candidate in ["Uttermost", "Four Hands", "Bernhardt", "Rowe", "Loloi",
+                          "Visual Comfort", "HVL", "Hudson Valley", "Gabby", "Bassett",
+                          "Surya", "Safavieh", "Regina Andrew", "Global Views", "V and H",
+                          "Flow Decor", "Crestview", "Eichholtz", "MOH", "Phillip Jeffries",
+                          "York", "Classic Home"]:
+            if candidate.lower() in name.lower():
+                item["brand"] = candidate
+                break
+        if not item.get("name") and not item.get("extended_price"):
+            continue
+        items.append(item)
+    return items
+
+
+def _parse_houzz_html(html: str) -> Dict[str, Any]:
+    """Server-side parser. Returns dict with items + top-level totals + meta."""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "html.parser")
+
+    # Strip tags that add noise
+    for tag in soup.find_all(["script", "style", "svg", "noscript"]):
+        tag.decompose()
+
+    body_text = soup.get_text(" ", strip=True)
+    meta: Dict[str, Any] = {}
+    m = re.search(r"(?:estimate|proposal|purchase\s*document|purchase\s*order|invoice)\s*#?\s*([A-Z0-9\-]{2,})", body_text, re.I)
+    if m:
+        meta["proposal_number"] = m.group(1)
+    m = re.search(r"(?:client|customer|bill(?:ed)?\s*to)\s*[:\-]?\s*([A-Z][A-Za-z\'\.\-\s,]{2,60})", body_text)
+    if m:
+        meta["client_name"] = m.group(1).strip()
+
+    # Totals — REQUIRE the money value to be $-prefixed OR clearly money-shaped
+    # (comma-thousands OR decimal cents). This prevents matching bare digits
+    # like "Total Uttermost Anmer 6-Light" -> 6.
+    _money_shape = r"\$\s*\d{1,3}(?:,\d{3})+(?:\.\d+)?|\$\s*\d+(?:\.\d+)?|\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d{2}"
+    def _grep_money(pattern: str):
+        m = re.search(pattern, body_text, re.I)
+        return _parse_money(m.group(0)) if m else None
+    # For each total, insist on a "$" or clearly-formatted number within a
+    # short window AFTER the label; also require the label to be at a word
+    # boundary so "Subtotal" doesn't inadvertently match "total".
+    meta["subtotal"] = _grep_money(r"\bsubtotal\b[^\n]{0,30}?(" + _money_shape + r")")
+    meta["tax"] = _grep_money(r"(?<!sub)\btax\b[^\n]{0,30}?(" + _money_shape + r")")
+    meta["total"] = _grep_money(r"(?:\bgrand\s*)?\btotal\b(?!\s*(?:cost|price|column))[^\n]{0,30}?(" + _money_shape + r")")
+
+    # Table-based extraction wins if we find a good table
+    best: List[Dict[str, Any]] = []
+    for table in soup.find_all("table"):
+        items = _extract_from_table(table)
+        if len(items) > len(best):
+            best = items
+
+    if not best:
+        best = _extract_from_grid_divs(soup)
+
+    return {"items": best, "meta": meta}
+
+
+@router.post("/raw-capture")
+async def raw_capture(payload: HouzzRawCapture):
+    """
+    Chrome extension v7.46+ posts the outerHTML of the Houzz page here.
+    We parse server-side (BeautifulSoup), so parser fixes never need an
+    extension reinstall.
+    """
+    db = _get_db()
+    if not payload.html or len(payload.html) < 200:
+        raise HTTPException(status_code=400, detail="HTML payload is empty or too small")
+
+    parsed = _parse_houzz_html(payload.html)
+    line_items = [HouzzLineItem(**it) for it in parsed["items"]]
+
+    session_payload = HouzzProposalPayload(
+        project_id=payload.project_id,
+        houzz_url=payload.houzz_url,
+        proposal_number=parsed["meta"].get("proposal_number"),
+        client_name=parsed["meta"].get("client_name"),
+        subtotal=parsed["meta"].get("subtotal"),
+        tax=parsed["meta"].get("tax"),
+        total=parsed["meta"].get("total"),
+        items=line_items,
+        kind=payload.kind,
+        scraped_at=payload.scraped_at,
+        session_id=payload.session_id,
+    )
+    cleaned = _dedupe_and_validate(session_payload.items)
+    resolved = [_resolve_line(it) for it in cleaned]
+    sid = await _save_session(session_payload, resolved)
+
+    # Also persist the raw HTML for offline analysis / re-parse without another scrape
+    await db.houzz_raw_captures.replace_one(
+        {"session_id": sid},
+        {
+            "session_id": sid,
+            "houzz_url": payload.houzz_url,
+            "kind": payload.kind,
+            "html_bytes": len(payload.html),
+            "extension_version": payload.extension_version,
+            "captured_at": datetime.now(timezone.utc).isoformat(),
+            "html": payload.html,
+            "raw_item_count": len(parsed["items"]),
+            "cleaned_item_count": len(cleaned),
+        },
+        upsert=True,
+    )
+
+    doc = await db.houzz_import_sessions.find_one({"session_id": sid}, {"_id": 0})
+    logger.info(
+        "🏠 Houzz raw-capture: html=%d KB parsed=%d cleaned=%d matched=%d from %s",
+        len(payload.html) // 1024,
+        len(parsed["items"]),
+        len(cleaned),
+        sum(1 for it in resolved if it.get("manufacturer_link")),
+        payload.houzz_url,
+    )
+    return _build_response(doc)
+
+
+@router.post("/reparse/{session_id}", response_model=HouzzImportSessionResponse)
+async def reparse_session(session_id: str):
+    """Re-run the HTML parser on a stored session (used when we improve the parser)."""
+    db = _get_db()
+    cap = await db.houzz_raw_captures.find_one({"session_id": session_id})
+    if not cap or not cap.get("html"):
+        raise HTTPException(status_code=404, detail="No raw capture found for this session")
+    parsed = _parse_houzz_html(cap["html"])
+    line_items = [HouzzLineItem(**it) for it in parsed["items"]]
+    session_payload = HouzzProposalPayload(
+        project_id=cap.get("project_id"),
+        houzz_url=cap.get("houzz_url"),
+        proposal_number=parsed["meta"].get("proposal_number"),
+        client_name=parsed["meta"].get("client_name"),
+        subtotal=parsed["meta"].get("subtotal"),
+        tax=parsed["meta"].get("tax"),
+        total=parsed["meta"].get("total"),
+        items=line_items,
+        kind=cap.get("kind", "proposal"),
+        session_id=session_id,
+    )
+    cleaned = _dedupe_and_validate(session_payload.items)
+    resolved = [_resolve_line(it) for it in cleaned]
+    await _save_session(session_payload, resolved)
+    doc = await db.houzz_import_sessions.find_one({"session_id": session_id}, {"_id": 0})
+    return _build_response(doc)
+
+
+
+# ============================================================================
 # ROUTES
 # ============================================================================
 @router.post("/proposal-import", response_model=HouzzImportSessionResponse)

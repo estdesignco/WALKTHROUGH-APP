@@ -3501,44 +3501,63 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
     }
 
     // ------------------------------------------------------------------
-    // MAIN
+    // MAIN (v7.46) — server-side parsing model
+    //
+    // Instead of trying to guess Houzz's constantly-changing React DOM in
+    // the content script, we:
+    //   1. wait a few seconds so the page hydrates,
+    //   2. grab the outerHTML of the main content region (or body),
+    //   3. POST it to /api/houzz/raw-capture on our backend,
+    //   4. the backend uses BeautifulSoup to extract line items and stores
+    //      them under the same session id the frontend is already polling.
+    //
+    // This lets us fix parsing bugs SERVER-side without you having to
+    // reinstall the extension.
     // ------------------------------------------------------------------
     (async () => {
       try {
-        const rows = await waitForItems();
-        const rawItems = [];
-        for (const r of rows) {
-          const li = extractOne(r);
-          if (li) rawItems.push(li);
-        }
-        const items = dedupeAndValidate(rawItems);
-        const meta = metaText();
+        // Wait for React to hydrate and lazy-load the line items.
+        // Detect when the DOM stops changing for ~1.5s (or fall back to 8s cap).
+        await new Promise((resolve) => {
+          let lastMutationAt = Date.now();
+          const cap = Date.now() + 8000;
+          const obs = new MutationObserver(() => { lastMutationAt = Date.now(); });
+          try { obs.observe(document.body, { childList: true, subtree: true }); } catch (e) {}
+          const iv = setInterval(() => {
+            if (Date.now() - lastMutationAt > 1500 || Date.now() > cap) {
+              clearInterval(iv); try { obs.disconnect(); } catch (e) {}
+              resolve();
+            }
+          }, 250);
+        });
 
-        console.log('[DR Houzz] candidates:', rows.length, 'extracted:', rawItems.length, 'after dedup:', items.length);
+        // Grab the most useful HTML region: <main> preferred, then any
+        // container that holds a table, then the whole body.
+        const mainEl =
+          document.querySelector('main') ||
+          document.querySelector('[role="main"]') ||
+          document.querySelector('[class*="content" i]') ||
+          document.body;
 
-        if (!items.length) {
-          banner.style.background = '#ef4444';
-          banner.style.color = '#fff';
-          banner.textContent = '❌ DESIGN READY — no line items found on this Houzz page. Are you logged in and viewing the estimate/proposal edit page?';
-          return;
-        }
+        // Strip <script>/<style>/<link>/<svg> to keep payload small.
+        const cloned = mainEl.cloneNode(true);
+        cloned.querySelectorAll('script, style, link, svg, noscript, iframe').forEach(n => n.remove());
+        let html = cloned.outerHTML;
+        // Cap at ~500KB to be safe over the wire.
+        if (html.length > 500000) html = html.slice(0, 500000);
 
         const payload = {
+          session_id: sessionId,
           project_id: projectId,
           houzz_url: window.location.origin + window.location.pathname + window.location.search,
-          proposal_number: meta.proposal_number || null,
-          client_name: meta.client_name || null,
-          subtotal: meta.subtotal || null,
-          tax: meta.tax || null,
-          total: meta.total || null,
-          items: items,
           kind: kind,
+          html: html,
           scraped_at: new Date().toISOString(),
-          session_id: sessionId,
+          extension_version: '7.46.0',
         };
 
         const backend = await resolveBackend();
-        const endpoint = backend.replace(/\/$/, '') + '/api/houzz/proposal-import';
+        const endpoint = backend.replace(/\/$/, '') + '/api/houzz/raw-capture';
         const r = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -3546,22 +3565,21 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
         });
         if (!r.ok) {
           const t = await r.text();
-          throw new Error('Backend rejected import: HTTP ' + r.status + ' — ' + t.slice(0, 200));
+          throw new Error('Backend rejected capture: HTTP ' + r.status + ' — ' + t.slice(0, 200));
         }
         const resp = await r.json();
 
         banner.style.background = 'linear-gradient(135deg,#10B981 0%,#059669 100%)';
-        banner.textContent = '✓ DESIGN READY — imported ' + items.length + ' items (' + (resp.resolved_item_count || 0) + ' matched to manufacturer) → ' + backend.replace(/^https?:\/\//, '');
+        banner.textContent = '✓ DESIGN READY — captured ' + (html.length / 1024).toFixed(0) + ' KB · ' + (resp.item_count || 0) + ' items parsed';
 
-        // Notify coordinator window if opened via one
         try {
           if (window.opener) {
             window.opener.postMessage({
               source: 'design-ready-houzz-scrape',
               status: 'done',
               session_id: resp.session_id,
-              item_count: resp.item_count,
-              resolved_item_count: resp.resolved_item_count,
+              item_count: resp.item_count || 0,
+              resolved_item_count: resp.resolved_item_count || 0,
               houzz_url: payload.houzz_url,
             }, '*');
           }
