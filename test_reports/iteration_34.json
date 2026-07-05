@@ -101,7 +101,7 @@
   
   "test_credentials": {
     "password": "DesignReady2026!",
-    "app_url": "https://design-preview-131.preview.emergentagent.com",
+    "app_url": "https://design-burst.preview.emergentagent.com",
     "test_project_with_rooms": "Test Mobile Project",
     "test_project_zero_rooms": "Test Zero Rooms for Bug Fix (ID: 292dbb96-6b73-46a2-a631-e9d98879181b)"
   },

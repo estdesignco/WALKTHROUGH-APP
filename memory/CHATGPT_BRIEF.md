@@ -366,6 +366,6 @@ curl -X POST http://localhost:8001/api/ai-assist/push-items \
   -d '{"project_id":"72d4051a-...", "items": [...from step 4...]}'
 ```
 
-App URL: `https://design-preview-131.preview.emergentagent.com` (password: `DesignReady2026!`)
+App URL: `https://design-burst.preview.emergentagent.com` (password: `DesignReady2026!`)
 Test project: Wheeler Ridge Residence, id `72d4051a-4986-4d3c-8df7-fb0fec94f250`
 Vendor Portals UI: `/admin/vendor-portals`

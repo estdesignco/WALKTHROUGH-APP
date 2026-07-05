@@ -28,7 +28,7 @@
   ],
   "updated_files": [],
   "success_rate": {"backend": "N/A (not tested)", "frontend": "60% — UX shell verified, real-data filtering NOT verifiable due to missing FF&E/Checklist seed data"},
-  "test_credentials": "App password DesignReady2026!. Preview URL: https://design-preview-131.preview.emergentagent.com. Project: 4d4a56dc-2f79-4269-93a9-bea4d3e85109 (Wheeler Ridge Residence).",
+  "test_credentials": "App password DesignReady2026!. Preview URL: https://design-burst.preview.emergentagent.com. Project: 4d4a56dc-2f79-4269-93a9-bea4d3e85109 (Wheeler Ridge Residence).",
   "seed_data_creation": "Created and then deleted one TEST_todo_for_link_picker to-do item in order to validate the link-existing inline picker (testid prefix todo-link-<id>-*). Cleaned up afterward.",
   "retest_needed": true,
   "main_agent_can_self_test": true,

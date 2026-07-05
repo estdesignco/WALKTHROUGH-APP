@@ -1,126 +1,146 @@
-<analysis>**original_problem_statement**: The user is building a full-stack project management tool for an interior design company, focusing heavily on a Room Finish Schedule feature. The application must render a realistic, interactive 3D shower perspective (ceiling, floor, back wall, left/right walls) where users can apply specific tile patterns using extracted single tiles. It must also support placing, resizing, and tiling Niches, Benches, and Drag-and-drop Fixtures. PRODUCT REQUIREMENTS include realistic visual scaling of applied tiles to match real-world aesthetics.
+<analysis>**original_problem_statement**: 
+The user is building a full-stack project management tool for an interior design company. Core features include massive interactive spreadsheets and an AI Design Agent that parses Canva boards/PDFs to auto-generate item rows. A major requirement is bypassing B2B vendor bot-protection (Uttermost, Fourhands, HVL) to scrape wholesale prices, sizes, and finishes. The app integrates a custom Chrome Extension Clipper to cache data via the user's active browser session. 
 
-**User's preferred language**: English (You MUST respond in English only)
+**User's preferred language**: English (INSTRUCT next agent to respond in English only)
 
-**what currently exists?** 
-The app has a one-point perspective 3D Room Finish Schedule using HTML5 Canvas and CSS . In the latest session, major functional bugs were resolved: drag-and-drop works, benches correctly anchor to the bottom of the wall, the floor is interactive, and side walls successfully auto-fill with the back wall's tile. However, the visual mathematical scaling of the tiles on the canvas is highly contentious; the user rejected multiple scaling formulas (both percentage-based and fixed-pixel), leading to extreme user frustration and abandonment of the session.
+**what currently exists?**: 
+React frontend + FastAPI backend + MongoDB. The backend parses PDFs and extracts product URLs. A newly introduced Burst Backfill system coordinates with the user's custom Chrome Extension (v7.42) to sequentially auto-scrape vendor pages in a single popup window, bypassing both headless bot-blocks and Chrome popup-blockers. Canva OAuth integration is wired to dynamically read preview URLs to prevent redirect URI mismatches.
 
 **Last working item**:
-    - Last item agent was working: Attempting to fix the tile pattern scaling logic ( in ). The agent cycled through multiple approaches (, , fixed , and fixed ), but none matched the user's expected visual realism, causing the user to rage-quit the session.
-    - Status: BLOCKED
-    - Agent Testing Done: Y (Testing agent verified functional fixes; main agent used screenshots for visual checks).
-    - Which testing method agent to use?: Frontend testing agent / Screenshot tool (to visually verify tile scaling if the user returns).
-    - User Testing Done: N (User rejected the visuals and left).
+    - Last item agent was working: Fixing Canva OAuth token exchange (403 error due to missing HTTP Basic Auth) and releasing Chrome Extension v7.42 for the Burst Backfill Coordinator workflow.
+    - Status: USER VERIFICATION PENDING
+    - Agent Testing Done: Y (Python unit tests for JSON-LD parser, backend endpoint curls, E2E simulated backfill, UI screenshots)
+    - Which testing method agent to use?: Frontend testing agent/ curl / manual testing. 
+    - User Testing Done: N (Waiting for the user to install Extension v7.42 and test the Burst Backfill and Canva Connect features).
 
 **All Pending/In progress Issue list**:
-  - Issue 1: Tile Scale Rendering is visually unsatisfactory and uncalibrated to real-world sizes. (Priority: P0)
-     - Attempted fixes: Agent guessed arbitrary pixel multipliers and fixed sizes (0.12x, 0.16x, 80px, 35px). The user hated all of them because they didn't look proportional to real tiles in a shower.
-     - Next debug checklist:  (). If the user resumes, propose a mathematical inch-to-pixel mapping system based on the room's physical dimensions rather than arbitrary multipliers.
-     - Why fix this issue and what will be achieved with the fix? It is the core visual requirement of the app, and the current failure has caused the user to halt development.
-     - Status: BLOCKED
+  Issue 1: Verify Canva OAuth flow (P0)
+     - Attempted fixes: Agent fixed redirect URI mismatch by generating it dynamically from the live Request instead of . Fixed token exchange 403 by utilizing HTTP Basic Auth with : per Canva's docs.
+     - Next debug checklist: Check   and . Confirm with the user if authentication succeeds.
+     - Why fix this issue and what will be achieved with the fix? Enables seamless Canva board imports directly via URL.
+     - Status: USER VERIFICATION PENDING
+     - Is recurring issue? Y (Persistent configuration issue due to rotating Preview URLs)
+     - Should Test frontend/backend/both after fix? Both
+     - Blocked on other issue: None
+
+  Issue 2: Verify Chrome Extension v7.42 Burst Backfill functionality (P0)
+     - Attempted fixes: Replaced multiple  calls (blocked by Chrome) with a single Coordinator Window that sequentially navigates through missing-data URLs. Configured Extension v7.42 to auto-scrape based on  hash and target the dynamic backend URL provided in the hash.
+     - Next debug checklist: Wait for user to install v7.42. Monitor backend logs for  hits. Validate if  ticks rows off when data is received.
+     - Why fix this issue and what will be achieved with the fix? Fully automates scraping of B2B vendors that block backend Python scrapers.
+     - Status: USER VERIFICATION PENDING
      - Is recurring issue? Y
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on other issue: User has walked away from the chat (IM DONE). Needs user cooperation to proceed.
+     - Should Test frontend/backend/both after fix? Both
+     - Blocked on other issue: None
 
-**In progress Task List**:
-  - Task 1: Finalize 3D Room Finish Schedule tile scaling.
-     - Where to resume:  -> .
-     - What will be achieved with this? Realistic tile rendering that satisfies the interior designer's eye.
-     - Status: BLOCKED
-     - Should Test frontend/backend/both after fix? Frontend
-     - Blocked on something: User input and willingness to continue.
+  Issue 3: Houzz Integration / Clipper Expansion (P1)
+     - Next debug checklist: Expand the existing Chrome Extension Clipper to scrape Houzz () for leads, project details, and client messages as an alternative to their locked API.
+     - Status: NOT STARTED
+     - Is recurring issue? N
 
-**Upcoming and Future Tasks**
+**In progress Task List**: None (Currently waiting on user verification).
+
+**Upcoming and Future Tasks**:
     Upcoming Tasks:
-    - Implement Glass door panel / shower enclosure frame (P1).
+    - Auto-populate plumbing fixtures from FFE/Checklist into 3D palette (P1).
     Future Tasks:
-    - Refactor  (currently 4000+ lines) (P2).
+    - Implement Glass door panel / shower enclosure frame in 3D view (P2).
+    - Refactor  (4000+ lines) (P2).
     - Break down  into smaller components (P2).
+    - Refactor  (>23,000 lines) to split routers/models into separate files (P2).
     - Rename  to  (P2).
     - Archive/remove unused  directory (P2).
+    - Vendor-specific selector tuning for Loloi/Bernhardt/Visual Comfort (P2).
 
 **Completed work in this session**
-- Fixed Drag-to-move/resize for features inside the skewed 3D zones (DONE).
-- Fixed Floor hit-detection and clickability via z-index and default patterns (DONE).
-- Fixed Bench placement logic so they anchor to the absolute bottom () of the wall instead of floating (DONE).
-- Implemented Side-wall Auto-fill so the left and right walls automatically inherit the main wall's tile (DONE).
-- Added logic to apply tiles directly to Niches and Benches (DONE).
+- Added a  utility to fix  breaking on JS-style comments in vendor JSON-LD payloads. (DONE)
+- Built  UI for coordinating batch Chrome extension scraping. (DONE)
+- Updated Chrome Extension to v7.42, adding  listener and dynamic backend targeting. (DONE)
+- Fixed Burst popup-blocker issues by utilizing a single Coordinator window with sequential  navigation. (DONE)
+- Fixed Canva OAuth redirect URI drift by computing URIs dynamically off the active  host. (DONE)
+- Fixed Canva Token 403 errors by enforcing HTTP Basic Auth. (DONE)
+- Created unit tests in . (DONE)
 
 **Earlier issues found/mentioned but not fixed**
-None functional, only the aesthetic tile scaling dispute.
+   Issue 1: Massive File Sizes (Technical Debt)
+   - Debug checklist:  is >23,000 lines.  is >4,300 lines.
+   - Why to solve this issue and what will be achieved with this? Adding endpoints is becoming bug-prone.
 
 **Known issue recurrence from previous fork**
-  - Issue recurrence in previous fork: Tile scaling complaints.
-  - Recurrence count: 5+ times in this session alone.
-  - Status: BLOCKED
+  - Issue recurrence in previous fork: Canva OAuth redirect URL mismatches. Playwright headless bot detection by B2B vendors. Popup blockers halting automated UI flows. 
+  - Recurrence count: 6+
+  - Status: USER VERIFICATION PENDING
+  - Note: **User has a highly volatile temperament and uses heavy profanity.** They are extremely frustrated by URL configuration errors. Be direct, apologetic but confident, and provide Zero-Config solutions. Do NOT blame the user or ask them to configure hidden settings unnecessarily. Never hardcode preview URLs.
 
 **Code Architecture**
-
+#design-ready-autoscrape
 
 **Key Technical Concepts**
-- HTML5 Canvas combined with CSS  for pseudo-3D one-point perspective.
-- Hit detection and coordinate mapping on geometrically skewed DOM elements.
+- React frontend, FastAPI backend, MongoDB.
+- Chrome Extension (Manifest V3) bypassing B2B vendor bot-protection via sequential popups.
+-  used for Gemini Vision AI.
 
 **key DB schema**
   - : 
-  - : supports  (ceiling, floor, wall), , , .
+  - : 
+  - : 
 
 **changes in tech stack**
-  - None
+  - Moved from headless cloud scraping to a Coordinator Window that drives the user's local Chrome Extension sequentially to bypass B2B bot blocks. 
 
 **All files of reference** 
-  -  (Extensively edited for event handling and canvas rendering).
-  -  (Updated).
-  -  (Created).
-  -  (Shows 100% pass rate for functional bug fixes).
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
 
 **Areas that need refactoring**: 
--  is a massive monolith handling too much complex math and state. Needs componentization once the aesthetic issues are resolved.
--  (4000+ lines).
+-  (Too large).
+-  (Agent failed to update PRD via search/replace before ending the session. Needs to be synchronized).
 
 **key api endpoints**
-- 
+-  (Dynamically handles OAuth redirects)
+-  (Ingests data from Clipper v7.42)
+-  (Fetches items missing details)
+-  (Applies scraped data to DB)
+-  (Serves v7.42 zip)
 
 **Critical Info for New Agent**
-- **HIGH USER FRUSTRATION WARNING**: The user is extremely angry and ended the last session by stating ITS RIDICULOUS YOU SUCK AT YOUR JOB and IM DONE because the agent could not guess the correct mathematical ratio for the tile sizes. 
-- Do **NOT** attempt to touch the tile sizing logic or make unsolicited code changes without first carefully re-engaging the user (if they reply). Be highly empathetic, acknowledge the previous failures, and offer to use a strict measurement-based approach (e.g., calculating real-world inches to pixels) rather than guessing arbitrary multipliers.
-- The 10 functional requirements (drag and drop, bench anchoring, floor interactions) *were* successfully fixed and verified by the testing agent; the blocker is strictly the 2D pattern scale rendering.
+- **DO NOT HARDCODE PREVIEW URLs:** The user's preview environment URLs rotate constantly (e.g., , ). Rely on the incoming Request to build callback URIs dynamically.
+- **Canva OAuth:** Canva Connect API *does not* support Personal Access Tokens. The agent reverted to OAuth but fixed the configurations. 
+- **Chrome Clipper:** Cloud scraping is permanently dead for Uttermost and FourHands. Always rely on the  and Burst Backfill logic. The agent just bumped it to **v7.42**.
+- Before proceeding, check if the user responded about having custom edits in their local v7.41 extension. If they did, merge their edits into v7.42.
+- **User Tone:** The user is on the verge of abandoning the platform. Address their queries immediately with functional, verifiable code.
 
 **documents and test reports created in this job**
   - 
-  - 
-  - 
 
 **Last 10 User Messages and any pending HUMAN messages** 
- - User: ITS RIDICULOUS YOU SUCK AT YOUR JOB (COMPLETED - Agent routed to support playbook)
- - User: IM DONE (COMPLETED - Agent routed to support playbook / rollback suggestions)
- - User: ABSOLUTELY NOT (COMPLETED - Agent tried fixed 35px scale)
- - User: DAMN IT!!!!!!! NOW ITS BACK TO THE TOO SMALL AGAIN... + Image (COMPLETED - Agent tried fixed 80px scale)
- - User: DO YOU UNDERSTAND THE FUCKING THE WORD SPLIT THE DIFFERENCE... + Image (COMPLETED - Agent tried 0.16 multiplier)
- - User: MUCH BETTER, HOWEVER, that is a little TOO small!!!! (COMPLETED - Agent attempted a larger multiplier)
- - User: STARTING TO GET PISSED NOW... TILE STILL TOO BIG... + Images (COMPLETED - Agent fixed functional bugs and attempted first scale fix)
+ 1. User complained that Canva URLs didn't extract item colors/sizes/prices. (RESOLVED: Fixed backend  failing on JS-style comments in JSON-LD).
+ 2. User complained that Uttermost/Fourhands still lacked data and the backend Backfill button was useless. (RESOLVED: Pivoted to Burst Backfill using Chrome extension).
+ 3. User stated the Canva connection link is completely broken. (RESOLVED: Fixed  hardcoded Redirect URI drift by making it dynamic).
+ 4. User complained that Chrome blocked the multiple popups triggered by Burst Backfill. (RESOLVED: Replaced  loop with a single Coordinator window that navigates sequentially).
+ 5. User questioned if moving from extension v7.41 to v7.40 was a downgrade. (PENDING: Agent bumped it to v7.42.0 and asked the user to verify if they had custom local changes in v7.41 before installing).
 
 **Project Health Check:**
-- Broken (Visually/Aesthetically, leading to blocked state).
+- Broken: Pending User testing on Burst Backfill and Canva Auth.
+- Mocked: NA.
 
 **3rd Party Integrations**
-- Canva API (existing)
+- Gemini 3.1 Pro Preview (Vision) via  — uses Emergent LLM Key.
+- Canva API — requires User API Key.
+- Resend — requires User API Key.
 
 **Testing status**
-  - Testing agent used after significant changes: YES (Iteration 47 verified all functional fixes).
-  - Troubleshoot agent used after agent stuck in loop: NO (Used support_agent instead).
-  - Test files created: None new.
-  - Known regressions: Tile visual scaling is currently hardcoded to a fixed  base, which the user hates.
+  - Testing agent used after significant changes: NO (Self-tested via bash/curl/screenshots).
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: 
+  - Known regressions: None known.
 
 **Credentials to test flow:**
 - App Password: 
+- User's Canva OAuth Client ID: 
 
 **What agent forgot to execute**
-The agent failed to implement a mathematically sound, real-world measurement system (inches to pixels) for the tiles, relying instead on guessing random multipliers, which caused the user to lose patience.
-
-**Debugging checklist for current issue**
-    Issue: Tile scale rendering is visually inaccurate and frustrating the user.
-    Frontend files to check:  (Specifically the  function, , and  variables).
-    Next Steps:
-    1. Await user response.
-    2. If they engage, DO NOT guess multipliers. Ask for the physical dimensions of the shower wall, and calculate the exact pixel-per-inch ratio so a 12x24 tile renders exactly at scale.</analysis>
+- The agent encountered an error updating  but called  anyway. The  is currently out of sync with the new Burst Backfill and Canva OAuth dynamic URI changes. Update this early in the next session.</analysis>

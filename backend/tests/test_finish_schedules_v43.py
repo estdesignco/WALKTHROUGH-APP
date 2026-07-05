@@ -13,7 +13,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-preview-131.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-burst.preview.emergentagent.com').rstrip('/')
 
 # Test project and room IDs from the demo data (updated for iteration 44)
 TEST_PROJECT_ID = "a3f6f6c5-0cbd-41c3-a997-34321e21cea4"

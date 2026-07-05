@@ -7,7 +7,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-preview-131.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-burst.preview.emergentagent.com').rstrip('/')
 PROJECT_ID = 'a3f6f6c5-0cbd-41c3-a997-34321e21cea4'
 ROOM_ID = 'c607262f-28b6-418c-a5b3-2812e0830bc7'
 

@@ -11,7 +11,7 @@ from typing import Dict, Any, List
 from datetime import datetime
 
 # Backend URL from frontend .env
-BACKEND_URL = "https://design-preview-131.preview.emergentagent.com/api"
+BACKEND_URL = "https://design-burst.preview.emergentagent.com/api"
 
 class LaunchReadinessTester:
     def __init__(self):

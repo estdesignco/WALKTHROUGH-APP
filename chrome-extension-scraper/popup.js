@@ -6,7 +6,7 @@
 //         talk to the preview environment, not just production.
 
 // Default to production but allow override via chrome.storage.local.
-// Set with: chrome.storage.local.set({backend_url: 'https://design-preview-131.preview.emergentagent.com'})
+// Set with: chrome.storage.local.set({backend_url: 'https://design-burst.preview.emergentagent.com'})
 let APP_URL = 'https://app.estdesignco.com';
 let BACKEND_URL = 'https://app.estdesignco.com';
 try {

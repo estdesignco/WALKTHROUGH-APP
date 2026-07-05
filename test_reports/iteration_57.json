@@ -47,7 +47,7 @@
     "/app/backend/tests/test_vendor_portals_and_ai.py (new)"
   ],
   "success_rate": {"backend": "100% (7/7 pytest)", "frontend": "100% (steps 8-12 all passed)"},
-  "test_credentials": "App password DesignReady2026! works. Real project_id=72d4051a-4986-4d3c-8df7-fb0fec94f250.",
+  "test_credentials": "App password DesignReady2026! works. Real project_id=design-burst.",
   "seed_data_creation": "Created and deleted dummy loloi credential (test@example.com / TestPass123!). DB confirmed clean (delete cleanup ran). AI push-items added 10 detected checklist items to Wheeler Ridge / Master Bathroom — those persist (intended; main agent / user can decide to keep or wipe).",
   "retest_needed": true,
   "main_agent_can_self_test": true,

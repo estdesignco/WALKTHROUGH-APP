@@ -1,7 +1,7 @@
 # Mobile App Handoff — ESTABLISHED Design Co.
 
 ## Backend API
-**Base URL:** `https://design-preview-131.preview.emergentagent.com/api`  
+**Base URL:** `https://design-burst.preview.emergentagent.com/api`  
 **Auth:** App password `DesignReady2026!` (frontend-only gate, API is open)
 
 ---

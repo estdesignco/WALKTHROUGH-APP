@@ -179,7 +179,7 @@ Cloud Playwright is permanently locked out of Uttermost, Four Hands, Gabby — t
 ### Canva Redirect URI Fix (June 1, 2026)
 - Backend `api_router` mounts at `/api`, so the OAuth callback URL is `/api/canva/callback` — not `/canva/callback` (which hits the frontend and 404s).
 - Updated `CANVA_REDIRECT_URI` in `backend/.env` and `CANVA_CLIENT_ID`/`CANVA_CLIENT_SECRET` to the new integration `OC-AZ5ixiAhK2Eq`.
-- User must register `https://design-preview-131.preview.emergentagent.com/api/canva/callback` exactly under Canva developer console → Authentication tab for the connect flow to complete.
+- User must register `https://design-burst.preview.emergentagent.com/api/canva/callback` exactly under Canva developer console → Authentication tab for the connect flow to complete.
 
 
 - New dedicated **📐 Floor plan** attach button in the AI Assistant panel (`/app/frontend/src/components/AIDesignAssistantPanel.js`, next to the regular 📎 Attach).

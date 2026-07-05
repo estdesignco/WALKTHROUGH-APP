@@ -13,7 +13,7 @@ import time
 import uuid
 
 # Get backend URL from environment
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-preview-131.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-burst.preview.emergentagent.com')
 API_URL = f"{BASE_URL}/api"
 
 print(f"🔗 Testing against: {API_URL}")

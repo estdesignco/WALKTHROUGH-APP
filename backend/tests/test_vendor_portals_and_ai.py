@@ -9,7 +9,7 @@ import time
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://design-preview-131.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://design-burst.preview.emergentagent.com").rstrip("/")
 PROJECT_ID = "72d4051a-4986-4d3c-8df7-fb0fec94f250"  # Wheeler Ridge (real id; test_credentials.md had stale id)
 ROOM_NAME = "Master Bathroom"
 VENDOR_KEY = "loloi"

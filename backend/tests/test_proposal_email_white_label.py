@@ -18,7 +18,7 @@ import requests
 import asyncio
 import motor.motor_asyncio
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://design-preview-131.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://design-burst.preview.emergentagent.com").rstrip("/")
 API = f"{BASE_URL}/api"
 CODE = "JXQ8EYEQ"
 MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")

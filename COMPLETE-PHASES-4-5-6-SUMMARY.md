@@ -254,7 +254,7 @@ OPENAI_API_KEY=sk-your-key-here
 ```bash
 CANVA_CLIENT_ID=OC-AZm1nEt2t3hv
 CANVA_CLIENT_SECRET=cnvca_...
-CANVA_REDIRECT_URI=https://design-preview-131.preview.emergentagent.com/canva/callback
+CANVA_REDIRECT_URI=https://design-burst.preview.emergentagent.com/canva/callback
 ```
 **Status:** ✅ Already configured and working
 

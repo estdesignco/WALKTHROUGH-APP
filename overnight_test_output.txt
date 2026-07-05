@@ -2,7 +2,7 @@
 COMPREHENSIVE OVERNIGHT BACKEND DIAGNOSTICS
 Testing ALL backend functionality
 ================================================================================
-Backend URL: https://design-preview-131.preview.emergentagent.com/api
+Backend URL: https://design-burst.preview.emergentagent.com/api
 Test Project ID: 35db1692-4325-47dc-9b66-16bfe9b9fcf3
 Started at: 2025-10-28T07:08:32.850412
 

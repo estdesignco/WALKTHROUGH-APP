@@ -227,4 +227,4 @@ Working on specific room?
 
 ---
 
-Test it now: https://design-preview-131.preview.emergentagent.com/mobile-app
+Test it now: https://design-burst.preview.emergentagent.com/mobile-app

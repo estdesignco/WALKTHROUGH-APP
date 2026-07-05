@@ -85,8 +85,8 @@
   
   "test_credentials": {
     "password": "DesignReady2026!",
-    "app_url": "https://design-preview-131.preview.emergentagent.com",
-    "mobile_url": "https://design-preview-131.preview.emergentagent.com/mobile-app"
+    "app_url": "https://design-burst.preview.emergentagent.com",
+    "mobile_url": "https://design-burst.preview.emergentagent.com/mobile-app"
   },
   
   "seed_data_creation": "Created TEST_ZeroRoomsVerify_1772323886 project for testing zero-rooms flow",

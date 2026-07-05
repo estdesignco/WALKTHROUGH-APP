@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://design-preview-131.preview.emergentagent.com';
+const BACKEND_URL = 'https://design-burst.preview.emergentagent.com';
 let projectData = null;
 
 // Load saved settings

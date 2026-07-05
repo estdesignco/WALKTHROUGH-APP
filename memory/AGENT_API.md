@@ -3,7 +3,7 @@
 > Authenticated REST API to create, update, search and image-attach checklist /
 > FFE / walkthrough rows in this app from any external agent.
 >
-> Live now in **preview** (`https://design-preview-131.preview.emergentagent.com`).
+> Live now in **preview** (`https://design-burst.preview.emergentagent.com`).
 > Will be live on **production** (`https://app.estdesignco.com`) after redeploy.
 
 ---
@@ -16,7 +16,7 @@
 | Webhooks? | Not yet (one-way: agent → app). Easy to add later if needed. |
 | MCP server? | Not built-in, but you can wrap these endpoints as MCP tools in 10 minutes (sample below). |
 | Auth? | **API key** via `X-API-Key` header. Keys are minted per-project or workspace-wide. |
-| Base URL | `https://app.estdesignco.com/api` (prod) · `https://design-preview-131.preview.emergentagent.com/api` (preview) |
+| Base URL | `https://app.estdesignco.com/api` (prod) · `https://design-burst.preview.emergentagent.com/api` (preview) |
 
 ---
 

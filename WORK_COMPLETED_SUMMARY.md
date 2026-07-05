@@ -171,7 +171,7 @@ Created comprehensive integration plan document:
 ## 🚀 How to Test
 
 ### Test Offline Mode:
-1. Open mobile app: `https://design-preview-131.preview.emergentagent.com/mobile-app`
+1. Open mobile app: `https://design-burst.preview.emergentagent.com/mobile-app`
 2. Select a project
 3. Open Walkthrough or FF&E
 4. **Turn off WiFi/mobile data**
@@ -221,10 +221,10 @@ Created comprehensive integration plan document:
 ## 📱 Mobile App URL
 
 **Main App:**
-`https://design-preview-131.preview.emergentagent.com`
+`https://design-burst.preview.emergentagent.com`
 
 **Mobile Simulator:**
-`https://design-preview-131.preview.emergentagent.com/mobile-app`
+`https://design-burst.preview.emergentagent.com/mobile-app`
 
 ---
 

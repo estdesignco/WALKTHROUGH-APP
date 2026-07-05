@@ -7,7 +7,7 @@ import requests
 import os
 
 # Use the preview URL for testing
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-preview-131.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://design-burst.preview.emergentagent.com')
 
 # Test project ID provided
 TEST_PROJECT_ID = "26a02fff-c661-478c-b26f-3694c4bb72c8"

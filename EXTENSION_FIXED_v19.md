@@ -47,10 +47,10 @@ The extension now combines:
 ## Download Links
 
 **Direct Download (UPDATED):**
-https://design-preview-131.preview.emergentagent.com/chrome-extension-v19.zip
+https://design-burst.preview.emergentagent.com/chrome-extension-v19.zip
 
 **OR via API:**
-https://design-preview-131.preview.emergentagent.com/api/download/chrome-extension
+https://design-burst.preview.emergentagent.com/api/download/chrome-extension
 
 ## Installation Steps
 

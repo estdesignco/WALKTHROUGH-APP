@@ -9,5 +9,5 @@
 - Rooms: Master Bathroom, Kitchen (both on 1st Floor)
 
 ## Backend
-- Backend URL: https://design-preview-131.preview.emergentagent.com
+- Backend URL: https://design-burst.preview.emergentagent.com
 - MongoDB: mongodb://localhost:27017 / interior_design_db
