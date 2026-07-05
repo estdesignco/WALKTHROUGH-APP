@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.44.0",
-  "description": "Scrape product data from wholesale vendors + import Houzz Pro proposals/estimates/purchase-documents/POs. v7.44 — adds Houzz /purchase-documents/ path support.",
+  "version": "7.45.0",
+  "description": "v7.45 — Houzz import: ancestor-exclusion + content-hash dedup + math-validation. Kills the 59-copies-of-5-items bug.",
   "permissions": [
     "activeTab",
     "scripting",

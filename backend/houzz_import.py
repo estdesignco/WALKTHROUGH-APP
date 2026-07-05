@@ -121,6 +121,65 @@ def _price_from_text(txt: Optional[str]) -> Optional[float]:
         return None
 
 
+def _dedupe_and_validate(items: List["HouzzLineItem"]) -> List["HouzzLineItem"]:
+    """Backend safety net: drop duplicate rows + rows whose math doesn't add up.
+
+    Even if the Chrome extension misbehaves and posts the same row 8 times or
+    grabs subtotal / grand-total rows as line items, this filter catches it.
+
+    Rules:
+      * If qty * unit_price is off from extended_price by >5% AND >$2 -> drop
+        (that row is almost certainly a subtotal / grand total).
+      * Content hash on (name, qty, unit, ext) -> keep one per hash.
+      * If two rows hash-collide, keep the one with more populated fields.
+      * Reject rows named exactly "Item", "Item 1", etc. (React placeholders).
+      * Reject rows named "Subtotal", "Total", "Tax", "Shipping", etc.
+    """
+    def fill_count(it: "HouzzLineItem") -> int:
+        return sum(1 for v in it.dict().values() if v not in (None, "", 0))
+
+    placeholder_re = re.compile(r"^\s*item(?:\s+\d+)?\s*$", re.I)
+    totals_re = re.compile(
+        r"^\s*(subtotal|total|tax|shipping|grand\s*total|deposit|balance|amount\s*due|amount\s*paid|balance\s*due)\s*$",
+        re.I,
+    )
+
+    seen: Dict[str, "HouzzLineItem"] = {}
+    for it in items:
+        name = (it.name or "").strip()
+        if name and placeholder_re.match(name):
+            continue
+        if name and totals_re.match(name):
+            continue
+
+        q = float(it.quantity or 0)
+        u = float(it.unit_price or 0)
+        e = float(it.extended_price or 0)
+
+        # Math validation
+        if q > 0 and u > 0 and e > 0:
+            expected = q * u
+            diff = abs(expected - e)
+            tolerance = max(2.0, expected * 0.05)
+            if diff > tolerance:
+                continue  # likely a subtotal / summary row
+
+        # Reject $0 rows with no product identifier
+        if e == 0 and not (it.sku or it.brand):
+            continue
+
+        key = "|".join([
+            re.sub(r"\s+", " ", name.lower()),
+            f"{q:.2f}", f"{u:.2f}", f"{e:.2f}",
+        ])
+        if key not in seen:
+            seen[key] = it
+        else:
+            if fill_count(it) > fill_count(seen[key]):
+                seen[key] = it
+    return list(seen.values())
+
+
 def _resolve_line(item: HouzzLineItem) -> Dict[str, Any]:
     """Attach manufacturer_link + resolution reason to a raw line item."""
     manuf_url, reason = resolve_manufacturer_link(
@@ -278,7 +337,23 @@ async def import_from_extension(payload: HouzzProposalPayload):
     if not payload.items:
         raise HTTPException(status_code=400, detail="No line items in payload")
 
-    resolved = [_resolve_line(it) for it in payload.items]
+    # Backend safety net — even if the extension over-collects, we dedupe here.
+    original_count = len(payload.items)
+    cleaned_items = _dedupe_and_validate(payload.items)
+    dropped = original_count - len(cleaned_items)
+    if dropped > 0:
+        logger.info(
+            "🏠 Houzz import: dropped %d duplicate/invalid rows (%d -> %d) from %s",
+            dropped, original_count, len(cleaned_items), payload.houzz_url,
+        )
+
+    if not cleaned_items:
+        raise HTTPException(
+            status_code=400,
+            detail=f"All {original_count} scraped rows were duplicates or invalid; nothing to import.",
+        )
+
+    resolved = [_resolve_line(it) for it in cleaned_items]
     sid = await _save_session(payload, resolved)
     doc = await _get_db().houzz_import_sessions.find_one({"session_id": sid}, {"_id": 0})
     logger.info(

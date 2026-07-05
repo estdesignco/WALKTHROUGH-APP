@@ -3304,8 +3304,9 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
       return meta;
     }
 
-    // Try well-known Houzz selectors first, then fall back to generic
-    // "row that contains a $ price + qty + text" heuristics.
+    // Try well-known Houzz selectors first. We aggregate candidates from
+    // MANY selectors, then run ancestor-exclusion + dedup to keep only the
+    // innermost, unique line rows.
     function findLineItemRows() {
       const selectorCandidates = [
         '[data-testid*="line-item"]',
@@ -3321,24 +3322,42 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
         'tr[data-item-id], tr[data-line-id]',
         'div[role="row"]',
       ];
+      let pool = [];
       for (const sel of selectorCandidates) {
-        const els = Array.from(document.querySelectorAll(sel));
-        if (els.length >= 1) {
-          // sanity check: at least one has a $ price string
-          const withMoney = els.filter(el => /\$\s?[\d,]/.test(el.innerText || ''));
-          if (withMoney.length) return withMoney;
-        }
+        try {
+          const els = Array.from(document.querySelectorAll(sel));
+          for (const e of els) {
+            const t = (e.innerText || '');
+            if (!/\$\s?[\d,]/.test(t)) continue;
+            pool.push(e);
+          }
+        } catch (e) {}
       }
-      // Generic fallback: any node with a qty column + $ price + description
-      const all = Array.from(document.querySelectorAll('div, tr'));
-      return all.filter(el => {
-        const t = (el.innerText || '');
-        if (t.length < 8 || t.length > 800) return false;
-        if (!/\$\s?[\d,]/.test(t)) return false;
-        if (!/\b(\d+(?:\.\d+)?)\s+/.test(t)) return false;
-        return el.querySelectorAll('div,td,span').length >= 3;
+
+      // Generic fallback ONLY if the specific selectors returned nothing.
+      if (pool.length === 0) {
+        const all = Array.from(document.querySelectorAll('tr, div[role="row"]'));
+        pool = all.filter(el => {
+          const t = (el.innerText || '');
+          if (t.length < 8 || t.length > 800) return false;
+          if (!/\$\s?[\d,]/.test(t)) return false;
+          if (!/\b(\d+(?:\.\d+)?)\s+/.test(t)) return false;
+          return el.querySelectorAll('div,td,span').length >= 3;
+        });
+      }
+
+      // Ancestor-exclusion: if any candidate contains another candidate,
+      // drop the outer one — we want the innermost row.
+      const survivors = pool.filter(a => {
+        for (const b of pool) {
+          if (a === b) continue;
+          if (a.contains(b)) return false;   // a is an ancestor of b -> drop a
+        }
+        return true;
       });
+      return survivors;
     }
+
 
     function extractOne(row) {
       const rowText = txt(row);
@@ -3423,8 +3442,51 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
       });
       // Reject rows that look like headers or totals
       if (!out.name && !out.unit_price && !out.extended_price) return null;
-      if (out.name && /^(subtotal|total|tax|shipping|grand\s*total|deposit|balance)$/i.test(out.name)) return null;
+      if (out.name && /^(subtotal|total|tax|shipping|grand\s*total|deposit|balance|amount\s*due|amount\s*paid|balance\s*due)$/i.test(out.name)) return null;
+      // Reject placeholder/template rows that Houzz React renders empty
+      if (out.name && /^item\s*\d*$/i.test(out.name.trim())) return null;
+      // Reject rows with no useful data at all
+      if (!out.name && !out.sku && !out.brand) return null;
       return out;
+    }
+
+    // Content-hash + math-validation dedup. Same qty+unit+ext+name = same row.
+    function dedupeAndValidate(items) {
+      const seen = new Map();
+      for (const it of items) {
+        // Math validation: if qty * unit != ext (>5% or >$2 off), the row is
+        // likely a subtotal/summary that leaked in — SKIP it.
+        const q = Number(it.quantity || 0);
+        const u = Number(it.unit_price || 0);
+        const e = Number(it.extended_price || 0);
+        if (q > 0 && u > 0 && e > 0) {
+          const expected = q * u;
+          const diff = Math.abs(expected - e);
+          const tolerance = Math.max(2, expected * 0.05);
+          if (diff > tolerance) {
+            // math doesn't check out — drop
+            continue;
+          }
+        }
+        // Reject $0 line-total rows unless they clearly have a real product identifier
+        if (e === 0 && !it.sku && !it.brand) continue;
+
+        // Content-hash: normalize name + qty + unit + ext
+        const key = [
+          (it.name || '').replace(/\s+/g, ' ').trim().toLowerCase(),
+          q.toFixed(2),
+          u.toFixed(2),
+          e.toFixed(2),
+        ].join('|');
+        if (!seen.has(key)) seen.set(key, it);
+        else {
+          // Merge: keep the row that has more fields filled in
+          const prev = seen.get(key);
+          const fillCount = (obj) => Object.values(obj).filter(v => v != null && v !== '').length;
+          if (fillCount(it) > fillCount(prev)) seen.set(key, it);
+        }
+      }
+      return Array.from(seen.values());
     }
 
     // Wait for React to render — poll every 500ms for up to ~15s
@@ -3444,12 +3506,15 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
     (async () => {
       try {
         const rows = await waitForItems();
-        const items = [];
+        const rawItems = [];
         for (const r of rows) {
           const li = extractOne(r);
-          if (li) items.push(li);
+          if (li) rawItems.push(li);
         }
+        const items = dedupeAndValidate(rawItems);
         const meta = metaText();
+
+        console.log('[DR Houzz] candidates:', rows.length, 'extracted:', rawItems.length, 'after dedup:', items.length);
 
         if (!items.length) {
           banner.style.background = '#ef4444';
