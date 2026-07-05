@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Design Ready Product Scraper",
-  "version": "7.46.0",
-  "description": "v7.46 — Houzz import switches to server-side parsing: extension captures page HTML, backend parses with BeautifulSoup. Parser fixes never require an extension reinstall.",
+  "version": "7.47.0",
+  "description": "v7.47 — Houzz import waits up to 45s for content to hydrate, captures WHOLE document HTML, live countdown in banner.",
   "permissions": [
     "activeTab",
     "scripting",

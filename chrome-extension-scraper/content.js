@@ -3501,50 +3501,41 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
     }
 
     // ------------------------------------------------------------------
-    // MAIN (v7.46) — server-side parsing model
-    //
-    // Instead of trying to guess Houzz's constantly-changing React DOM in
-    // the content script, we:
-    //   1. wait a few seconds so the page hydrates,
-    //   2. grab the outerHTML of the main content region (or body),
-    //   3. POST it to /api/houzz/raw-capture on our backend,
-    //   4. the backend uses BeautifulSoup to extract line items and stores
-    //      them under the same session id the frontend is already polling.
-    //
-    // This lets us fix parsing bugs SERVER-side without you having to
-    // reinstall the extension.
+    // MAIN (v7.47) — server-side parsing model with proper hydration wait
     // ------------------------------------------------------------------
     (async () => {
       try {
-        // Wait for React to hydrate and lazy-load the line items.
-        // Detect when the DOM stops changing for ~1.5s (or fall back to 8s cap).
-        await new Promise((resolve) => {
-          let lastMutationAt = Date.now();
-          const cap = Date.now() + 8000;
-          const obs = new MutationObserver(() => { lastMutationAt = Date.now(); });
-          try { obs.observe(document.body, { childList: true, subtree: true }); } catch (e) {}
-          const iv = setInterval(() => {
-            if (Date.now() - lastMutationAt > 1500 || Date.now() > cap) {
-              clearInterval(iv); try { obs.disconnect(); } catch (e) {}
-              resolve();
-            }
-          }, 250);
-        });
+        // Houzz Pro lazy-loads the document contents via XHR after mount.
+        // Wait until the body actually contains $ prices (real data present)
+        // OR up to 45s.
+        const startedAt = Date.now();
+        const cap = 45000;   // 45 second cap
+        let ready = false;
+        while (Date.now() - startedAt < cap) {
+          const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+          banner.textContent = '⏳ DESIGN READY — reading Houzz ' + kind + '  (' + elapsed + 's / 45s, waiting for content)…';
+          const bodyText = document.body ? document.body.innerText : '';
+          // Look for at least 2 $ prices AND at least one line-item-ish keyword
+          const dollarCount = (bodyText.match(/\$[\d,]+/g) || []).length;
+          if (dollarCount >= 2) {
+            // Wait a bit more for the rest of items to render
+            await new Promise(r => setTimeout(r, 2000));
+            ready = true;
+            break;
+          }
+          await new Promise(r => setTimeout(r, 500));
+        }
+        if (!ready) {
+          banner.textContent = '⚠ DESIGN READY — timed out waiting for Houzz to load line items. Capturing what we have…';
+        }
 
-        // Grab the most useful HTML region: <main> preferred, then any
-        // container that holds a table, then the whole body.
-        const mainEl =
-          document.querySelector('main') ||
-          document.querySelector('[role="main"]') ||
-          document.querySelector('[class*="content" i]') ||
-          document.body;
-
-        // Strip <script>/<style>/<link>/<svg> to keep payload small.
-        const cloned = mainEl.cloneNode(true);
+        // Capture the WHOLE document HTML (not just <main>), because Houzz
+        // renders line items into portals sometimes.
+        const cloned = document.documentElement.cloneNode(true);
         cloned.querySelectorAll('script, style, link, svg, noscript, iframe').forEach(n => n.remove());
         let html = cloned.outerHTML;
-        // Cap at ~500KB to be safe over the wire.
-        if (html.length > 500000) html = html.slice(0, 500000);
+        // Cap at ~1MB (still fine over the wire and gives us enough context)
+        if (html.length > 1000000) html = html.slice(0, 1000000);
 
         const payload = {
           session_id: sessionId,
@@ -3553,7 +3544,7 @@ if (window.location.hostname.includes('emergentagent.com') || window.location.ho
           kind: kind,
           html: html,
           scraped_at: new Date().toISOString(),
-          extension_version: '7.46.0',
+          extension_version: '7.47.0',
         };
 
         const backend = await resolveBackend();

@@ -177,13 +177,13 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
             <>
               <div className="bg-amber-500/15 border border-amber-500/40 rounded-lg p-3 flex items-center justify-between gap-3">
                 <div className="text-sm text-amber-100">
-                  <div className="font-bold">Chrome Extension v7.46+ required</div>
+                  <div className="font-bold">Chrome Extension v7.47+ required</div>
                   <div className="text-xs text-amber-200/80">If you&apos;re on an older version, download and reinstall it first.</div>
                 </div>
                 <a data-testid="download-extension-btn"
                    href={(window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin) + '/api/download/chrome-extension?v=' + Date.now()}
                    className="whitespace-nowrap bg-amber-500 hover:bg-amber-400 text-black font-bold px-4 py-2 rounded-lg text-sm shadow">
-                  ⬇ Download v7.46
+                  ⬇ Download v7.47
                 </a>
               </div>
 
