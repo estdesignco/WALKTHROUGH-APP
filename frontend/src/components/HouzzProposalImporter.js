@@ -161,7 +161,7 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
           <div>
             <div className="text-xs uppercase tracking-widest text-[#B49B7E]">Import from Houzz</div>
             <div className="text-2xl font-bold text-[#F5F5DC]">🏠 Houzz Proposal → Design Ready</div>
-            <div className="text-xs text-stone-400 mt-1">Chrome Extension v7.43+ required · Never uses retailer links</div>
+            <div className="text-xs text-stone-400 mt-1">Chrome Extension v7.43+ required · Uses ONLY your approved manufacturer sites</div>
           </div>
           <button data-testid="houzz-importer-close-btn" onClick={onClose} className="text-stone-400 hover:text-white p-2"><X size={22}/></button>
         </div>
@@ -182,8 +182,10 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
                   value={houzzUrl} onChange={(e) => setHouzzUrl(e.target.value)} />
                 <div className="text-xs text-stone-400">
                   You must be logged into Houzz Pro in this browser. We&apos;ll open the URL in a small window,
-                  the extension will read every line item, and we&apos;ll swap any retailer links (Wayfair,
-                  Amazon, etc.) for the manufacturer&apos;s own product page.
+                  the extension will read every line item, and we&apos;ll pull the actual manufacturer product page
+                  from your approved vendor list (Uttermost, Four Hands, Bernhardt, HVL, Loloi, Visual Comfort,
+                  Regina Andrew, Bassett Mirror, Rowe, Gabby, Global Views, Surya, Safavieh, V and H, Flow Decor,
+                  Crestview Collection, Eichholtz, MOH America, Phillip Jeffries, York Wallcoverings, Classic Home).
                 </div>
               </div>
 

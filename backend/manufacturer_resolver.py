@@ -2,20 +2,16 @@
 Manufacturer Link Resolver
 ==========================
 
-Given a brand/manufacturer name and a SKU (or product name), returns the
-ACTUAL MANUFACTURER product page URL — never a retailer/reseller.
+Single, non-negotiable rule:
 
-CRITICAL RULE (per user requirement, absolute):
-    Retailers/vendors like Wayfair, Amazon, Ballard Designs, West Elm, CB2,
-    Crate & Barrel, Perigold, Overstock, Houzz Marketplace, etc. are FORBIDDEN.
-    Even if the Houzz proposal line item points at one of them, we must swap
-    to the manufacturer's own website.
+    manufacturer_link may ONLY point at one of the manufacturer domains
+    that the user has EXPLICITLY approved in `vendor_portals._URL_DOMAIN_TO_KEY`.
 
-The resolver has three layers:
-    1. If the source URL is already on a known manufacturer domain -> keep it.
-    2. If the source URL is on a known retailer domain -> reject; build a
-       manufacturer search URL using the brand mapping + SKU/name.
-    3. Fallback -> return None (caller decides how to handle).
+    If we can't produce a link on one of those domains, we return None.
+    We do NOT construct links to any other website — period.
+
+Source of truth: `vendor_portals._URL_DOMAIN_TO_KEY` (21 approved domains).
+Adding a vendor there automatically enables it here.
 """
 
 from __future__ import annotations
@@ -24,174 +20,136 @@ from typing import Optional, Dict, Tuple
 from urllib.parse import quote_plus, urlparse
 import re
 
+from vendor_portals import _URL_DOMAIN_TO_KEY
 
 # ============================================================================
-# BRAND -> MANUFACTURER DOMAIN MAP
+# APPROVED MANUFACTURER MAP
+#   built directly from vendor_portals._URL_DOMAIN_TO_KEY so we never drift.
 # ============================================================================
-# Key: normalized brand name (lowercase, alphanumeric only).
-# Value: dict describing how to build a manufacturer product/search URL.
-#
-# `search_url` supports {sku} placeholder that gets URL-encoded at runtime.
-# ============================================================================
-BRAND_MANUFACTURERS: Dict[str, Dict[str, str]] = {
-    # ----- Furniture -----
-    "fourhands":       {"domain": "fourhands.com",        "search_url": "https://fourhands.com/search?q={sku}"},
-    "fourhandshome":   {"domain": "fourhands.com",        "search_url": "https://fourhands.com/search?q={sku}"},
-    "bernhardt":       {"domain": "bernhardt.com",        "search_url": "https://www.bernhardt.com/search?q={sku}"},
-    "hooker":          {"domain": "hookerfurniture.com",  "search_url": "https://www.hookerfurniture.com/search?searchTerm={sku}"},
-    "hookerfurniture": {"domain": "hookerfurniture.com",  "search_url": "https://www.hookerfurniture.com/search?searchTerm={sku}"},
-    "gabby":           {"domain": "gabbyhome.com",        "search_url": "https://gabbyhome.com/search?q={sku}"},
-    "arteriors":       {"domain": "arteriorshome.com",    "search_url": "https://www.arteriorshome.com/search?q={sku}"},
-    "arteriorshome":   {"domain": "arteriorshome.com",    "search_url": "https://www.arteriorshome.com/search?q={sku}"},
-    "madegoods":       {"domain": "madegoods.com",        "search_url": "https://www.madegoods.com/search?q={sku}"},
-    "vanguard":        {"domain": "vanguardfurniture.com","search_url": "https://www.vanguardfurniture.com/search?q={sku}"},
-    "vanguardfurniture":{"domain":"vanguardfurniture.com","search_url": "https://www.vanguardfurniture.com/search?q={sku}"},
-    "century":         {"domain": "centuryfurniture.com", "search_url": "https://www.centuryfurniture.com/search?q={sku}"},
-    "centuryfurniture":{"domain": "centuryfurniture.com", "search_url": "https://www.centuryfurniture.com/search?q={sku}"},
-    "leefurniture":    {"domain": "leefurniture.com",     "search_url": "https://www.leefurniture.com/search?q={sku}"},
-    "lee":             {"domain": "leefurniture.com",     "search_url": "https://www.leefurniture.com/search?q={sku}"},
-    "cistoneshoreline":{"domain": "shorelineinteriors.com","search_url": "https://shorelineinteriors.com/search?q={sku}"},
-    "worldsawayhome":  {"domain": "worldsaway.com",       "search_url": "https://worldsaway.com/search?q={sku}"},
-    "worldsaway":      {"domain": "worldsaway.com",       "search_url": "https://worldsaway.com/search?q={sku}"},
-    "cisco":           {"domain": "ciscohome.com",        "search_url": "https://ciscohome.com/search?q={sku}"},
-    "ciscohome":       {"domain": "ciscohome.com",        "search_url": "https://ciscohome.com/search?q={sku}"},
-    "bassett":         {"domain": "bassettfurniture.com", "search_url": "https://www.bassettfurniture.com/search.aspx?q={sku}"},
-    "bassettmirror":   {"domain": "bassettmirror.com",    "search_url": "https://www.bassettmirror.com/search?q={sku}"},
-    "hancockmoore":    {"domain": "hancockandmoore.com",  "search_url": "https://www.hancockandmoore.com/search?q={sku}"},
-    "hancockandmoore": {"domain": "hancockandmoore.com",  "search_url": "https://www.hancockandmoore.com/search?q={sku}"},
-    "kravet":          {"domain": "kravet.com",           "search_url": "https://www.kravet.com/search?searchtext={sku}"},
-    "leejofa":         {"domain": "leejofa.com",          "search_url": "https://www.leejofa.com/search?searchtext={sku}"},
-    "safavieh":        {"domain": "safaviehhome.com",     "search_url": "https://www.safaviehhome.com/search?q={sku}"},
-
-    # ----- Lighting -----
-    "uttermost":            {"domain": "uttermost.com",       "search_url": "https://www.uttermost.com/en-us/searchresults?searchTerm={sku}"},
-    "visualcomfort":        {"domain": "visualcomfort.com",   "search_url": "https://www.visualcomfort.com/us_en/search?text={sku}"},
-    "visualcomfortandco":   {"domain": "visualcomfort.com",   "search_url": "https://www.visualcomfort.com/us_en/search?text={sku}"},
-    "hudsonvalleylighting": {"domain": "hudsonvalleylighting.com","search_url": "https://www.hudsonvalleylighting.com/search?type=product&q={sku}"},
-    "hvl":                  {"domain": "hudsonvalleylighting.com","search_url": "https://www.hudsonvalleylighting.com/search?type=product&q={sku}"},
-    "hinkley":              {"domain": "hinkley.com",         "search_url": "https://www.hinkley.com/search?searchword={sku}"},
-    "hinkleylighting":      {"domain": "hinkley.com",         "search_url": "https://www.hinkley.com/search?searchword={sku}"},
-    "kichler":              {"domain": "kichler.com",         "search_url": "https://www.kichler.com/search-results?q={sku}"},
-    "circalighting":        {"domain": "circalighting.com",   "search_url": "https://www.circalighting.com/search?q={sku}"},
-    "curreyandcompany":     {"domain": "curreyandcompany.com","search_url": "https://www.curreyandcompany.com/search?q={sku}"},
-    "currey":               {"domain": "curreyandcompany.com","search_url": "https://www.curreyandcompany.com/search?q={sku}"},
-    "regina":               {"domain": "reginaandrew.com",    "search_url": "https://www.reginaandrew.com/search?q={sku}"},
-    "reginaandrew":         {"domain": "reginaandrew.com",    "search_url": "https://www.reginaandrew.com/search?q={sku}"},
-    "corbett":              {"domain": "corbettlighting.com", "search_url": "https://www.corbettlighting.com/search?type=product&q={sku}"},
-    "corbettlighting":      {"domain": "corbettlighting.com", "search_url": "https://www.corbettlighting.com/search?type=product&q={sku}"},
-    "mitzi":                {"domain": "mitzi.com",           "search_url": "https://www.mitzi.com/search?type=product&q={sku}"},
-    "troy":                 {"domain": "troy-lighting.com",   "search_url": "https://www.troy-lighting.com/search?type=product&q={sku}"},
-    "troylighting":         {"domain": "troy-lighting.com",   "search_url": "https://www.troy-lighting.com/search?type=product&q={sku}"},
-
-    # ----- Rugs -----
-    "loloi":                {"domain": "loloirugs.com",       "search_url": "https://loloirugs.com/search?q={sku}"},
-    "loloirugs":            {"domain": "loloirugs.com",       "search_url": "https://loloirugs.com/search?q={sku}"},
-    "jaipur":               {"domain": "jaipurliving.com",    "search_url": "https://www.jaipurliving.com/search?q={sku}"},
-    "jaipurliving":         {"domain": "jaipurliving.com",    "search_url": "https://www.jaipurliving.com/search?q={sku}"},
-    "surya":                {"domain": "surya.com",           "search_url": "https://www.surya.com/search?q={sku}"},
-    "feizy":                {"domain": "feizy.com",           "search_url": "https://www.feizy.com/search?q={sku}"},
-    "dashandalbert":        {"domain": "annieselke.com",      "search_url": "https://www.annieselke.com/search?searchword={sku}"},
-
-    # ----- Plumbing / Bath -----
-    "kohler":               {"domain": "kohler.com",          "search_url": "https://www.kohler.com/en/search-results/?keyword={sku}"},
-    "brizo":                {"domain": "brizo.com",           "search_url": "https://www.brizo.com/search?q={sku}"},
-    "delta":                {"domain": "deltafaucet.com",     "search_url": "https://www.deltafaucet.com/search?q={sku}"},
-    "deltafaucet":          {"domain": "deltafaucet.com",     "search_url": "https://www.deltafaucet.com/search?q={sku}"},
-    "rohl":                 {"domain": "rohlhome.com",        "search_url": "https://www.rohlhome.com/search?q={sku}"},
-    "hansgrohe":            {"domain": "hansgrohe-usa.com",   "search_url": "https://www.hansgrohe-usa.com/search?q={sku}"},
-    "toto":                 {"domain": "totousa.com",         "search_url": "https://www.totousa.com/search-results?query={sku}"},
-    "duravit":              {"domain": "duravit.us",          "search_url": "https://www.duravit.us/search?q={sku}"},
-    "kallista":             {"domain": "kallista.com",        "search_url": "https://www.kallista.com/en/search-results/?keyword={sku}"},
-    "wattsofresidential":   {"domain": "watersofresidential.com","search_url": "https://www.watersofresidential.com/search?q={sku}"},
-
-    # ----- Appliances -----
-    "sub-zero":             {"domain": "subzero-wolf.com",    "search_url": "https://www.subzero-wolf.com/search-results?searchtext={sku}"},
-    "subzero":              {"domain": "subzero-wolf.com",    "search_url": "https://www.subzero-wolf.com/search-results?searchtext={sku}"},
-    "wolf":                 {"domain": "subzero-wolf.com",    "search_url": "https://www.subzero-wolf.com/search-results?searchtext={sku}"},
-    "thermador":            {"domain": "thermador.com",       "search_url": "https://www.thermador.com/us/search?q={sku}"},
-    "miele":                {"domain": "mieleusa.com",        "search_url": "https://www.mieleusa.com/e/search-results-{sku}"},
-    "monogram":             {"domain": "monogram.com",        "search_url": "https://www.monogram.com/search?q={sku}"},
-    "viking":               {"domain": "vikingrange.com",     "search_url": "https://www.vikingrange.com/consumer/search?searchTerm={sku}"},
-
-    # ----- Hardware -----
-    "restorationhardware":  {"domain": "rh.com",              "search_url": "https://rh.com/search-results.jsp?N=0&Ntt={sku}"},
-    "rh":                   {"domain": "rh.com",              "search_url": "https://rh.com/search-results.jsp?N=0&Ntt={sku}"},
-    "emtek":                {"domain": "emtek.com",           "search_url": "https://emtek.com/search?q={sku}"},
-    "rockymountainhardware":{"domain": "rockymountainhardware.com","search_url": "https://www.rockymountainhardware.com/search?q={sku}"},
-    "topknobs":             {"domain": "topknobs.com",        "search_url": "https://www.topknobs.com/search?q={sku}"},
-    "schaub":               {"domain": "schaubandcompany.com","search_url": "https://www.schaubandcompany.com/search?q={sku}"},
+# Per-brand search URL template. If a brand isn't listed here, we fall back
+# to `https://{domain}/search?q={sku}` which most e-commerce sites accept.
+_SEARCH_URL_OVERRIDES: Dict[str, str] = {
+    "uttermost.com":            "https://www.uttermost.com/en-us/searchresults?searchTerm={sku}",
+    "visualcomfort.com":        "https://www.visualcomfort.com/us_en/search?text={sku}",
+    "hvlgroup.com":             "https://www.hvlgroup.com/search?q={sku}",
+    "bernhardt.com":            "https://www.bernhardt.com/search?q={sku}",
+    "fourhands.com":            "https://fourhands.com/search?q={sku}",
+    "loloirugs.com":            "https://loloirugs.com/search?q={sku}",
+    "gabby.com":                "https://gabby.com/search?q={sku}",
+    "surya.com":                "https://www.surya.com/search?q={sku}",
+    "safavieh.com":             "https://www.safavieh.com/search?q={sku}",
+    "reginaandrew.com":         "https://www.reginaandrew.com/search?q={sku}",
+    "globalviews.com":          "https://www.globalviews.com/search?q={sku}",
+    "vandh.com":                "https://www.vandh.com/search?q={sku}",
+    "flowdecor.com":            "https://www.flowdecor.com/search?q={sku}",
+    "crestviewcollection.com":  "https://www.crestviewcollection.com/search?q={sku}",
+    "eichholtz.com":            "https://www.eichholtz.com/en/search?q={sku}",
+    "myohamerica.com":          "https://myohamerica.com/search?q={sku}",
+    "rowefurniture.com":        "https://www.rowefurniture.com/search?q={sku}",
+    "bassettmirror.com":        "https://www.bassettmirror.com/search?q={sku}",
+    "phillipjeffries.com":      "https://www.phillipjeffries.com/search?q={sku}",
+    "yorkwallcoverings.com":    "https://www.yorkwallcoverings.com/search?q={sku}",
+    "classichome.com":          "https://classichome.com/search?q={sku}",
 }
 
-# Aliases: brand may appear in Houzz as "Four Hands, Inc." — collapse to canonical.
-BRAND_ALIASES: Dict[str, str] = {
-    "fourhandsinc": "fourhands",
-    "fourhandsfurniture": "fourhands",
-    "hookerfurniturecorporation": "hooker",
-    "hookerfurnitureco": "hooker",
-    "visualcomfortco": "visualcomfort",
-    "visualcomfortcompany": "visualcomfort",
-    "hudsonvalley": "hudsonvalleylighting",
-    "curreyco": "curreyandcompany",
-    "hancockandmooreleatherfurniture": "hancockandmoore",
-    "kohlerco": "kohler",
-    "kohlercompany": "kohler",
-    "subzerowolf": "subzero",
-    "brizohansgrohe": "brizo",
-    "loloirugsinc": "loloi",
-    "arteriorsinc": "arteriors",
-    "wolfsubzero": "wolf",
+# Brand-name aliases that map to a vendor_key. Houzz proposals often print
+# a manufacturer name with punctuation / different casing / abbreviations.
+_BRAND_TO_VENDOR_KEY_ALIASES: Dict[str, str] = {
+    # Four Hands
+    "fourhands": "four_hands",
+    "fourhandsinc": "four_hands",
+    "fourhandshome": "four_hands",
+    "fourhandsfurniture": "four_hands",
+    "four hands": "four_hands",
+    # Visual Comfort
+    "visualcomfort": "visual_comfort",
+    "visualcomfortco": "visual_comfort",
+    "visualcomfortandco": "visual_comfort",
+    "visualcomfortcompany": "visual_comfort",
+    # HVL / Hudson Valley
+    "hvl": "hvl_group",
+    "hvlgroup": "hvl_group",
+    "hudsonvalley": "hvl_group",
+    "hudsonvalleylighting": "hvl_group",
+    "hudsonvalleylightinggroup": "hvl_group",
+    # Regina Andrew
+    "regina": "regina_andrew",
+    "reginaandrew": "regina_andrew",
+    "reginaandrewdesign": "regina_andrew",
+    # Global Views
+    "globalviews": "global_views",
+    # Bernhardt
+    "bernhardt": "bernhardt",
+    "bernhardtfurniture": "bernhardt",
+    "bernhardtinteriors": "bernhardt",
+    "bernhardtexteriors": "bernhardt",
+    # Rowe
+    "rowe": "rowe",
+    "rowefurniture": "rowe",
+    # Loloi
+    "loloi": "loloi",
+    "loloirugs": "loloi",
+    "loloii": "loloi",
+    "loloiinc": "loloi",
+    # Uttermost
+    "uttermost": "uttermost",
+    "uttermostco": "uttermost",
+    "uttermostcompany": "uttermost",
+    # Gabby
+    "gabby": "gabby",
+    "gabbyhome": "gabby",
+    # Bassett Mirror
+    "bassett": "bassett_mirror",
+    "bassettmirror": "bassett_mirror",
+    "bassettmirrorcompany": "bassett_mirror",
+    # Surya
+    "surya": "surya",
+    "suryarugs": "surya",
+    # Safavieh
+    "safavieh": "safavieh",
+    "safaviehhome": "safavieh",
+    # V and H
+    "vandh": "vandh",
+    "vandhcompany": "vandh",
+    "vandhinteriors": "vandh",
+    # Flow Decor
+    "flow": "flow_decor",
+    "flowdecor": "flow_decor",
+    # Crestview Collection
+    "crestview": "crestview_collection",
+    "crestviewcollection": "crestview_collection",
+    # Eichholtz
+    "eichholtz": "eichholtz",
+    # MOH America
+    "moh": "moh_america",
+    "mohamerica": "moh_america",
+    "myohamerica": "moh_america",
+    # Wallpaper
+    "phillipjeffries": "phillip_jeffries",
+    "phillipjeffriesltd": "phillip_jeffries",
+    "york": "york_wallcoverings",
+    "yorkwallcoverings": "york_wallcoverings",
+    # Classic Home
+    "classichome": "classic_home",
 }
 
 
-# ============================================================================
-# FORBIDDEN RETAILER / RESELLER DOMAINS
-# ============================================================================
-# If a Houzz proposal points at one of these, we IGNORE the URL and rebuild
-# a manufacturer search URL. Per user's explicit and non-negotiable rule.
-# ============================================================================
-FORBIDDEN_RETAILER_DOMAINS = {
-    "wayfair.com", "wayfair.co.uk", "wayfair.ca",
-    "amazon.com", "amazon.ca", "amazon.co.uk", "amzn.to",
-    "ballarddesigns.com",
-    "westelm.com",
-    "cb2.com",
-    "crateandbarrel.com",
-    "potterybarn.com",
-    "williams-sonoma.com", "williamssonoma.com",
-    "overstock.com", "bedbathandbeyond.com",
-    "perigold.com",
-    "onekingslane.com",
-    "chairish.com", "1stdibs.com",
-    "target.com", "walmart.com", "homedepot.com", "lowes.com",
-    "houzz.com",  # Houzz Shop / Marketplace — never a manufacturer link
-    "etsy.com",
-    "ebay.com",
-    "worldmarket.com", "cost-plus.com",
-    "anthropologie.com", "urbanoutfitters.com",
-    "lumens.com",  # aggregator lighting retailer
-    "ylighting.com", "1800lighting.com",
-    "buildwithferguson.com", "ferguson.com",  # (Ferguson resells but the manufacturer wins)
-    "wayside.com",
-    "livingspaces.com",
-    "raymourflanigan.com",
-    "roomsandgardens.com",
-    "themoderncustomer.com",
-    "shopstyle.com",
-    "google.com",  # google shopping / images
-    "bing.com",
-    "pinterest.com",
-    "instagram.com", "facebook.com",
-}
+def _key_to_domain() -> Dict[str, str]:
+    """Reverse `_URL_DOMAIN_TO_KEY` into vendor_key -> domain."""
+    return {v: k for k, v in _URL_DOMAIN_TO_KEY.items()}
+
+
+_KEY_TO_DOMAIN = _key_to_domain()
+_APPROVED_DOMAINS = set(_URL_DOMAIN_TO_KEY.keys())
 
 
 # ============================================================================
 # HELPERS
 # ============================================================================
-def _norm_brand(brand: Optional[str]) -> str:
-    """Normalize a brand string: lowercase, strip non-alphanumeric."""
-    if not brand:
+def _norm(s: Optional[str]) -> str:
+    if not s:
         return ""
-    return re.sub(r"[^a-z0-9]", "", brand.lower())
+    return re.sub(r"[^a-z0-9]", "", s.lower())
 
 
 def _domain_of(url: Optional[str]) -> str:
@@ -199,7 +157,6 @@ def _domain_of(url: Optional[str]) -> str:
         return ""
     try:
         host = urlparse(url).netloc.lower()
-        # strip common leading www.
         if host.startswith("www."):
             host = host[4:]
         return host
@@ -207,108 +164,86 @@ def _domain_of(url: Optional[str]) -> str:
         return ""
 
 
-def _is_forbidden_retailer(url: Optional[str]) -> bool:
-    host = _domain_of(url)
-    if not host:
-        return False
-    for bad in FORBIDDEN_RETAILER_DOMAINS:
-        if host == bad or host.endswith("." + bad):
-            return True
-    return False
-
-
-def _brand_entry(brand: Optional[str]) -> Optional[Dict[str, str]]:
-    key = _norm_brand(brand)
-    if not key:
+def _vendor_key_for_brand(brand: Optional[str]) -> Optional[str]:
+    """Map a brand name to a vendor_key by consulting the alias table."""
+    if not brand:
         return None
-    if key in BRAND_ALIASES:
-        key = BRAND_ALIASES[key]
-    return BRAND_MANUFACTURERS.get(key)
+    key = _norm(brand)
+    if key in _BRAND_TO_VENDOR_KEY_ALIASES:
+        return _BRAND_TO_VENDOR_KEY_ALIASES[key]
+    # If a brand string like "Four Hands" wasn't caught, try substring match
+    # against the alias keys (only long, distinctive tokens).
+    for alias_key, vk in _BRAND_TO_VENDOR_KEY_ALIASES.items():
+        if len(alias_key) >= 6 and alias_key in key:
+            return vk
+    return None
 
 
-def _url_matches_brand(url: Optional[str], brand: Optional[str]) -> bool:
-    entry = _brand_entry(brand)
-    if not entry:
-        return False
+def _is_approved_domain(url: Optional[str]) -> Optional[str]:
+    """If `url` is on an approved manufacturer domain, return that domain."""
     host = _domain_of(url)
     if not host:
-        return False
-    dom = entry["domain"].lower()
-    return host == dom or host.endswith("." + dom)
+        return None
+    for dom in _APPROVED_DOMAINS:
+        if host == dom or host.endswith("." + dom):
+            return dom
+    return None
+
+
+def _search_url(domain: str, sku: str) -> str:
+    tpl = _SEARCH_URL_OVERRIDES.get(domain, "https://{d}/search?q={{sku}}".format(d=domain))
+    return tpl.format(sku=quote_plus(sku))
 
 
 # ============================================================================
 # PUBLIC API
 # ============================================================================
 def resolve_manufacturer_link(
-    source_url: Optional[str],
+    source_url: Optional[str] = None,
     brand: Optional[str] = None,
     sku: Optional[str] = None,
     name: Optional[str] = None,
 ) -> Tuple[Optional[str], str]:
     """
-    Return (manufacturer_url, reason) for a Houzz line item.
+    Return (manufacturer_url, reason).
 
-    Rules:
-        1. If source_url is already on the correct manufacturer domain -> keep.
-        2. If source_url is on a KNOWN retailer/reseller domain -> swap to a
-           manufacturer search URL built from brand + sku.
-        3. If source_url is on some unknown 3rd party domain but the brand IS
-           a known manufacturer -> swap to a manufacturer search URL.
-        4. If brand is not in our map -> return the source_url ONLY IF it is
-           not on the forbidden list; otherwise None.
-
-    Args:
-        source_url:  URL from the Houzz proposal (may be a retailer).
-        brand:       Manufacturer name from the Houzz line item.
-        sku:         Product SKU/model number.
-        name:        Product name (used as fallback search term).
-
-    Returns:
-        (best_url_or_none, human_readable_reason)
+    Rules — in strict order:
+      1. If `source_url` is already on one of the APPROVED domains -> return it.
+      2. If `brand` maps to a known vendor_key -> return a search URL on that
+         approved domain, using SKU (preferred) or product name.
+      3. Otherwise -> return (None, reason). We NEVER return a URL that is
+         not on an approved domain.
     """
-    # 1. Perfect case: source URL is on the manufacturer's own domain.
-    if source_url and _url_matches_brand(source_url, brand):
-        return source_url, "source_url is already the manufacturer's site"
+    # 1. Source URL is already on one of the approved manufacturer domains.
+    approved_dom = _is_approved_domain(source_url)
+    if approved_dom:
+        return source_url, f"source_url is on approved manufacturer site ({approved_dom})"
 
-    entry = _brand_entry(brand)
-    search_term = (sku or name or "").strip()
+    # 2. Try to derive from brand.
+    vk = _vendor_key_for_brand(brand)
+    if vk and vk in _KEY_TO_DOMAIN:
+        dom = _KEY_TO_DOMAIN[vk]
+        query = (sku or name or "").strip()
+        if query:
+            return _search_url(dom, query), f"built {dom} search for '{query}'"
+        return f"https://{dom}/", f"brand mapped to {dom} (no SKU to search)"
 
-    # 2. Forbidden retailer detected. Swap out.
-    if _is_forbidden_retailer(source_url):
-        if entry and search_term:
-            url = entry["search_url"].format(sku=quote_plus(search_term))
-            return url, f"source was retailer ({_domain_of(source_url)}); swapped to {entry['domain']} search"
-        if entry:
-            return f"https://{entry['domain']}/", f"source was retailer; brand {brand} known but no SKU to search"
-        # No known brand, source is retailer -> nothing safe to return.
-        return None, f"source is retailer ({_domain_of(source_url)}) and brand '{brand or ''}' is unknown — no manufacturer link available"
-
-    # 3. Unknown 3rd party domain, but brand IS known.
-    if entry and source_url and not _url_matches_brand(source_url, brand):
-        if search_term:
-            url = entry["search_url"].format(sku=quote_plus(search_term))
-            return url, f"source_url domain didn't match brand; built {entry['domain']} search for '{search_term}'"
-        return f"https://{entry['domain']}/", f"source_url didn't match brand; returning {entry['domain']} homepage"
-
-    # 4. Brand not known.
-    if not entry:
-        if source_url and not _is_forbidden_retailer(source_url):
-            return source_url, "brand unknown; keeping source_url (not a known retailer)"
-        return None, f"brand '{brand or ''}' unknown, no safe source_url"
-
-    # 5. Brand known but no source_url given.
-    if search_term:
-        return entry["search_url"].format(sku=quote_plus(search_term)), \
-            f"no source_url provided; built {entry['domain']} search for '{search_term}'"
-    return f"https://{entry['domain']}/", f"no source_url and no sku; returning {entry['domain']} homepage"
+    # 3. Nothing safe to return.
+    if brand:
+        return None, f"brand '{brand}' is not in your approved manufacturer list"
+    return None, "no brand and source_url is not on an approved manufacturer site"
 
 
 def is_known_manufacturer(brand: Optional[str]) -> bool:
-    """True if the brand is in our manufacturer mapping."""
-    return _brand_entry(brand) is not None
+    """True if this brand maps to an approved manufacturer domain."""
+    return _vendor_key_for_brand(brand) is not None
 
 
 def known_manufacturer_domains() -> Dict[str, str]:
-    """Return {brand_key: domain} for all mapped manufacturers (for diagnostics)."""
-    return {k: v["domain"] for k, v in BRAND_MANUFACTURERS.items()}
+    """Return {vendor_key: domain} for all approved manufacturers."""
+    return dict(_KEY_TO_DOMAIN)
+
+
+def approved_domains() -> set:
+    """The full set of approved manufacturer domains."""
+    return set(_APPROVED_DOMAINS)
