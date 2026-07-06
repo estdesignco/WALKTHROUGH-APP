@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import PurchaseOrderDetailModal from './PurchaseOrderDetailModal';
 import HouzzProposalImporter from './HouzzProposalImporter';
+import ExtensionDownloadButton from './ExtensionDownloadButton';
 
 const API_BASE = (window.ENV?.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL || window.location.origin) + '/api';
 
@@ -81,6 +82,7 @@ const PurchaseOrdersDashboard = ({ projectId }) => {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
+            <ExtensionDownloadButton dataTestId="po-download-extension-btn" />
             <button data-testid="po-import-houzz-btn" onClick={() => setShowHouzz(true)}
               className="bg-gradient-to-r from-[#B49B7E] to-[#8B7355] hover:from-[#D4C5A9] hover:to-[#A08B6F] text-black font-bold px-4 py-2 rounded-lg flex items-center gap-2 text-sm">
               <Sparkles size={16}/> Import from Houzz

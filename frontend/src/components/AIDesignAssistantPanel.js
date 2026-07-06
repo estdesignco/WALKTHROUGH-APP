@@ -10,6 +10,7 @@
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import BurstBackfillModal from './BurstBackfillModal';
+import ExtensionDownloadButton from './ExtensionDownloadButton';
 
 const API = ((window.ENV?.REACT_APP_BACKEND_URL) || (process.env.REACT_APP_BACKEND_URL) || window.location.origin) + '/api';
 
@@ -481,6 +482,7 @@ export default function AIDesignAssistantPanel({ projectId, projectName = '', pr
             style={{ background: 'transparent', color: '#a855f7', border: '1px solid #a855f7', padding: '3px 8px', fontSize: 10, fontWeight: 800, letterSpacing: 1, borderRadius: 3, cursor: 'pointer' }}>
             🚀 BURST
           </button>
+          <ExtensionDownloadButton variant="compact" dataTestId="aiassist-download-extension" />
           <button data-testid="aiassist-re-enrich" onClick={reEnrichMissing} title="Backfill empty image / size / finish / price on existing checklist items"
             disabled={reEnrichStatus?.scanning}
             style={{ background: 'transparent', color: '#D4A574', border: '1px solid #D4A574', padding: '3px 8px', fontSize: 10, fontWeight: 800, letterSpacing: 1, borderRadius: 3, cursor: reEnrichStatus?.scanning ? 'wait' : 'pointer' }}>

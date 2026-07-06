@@ -18055,6 +18055,32 @@ async def login_to_all_vendor_portals():
 # CHROME EXTENSION DOWNLOAD
 # ============================================================================
 
+@api_router.get("/extension/version")
+async def extension_version():
+    """Return the current Chrome Extension version + download URL.
+    Reads the version straight from /app/chrome-extension-scraper/manifest.json
+    so the frontend banner always shows the truth (no hardcoding to drift out
+    of sync with what's actually shipped)."""
+    import os, json
+    manifest_path = "/app/chrome-extension-scraper/manifest.json"
+    version = None
+    description = None
+    try:
+        if os.path.exists(manifest_path):
+            with open(manifest_path, "r") as f:
+                m = json.load(f)
+                version = m.get("version")
+                description = m.get("description")
+    except Exception as e:
+        logger.warning(f"Failed to read extension manifest: {e}")
+    return {
+        "version": version or "unknown",
+        "description": description or "",
+        "download_url": "/api/download/chrome-extension",
+        "filename": f"design-ready-scraper-v{version}.zip" if version else "design-ready-scraper.zip",
+    }
+
+
 @api_router.get("/download/chrome-extension")
 async def download_chrome_extension():
     """Download Chrome Extension - Latest version with editable fields"""
