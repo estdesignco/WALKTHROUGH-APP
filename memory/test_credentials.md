@@ -1,13 +1,14 @@
 # Test Credentials
 
-## App Login
+## App password gate
 - Password: `DesignReady2026!`
+  - Prompted on first load — value stored in `frontend/.env` as `REACT_APP_PASSWORD`. Enter and press Enter.
 
-## Test Project
-- Project Name: Wheeler Ridge Residence
-- Project ID: `f694f389-29ff-4190-9bd8-a64f2000b54d`
-- Rooms: Master Bathroom, Kitchen (both on 1st Floor)
+## Canva OAuth (for Canva connect flow)
+- Client ID: `OC-AZ5ixiAhK2Eq`
+- Redirect URI is computed dynamically from the incoming Request — do NOT hardcode.
+- Register `https://<preview-host>/api/canva/callback` in Canva developer console → Authentication tab.
 
-## Backend
-- Backend URL: https://design-burst.preview.emergentagent.com
-- MongoDB: mongodb://localhost:27017 / interior_design_db
+## Notes
+- No per-user accounts; the app password is the only auth.
+- Vendor portal credentials are stored encrypted in Mongo (`vendor_portals` collection, Fernet with `VENDOR_ENCRYPTION_KEY`). Do not hardcode.

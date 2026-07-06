@@ -1,9 +1,18 @@
 # PRD — Interior Design Project Management Tool
 
-## Architecture  
-React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
+## Architecture — React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
-## Implemented
+### Chrome Extension Download Visibility Fix (Jul 5, 2026) — NEW
+**User complained: "YOU DIDNT INCLUDE THE DOWNLOAD FOR THE SCRAPER!" Their extension was frozen at v7.41 while the app required v7.47. Download button existed only inside modals — invisible from main pages.**
+- New `GET /api/extension/version` endpoint (`server.py`) reads `/app/chrome-extension-scraper/manifest.json` at request time → returns `{version, description, download_url, filename}`. No more hardcoded version in frontend.
+- New reusable `frontend/src/components/ExtensionDownloadButton.js` with `default`, `compact`, and `banner` variants. Fetches `/api/extension/version` once on mount, renders an `<a>` to `/api/download/chrome-extension?v={ver}_{timestamp}`.
+- Dropped into three high-visibility spots:
+  - `PurchaseOrdersDashboard.js` header — amber "⬇ Download Scraper v7.47.0" button next to Import from Houzz (`data-testid=po-download-extension-btn`).
+  - `HouzzProposalImporter.js` input phase — replaced the hardcoded v7.47 banner with `<ExtensionDownloadButton variant="banner"/>`.
+  - `AIDesignAssistantPanel.js` header — compact "⬇ SCRAPER v7.47.0" link next to the 🚀 BURST button (`data-testid=aiassist-download-extension`).
+- **iteration_59 pytest 6/6 + UI 3/3 PASS.** Endpoint stays in sync with `manifest.json` (verified via mutate/restore test). Zip is 54,702 bytes, filename includes `v7.47`.
+
+## Architecture  
 
 ### Houzz Proposal Import + Purchase Orders (Jul 5, 2026) — NEW
 **Two P0 features shipped in one drop. 18/18 backend pytest PASS. UI verified end-to-end.**
