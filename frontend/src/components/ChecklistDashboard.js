@@ -10,6 +10,7 @@ import CompletePageLayout from './CompletePageLayout';
 import RoomSpecificCanvaImporter from './RoomSpecificCanvaImporter';
 import PhotoManagerModal from './PhotoManagerModal';
 import AIAssistantFAB from './AIAssistantFAB';
+import HouzzProposalImporter from './HouzzProposalImporter';
 import { getColorByIndex } from '../utils/roomColors';
 
 const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: propProjectId }) => {
@@ -27,6 +28,7 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
   const [vendorTypes, setVendorTypes] = useState([]);
   const [carrierTypes, setCarrierTypes] = useState([]);
   const [showPhotoManager, setShowPhotoManager] = useState(false);
+  const [showHouzzImporter, setShowHouzzImporter] = useState(false);
   const [selectedRoomForPhotos, setSelectedRoomForPhotos] = useState(null);
   const [roomPhotos, setRoomPhotos] = useState({});
   const [photosCollapsed, setPhotosCollapsed] = useState(true); // COLLAPSED by default
@@ -410,6 +412,29 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
         onAddRoom={() => setShowAddRoom(true)}
       >
       
+      {/* HOUZZ → CHECKLIST IMPORT - Separate from Purchase Orders */}
+      <div className="mb-6 rounded-xl border border-emerald-500/40 px-6 py-4 flex items-center justify-between"
+           style={{ background: 'linear-gradient(135deg, rgba(6,40,25,0.95) 0%, rgba(10,25,18,0.9) 100%)' }}
+           data-testid="checklist-houzz-import-banner">
+        <div className="flex items-center gap-4">
+          <span className="text-2xl">🏠</span>
+          <div>
+            <h3 className="text-emerald-300 font-bold text-lg">Import from Houzz → Checklist</h3>
+            <p className="text-gray-400 text-sm">
+              Pull every line item from a Houzz proposal/estimate/PO straight into this checklist —
+              rooms auto-created, with direct manufacturer links (your approved vendors only, never retail).
+            </p>
+          </div>
+        </div>
+        <button
+          data-testid="checklist-import-houzz-btn"
+          onClick={() => setShowHouzzImporter(true)}
+          className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all flex items-center gap-2 whitespace-nowrap"
+        >
+          🏠 Import from Houzz
+        </button>
+      </div>
+
       {/* WALKTHROUGH SYNC PANEL - Critical for mobile → desktop data flow */}
       {syncStatus && (syncStatus.walkthrough?.rooms > 0 || syncStatus.needs_sync) && (
         <div className="mb-6 rounded-xl border border-[#D4A574]/40 overflow-hidden"
@@ -589,6 +614,16 @@ const ChecklistDashboard = ({ isOffline, hideNavigation = false, projectId: prop
           onSubmit={handleAddRoom}
           roomColors={roomColors}
           existingRooms={project?.rooms || []}
+        />
+      )}
+
+      {/* Houzz → Checklist Importer (SEPARATE from Purchase Orders) */}
+      {showHouzzImporter && (
+        <HouzzProposalImporter
+          projectId={projectId}
+          defaultTarget="checklist"
+          onClose={() => { setShowHouzzImporter(false); loadSimpleProject(); }}
+          onImportedToItems={() => { setShowHouzzImporter(false); loadSimpleProject(); }}
         />
       )}
 

@@ -23,7 +23,7 @@ import re
 import uuid
 import logging
 from datetime import datetime, timezone
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel, Field
@@ -69,6 +69,12 @@ class HouzzLineItem(BaseModel):
     source_url: Optional[str] = None       # link as shown on Houzz (may be retailer)
     houzz_item_id: Optional[str] = None    # dom-scraped stable id if available
     notes: Optional[str] = None
+    # Houzz vt-table structure fields
+    room_name: Optional[str] = None        # from group header row OR "Room:" extra-info OR Add Room input
+    unit_type: Optional[str] = None        # "Yards", "Each", …
+    materials: Optional[str] = None        # "100% Polyester, …"
+    row_number: Optional[str] = None       # Houzz auto-number, eg "1.4"
+    parent_name: Optional[str] = None      # parent line name when this row is a component (eg drape spec)
 
 
 class HouzzProposalPayload(BaseModel):
@@ -122,18 +128,13 @@ def _price_from_text(txt: Optional[str]) -> Optional[float]:
 
 
 def _dedupe_and_validate(items: List["HouzzLineItem"]) -> List["HouzzLineItem"]:
-    """Backend safety net: drop duplicate rows + rows whose math doesn't add up.
+    """Backend safety net: drop placeholder / totals / truly-empty / duplicate rows.
 
-    Even if the Chrome extension misbehaves and posts the same row 8 times or
-    grabs subtotal / grand-total rows as line items, this filter catches it.
-
-    Rules:
-      * If qty * unit_price is off from extended_price by >5% AND >$2 -> drop
-        (that row is almost certainly a subtotal / grand total).
-      * Content hash on (name, qty, unit, ext) -> keep one per hash.
-      * If two rows hash-collide, keep the one with more populated fields.
-      * Reject rows named exactly "Item", "Item 1", etc. (React placeholders).
-      * Reject rows named "Subtotal", "Total", "Tax", "Shipping", etc.
+    IMPORTANT: we deliberately do NOT drop rows because qty * unit_price
+    doesn't equal extended_price. Houzz line items frequently have a
+    material-cost unit (eg 7 Yards @ $33 material cost -> $231 line total)
+    where the math is intentionally different. The old math check silently
+    deleted the user's real items.
     """
     def fill_count(it: "HouzzLineItem") -> int:
         return sum(1 for v in it.dict().values() if v not in (None, "", 0))
@@ -151,25 +152,18 @@ def _dedupe_and_validate(items: List["HouzzLineItem"]) -> List["HouzzLineItem"]:
             continue
         if name and totals_re.match(name):
             continue
+        # Truly empty row (Houzz "add new row" stub at the bottom of edit views)
+        if not name and not it.sku and not it.brand and not (it.extended_price or 0):
+            continue
 
         q = float(it.quantity or 0)
         u = float(it.unit_price or 0)
         e = float(it.extended_price or 0)
 
-        # Math validation
-        if q > 0 and u > 0 and e > 0:
-            expected = q * u
-            diff = abs(expected - e)
-            tolerance = max(2.0, expected * 0.05)
-            if diff > tolerance:
-                continue  # likely a subtotal / summary row
-
-        # Reject $0 rows with no product identifier
-        if e == 0 and not (it.sku or it.brand):
-            continue
-
         key = "|".join([
             re.sub(r"\s+", " ", name.lower()),
+            (it.sku or "").lower(),
+            (it.room_name or "").lower(),
             f"{q:.2f}", f"{u:.2f}", f"{e:.2f}",
         ])
         if key not in seen:
@@ -565,6 +559,220 @@ def _extract_from_grid_divs(soup) -> List[Dict[str, Any]]:
     return items
 
 
+_KNOWN_BRANDS = ["Uttermost", "Four Hands", "Bernhardt", "Rowe", "Loloi",
+                 "Visual Comfort", "HVL", "Hudson Valley", "Gabby", "Bassett",
+                 "Surya", "Safavieh", "Regina Andrew", "Global Views", "V and H",
+                 "Flow Decor", "Crestview", "Eichholtz", "MOH", "Phillip Jeffries",
+                 "York", "Classic Home", "Kasmir"]
+
+
+def _brand_from_text(text: Optional[str]) -> Optional[str]:
+    if not text:
+        return None
+    low = text.lower()
+    for candidate in _KNOWN_BRANDS:
+        if candidate.lower() in low:
+            return candidate
+    return None
+
+
+def _sku_from_text(text: Optional[str]) -> Optional[str]:
+    """Pull a SKU/model out of a name/description, eg 'Milton Road Pendant (TOB5158)'."""
+    if not text:
+        return None
+    m = re.search(r"\(([A-Z]{1,5}[-\s]?\d{3,}[A-Z0-9./-]*)\)", text)
+    if m:
+        return m.group(1)
+    m = re.search(r"\b(?:sku|model|item)\b\s*#?\s*[:\-]?\s*([A-Z0-9][A-Z0-9./-]{3,})", text, re.I)
+    if m:
+        return m.group(1)
+    return None
+
+
+def _real_img_src(el) -> Optional[str]:
+    """First product image inside `el`, skipping logos / tracking pixels / data URIs."""
+    if el is None:
+        return None
+    for img in el.find_all("img"):
+        src = img.get("src") or img.get("data-src") or ""
+        if not src.startswith("http"):
+            continue
+        if any(bad in src for bad in ("company_logo", "/js/log", "logo", "avatar", "1x1")):
+            continue
+        return src
+    return None
+
+
+def _extract_vt_rows(soup) -> List[Dict[str, Any]]:
+    """
+    PRIMARY extractor for pro.houzz.com virtual tables (estimates, proposals,
+    purchase documents — both /preview and /edit views).
+
+    Houzz renders line items as `div.tr.vt-row` with SEMANTIC column classes:
+        vt-group-row              -> room/section header ("1 SCULLERY … $13,424.10")
+        vt-item-row / item rows   -> auto-number-column, item-details-column,
+                                     quantity-column, cost-column, total-column
+    Preview views keep data as text (`.print-item-name`, `.print-item-note`,
+    `.item-extra-info-pair`). Edit views keep data in <input value="…"> fields
+    identified by data-testid / placeholder ("Add SKU", "Add a manufacturer",
+    "Add a color", "Add dimensions", "Add materials", "Add Room").
+    """
+    rows = soup.select("div.tr.vt-row")
+    if not rows:
+        return []
+
+    raw: List[Dict[str, Any]] = []
+    current_group: Optional[str] = None
+
+    for r in rows:
+        classes = r.get("class") or []
+        if "vt-group-row" in classes:
+            # "1 SCULLERY $0.00 $0.00 $13,424.10" -> "SCULLERY"
+            t = _text(r)
+            t = re.sub(r"^\s*\d+(\.\d+)?\s+", "", t)
+            t = re.sub(r"(\s*\$[\d,\.]+)+\s*$", "", t).strip()
+            current_group = t or current_group
+            continue
+
+        item: Dict[str, Any] = {"room_name": current_group}
+
+        num_el = r.select_one('[class*="auto-number-column"]')
+        item["row_number"] = _text(num_el) or None
+
+        details = r.select_one('[class*="item-details-column"]')
+
+        # ---- 1. Text-based fields (preview views) --------------------------
+        name_el = details.select_one(".print-item-name") if details else None
+        if name_el is not None:
+            item["name"] = _text(name_el) or None
+        note_el = details.select_one(".print-item-note") if details else None
+        if note_el is not None:
+            item["description"] = _text(note_el)[:500] or None
+        if details is not None:
+            for pair in details.select(".item-extra-info-pair"):
+                pt = _text(pair)
+                m = re.match(r"^\s*(room|color|colour|finish|dimensions?|size|sku|manufacturer|brand|materials?)\s*:\s*(.+)$", pt, re.I)
+                if not m:
+                    continue
+                key, val = m.group(1).lower(), m.group(2).strip()
+                if key == "room" and val:
+                    item["room_name"] = val
+                elif key in ("color", "colour", "finish"):
+                    item["finish_color"] = val
+                elif key in ("dimensions", "dimension", "size"):
+                    item["dimensions"] = val
+                elif key == "sku":
+                    item["sku"] = val
+                elif key in ("manufacturer", "brand"):
+                    item["brand"] = val
+                elif key in ("materials", "material"):
+                    item["materials"] = val
+
+        # ---- 2. Input-based fields (edit views + qty everywhere) -----------
+        for inp in r.find_all("input"):
+            val = (inp.get("value") or "").strip()
+            if not val:
+                continue
+            tid = (inp.get("data-testid") or "").strip()
+            ph = (inp.get("placeholder") or "").strip().lower()
+            if tid == "itemName" and not item.get("name"):
+                item["name"] = val
+            elif tid == "quantity":
+                item["quantity"] = _parse_qty(val)
+            elif tid == "UnitType" and val.lower() not in ("add unit type",):
+                item["unit_type"] = val
+            elif tid in ("materialCost", "laborCost", "unitCost"):
+                item["unit_cost"] = _parse_money(val)
+            elif ph == "add sku":
+                item["sku"] = val
+            elif ph == "add a manufacturer":
+                item["brand"] = val
+            elif ph == "add a color":
+                item["finish_color"] = val
+            elif ph == "add dimensions":
+                item["dimensions"] = val
+            elif ph == "add materials":
+                item["materials"] = val
+            elif ph == "add room":
+                item["room_name"] = val
+
+        # ---- 3. Money columns ----------------------------------------------
+        total_el = r.select_one('[class*="total-column"]')
+        item["extended_price"] = _parse_money(_text(total_el))
+        cost_el = r.select_one('[class*="cost-column"]:not([class*="shipping"])')
+        cost_val = _parse_money(_text(cost_el))
+        if cost_val:
+            item.setdefault("unit_cost", cost_val)
+
+        # ---- 4. Image / link -------------------------------------------------
+        item["image_url"] = _real_img_src(details if details is not None else r)
+        item["source_url"] = _first_a(details if details is not None else r)
+
+        # ---- 5. Derived fields ----------------------------------------------
+        if not item.get("name") and details is not None:
+            # last resort: cell text minus placeholder phrases
+            t = re.sub(r"add a description|no status|\d+\s*link[s]?", "", _text(details), flags=re.I).strip()
+            item["name"] = t[:150] or None
+
+        if not item.get("sku"):
+            item["sku"] = _sku_from_text((item.get("name") or "") + " " + (item.get("description") or ""))
+        if not item.get("brand"):
+            item["brand"] = _brand_from_text((item.get("name") or "") + " " + (item.get("description") or ""))
+
+        # unit price from total/qty when missing
+        q = item.get("quantity")
+        ext = item.get("extended_price")
+        if item.get("unit_price") is None and q and ext:
+            item["unit_price"] = round(ext / q, 2)
+        elif item.get("unit_price") is None and ext and not q:
+            item["quantity"] = 1
+            item["unit_price"] = ext
+
+        raw.append(item)
+
+    # ---- Parent/child folding (purchase documents) --------------------------
+    # Edit views number deliverables "1", "2"… and their component/spec rows
+    # "1.1", "2.1"…  The component row carries SKU/brand/color/dims; the parent
+    # carries the display name + room. Merge them so nothing is lost and
+    # nothing is double-counted.
+    by_number = {it.get("row_number"): it for it in raw if it.get("row_number")}
+    has_children = set()
+    for it in raw:
+        rn = it.get("row_number") or ""
+        m = re.match(r"^(\d+)\.\d+$", rn)
+        if m and m.group(1) in by_number:
+            has_children.add(m.group(1))
+
+    items: List[Dict[str, Any]] = []
+    for it in raw:
+        rn = it.get("row_number") or ""
+        m = re.match(r"^(\d+)\.\d+$", rn)
+        parent = by_number.get(m.group(1)) if m else None
+        if parent is not None and parent.get("name"):
+            it["parent_name"] = parent["name"]
+            it["room_name"] = it.get("room_name") or parent.get("room_name")
+            if it.get("extended_price") is None:
+                it["extended_price"] = parent.get("extended_price")
+        # Skip parent wrappers whose $ totals are duplicated by their children
+        if re.match(r"^\d+$", rn) and rn in has_children:
+            continue
+        items.append(it)
+
+    # Notes: fold unit_type + materials into notes so they surface everywhere
+    for it in items:
+        bits = []
+        if it.get("unit_type"):
+            bits.append(f"Unit: {it['unit_type']}")
+        if it.get("materials"):
+            bits.append(f"Materials: {it['materials']}")
+        if it.get("parent_name"):
+            bits.append(f"For: {it['parent_name']}")
+        if bits:
+            it["notes"] = " | ".join(bits)
+
+    return items
+
+
 def _parse_houzz_html(html: str) -> Dict[str, Any]:
     """Server-side parser. Returns dict with items + top-level totals + meta."""
     from bs4 import BeautifulSoup
@@ -576,34 +784,38 @@ def _parse_houzz_html(html: str) -> Dict[str, Any]:
 
     body_text = soup.get_text(" ", strip=True)
     meta: Dict[str, Any] = {}
-    m = re.search(r"(?:estimate|proposal|purchase\s*document|purchase\s*order|invoice)\s*#?\s*([A-Z0-9\-]{2,})", body_text, re.I)
+    # Document number MUST contain digits (eg "ES-400220") so we never mistake
+    # a client surname ("Diehl") for a document number.
+    m = re.search(r"(?:estimate|proposal|purchase\s*document|purchase\s*order|invoice|quote)\s*#?\s*((?=[A-Z0-9\-]*\d)[A-Z0-9\-]{3,})", body_text, re.I)
     if m:
         meta["proposal_number"] = m.group(1)
     m = re.search(r"(?:client|customer|bill(?:ed)?\s*to)\s*[:\-]?\s*([A-Z][A-Za-z\'\.\-\s,]{2,60})", body_text)
     if m:
         meta["client_name"] = m.group(1).strip()
 
-    # Totals — REQUIRE the money value to be $-prefixed OR clearly money-shaped
-    # (comma-thousands OR decimal cents). This prevents matching bare digits
-    # like "Total Uttermost Anmer 6-Light" -> 6.
-    _money_shape = r"\$\s*\d{1,3}(?:,\d{3})+(?:\.\d+)?|\$\s*\d+(?:\.\d+)?|\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+\.\d{2}"
+    # Totals — REQUIRE a $-prefixed amount so percentages ("Tax 7%") and bare
+    # digits never leak into money fields.
+    _money_shape = r"\$\s*\d{1,3}(?:,\d{3})*(?:\.\d+)?"
     def _grep_money(pattern: str):
-        m = re.search(pattern, body_text, re.I)
-        return _parse_money(m.group(0)) if m else None
-    # For each total, insist on a "$" or clearly-formatted number within a
-    # short window AFTER the label; also require the label to be at a word
-    # boundary so "Subtotal" doesn't inadvertently match "total".
+        """All label→$ matches; return the LARGEST (column headers often show $0.00)."""
+        vals = [_parse_money(g) for g in re.findall(pattern, body_text, re.I)]
+        vals = [v for v in vals if v is not None]
+        return max(vals) if vals else None
     meta["subtotal"] = _grep_money(r"\bsubtotal\b[^\n]{0,30}?(" + _money_shape + r")")
-    meta["tax"] = _grep_money(r"(?<!sub)\btax\b[^\n]{0,30}?(" + _money_shape + r")")
+    meta["tax"] = _grep_money(r"(?<!sub)\btax\b(?:\s*\([^)]*\))?[^\n]{0,30}?(" + _money_shape + r")")
     meta["total"] = _grep_money(r"(?:\bgrand\s*)?\btotal\b(?!\s*(?:cost|price|column))[^\n]{0,30}?(" + _money_shape + r")")
 
-    # Table-based extraction wins if we find a good table
-    best: List[Dict[str, Any]] = []
-    for table in soup.find_all("table"):
-        items = _extract_from_table(table)
-        if len(items) > len(best):
-            best = items
+    # STRATEGY 1 (primary): Houzz pro virtual-table rows — semantic classes.
+    best: List[Dict[str, Any]] = _extract_vt_rows(soup)
 
+    # STRATEGY 2: semantic <table> extraction.
+    if not best:
+        for table in soup.find_all("table"):
+            items = _extract_from_table(table)
+            if len(items) > len(best):
+                best = items
+
+    # STRATEGY 3: repeated-div heuristics.
     if not best:
         best = _extract_from_grid_divs(soup)
 
@@ -821,16 +1033,63 @@ async def list_sessions(project_id: Optional[str] = None, limit: int = 25):
 class CommitRequest(BaseModel):
     session_id: str
     project_id: str
-    target: str = "items"       # "items" (spreadsheet) | "purchase_order"
+    target: str = "checklist"   # "checklist" (spreadsheet) | "purchase_order" | legacy alias "items"
     room_id: Optional[str] = None
     po_status: str = "pending"  # only when target = purchase_order
+    default_room_name: Optional[str] = None   # room for items without a Houzz room
+    category_name: str = "FF&E"               # checklist category items are filed under
+    room_overrides: Optional[Dict[str, str]] = None  # {item_index: room_name} from review screen
+
+
+async def _find_or_create_checklist_slot(db, project_id: str, room_name: str, category_name: str) -> Tuple[str, str]:
+    """Room -> Category -> Subcategory for the checklist sheet. Returns (room_id, subcategory_id)."""
+    now = datetime.now(timezone.utc).isoformat()
+    room_name = (room_name or "HOUZZ IMPORT").strip().upper()
+
+    room = await db.rooms.find_one({
+        "project_id": project_id, "sheet_type": "checklist",
+        "name": {"$regex": f"^{re.escape(room_name)}$", "$options": "i"},
+    })
+    if not room:
+        room = {
+            "id": str(uuid.uuid4()), "project_id": project_id, "name": room_name,
+            "sheet_type": "checklist", "description": "", "order_index": 999,
+            "color": "#7A5A8A", "notes": "", "floor": "1st Floor",
+            "created_at": now, "updated_at": now,
+        }
+        await db.rooms.insert_one(room)
+
+    cat = await db.categories.find_one({
+        "room_id": room["id"],
+        "name": {"$regex": f"^{re.escape(category_name)}$", "$options": "i"},
+    })
+    if not cat:
+        cat = {
+            "id": str(uuid.uuid4()), "room_id": room["id"], "name": category_name.upper(),
+            "description": "", "order_index": 0, "color": "#5A7A5A",
+            "created_at": now, "updated_at": now,
+        }
+        await db.categories.insert_one(cat)
+
+    sub = await db.subcategories.find_one({"category_id": cat["id"]})
+    if not sub:
+        sub = {
+            "id": str(uuid.uuid4()), "category_id": cat["id"], "name": "HOUZZ IMPORT",
+            "description": "", "order_index": 0, "color": "#8A5A5A",
+            "created_at": now, "updated_at": now,
+        }
+        await db.subcategories.insert_one(sub)
+    return room["id"], sub["id"]
 
 
 @router.post("/commit")
 async def commit_session(payload: CommitRequest):
     """
     Take a resolved import session and push items into either:
-      - the project's items spreadsheet (target='items')
+      - the project's CHECKLIST spreadsheet (target='checklist' / legacy 'items')
+        -> rooms auto-created from the Houzz room groupings, every item filed
+           under Room -> {category_name} -> HOUZZ IMPORT with its manufacturer
+           link (approved B2B domains ONLY — never a retail URL).
       - a new Purchase Order draft (target='purchase_order')
     """
     db = _get_db()
@@ -849,7 +1108,7 @@ async def commit_session(payload: CommitRequest):
             "project_id": payload.project_id,
             "houzz_url": doc.get("houzz_url"),
             "po_number": doc.get("proposal_number") or f"HZ-{doc.get('session_id','')[:6].upper()}",
-            "vendor": items[0].get("brand") if items else "Houzz",
+            "vendor": next((it.get("brand") for it in items if it.get("brand")), "Houzz"),
             "line_items": items,
             "subtotal": doc.get("subtotal"),
             "tax": doc.get("tax"),
@@ -873,41 +1132,66 @@ async def commit_session(payload: CommitRequest):
         )
         return {"ok": True, "purchase_order_id": po_id, "line_count": len(items)}
 
-    # target == "items" (default): push to spreadsheet
+    # target == "checklist" (or legacy "items"): push into the checklist sheet
+    overrides = payload.room_overrides or {}
+    subcat_cache: Dict[str, Tuple[str, str]] = {}
     inserted = []
-    for it in items:
+    rooms_used: set = set()
+    for idx, it in enumerate(items):
+        room_name = (
+            overrides.get(str(idx))
+            or it.get("room_name")
+            or payload.default_room_name
+            or "HOUZZ IMPORT"
+        )
+        cache_key = room_name.strip().upper()
+        if cache_key not in subcat_cache:
+            subcat_cache[cache_key] = await _find_or_create_checklist_slot(
+                db, payload.project_id, room_name, payload.category_name
+            )
+        rooms_used.add(cache_key)
+        room_id, subcat_id = subcat_cache[cache_key]
+
+        qty = it.get("quantity")
+        note_bits = [b for b in [it.get("notes"),
+                                 f"Houzz #{doc.get('proposal_number')}" if doc.get("proposal_number") else None] if b]
         item_doc = {
             "id": str(uuid.uuid4()),
+            "subcategory_id": subcat_id,
+            "room_id": room_id,
             "project_id": payload.project_id,
-            "room_id": payload.room_id,
-            "name": it.get("name") or it.get("description"),
-            "vendor": it.get("brand"),
-            "sku": it.get("sku"),
-            "link": it.get("manufacturer_link") or it.get("source_url"),
-            "manufacturer_link": it.get("manufacturer_link"),
+            "name": it.get("name") or it.get("description") or "Unknown Product",
+            "vendor": it.get("brand") or "",
+            "sku": it.get("sku") or "",
+            # STRICT: link is the manufacturer link ONLY (21 approved B2B
+            # domains). Retail URLs from Houzz are kept in a separate field
+            # for reference and are NEVER used as the item link.
+            "link": it.get("manufacturer_link") or "",
             "houzz_source_url": it.get("source_url"),
-            "image_url": it.get("image_url"),
-            "size": it.get("dimensions"),
-            "finish_color": it.get("finish_color"),
-            "quantity": it.get("quantity") or 1,
-            "cost": it.get("unit_cost"),
-            "price": it.get("unit_price"),
-            "extended_price": it.get("extended_price"),
-            "description": it.get("description"),
-            "category": it.get("category"),
-            "notes": it.get("notes"),
+            "image_url": it.get("image_url") or "",
+            "size": it.get("dimensions") or "",
+            "finish_color": it.get("finish_color") or "",
+            "quantity": int(round(qty)) if qty else 1,
+            "cost": it.get("unit_cost") or it.get("unit_price") or 0.0,
+            "price": it.get("unit_price") or 0.0,
+            "description": it.get("description") or "",
+            "remarks": "",
+            "status": "",
+            "notes": " | ".join(note_bits),
             "source": "houzz_proposal_import",
             "source_session_id": payload.session_id,
             "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         await db.items.insert_one(item_doc)
         inserted.append(item_doc["id"])
 
     await db.houzz_import_sessions.update_one(
         {"session_id": payload.session_id},
-        {"$set": {"committed": True, "committed_to": "items", "committed_ids": inserted}},
+        {"$set": {"committed": True, "committed_to": "checklist", "committed_ids": inserted}},
     )
-    return {"ok": True, "inserted_item_ids": inserted, "count": len(inserted)}
+    return {"ok": True, "inserted_item_ids": inserted, "count": len(inserted),
+            "rooms": sorted(rooms_used)}
 
 
 @router.delete("/import-session/{session_id}")

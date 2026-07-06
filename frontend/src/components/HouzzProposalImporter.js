@@ -26,16 +26,44 @@ const currency = (v) => v == null ? '—' : '$' + Number(v).toLocaleString(undef
  * Alt path: user uploads a Houzz proposal PDF; we call
  * /api/houzz/proposal-import-pdf and land at the same review screen.
  */
-const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onImportedToItems }) => {
+const HouzzProposalImporter = ({ projectId, roomId, defaultTarget, onClose, onImportedToPO, onImportedToItems }) => {
   const [houzzUrl, setHouzzUrl] = useState('');
   const [phase, setPhase] = useState('input');  // input | waiting | review | committing | done
   const [session, setSession] = useState(null);
   const [error, setError] = useState(null);
-  const [target, setTarget] = useState('purchase_order');
+  const [target, setTarget] = useState(defaultTarget || 'purchase_order');
   const [poStatus, setPoStatus] = useState('pending');
   const [coordinator, setCoordinator] = useState(null);
+  const [roomEdits, setRoomEdits] = useState({});   // {itemIndex: roomName}
+  const [doneInfo, setDoneInfo] = useState(null);
 
   const sessionId = React.useMemo(() => `hz_${Math.random().toString(36).slice(2, 12)}`, []);
+  const [recentSessions, setRecentSessions] = useState([]);
+
+  useEffect(() => {
+    // Show previously captured Houzz sessions so users can import without re-scraping
+    axios.get(`${API_BASE}/houzz/import-sessions?limit=5`)
+      .then(r => setRecentSessions((r.data || []).filter(s => s.item_count > 0)))
+      .catch(() => {});
+  }, []);
+
+  const openExistingSession = async (sid) => {
+    setError(null);
+    try {
+      // Re-parse with the latest parser so old captures get the newest extraction
+      const r = await axios.post(`${API_BASE}/houzz/reparse/${sid}`);
+      setSession(r.data);
+      setPhase('review');
+    } catch (e) {
+      try {
+        const r2 = await axios.get(`${API_BASE}/houzz/import-session/${sid}`);
+        setSession(r2.data);
+        setPhase('review');
+      } catch (e2) {
+        setError('Could not load that capture: ' + (e2.response?.data?.detail || e2.message));
+      }
+    }
+  };
 
   const cleanUrl = (u) => {
     try {
@@ -142,13 +170,14 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
         room_id: roomId || null,
         target: target,
         po_status: poStatus,
+        room_overrides: roomEdits,
       });
+      setDoneInfo(r.data);
       setPhase('done');
       toast.success(target === 'purchase_order'
         ? `Purchase Order ${r.data.purchase_order_id} created (${r.data.line_count} items)`
-        : `${r.data.count} items added to spreadsheet`);
+        : `${r.data.count} items added to Checklist (${(r.data.rooms || []).length} room${(r.data.rooms || []).length === 1 ? '' : 's'})`);
       if (target === 'purchase_order' && onImportedToPO) onImportedToPO(r.data.purchase_order_id);
-      if (target === 'items' && onImportedToItems) onImportedToItems(r.data.inserted_item_ids);
     } catch (err) {
       setError(err.response?.data?.detail || err.message);
       setPhase('review');
@@ -199,6 +228,26 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
 
               <div className="text-center text-stone-500 text-xs">— or —</div>
 
+              {recentSessions.length > 0 && (
+                <div className="bg-stone-900/40 border border-[#B49B7E]/30 rounded-lg p-4 space-y-2" data-testid="houzz-recent-captures">
+                  <div className="text-sm font-bold text-[#B49B7E]">Recent Houzz captures — import without re-scraping</div>
+                  {recentSessions.map((s) => (
+                    <div key={s.session_id} className="flex items-center justify-between gap-3 bg-black/30 border border-stone-800 rounded px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-xs text-white truncate">{s.proposal_number ? `#${s.proposal_number}` : s.kind} · {s.item_count} items</div>
+                        <div className="text-[10px] text-stone-500 truncate">{s.houzz_url}</div>
+                      </div>
+                      <button
+                        data-testid={`houzz-open-session-${s.session_id}`}
+                        onClick={() => openExistingSession(s.session_id)}
+                        className="text-xs bg-[#B49B7E] hover:bg-[#D4C5A9] text-black font-bold px-3 py-1.5 rounded whitespace-nowrap">
+                        Review &amp; Import
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <label data-testid="houzz-pdf-upload-label" className="flex flex-col items-center gap-2 border-2 border-dashed border-[#B49B7E]/40 rounded-lg p-6 text-sm text-stone-300 hover:bg-stone-900/40 cursor-pointer">
                 <Package size={20} className="text-[#B49B7E]"/>
                 Upload a Houzz proposal PDF instead
@@ -241,9 +290,13 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
                 <table className="w-full text-sm">
                   <thead className="bg-stone-900/70 text-xs uppercase text-stone-400 sticky top-0">
                     <tr>
+                      <th className="text-left px-2 py-2">Img</th>
+                      <th className="text-left px-3 py-2">Room</th>
                       <th className="text-left px-3 py-2">Item</th>
                       <th className="text-left px-3 py-2">Brand</th>
                       <th className="text-left px-3 py-2">SKU</th>
+                      <th className="text-left px-3 py-2">Finish/Color</th>
+                      <th className="text-left px-3 py-2">Size</th>
                       <th className="text-right px-3 py-2">Qty</th>
                       <th className="text-right px-3 py-2">Unit</th>
                       <th className="text-right px-3 py-2">Ext.</th>
@@ -253,13 +306,32 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
                   <tbody className="text-stone-200">
                     {(session.items || []).map((it, idx) => (
                       <tr key={idx} className="border-t border-stone-800" data-testid={`houzz-item-preview-${idx}`}>
+                        <td className="px-2 py-2">
+                          {it.image_url ? (
+                            <img src={it.image_url} alt="" className="w-10 h-10 object-cover rounded border border-stone-700" />
+                          ) : (
+                            <div className="w-10 h-10 rounded bg-stone-800 border border-stone-700 flex items-center justify-center text-stone-600 text-[9px]">no img</div>
+                          )}
+                        </td>
+                        <td className="px-3 py-2">
+                          <input
+                            data-testid={`houzz-item-room-input-${idx}`}
+                            className="bg-black/40 border border-stone-700 rounded px-2 py-1 text-xs text-white w-28"
+                            value={roomEdits[idx] !== undefined ? roomEdits[idx] : (it.room_name || '')}
+                            placeholder="Room…"
+                            onChange={(e) => setRoomEdits(prev => ({ ...prev, [idx]: e.target.value }))}
+                          />
+                        </td>
                         <td className="px-3 py-2">
                           <div className="font-medium">{it.name || '—'}</div>
-                          {it.dimensions && <div className="text-xs text-stone-400">{it.dimensions}</div>}
+                          {it.parent_name && <div className="text-xs text-stone-500">for: {it.parent_name}</div>}
+                          {it.materials && <div className="text-xs text-stone-400">{it.materials}</div>}
                         </td>
                         <td className="px-3 py-2">{it.brand || '—'}</td>
                         <td className="px-3 py-2 font-mono text-xs">{it.sku || '—'}</td>
-                        <td className="px-3 py-2 text-right">{it.quantity ?? '—'}</td>
+                        <td className="px-3 py-2 text-xs">{it.finish_color || '—'}</td>
+                        <td className="px-3 py-2 text-xs">{it.dimensions || '—'}</td>
+                        <td className="px-3 py-2 text-right">{it.quantity ?? '—'}{it.unit_type ? <span className="text-stone-500 text-xs"> {it.unit_type}</span> : ''}</td>
                         <td className="px-3 py-2 text-right">{currency(it.unit_price)}</td>
                         <td className="px-3 py-2 text-right font-semibold">{currency(it.extended_price)}</td>
                         <td className="px-3 py-2">
@@ -284,12 +356,12 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
                 <div className="text-sm font-bold text-[#B49B7E]">Send these items to…</div>
                 <div className="flex flex-wrap gap-3">
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input data-testid="target-po-radio" type="radio" name="tgt" checked={target === 'purchase_order'} onChange={() => setTarget('purchase_order')} />
-                    <span className="text-white text-sm">Create a Purchase Order</span>
+                    <input data-testid="target-checklist-radio" type="radio" name="tgt" checked={target === 'checklist'} onChange={() => setTarget('checklist')} />
+                    <span className="text-white text-sm">Add to Checklist <span className="text-stone-400 text-xs">(rooms auto-created, manufacturer links)</span></span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input data-testid="target-items-radio" type="radio" name="tgt" checked={target === 'items'} onChange={() => setTarget('items')} />
-                    <span className="text-white text-sm">Add to Project Spreadsheet</span>
+                    <input data-testid="target-po-radio" type="radio" name="tgt" checked={target === 'purchase_order'} onChange={() => setTarget('purchase_order')} />
+                    <span className="text-white text-sm">Create a Purchase Order</span>
                   </label>
                 </div>
                 {target === 'purchase_order' && (
@@ -308,7 +380,7 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
               <button data-testid="houzz-commit-btn" onClick={handleCommit}
                 className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2">
                 <ShoppingBag size={18}/>
-                {target === 'purchase_order' ? 'Create Purchase Order' : 'Add Items to Project'}
+                {target === 'purchase_order' ? 'Create Purchase Order' : 'Add Items to Checklist'}
               </button>
             </>
           )}
@@ -324,8 +396,19 @@ const HouzzProposalImporter = ({ projectId, roomId, onClose, onImportedToPO, onI
             <div className="py-12 text-center">
               <CheckCircle2 className="mx-auto mb-4 text-emerald-400" size={56}/>
               <div className="text-xl font-bold text-[#F5F5DC]">Imported!</div>
+              {doneInfo && doneInfo.count != null && (
+                <div className="text-sm text-emerald-300 mt-2">
+                  {doneInfo.count} items added to the Checklist
+                  {doneInfo.rooms && doneInfo.rooms.length > 0 && <> in: {doneInfo.rooms.join(', ')}</>}
+                </div>
+              )}
+              {doneInfo && doneInfo.purchase_order_id && (
+                <div className="text-sm text-emerald-300 mt-2">Purchase Order created ({doneInfo.line_count} lines)</div>
+              )}
               <div className="text-sm text-stone-400 mt-2">You can close this window now.</div>
-              <button data-testid="houzz-importer-done-btn" onClick={onClose} className="mt-4 bg-[#B49B7E] hover:bg-[#D4C5A9] text-black font-bold px-6 py-2 rounded-lg">Close</button>
+              <button data-testid="houzz-importer-done-btn"
+                onClick={() => { if (onImportedToItems && doneInfo?.count != null) onImportedToItems(doneInfo.inserted_item_ids); else onClose(); }}
+                className="mt-4 bg-[#B49B7E] hover:bg-[#D4C5A9] text-black font-bold px-6 py-2 rounded-lg">Close</button>
             </div>
           )}
         </div>

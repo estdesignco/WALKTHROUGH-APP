@@ -1,0 +1,22 @@
+{
+  "summary": "Iteration 60 – Verified NEW Houzz parser (vt-row semantic DOM) + separate Checklist vs Purchase Order commit paths. All 17 parser unit tests + 7 live reparse/commit/regression tests + all frontend UI checks passed. Real data from stored sessions hz_cgtfil6xyf (7-item estimate ES-400220, $116,563.06 / $124,722.46) and hz_gzl1npa1v3 (5 Kasmir fabric items) parses correctly. Manufacturer link rule respected: Milton Road Pendant → visualcomfort.com; all 5 Kasmir items → blank link (unapproved brand). Frontend: checklist banner button, importer modal, recent captures list, session buttons, review table with editable room inputs, target radios (pre-selected based on entry tab), and commit button label all render correctly. Committed data was cleaned up via /api/houzz/cleanup.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_houzz_reparse_and_commit.py",
+    "/app/backend/tests/test_houzz_parser.py",
+    "/app/test_reports/pytest/iter60_reparse.xml",
+    "/app/test_reports/pytest/iter60_parser.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Minor: houzz_import.py:140 uses deprecated Pydantic .dict() – switch to model_dump() (Pydantic V3 will remove)."
+  ],
+  "updated_files": ["/app/backend/tests/test_houzz_reparse_and_commit.py"],
+  "success_rate": {"backend": "100% (24/24)", "frontend": "100%"},
+  "test_credentials": "App password DesignReady2026! (used for frontend gate)",
+  "seed_data_creation": "Committed hz_gzl1npa1v3 (checklist) and hz_cgtfil6xyf (PO ES-400220) to project 650e5a59-b510-400a-b271-4d85baae3be3, then invoked POST /api/houzz/cleanup for both to restore clean first-run state.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "New parser (_extract_vt_rows in houzz_import.py) reads Houzz div.tr.vt-row semantic DOM plus <input value> in edit views. Two live stored sessions in db.houzz_raw_captures: hz_cgtfil6xyf (estimate, 7 items) and hz_gzl1npa1v3 (5 Kasmir fabric items). Checklist tab uses defaultTarget='checklist' with data-testid='checklist-import-houzz-btn'; PO tab uses 'po-import-houzz-btn'. /api/houzz/cleanup accepts {session_id, project_id, target} and undoes commits."
+}
