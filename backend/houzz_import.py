@@ -137,7 +137,7 @@ def _dedupe_and_validate(items: List["HouzzLineItem"]) -> List["HouzzLineItem"]:
     deleted the user's real items.
     """
     def fill_count(it: "HouzzLineItem") -> int:
-        return sum(1 for v in it.dict().values() if v not in (None, "", 0))
+        return sum(1 for v in it.model_dump().values() if v not in (None, "", 0))
 
     placeholder_re = re.compile(r"^\s*item(?:\s+\d+)?\s*$", re.I)
     totals_re = re.compile(

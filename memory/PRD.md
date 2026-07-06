@@ -2,7 +2,20 @@
 
 ## Architecture — React 18 + Three.js (@react-three/fiber v8) + Tailwind + FastAPI + MongoDB
 
-### Chrome Extension Download Visibility Fix (Jul 5, 2026) — NEW
+### Houzz vt-Table Parser Rewrite + Separate Checklist Import (Feb 2026) — NEW
+**P0 fix: user raged the Houzz import "doesn't read the lines" (9 items → 2 kept, 10 → 1) and that PO import + Checklist import were wrongly combined into one function.**
+- **Root cause:** old parser read Houzz outline numbers ("1.1", "2.2") as quantities, then a qty×unit≠ext math check silently deleted the real rows. Edit views keep all data in `<input value>` fields the old text-based parser never read.
+- **New primary parser `_extract_vt_rows()` (`houzz_import.py`):** reads Houzz Pro's semantic virtual-table DOM (`div.tr.vt-row`): `vt-group-row` → room names (SCULLERY, MAN CAVE); `auto-number-column` = row #; `.print-item-name`/`.print-item-note`/`.item-extra-info-pair` (preview views); `<input>` by data-testid/placeholder — quantity, materialCost, "Add SKU", "Add a manufacturer", "Add a color", "Add dimensions", "Add materials", "Add Room" (edit views). Parent/child folding for purchase docs (drape line "1" wrapper folded into fabric spec "1.1"). Unit price derived from total/qty. SKU regex from "(TOB5158)" patterns.
+- **Dedupe rewritten:** no more math-based row deletion; only drops placeholder/totals/empty-stub/duplicate rows.
+- **Meta fixed:** document # must contain digits; totals must be $-amounts (largest match wins) — ES-400220: subtotal $116,563.06, total $124,722.46 ✓.
+- **Two SEPARATE functions (user's explicit demand):**
+  1. **PO import** — Purchase Orders tab → "Import from Houzz" (`po-import-houzz-btn`), target defaults to `purchase_order`.
+  2. **Checklist import** — Checklist tab banner "Import from Houzz → Checklist" (`checklist-import-houzz-btn`), target defaults to `checklist`. Commit creates Room → FF&E → HOUZZ IMPORT hierarchy (rooms auto-created from Houzz room groupings, per-item room override inputs in review screen). `link` = manufacturer_link ONLY (21 approved B2B domains; blank when brand unapproved — NEVER retail).
+- **Review screen upgraded:** Img thumbnail, editable Room, Item, Brand, SKU, Finish/Color, Size, Qty (+unit type), Unit, Ext., Manufacturer columns. "Recent Houzz captures" list on input phase → re-parse + import stored sessions WITHOUT re-scraping (`/api/houzz/reparse/{sid}`).
+- **Verified against the user's two REAL stored captures** (db.houzz_raw_captures: hz_cgtfil6xyf estimate 7 items, hz_gzl1npa1v3 drapery PO 5 Kasmir fabric items). 17 regression tests in `tests/test_houzz_parser.py` (fixtures in `tests/fixtures/`). **iteration_60: 24/24 backend + 100% frontend PASS.** Test data cleaned up post-verification.
+- Known limitation: images absent in the 2 existing captures because Houzz lazy-load hadn't finished at capture time (extension shows loading dots). Parser extracts `img src` whenever present. Possible future v7.48: wait for `document-image-cell` images before capture.
+
+### Chrome Extension Download Visibility Fix (Jul 5, 2026)
 **User complained: "YOU DIDNT INCLUDE THE DOWNLOAD FOR THE SCRAPER!" Their extension was frozen at v7.41 while the app required v7.47. Download button existed only inside modals — invisible from main pages.**
 - New `GET /api/extension/version` endpoint (`server.py`) reads `/app/chrome-extension-scraper/manifest.json` at request time → returns `{version, description, download_url, filename}`. No more hardcoded version in frontend.
 - New reusable `frontend/src/components/ExtensionDownloadButton.js` with `default`, `compact`, and `banner` variants. Fetches `/api/extension/version` once on mount, renders an `<a>` to `/api/download/chrome-extension?v={ver}_{timestamp}`.
